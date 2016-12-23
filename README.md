@@ -6,9 +6,11 @@ Rendact is a modern React CMS built as a single page, progressive web app with t
 
 ### Installing
 
-`git clone git@github.com:rendact/rendact.git`
-`cd rendact`
-`npm install`
+```
+git clone git@github.com:rendact/rendact.git
+cd rendact
+npm install
+```
 
 ### Developing
 
