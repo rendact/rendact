@@ -1,0 +1,20 @@
+{
+  "name": "rendact",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "bootstrap": "^4.0.0-alpha.5",
+    "react-scripts": "0.8.4",
+    "sw-precache": "^4.2.3"
+  },
+  "dependencies": {
+    "react": "^15.4.1",
+    "react-dom": "^15.4.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build && sw-precache --root='build/' --static-file-globs='build/**/!(*map*)' --navigate-fallback='index.html'",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
