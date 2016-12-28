@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "bootstrap": "^4.0.0-alpha.5",
     "react-scripts": "0.8.4",
     "sw-precache": "^4.2.3"
   },
   "dependencies": {
+    "bootstrap": "^4.0.0-alpha.5",
     "react": "^15.4.1",
-    "react-dom": "^15.4.1"
+    "react-dom": "^15.4.1",
+    "react-router": "^4.0.0-alpha.6",
   },
   "scripts": {
     "start": "react-scripts start",
