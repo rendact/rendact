@@ -1,3 +1,7 @@
 h2 {
 	color: purple;
 }
+
+.layout-home > .container {
+	padding-top: 60px;
+}

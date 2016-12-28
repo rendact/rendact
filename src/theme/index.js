@@ -1,9 +1,13 @@
 import './index.css'
 
 import React from 'react'
+
 import Home from './layouts/Home';
 import Page from './layouts/Page';
 import Post from './layouts/Post';
+
+// eslint-disable-next-line
+import Bootstrap from 'bootstrap/dist/css/bootstrap.css'
 
 const Theme = React.createClass({
 	getDefaultProps: function() {

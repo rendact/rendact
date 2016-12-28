@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
+    "react-bootstrap": "^0.30.7",
     "react-scripts": "0.8.4",
     "sw-precache": "^4.2.3"
   },
