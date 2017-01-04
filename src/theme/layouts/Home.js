@@ -1,11 +1,12 @@
 import './Home.css';
 import React from 'react'
-import { graphql } from 'react-apollo';
+import {graphql} from 'react-apollo';
 import gql from 'graphql-tag';
 import Header from '../includes/Header'
 import Footer from '../includes/Footer'
 
-const postQuery = gql`
+// This is for example. Later separate data hooks from theme..
+const postQuery = gql `
   query GetPosts{
     viewer {
       allPosts {
@@ -25,19 +26,18 @@ class Posts extends React.Component {
 	render() {
 		if (this.props.data.viewer) {
 			return (
-			<div>
-			<ul>
-			{this.props.data.viewer.allPosts.edges.map(function(item){
-				return <li key={item.node.title}>
-				<h2>{item.node.title}</h2>
-				<p>{item.node.content}</p>
-				</li>
-			})}
-			</ul>
-			</div>
+				<div>
+					<ul>
+						{this.props.data.viewer.allPosts.edges.map(function(item) {
+							return <li key={item.node.title}>
+								<h2>{item.node.title}</h2>
+								<p>{item.node.content}</p>
+							</li>
+						})}
+					</ul>
+				</div>
 			)
-		}
-		else 
+		} else
 			return <div></div>
 	}
 

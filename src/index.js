@@ -1,6 +1,6 @@
 import React from 'react'
 import {render} from 'react-dom'
-import { ApolloProvider } from 'react-apollo';
+import {ApolloProvider} from 'react-apollo';
 import {BrowserRouter, Match, Miss} from 'react-router'
 import client from './apollo';
 import Theme from './theme';
@@ -8,11 +8,11 @@ import Admin from './admin'
 
 render((
 	<ApolloProvider client={client}>
-	    <BrowserRouter>
+		<BrowserRouter>
 			<div id="router">
 				<Match pattern="/admin/:a?/:b?/:c?/:d?/:e?/:f?/:g?/:h?/:i?/:j?" component={Admin}/>
 				<Miss component={Theme}/>
 			</div>
 		</BrowserRouter>
-  </ApolloProvider>
+	</ApolloProvider>
 ), document.getElementById('root'))
