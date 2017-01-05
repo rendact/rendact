@@ -9,7 +9,7 @@ import Admin from './admin'
 render((
 	<ApolloProvider client={client}>
 		<BrowserRouter>
-			<div id="router">
+			<div id="router" style={{height: "100%"}}>
 				<Match pattern="/admin/:a?/:b?/:c?/:d?/:e?/:f?/:g?/:h?/:i?/:j?" component={Admin}/>
 				<Miss component={Theme}/>
 			</div>
