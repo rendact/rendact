@@ -1,11 +1,15 @@
-//import './index.css';
+import React from 'react';
+import $ from 'jquery';
+window.jQuery = $;
+window.$ = $;
+
 import '../../public/css/bootstrap.min.css';
 import '../../public/css/ionicons.min.css';
 import '../../public/css/AdminLTE.min.css';
 import '../../public/css/skins/_all-skins.min.css';
 
-import React from 'react'
-//import Dashboard from './views/Dashboard';
+require ('../../public/js/jquery-ui.min.js');
+require ('../../public/js/app.min.js');
 
 class SideMenu extends React.Component {
 	render() {
@@ -14,7 +18,7 @@ class SideMenu extends React.Component {
 			    <section className="sidebar">
 			      <div className="user-panel">
 			        <div className="pull-left image">
-			          <img src="../../images/user2-160x160.jpg" className="img-circle" alt="User Image" />
+			          <img src="../../images/user2-160x160.jpg" className="img-circle" alt="User" />
 			        </div>
 			        <div className="pull-left info">
 			          <p>Alexander Pierce</p>
@@ -107,7 +111,7 @@ class SideMenu extends React.Component {
 }
 
 var fullHeight = {
-	height: "100%"
+	height: '100%'
 }
 
 const Admin = React.createClass({
@@ -137,7 +141,7 @@ const Admin = React.createClass({
 					        <small>Control panel</small>
 					      </h1>
 					      <ol className="breadcrumb">
-					        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+					        <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
 					        <li className="active">Dashboard</li>
 					      </ol>
 					    </section>
