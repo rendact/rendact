@@ -7,6 +7,14 @@ import '../../public/css/bootstrap.min.css';
 import '../../public/css/ionicons.min.css';
 import '../../public/css/AdminLTE.min.css';
 import '../../public/css/skins/_all-skins.min.css';
+import Dashboard from './Dashboard';
+import Settings from './Settings';
+import Posts from './Posts';
+import Pages from './Pages';
+import Themes from './Themes';
+import NewPost from './NewPost';
+import NewPage from './NewPage';
+import NewTheme from './NewTheme';
 
 require ('../../public/js/jquery-ui.min.js');
 require ('../../public/js/app.min.js');
@@ -18,7 +26,7 @@ class SideMenu extends React.Component {
 			    <section className="sidebar">
 			      <div className="user-panel">
 			        <div className="pull-left image">
-			          <img src="../../images/user2-160x160.jpg" className="img-circle" alt="User" />
+			          <img src="../../images/avatar-default.png" className="img-circle" alt="User" />
 			        </div>
 			        <div className="pull-left info">
 			          <p>Alexander Pierce</p>
@@ -36,14 +44,11 @@ class SideMenu extends React.Component {
 			      </form>
 			      <ul className="sidebar-menu">
 			        <li className="active treeview">
-			          <a href="#">
+			          <a href="dashboard">
 			            <i className="fa fa-dashboard"></i> <span>Dashboard</span>
-			            <span className="pull-right-container">
-			              <i className="fa fa-angle-left pull-right"></i>
-			            </span>
 			          </a>
 			          <ul className="treeview-menu">
-			            <li className="active"><a href="#"><i className="fa fa-circle-o"></i> Settings</a></li>
+			            <li className="active"><a href="settings"><i className="fa fa-circle-o"></i> Settings</a></li>
 			            <li><a href="#"><i className="fa fa-circle-o"></i> Content Type</a></li>
 			          </ul>
 			        </li>
@@ -51,58 +56,45 @@ class SideMenu extends React.Component {
 			          <a href="#">
 			            <i className="fa fa-files-o"></i>
 			            <span>Posts</span>
-			            <span className="pull-right-container">
-			              <span className="label label-primary pull-right">4</span>
-			            </span>
 			          </a>
 			          <ul className="treeview-menu">
-			            <li><a href="#"><i className="fa fa-circle-o"></i> Add New</a></li>
-			            <li><a href="#"><i className="fa fa-circle-o"></i> List</a></li>
+			            <li><a href="new-post"><i className="fa fa-circle-o"></i> Add New</a></li>
+			            <li><a href="posts"><i className="fa fa-circle-o"></i> List</a></li>
 			            <li><a href="#"><i className="fa fa-circle-o"></i> Categories</a></li>
 			          </ul>
 			        </li>
 			        <li className="treeview">
 			          <a href="#">
 			            <i className="fa fa-th"></i> <span>Pages</span>
-			            <span className="pull-right-container">
-			              <small className="label pull-right bg-green">new</small>
-			            </span>
 			          </a>
 			          <ul className="treeview-menu">
-			            <li><a href="#"><i className="fa fa-circle-o"></i> Add New</a></li>
-			            <li><a href="#"><i className="fa fa-circle-o"></i> List</a></li>
+			            <li><a href="new-page"><i className="fa fa-circle-o"></i> Add New</a></li>
+			            <li><a href="pages"><i className="fa fa-circle-o"></i> List</a></li>
 			          </ul>
 			        </li>
 			        <li className="treeview">
 			          <a href="#">
 			            <i className="fa fa-pie-chart"></i>
 			            <span>Themes</span>
-			            <span className="pull-right-container">
-			              <i className="fa fa-angle-left pull-right"></i>
-			            </span>
 			          </a>
 			          <ul className="treeview-menu">
-			            <li><a href="#"><i className="fa fa-circle-o"></i> Install</a></li>
-			            <li><a href="#"><i className="fa fa-circle-o"></i> Configure</a></li>
+			            <li><a href="new-theme"><i className="fa fa-circle-o"></i> Install</a></li>
+			            <li><a href="themes"><i className="fa fa-circle-o"></i> Configure</a></li>
 			          </ul>
 			        </li>
 			        <li className="treeview">
 			          <a href="#">
 			            <i className="fa fa-laptop"></i>
 			            <span>Plugins</span>
-			            <span className="pull-right-container">
-			              <i className="fa fa-angle-left pull-right"></i>
-			            </span>
 			          </a>
 			          <ul className="treeview-menu">
 			            <li><a href="#"><i className="fa fa-circle-o"></i> Install</a></li>
 			            <li><a href="#"><i className="fa fa-circle-o"></i> Configure</a></li>
 			          </ul>
 			        </li>
-			        <li className="header">LABELS</li>
-			        <li><a href="#"><i className="fa fa-circle-o text-red"></i> <span>Important</span></a></li>
-			        <li><a href="#"><i className="fa fa-circle-o text-yellow"></i> <span>Warning</span></a></li>
-			        <li><a href="#"><i className="fa fa-circle-o text-aqua"></i> <span>Information</span></a></li>
+			        <li className="header">HELP</li>
+			        <li><a href="#"><i className="fa fa-circle-o text-red"></i> <span>F.A.Q</span></a></li>
+			        <li><a href="#"><i className="fa fa-circle-o text-yellow"></i> <span>RendactWiki</span></a></li>
 			      </ul>
 			    </section>
 			  </aside>
@@ -114,41 +106,49 @@ var fullHeight = {
 	height: '100%'
 }
 
+class PageLoader extends React.Component{
+	render() {
+		var map = {
+			'dashboard' : <Dashboard />,
+			'settings' : <Settings />,
+			'posts' : <Posts />,
+			'pages' : <Pages />,
+			'themes' : <Themes />,
+			'new-post' : <NewPost />,
+			'new-page' : <NewPage />,
+			'new-theme' : <NewTheme />
+		}
+
+		return map[this.props.pageId]
+	}
+}
+
+
 const Admin = React.createClass({
 	// router params @ this.props.params
 	getDefaultProps: function() {},
 	getInitialState: function() {
-		console.log(this.props.params);
+		if (this.props.params['page']==null)
+			this.props.params['page'] = 'dashboard';
+		
 		return this.props.params;
 		// Query if params match page and pass to switch below..
 		// ie. return {page: "Plugins"};
 	},
 	render: function() {
 		// switch (this.state.layout) or similar
+		console.log(this.props.params);
 		return (
 			<div className="hold-transition skin-blue sidebar-mini" style={fullHeight}>
 				<div className="wrapper" style={fullHeight}>
 	        		<header className="main-header">
 	    				<nav className="navbar navbar-static-top">
-		        		Hello
+		        		
 		        		</nav>
 	  				</header>
 	  				<SideMenu/>
-	  				<div className="content-wrapper" style={fullHeight}>
-					    <section className="content-header">
-					      <h1>
-					        Dashboard
-					        <small>Control panel</small>
-					      </h1>
-					      <ol className="breadcrumb">
-					        <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-					        <li className="active">Dashboard</li>
-					      </ol>
-					    </section>
-
-					    <section className="content">
-					    </section>
-					</div>
+	  				
+					<PageLoader pageId={this.props.params.page} />
 	            </div>
 	        </div>
 		);
