@@ -1,23 +1,25 @@
 import React from 'react';
-import $ from 'jquery';
-window.jQuery = $;
-window.$ = $;
+import './lib/app.min.js';
+
+import 'jquery-ui/themes/base/core.css';
+import 'jquery-ui/themes/base/theme.css';
+import 'jquery-ui/themes/base/tooltip.css';
+import 'jquery-ui/ui/core';
+import 'jquery-ui/ui/widgets/tooltip';
 
 import '../../public/css/bootstrap.min.css';
 import '../../public/css/ionicons.min.css';
-import '../../public/css/AdminLTE.min.css';
+import '../../public/css/AdminLTE.css';
 import '../../public/css/skins/_all-skins.min.css';
-import Dashboard from './Dashboard';
-import Settings from './Settings';
-import Posts from './Posts';
-import Pages from './Pages';
-import Themes from './Themes';
-import NewPost from './NewPost';
-import NewPage from './NewPage';
-import NewTheme from './NewTheme';
-
-require ('../../public/js/jquery-ui.min.js');
-require ('../../public/js/app.min.js');
+import Dashboard from './pages/Dashboard';
+import Settings from './pages/Settings';
+import Posts from './pages/Posts';
+import Pages from './pages/Pages';
+import Themes from './pages/Themes';
+import NewPost from './pages/NewPost';
+import NewPage from './pages/NewPage';
+import NewTheme from './pages/NewTheme';
+import logoImage from '../../public/images/logo-white-230x85.png';
 
 class SideMenu extends React.Component {
 	render() {
@@ -25,6 +27,9 @@ class SideMenu extends React.Component {
 			<aside className="main-sidebar">
 			    <section className="sidebar">
 			      <div className="user-panel">
+			      	<a className="" href="/admin" class="logo" style={{"padding-bottom": 20, "display": "block"}}>
+				      <img src={logoImage} style={{"max-width": 200}} />
+				    </a>
 			        <div className="pull-left image">
 			          <img src="../../images/avatar-default.png" className="img-circle" alt="User" />
 			        </div>
@@ -44,11 +49,11 @@ class SideMenu extends React.Component {
 			      </form>
 			      <ul className="sidebar-menu">
 			        <li className="active treeview">
-			          <a href="dashboard">
+			          <a href="/admin/dashboard">
 			            <i className="fa fa-dashboard"></i> <span>Dashboard</span>
 			          </a>
 			          <ul className="treeview-menu">
-			            <li className="active"><a href="settings"><i className="fa fa-circle-o"></i> Settings</a></li>
+			            <li className="active"><a href="/admin/settings"><i className="fa fa-circle-o"></i> Settings</a></li>
 			            <li><a href="#"><i className="fa fa-circle-o"></i> Content Type</a></li>
 			          </ul>
 			        </li>
@@ -58,8 +63,8 @@ class SideMenu extends React.Component {
 			            <span>Posts</span>
 			          </a>
 			          <ul className="treeview-menu">
-			            <li><a href="new-post"><i className="fa fa-circle-o"></i> Add New</a></li>
-			            <li><a href="posts"><i className="fa fa-circle-o"></i> List</a></li>
+			            <li><a href="/admin/new-post"><i className="fa fa-circle-o"></i> Add New</a></li>
+			            <li><a href="/admin/posts"><i className="fa fa-circle-o"></i> List</a></li>
 			            <li><a href="#"><i className="fa fa-circle-o"></i> Categories</a></li>
 			          </ul>
 			        </li>
@@ -68,8 +73,8 @@ class SideMenu extends React.Component {
 			            <i className="fa fa-th"></i> <span>Pages</span>
 			          </a>
 			          <ul className="treeview-menu">
-			            <li><a href="new-page"><i className="fa fa-circle-o"></i> Add New</a></li>
-			            <li><a href="pages"><i className="fa fa-circle-o"></i> List</a></li>
+			            <li><a href="/admin/new-page"><i className="fa fa-circle-o"></i> Add New</a></li>
+			            <li><a href="/admin/pages"><i className="fa fa-circle-o"></i> List</a></li>
 			          </ul>
 			        </li>
 			        <li className="treeview">
@@ -78,8 +83,8 @@ class SideMenu extends React.Component {
 			            <span>Themes</span>
 			          </a>
 			          <ul className="treeview-menu">
-			            <li><a href="new-theme"><i className="fa fa-circle-o"></i> Install</a></li>
-			            <li><a href="themes"><i className="fa fa-circle-o"></i> Configure</a></li>
+			            <li><a href="/admin/new-theme"><i className="fa fa-circle-o"></i> Install</a></li>
+			            <li><a href="/admin/themes"><i className="fa fa-circle-o"></i> Configure</a></li>
 			          </ul>
 			        </li>
 			        <li className="treeview">
