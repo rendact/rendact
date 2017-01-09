@@ -12,10 +12,13 @@
     "bootstrap": "^4.0.0-alpha.5",
     "graphql": "^0.7.0",
     "graphql-tag": "^0.1.11",
+    "jquery": "^3.1.1",
+    "jquery-ui": "^1.12.1",
     "react": "^15.4.1",
     "react-apollo": "^0.4.5",
     "react-bootstrap": "^0.30.2",
     "react-dom": "^15.4.1",
+    "react-fastclick": "^2.1.2",
     "react-fontawesome": "^1.1.0",
     "react-router": "^4.0.0-alpha.6",
     "react-router-scroll": "^0.3.2"
