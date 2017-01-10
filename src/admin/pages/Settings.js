@@ -75,7 +75,6 @@ var Settings = React.createClass({
 										<input type="submit" value="Save" className="btn btn-success btn-block btn-h1-spacing" />
 								</div>
 								</div>
-								
 							</form>
 						</section>
 					  	</div>
