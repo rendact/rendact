@@ -22,6 +22,14 @@ import NewTheme from './pages/ThemesNew';
 import NotFound from './NotFound';
 import logoImage from '../../public/images/logo-white-230x85.png';
 
+const ContentTypeList = {
+	'posts': 	{id: 'posts', label: "Posts"},
+	'news': 	{id: 'news', label: "News"},
+	'articles': {id: 'articles', label: "Articles"}
+};
+
+const ActiveContentType = 'news';
+
 const MenuJson = [
 	{id: 'dashboard', label: 'Dashboard', icon: 'fa-dashboard', open: true, 
 		elements: [
@@ -47,7 +55,7 @@ const MenuJson = [
 			{id: 'new-page', label: 'Add New', icon: 'fa-book', open: false, url: '/admin/pages/new'}
 		]
 	},
-	{id: 'posts', label: 'Posts', icon: 'fa-files-o', open: false,
+	{id: ActiveContentType, label: ContentTypeList[ActiveContentType].label, icon: 'fa-files-o', open: false,
 		elements: [
 			{id: 'posts', label: 'Posts', icon: 'fa-circle-o', open: true, url: '/admin/posts'},
 			{id: 'new-post', label: 'Add New', icon: 'fa-book', open: false, url: '/admin/posts/new'}
