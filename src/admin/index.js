@@ -16,10 +16,52 @@ import Settings from './pages/Settings';
 import Posts from './pages/Posts';
 import Pages from './pages/Pages';
 import Themes from './pages/Themes';
-import NewPost from './pages/NewPost';
-import NewPage from './pages/NewPage';
-import NewTheme from './pages/NewTheme';
+import NewPost from './pages/PostsNew';
+import NewPage from './pages/PagesNew';
+import NewTheme from './pages/ThemesNew';
+import NotFound from './NotFound';
 import logoImage from '../../public/images/logo-white-230x85.png';
+
+const ContentTypeList = {
+	'posts': 	{id: 'posts', label: "Posts"},
+	'news': 	{id: 'news', label: "News"},
+	'articles': {id: 'articles', label: "Articles"}
+};
+
+const ActiveContentType = 'news';
+
+const MenuJson = [
+	{id: 'dashboard', label: 'Dashboard', icon: 'fa-dashboard', open: true, 
+		elements: [
+			{id: 'settings', label: 'Settings', icon: 'fa-circle-o', open: true, url: '/admin/settings'},
+			{id: 'content', label: 'Content', icon: 'fa-book', open: false, url: '/admin/content'}
+		]
+	},
+	{id: 'themes', label: 'Themes', icon: 'fa-pie-chart', open: false,
+		elements: [
+			{id: 'themes', label: 'Themes', icon: 'fa-circle-o', open: true, url: '/admin/themes'},
+			{id: 'customize-theme', label: 'Customize', icon: 'fa-book', open: false, url: '/admin/themes/customize'}
+		]
+	},
+	{id: 'plugins', label: 'Plugins', icon: 'fa-laptop', open: false,
+		elements: [
+			{id: 'plugins', label: 'Plugins', icon: 'fa-circle-o', open: true, url: '/admin/plugins'}
+		]
+	},
+	{id: 'separator', label: 'CONTENT'},
+	{id: 'pages', label: 'Pages', icon: 'fa-th', open: false, 
+		elements: [
+			{id: 'pages', label: 'Pages', icon: 'fa-circle-o', open: true, url: '/admin/pages'},
+			{id: 'new-page', label: 'Add New', icon: 'fa-book', open: false, url: '/admin/pages/new'}
+		]
+	},
+	{id: ActiveContentType, label: ContentTypeList[ActiveContentType].label, icon: 'fa-files-o', open: false,
+		elements: [
+			{id: 'posts', label: 'Posts', icon: 'fa-circle-o', open: true, url: '/admin/posts'},
+			{id: 'new-post', label: 'Add New', icon: 'fa-book', open: false, url: '/admin/posts/new'}
+		]
+	},
+];
 
 class SideMenu extends React.Component {
 	render() {
@@ -48,58 +90,37 @@ class SideMenu extends React.Component {
 			        </div>
 			      </form>
 			      <ul className="sidebar-menu">
-			        <li className="active treeview">
-			          <a href="/admin/dashboard">
-			            <i className="fa fa-dashboard"></i> <span>Dashboard</span>
-			          </a>
-			          <ul className="treeview-menu">
-			            <li className="active"><a href="/admin/settings"><i className="fa fa-circle-o"></i> Settings</a></li>
-			            <li><a href="#"><i className="fa fa-circle-o"></i> Content Type</a></li>
-			          </ul>
-			        </li>
-			        <li className="treeview">
-			          <a href="#">
-			            <i className="fa fa-files-o"></i>
-			            <span>Posts</span>
-			          </a>
-			          <ul className="treeview-menu">
-			            <li><a href="/admin/new-post"><i className="fa fa-circle-o"></i> Add New</a></li>
-			            <li><a href="/admin/posts"><i className="fa fa-circle-o"></i> List</a></li>
-			            <li><a href="#"><i className="fa fa-circle-o"></i> Categories</a></li>
-			          </ul>
-			        </li>
-			        <li className="treeview">
-			          <a href="#">
-			            <i className="fa fa-th"></i> <span>Pages</span>
-			          </a>
-			          <ul className="treeview-menu">
-			            <li><a href="/admin/new-page"><i className="fa fa-circle-o"></i> Add New</a></li>
-			            <li><a href="/admin/pages"><i className="fa fa-circle-o"></i> List</a></li>
-			          </ul>
-			        </li>
-			        <li className="treeview">
-			          <a href="#">
-			            <i className="fa fa-pie-chart"></i>
-			            <span>Themes</span>
-			          </a>
-			          <ul className="treeview-menu">
-			            <li><a href="/admin/new-theme"><i className="fa fa-circle-o"></i> Install</a></li>
-			            <li><a href="/admin/themes"><i className="fa fa-circle-o"></i> Configure</a></li>
-			          </ul>
-			        </li>
-			        <li className="treeview">
-			          <a href="#">
-			            <i className="fa fa-laptop"></i>
-			            <span>Plugins</span>
-			          </a>
-			          <ul className="treeview-menu">
-			            <li><a href="#"><i className="fa fa-circle-o"></i> Install</a></li>
-			            <li><a href="#"><i className="fa fa-circle-o"></i> Configure</a></li>
-			          </ul>
-			        </li>
-			        <li className="header">HELP</li>
-			        <li><a href="#"><i className="fa fa-circle-o text-red"></i> <span>F.A.Q</span></a></li>
-			        <li><a href="#"><i className="fa fa-circle-o text-yellow"></i> <span>RendactWiki</span></a></li>
+			      	{ MenuJson.map(function(item) {
+			      		if (item.id === 'separator') {
+			      			return <li className="header">{item.label}</li>
+			      		}
+			      		var childItems = "";
+			      		if (item.elements) {
+				      		var childItems = (
+				      			<ul className="treeview-menu">
+				      			{
+				      				item.elements.map(function(item) {
+				      					var activeClass = item.open?"active":"";
+				      					var iconClass = "fa "+item.icon;
+				      					return <li className={activeClass}><a href={item.url}><i className={item.icon}></i> {item.label}</a></li>
+				      				})
+				      			}
+				      			</ul>
+				      		);
+				      	}
+
+				      	var rootActiveClass = item.open?"active treeview":"treeview";
+				      	var rootIconClass = "fa "+item.icon;
+						var menuItem = (
+							<li className={rootActiveClass}>
+					          <a href="#">
+					            <i className={rootIconClass}></i> <span>{item.label}</span>
+					          </a>
+					          {childItems}
+					        </li> 
+					    );
+					    return menuItem;
+					})}
 			      </ul>
 			    </section>
 			  </aside>
@@ -113,18 +134,27 @@ var fullHeight = {
 
 class PageLoader extends React.Component{
 	render() {
+		var page = this.props.pageId;
+		var action = "";
+		if (this.props.actionId) {
+			action = "-"+this.props.actionId;
+		}
 		var map = {
 			'dashboard' : <Dashboard />,
 			'settings' : <Settings />,
 			'posts' : <Posts />,
 			'pages' : <Pages />,
 			'themes' : <Themes />,
-			'new-post' : <NewPost />,
-			'new-page' : <NewPage />,
-			'new-theme' : <NewTheme />
+			'posts-new' : <NewPost />,
+			'pages-new' : <NewPage />,
+			'theme-new' : <NewTheme />
 		}
-
-		return map[this.props.pageId]
+		if (map[page+action]) {
+			return map[page+action]
+		} else {
+			return <NotFound/>
+		}
+		
 	}
 }
 
@@ -153,7 +183,7 @@ const Admin = React.createClass({
 	  				</header>
 	  				<SideMenu/>
 	  				
-					<PageLoader pageId={this.props.params.page} />
+					<PageLoader pageId={this.props.params.page} actionId={this.props.params.action} />
 	            </div>
 	        </div>
 		);
