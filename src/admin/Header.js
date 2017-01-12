@@ -6,7 +6,10 @@ class AdminHeader extends React.Component {
       <header className="main-header">
       <a href="#" className="logo">
         <span className="logo-mini"><b>A</b>LT</span>
-        <span className="logo-lg"><b>Rendact</b></span>
+        <span className="logo-lg" style={{"padding-right":10}}>
+          <img src="../../images/icon-32.png" className="img-circle" alt="Rendact Logo"/> 
+          <b style={{"margin-left":5}}>My Site</b>
+        </span>
       </a>
       <nav className="navbar navbar-static-top">
         <a href="#" className="sidebar-toggle" data-toggle="offcanvas" role="button">
