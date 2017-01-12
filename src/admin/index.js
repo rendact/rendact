@@ -19,6 +19,8 @@ import '../../public/css/AdminLTE.min.css';
 import '../../public/css/skins/_all-skins.min.css';
 
 import AdminHeader from './Header';
+import ControlSidebar from './ControlSidebar';
+import Footer from './Footer';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import Posts from './pages/Posts';
@@ -68,7 +70,7 @@ class SideMenu extends React.Component {
 				      				item.elements.map(function(item) {
 				      					var activeClass = item.open?"active":"";
 				      					var iconClass = "fa "+item.icon;
-				      					return <li className={activeClass}><a href={item.url}><i className={iconClass}></i> {item.label}</a></li>
+				      					return <li key={item.id} className={activeClass}><a href={item.url}><i className={iconClass}></i> {item.label}</a></li>
 				      				})
 				      			}
 				      			</ul>
@@ -147,8 +149,10 @@ const Admin = React.createClass({
 	        		
 	        		<AdminHeader/>
 	  				<SideMenu/>
-	  				
 					<PageLoader pageId={this.props.params.page} actionId={this.props.params.action} />
+					<Footer/>
+					<ControlSidebar/>
+
 	            </div>
 	        </div>
 		);
