@@ -1,22 +1,7 @@
 import React from 'react';
-
-import '../lib/app.min.js';
-<script src="../../../public/js/tables/jquery-2.2.3.min.js"></script>;
-<script src="../../../public/js/tables/demo.js"></script>;
-<script src="../../../public/js/tables/bootstrap.min.js"></script>;
-<script src="../../../public/js/tables/fastclick.js"></script>;
-<script src="../../../public/js/tables/jquery.dataTables.min.js"></script>;
-<script src="../../../public/js/tables/jquery.slimscroll.min.js"></script>;
-
-
-
-import '../../../public/css/AdminLTE.css';
-import '../../../public/css/bootstrap.min.css';
-import '../../../public/css/dataTables.bootstrap.css';
-import '../../../public/css/skins/_all-skins.min.css';
-
 import images from '../../../public/images/photo4.jpg';
 
+require ('datatables');
 
 var Posts = React.createClass({
 	render: function(){
@@ -109,7 +94,7 @@ var Posts = React.createClass({
 			                <tbody>
 								<tr>
 									<td><input type="checkbox"></input></td>
-									<td><img src={images} height="50" /></td>
+									<td><img src={images} height="50" alt="thumbnail"/></td>
 									<td>Dianjurkan Mumakai Penutup Kepala Ketika Sholat</td>
 									<td>Yulian</td>
 									<td>Fikih</td>
@@ -119,7 +104,7 @@ var Posts = React.createClass({
 								</tr>
 								<tr>
 									<td><input type="checkbox"></input></td>
-									<td><img src={images} height="50" /></td>
+									<td><img src={images} height="50" alt="thumbnail"/></td>
 									<td>Hidup tenang dengan meninggalkan dunia</td>
 									<td>Ardi Nugraha</td>
 									<td>Fikih</td>
@@ -129,7 +114,7 @@ var Posts = React.createClass({
 								</tr>
 								<tr>
 									<td><input type="checkbox"></input></td>
-									<td><img src={images} height="50" /></td>
+									<td><img src={images} height="50" alt="thumbnail"/></td>
 									<td>Keutamaan Sholat Malam</td>
 									<td>Jarot Syaifullah</td>
 									<td>Fikih</td>

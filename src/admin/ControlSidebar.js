@@ -1,7 +1,11 @@
 import React from 'react';
 
-class ControlSidebar extends React.Component {
-	render() {
+
+const ControlSidebar = React.createClass({
+	handleCheckBox: function(){
+
+	},
+	render: function(){
 		return (
 			<aside className="control-sidebar control-sidebar-dark">
 			    <ul className="nav nav-tabs nav-justified control-sidebar-tabs">
@@ -13,7 +17,7 @@ class ControlSidebar extends React.Component {
 			        <h3 className="control-sidebar-heading">Recent Activity</h3>
 			        <ul className="control-sidebar-menu">
 			          <li>
-			            <a href="javascript:void(0)">
+			            <a href="#">
 			              <i className="menu-icon fa fa-birthday-cake bg-red"></i>
 
 			              <div className="menu-info">
@@ -24,7 +28,7 @@ class ControlSidebar extends React.Component {
 			            </a>
 			          </li>
 			          <li>
-			            <a href="javascript:void(0)">
+			            <a href="#">
 			              <i className="menu-icon fa fa-user bg-yellow"></i>
 
 			              <div className="menu-info">
@@ -35,7 +39,7 @@ class ControlSidebar extends React.Component {
 			            </a>
 			          </li>
 			          <li>
-			            <a href="javascript:void(0)">
+			            <a href="#">
 			              <i className="menu-icon fa fa-envelope-o bg-light-blue"></i>
 
 			              <div className="menu-info">
@@ -46,7 +50,7 @@ class ControlSidebar extends React.Component {
 			            </a>
 			          </li>
 			          <li>
-			            <a href="javascript:void(0)">
+			            <a href="#">
 			              <i className="menu-icon fa fa-file-code-o bg-green"></i>
 
 			              <div className="menu-info">
@@ -61,7 +65,7 @@ class ControlSidebar extends React.Component {
 			        <h3 className="control-sidebar-heading">Tasks Progress</h3>
 			        <ul className="control-sidebar-menu">
 			          <li>
-			            <a href="javascript:void(0)">
+			            <a href="#">
 			              <h4 className="control-sidebar-subheading">
 			                Custom Template Design
 			                <span className="label label-danger pull-right">70%</span>
@@ -73,7 +77,7 @@ class ControlSidebar extends React.Component {
 			            </a>
 			          </li>
 			          <li>
-			            <a href="javascript:void(0)">
+			            <a href="#">
 			              <h4 className="control-sidebar-subheading">
 			                Update Resume
 			                <span className="label label-success pull-right">95%</span>
@@ -85,7 +89,7 @@ class ControlSidebar extends React.Component {
 			            </a>
 			          </li>
 			          <li>
-			            <a href="javascript:void(0)">
+			            <a href="#">
 			              <h4 className="control-sidebar-subheading">
 			                Laravel Integration
 			                <span className="label label-warning pull-right">50%</span>
@@ -97,7 +101,7 @@ class ControlSidebar extends React.Component {
 			            </a>
 			          </li>
 			          <li>
-			            <a href="javascript:void(0)">
+			            <a href="#">
 			              <h4 className="control-sidebar-subheading">
 			                Back End Framework
 			                <span className="label label-primary pull-right">68%</span>
@@ -119,7 +123,7 @@ class ControlSidebar extends React.Component {
 			          <div className="form-group">
 			            <label className="control-sidebar-subheading">
 			              Report panel usage
-			              <input type="checkbox" className="pull-right" checked/>
+			              <input type="checkbox" className="pull-right" onChange={this.handleCheckBox} checked/>
 			            </label>
 
 			            <p>
@@ -130,7 +134,7 @@ class ControlSidebar extends React.Component {
 			          <div className="form-group">
 			            <label className="control-sidebar-subheading">
 			              Allow mail redirect
-			              <input type="checkbox" className="pull-right" checked/>
+			              <input type="checkbox" className="pull-right" onChange={this.handleCheckBox} checked/>
 			            </label>
 
 			            <p>
@@ -141,7 +145,7 @@ class ControlSidebar extends React.Component {
 			          <div className="form-group">
 			            <label className="control-sidebar-subheading">
 			              Expose author name in posts
-			              <input type="checkbox" className="pull-right" checked/>
+			              <input type="checkbox" className="pull-right" onChange={this.handleCheckBox} checked/>
 			            </label>
 
 			            <p>
@@ -154,21 +158,21 @@ class ControlSidebar extends React.Component {
 			          <div className="form-group">
 			            <label className="control-sidebar-subheading">
 			              Show me as online
-			              <input type="checkbox" className="pull-right" checked/>
+			              <input type="checkbox" className="pull-right" onChange={this.handleCheckBox} checked/>
 			            </label>
 			          </div>
 
 			          <div className="form-group">
 			            <label className="control-sidebar-subheading">
 			              Turn off notifications
-			              <input type="checkbox" className="pull-right"/>
+			              <input type="checkbox" className="pull-right" onChange={this.handleCheckBox}/>
 			            </label>
 			          </div>
 
 			          <div className="form-group">
 			            <label className="control-sidebar-subheading">
 			              Delete chat history
-			              <a href="javascript:void(0)" className="text-red pull-right"><i className="fa fa-trash-o"></i></a>
+			              <a href="#" className="text-red pull-right"><i className="fa fa-trash-o"></i></a>
 			            </label>
 			          </div>
 			        </form>
@@ -177,6 +181,6 @@ class ControlSidebar extends React.Component {
 			  </aside>
 		)
 	}
-}
+});
 
 export default ControlSidebar;

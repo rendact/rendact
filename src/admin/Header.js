@@ -6,9 +6,9 @@ class AdminHeader extends React.Component {
       <header className="main-header">
       <a href="#" className="logo">
         <span className="logo-mini"><b>A</b>LT</span>
-        <span className="logo-lg" style={{"padding-right":10}}>
+        <span className="logo-lg" style={{paddingRight:10}}>
           <img src="../../images/icon-32.png" className="img-circle" alt="Rendact Logo"/> 
-          <b style={{"margin-left":5}}>My Site</b>
+          <b style={{marginLeft:5}}>My Site</b>
         </span>
       </a>
       <nav className="navbar navbar-static-top">
@@ -30,7 +30,7 @@ class AdminHeader extends React.Component {
                     <li>
                       <a href="#">
                         <div className="pull-left">
-                          <img src="../../images/avatar-default.png" className="img-circle" alt="User Image"/>
+                          <img src="../../images/avatar-default.png" className="img-circle" alt="User"/>
                         </div>
                         <h4>
                           Support Team
@@ -42,7 +42,7 @@ class AdminHeader extends React.Component {
                     <li>
                       <a href="#">
                         <div className="pull-left">
-                          <img src="../../images/avatar-default.png" className="img-circle" alt="User Image"/>
+                          <img src="../../images/avatar-default.png" className="img-circle" alt="User"/>
                         </div>
                         <h4>
                           AdminLTE Design Team
@@ -54,7 +54,7 @@ class AdminHeader extends React.Component {
                     <li>
                       <a href="#">
                         <div className="pull-left">
-                          <img src="../../images/avatar-default.png" className="img-circle" alt="User Image"/>
+                          <img src="../../images/avatar-default.png" className="img-circle" alt="User"/>
                         </div>
                         <h4>
                           Developers
@@ -66,7 +66,7 @@ class AdminHeader extends React.Component {
                     <li>
                       <a href="#">
                         <div className="pull-left">
-                          <img src="../../images/avatar-default.png" className="img-circle" alt="User Image"/>
+                          <img src="../../images/avatar-default.png" className="img-circle" alt="User"/>
                         </div>
                         <h4>
                           Sales Department
@@ -78,7 +78,7 @@ class AdminHeader extends React.Component {
                     <li>
                       <a href="#">
                         <div className="pull-left">
-                          <img src="../../images/avatar-default.png" className="img-circle" alt="User Image"/>
+                          <img src="../../images/avatar-default.png" className="img-circle" alt="User"/>
                         </div>
                         <h4>
                           Reviewers
@@ -202,12 +202,12 @@ class AdminHeader extends React.Component {
             </li>
             <li className="dropdown user user-menu">
               <a href="#" className="dropdown-toggle" data-toggle="dropdown">
-                <img src="../../images/avatar-default.png" className="user-image" alt="User Image" />
+                <img src="../../images/avatar-default.png" className="user-image" alt="User" />
                 <span className="hidden-xs">Ali Camarata</span>
               </a>
               <ul className="dropdown-menu">
                 <li className="user-header">
-                  <img src="../../images/avatar-default.png" className="img-circle" alt="User Image" />
+                  <img src="../../images/avatar-default.png" className="img-circle" alt="User" />
 
                   <p>
                     Ali Camarata - Web Developer

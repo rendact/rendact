@@ -4,7 +4,7 @@ window.jQuery = $;
 
 import config from '../config';
 
-import './lib/app.min.js';
+import './lib/app.js';
 
 import 'jquery-ui/themes/base/core.css';
 import 'jquery-ui/themes/base/theme.css';
@@ -30,7 +30,6 @@ import NewPost from './pages/PostsNew';
 import NewPage from './pages/PagesNew';
 import NewTheme from './pages/ThemesNew';
 import NotFound from './NotFound';
-import logoImage from '../../public/images/logo-white-230x85.png';
 
 require ('bootstrap');
 
@@ -60,11 +59,11 @@ class SideMenu extends React.Component {
 			      <ul className="sidebar-menu">
 			      	{ config.menuList.map(function(item) {
 			      		if (item.id === 'separator') {
-			      			return <li className="header">{item.label}</li>
+			      			return <li className="header" key={item.id}>{item.label}</li>
 			      		}
 			      		var childItems = "";
 			      		if (item.elements) {
-				      		var childItems = (
+				      		childItems = (
 				      			<ul className="treeview-menu">
 				      			{
 				      				item.elements.map(function(item) {
@@ -80,7 +79,7 @@ class SideMenu extends React.Component {
 				      	var rootActiveClass = item.open?"active treeview":"treeview";
 				      	var rootIconClass = "fa "+item.icon;
 						var menuItem = (
-							<li className={rootActiveClass}>
+							<li className={rootActiveClass} key={item.id}>
 					          <a href="#">
 					            <i className={rootIconClass}></i> <span>{item.label}</span>
 					          </a>
