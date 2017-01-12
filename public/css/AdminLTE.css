@@ -4935,3 +4935,7 @@ table.text-center th {
     white-space: normal !important;
   }
 }
+
+.margin-left{
+  margin-left: 12px;
+}
