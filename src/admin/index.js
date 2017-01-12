@@ -1,4 +1,9 @@
 import React from 'react';
+import $ from 'jquery';
+window.jQuery = $;
+
+import config from '../config';
+
 import './lib/app.min.js';
 
 import 'jquery-ui/themes/base/core.css';
@@ -6,11 +11,14 @@ import 'jquery-ui/themes/base/theme.css';
 import 'jquery-ui/themes/base/tooltip.css';
 import 'jquery-ui/ui/core';
 import 'jquery-ui/ui/widgets/tooltip';
+import 'font-awesome/css/font-awesome.css';
+//import 'bootstrap/dist/css/bootstrap.min.css';
 
-import '../../public/css/bootstrap.min.css';
 import '../../public/css/ionicons.min.css';
-import '../../public/css/AdminLTE.css';
+import '../../public/css/AdminLTE.min.css';
 import '../../public/css/skins/_all-skins.min.css';
+
+import AdminHeader from './Header';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import Posts from './pages/Posts';
@@ -22,46 +30,7 @@ import NewTheme from './pages/ThemesNew';
 import NotFound from './NotFound';
 import logoImage from '../../public/images/logo-white-230x85.png';
 
-const ContentTypeList = {
-	'posts': 	{id: 'posts', label: "Posts"},
-	'news': 	{id: 'news', label: "News"},
-	'articles': {id: 'articles', label: "Articles"}
-};
-
-const ActiveContentType = 'news';
-
-const MenuJson = [
-	{id: 'dashboard', label: 'Dashboard', icon: 'fa-dashboard', open: true, 
-		elements: [
-			{id: 'settings', label: 'Settings', icon: 'fa-circle-o', open: true, url: '/admin/settings'},
-			{id: 'content', label: 'Content', icon: 'fa-book', open: false, url: '/admin/content'}
-		]
-	},
-	{id: 'themes', label: 'Themes', icon: 'fa-pie-chart', open: false,
-		elements: [
-			{id: 'themes', label: 'Themes', icon: 'fa-circle-o', open: true, url: '/admin/themes'},
-			{id: 'customize-theme', label: 'Customize', icon: 'fa-book', open: false, url: '/admin/themes/customize'}
-		]
-	},
-	{id: 'plugins', label: 'Plugins', icon: 'fa-laptop', open: false,
-		elements: [
-			{id: 'plugins', label: 'Plugins', icon: 'fa-circle-o', open: true, url: '/admin/plugins'}
-		]
-	},
-	{id: 'separator', label: 'CONTENT'},
-	{id: 'pages', label: 'Pages', icon: 'fa-th', open: false, 
-		elements: [
-			{id: 'pages', label: 'Pages', icon: 'fa-circle-o', open: true, url: '/admin/pages'},
-			{id: 'new-page', label: 'Add New', icon: 'fa-book', open: false, url: '/admin/pages/new'}
-		]
-	},
-	{id: ActiveContentType, label: ContentTypeList[ActiveContentType].label, icon: 'fa-files-o', open: false,
-		elements: [
-			{id: 'posts', label: 'Posts', icon: 'fa-circle-o', open: true, url: '/admin/posts'},
-			{id: 'new-post', label: 'Add New', icon: 'fa-book', open: false, url: '/admin/posts/new'}
-		]
-	},
-];
+require ('bootstrap');
 
 class SideMenu extends React.Component {
 	render() {
@@ -69,14 +38,11 @@ class SideMenu extends React.Component {
 			<aside className="main-sidebar">
 			    <section className="sidebar">
 			      <div className="user-panel">
-			      	<a className="" href="/admin" class="logo" style={{"padding-bottom": 20, "display": "block"}}>
-				      <img src={logoImage} style={{"max-width": 200}} />
-				    </a>
-			        <div className="pull-left image">
+			      	<div className="pull-left image">
 			          <img src="../../images/avatar-default.png" className="img-circle" alt="User" />
 			        </div>
 			        <div className="pull-left info">
-			          <p>Alexander Pierce</p>
+			          <p>Ali Camarata</p>
 			          <a href="#"><i className="fa fa-circle text-success"></i> Online</a>
 			        </div>
 			      </div>
@@ -90,7 +56,7 @@ class SideMenu extends React.Component {
 			        </div>
 			      </form>
 			      <ul className="sidebar-menu">
-			      	{ MenuJson.map(function(item) {
+			      	{ config.menuList.map(function(item) {
 			      		if (item.id === 'separator') {
 			      			return <li className="header">{item.label}</li>
 			      		}
@@ -102,7 +68,7 @@ class SideMenu extends React.Component {
 				      				item.elements.map(function(item) {
 				      					var activeClass = item.open?"active":"";
 				      					var iconClass = "fa "+item.icon;
-				      					return <li className={activeClass}><a href={item.url}><i className={item.icon}></i> {item.label}</a></li>
+				      					return <li className={activeClass}><a href={item.url}><i className={iconClass}></i> {item.label}</a></li>
 				      				})
 				      			}
 				      			</ul>
@@ -151,8 +117,10 @@ class PageLoader extends React.Component{
 		}
 		if (map[page+action]) {
 			return map[page+action]
-		} else {
+		} else if (action!==""){
 			return <NotFound/>
+		} else {
+			return <Dashboard />
 		}
 		
 	}
@@ -176,11 +144,8 @@ const Admin = React.createClass({
 		return (
 			<div className="hold-transition skin-blue sidebar-mini" style={fullHeight}>
 				<div className="wrapper" style={fullHeight}>
-	        		<header className="main-header">
-	    				<nav className="navbar navbar-static-top">
-		        		
-		        		</nav>
-	  				</header>
+	        		
+	        		<AdminHeader/>
 	  				<SideMenu/>
 	  				
 					<PageLoader pageId={this.props.params.page} actionId={this.props.params.action} />

@@ -417,7 +417,7 @@ a:focus {
   position: absolute;
   top: 0;
   left: 0;
-  padding-top: 10px;
+  padding-top: 50px;
   min-height: 100%;
   width: 230px;
   z-index: 810;
