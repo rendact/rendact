@@ -25,7 +25,7 @@ var Settings = React.createClass({
 								  	<label for="name" className="col-md-3">Name</label>
 								  	<div className="col-md-9">
 										<input type="text" name="name" placeholder="Name" className="form-control" />
-										<p><i>Fill in your Name</i></p>
+										<p><i>Your great full name</i></p>
 									</div>
 								</div>
 
@@ -33,15 +33,15 @@ var Settings = React.createClass({
 								  	<label for="tagline" className="col-md-3">Tagline</label>
 								  	<div className="col-md-9">
 										<input type="text" name="tagline" placeholder="Tagline" className="form-control" />
-										<p><i>Fill in your Tag Line</i></p>
+										<p><i>Few words that describes your web, example: a bunch of words of mine</i></p>
 									</div>
 								</div>
 
 					  			<div className="form-group">
-								  	<label for="keywoards" className="col-md-3">Keywoards</label>
+								  	<label for="keywoards" className="col-md-3">Keywords</label>
 								  	<div className="col-md-9">
 										<input type="text" name="keywoards" placeholder="Keywoards" className="form-control" />
-										<p><i>Fill in your Keywoard</i></p>
+										<p><i>Some words represents your web</i></p>
 									</div>
 								</div>
 
@@ -49,7 +49,6 @@ var Settings = React.createClass({
 								  	<label for="homeUrl" className="col-md-3">Home URL</label>
 								  	<div className="col-md-9">
 										<input type="text" name="homeUrl" placeholder="Home URL" className="form-control" />
-										<p><i>Fill in your Home URL</i></p>
 									</div>
 								</div>
 
@@ -57,7 +56,6 @@ var Settings = React.createClass({
 								  	<label for="adminEmail" className="col-md-3">Admin Email</label>
 								  	<div className="col-md-9">
 										<input type="text" name="adminEmail" placeholder="Admin Email" className="form-control" />
-										<p><i>Fill in your Email</i></p>
 									</div>
 								</div>
 
@@ -65,7 +63,6 @@ var Settings = React.createClass({
 								  	<label for="timeZone" className="col-md-3">Time Zone</label>
 								  	<div className="col-md-9">
 										<input type="text" name="timeZone" placeholder="Time Zone" className="form-control" />
-										<p><i>Fill in your Time Zone</i></p>
 									</div>
 								</div>
 								
