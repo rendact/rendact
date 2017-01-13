@@ -33,8 +33,13 @@ import NotFound from './NotFound';
 
 require ('bootstrap');
 
-class SideMenu extends React.Component {
-	render() {
+const SideMenu = React.createClass({
+	onClick: function(id, e){
+		e.preventDefault();
+		this.props.onClick(id);
+	},
+	render: function() {
+		
 		return (
 			<aside className="main-sidebar">
 			    <section className="sidebar">
@@ -69,8 +74,8 @@ class SideMenu extends React.Component {
 				      				item.elements.map(function(item) {
 				      					var activeClass = item.open?"active":"";
 				      					var iconClass = "fa "+item.icon;
-				      					return <li key={item.id} className={activeClass}><a href={item.url}><i className={iconClass}></i> {item.label}</a></li>
-				      				})
+				      					return <li key={item.id} className={activeClass} onClick={this.onClick.bind(this, item.id)}><a href={item.url}><i className={iconClass}></i> {item.label}</a></li>
+				      				}, this)
 				      			}
 				      			</ul>
 				      		);
@@ -87,20 +92,23 @@ class SideMenu extends React.Component {
 					        </li> 
 					    );
 					    return menuItem;
-					})}
+					}, this)}
 			      </ul>
 			    </section>
 			  </aside>
 		)
 	}
-}
+});
 
 var fullHeight = {
 	height: '100%'
 }
 
-class PageLoader extends React.Component{
-	render() {
+const PageLoader = React.createClass({
+	getInitialState: function() {
+		return {pageId: 'dashboard', action: ''}
+	},
+	render: function() {
 		var page = this.props.pageId;
 		var action = "";
 		if (this.props.actionId) {
@@ -125,30 +133,39 @@ class PageLoader extends React.Component{
 		}
 		
 	}
-}
+});
 
 
 const Admin = React.createClass({
 	// router params @ this.props.params
-	getDefaultProps: function() {},
+	getDefaultProps: function() {
+		return {
+			params: {
+				page: 'dashboard',
+				action: ''
+			}
+		}
+	},
 	getInitialState: function() {
-		if (this.props.params['page']==null)
-			this.props.params['page'] = 'dashboard';
-		
-		return this.props.params;
-		// Query if params match page and pass to switch below..
-		// ie. return {page: "Plugins"};
+		return {
+			page: this.props.params['page'],
+			action: this.props.params['action']
+		}
+	},
+	handleMenuClick: function(pageId){
+		this.setState({page: pageId})
+		//PageLoader.openPage();
 	},
 	render: function() {
 		// switch (this.state.layout) or similar
-		console.log(this.props.params);
+		console.log(this.state.page);
 		return (
 			<div className="hold-transition skin-blue sidebar-mini" style={fullHeight}>
 				<div className="wrapper" style={fullHeight}>
 	        		
 	        		<AdminHeader/>
-	  				<SideMenu/>
-					<PageLoader pageId={this.props.params.page} actionId={this.props.params.action} />
+	  				<SideMenu onClick={this.handleMenuClick}/>
+					<PageLoader pageId={this.state.page} actionId={this.state.action} />
 					<Footer/>
 					<ControlSidebar/>
 
