@@ -4,7 +4,7 @@ window.jQuery = $;
 
 import config from '../config';
 
-import './lib/app.min.js';
+import './lib/app.js';
 
 import 'jquery-ui/themes/base/core.css';
 import 'jquery-ui/themes/base/theme.css';
@@ -12,15 +12,15 @@ import 'jquery-ui/themes/base/tooltip.css';
 import 'jquery-ui/ui/core';
 import 'jquery-ui/ui/widgets/tooltip';
 import 'font-awesome/css/font-awesome.css';
-import 'datatables/media/css/jquery.dataTables.min.css';
-import 'datatables/media/js/jquery.dataTables.min.js';
 //import 'bootstrap/dist/css/bootstrap.min.css';
-
+import 'datatables/media/css/jquery.dataTables.min.css';
 import '../../public/css/ionicons.min.css';
 import '../../public/css/AdminLTE.min.css';
 import '../../public/css/skins/_all-skins.min.css';
 
 import AdminHeader from './Header';
+import ControlSidebar from './ControlSidebar';
+import Footer from './Footer';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import Posts from './pages/Posts';
@@ -30,7 +30,6 @@ import NewPost from './pages/PostsNew';
 import NewPage from './pages/PagesNew';
 import NewTheme from './pages/ThemesNew';
 import NotFound from './NotFound';
-import logoImage from '../../public/images/logo-white-230x85.png';
 
 require ('bootstrap');
 
@@ -60,17 +59,17 @@ class SideMenu extends React.Component {
 			      <ul className="sidebar-menu">
 			      	{ config.menuList.map(function(item) {
 			      		if (item.id === 'separator') {
-			      			return <li className="header">{item.label}</li>
+			      			return <li className="header" key={item.id}>{item.label}</li>
 			      		}
 			      		var childItems = "";
 			      		if (item.elements) {
-				      		var childItems = (
+				      		childItems = (
 				      			<ul className="treeview-menu">
 				      			{
 				      				item.elements.map(function(item) {
 				      					var activeClass = item.open?"active":"";
 				      					var iconClass = "fa "+item.icon;
-				      					return <li className={activeClass}><a href={item.url}><i className={iconClass}></i> {item.label}</a></li>
+				      					return <li key={item.id} className={activeClass}><a href={item.url}><i className={iconClass}></i> {item.label}</a></li>
 				      				})
 				      			}
 				      			</ul>
@@ -80,7 +79,7 @@ class SideMenu extends React.Component {
 				      	var rootActiveClass = item.open?"active treeview":"treeview";
 				      	var rootIconClass = "fa "+item.icon;
 						var menuItem = (
-							<li className={rootActiveClass}>
+							<li className={rootActiveClass} key={item.id}>
 					          <a href="#">
 					            <i className={rootIconClass}></i> <span>{item.label}</span>
 					          </a>
@@ -149,8 +148,10 @@ const Admin = React.createClass({
 	        		
 	        		<AdminHeader/>
 	  				<SideMenu/>
-	  				
 					<PageLoader pageId={this.props.params.page} actionId={this.props.params.action} />
+					<Footer/>
+					<ControlSidebar/>
+
 	            </div>
 	        </div>
 		);

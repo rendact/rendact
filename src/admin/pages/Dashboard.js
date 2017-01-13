@@ -31,10 +31,10 @@ var Dashboard = React.createClass({
 					              <ul className="products-list product-list-in-box">
 					                <li className="item">
 					                  <div className="product-img">
-					                    <img src="../../images/default-50x50.gif" alt="Product Image"/>
+					                    <img src="../../images/default-50x50.gif" alt="Product"/>
 					                  </div>
 					                  <div className="product-info">
-					                    <a href="javascript:void(0)" className="product-title">Eartquake in Myanmar takes 1000 lifes
+					                    <a href="#" className="product-title">Eartquake in Myanmar takes 1000 lifes
 					                      <span className="label label-info pull-right">1 day ago</span></a>
 					                        <span className="product-description">
 					                          Myanmar shaked by 7 richter scale eartquake on Sunday morning (1/1/2016)
@@ -43,10 +43,10 @@ var Dashboard = React.createClass({
 					                </li>
 					                <li className="item">
 					                  <div className="product-img">
-					                    <img src="../../images/default-50x50.gif" alt="Product Image"/>
+					                    <img src="../../images/default-50x50.gif" alt="Product"/>
 					                  </div>
 					                  <div className="product-info">
-					                    <a href="javascript:void(0)" className="product-title">Bicycle
+					                    <a href="#" className="product-title">Bicycle
 					                      <span className="label label-info pull-right">2 days ago</span></a>
 					                        <span className="product-description">
 					                          26" Mongoose Dolomite Men's 7-speed, Navy Blue.
@@ -55,10 +55,10 @@ var Dashboard = React.createClass({
 					                </li>
 					                <li className="item">
 					                  <div className="product-img">
-					                    <img src="../../images/default-50x50.gif" alt="Product Image"/>
+					                    <img src="../../images/default-50x50.gif" alt="Product"/>
 					                  </div>
 					                  <div className="product-info">
-					                    <a href="javascript:void(0)" className="product-title">Xbox Launched New Console <span className="label label-info pull-right">3 days ago</span></a>
+					                    <a href="#" className="product-title">Xbox Launched New Console <span className="label label-info pull-right">3 days ago</span></a>
 					                        <span className="product-description">
 					                          Xbox One Console Bundle with Halo Master Chief Collection.
 					                        </span>
@@ -66,10 +66,10 @@ var Dashboard = React.createClass({
 					                </li>
 					                <li className="item">
 					                  <div className="product-img">
-					                    <img src="../../images/default-50x50.gif" alt="Product Image"/>
+					                    <img src="../../images/default-50x50.gif" alt="Product"/>
 					                  </div>
 					                  <div className="product-info">
-					                    <a href="javascript:void(0)" className="product-title">PlayStation 4
+					                    <a href="#" className="product-title">PlayStation 4
 					                      <span className="label label-info pull-right">4 days ago</span></a>
 					                        <span className="product-description">
 					                          PlayStation 4 500GB Console (PS4)
@@ -79,7 +79,7 @@ var Dashboard = React.createClass({
 					              </ul>
 					            </div>
 					            <div className="box-footer text-center">
-					              <a href="javascript:void(0)" className="uppercase">View All News</a>
+					              <a href="#" className="uppercase">View All News</a>
 					            </div>
 					        </div>
 					    </div>
@@ -116,7 +116,7 @@ var Dashboard = React.createClass({
 					                  <input type="text" className="form-control" name="subject" placeholder="Title"/>
 					                </div>
 					                <div>
-					                  <textarea className="textarea" placeholder="Content" style={{width: "100%", height: 125, "font-size": 14, "line-height": 18, border: "1px solid #dddddd", padding: 10}}></textarea>
+					                  <textarea className="textarea" placeholder="Content" style={{width: "100%", height: 125, fontSize: 14, lineHeight: 18, border: "1px solid #dddddd", padding: 10}}></textarea>
 					                </div>
 					              </form>
 					            </div>
