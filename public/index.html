@@ -8,19 +8,21 @@
 	<link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
 	<link rel="manifest" href="%PUBLIC_URL%/images/manifest.json">
 	<link rel="shortcut icon" type="image/png" href="/images/favicon-64x64.png" />
-</head>
-
-<body>
-	<div id="root" style="height:99vh;"></div>
-	<script>
-		if ('serviceWorker' in navigator) {
-			navigator.serviceWorker.register('service-worker.js').catch(function(ex) {
-				//console.warn(ex);
-				//console.warn('(This warning can be safely ignored outside of the production build.)');
+	<script type="text/javascript">
+		if ('serviceWorker' in navigator) { 
+			navigator.serviceWorker.register('sw.js').then(function(registration) {
+				// Registration was successful
+				console.log('ServiceWorker registration successful with scope: ', registration.scope); 
+			}).catch(function(err) {
+				// registration failed 
+				console.log('ServiceWorker registration failed: ', err); 
 			});
 		}
-
 	</script>
+</head>
+
+<body class="hold-transition skin-blue sidebar-mini">
+	<div id="root" style="height:99vh;"></div>
 </body>
 
 </html>

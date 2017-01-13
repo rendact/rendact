@@ -1,10 +1,12 @@
 import React from 'react';
 import $ from 'jquery';
+const jQuery = $;
 window.jQuery = $;
 
 import config from '../config';
 
-import './lib/app.js';
+import './lib/app.min.js';
+import skinning from './lib/skinning.js';
 
 import 'jquery-ui/themes/base/core.css';
 import 'jquery-ui/themes/base/theme.css';
@@ -156,11 +158,14 @@ const Admin = React.createClass({
 		this.setState({page: pageId})
 		//PageLoader.openPage();
 	},
+	componentDidMount: function(){
+		skinning(jQuery, $.AdminLTE);
+	},
 	render: function() {
 		// switch (this.state.layout) or similar
 		console.log(this.state.page);
 		return (
-			<div className="hold-transition skin-blue sidebar-mini" style={fullHeight}>
+			<div style={fullHeight}>
 				<div className="wrapper" style={fullHeight}>
 	        		
 	        		<AdminHeader/>
@@ -168,7 +173,7 @@ const Admin = React.createClass({
 					<PageLoader pageId={this.state.page} actionId={this.state.action} />
 					<Footer/>
 					<ControlSidebar/>
-
+					<div className="control-sidebar-bg"></div>
 	            </div>
 	        </div>
 		);

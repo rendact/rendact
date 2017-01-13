@@ -5,7 +5,9 @@ class AdminHeader extends React.Component {
     return (
       <header className="main-header">
       <a href="#" className="logo">
-        <span className="logo-mini"><b>A</b>LT</span>
+        <span className="logo-mini">
+          <img src="../../images/icon-32.png" className="img-circle" alt="Rendact Logo"/> 
+        </span>
         <span className="logo-lg" style={{paddingRight:10}}>
           <img src="../../images/icon-32.png" className="img-circle" alt="Rendact Logo"/> 
           <b style={{marginLeft:5}}>My Site</b>

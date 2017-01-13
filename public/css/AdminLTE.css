@@ -2,7 +2,7 @@
 /*!
  *   AdminLTE v2.3.8
  *   Author: Almsaeed Studio
- *	 Website: Almsaeed Studio <http://almsaeedstudio.com>
+ *   Website: Almsaeed Studio <http://almsaeedstudio.com>
  *   License: Open source - MIT
  *           Please visit http://opensource.org/licenses/MIT for more information
 !*/
@@ -190,10 +190,9 @@ a:focus {
  * ----------------------
  */
 .main-header {
-  position: fixed;
+  position: relative;
   max-height: 100px;
   z-index: 1030;
-  width: 100%;
 }
 .main-header .navbar {
   -webkit-transition: margin-left 0.3s ease-in-out;
@@ -4935,8 +4934,4 @@ table.text-center th {
   .table-responsive > .table tr td {
     white-space: normal !important;
   }
-}
-
-.margin-left{
-  margin-left: 12px;
 }
