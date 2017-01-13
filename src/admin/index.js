@@ -12,6 +12,8 @@ import 'jquery-ui/themes/base/tooltip.css';
 import 'jquery-ui/ui/core';
 import 'jquery-ui/ui/widgets/tooltip';
 import 'font-awesome/css/font-awesome.css';
+import 'datatables/media/css/jquery.dataTables.min.css';
+import 'datatables/media/js/jquery.dataTables.min.js';
 //import 'bootstrap/dist/css/bootstrap.min.css';
 
 import '../../public/css/ionicons.min.css';
