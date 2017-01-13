@@ -190,9 +190,10 @@ a:focus {
  * ----------------------
  */
 .main-header {
-  position: relative;
+  position: fixed;
   max-height: 100px;
   z-index: 1030;
+  width: 100%;
 }
 .main-header .navbar {
   -webkit-transition: margin-left 0.3s ease-in-out;

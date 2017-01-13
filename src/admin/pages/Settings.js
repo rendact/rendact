@@ -22,7 +22,7 @@ var Settings = React.createClass({
 			    			<form className="form-horizontal">
 			    			
 					  			<div className="form-group">
-								  	<label for="name" className="col-md-3">Name</label>
+								  	<label htmlFor="name" className="col-md-3">Name</label>
 								  	<div className="col-md-9">
 										<input type="text" name="name" placeholder="Name" className="form-control" />
 										<p><i>Your great full name</i></p>
@@ -30,7 +30,7 @@ var Settings = React.createClass({
 								</div>
 
 					  			<div className="form-group">
-								  	<label for="tagline" className="col-md-3">Tagline</label>
+								  	<label htmlFor="tagline" className="col-md-3">Tagline</label>
 								  	<div className="col-md-9">
 										<input type="text" name="tagline" placeholder="Tagline" className="form-control" />
 										<p><i>Few words that describes your web, example: a bunch of words of mine</i></p>
@@ -38,7 +38,7 @@ var Settings = React.createClass({
 								</div>
 
 					  			<div className="form-group">
-								  	<label for="keywoards" className="col-md-3">Keywords</label>
+								  	<label htmlFor="keywoards" className="col-md-3">Keywords</label>
 								  	<div className="col-md-9">
 										<input type="text" name="keywoards" placeholder="Keywoards" className="form-control" />
 										<p><i>Some words represents your web</i></p>
@@ -46,21 +46,21 @@ var Settings = React.createClass({
 								</div>
 
 					  			<div className="form-group">
-								  	<label for="homeUrl" className="col-md-3">Home URL</label>
+								  	<label htmlFor="homeUrl" className="col-md-3">Home URL</label>
 								  	<div className="col-md-9">
 										<input type="text" name="homeUrl" placeholder="Home URL" className="form-control" />
 									</div>
 								</div>
 
 					  			<div className="form-group">
-								  	<label for="adminEmail" className="col-md-3">Admin Email</label>
+								  	<label htmlFor="adminEmail" className="col-md-3">Admin Email</label>
 								  	<div className="col-md-9">
 										<input type="text" name="adminEmail" placeholder="Admin Email" className="form-control" />
 									</div>
 								</div>
 
 					  			<div className="form-group">
-								  	<label for="timeZone" className="col-md-3">Time Zone</label>
+								  	<label htmlFor="timeZone" className="col-md-3">Time Zone</label>
 								  	<div className="col-md-9">
 										<input type="text" name="timeZone" placeholder="Time Zone" className="form-control" />
 									</div>
