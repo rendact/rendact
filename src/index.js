@@ -1,3 +1,7 @@
+import $ from 'jquery';
+const jQuery = $;
+window.jQuery = $;
+
 import React from 'react'
 import {render} from 'react-dom'
 import {ApolloProvider} from 'react-apollo';

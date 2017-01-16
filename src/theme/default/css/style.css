@@ -4,6 +4,8 @@ Author URL: http://w3layouts.com
 License: Creative Commons Attribution 3.0 Unported
 License URL: http://creativecommons.org/licenses/by/3.0/
 --*/
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700|Orbitron:400,500,700,900");
+
 html, body{
 font-family: 'Open Sans', sans-serif;
  font-size: 100%;
@@ -41,7 +43,7 @@ label{
 }
 /*----header--------*/
 .banner{
-  background: url(../images/banner.jpg) no-repeat 0px 0px;
+  /* background: url(../images/banner.jpg) no-repeat 0px 0px; */
   background-size: cover;
   -webkit-background-size: cover;
   -o-background-size: cover;
@@ -1099,7 +1101,7 @@ ul.address li a {
   font-size: 14px;
   text-transform: uppercase;
   width: 80px!important;
-  -webkit-appearence:none
+  -webkit-appearence:none;
   text-align: center;
    border-top:1px solid #698a9a;
    outline:none;
@@ -1408,7 +1410,7 @@ ul.address li a {
 }
 @media (max-width:640px){
 	.banner {
-	  background: url(../images/banner.jpg) no-repeat 0px 0px;
+	  /* background: url(../images/banner.jpg) no-repeat 0px 0px; */
 	  background-size: 100% 100%;
 	  -webkit-background-size: cover;
 	  -o-background-size: 100% 100%;
@@ -1518,7 +1520,7 @@ ul.address li a {
 }
 @media (max-width:480px){
 	.banner {
-	  background: url(../images/banner.jpg) no-repeat 0px 0px;
+	  /* background: url(../images/banner.jpg) no-repeat 0px 0px; */
 	  background-size: 100% 100%;
 	  -webkit-background-size: cover;
 	  -o-background-size: 100% 100%;
@@ -1691,7 +1693,7 @@ ul.address li a {
 	  padding: 0;
 	}
 	.banner {
-	  background: url(../images/banner.jpg) no-repeat 0px 0px;
+	  /* background: url(../images/banner.jpg) no-repeat 0px 0px; */
 	  background-size: 100% 100%;
 	  -webkit-background-size: cover;
 	  -o-background-size: 100% 100%;
