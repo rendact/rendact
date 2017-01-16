@@ -3,7 +3,7 @@ import {render} from 'react-dom'
 import {ApolloProvider} from 'react-apollo';
 import {BrowserRouter, Match, Miss} from 'react-router'
 import client from './apollo';
-import Theme from './theme';
+import Theme from './theme/default';
 import Admin from './admin';
 
 const Main = React.createClass({
