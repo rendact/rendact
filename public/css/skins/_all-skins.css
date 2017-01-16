@@ -93,7 +93,8 @@
 }
 .skin-blue .treeview-menu > li.active > a,
 .skin-blue .treeview-menu > li > a:hover {
-  color: #ffffff;
+  color: #98dbf9;
+  background-color: darkcyan;
 }
 .skin-blue .sidebar-form {
   border-radius: 3px;

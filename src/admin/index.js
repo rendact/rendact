@@ -17,8 +17,8 @@ import 'font-awesome/css/font-awesome.css';
 //import 'bootstrap/dist/css/bootstrap.min.css';
 import 'datatables/media/css/jquery.dataTables.min.css';
 import '../../public/css/ionicons.min.css';
-import '../../public/css/AdminLTE.min.css';
-import '../../public/css/skins/_all-skins.min.css';
+import '../../public/css/AdminLTE.css';
+import '../../public/css/skins/_all-skins.css';
 
 import AdminHeader from './Header';
 import ControlSidebar from './ControlSidebar';
@@ -28,6 +28,8 @@ import Settings from './pages/Settings';
 import Posts from './pages/Posts';
 import Pages from './pages/Pages';
 import Themes from './pages/Themes';
+import Plugins from './pages/Plugins';
+import Users from './pages/Users';
 import NewPost from './pages/PostsNew';
 import NewPage from './pages/PagesNew';
 import NewTheme from './pages/ThemesNew';
@@ -36,9 +38,18 @@ import NotFound from './NotFound';
 require ('bootstrap');
 
 const SideMenu = React.createClass({
+	getInitialState: function() {
+		return {activeMenu: 'dashboard'}
+	},
 	onClick: function(id, e){
 		e.preventDefault();
 		this.props.onClick(id);
+		this.setState({activeMenu: id});
+		$(".menu-item").removeClass("active");
+		$("#menu-"+id).addClass("active");
+	},
+	componentDidMount: function(){
+		$("#menu-"+this.state.activeMenu).addClass("active");
 	},
 	render: function() {
 		
@@ -76,7 +87,7 @@ const SideMenu = React.createClass({
 				      				item.elements.map(function(item) {
 				      					var activeClass = item.open?"active":"";
 				      					var iconClass = "fa "+item.icon;
-				      					return <li key={item.id} className={activeClass} onClick={this.onClick.bind(this, item.id)}><a href={item.url}><i className={iconClass}></i> {item.label}</a></li>
+				      					return <li key={item.id} id={"menu-"+item.id} className="menu-item" onClick={this.onClick.bind(this, item.id)}><a href={item.url}><i className={iconClass}></i> {item.label}</a></li>
 				      				}, this)
 				      			}
 				      			</ul>
@@ -107,8 +118,8 @@ var fullHeight = {
 }
 
 const PageLoader = React.createClass({
-	getInitialState: function() {
-		return {pageId: 'dashboard', action: ''}
+	getDefaultProps: function() {
+		return {pageId: "dashboard", actionId: ''}
 	},
 	render: function() {
 		var page = this.props.pageId;
@@ -122,32 +133,24 @@ const PageLoader = React.createClass({
 			'posts' : <Posts />,
 			'pages' : <Pages />,
 			'themes' : <Themes />,
+			'plugins' : <Plugins />,
+			'users' : <Users />,
 			'posts-new' : <NewPost />,
 			'pages-new' : <NewPage />,
 			'theme-new' : <NewTheme />
 		}
 		if (map[page+action]) {
 			return map[page+action]
-		} else if (action!==""){
+		} else if (action===""){
 			return <NotFound/>
 		} else {
 			return <Dashboard />
 		}
-		
 	}
 });
 
 
 const Admin = React.createClass({
-	// router params @ this.props.params
-	getDefaultProps: function() {
-		return {
-			params: {
-				page: 'dashboard',
-				action: ''
-			}
-		}
-	},
 	getInitialState: function() {
 		return {
 			page: this.props.params['page'],
