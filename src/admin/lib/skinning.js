@@ -52,21 +52,13 @@ const skinning = function ($, AdminLTE) {
       "<h4 class='control-sidebar-heading'>"
       + "Layout Options"
       + "</h4>"
-        //Fixed layout
+        //Profile Toggle
       + "<div class='form-group'>"
       + "<label class='control-sidebar-subheading'>"
-      + "<input type='checkbox' data-layout='fixed' class='pull-right'/> "
-      + "Fixed layout"
+      + "<input type='checkbox' data-layout='profile-hide' class='pull-right'/> "
+      + "Toggle Profile Box"
       + "</label>"
-      + "<p>Activate the fixed layout. You can't use fixed and boxed layouts together</p>"
-      + "</div>"
-        //Boxed layout
-      + "<div class='form-group'>"
-      + "<label class='control-sidebar-subheading'>"
-      + "<input type='checkbox' data-layout='layout-boxed'class='pull-right'/> "
-      + "Boxed Layout"
-      + "</label>"
-      + "<p>Activate the boxed layout</p>"
+      + "<p>Toggle the profile box in the left sidebar(show or hidden)</p>"
       + "</div>"
         //Sidebar Toggle
       + "<div class='form-group'>"
@@ -210,7 +202,7 @@ const skinning = function ($, AdminLTE) {
   $("#control-sidebar-home-tab").after(tab_pane);
 
   setup();
-
+  
   /**
    * Toggles layout classes
    *
@@ -218,6 +210,7 @@ const skinning = function ($, AdminLTE) {
    * @returns void
    */
   function change_layout(cls) {
+
     $("body").toggleClass(cls);
     AdminLTE.layout.fixSidebar();
     //Fix the problem with right sidebar and layout boxed
@@ -226,6 +219,10 @@ const skinning = function ($, AdminLTE) {
     if ($('body').hasClass('fixed') && cls === 'fixed') {
       AdminLTE.pushMenu.expandOnHover();
       AdminLTE.layout.activate();
+    }
+    if (cls === "profile-hide") {
+      $(".user-panel").toggleClass("user-panel-hidden");
+      localStorage.setItem("user-panel-box", !$(".user-panel").hasClass("user-panel-hidden"));
     }
     AdminLTE.controlSidebar._fix($(".control-sidebar-bg"));
     AdminLTE.controlSidebar._fix($(".control-sidebar"));
@@ -284,7 +281,12 @@ const skinning = function ($, AdminLTE) {
     var tmp = get('skin');
     if (tmp && $.inArray(tmp, my_skins))
       change_skin(tmp);
-
+    //Load profile box config
+    var profileBox = get('user-panel-box');
+    $("[data-layout='profile-hide']").attr('checked', profileBox==='true'?'checked':'');
+    if (profileBox==="true" && $(".user-panel").hasClass("user-panel-hidden")) {
+      $(".user-panel").removeClass("user-panel-hidden")
+    }
     //Add the change skin listener
     $("[data-skin]").on('click', function (e) {
       if($(this).hasClass('knob'))
@@ -334,7 +336,6 @@ const skinning = function ($, AdminLTE) {
     if ($('body').hasClass('sidebar-collapse')) {
       $("[data-layout='sidebar-collapse']").attr('checked', 'checked');
     }
-
   }
 }
 

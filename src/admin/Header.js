@@ -9,17 +9,20 @@ class AdminHeader extends React.Component {
           <img src="../../images/icon-32.png" className="img-circle" alt="Rendact Logo"/> 
         </span>
         <span className="logo-lg" style={{paddingRight:10}}>
-          <img src="../../images/icon-32.png" className="img-circle" alt="Rendact Logo"/> 
-          <b style={{marginLeft:5}}>My Site</b>
+          <img src="../../images/logo-white-230x85.png" width="110" className="img-circle" alt="Rendact Logo"/> 
         </span>
       </a>
       <nav className="navbar navbar-static-top">
         <a href="#" className="sidebar-toggle" data-toggle="offcanvas" role="button">
           <span className="sr-only">Toggle navigation</span>
         </a>
-
         <div className="navbar-custom-menu">
           <ul className="nav navbar-nav">
+            <li>
+              <a href="/">
+                <span><i className="fa fa-home"></i> My Site</span>
+              </a>
+            </li>
             <li className="dropdown messages-menu">
               <a href="#" className="dropdown-toggle" data-toggle="dropdown">
                 <i className="fa fa-envelope-o"></i>
