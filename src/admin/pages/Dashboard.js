@@ -1,13 +1,14 @@
 import React from 'react';
 import config from '../../config';
 import $ from 'jquery';
-const jQuery = $;
-window.jQuery = $;
 
+import '../lib/morris.js';
+import '../lib/morris.css';
+import 'jvectormap-next'; 
+import '../lib/jvectormap/jquery-jvectormap-world-mill-en.js';
+import '../lib/jvectormap/jquery-jvectormap-2.0.3.css';
 
-require ('jvectormap');
-
-
+//require('jvectormap-next');
 
 var Dashboard = React.createClass({
 	componentDidMount: function(){
@@ -31,7 +32,46 @@ var Dashboard = React.createClass({
 		    labels: ['Item 1', 'Item 2'],
 		    lineColors: ['#a0d0e0', '#3c8dbc'],
 		    hideHover: 'auto' 
-		  })
+		});
+
+		var visitorsData = {
+		    "US": 398, //USA
+		    "SA": 400, //Saudi Arabia
+		    "CA": 1000, //Canada
+		    "DE": 500, //Germany
+		    "FR": 760, //France
+		    "CN": 300, //China
+		    "AU": 700, //Australia
+		    "BR": 600, //Brazil
+		    "IN": 800, //India
+		    "GB": 320, //Great Britain
+		    "RU": 3000 //Russia
+		  };
+ 
+		$('#world-map').vectorMap({
+		    map: 'world_mill',
+		    backgroundColor: "transparent",
+		    regionStyle: {
+		      initial: {
+		        fill: '#e4e4e4',
+		        "fill-opacity": 1,
+		        stroke: 'none',
+		        "stroke-width": 0,
+		        "stroke-opacity": 1
+		      }
+		    },
+		    series: {
+		      regions: [{
+		        values: visitorsData,
+		        scale: ["#92c1dc", "#ebf4f9"],
+		        normalizeFunction: 'polynomial'
+		      }]
+		    },
+		    onRegionLabelShow: function (e, el, code) {
+		      if (typeof visitorsData[code] !== "undefined")
+		        el.html(el.html() + ': ' + visitorsData[code] + ' new visitors');
+		    }
+		});
 	},
 	render: function(){
 		return (
@@ -79,7 +119,7 @@ var Dashboard = React.createClass({
 					                  <div className="product-info">
 					                    <a href="#" className="product-title">Bicycle
 					                      <span className="label label-info pull-right">2 days ago</span></a>
-					                      <span className="product-description">
+					                        <span className="product-description">
 					                          26" Mongoose Dolomite Men's 7-speed, Navy Blue.
 					                        </span>
 					                  </div>
@@ -114,17 +154,20 @@ var Dashboard = React.createClass({
 					            </div>
 					        </div>
 					    </div>
-					    <div className="col-md-6 connectedSortable">
-						    <div className="nav-tabs-custom">
-					            <ul className="nav nav-tabs pull-right">
-						            <li className="active"><a href="#revenue-chart" data-toggle="tab">Area</a></li>
-						            <li><a href="#sales-chart" data-toggle="tab">Donut</a></li>
-						            <li className="pull-left header"><i className="fa fa-inbox"></i> Statistics</li>
-						        </ul>
-						        <div className="tab-content no-padding">
-								
+					    <div className="col-md-6">
+						    <div className="box box-primary">
+						    	<div className="box-header with-border">
+					              <h3 className="box-title">Visitor stats</h3>
 
-								</div>
+					              <div className="box-tools pull-right">
+					                <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-minus"></i>
+					                </button>
+					                <button type="button" className="btn btn-box-tool" data-widget="remove"><i className="fa fa-times"></i></button>
+					              </div>
+					            </div>
+						        <div className="box-body">
+						        	<div className="chart tab-pane" id="sales-chart" style={{position: "relative", height: 300}}></div>
+					    		</div>
 					        </div>
 					    </div>
 			        </div>
@@ -154,19 +197,19 @@ var Dashboard = React.createClass({
 					            </div>
 					        </div>
 					    </div>
-					    <div className="col-md-6 connectedSortable">
-						    <div className="box box-solid bg-light-blue-gradient">
-					            <div className="box-header">
-					              
+					    <div className="col-md-6">
+						    <div className="box box box-solid bg-light-blue-gradient">
+						    	<div className="box-header with-border">
+					              <h3 className="box-title">Visitor Geo Map</h3>
 
-					              <i className="fa fa-map-marker"></i>
-
-					              <h3 className="box-title">
-					                Visitors
-					              </h3>
+					              <div className="box-tools pull-right">
+					                <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-minus"></i>
+					                </button>
+					                <button type="button" className="btn btn-box-tool" data-widget="remove"><i className="fa fa-times"></i></button>
+					              </div>
 					            </div>
-					            <div className="box-body">
-					              <div id="world-map"></div>
+						        <div className="box-body">
+					              <div id="world-map" style={{height: 250, width: "100%"}}></div>
 					            </div>
 					        </div>
 					    </div>
