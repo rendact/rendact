@@ -202,6 +202,7 @@ const skinning = function ($, AdminLTE) {
   $("#control-sidebar-home-tab").after(tab_pane);
 
   setup();
+  change_layout('fixed');
   
   /**
    * Toggles layout classes

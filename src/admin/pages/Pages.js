@@ -2,7 +2,7 @@ import React from 'react';
 import $ from 'jquery';
 window.jQuery = $;
 
-//import images from '../../../public/images/photo4.jpg';
+import './Pages.css';
 
 require ('datatables');
 
@@ -10,23 +10,20 @@ var Pages = React.createClass({
 
 	componentDidMount: function(){
         $(document).ready(function(){
-		    $('#myTable').DataTable();
+		    $('#pageListTbl').DataTable();
 		})},
 
 	render: function(){
 		return (
 	<div className="content-wrapper">
         <section className="content-header">
-        <div style={{marginTop:'50'}}>
-          	<h2>
+          	<h1>
            		Page List
-            	<small> Control panel</small>
-            </h2>
+            </h1>
             <ol className="breadcrumb">
                 <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
                 <li className="active">Page List</li>
             </ol>
-         </div>
         </section>
       
         <section className="content">
@@ -35,13 +32,12 @@ var Pages = React.createClass({
 					<div className="container-fluid">
                 		<div className="row">
                     		<div className="col-xs-12">
-                        		<table id="myTable" className="display">                        
+                            <div style={{marginTop: 10, marginBottom: 20}}>
+                              <button className="btn btn-default" href="#" style={{marginRight: '10'}}>Edit</button>
+                              <button className="btn btn-default" href="#">Delete</button>
+                            </div>
+                        		<table id="pageListTbl" className="display">                        
                           			<thead>
-                          				<div style={{marginTop: '10', marginBottom: '10'}}>
-                            				<button className="btn btn-default" href="#" style={{marginRight: '10'}}>Edit</button>
-                            				<button className="btn btn-default" href="#">Delete</button>
-                          				</div>
-                          
                             			<tr>
                               				<th><input type="checkbox"></input></th>                            
                               				<th>Title</th>

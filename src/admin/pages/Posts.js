@@ -2,6 +2,7 @@ import React from 'react';
 import $ from 'jquery';
 window.jQuery = $;
 
+import './Posts.css';
 import images from '../../../public/images/photo4.jpg';
 
 require ('datatables');
@@ -10,7 +11,7 @@ var Posts = React.createClass({
 
 	componentDidMount: function(){
         $(document).ready(function(){
-		    $('#myTable').DataTable();
+		    $('#postListTbl').DataTable();
 		})},
 
 	render: function(){
@@ -19,7 +20,6 @@ var Posts = React.createClass({
 				<section className="content-header">
 			      <h1>
 			        Post List
-			        <small>Control panel</small>
 			      </h1>
 			      <ol className="breadcrumb">
 			        <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
@@ -36,7 +36,7 @@ var Posts = React.createClass({
 	                    </div>
 	                    
 	                    <div className="box-body">
-	                      <table id="myTable" className="display">
+	                      <table id="postListTbl" className="display">
 	                        <thead>
 	                          <tr>
 	                            <th><input type="checkbox"></input></th>
