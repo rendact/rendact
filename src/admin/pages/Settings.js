@@ -69,7 +69,7 @@ var Settings = React.createClass({
 								<div className="form-group">
 								<div className="col-md-3">
 									
-										<input type="submit" value="Save" className="btn btn-success btn-block btn-h1-spacing" />
+										<input type="submit" value="Save" className="btn btn-default btn-block btn-h1-spacing disabled" />
 								</div>
 								</div>
 							</form>

@@ -53,163 +53,113 @@ var Posts = React.createClass({
 		                        <tr>
 		                            <td><input type="checkbox"></input></td>
 		                            <td><img src={images} height="50" /></td>
-		                            <td>Hidup tenang dengan meninggalkan dunia</td>
-		                            <td>Ardi Nugraha</td>
-		                            <td>Fikih</td>
-		                            <td>Sholat, Fikih</td>
+		                            <td><a href="#">Satu</a></td>
+		                            <td><a href="#">Ardi Nugraha</a> </td>
+		                            <td><a href="#">satu</a></td>
+		                            <td><a href="#">satu</a></td>
+		                            <td>32</td>
+		                            <td>Published 12/01/2017</td>
+		                        </tr>
+		                         <tr>
+		                            <td><input type="checkbox"></input></td>
+		                            <td><img src={images} height="50" /></td>
+		                            <td><a href="#">Dua</a></td>
+		                            <td><a href="#">Dua</a> </td>
+		                            <td><a href="#">Dua</a></td>
+		                            <td><a href="#">Dua</a></td>
 		                            <td>32</td>
 		                            <td>Published 12/01/2017</td>
 		                        </tr>
 		                        <tr>
 		                            <td><input type="checkbox"></input></td>
 		                            <td><img src={images} height="50" /></td>
-		                            <td>Sunyi Sepi</td>
-		                            <td>Bayu Nugraha</td>
-		                            <td>Hidup</td>
-		                            <td>Hidup</td>
-		                            <td>23</td>
-		                            <td>Published 01/01/2017</td>
+		                            <td><a href="#">Tiga</a></td>
+		                            <td><a href="#">Tiga</a> </td>
+		                            <td><a href="#">Tiga</a></td>
+		                            <td><a href="#">Tiga</a></td>
+		                            <td>32</td>
+		                            <td>Published 12/01/2017</td>
 		                        </tr>
-		                          <tr>
-	                              <td><input type="checkbox"></input></td>
-	                              <td><img src={images} height="50" /></td>
-	                              <td>Meninggalkan dunia</td>
-	                              <td>Sultan Nugraha</td>
-	                              <td>Ahlak</td>
-	                              <td>Hidup</td>
-	                              <td>37</td>
-	                              <td>Published 12/12/2016</td>
-	                            </tr>
 	                            <tr>
-	                              <td><input type="checkbox"></input></td>
-	                              <td><img src={images} height="50" /></td>
-	                              <td>Karam Merdeka Sepi</td>
-	                              <td>Wulan Nugraha</td>
-	                              <td>Kehidupan</td>
-	                              <td>Hidup</td>
-	                              <td>83</td>
-	                              <td>Published 22/12/2016</td>
-	                            </tr>
-	                            <tr>
-	                              <td><input type="checkbox"></input></td>
-	                              <td><img src={images} height="50" /></td>
-	                              <td>Hidup tenang dengan meninggalkan dunia</td>
-	                              <td>damar Nugraha</td>
-	                              <td>Fikih</td>
-	                              <td>Sholat, Fikih</td>
-	                              <td>32</td>
-	                              <td>Published 21/01/2017</td>
-	                            </tr>
-	                            <tr>
-	                              <td><input type="checkbox"></input></td>
-	                              <td><img src={images} height="50" /></td>
-	                              <td>Sunyi Sepi</td>
-	                              <td>kunir Nugraha</td>
-	                              <td>Hidup</td>
-	                              <td>Hidup</td>
-	                              <td>23</td>
-	                              <td>Published 14/01/2017</td>
-	                            </tr>
-	                            	<tr>
-	                                <td><input type="checkbox"></input></td>
-	                                <td><img src={images} height="50" /></td>
-	                                <td>Meninggalkan dunia</td>
-	                                <td>Sultan Nugraha</td>
-	                                <td>Ahlak</td>
-	                                <td>Hidup</td>
-	                                <td>37</td>
-	                                <td>Published 30/12/2016</td>
-	                            </tr>
-	                            <tr>
-	                                <td><input type="checkbox"></input></td>
-	                                <td><img src={images} height="50" /></td>
-	                                <td>Karam Merdeka Sepi</td>
-	                                <td>Yudi Nugraha</td>
-	                                <td>Kehidupan</td>
-	                                <td>Hidup</td>
-	                                <td>83</td>
-	                                <td>Published 25/12/2016</td>
-	                            </tr>
-		                        <tr>
 		                            <td><input type="checkbox"></input></td>
 		                            <td><img src={images} height="50" /></td>
-		                            <td>Hidup tenang dengan meninggalkan dunia</td>
-		                            <td>Ardi Nugraha</td>
-		                            <td>Fikih</td>
-		                            <td>Sholat, Fikih</td>
+		                            <td><a href="#">Empat</a></td>
+		                            <td><a href="#">Empat</a> </td>
+		                            <td><a href="#">Empat</a></td>
+		                            <td><a href="#">Empat</a></td>
 		                            <td>32</td>
 		                            <td>Published 12/01/2017</td>
 		                        </tr>
 		                        <tr>
 		                            <td><input type="checkbox"></input></td>
 		                            <td><img src={images} height="50" /></td>
-		                            <td>Sunyi Sepi</td>
-		                            <td>Bayu Nugraha</td>
-		                            <td>Hidup</td>
-		                            <td>Hidup</td>
-		                            <td>23</td>
-		                            <td>Published 01/01/2017</td>
+		                            <td><a href="#">Lima</a></td>
+		                            <td><a href="#">Lima</a> </td>
+		                            <td><a href="#">Lima</a></td>
+		                            <td><a href="#">Lima</a></td>
+		                            <td>32</td>
+		                            <td>Published 12/01/2017</td>
+		                        </tr>
+	                            <tr>
+		                            <td><input type="checkbox"></input></td>
+		                            <td><img src={images} height="50" /></td>
+		                            <td><a href="#">Enam</a></td>
+		                            <td><a href="#">Enam</a> </td>
+		                            <td><a href="#">Enam</a></td>
+		                            <td><a href="#">Enam</a></td>
+		                            <td>32</td>
+		                            <td>Published 12/01/2017</td>
 		                        </tr>
 		                        <tr>
-	                              <td><input type="checkbox"></input></td>
-	                              <td><img src={images} height="50" /></td>
-	                              <td>Keroncong Indonesia</td>
-	                              <td>Waljinah</td>
-	                              <td>Ahlak</td>
-	                              <td>Hidup</td>
-	                              <td>37</td>
-	                              <td>Published 12/12/2016</td>
-	                            </tr>
+		                            <td><input type="checkbox"></input></td>
+		                            <td><img src={images} height="50" /></td>
+		                            <td><a href="#">Tujuh</a></td>
+		                            <td><a href="#">Tujuh</a> </td>
+		                            <td><a href="#">Tujuh</a></td>
+		                            <td><a href="#">Tujuh</a></td>
+		                            <td>32</td>
+		                            <td>Published 12/01/2017</td>
+		                        </tr>
 	                            <tr>
-	                              <td><input type="checkbox"></input></td>
-	                              <td><img src={images} height="50" /></td>
-	                              <td>Singgung Neraca</td>
-	                              <td>Katimin</td>
-	                              <td>Kehidupan</td>
-	                              <td>Hidup</td>
-	                              <td>83</td>
-	                              <td>Published 22/12/2016</td>
-	                            </tr>
-	                            <tr>
-	                              <td><input type="checkbox"></input></td>
-	                              <td><img src={images} height="50" /></td>
-	                              <td>Menata Hari</td>
-	                              <td>Lukman</td>
-	                              <td>Fikih</td>
-	                              <td>Sholat, Fikih</td>
-	                              <td>32</td>
-	                              <td>Published 21/01/2017</td>
-	                            </tr>
-	                            <tr>
-	                              <td><input type="checkbox"></input></td>
-	                              <td><img src={images} height="50" /></td>
-	                              <td>Besok Mau Makan Apa</td>
-	                              <td>Wulan</td>
-	                              <td>Hidup</td>
-	                              <td>Hidup</td>
-	                              <td>23</td>
-	                              <td>Published 14/01/2017</td>
-	                            </tr>
-	                            <tr>
-	                                <td><input type="checkbox"></input></td>
-	                                <td><img src={images} height="50" /></td>
-	                                <td>Elok di tepi Pantai</td>
-	                                <td>Sumarni</td>
-	                                <td>Ahlak</td>
-	                                <td>Hidup</td>
-	                                <td>37</td>
-	                                <td>Published 30/12/2016</td>
-	                            </tr>
-	                            <tr>
-	                                <td><input type="checkbox"></input></td>
-	                                <td><img src={images} height="50" /></td>
-	                                <td>Hanya Gambaran</td>
-	                                <td>Ida</td>
-	                                <td>Kehidupan</td>
-	                                <td>Hidup</td>
-	                                <td>83</td>
-	                                <td>Published 25/12/2016</td>
-	                              </tr>
+		                            <td><input type="checkbox"></input></td>
+		                            <td><img src={images} height="50" /></td>
+		                            <td><a href="#">Delapan</a></td>
+		                            <td><a href="#">Delapan</a> </td>
+		                            <td><a href="#">Delapan</a></td>
+		                            <td><a href="#">Delapan</a></td>
+		                            <td>32</td>
+		                            <td>Published 12/01/2017</td>
+		                        </tr>
+		                        <tr>
+		                            <td><input type="checkbox"></input></td>
+		                            <td><img src={images} height="50" /></td>
+		                            <td><a href="#">Sepuluh</a></td>
+		                            <td><a href="#">Sepuluh</a> </td>
+		                            <td><a href="#">Sepuluh</a></td>
+		                            <td><a href="#">Sepuluh</a></td>
+		                            <td>32</td>
+		                            <td>Published 12/01/2017</td>
+		                        </tr>
+		                        <tr>
+		                            <td><input type="checkbox"></input></td>
+		                            <td><img src={images} height="50" /></td>
+		                            <td><a href="#">Sebelas</a></td>
+		                            <td><a href="#">Sebelas</a> </td>
+		                            <td><a href="#">Sebelas</a></td>
+		                            <td><a href="#">Sebelas</a></td>
+		                            <td>32</td>
+		                            <td>Published 12/01/2017</td>
+		                        </tr>
+		                        <tr>
+		                            <td><input type="checkbox"></input></td>
+		                            <td><img src={images} height="50" /></td>
+		                            <td><a href="#">Duabelas</a></td>
+		                            <td><a href="#">Duabelas</a> </td>
+		                            <td><a href="#">Duabelas</a></td>
+		                            <td><a href="#">Duabelas</a></td>
+		                            <td>32</td>
+		                            <td>Published 12/01/2017</td>
+		                        </tr>
 	                        </tbody>
 	                      </table>
 	                    </div>
