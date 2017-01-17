@@ -4,6 +4,7 @@ window.jQuery = $;
 
 import './css/style.css';
 import './css/animate.css';
+import Bootstrap from 'bootstrap/dist/css/bootstrap.css';
 
 import React from 'react'
 // import WOW from 'wowjs';
