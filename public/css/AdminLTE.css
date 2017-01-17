@@ -105,9 +105,11 @@ body {
   border-top: 1px solid #d2d6de;
 }
 /* Fixed layout */
-.fixed .main-header,
-.fixed .main-sidebar,
-.fixed .left-side {
+.fixed .left-side,
+.fixed .main-sidebar {
+  position: absolute;
+}
+.fixed .main-header {
   position: fixed;
 }
 .fixed .main-header {
@@ -199,10 +201,23 @@ a:focus {
   -o-transition: margin-left 0.3s ease-in-out;
   transition: margin-left 0.3s ease-in-out;
   margin-bottom: 0;
-  margin-left: 230px;
   border: none;
   min-height: 50px;
   border-radius: 0;
+}
+.main-header .site-name {
+  -webkit-transition: width 0.3s ease-in-out;
+  -o-transition: width 0.3s ease-in-out;
+  transition: width 0.3s ease-in-out;
+  display: block;
+  float: left;
+  color: white;
+  height: 50px;
+  text-align: center;
+  font-family: "Source Sans Pro", Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  padding: 15px;
+  overflow: hidden;
 }
 .layout-top-nav .main-header .navbar {
   margin-left: 0;
@@ -293,11 +308,11 @@ a:focus {
   font-size: 20px;
   line-height: 50px;
   text-align: center;
-  width: 230px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   padding: 0 15px;
   font-weight: 300;
   overflow: hidden;
+  width: 63px;
 }
 .main-header .logo .logo-lg {
   display: block;
