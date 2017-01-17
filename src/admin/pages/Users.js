@@ -1,6 +1,8 @@
 import React from 'react';
 import $ from 'jquery';
 window.jQuery = $;
+
+import './Users.css';
 import images from '../../../public/images/avatar-default.png';
 require ('datatables');
 
