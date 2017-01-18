@@ -4,7 +4,7 @@ import $ from 'jquery';
 
 import '../lib/morris.js';
 import '../lib/morris.css';
-import 'jvectormap-next'; 
+import 'jvectormap'; 
 import '../lib/jvectormap/jquery-jvectormap-world-mill-en.js';
 import '../lib/jvectormap/jquery-jvectormap-2.0.3.css';
 

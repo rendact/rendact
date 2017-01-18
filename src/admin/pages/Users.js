@@ -43,7 +43,7 @@ var Users = React.createClass({
 	                            <th>User Name</th>
 	                            <th>Name</th>
 	                            <th>Email</th>
-	                            <th>Level</th>
+	                            <th>Role</th>
 	                            <th>Posts</th>
 	                          </tr>
 	                        </thead>
@@ -148,6 +148,17 @@ var Users = React.createClass({
 		                            <td>32</td>
 		                        </tr>
 	                        </tbody>
+	                        <tfoot>
+	                          <tr>
+	                            <th><input type="checkbox"></input></th>
+	                            <th></th>
+	                            <th>User Name</th>
+	                            <th>Name</th>
+	                            <th>Email</th>
+	                            <th>Role</th>
+	                            <th>Posts</th>
+	                          </tr>
+	                        </tfoot>
 	                      </table>
 	                    </div>
 	                  </div>

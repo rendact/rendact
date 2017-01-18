@@ -16,6 +16,7 @@ import 'jquery-ui/ui/widgets/tooltip';
 import 'font-awesome/css/font-awesome.css';
 //import 'bootstrap/dist/css/bootstrap.min.css';
 import 'datatables/media/css/jquery.dataTables.min.css';
+import 'jvectormap/jquery-jvectormap.css';
 import '../../public/css/ionicons.min.css';
 import '../../public/css/AdminLTE.css';
 import '../../public/css/skins/_all-skins.css';

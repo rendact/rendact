@@ -161,6 +161,18 @@ var Posts = React.createClass({
 		                            <td>Published 12/01/2017</td>
 		                        </tr>
 	                        </tbody>
+	                        <tfoot>
+	                          <tr>
+	                            <th><input type="checkbox"></input></th>
+	                            <th></th>
+	                            <th>Title</th>
+	                            <th>Author</th>
+	                            <th>Categories</th>
+	                            <th>Tags</th>
+	                            <th>Likes</th>
+	                            <th>Date</th>
+	                          </tr>
+	                        </tfoot>
 	                      </table>
 	                    </div>
 	                  </div>
