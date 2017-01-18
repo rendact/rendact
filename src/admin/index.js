@@ -39,7 +39,9 @@ require ('bootstrap');
 
 const SideMenu = React.createClass({
 	getInitialState: function() {
-		return {activeMenu: 'dashboard'}
+		return {
+			activeMenu: this.props.activeMenu
+		}
 	},
 	onClick: function(id, e){
 		e.preventDefault();
@@ -50,6 +52,7 @@ const SideMenu = React.createClass({
 	},
 	componentDidMount: function(){
 		$("#menu-"+this.state.activeMenu).addClass("active");
+		$("#menu-"+this.state.activeMenu).parent("ul").parent("li").addClass("active");
 	},
 	render: function() {
 		
@@ -140,10 +143,8 @@ const PageLoader = React.createClass({
 		}
 		if (map[page+action]) {
 			return map[page+action]
-		} else if (action===""){
-			return <NotFound/>
 		} else {
-			return <Dashboard />
+			return <NotFound/>
 		}
 	}
 });
@@ -152,12 +153,21 @@ const PageLoader = React.createClass({
 const Admin = React.createClass({
 	getInitialState: function() {
 		return {
-			page: this.props.params['page'],
-			action: this.props.params['action']
+			page: this.props.params['page']?this.props.params['page']:'dashboard',
+			action: this.props.params['action']?this.props.params['action']:''
+		}
+	},
+	getDefaultProps: function() {
+		return { 
+			params: {
+				page: 'dashboard',
+				action: ''
+			}
 		}
 	},
 	handleMenuClick: function(pageId){
-		this.setState({page: pageId})
+		var pg = pageId.split("-");
+		this.setState({page: pg[0], action: pg[1]?pg[1]:''})
 		//PageLoader.openPage();
 	},
 	componentDidMount: function(){
@@ -172,7 +182,7 @@ const Admin = React.createClass({
 				<div className="wrapper" style={fullHeight}>
 	        		
 	        		<AdminHeader/>
-	  				<SideMenu onClick={this.handleMenuClick}/>
+	  				<SideMenu onClick={this.handleMenuClick} activeMenu={this.state.page+(this.state.action?'-':'')+this.state.action}/>
 					<PageLoader pageId={this.state.page} actionId={this.state.action} />
 					<Footer/>
 					<ControlSidebar/>
