@@ -5,7 +5,8 @@ var NewPage = React.createClass({
 	componenDidMount: function(){
 		const script = document.createElement("script");
 
-        script.src = "https://cdn.ckeditor.com/4.5.7/standard/ckeditor.js";
+        fetch('https://cdn.ckeditor.com/4.5.7/standard/ckeditor.js')
+        .then (response => response.json())
         script.async = true;
 
         document.body.appendChild(script);
@@ -31,7 +32,7 @@ var NewPage = React.createClass({
 			    </section>
 			    <section className="content">
               		<form>
-                    	<textarea id="editor1" name="editor1" rows="15" cols="107">
+                    	<textarea id="editor1" name="editor1" rows="15" cols="92" wrap="hard">
                             This is my textarea to be replaced with CKEditor.
                     	</textarea>
               		</form>		       					
@@ -85,7 +86,7 @@ var NewPage = React.createClass({
             						<form>
   										<div className="form-group">
     										<button type="submit" className="btn btn-default">Save Draft</button>
-    										<button type="submit" className="btn btn-default" style={{marginLeft:'115'}}>Preview</button>
+    										<button type="submit" className="btn btn-default" style={{marginLeft:'105'}}>Preview</button>
   										</div>
   									</form>
   									<form className="form-inline">
