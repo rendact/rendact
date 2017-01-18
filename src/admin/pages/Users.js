@@ -31,7 +31,6 @@ var Users = React.createClass({
 	                <div className="col-xs-12">
 	                  <div className="box">
 	                    <div className="box-header">
-	                      <h3 className="box-title"></h3>
 	                    </div>
 	                    
 	                    <div className="box-body">
