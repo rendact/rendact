@@ -10,7 +10,6 @@
   "dependencies": {
     "apollo-client": "^0.4.11",
     "bootstrap": "^3.3.6",
-    "ckeditor": "^4.6.2",
     "datatables": "^1.10.13",
     "font-awesome": "^4.7.0",
     "graphql": "^0.7.0",

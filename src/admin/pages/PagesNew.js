@@ -1,16 +1,12 @@
 import React from 'react';
-import CKEDITOR from 'ckeditor';
+import $ from 'jquery';
+window.jQuery = $;
+window.CKEDITOR_BASEPATH = '/ckeditor/';
+require('ckeditor');
 
 var NewPage = React.createClass({
-	componenDidMount: function(){
-		const script = document.createElement("script");
-
-        script.src = "https://cdn.ckeditor.com/4.5.7/standard/ckeditor.js";
-        script.async = true;
-
-        document.body.appendChild(script);
-
-		CKEDITOR.replace('editor1');
+	componentDidMount: function(){
+    window.CKEDITOR.replace('editor1');
 	},
 	
 	render: function(){
@@ -31,6 +27,7 @@ var NewPage = React.createClass({
 			    </section>
 			    <section className="content">
               		<form>
+                      <div id="script-container"></div>
                     	<textarea id="editor1" name="editor1" rows="15" cols="107">
                             This is my textarea to be replaced with CKEditor.
                     	</textarea>
