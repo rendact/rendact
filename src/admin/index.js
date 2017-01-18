@@ -5,7 +5,7 @@ window.jQuery = $;
 
 import config from '../config';
 
-import './lib/app.js';
+import AdminLTEinit from './lib/app.js';
 import skinning from './lib/skinning.js';
 
 import 'jquery-ui/themes/base/core.css';
@@ -161,7 +161,8 @@ const Admin = React.createClass({
 		//PageLoader.openPage();
 	},
 	componentDidMount: function(){
-		skinning(jQuery, $.AdminLTE);
+		AdminLTEinit();
+		skinning(jQuery, jQuery.AdminLTE);
 	},
 	render: function() {
 		// switch (this.state.layout) or similar
