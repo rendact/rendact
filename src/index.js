@@ -1,5 +1,4 @@
 import $ from 'jquery';
-const jQuery = $;
 window.jQuery = $;
 
 import React from 'react'

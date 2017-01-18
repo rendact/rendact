@@ -5,7 +5,7 @@ window.jQuery = $;
 
 import config from '../config';
 
-import './lib/app.min.js';
+import './lib/app.js';
 import skinning from './lib/skinning.js';
 
 import 'jquery-ui/themes/base/core.css';
@@ -85,7 +85,6 @@ const SideMenu = React.createClass({
 				      			<ul className="treeview-menu">
 				      			{
 				      				item.elements.map(function(item) {
-				      					var activeClass = item.open?"active":"";
 				      					var iconClass = "fa "+item.icon;
 				      					return <li key={item.id} id={"menu-"+item.id} className="menu-item" onClick={this.onClick.bind(this, item.id)}><a href={item.url}><i className={iconClass}></i> {item.label}</a></li>
 				      				}, this)
