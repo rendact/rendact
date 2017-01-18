@@ -178,17 +178,15 @@ const Admin = React.createClass({
 		// switch (this.state.layout) or similar
 		console.log(this.state.page);
 		return (
-			<div style={fullHeight}>
-				<div className="wrapper" style={fullHeight}>
-	        		
-	        		<AdminHeader/>
-	  				<SideMenu onClick={this.handleMenuClick} activeMenu={this.state.page+(this.state.action?'-':'')+this.state.action}/>
-					<PageLoader pageId={this.state.page} actionId={this.state.action} />
-					<Footer/>
-					<ControlSidebar/>
-					<div className="control-sidebar-bg"></div>
-	            </div>
-	        </div>
+			<div className="wrapper">
+        		
+        		<AdminHeader/>
+  				<SideMenu onClick={this.handleMenuClick} activeMenu={this.state.page+(this.state.action?'-':'')+this.state.action}/>
+				<PageLoader pageId={this.state.page} actionId={this.state.action} />
+				<Footer/>
+				<ControlSidebar/>
+				<div className="control-sidebar-bg"></div>
+            </div>
 		);
 	}
 });

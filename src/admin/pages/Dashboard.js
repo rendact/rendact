@@ -75,7 +75,7 @@ var Dashboard = React.createClass({
 	},
 	render: function(){
 		return (
-			<div className="content-wrapper" style={{height: '100%'}}>
+			<div className="content-wrapper">
 				<section className="content-header">
 			      <h1>
 			        Dashboard
