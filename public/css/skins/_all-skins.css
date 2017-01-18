@@ -74,9 +74,9 @@
 }
 .skin-blue .sidebar-menu > li:hover > a,
 .skin-blue .sidebar-menu > li.active > a {
-  color: #ffffff;
-  background: #1e282c;
-  border-left-color: #3c8dbc;
+  color: inherit;
+  background: #3c8dbc;
+  font-weight: bold;
 }
 .skin-blue .sidebar-menu > li > .treeview-menu {
   margin: 0 1px;
@@ -93,8 +93,8 @@
 }
 .skin-blue .treeview-menu > li.active > a,
 .skin-blue .treeview-menu > li > a:hover {
-  color: #98dbf9;
-  background-color: darkcyan;
+  color: #ffffff;
+  font-weight: bold;
 }
 .skin-blue .sidebar-form {
   border-radius: 3px;

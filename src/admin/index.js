@@ -5,7 +5,7 @@ window.jQuery = $;
 
 import config from '../config';
 
-import './lib/app.min.js';
+import AdminLTEinit from './lib/app.js';
 import skinning from './lib/skinning.js';
 
 import 'jquery-ui/themes/base/core.css';
@@ -16,7 +16,6 @@ import 'jquery-ui/ui/widgets/tooltip';
 import 'font-awesome/css/font-awesome.css';
 //import 'bootstrap/dist/css/bootstrap.min.css';
 import 'datatables/media/css/jquery.dataTables.min.css';
-import 'jvectormap/jquery-jvectormap.css';
 import '../../public/css/ionicons.min.css';
 import '../../public/css/AdminLTE.css';
 import '../../public/css/skins/_all-skins.css';
@@ -40,7 +39,9 @@ require ('bootstrap');
 
 const SideMenu = React.createClass({
 	getInitialState: function() {
-		return {activeMenu: 'dashboard'}
+		return {
+			activeMenu: this.props.activeMenu
+		}
 	},
 	onClick: function(id, e){
 		e.preventDefault();
@@ -51,6 +52,7 @@ const SideMenu = React.createClass({
 	},
 	componentDidMount: function(){
 		$("#menu-"+this.state.activeMenu).addClass("active");
+		$("#menu-"+this.state.activeMenu).parent("ul").parent("li").addClass("active");
 	},
 	render: function() {
 		
@@ -86,7 +88,6 @@ const SideMenu = React.createClass({
 				      			<ul className="treeview-menu">
 				      			{
 				      				item.elements.map(function(item) {
-				      					var activeClass = item.open?"active":"";
 				      					var iconClass = "fa "+item.icon;
 				      					return <li key={item.id} id={"menu-"+item.id} className="menu-item" onClick={this.onClick.bind(this, item.id)}><a href={item.url}><i className={iconClass}></i> {item.label}</a></li>
 				      				}, this)
@@ -114,10 +115,6 @@ const SideMenu = React.createClass({
 	}
 });
 
-var fullHeight = {
-	height: '100%'
-}
-
 const PageLoader = React.createClass({
 	getDefaultProps: function() {
 		return {pageId: "dashboard", actionId: ''}
@@ -142,10 +139,8 @@ const PageLoader = React.createClass({
 		}
 		if (map[page+action]) {
 			return map[page+action]
-		} else if (action===""){
-			return <NotFound/>
 		} else {
-			return <Dashboard />
+			return <NotFound/>
 		}
 	}
 });
@@ -154,32 +149,40 @@ const PageLoader = React.createClass({
 const Admin = React.createClass({
 	getInitialState: function() {
 		return {
-			page: this.props.params['page'],
-			action: this.props.params['action']
+			page: this.props.params['page']?this.props.params['page']:'dashboard',
+			action: this.props.params['action']?this.props.params['action']:''
+		}
+	},
+	getDefaultProps: function() {
+		return { 
+			params: {
+				page: 'dashboard',
+				action: ''
+			}
 		}
 	},
 	handleMenuClick: function(pageId){
-		this.setState({page: pageId})
+		var pg = pageId.split("-");
+		this.setState({page: pg[0], action: pg[1]?pg[1]:''})
 		//PageLoader.openPage();
 	},
 	componentDidMount: function(){
-		skinning(jQuery, $.AdminLTE);
+		AdminLTEinit();
+		skinning(jQuery, jQuery.AdminLTE);
 	},
 	render: function() {
 		// switch (this.state.layout) or similar
 		console.log(this.state.page);
 		return (
-			<div style={fullHeight}>
-				<div className="wrapper" style={fullHeight}>
-	        		
-	        		<AdminHeader/>
-	  				<SideMenu onClick={this.handleMenuClick}/>
-					<PageLoader pageId={this.state.page} actionId={this.state.action} />
-					<Footer/>
-					<ControlSidebar/>
-					<div className="control-sidebar-bg"></div>
-	            </div>
-	        </div>
+			<div className="wrapper">
+        		
+        		<AdminHeader/>
+  				<SideMenu onClick={this.handleMenuClick} activeMenu={this.state.page+(this.state.action?'-':'')+this.state.action}/>
+				<PageLoader pageId={this.state.page} actionId={this.state.action} />
+				<Footer/>
+				<ControlSidebar/>
+				<div className="control-sidebar-bg"></div>
+            </div>
 		);
 	}
 });

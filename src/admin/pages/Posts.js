@@ -52,7 +52,7 @@ var Posts = React.createClass({
 	                        <tbody>
 		                        <tr>
 		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" /></td>
+		                            <td><img src={images} height="50" alt="thumbnail" /></td>
 		                            <td><a href="#">Satu</a></td>
 		                            <td><a href="#">Ardi Nugraha</a> </td>
 		                            <td><a href="#">satu</a></td>
@@ -62,7 +62,7 @@ var Posts = React.createClass({
 		                        </tr>
 		                         <tr>
 		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" /></td>
+		                            <td><img src={images} height="50" alt="thumbnail" /></td>
 		                            <td><a href="#">Dua</a></td>
 		                            <td><a href="#">Dua</a> </td>
 		                            <td><a href="#">Dua</a></td>
@@ -72,7 +72,7 @@ var Posts = React.createClass({
 		                        </tr>
 		                        <tr>
 		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" /></td>
+		                            <td><img src={images} height="50" alt="thumbnail" /></td>
 		                            <td><a href="#">Tiga</a></td>
 		                            <td><a href="#">Tiga</a> </td>
 		                            <td><a href="#">Tiga</a></td>
@@ -82,7 +82,7 @@ var Posts = React.createClass({
 		                        </tr>
 	                            <tr>
 		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" /></td>
+		                            <td><img src={images} height="50" alt="thumbnail" /></td>
 		                            <td><a href="#">Empat</a></td>
 		                            <td><a href="#">Empat</a> </td>
 		                            <td><a href="#">Empat</a></td>
@@ -92,7 +92,7 @@ var Posts = React.createClass({
 		                        </tr>
 		                        <tr>
 		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" /></td>
+		                            <td><img src={images} height="50" alt="thumbnail" /></td>
 		                            <td><a href="#">Lima</a></td>
 		                            <td><a href="#">Lima</a> </td>
 		                            <td><a href="#">Lima</a></td>
@@ -102,7 +102,7 @@ var Posts = React.createClass({
 		                        </tr>
 	                            <tr>
 		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" /></td>
+		                            <td><img src={images} height="50" alt="thumbnail" /></td>
 		                            <td><a href="#">Enam</a></td>
 		                            <td><a href="#">Enam</a> </td>
 		                            <td><a href="#">Enam</a></td>
@@ -112,7 +112,7 @@ var Posts = React.createClass({
 		                        </tr>
 		                        <tr>
 		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" /></td>
+		                            <td><img src={images} height="50" alt="thumbnail" /></td>
 		                            <td><a href="#">Tujuh</a></td>
 		                            <td><a href="#">Tujuh</a> </td>
 		                            <td><a href="#">Tujuh</a></td>
@@ -122,7 +122,7 @@ var Posts = React.createClass({
 		                        </tr>
 	                            <tr>
 		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" /></td>
+		                            <td><img src={images} height="50" alt="thumbnail" /></td>
 		                            <td><a href="#">Delapan</a></td>
 		                            <td><a href="#">Delapan</a> </td>
 		                            <td><a href="#">Delapan</a></td>
@@ -132,7 +132,7 @@ var Posts = React.createClass({
 		                        </tr>
 		                        <tr>
 		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" /></td>
+		                            <td><img src={images} height="50" alt="thumbnail" /></td>
 		                            <td><a href="#">Sepuluh</a></td>
 		                            <td><a href="#">Sepuluh</a> </td>
 		                            <td><a href="#">Sepuluh</a></td>
@@ -142,7 +142,7 @@ var Posts = React.createClass({
 		                        </tr>
 		                        <tr>
 		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" /></td>
+		                            <td><img src={images} height="50" alt="thumbnail" /></td>
 		                            <td><a href="#">Sebelas</a></td>
 		                            <td><a href="#">Sebelas</a> </td>
 		                            <td><a href="#">Sebelas</a></td>
@@ -152,7 +152,7 @@ var Posts = React.createClass({
 		                        </tr>
 		                        <tr>
 		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" /></td>
+		                            <td><img src={images} height="50" alt="thumbnail" /></td>
 		                            <td><a href="#">Duabelas</a></td>
 		                            <td><a href="#">Duabelas</a> </td>
 		                            <td><a href="#">Duabelas</a></td>

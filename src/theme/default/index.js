@@ -1,10 +1,9 @@
 import $ from 'jquery';
-const jQuery = $;
 window.jQuery = $;
 
 import './css/style.css';
 import './css/animate.css';
-import Bootstrap from 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/css/bootstrap.css';
 
 import React from 'react'
 // import WOW from 'wowjs';
@@ -28,12 +27,16 @@ const Theme = React.createClass({
 		switch (this.state.layout) {
 			case "Home":
 				rend_element = <Home/>;
+				break;
 			case "Page":
 				rend_element = <Page/>;
+				break;
 			case "Post":
 				rend_element = <Post/>;
+				break;
 			default:
 				rend_element = <Home/>;
+				break;
 		}
 				
 				

@@ -1,5 +1,4 @@
 import $ from 'jquery';
-const jQuery = $;
 window.jQuery = $;
 
 import React from 'react'
@@ -15,7 +14,7 @@ const Main = React.createClass({
 		return (
 			<ApolloProvider client={client}>
 				<BrowserRouter>
-					<div id="router" style={{height: "100%"}}>
+					<div id="router" style={{height: "100vh"}}>
 						<Match pattern="/admin/:page?/:action?/:param1?/:param2?/:param3?/:param4?/:param5?" component={Admin}/>
 						<Miss component={Theme}/>
 					</div>

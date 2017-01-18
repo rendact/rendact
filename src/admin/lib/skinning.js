@@ -201,8 +201,8 @@ const skinning = function ($, AdminLTE) {
   tab_pane.append(demo_settings);
   $("#control-sidebar-home-tab").after(tab_pane);
 
-  setup();
   change_layout('fixed');
+  setup();
   
   /**
    * Toggles layout classes
@@ -211,22 +211,22 @@ const skinning = function ($, AdminLTE) {
    * @returns void
    */
   function change_layout(cls) {
-
+    
     $("body").toggleClass(cls);
-    AdminLTE.layout.fixSidebar();
+    //AdminLTE.layout.fixSidebar();
     //Fix the problem with right sidebar and layout boxed
     if (cls === "layout-boxed")
       AdminLTE.controlSidebar._fix($(".control-sidebar-bg"));
     if ($('body').hasClass('fixed') && cls === 'fixed') {
-      AdminLTE.pushMenu.expandOnHover();
-      AdminLTE.layout.activate();
+      //AdminLTE.pushMenu.expandOnHover();
+      //AdminLTE.layout.activate();
     }
     if (cls === "profile-hide") {
       $(".user-panel").toggleClass("user-panel-hidden");
       localStorage.setItem("user-panel-box", !$(".user-panel").hasClass("user-panel-hidden"));
     }
-    AdminLTE.controlSidebar._fix($(".control-sidebar-bg"));
-    AdminLTE.controlSidebar._fix($(".control-sidebar"));
+    //AdminLTE.controlSidebar._fix($(".control-sidebar-bg"));
+    //AdminLTE.controlSidebar._fix($(".control-sidebar"));
   }
 
   /**
@@ -284,7 +284,9 @@ const skinning = function ($, AdminLTE) {
       change_skin(tmp);
     //Load profile box config
     var profileBox = get('user-panel-box');
-    $("[data-layout='profile-hide']").attr('checked', profileBox==='true'?'checked':'');
+    
+    $("[data-layout='profile-hide']").prop('checked', profileBox==='true');
+    //$("[data-layout='profile-hide']").checked = profileBox==='true';
     if (profileBox==="true" && $(".user-panel").hasClass("user-panel-hidden")) {
       $(".user-panel").removeClass("user-panel-hidden")
     }

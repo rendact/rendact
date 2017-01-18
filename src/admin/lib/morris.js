@@ -1,3 +1,4 @@
+/* eslint-disable */
 /* @license
 morris.js v0.5.0
 Copyright 2014 Olly Smith All rights reserved.
@@ -36,7 +37,8 @@ window.jQuery = $;
 
     EventEmitter.prototype.fire = function() {
       var args, handler, name, _i, _len, _ref, _results;
-      name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      name = arguments[0];
+      args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       if ((this.handlers != null) && (this.handlers[name] != null)) {
         _ref = this.handlers[name];
         _results = [];
