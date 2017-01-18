@@ -115,10 +115,6 @@ const SideMenu = React.createClass({
 	}
 });
 
-var fullHeight = {
-	height: '100%'
-}
-
 const PageLoader = React.createClass({
 	getDefaultProps: function() {
 		return {pageId: "dashboard", actionId: ''}

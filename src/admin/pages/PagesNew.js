@@ -25,12 +25,11 @@ var NewPage = React.createClass({
 			        <li>Pages</li>
 			        <li className="active">Add New</li>
 			      </ol>
-			      <input style={{marginTop:'40'}} type="text" className="form-control" placeholder="Input Title Here"/>
+			      <input style={{marginTop:40}} type="text" className="form-control" placeholder="Input Title Here"/>
 			    </section>
 			    <section className="content">
               		<form>
-                      <div id="script-container"></div>
-                    	<textarea id="editor1" name="editor1" rows="15" cols="107">
+                    	<textarea id="editor1" name="editor1" rows="15" cols="92" wrap="hard">
                             This is my textarea to be replaced with CKEditor.
                     	</textarea>
               		</form>		       					
@@ -55,7 +54,7 @@ var NewPage = React.createClass({
     								<li><a href="#">Separated link</a></li>
   								</ul>
 							</div>
-							<div className="btn-group" style={{marginLeft: '20'}}>
+							<div className="btn-group" style={{marginLeft: 20}}>
   								<button type="button" className="btn btn-default">Help</button>
   								<button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     								<span className="caret"></span>
@@ -70,7 +69,7 @@ var NewPage = React.createClass({
   								</ul>
 							</div>
 							</div>
-        					<div className="box box-info" style={{marginTop:'70'}}>
+        					<div className="box box-info" style={{marginTop:70}}>
             					<div className="box-header">
               						<h3 className="box-title">Publish
               						</h3>
@@ -84,14 +83,14 @@ var NewPage = React.createClass({
             						<form>
   										<div className="form-group">
     										<button type="submit" className="btn btn-default">Save Draft</button>
-    										<button type="submit" className="btn btn-default" style={{marginLeft:'115'}}>Preview</button>
+    										<button type="submit" className="btn btn-default" style={{marginLeft:105}}>Preview</button>
   										</div>
   									</form>
   									<form className="form-inline">
   										<div className="form-group">
-    										<p style={{fontSize: '14'}}><span className="glyphicon glyphicon-pushpin" style={{marginRight:'10'}}></span>Status: <b>Draft </b><a href="#"><u>edit</u></a></p>
-    										<p style={{fontSize: '14'}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:'10'}}></span>Visibility: <b>Public </b><a href="#"><u>edit</u></a></p>
-    										<p style={{fontSize: '14'}}><span className="glyphicon glyphicon-calendar" style={{marginRight:'10'}}></span>Publish <b>immediately </b><a href="#"><u>edit</u></a></p>
+    										<p style={{fontSize: 14}}><span className="glyphicon glyphicon-pushpin" style={{marginRight:'10'}}></span>Status: <b>Draft </b><a href="#"><u>edit</u></a></p>
+    										<p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:'10'}}></span>Visibility: <b>Public </b><a href="#"><u>edit</u></a></p>
+    										<p style={{fontSize: 14}}><span className="glyphicon glyphicon-calendar" style={{marginRight:'10'}}></span>Publish <b>immediately </b><a href="#"><u>edit</u></a></p>
   										</div>
   									</form>
   									<div className="box-footer">
@@ -120,10 +119,10 @@ var NewPage = React.createClass({
   											<option value>(no parent)</option>
   											<option value="">Tentang</option>
   										</select>
-  										<div className="form-group" style={{marginTop:'20'}}>
+  										<div className="form-group" style={{marginTop:20}}>
     										<label>Order</label>
     									</div>
-  										<input type="text" placeholder="0" style={{width:'50'}} />
+  										<input type="text" placeholder="0" style={{width:50}} />
   										<hr/>
   										<p>Need help? Use the Help tab above the screen title.</p>	
   									</form>      						
