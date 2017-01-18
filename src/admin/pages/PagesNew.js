@@ -1,12 +1,14 @@
 import React from 'react';
 import $ from 'jquery';
 window.jQuery = $;
-window.CKEDITOR_BASEPATH = '/ckeditor/';
-require('ckeditor');
+//window.CKEDITOR_BASEPATH = '/ckeditor/';
+//require('ckeditor');
 
 var NewPage = React.createClass({
 	componentDidMount: function(){
-    window.CKEDITOR.replace('editor1');
+    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
+      window.CKEDITOR.replace('editor1');
+    });
 	},
 	
 	render: function(){
