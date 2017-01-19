@@ -9,9 +9,6 @@ var NewPost = React.createClass({
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
       window.CKEDITOR.replace('editor1');
     });
-    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
-      window.CKEDITOR.replace('editor2');
-    });
   },
   
   render: function(){
@@ -39,12 +36,19 @@ var NewPost = React.createClass({
                 </form> 
               </div>
               <div className="form-group">
-                <input style={{marginBottom:10}} type="text" className="form-control" placeholder="Input Summary"/>
-                <form>
-                  <textarea id="editor2" name="editor2" rows="15" cols="92" wrap="hard">
-                    This is my textarea for Summary.
-                  </textarea>
-                </form> 
+                <div className="box box-info">
+                    <div className="box-header">
+                      <h3 className="box-title">Summary</h3>
+                      <div className="pull-right box-tools">
+                      <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool">
+                      <i className="fa fa-minus"></i></button>
+                    </div>
+                    </div>
+                    <div className="box-body pad">
+                     <textarea className="form-control" id="editor1" name="editor1" wrap="hard" rows="3" style={{width: '100%'}}>
+                     </textarea>    
+                    </div>
+                  </div>
               </div>
             </div>
          
@@ -56,15 +60,15 @@ var NewPost = React.createClass({
                           <h3 className="box-title">Publish
                           </h3>
                           <div className="pull-right box-tools">
-                            <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+                            <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool ">
                               <i className="fa fa-minus"></i></button>
                           </div>
                       </div>
                       <div className="box-body pad">
                         <form>
                       <div className="form-group">
-                        <button type="submit" className="btn btn-default pull-left btn-flat">Save Draft</button>
-                        <button type="submit" className="btn btn-default pull-right btn-flat" >Preview</button>
+                        <button type="submit" className="btn btn-default pull-left btn-flat disabled">Save Draft</button>
+                        <button type="submit" className="btn btn-default pull-right btn-flat disabled" >Preview</button>
                       </div>
                     </form>
                     <form className="form-inline">
@@ -76,7 +80,7 @@ var NewPost = React.createClass({
                     </form>
                     <div className="box-footer">
                       <div className="pull-right box-tools">
-                        <button className="btn btn-primary btn-flat" href="#">Publish</button>
+                        <button className="btn btn-primary btn-flat disabled" href="#">Publish</button>
                       </div>
                     </div>                    
                   </div>
@@ -86,7 +90,7 @@ var NewPost = React.createClass({
                   <div className="box-header">
                     <h3 className="box-title">Categories</h3>
                     <div className="pull-right box-tools">
-                      <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+                      <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool">
                       <i className="fa fa-minus"></i></button>
                     </div>
                   </div>
@@ -94,8 +98,8 @@ var NewPost = React.createClass({
                     <form>
                       <div className="form-group nav-tab-custom">
                         <ul className="nav nav-tab ui-sortable-handle">
-                          <li className="pull-left"><a href="#1"><button className="btn btn-default btn-flat">All Category</button></a></li>
-                          <li className="pull-right"><a href="#2"><button className="btn btn-default btn-flat">Most Category</button></a></li>
+                          <li className="pull-left"><a href="#1"><button className="btn btn-default btn-flat disabled">All Category</button></a></li>
+                          <li className="pull-right"><a href="#2"><button className="btn btn-default btn-flat disabled">Most Category</button></a></li>
                         </ul>
                         <div id="1" >
                           <p>Hai</p>
@@ -117,7 +121,7 @@ var NewPost = React.createClass({
                   <div className="box-header">
                     <h3 className="box-title">Tags</h3>
                     <div className="pull-right box-tools">
-                      <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+                      <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool">
                       <i className="fa fa-minus"></i></button>
                     </div>
                   </div>
@@ -127,7 +131,7 @@ var NewPost = React.createClass({
                               <div className="input-group">
                                 <input type="text" name="message" placeholder="Type Message ..." className="form-control" />
                                   <span className="input-group-btn">
-                                    <button type="submit" className="btn btn-primary btn-flat">Send</button>
+                                    <button type="submit" className="btn btn-primary btn-flat disabled">Send</button>
                                   </span>
                               </div>
                         </form> 
@@ -146,7 +150,7 @@ var NewPost = React.createClass({
                     <div className="box-header">
                       <h3 className="box-title">Featured Image</h3>
                       <div className="pull-right box-tools">
-                        <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+                        <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool">
                         <i className="fa fa-minus"></i></button>
                       </div>
                     </div>
