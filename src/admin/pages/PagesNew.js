@@ -63,7 +63,7 @@ var NewPage = React.createClass({
                       <div className="form-group">
                         <button type="submit" className="btn btn-default">Preview</button>
                         <div className="pull-right box-tools">
-                        <button type="submit" className="btn btn-primary" style={{marginLeft:125}}>Publish</button>
+                        <button type="submit" className="btn btn-primary">Publish</button>
                         </div>
                       </div>
                       </form>                  
@@ -80,8 +80,8 @@ var NewPage = React.createClass({
                     <div className="box-body pad">
                       <form className="form-inline">
                       <div className="form-group">
-                        <input type="text"/>
-                        <button className="btn btn-default" style={{marginLeft: 10}}>Add</button>
+                        <input type="text" style={{marginRight: 10}}/>
+                        <button className="btn btn-default">Add</button>
                       </div>
                       </form>
                       <form>
