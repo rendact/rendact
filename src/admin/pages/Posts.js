@@ -2,17 +2,16 @@ import React from 'react';
 import $ from 'jquery';
 window.jQuery = $;
 
-import './Posts.css';
 import images from '../../../public/images/photo4.jpg';
 
-require ('datatables');
-
 var Posts = React.createClass({
-
 	componentDidMount: function(){
-        $(document).ready(function(){
-		    $('#postListTbl').DataTable();
-		})},
+		require ('datatables');
+		require ('datatables/media/css/jquery.dataTables.min.css');
+		require ('./Posts.css');
+
+		$('#postListTbl').DataTable();
+	},
 
 	render: function(){
 		return (

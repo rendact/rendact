@@ -2,16 +2,16 @@ import React from 'react';
 import $ from 'jquery';
 window.jQuery = $;
 
-import './Users.css';
 import images from '../../../public/images/avatar-default.png';
-require ('datatables');
 
 var Users = React.createClass({
 
 	componentDidMount: function(){
-        $(document).ready(function(){
-		    $('#myTable').DataTable();
-		})},
+      	require ('datatables');
+      	require ('./Users.css');
+
+		$('#myTable').DataTable();
+	},
 
 	render: function(){
 		return (

@@ -1,10 +1,5 @@
 import $ from 'jquery';
 window.jQuery = $;
-
-import './css/style.css';
-import './css/animate.css';
-import 'bootstrap/dist/css/bootstrap.css';
-
 import React from 'react'
 // import WOW from 'wowjs';
 // import Helmet from "react-helmet";
@@ -47,6 +42,9 @@ const Theme = React.createClass({
 		)	
 	},
 	componentDidMount() {
+		require ('./css/style.css');
+		require ('./css/animate.css');
+		require ('bootstrap/dist/css/bootstrap.css');
 		//new WOW.WOW().init();
 		
 		$( "span.menu" ).click(function() {

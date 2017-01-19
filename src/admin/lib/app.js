@@ -1,7 +1,8 @@
 import $ from 'jquery';
 import FastClick from 'react-fastclick';
-import 'jquery-slimscroll';
 const jQuery = $;
+
+require('jquery-slimscroll');
 
 var AdminLTEOptions = {
     //Enable sidebar expand on hover effect for sidebar mini

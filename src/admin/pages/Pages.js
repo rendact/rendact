@@ -2,16 +2,14 @@ import React from 'react';
 import $ from 'jquery';
 window.jQuery = $;
 
-import './Pages.css';
-
-require ('datatables');
-
 var Pages = React.createClass({
-
 	componentDidMount: function(){
-        $(document).ready(function(){
-		    $('#pageListTbl').DataTable();
-		})},
+    require ('datatables');
+    require ('datatables/media/css/jquery.dataTables.min.css');
+    require ('./Pages.css');
+
+    $('#pageListTbl').DataTable();
+	},
 
 	render: function(){
 		return (

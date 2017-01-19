@@ -2,16 +2,14 @@ import React from 'react';
 import config from '../../config';
 import $ from 'jquery';
 
-import '../lib/morris.js';
-import '../lib/morris.css';
-import 'jvectormap-next'; 
-import 'jvectormap-next/jquery-jvectormap.css';
-import '../lib/jquery-jvectormap-world-mill-en.js';
-
-//require('jvectormap-next');
-
 var Dashboard = React.createClass({
 	componentDidMount: function(){
+		require ('jvectormap-next');
+		require ('../lib/morris.js');
+		require ('../lib/jquery-jvectormap-world-mill-en.js');
+		require ('../lib/morris.css');
+		require ('jvectormap-next/jquery-jvectormap.css');
+		
 		window.Morris.Area({
 		    element: 'sales-chart',
 		    resize: true,

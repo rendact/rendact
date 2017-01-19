@@ -3,23 +3,6 @@ import $ from 'jquery';
 const jQuery = $;
 window.jQuery = $;
 
-import config from '../config';
-
-import AdminLTEinit from './lib/app.js';
-import skinning from './lib/skinning.js';
-
-import 'jquery-ui/themes/base/core.css';
-import 'jquery-ui/themes/base/theme.css';
-import 'jquery-ui/themes/base/tooltip.css';
-import 'jquery-ui/ui/core';
-import 'jquery-ui/ui/widgets/tooltip';
-import 'font-awesome/css/font-awesome.css';
-//import 'bootstrap/dist/css/bootstrap.min.css';
-import 'datatables/media/css/jquery.dataTables.min.css';
-import '../../public/css/ionicons.min.css';
-import '../../public/css/AdminLTE.css';
-import '../../public/css/skins/_all-skins.css';
-
 import AdminHeader from './Header';
 import ControlSidebar from './ControlSidebar';
 import Footer from './Footer';
@@ -34,6 +17,15 @@ import NewPost from './pages/PostsNew';
 import NewPage from './pages/PagesNew';
 import NewTheme from './pages/ThemesNew';
 import NotFound from './NotFound';
+
+import Config from '../config';
+import AdminLTEinit from './lib/app.js';
+import Skinning from './lib/skinning.js';
+
+import 'jquery-ui/ui/core';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'jquery-ui/themes/base/core.css';
+//import '../../public/css/AdminLTE.css';
 
 require ('bootstrap');
 
@@ -78,7 +70,7 @@ const SideMenu = React.createClass({
 			        </div>
 			      </form>
 			      <ul className="sidebar-menu">
-			      	{ config.menuList.map(function(item) {
+			      	{ Config.menuList.map(function(item) {
 			      		if (item.id === 'separator') {
 			      			return <li className="header" key={item.id}>{item.label}</li>
 			      		}
@@ -147,6 +139,18 @@ const PageLoader = React.createClass({
 
 
 const Admin = React.createClass({
+	componentDidMount: function(){
+		require ('jquery-ui/themes/base/theme.css');
+		require ('jquery-ui/themes/base/tooltip.css');
+		require ('font-awesome/css/font-awesome.css');
+		require ('../../public/css/ionicons.min.css');
+		require ('../../public/css/AdminLTE.css');
+		require ('../../public/css/skins/_all-skins.css');
+		require ('jquery-ui/ui/widgets/tooltip')
+
+		AdminLTEinit();
+		Skinning(jQuery, jQuery.AdminLTE);
+	},
 	getInitialState: function() {
 		return {
 			page: this.props.params['page']?this.props.params['page']:'dashboard',
@@ -165,10 +169,6 @@ const Admin = React.createClass({
 		var pg = pageId.split("-");
 		this.setState({page: pg[0], action: pg[1]?pg[1]:''})
 		//PageLoader.openPage();
-	},
-	componentDidMount: function(){
-		AdminLTEinit();
-		skinning(jQuery, jQuery.AdminLTE);
 	},
 	render: function() {
 		// switch (this.state.layout) or similar
