@@ -8,7 +8,9 @@ window.jQuery = $;
 var NewPage = React.createClass({
   componentDidMount: function(){
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
-      window.CKEDITOR.replace('editor1');
+      window.CKEDITOR.replace('editor1', {
+        height: 400
+      });
     });
   },
 

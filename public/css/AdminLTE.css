@@ -4959,3 +4959,10 @@ table.text-center th {
 .user-panel-hidden {
   display: none;
 }
+
+.logo-menu {
+  margin: 0;
+  background-clip: inherit;
+  border: 0;
+  border-radius: 0;
+}
