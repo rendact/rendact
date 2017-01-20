@@ -17,7 +17,7 @@ var NewPost = React.createClass({
     return (
     <div className="content-wrapper">
       <div className="container-fluid">
-        <div className="col-md-12">
+        
           <section className="content-header"  style={{marginBottom:20}}>
             <h1>Add New Post</h1>
             <ol className="breadcrumb">
@@ -204,7 +204,7 @@ var NewPost = React.createClass({
               </div>
             </div>  
           </div>
-        </div>
+        
       </div>
     </div>
   )

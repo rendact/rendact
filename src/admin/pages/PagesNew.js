@@ -16,7 +16,7 @@ var NewPage = React.createClass({
     return (
       <div className="content-wrapper">
         <div className="container-fluid">
-          <div className="col-md-12">
+          
             <section className="content-header"  style={{marginBottom:20}}>
               <h1>Add New Page</h1>
               <ol className="breadcrumb">
@@ -137,7 +137,7 @@ var NewPage = React.createClass({
                         </form>                 
                       </div>
                     </div>
-                </div>
+                
               </div>  
             </div>
           </div>
