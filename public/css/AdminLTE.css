@@ -1767,7 +1767,8 @@ a:focus {
 .box-header > .ion,
 .box-header .box-title {
   display: inline-block;
-  font-size: 18px;
+  font-size: 15px;
+  font-weight: bold;
   margin: 0;
   line-height: 1;
 }
