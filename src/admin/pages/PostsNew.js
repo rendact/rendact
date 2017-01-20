@@ -19,12 +19,10 @@ var NewPost = React.createClass({
       <div className="container-fluid">
         <div className="col-md-12">
           <section className="content-header"  style={{marginBottom:20}}>
-            <h1>
-              Add New Post
-            </h1>
+            <h1>Add New Post</h1>
             <ol className="breadcrumb">
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-              <li>Pages</li>
+              <li>Posts</li>
               <li className="active">Add New</li>
             </ol>
           </section>
