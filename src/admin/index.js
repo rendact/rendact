@@ -48,7 +48,6 @@ const SideMenu = React.createClass({
 		$("#menu-"+this.state.activeMenu).parent("ul").parent("li").addClass("active");
 	},
 	render: function() {
-		
 		return (
 			<aside className="main-sidebar">
 			    <section className="sidebar">

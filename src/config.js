@@ -47,11 +47,19 @@ const MenuJson = [
 	},
 ];
 
+const ActiveThemeConfig = {
+	id: 'default',
+	name: 'Default Theme',
+	path: 'default',
+	version: '1.0'
+}
+
 const config = {
 	scapholdUrl: 'https://us-west-2.api.scaphold.io/graphql/rendact',
 	activeContentType: ActiveContentType,
 	contentTypeList: ContentTypeList,
-	menuList: MenuJson
+	menuList: MenuJson,
+	theme: ActiveThemeConfig
 }
 
 module.exports = config;
