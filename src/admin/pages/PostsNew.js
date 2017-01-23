@@ -84,7 +84,7 @@ var NewPost = React.createClass({
                           <div className="col-md-9">
                             <p><h5>160 characters left</h5></p>
                             <input className="form-control" placeholder="query"></input>
-                            <p><h5>I want to use post tags in addition to my keywords</h5></p>
+                            <p><h5>I want to use post tags in addition to my keywords</h5><input type="checkbox"></input></p>
                           </div>
                         </div>
                       </div>
