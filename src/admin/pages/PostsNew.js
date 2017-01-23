@@ -7,7 +7,9 @@ window.jQuery = $;
 var NewPost = React.createClass({
   componentDidMount: function(){
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
-      window.CKEDITOR.replace('editor1');
+      window.CKEDITOR.replace('editor1', {
+        height: 400
+      });
     });
   },
   
@@ -15,13 +17,13 @@ var NewPost = React.createClass({
     return (
     <div className="content-wrapper">
       <div className="container-fluid">
-          <section className="content-header"  style={{marginBottom:40}}>
+          <section className="content-header"  style={{marginBottom:20}}>
             <h1>
               Add New Post
             </h1>
             <ol className="breadcrumb">
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-              <li>Pages</li>
+              <li>Posts</li>
               <li className="active">Add New</li>
             </ol>
           </section>
