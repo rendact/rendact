@@ -29,16 +29,73 @@ var NewPost = React.createClass({
             <div className="col-md-8">
               <div className="form-group"  style={{marginBottom:30}}>
                 <input style={{marginBottom:10}} type="text" className="form-control" placeholder="Input Title Here"/>
+                <p>Permalink : <a href="#">https://ussunnah.org/title </a> <button className="btn btn-default btn-sm btn-flat">Edit</button></p>
                 <form>
                   <textarea id="editor1" name="editor1" rows="15" cols="92" wrap="hard">
                     This is my textarea to be replaced with CKEditor.
                   </textarea>
                 </form> 
               </div>
+
               <div className="form-group">
-                <div className="box box-info">
+                <div className="box info-box">
                     <div className="box-header">
-                      <h3 className="box-title">Summary</h3>
+                      <h4 className="box-title"><b>SmartCrawl</b></h4>
+                      <div className="pull-right box-tools">
+                      <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool">
+                      <i className="fa fa-minus"></i></button>
+                    </div>
+                    </div>
+                    <div className="box-body pad">
+                      <div className="row">
+                        <div className="form-group">
+                          <div className="col-md-3">
+                            <p className="">Preview :</p>
+                          </div>
+                          <div className="col-md-9">
+                            <p><h4><a href="#">temp title</a></h4></p>
+                            <p>.......</p>
+                            <p><h5><a href="#">https://ussunnah.org/temp-title/</a><a href="#">-Cached</a><a href="#">Similar</a></h5></p>
+                          </div>
+                        </div>
+                        <div className="form-group">
+                          <div className="col-md-3">
+                            <p>Title Tag :</p>
+                          </div>
+                          <div className="col-md-9">
+                            <input className="form-control" placeholder="query"></input>
+                            <p><h5>Up to 65 characters recomended</h5></p>
+                          </div>
+                        </div>
+                        <div className="form-group">
+                          <div className="col-md-3">
+                            <p>Meta Description :</p>
+                          </div>
+                          <div className="col-md-9">
+                            <p><h5>65 characters left</h5></p>
+                            <textarea className="form-control" placeholder="Text"  rows="2"></textarea>
+                            <p><h5>160 characters minimum</h5></p>
+                          </div>
+                        </div>
+                        <div className="form-group">
+                          <div className="col-md-3">
+                            <p>Meta Keywords :</p>
+                          </div>
+                          <div className="col-md-9">
+                            <p><h5>160 characters left</h5></p>
+                            <input className="form-control" placeholder="query"></input>
+                            <p><h5>I want to use post tags in addition to my keywords</h5></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+
+              <div className="form-group">
+                <div className="box info-box">
+                    <div className="box-header">
+                      <h4 className="box-title"><b>Summary</b></h4>
                       <div className="pull-right box-tools">
                       <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool">
                       <i className="fa fa-minus"></i></button>
@@ -55,14 +112,13 @@ var NewPost = React.createClass({
             <div className="col-md-4">
               <div className="row">
                 <div className="col-md-12">
-                  <div className="box box-info" >
+                  <div className="box info-box" >
                       <div className="box-header">
-                          <h3 className="box-title">Publish
-                          </h3>
-                          <div className="pull-right box-tools">
+                          <h3 className="box-title">Publish</h3>
+                          <form className="pull-right box-tools">
                             <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool ">
                               <i className="fa fa-minus"></i></button>
-                          </div>
+                          </form>
                       </div>
                       <div className="box-body pad">
                         <form>
@@ -86,7 +142,7 @@ var NewPost = React.createClass({
                   </div>
                 </div>
 
-                <div className="box box-info">
+                <div className="box info-box">
                   <div className="box-header">
                     <h3 className="box-title">Categories</h3>
                     <div className="pull-right box-tools">
@@ -117,7 +173,7 @@ var NewPost = React.createClass({
                   </div>
                 </div>
 
-                 <div className="box box-info">
+                 <div className="box info-box">
                   <div className="box-header">
                     <h3 className="box-title">Tags</h3>
                     <div className="pull-right box-tools">
@@ -146,7 +202,7 @@ var NewPost = React.createClass({
                     </p> 
                   </div>
                 </div>
-                <div className="box box-info">
+                <div className="box info-box">
                     <div className="box-header">
                       <h3 className="box-title">Featured Image</h3>
                       <div className="pull-right box-tools">
