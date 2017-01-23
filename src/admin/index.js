@@ -41,12 +41,14 @@ const SideMenu = React.createClass({
 		this.setState({activeMenu: id});
 		$(".menu-item").removeClass("active");
 		$("#menu-"+id).addClass("active");
+		window.history.pushState("", "", '/admin/'+id.replace('-','/'));
 	},
 	componentDidMount: function(){
 		$("#menu-"+this.state.activeMenu).addClass("active");
 		$("#menu-"+this.state.activeMenu).parent("ul").parent("li").addClass("active");
 	},
 	render: function() {
+		
 		return (
 			<aside className="main-sidebar">
 			    <section className="sidebar">
