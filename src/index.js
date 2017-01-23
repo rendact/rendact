@@ -6,7 +6,7 @@ import {render} from 'react-dom'
 import {ApolloProvider} from 'react-apollo';
 import {BrowserRouter, Match, Miss} from 'react-router'
 import client from './apollo';
-import Theme from './theme/default';
+import {ThemeHome, ThemeSingle, ThemePage} from './admin/theme';
 import Admin from './admin';
 
 const Main = React.createClass({
@@ -16,7 +16,9 @@ const Main = React.createClass({
 				<BrowserRouter>
 					<div id="router" style={{height: "100vh"}}>
 						<Match pattern="/admin/:page?/:action?/:param1?/:param2?/:param3?/:param4?/:param5?" component={Admin}/>
-						<Miss component={Theme}/>
+						<Match pattern="/page/:pageId?/:param1?/:param2?/:param3?/:param4?/:param5?" component={ThemeSingle}/>
+						<Match pattern="/article/:postId?/:param1?/:param2?/:param3?/:param4?/:param5?" component={ThemeSingle}/>
+						<Miss component={ThemeHome}/>
 					</div>
 				</BrowserRouter>
 			</ApolloProvider>
