@@ -90,7 +90,7 @@ var Themes = React.createClass({
     style: function() {
       if (this.state.hovering) {
         return { 
-        	opacity: 0.5
+        	opacity: 1
     	}
       } 
     },
