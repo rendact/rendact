@@ -4,7 +4,6 @@ var NewTheme = React.createClass({
 	render: function(){
 		return (
 			<div className="content-wrapper" style={{height: '100%'}}>
-			<div className="container-fluid">
 				<section className="content-header">
 			      <h1>
 			        New Theme
@@ -18,7 +17,6 @@ var NewTheme = React.createClass({
 
 			    <section className="content">
 			    </section>
-			</div>
 		    </div>
 		)
 	}

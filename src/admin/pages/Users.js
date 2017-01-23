@@ -8,7 +8,6 @@ var Users = React.createClass({
 
 	componentDidMount: function(){
       	require ('datatables');
-    	require ('datatables/media/css/jquery.dataTables.min.css');
       	require ('./Users.css');
 
 		$('#myTable').DataTable();
@@ -17,7 +16,6 @@ var Users = React.createClass({
 	render: function(){
 		return (
 			<div className="content-wrapper" style={{height: '100%'}}>
-				<div className="container-fluid">
 				<section className="content-header">
 			      <h1>
 			        Users List
@@ -155,7 +153,6 @@ var Users = React.createClass({
 	                </div>
 	              </div>
 	            </section>
-	            </div>
 		    </div>
 		)
 	}

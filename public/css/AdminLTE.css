@@ -1767,8 +1767,7 @@ a:focus {
 .box-header > .ion,
 .box-header .box-title {
   display: inline-block;
-  font-size: 15px;
-  font-weight: bold;
+  font-size: 18px;
   margin: 0;
   line-height: 1;
 }
@@ -4958,11 +4957,4 @@ table.text-center th {
 
 .user-panel-hidden {
   display: none;
-}
-
-.logo-menu {
-  margin: 0;
-  background-clip: inherit;
-  border: 0;
-  border-radius: 0;
 }

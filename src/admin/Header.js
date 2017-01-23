@@ -5,7 +5,7 @@ class AdminHeader extends React.Component {
     return (
       <header className="main-header">
       <nav className="navbar navbar-static-top">
-        <a href="#" className="logo dropdown-toggle" data-toggle="dropdown">
+        <a href="#" className="logo">
           <span className="logo-mini">
             <img src="../../images/icon-32.png" className="img-circle" alt="Rendact Logo"/> 
           </span>
@@ -13,23 +13,6 @@ class AdminHeader extends React.Component {
             <img src="../../images/icon-32.png" className="img-circle" alt="Rendact Logo"/> 
           </span>
         </a>
-        <ul className="dropdown-menu logo-menu">
-          <li>
-            <a href="#">
-              Documentation
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              Supports Forum
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              Feedback
-            </a>
-          </li>
-        </ul>
         <a href="/" className="site-name">
           <span><i className="fa fa-home"></i> My Site</span>
         </a>
