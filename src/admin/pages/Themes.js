@@ -113,6 +113,7 @@ var Themes = React.createClass({
 		let state = this.state;
 		return (
 			<div className="content-wrapper">
+        <div className="container-fluid">
 				<section className="content-header">
 			    	<h1>
             			Theme List
@@ -383,6 +384,7 @@ var Themes = React.createClass({
             			</div>
 					</div>
         		</section>
+          </div>
 		    </div>
 		)
 	}

@@ -37,10 +37,12 @@ var Input= React.createClass({
   }
 });
 
-var NewPage = React.createClass({
+var NewPost = React.createClass({
   componentDidMount: function(){
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
-      window.CKEDITOR.replace('editor1');
+      window.CKEDITOR.replace('editor1', {
+        height: 400
+      });
     });
   },
 
@@ -59,31 +61,31 @@ var NewPage = React.createClass({
 
   render: function(){
     return (
-      <div className="content-wrapper">
-        <section className="content-header">
-          <h1>
-            Add New Page
-          </h1>
-          <ol className="breadcrumb">
-            <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-            <li>Pages</li>
-            <li className="active">Add New</li>
-          </ol>
+    <div className="content-wrapper">
+      <div className="container-fluid">
+        <section className="content-header"  style={{marginBottom:20}}>
+            <h1>Add New Page</h1>
+              <ol className="breadcrumb">
+                <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
+                <li>Pages</li>
+                <li className="active">Add New</li>
+              </ol>
         </section>
         <section className="content">
-        <div className="row">
-            <div className="col-md-8 col-sm-6 col-xs-12">
-              <form>
-                <input style={{marginTop: 20, marginBottom: 20}} type="text" className="form-control" placeholder="Input Title Here"/>
-                <div>
-                <form className="form-inline">
-                  <p><b>Permalink: </b><a>https:"//ussunnah.org/title"</a></p>
-                  <button className="btn btn-default" style={{marginBottom:10}}>Edit</button>
+            <div className="col-md-8">
+              <div className="form-group"  style={{marginBottom:30}}>
+                <form>
+                  <input style={{marginTop: 20, marginBottom: 20}} type="text" className="form-control" placeholder="Input Title Here"/>
+                  <div>
+                  <form className="form-inline">
+                    <p><b>Permalink: </b><a>https:"//ussunnah.org/title"</a></p>
+                    <button className="btn btn-default" style={{marginBottom:10}}>Edit</button>
+                  </form>
+                  </div>
+                  <textarea id="editor1" name="editor1" rows="25" style={{width: "100%"}} wrap="hard">
+                  </textarea>
                 </form>
-                </div>
-                <textarea id="editor1" name="editor1" style={{width: '100%'}} wrap="hard">
-                </textarea>
-              </form>
+              </div>
               <div className="box box-info" style={{marginTop:20}}>
                 <div className="box-header">
                   <h3 className="box-title">Smart Crawl</h3>         
@@ -160,18 +162,13 @@ var NewPage = React.createClass({
                 </div>
               </div>                  
             </div>
+
             <div className="col-md-4 col-sm-6 col-xs-12">
               <div className="row">
                 <div className="col-md-12">  
                   <div className="box box-info" style={{marginTop:20}}>
                     <div className="box-header">
                       <h3 className="box-title">Publish</h3>         
-                      <div className="pull-right box-tools">
-                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
-                        <i className="fa fa-minus"></i></button>
-                      </div>
-                    </div>
-                    <div className="box-body pad">
                       <form>
                       <div className="form-group">
                         <button className="btn btn-default">Save Draft</button>
@@ -223,6 +220,7 @@ var NewPage = React.createClass({
                       </form>                  
                     </div>
                   </div>
+
                   <div className="box box-info" style={{marginTop:20}}>
                     <div className="box-header">
                       <h3 className="box-title">Cache Options</h3>         
@@ -257,56 +255,14 @@ var NewPage = React.createClass({
                       </form>                  
                     </div>
                   </div>
-                  <div className="box box-info" style={{marginTop:20}}>
-                    <div className="box-header">
-                      <h3 className="box-title">Tags</h3>         
-                      <div className="pull-right box-tools">
-                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
-                        <i className="fa fa-minus"></i></button>
-                      </div>
-                    </div>
-                    <div className="box-body pad">
-                      <form className="form-inline">
-                      <div className="form-group">
-                        <input type="text" style={{marginRight: 10}}/>
-                        <button className="btn btn-default">Add</button>
-                      </div>
-                      </form>
-                      <form>
-                      <div className="form-group">
-                        <p><i>Separate tags with commas</i></p>
-                        <br/>
-                        <a><u>Choose from the most used tags</u></a>
-                      </div>
-                      </form>                   
-                    </div>
-                  </div>
-                  <div className="box box-info">
-                    <div className="box-header">
-                      <h3 className="box-title">Featured Image</h3>
-                      <div className="pull-right box-tools">
-                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
-                        <i className="fa fa-minus"></i></button>    
-                      </div>
-                    </div>
-                    <div className="box-body pad">
-                      <form>
-                      <div className="form-group">
-                        <input type="file" />
-                      </div>
-                      </form>                 
-                    </div>
-                  </div>                    
-                </div>
               </div>
             </div>
-          
         </div>
-        </section>
-        
-      </div>
-    )
-  }
+    </section>
+    </div>
+  </div>
+  )
+}
 });
 
-export default NewPage;
+export default NewPost;

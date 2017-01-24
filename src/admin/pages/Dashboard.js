@@ -74,6 +74,7 @@ var Dashboard = React.createClass({
 	render: function(){
 		return (
 			<div className="content-wrapper">
+				<div className="container-fluid">
 				<section className="content-header">
 			      <h1>
 			        Dashboard
@@ -213,6 +214,7 @@ var Dashboard = React.createClass({
 					    </div>
 			        </div>
 			    </section>
+			    </div>
 		    </div>
 		)
 	}
