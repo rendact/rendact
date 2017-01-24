@@ -74,7 +74,7 @@ var NewPost = React.createClass({
           <div className="col-md-8">
             <div className="form-group"  style={{marginBottom:30}}>
               <form>
-                <input style={{marginTop: 20, marginBottom: 20}} type="text" className="form-control" placeholder="Input Title Here"/>
+                <input style={{marginBottom: 20}} type="text" className="form-control" placeholder="Input Title Here"/>
                   <form className="form-inline">
                     <p>Permalink: <a>https://ussunnah.org/title</a>
                     <button className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
