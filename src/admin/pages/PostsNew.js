@@ -9,6 +9,15 @@ var NewPost = React.createClass({
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
       window.CKEDITOR.replace('editor1');
     });
+
+    $(document).ready(function(){
+      $("#hide").click(function(){
+          $("j").hide(1000);
+      });
+      $("#show").click(function(){
+          $("j").show(1000);
+      });
+    });
   },
   
   render: function(){
@@ -26,6 +35,7 @@ var NewPost = React.createClass({
             </ol>
           </section>
             <div className="col-md-8">
+
               <div className="form-group"  style={{marginBottom:30}}>
                 <input style={{marginBottom:10}} type="text" className="form-control" placeholder="Input title here"/>
                 <p>Permalink : <a href="#">https://ussunnah.org/title </a> <button className="btn btn-default btn-sm btn-flat">Edit</button></p>
@@ -65,7 +75,7 @@ var NewPost = React.createClass({
                       <div className="row">
                         <div className="form-group">
                           <div className="col-md-3">
-                            <p className="">Preview :</p>
+                            <p className="" style={{marginTop:35}}>Preview :</p>
                           </div>
                           <div className="col-md-9">
                             <p><h4><a href="#">temp title</a></h4></p>
@@ -75,7 +85,7 @@ var NewPost = React.createClass({
                         </div>
                         <div className="form-group">
                           <div className="col-md-3">
-                            <p>Title Tag :</p>
+                            <p style={{marginTop:15}}>Title Tag :</p>
                           </div>
                           <div className="col-md-9">
                             <input className="form-control" placeholder="query"></input>
@@ -84,7 +94,7 @@ var NewPost = React.createClass({
                         </div>
                         <div className="form-group">
                           <div className="col-md-3">
-                            <p>Meta Description :</p>
+                            <p style={{marginTop:55}}>Meta Description :</p>
                           </div>
                           <div className="col-md-9">
                             <p><h5>65 characters left</h5></p>
@@ -94,12 +104,12 @@ var NewPost = React.createClass({
                         </div>
                         <div className="form-group">
                           <div className="col-md-3">
-                            <p>Meta Keywords :</p>
+                            <p style={{marginTop:42}}>Meta Keywords :</p>
                           </div>
                           <div className="col-md-9">
                             <p><h5>160 characters left</h5></p>
                             <input className="form-control" placeholder="query"></input>
-                            <p><h5>I want to use post tags in addition to my keywords</h5><input type="checkbox"></input></p>
+                            <div><h5>I want to use post tags in addition to my keywords</h5><input type="checkbox"></input></div>
                           </div>
                         </div>
                       </div>
@@ -120,6 +130,7 @@ var NewPost = React.createClass({
                           </div>
                       </div>
                       <div className="box-body pad">
+                        
                         <div className="form-group">
                           <p style={{fontSize: 14}}><span className="glyphicon glyphicon-pushpin" style={{marginRight:'10'}}></span>Status: <b>Draft </b><a href="#"><u>edit</u></a></p>
                         </div>
@@ -127,8 +138,11 @@ var NewPost = React.createClass({
                           <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:'10'}}></span>Visibility: <b>Public </b><a href="#"><u>edit</u></a></p>
                         </div>
                         <div className="form-group">
-                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-calendar" style={{marginRight:'10'}}></span>Publish <b>immediately </b><a href="#"><u>edit</u></a></p>
+                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-calendar" style={{marginRight:'10'}}></span>Publish <b>immediately </b><button id="show">Show</button></p>
+                <j>If you click on the "Hide" button, I will disappear.
+                <button id="hide">Hide</button></j>
                         </div>
+
                       </div>
                       <div className="box-footer">
                           <div className="form-group pull-right">
