@@ -4,38 +4,9 @@ window.jQuery = $;
 //window.CKEDITOR_BASEPATH = '/ckeditor/';
 //require('ckeditor');
 
-var Input= React.createClass({
-  render: function(){
-    return (
-      <div className="form-group">
-      <form className="form-inline">
-        <select className="form-control" style={{marginRight: 10}}>
-          <option>Jan</option>
-          <option>Feb</option>
-          <option>Mar</option>
-          <option>Apr</option>
-          <option>May</option>
-          <option>June</option>
-          <option>July</option>
-          <option>Aug</option>
-          <option>Sep</option>
-          <option>Oct</option>
-          <option>Nov</option>
-          <option>Des</option>
-        </select>
-        <input className="form-control" type="text" placeholder="day" style={{width: 50}}/>,
-        <input className="form-control" type="text" placeholder="year" style={{marginLeft: 10, marginRight:5, width: 50}}/>@
-        <input className="form-control" type="text" placeholder="hour" style={{marginLeft: 5,  width: 35}}/> : 
-        <input className="form-control" type="text" placeholder="min" style={{width: 35}}/>
-      </form>
-        <form className="form-inline" style={{marginTop: 10}}>
-          <button className="btn btn-default btn-flat btn-sm" style={{marginRight: 10}}> OK </button>
-          <a><u>Cancel</u></a>
-        </form>
-      </div>
-      )
-  }
-});
+
+      
+      
 
 var NewPost = React.createClass({
   componentDidMount: function(){
@@ -44,20 +15,19 @@ var NewPost = React.createClass({
         height: 400
       });
     });
+
+    $(document).ready(function(){
+      $("m").hide();
+        $("#hide").click(function(){
+            $("m").hide(1000);
+        });
+        $("#show").click(function(){
+            $("m").show(1000);
+        });
+        });
   },
 
-  getInitialState : function() {
-      return this.state = {inputList: []};
-        this.onAddBtnClick = this.onAddBtnClick.bind(this);
-    },
 
-  onAddBtnClick: function(event) {
-        const inputList = this.state.inputList;
-        inputList.length = 1;
-        this.setState({
-            inputList: inputList.concat(<Input key={inputList.length} />)
-        });
-    },
   
   render: function(){
     return (
@@ -94,7 +64,7 @@ var NewPost = React.createClass({
                     </div>
                     </div>
                     <div className="box-body pad">
-                     <textarea className="form-control" id="summary" name="summary" wrap="hard" rows="3" style={{width: '100%'}}>
+                     <textarea className="form-control" id="editor1" name="editor1" wrap="hard" rows="3" style={{width: '100%'}}>
                      </textarea>
                      <p className="help-block">Summaries of your content that sometimes will show up in your homepages or contents list</p>
                     </div>
@@ -172,13 +142,43 @@ var NewPost = React.createClass({
                       <div className="box-body pad">
                         
                         <div className="form-group">
-                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-pushpin" style={{marginRight:'10'}}></span>Status: <b>Draft </b><a href="#"><u>edit</u></a></p>
+                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-pushpin" style={{marginRight:'10'}}></span>Status: <b>Draft </b>
+                          <button className="btn btn-flat btn-xs btn-default"> Edit </button></p>
                         </div>
                         <div className="form-group">
-                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:'10'}}></span>Visibility: <b>Public </b><a href="#"><u>edit</u></a></p>
+                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:'10'}}></span>Visibility: <b>Public </b>
+                          <button className="btn btn-flat btn-xs btn-default"> Edit </button></p>
                         </div>
                         <div className="form-group">
-                          <p><span className="glyphicon glyphicon-calendar" style={{marginRight: 10}}></span>Publish <b>Immediately </b><a onClick={this.onAddBtnClick}><u>edit</u></a>{this.state.inputList.map(function(input, index) {return input;})}</p>
+                          <p><span className="glyphicon glyphicon-calendar" style={{marginRight: 10}}></span>Publish <b>Immediately </b>
+                          <button className="btn btn-flat btn-xs btn-default" id="show"> Edit </button></p>
+
+                          <m><div className="form-group">
+                              <form className="form-inline">
+                                <select className="form-control" style={{marginRight: 10}}>
+                                  <option>Jan</option>
+                                  <option>Feb</option>
+                                  <option>Mar</option>
+                                  <option>Apr</option>
+                                  <option>May</option>
+                                  <option>June</option>
+                                  <option>July</option>
+                                  <option>Aug</option>
+                                  <option>Sep</option>
+                                  <option>Oct</option>
+                                  <option>Nov</option>
+                                  <option>Des</option>
+                                </select>
+                                <input className="form-control" type="text" placeholder="day" style={{width: 50}}/>,
+                                <input className="form-control" type="text" placeholder="year" style={{marginLeft: 10, marginRight:5, width: 50}}/>@
+                                <input className="form-control" type="text" placeholder="hour" style={{marginLeft: 5,  width: 35}}/> : 
+                                <input className="form-control" type="text" placeholder="min" style={{width: 35}}/>
+                              </form>
+                                <form className="form-inline" style={{marginTop: 10}}>
+                                  <button className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}> OK </button>
+                                  <button className="btn btn-flat btn-xs btn-default" id="hide">Cancel</button>
+                                </form>
+                              </div></m>
                         </div>
 
                       </div>
