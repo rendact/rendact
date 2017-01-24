@@ -74,7 +74,7 @@ var NewPost = React.createClass({
           <div className="col-md-8">
             <div className="form-group"  style={{marginBottom:30}}>
               <form>
-                <input style={{marginTop: 20, marginBottom: 20}} type="text" className="form-control" placeholder="Input Title Here"/>
+                <input style={{marginBottom: 10}} type="text" className="form-control" placeholder="Input Title Here"/>
                   <form className="form-inline">
                     <p>Permalink: <a>https://ussunnah.org/title</a>
                     <button className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
@@ -149,9 +149,13 @@ var NewPost = React.createClass({
             <div className="col-md-4 col-sm-6 col-xs-12">
               <div className="row">
                 <div className="col-md-12">  
-                  <div className="box box-info" style={{marginTop:20}}>
+                  <div className="box box-info">
                     <div className="box-header with-border">
-                      <h3 className="box-title">Publish</h3>         
+                      <h3 className="box-title">Publish</h3>
+                      <div className="pull-right box-tools">
+                            <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool ">
+                              <i className="fa fa-minus"></i></button>
+                          </div>         
                     </div>
                     <div className="box-body pad">
                       <form>
