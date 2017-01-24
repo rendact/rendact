@@ -217,40 +217,6 @@ var NewPost = React.createClass({
                     </div>
                   </div>
 
-                  <div className="box box-info" style={{marginTop:20}}>
-                    <div className="box-header with-border">
-                      <h3 className="box-title">Cache Options</h3>         
-                      <div className="pull-right box-tools">
-                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
-                        <i className="fa fa-minus"></i></button>
-                      </div>
-                    </div>
-                    <div className="box-body pad">
-                      <input type="checkbox" style={{width:15, height:15, background: '#fcfff4'}}/> Never cache this page
-                      <hr/>
-                      <form>
-                        <div className="form-group">
-                          <p>Activate these options on this post:</p>
-                          <div>
-                          <input type="checkbox" style={{width:15, height:15, background: '#fcfff4'}}/> Images LazyLoad
-                          </div>
-                          <div>
-                          <input type="checkbox" style={{width:15, height:15, background: '#fcfff4'}}/> iFrames & Videos LazyLoad
-                          </div>
-                          <div>
-                          <input type="checkbox" style={{width:15, height:15, background: '#fcfff4'}}/> HTML Minification
-                          </div>
-                          <div>
-                          <input type="checkbox" style={{width:15, height:15, background: '#fcfff4'}}/> JS Minification
-                          </div>
-                          <div>
-                          <input type="checkbox" style={{width:15, height:15, background: '#fcfff4'}} disabled/> CDN
-                          </div>
-                          <p><b><i>Note: These options are not applied if you added this post in the "Never change the following pages" option</i></b></p>
-                        </div>
-                      </form>                  
-                    </div>
-                  </div>
               </div>
             </div>
           </div>
