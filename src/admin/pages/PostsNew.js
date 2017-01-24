@@ -4,6 +4,10 @@ window.jQuery = $;
 //window.CKEDITOR_BASEPATH = '/ckeditor/';
 //require('ckeditor');
 
+
+      
+      
+
 var NewPost = React.createClass({
   componentDidMount: function(){
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
@@ -11,7 +15,19 @@ var NewPost = React.createClass({
         height: 400
       });
     });
+
+    $(document).ready(function(){
+      $("m").hide();
+        $("#hide").click(function(){
+            $("m").hide(1000);
+        });
+        $("#show").click(function(){
+            $("m").show(1000);
+        });
+        });
   },
+
+
   
   render: function(){
     return (
@@ -28,6 +44,7 @@ var NewPost = React.createClass({
             </ol>
           </section>
             <div className="col-md-8">
+
               <div className="form-group"  style={{marginBottom:30}}>
                 <input style={{marginBottom:10}} type="text" className="form-control" placeholder="Input title here"/>
                 <p>Permalink : <a href="#">https://ussunnah.org/title </a> <button className="btn btn-default btn-sm btn-flat">Edit</button></p>
@@ -40,14 +57,14 @@ var NewPost = React.createClass({
               <div className="form-group">
                 <div className="box box-info">
                     <div className="box-header with-border">
-                      <h3 className="box-title">Summary</h3>
+                      <h4 className="box-title"><b>Summary</b></h4>
                       <div className="pull-right box-tools">
                       <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool">
                       <i className="fa fa-minus"></i></button>
                     </div>
                     </div>
                     <div className="box-body pad">
-                     <textarea className="form-control" id="summary" name="summary" wrap="hard" rows="3" style={{width: '100%'}}>
+                     <textarea className="form-control" id="editor1" name="editor1" wrap="hard" rows="3" style={{width: '100%'}}>
                      </textarea>
                      <p className="help-block">Summaries of your content that sometimes will show up in your homepages or contents list</p>
                     </div>
@@ -67,17 +84,17 @@ var NewPost = React.createClass({
                       <div className="row">
                         <div className="form-group">
                           <div className="col-md-3">
-                            <p className="">Preview :</p>
+                            <p className="" style={{marginTop:35}}>Preview :</p>
                           </div>
                           <div className="col-md-9">
                             <p><h4><a href="#">temp title</a></h4></p>
                             <p>.......</p>
-                            <p><h5><a href="#">https://ussunnah.org/temp-title/</a><a href="#">-Cached</a><a href="#">Similar</a></h5></p>
+                            <span className="help-block"><a style={{color: 'green'}}>https://ussunah.org/temp-title/</a> - <a>Cache</a> - <a>Similar</a></span>
                           </div>
                         </div>
                         <div className="form-group">
                           <div className="col-md-3">
-                            <p>Title Tag :</p>
+                            <p style={{marginTop:15}}>Title Tag :</p>
                           </div>
                           <div className="col-md-9">
                             <input className="form-control" placeholder="query"></input>
@@ -86,22 +103,23 @@ var NewPost = React.createClass({
                         </div>
                         <div className="form-group">
                           <div className="col-md-3">
-                            <p>Meta Description :</p>
+                            <p style={{marginTop:55}}>Meta Description :</p>
                           </div>
                           <div className="col-md-9">
-                            <p><h5>65 characters left</h5></p>
+                            <p>65 characters left</p>
                             <textarea className="form-control" placeholder="Text"  rows="2"></textarea>
-                            <p><h5>160 characters minimum</h5></p>
+                            <p>160 characters minimum</p>
                           </div>
                         </div>
                         <div className="form-group">
                           <div className="col-md-3">
-                            <p>Meta Keywords :</p>
+                            <p style={{marginTop:42}}>Meta Keywords :</p>
                           </div>
                           <div className="col-md-9">
-                            <p><h5>160 characters left</h5></p>
+                            <p>160 characters left</p>
                             <input className="form-control" placeholder="query"></input>
-                            <p><h5>I want to use post tags in addition to my keywords</h5><input type="checkbox"></input></p>
+                            <input type="checkbox"/> I want to use post tags in addition to my keywords
+                            <span className="help-block"><b>News keywords </b><a>(?)</a></span>
                           </div>
                         </div>
                       </div>
@@ -115,22 +133,54 @@ var NewPost = React.createClass({
                 <div className="col-md-12">
                   <div className="box box-info" >
                       <div className="box-header with-border">
-                          <h3 className="box-title">Publish</h3>
+                          <h4 className="box-title"><b>Publish</b></h4>
                           <div className="pull-right box-tools">
                             <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool ">
                               <i className="fa fa-minus"></i></button>
                           </div>
                       </div>
                       <div className="box-body pad">
+                        
                         <div className="form-group">
-                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-pushpin" style={{marginRight:'10'}}></span>Status: <b>Draft </b><a href="#"><u>edit</u></a></p>
+                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-pushpin" style={{marginRight:'10'}}></span>Status: <b>Draft </b>
+                          <button className="btn btn-flat btn-xs btn-default"> Edit </button></p>
                         </div>
                         <div className="form-group">
-                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:'10'}}></span>Visibility: <b>Public </b><a href="#"><u>edit</u></a></p>
+                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:'10'}}></span>Visibility: <b>Public </b>
+                          <button className="btn btn-flat btn-xs btn-default"> Edit </button></p>
                         </div>
                         <div className="form-group">
-                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-calendar" style={{marginRight:'10'}}></span>Publish <b>immediately </b><a href="#"><u>edit</u></a></p>
+                          <p><span className="glyphicon glyphicon-calendar" style={{marginRight: 10}}></span>Publish <b>Immediately </b>
+                          <button className="btn btn-flat btn-xs btn-default" id="show"> Edit </button></p>
+
+                          <m><div className="form-group">
+                              <form className="form-inline">
+                                <select className="form-control" style={{marginRight: 10}}>
+                                  <option>Jan</option>
+                                  <option>Feb</option>
+                                  <option>Mar</option>
+                                  <option>Apr</option>
+                                  <option>May</option>
+                                  <option>June</option>
+                                  <option>July</option>
+                                  <option>Aug</option>
+                                  <option>Sep</option>
+                                  <option>Oct</option>
+                                  <option>Nov</option>
+                                  <option>Des</option>
+                                </select>
+                                <input className="form-control" type="text" placeholder="day" style={{width: 50}}/>,
+                                <input className="form-control" type="text" placeholder="year" style={{marginLeft: 10, marginRight:5, width: 50}}/>@
+                                <input className="form-control" type="text" placeholder="hour" style={{marginLeft: 5,  width: 35}}/> : 
+                                <input className="form-control" type="text" placeholder="min" style={{width: 35}}/>
+                              </form>
+                                <form className="form-inline" style={{marginTop: 10}}>
+                                  <button className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}> OK </button>
+                                  <button className="btn btn-flat btn-xs btn-default" id="hide">Cancel</button>
+                                </form>
+                              </div></m>
                         </div>
+
                       </div>
                       <div className="box-footer">
                           <div className="form-group pull-right">
@@ -152,7 +202,7 @@ var NewPost = React.createClass({
 
                 <div className="box box-info">
                   <div className="box-header with-border">
-                    <h3 className="box-title">Categories</h3>
+                    <h4 className="box-title"><b>Categories</b></h4>
                     <div className="pull-right box-tools">
                       <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool">
                       <i className="fa fa-minus"></i></button>
@@ -215,7 +265,7 @@ var NewPost = React.createClass({
 
                  <div className="box box-info">
                   <div className="box-header with-border">
-                    <h3 className="box-title">Tags</h3>
+                    <h4 className="box-title"><b>Tags</b></h4>
                     <div className="pull-right box-tools">
                       <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool">
                       <i className="fa fa-minus"></i></button>
@@ -244,7 +294,7 @@ var NewPost = React.createClass({
                 </div>
                 <div className="box box-info">
                     <div className="box-header with-border">
-                      <h3 className="box-title">Featured Image</h3>
+                      <h4 className="box-title"><b>Featured Image</b></h4>
                       <div className="pull-right box-tools">
                         <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool">
                         <i className="fa fa-minus"></i></button>

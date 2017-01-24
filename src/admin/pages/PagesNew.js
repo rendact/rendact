@@ -149,9 +149,13 @@ var NewPost = React.createClass({
             <div className="col-md-4 col-sm-6 col-xs-12">
               <div className="row">
                 <div className="col-md-12">  
-                  <div className="box box-info" style={{marginTop:20}}>
+                  <div className="box box-info">
                     <div className="box-header with-border">
-                      <h3 className="box-title">Publish</h3>         
+                      <h3 className="box-title">Publish</h3>
+                      <div className="pull-right box-tools">
+                            <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool ">
+                              <i className="fa fa-minus"></i></button>
+                          </div>         
                     </div>
                     <div className="box-body pad">
                       <form>
