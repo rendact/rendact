@@ -4,6 +4,39 @@ window.jQuery = $;
 //window.CKEDITOR_BASEPATH = '/ckeditor/';
 //require('ckeditor');
 
+var Input= React.createClass({
+  render: function(){
+    return (
+      <div className="form-group">
+      <form className="form-inline">
+        <select className="form-control" style={{marginRight: 10}}>
+          <option>Jan</option>
+          <option>Feb</option>
+          <option>Mar</option>
+          <option>Apr</option>
+          <option>May</option>
+          <option>June</option>
+          <option>July</option>
+          <option>Aug</option>
+          <option>Sep</option>
+          <option>Oct</option>
+          <option>Nov</option>
+          <option>Des</option>
+        </select>
+        <input className="form-control" type="text" placeholder="day" style={{width: 50}}/>,
+        <input className="form-control" type="text" placeholder="year" style={{marginLeft: 10, marginRight:5, width: 50}}/>@
+        <input className="form-control" type="text" placeholder="hour" style={{marginLeft: 5,  width: 35}}/> : 
+        <input className="form-control" type="text" placeholder="min" style={{width: 35}}/>
+      </form>
+        <form className="form-inline" style={{marginTop: 10}}>
+          <button className="btn btn-default btn-flat btn-sm" style={{marginRight: 10}}> OK </button>
+          <a><u>Cancel</u></a>
+        </form>
+      </div>
+      )
+  }
+});
+
 var NewPost = React.createClass({
   componentDidMount: function(){
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
@@ -11,16 +44,20 @@ var NewPost = React.createClass({
         height: 400
       });
     });
-
-    $(document).ready(function(){
-      $("#hide").click(function(){
-          $("j").hide(1000);
-      });
-      $("#show").click(function(){
-          $("j").show(1000);
-      });
-    });
   },
+
+  getInitialState : function() {
+      return this.state = {inputList: []};
+        this.onAddBtnClick = this.onAddBtnClick.bind(this);
+    },
+
+  onAddBtnClick: function(event) {
+        const inputList = this.state.inputList;
+        inputList.length = 1;
+        this.setState({
+            inputList: inputList.concat(<Input key={inputList.length} />)
+        });
+    },
   
   render: function(){
     return (
@@ -50,7 +87,7 @@ var NewPost = React.createClass({
               <div className="form-group">
                 <div className="box box-info">
                     <div className="box-header with-border">
-                      <h3 className="box-title">Summary</h3>
+                      <h4 className="box-title"><b>Summary</b></h4>
                       <div className="pull-right box-tools">
                       <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool">
                       <i className="fa fa-minus"></i></button>
@@ -82,7 +119,7 @@ var NewPost = React.createClass({
                           <div className="col-md-9">
                             <p><h4><a href="#">temp title</a></h4></p>
                             <p>.......</p>
-                            <p><h5><a href="#">https://ussunnah.org/temp-title/</a><a href="#">-Cached</a><a href="#">Similar</a></h5></p>
+                            <span className="help-block"><a style={{color: 'green'}}>https://ussunah.org/temp-title/</a> - <a>Cache</a> - <a>Similar</a></span>
                           </div>
                         </div>
                         <div className="form-group">
@@ -99,9 +136,9 @@ var NewPost = React.createClass({
                             <p style={{marginTop:55}}>Meta Description :</p>
                           </div>
                           <div className="col-md-9">
-                            <p><h5>65 characters left</h5></p>
+                            <p>65 characters left</p>
                             <textarea className="form-control" placeholder="Text"  rows="2"></textarea>
-                            <p><h5>160 characters minimum</h5></p>
+                            <p>160 characters minimum</p>
                           </div>
                         </div>
                         <div className="form-group">
@@ -109,9 +146,10 @@ var NewPost = React.createClass({
                             <p style={{marginTop:42}}>Meta Keywords :</p>
                           </div>
                           <div className="col-md-9">
-                            <p><h5>160 characters left</h5></p>
+                            <p>160 characters left</p>
                             <input className="form-control" placeholder="query"></input>
-                            <div><h5>I want to use post tags in addition to my keywords</h5><input type="checkbox"></input></div>
+                            <input type="checkbox"/> I want to use post tags in addition to my keywords
+                            <span className="help-block"><b>News keywords </b><a>(?)</a></span>
                           </div>
                         </div>
                       </div>
@@ -125,7 +163,7 @@ var NewPost = React.createClass({
                 <div className="col-md-12">
                   <div className="box box-info" >
                       <div className="box-header with-border">
-                          <h3 className="box-title">Publish</h3>
+                          <h4 className="box-title"><b>Publish</b></h4>
                           <div className="pull-right box-tools">
                             <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool ">
                               <i className="fa fa-minus"></i></button>
@@ -140,9 +178,7 @@ var NewPost = React.createClass({
                           <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:'10'}}></span>Visibility: <b>Public </b><a href="#"><u>edit</u></a></p>
                         </div>
                         <div className="form-group">
-                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-calendar" style={{marginRight:'10'}}></span>Publish <b>immediately </b><button id="show">Show</button></p>
-                <j>If you click on the "Hide" button, I will disappear.
-                <button id="hide">Hide</button></j>
+                          <p><span className="glyphicon glyphicon-calendar" style={{marginRight: 10}}></span>Publish <b>Immediately </b><a onClick={this.onAddBtnClick}><u>edit</u></a>{this.state.inputList.map(function(input, index) {return input;})}</p>
                         </div>
 
                       </div>
@@ -166,7 +202,7 @@ var NewPost = React.createClass({
 
                 <div className="box box-info">
                   <div className="box-header with-border">
-                    <h3 className="box-title">Categories</h3>
+                    <h4 className="box-title"><b>Categories</b></h4>
                     <div className="pull-right box-tools">
                       <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool">
                       <i className="fa fa-minus"></i></button>
@@ -229,7 +265,7 @@ var NewPost = React.createClass({
 
                  <div className="box box-info">
                   <div className="box-header with-border">
-                    <h3 className="box-title">Tags</h3>
+                    <h4 className="box-title"><b>Tags</b></h4>
                     <div className="pull-right box-tools">
                       <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool">
                       <i className="fa fa-minus"></i></button>
@@ -258,7 +294,7 @@ var NewPost = React.createClass({
                 </div>
                 <div className="box box-info">
                     <div className="box-header with-border">
-                      <h3 className="box-title">Featured Image</h3>
+                      <h4 className="box-title"><b>Featured Image</b></h4>
                       <div className="pull-right box-tools">
                         <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool">
                         <i className="fa fa-minus"></i></button>
