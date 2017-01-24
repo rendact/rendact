@@ -47,7 +47,7 @@ var NewPost = React.createClass({
                     </div>
                     </div>
                     <div className="box-body pad">
-                     <textarea className="form-control" id="editor1" name="editor1" wrap="hard" rows="3" style={{width: '100%'}}>
+                     <textarea className="form-control" id="summary" name="summary" wrap="hard" rows="3" style={{width: '100%'}}>
                      </textarea>
                      <p className="help-block">Summaries of your content that sometimes will show up in your homepages or contents list</p>
                     </div>
