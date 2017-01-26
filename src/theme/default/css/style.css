@@ -4,8 +4,6 @@ Author URL: http://w3layouts.com
 License: Creative Commons Attribution 3.0 Unported
 License URL: http://creativecommons.org/licenses/by/3.0/
 --*/
-/*@import url("https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700|Orbitron:400,500,700,900");*/
-
 html, body{
 font-family: 'Open Sans', sans-serif;
  font-size: 100%;
@@ -42,15 +40,15 @@ label{
 	margin:0;
 }
 /*----header--------*/
-.banner{
-  /* background: url(../images/banner.jpg) no-repeat 0px 0px; */
+/*.banner{
+  background: url(../images/banner.jpg) no-repeat 0px 0px;
   background-size: cover;
   -webkit-background-size: cover;
   -o-background-size: cover;
   -moz-background-size: cover;
   -ms-background-size: cover;
   min-height: 400px;
-}
+}*/
 .logo {
 	float:left;
 }
@@ -192,7 +190,7 @@ nav.navigation a:focus {
   width: 80px;
   color: #fff;
   padding: 3px 1px 0px 14px;
-  background: #ff1791;
+  background: #698a9a;
   border-radius: 50%;
   -o-border-radius: 50%;
   -moz-border-radius: 50%;
@@ -217,7 +215,7 @@ nav.navigation a:focus {
 .trainee-grid h4 ,.trainee-grid a h5{
   color: #fff;
   text-align: center;
-  background-color: #FF1791;
+  background-color: #698a9a;
   font-size: 1em;
   text-transform: uppercase;
   padding: 0.4em;
@@ -243,7 +241,7 @@ nav.navigation a:focus {
 .banner-bottom  h2{
    font-size: 2.5em;
   font-weight:700;
-  color:#ff1791;
+  color:#698a9a;
     font-family: 'Orbitron', sans-serif;
 }
 .banner-bottom p {
@@ -276,7 +274,7 @@ nav.navigation a:focus {
 .tainer  h3 {
    font-size: 2.5em;
   font-weight: 700;
-  color: #ff1791;
+  color: #698a9a;
   font-family: 'Orbitron', sans-serif;
   text-transform: uppercase;
   line-height: 1.4em;
@@ -446,7 +444,7 @@ img.zoom-img {
 .new-section  h3 {
     font-size: 2.5em;
   font-weight: 700;
-  color: #ff1791;
+  color: #698a9a;
   text-transform:uppercase;
   font-family: 'Orbitron', sans-serif;
   margin-bottom: 1.5em;
@@ -464,7 +462,7 @@ img.zoom-img {
     margin: 0.25em 0;
 }
 .new a h4{
-   color: #ff1791;
+   color: #698a9a;
   font-size: 1.3em;
   font-weight:700; 
   text-decoration:none;
@@ -518,7 +516,7 @@ h4.col-md-3.f-logo {
   height: 120px;
   background-color: rgba(45, 45, 44, 0.99);
   font-size: 4em;
-  color: #FF1791;
+  color: #698a9a;
   padding: 26px 10px 14px 21px;
   font-family: 'Orbitron', sans-serif;
 }
@@ -833,7 +831,7 @@ span.m_14 {
   background: #eee;
 }
 #commentform input[type="submit"]{
-  background: #ff1791;
+  background: #698a9a;
   color: #fff;
   font-size: 1.2em;
   padding: 9px 25px;
@@ -848,14 +846,14 @@ span.m_14 {
   text-transform: uppercase;
   -webkit-appearance: none;
   border: none;
-  border-top: 2px solid #ff1791;
+  border-top: 2px solid #698a9a;
 }
 p.form-submit {
   margin-top: 1em;
 }
 #commentform input[type="submit"]:hover {
-  color: #ff1791;
-  border-top: 2px solid #ff1791;
+  color: #698a9a;
+  border-top: 2px solid #698a9a;
   transition: 0.5s all;
   -webkit-transition: 0.5s all;
   -moz-transition: 0.5s all;
@@ -889,7 +887,7 @@ p.form-submit {
 .error-top p{
   font-size:4em;
   font-weight: 400;
-  color:#ff1791;
+  color:#698a9a;
 }
 .error-btn{
 	margin-top:5em;
@@ -958,7 +956,7 @@ p.form-submit {
 		  height: 228px;
 }
 .myButton{
-	background:#ff1791;
+	background:#698a9a;
 	color: #fff;
 	font-size: 1.2em;
 	padding: 9px 25px;
@@ -974,11 +972,11 @@ p.form-submit {
     -webkit-appearance:none;
     float:right;
 	border:none;
-	border-top:2px solid #ff1791;
+	border-top:2px solid #698a9a;
 }
 .myButton:hover{
-color: #ff1791;
-  border-top: 2px solid #ff1791;
+color: #698a9a;
+  border-top: 2px solid #698a9a;
   transition: 0.5s all;
   -webkit-transition: 0.5s all;
   -moz-transition: 0.5s all;
@@ -1124,7 +1122,7 @@ ul.address li a {
     text-align: center;
 }
 .copy p a{
-    color:#ff1791;
+    color:#698a9a;
 }
 .copy p a:hover{
   text-decoration:underline;
@@ -1409,15 +1407,15 @@ ul.address li a {
 	}
 }
 @media (max-width:640px){
-	.banner {
-	  /* background: url(../images/banner.jpg) no-repeat 0px 0px; */
+	/*.banner {
+	  background: url(../images/banner.jpg) no-repeat 0px 0px;
 	  background-size: 100% 100%;
 	  -webkit-background-size: cover;
 	  -o-background-size: 100% 100%;
 	  -moz-background-size: 100% 100%;
 	  -ms-background-size: 100% 100%;
 	  min-height: 400px;
-	}
+	}*/
 	.banner-bottom,.clases-section {
 	  padding: 1.5em 0;
 	}
@@ -1519,15 +1517,15 @@ ul.address li a {
 }
 }
 @media (max-width:480px){
-	.banner {
-	  /* background: url(../images/banner.jpg) no-repeat 0px 0px; */
+	/*.banner {
+	  background: url(../images/banner.jpg) no-repeat 0px 0px;
 	  background-size: 100% 100%;
 	  -webkit-background-size: cover;
 	  -o-background-size: 100% 100%;
 	  -moz-background-size: 100% 100%;
 	  -ms-background-size: 100% 100%;
 	  min-height: 329px;
-	}
+	}*/
 	.logo a h1 {
 	  font-size: 2.8em;
 	  margin-top: 4px;
@@ -1692,15 +1690,15 @@ ul.address li a {
 	.col-md-8 {
 	  padding: 0;
 	}
-	.banner {
-	  /* background: url(../images/banner.jpg) no-repeat 0px 0px; */
+	/*.banner {
+	  background: url(../images/banner.jpg) no-repeat 0px 0px;
 	  background-size: 100% 100%;
 	  -webkit-background-size: cover;
 	  -o-background-size: 100% 100%;
 	  -moz-background-size: 100% 100%;
 	  -ms-background-size: 100% 100%;
 	  min-height: 190px;
-	}
+	}*/
 	.col-md-4 {
 	  padding: 0;
 	}
@@ -1879,3 +1877,5 @@ ul.address li a {
 	  font-size: 0.8em;
 	}
 }
+
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700|Orbitron:400,500,700,900");

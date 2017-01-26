@@ -18,20 +18,17 @@ const Theme = React.createClass({
 		return {layout: "Home"};
 	},
 	render: function() {
+		console.log("url "+location.pathname.split("/").slice(1))
 		var rend_element
-		switch (this.state.layout) {
-			case "Home":
-				rend_element = <Home/>;
-				break;
-			case "Page":
-				rend_element = <Page/>;
-				break;
-			case "Post":
-				rend_element = <Post/>;
-				break;
-			default:
-				rend_element = <Home/>;
-				break;
+		
+		if (location.pathname.split("/").slice(1) == "" || location.pathname.split("/").slice(1) == "index.html") {
+			rend_element = <Home/>;
+		} else if (location.pathname.split("/").slice(1) == "post") { 
+			rend_element = <Page/>;
+		} else if (location.pathname.split("/").slice(1) == "blogs") { 
+			rend_element = <Post/>;
+		} else {
+			rend_element = <Home/>;
 		}
 				
 				
