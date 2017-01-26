@@ -1,7 +1,11 @@
 import React from 'react';
 
-class AdminHeader extends React.Component {
-  render() {
+const AdminHeader = React.createClass({
+  handleSignout: function(){
+    localStorage.token="";
+    location.reload();
+  },
+  render: function() {
     return (
       <header className="main-header">
       <nav className="navbar navbar-static-top">
@@ -94,7 +98,7 @@ class AdminHeader extends React.Component {
                     <a href="#" className="btn btn-default btn-flat">Profile</a>
                   </div>
                   <div className="pull-right">
-                    <a href="#" className="btn btn-default btn-flat">Sign out</a>
+                    <a href="#" className="btn btn-default btn-flat" onClick={this.handleSignout}>Sign out</a>
                   </div>
                 </li>
               </ul>
@@ -108,6 +112,6 @@ class AdminHeader extends React.Component {
     </header>
     )
   }
-}
+});
 
 export default AdminHeader;

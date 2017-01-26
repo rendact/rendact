@@ -1,13 +1,21 @@
 import React from 'react';
+import request from 'request';
+import Router from 'react-router';
 import $ from 'jquery';
 const jQuery = $;
 window.jQuery = $;
 
+import Config from './config';
 import AdminLTEinit from './admin/lib/app.js';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../public/css/Login.css';
 
 const Login = React.createClass({
+	getInitialState: function(){
+		return {
+			errorMsg:''
+		}
+	},
 	componentDidMount: function(){
 		require ('font-awesome/css/font-awesome.css');
 		require ('../public/css/ionicons.min.css');
@@ -15,22 +23,67 @@ const Login = React.createClass({
 
 		AdminLTEinit();
 	},
+	handleSubmit: function(event) {
+		var username = $("#username").val();
+		var password = $("#password").val();
+
+		let data = {
+		  "query": `mutation LoginUserQuery ($input: LoginUserInput!) {
+		    loginUser(input: $input) {
+		      token
+		      user {
+		        id
+		        username
+		        createdAt
+		      }
+		    }
+		  }`,
+		  "variables": {
+		    "input": {
+		      "username": username,
+		      "password": password
+		    }
+		  }
+
+		};
+
+		request({
+		  url: Config.scapholdUrl,
+		  method: "POST",
+		  json: true,
+		  headers: {
+		    "content-type": "application/json"
+		  },
+		  body: data
+		}, (error, response, body) => {
+			if (!error && !body.errors && response.statusCode == 200) {
+		    localStorage.token = body.data.loginUser.token;
+		    window.location.replace("/admin");
+		  } else {
+		  	this.setState({errorMsg: error});
+		    console.log(error);
+		    console.log(response.statusCode);
+		  }
+		});
+
+		event.preventDefault();
+	},
 	render: function(){
 		return (
 			<div className="login-box">
 			  <div className="login-logo">
-			    <a href="../../index2.html"><b>Admin</b>LTE</a>
+			    <a href="/"><b>Rendact</b></a>
 			  </div>
 			  <div className="login-box-body">
 			    <p className="login-box-msg">Sign in to start your session</p>
-
-			    <form action="../../index2.html" method="post">
+			    <p className="error-msg">{this.state.errorMsg}</p>
+			    <form onSubmit={this.handleSubmit} method="get">
 			      <div className="form-group has-feedback">
-			        <input type="email" className="form-control" placeholder="Email"/>
+			        <input id="username" className="form-control" placeholder="Username"/>
 			        <span className="glyphicon glyphicon-envelope form-control-feedback"></span>
 			      </div>
 			      <div className="form-group has-feedback">
-			        <input type="password" className="form-control" placeholder="Password"/>
+			        <input type="password" id="password" className="form-control" placeholder="Password"/>
 			        <span className="glyphicon glyphicon-lock form-control-feedback"></span>
 			      </div>
 			      <div className="row">
@@ -48,14 +101,6 @@ const Login = React.createClass({
 			        </div>
 			      </div>
 			    </form>
-
-			    <div className="social-auth-links text-center">
-			      <p>- OR -</p>
-			      <a href="#" className="btn btn-block btn-social btn-facebook btn-flat"><i className="fa fa-facebook"></i> Sign in using
-			        Facebook</a>
-			      <a href="#" className="btn btn-block btn-social btn-google btn-flat"><i className="fa fa-google-plus"></i> Sign in using
-			        Google+</a>
-			    </div>
 
 			    <a href="#">I forgot my password</a><br/>
 			    <a href="register.html" className="text-center">Register a new membership</a>
