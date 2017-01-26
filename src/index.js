@@ -13,25 +13,20 @@ import Login from './login';
 import Config from './config';
 
 let data = {
-  "query": `query GetUsers{
-	    viewer {
-	      allUsers {
-	        edges {
-	          node {
-	            username,
-	            email
-	          }
-	        }
-	      }
-	    }
+  "query": `{ 
+  	getUser(id: "VXNlcjoy"){
+	      username,
+	      email
+    	}
 	  }`
 };
 
 
 const Auth = {
   isAuthenticated: (localStorage.token && localStorage.token!==""),
-  authenticate() {
-    this.isAuthenticated = true
+  authenticate(data) {
+    this.isAuthenticated = true;
+    localStorage.username = data.username;
   },
   signout() {
     this.isAuthenticated = false;
@@ -59,7 +54,6 @@ const Main = React.createClass({
 		}
 	},
 	componentWillMount: function(){
-		debugger;
 		request({
 		  url: Config.scapholdUrl,
 		  method: "POST",
@@ -70,10 +64,9 @@ const Main = React.createClass({
 		  },
 		  body: data
 		}, (error, response, body) => {
-			debugger;
 			if (!error && !body.errors && response.statusCode == 200) {
 		    console.log(JSON.stringify(body, null, 2));
-		    Auth.authenticate();
+		    Auth.authenticate(body.data.getUser);
 		  } else {
 		    console.log(error);
 		    console.log(response.statusCode);

@@ -13,7 +13,7 @@ import '../public/css/Login.css';
 const Login = React.createClass({
 	getInitialState: function(){
 		return {
-			errorMsg:''
+			errorMsg:null
 		}
 	},
 	componentDidMount: function(){
@@ -33,8 +33,6 @@ const Login = React.createClass({
 		      token
 		      user {
 		        id
-		        username
-		        createdAt
 		      }
 		    }
 		  }`,
@@ -58,11 +56,16 @@ const Login = React.createClass({
 		}, (error, response, body) => {
 			if (!error && !body.errors && response.statusCode == 200) {
 		    localStorage.token = body.data.loginUser.token;
+		    localStorage.userId = body.data.loginUser.user.id;
 		    window.location.replace("/admin");
 		  } else {
-		  	this.setState({errorMsg: error});
-		    console.log(error);
-		    console.log(response.statusCode);
+		  	if (body.errors) {
+		  		this.setState({errorMsg: body.errors[0].message});
+		  	} else {
+			  	this.setState({errorMsg: error});
+			    console.log(error);
+			    console.log(response.statusCode);
+			  }
 		  }
 		});
 
@@ -76,8 +79,14 @@ const Login = React.createClass({
 			  </div>
 			  <div className="login-box-body">
 			    <p className="login-box-msg">Sign in to start your session</p>
-			    <p className="error-msg">{this.state.errorMsg}</p>
-			    <form onSubmit={this.handleSubmit} method="get">
+			    { this.state.errorMsg &&
+			    	<div className="alert alert-danger alert-dismissible">
+	            <button type="button" className="close" data-dismiss="alert" aria-hidden="true">×</button>
+	            {this.state.errorMsg}
+	          </div>
+			    }
+			    <p className="error-msg has-error">{this.state.errorMsg}</p>
+			    <form id="login" onSubmit={this.handleSubmit} method="get">
 			      <div className="form-group has-feedback">
 			        <input id="username" className="form-control" placeholder="Username"/>
 			        <span className="glyphicon glyphicon-envelope form-control-feedback"></span>
