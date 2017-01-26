@@ -8,10 +8,10 @@ const Footer = ({params}) => {
 				<div className="f-grids">
 					<div className="col-md-4 footer-grid wow fadeInUpBig animated animated" data-wow-delay="0.4s">
 					<h3>Recent<span className="opening">Posts</span></h3>
-					  <a href="#"><h5>The do’s and don’ts of running for fitness</h5></a>
+					  <a href="#"><h5>Lorem ipsum dolor sit amet</h5></a>
 					  <p>Sed rhoncus nulla turpis, vitae rutrum velit iaculis et. Curabitur vestibulum, erat non im</p>
 					   <p className="month">April 1, 2014 , By Robert Louise</p>
-					  <a href="#"><h5>The do’s and don’ts of running for fitness</h5></a>
+					  <a href="#"><h5>Lorem ipsum dolor sit amet</h5></a>
 					  <p>Sed rhoncus nulla turpis, vitae rutrum velit iaculis et. Curabitur vestibulum, erat non im</p>
 					  <p className="month">April 1, 2014 , By Robert Louise</p>
 					</div>

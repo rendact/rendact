@@ -175,9 +175,9 @@ var NewPost = React.createClass({
                                 <input className="form-control" type="text" placeholder="min" style={{width: 35}}/>
                               </form>
                                 <form className="form-inline" style={{marginTop: 10}}>
-                                  <button className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}> OK </button>
-                                  <button className="btn btn-flat btn-xs btn-default" id="hide">Cancel</button>
+                                  <button className="btn btn-flat btn-xs btn-primary disabled" style={{marginRight: 10}}> OK </button>
                                 </form>
+                                <button style={{marginTop: 10}} className="btn btn-flat btn-xs btn-default" id="hide">Cancel</button>
                               </div></m>
                         </div>
 
