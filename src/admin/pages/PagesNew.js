@@ -48,7 +48,7 @@ var NewPost = React.createClass({
 
   getInitialState : function() {
       return this.state = {inputList: []};
-        this.onAddBtnClick = this.onAddBtnClick.bind(this);
+        
     },
 
   onAddBtnClick: function(event) {

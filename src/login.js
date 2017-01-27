@@ -1,8 +1,8 @@
 import React from 'react';
 import request from 'request';
-import Router from 'react-router';
+//import Router from 'react-router';
 import $ from 'jquery';
-const jQuery = $;
+//const jQuery = $;
 window.jQuery = $;
 
 import Config from './config';
@@ -54,7 +54,7 @@ const Login = React.createClass({
 		  },
 		  body: data
 		}, (error, response, body) => {
-			if (!error && !body.errors && response.statusCode == 200) {
+			if (!error && !body.errors && response.statusCode === 200) {
 		    localStorage.token = body.data.loginUser.token;
 		    localStorage.userId = body.data.loginUser.user.id;
 		    window.location.replace("/admin");

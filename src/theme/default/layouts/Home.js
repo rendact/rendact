@@ -2,7 +2,7 @@
 import React from 'react'
 
 import Header from '../includes/Header'
-import Sidebar from '../includes/Sidebar'
+//import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
 //import RM from 
 const Home = () => {
@@ -127,7 +127,7 @@ const Home = () => {
 					   <p>Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
 				   </div>
 					<div className="col-md-6 welcome-img">
-					 <a href="post" className="mask"><img src="images/n1.jpg" alt="image" className="img-responsive zoom-img" /></a>
+					 <a href="post" className="mask"><img src="images/n1.jpg" alt="" className="img-responsive zoom-img" /></a>
 					</div>
 				   <div className="clearfix"> </div>
 			   </div>
@@ -138,7 +138,7 @@ const Home = () => {
 										   <p>Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
 				   </div>
 					<div className="col-md-6 new-img two">
-					 <a href="post" className="mask"><img src="images/n3.jpg" alt="image" className="img-responsive zoom-img" /></a>
+					 <a href="post" className="mask"><img src="images/n3.jpg" alt="" className="img-responsive zoom-img" /></a>
 					</div>
 				   <div className="clearfix"> </div>
 			   </div> 
@@ -149,7 +149,7 @@ const Home = () => {
 					   <p>Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
 				   </div>
 					<div className="col-md-6 welcome-img">
-					 <a href="post" className="mask"><img src="images/n2.jpg" alt="image" className="img-responsive zoom-img" /></a>
+					 <a href="post" className="mask"><img src="images/n2.jpg" alt="" className="img-responsive zoom-img" /></a>
 					</div>
 				   <div className="clearfix"> </div>
 			   </div>
