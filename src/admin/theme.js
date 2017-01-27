@@ -54,10 +54,10 @@ function getTemplateComponent(type){
 		let Component = require('../theme/'+c.path+'/layouts/Home.js').default;
 		if (type==="home") {
 			// pass
-		} else if (type==="post") {
-			Component = require('../theme/'+c.path+'/layouts/Post.js').default;			
-		} else if (type==="page") {
-			Component = require('../theme/'+c.path+'/layouts/Page.js').default;			
+		} else if (type==="blog") {
+			Component = require('../theme/'+c.path+'/layouts/Blog.js').default;			
+		} else if (type==="single") {
+			Component = require('../theme/'+c.path+'/layouts/Single.js').default;			
 		}
 
 		return Component;
@@ -79,6 +79,19 @@ const ThemeHome = React.createClass({
 	}
 });
 
+const ThemeBlog = React.createClass({
+	componentDidMount: function(){
+		var c = window.config.theme;
+		require ('bootstrap/dist/css/bootstrap.css');
+		require('../theme/'+c.path+'/css/style.css');
+		require('../theme/'+c.path+'/function.js');
+	},
+	render: function() {
+		let Post = getTemplateComponent('blog');
+		return <Post/>;
+	}
+});
+
 const ThemeSingle = React.createClass({
 	componentDidMount: function(){
 		var c = window.config.theme;
@@ -87,20 +100,7 @@ const ThemeSingle = React.createClass({
 		require('../theme/'+c.path+'/function.js');
 	},
 	render: function() {
-		let Post = getTemplateComponent('post');
-		return <Post/>;
-	}
-});
-
-const ThemePage = React.createClass({
-	componentDidMount: function(){
-		var c = window.config.theme;
-		require ('bootstrap/dist/css/bootstrap.css');
-		require('../theme/'+c.path+'/css/style.css');
-		require('../theme/'+c.path+'/function.js');
-	},
-	render: function() {
-		let Page = getTemplateComponent('page');
+		let Page = getTemplateComponent('single');
 		return <Page/>;
 	}
 });
@@ -108,5 +108,5 @@ const ThemePage = React.createClass({
 module.exports = {
 	ThemeHome: ThemeHome,
 	ThemeSingle: ThemeSingle,
-	ThemePage: ThemePage
+	ThemeBlog: ThemeBlog
 }

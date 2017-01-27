@@ -7,7 +7,7 @@ import {render} from 'react-dom'
 import {ApolloProvider} from 'react-apollo';
 import {BrowserRouter, Match, Miss, Redirect} from 'react-router'
 import client from './apollo';
-import {ThemeHome, ThemeSingle} from './admin/theme';
+import {ThemeHome, ThemeSingle, ThemeBlog} from './admin/theme';
 import Admin from './admin';
 import Login from './login';
 import Config from './config';
@@ -82,8 +82,8 @@ const Main = React.createClass({
 						<MatchWhenAuthorized 
 							pattern="/admin/:page?/:action?/:param1?/:param2?/:param3?/:param4?/:param5?" 
 							component={Admin}/>
-						<Match pattern="/page/:pageId?/:param1?/:param2?/:param3?/:param4?/:param5?" component={ThemeSingle}/>
-						<Match pattern="/article/:postId?/:param1?/:param2?/:param3?/:param4?/:param5?" component={ThemeSingle}/>
+						<Match pattern="/article/:pageId?/:param1?/:param2?/:param3?/:param4?/:param5?" component={ThemeSingle}/>
+						<Match pattern="/blog/:postId?/:param1?/:param2?/:param3?/:param4?/:param5?" component={ThemeBlog}/>
 						<Match pattern="/login/:param1?" component={Login}/>
 						<Miss component={ThemeHome}/>
 					</div>

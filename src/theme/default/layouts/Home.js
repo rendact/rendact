@@ -9,7 +9,7 @@ const Home = () => {
 
 	return (
 
-	<div>
+	<div className="application">
 		<Header/>
 		
 		
@@ -39,7 +39,7 @@ const Home = () => {
 								<div className="single-one"><span><a href="#"><i className="four"> </i>400</a></span></div>
 							</div>
 							<div className="clearfix"></div>
-							  <a className="button" href="post"><img src={require('../images/read.png')} className="img-responsive" alt="" /></a>
+							  <a className="button" href="article"><img src={require('../images/read.png')} className="img-responsive" alt="" /></a>
 						</div>
 					</div>
 					 <div className="col-md-6 class-grid wow zoomInRight animated animated" style={{"visibility": "visible", "animationName": "zoomInRight"}}>
@@ -61,7 +61,7 @@ const Home = () => {
 								<div className="single-one"><span><a href="#"><i className="four"> </i>400</a></span></div>
 							</div>
 							<div className="clearfix"></div>
-							   <a className="button" href="post"><img src={require('../images/read.png')} className="img-responsive" alt="" /></a>
+							   <a className="button" href="article"><img src={require('../images/read.png')} className="img-responsive" alt="" /></a>
 						</div>
 					</div>
 					
@@ -84,7 +84,7 @@ const Home = () => {
 								<div className="single-one"><span><a href="#"><i className="four"> </i>400</a></span></div>
 							</div>
 							<div className="clearfix"></div>
-							    <a className="button" href="post"><img src={require('../images/read.png')} className="img-responsive" alt="" /></a>
+							    <a className="button" href="article"><img src={require('../images/read.png')} className="img-responsive" alt="" /></a>
 						</div>
 					</div>
 					 <div className="col-md-6 class-grid wow zoomInRight animated animated" style={{"visibility": "visible", "animationName": "zoomInRight"}}>
@@ -107,7 +107,7 @@ const Home = () => {
 
 							</div>
 							<div className="clearfix"></div>
-							  <a className="button" href="post"><img src={require('../images/read.png')} className="img-responsive" alt="" /></a>
+							  <a className="button" href="article"><img src={require('../images/read.png')} className="img-responsive" alt="" /></a>
 						</div>
 					</div>
 					<div className="clearfix"></div>
@@ -123,33 +123,33 @@ const Home = () => {
 				 <div className="new">
 				   <div className="col-md-6 new-text wow rollIn animated animated" data-wow-delay="0.4s" style={{"visibility": "visible", "animationDelay": "0.4s", "animationName": "rollIn"}}>
 					   <h5>THU 14 May, 2015</h5>
-					   <a href="post"><h4>How to clone your git</h4></a>
+					   <a href="article"><h4>How to clone your git</h4></a>
 					   <p>Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
 				   </div>
 					<div className="col-md-6 welcome-img">
-					 <a href="post" className="mask"><img src="images/n1.jpg" alt="" className="img-responsive zoom-img" /></a>
+					 <a href="article" className="mask"><img src="images/n1.jpg" alt="" className="img-responsive zoom-img" /></a>
 					</div>
 				   <div className="clearfix"> </div>
 			   </div>
 			    <div className="new">
 				 <div className="col-md-6 new-text two wow rollIn animated animated" data-wow-delay="0.4s" style={{"visibility": "visible", "animationDelay": "0.4s", "animationName": "rollIn"}}>
 					   <h5>THU 14 May, 2015</h5>
-					  <a href="post"><h4>Build your app from scratch</h4></a>
+					  <a href="article"><h4>Build your app from scratch</h4></a>
 										   <p>Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
 				   </div>
 					<div className="col-md-6 new-img two">
-					 <a href="post" className="mask"><img src="images/n3.jpg" alt="" className="img-responsive zoom-img" /></a>
+					 <a href="article" className="mask"><img src="images/n3.jpg" alt="" className="img-responsive zoom-img" /></a>
 					</div>
 				   <div className="clearfix"> </div>
 			   </div> 
 			    <div className="new">
 				   <div className="col-md-6 new-text wow rollIn animated animated" data-wow-delay="0.4s" style={{"visibility": "visible", "animationDelay": "0.4s", "animationName": "rollIn"}}>
 					   <h5>THU 14 May, 2015</h5>
-					   <a href="post"><h4>Reactjs vs Angular js</h4></a>
+					   <a href="article"><h4>Reactjs vs Angular js</h4></a>
 					   <p>Lorem ipsum dolor sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
 				   </div>
 					<div className="col-md-6 welcome-img">
-					 <a href="post" className="mask"><img src="images/n2.jpg" alt="" className="img-responsive zoom-img" /></a>
+					 <a href="article" className="mask"><img src="images/n2.jpg" alt="" className="img-responsive zoom-img" /></a>
 					</div>
 				   <div className="clearfix"> </div>
 			   </div>
