@@ -1,13 +1,51 @@
 import React from 'react';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 import $ from 'jquery';
 window.jQuery = $;
+const postPages = gql`
+  query getPages{
+  viewer{
+    allPages{
+      edges{
+        node{
+          title,
+          author
+        }
+      }
+    }
+  }
+} 
+`;
 
+class Page extends React.Component {
+    render() {
+        if (this.props.data.viewer) {
+            return (
+            <tbody>
+            {this.props.data.viewer.allPages.edges.map(function(item){
+                return <tr key={item.node.title}>
+                <td><input type="checkbox"></input></td>
+                <td>{item.node.title}</td>
+                <td>{item.node.author}</td>
+                <td style={{textAlign: 'center'}}>5</td>
+                <td>Published 12/01/2017</td>              
+                </tr>
+            })}
+            </tbody>
+            )
+        }
+        else 
+            return <div></div>
+    }
+}
+
+const PageWithData = graphql(postPages)(Page);
 var Pages = React.createClass({
   componentDidMount: function(){
     require ('datatables');
     require ('datatables/media/css/jquery.dataTables.min.css');
     require ('./Pages.css');
-
     $('#pageListTbl').DataTable();
   },
 
@@ -33,7 +71,7 @@ var Pages = React.createClass({
                       <div style={{marginTop: 10, marginBottom: 20}}>
                         <button className="btn btn-default" href="#" style={{marginRight: 10}}>Edit</button>
                         <button className="btn btn-default" href="#">Delete</button>
-                      </div>
+                      </div>                   
                       <table id="pageListTbl" className="display">                        
                         <thead>
                           <tr>
@@ -44,120 +82,7 @@ var Pages = React.createClass({
                             <th>Date</th>
                           </tr>
                       </thead>
-                      <tbody>
-                        <tr>
-                          <td><input type="checkbox"></input></td>                                
-                          <td>Hidup tenang dengan meninggalkan dunia</td>
-                          <td>Ardi Nugraha</td>
-                          <td style={{textAlign: 'center'}}>5</td>                                
-                          <td>Published 12/01/2017</td>
-                        </tr>
-                        <tr>
-                          <td><input type="checkbox"></input></td>                                
-                          <td>Sunyi Sepi</td>
-                          <td>Bayu Nugraha</td>
-                          <td style={{textAlign: 'center'}}>13</td>                               
-                          <td>Published 01/01/2017</td>
-                        </tr>
-                        <tr>
-                          <td ><input type="checkbox"></input></td>                               
-                          <td>Meninggalkan dunia</td>
-                          <td>Sultan Nugraha</td>
-                          <td style={{textAlign: 'center'}}> - </td>                              
-                          <td>Published 12/12/2016</td>
-                        </tr>
-                        <tr>
-                          <td><input type="checkbox"></input></td>                                
-                          <td>Karam Merdeka Sepi</td>
-                          <td>Wulan Nugraha</td>
-                          <td style={{textAlign: 'center'}}>4</td>                                
-                          <td>Published 22/12/2016</td>
-                        </tr>
-                        <tr>
-                          <td><input type="checkbox"></input></td>                                
-                          <td>Hidup tenang dengan meninggalkan dunia</td>
-                          <td>damar Nugraha</td>
-                          <td style={{textAlign: 'center'}}>1</td>                               
-                          <td>Published 21/01/2017</td>
-                        </tr>
-                        <tr>
-                          <td ><input type="checkbox"></input></td>                               
-                          <td>Sunyi Sepi</td>
-                          <td>kunir Nugraha</td>
-                          <td style={{textAlign: 'center'}}>9</td>                               
-                          <td>Published 14/01/2017</td>
-                        </tr>
-                        <tr>
-                          <td><input type="checkbox"></input></td>                                  
-                          <td>Meninggalkan dunia</td>
-                          <td>Sultan Nugraha</td>
-                          <td style={{textAlign: 'center'}}>-</td>                                 
-                          <td>Published 30/12/2016</td>
-                        </tr>
-                        <tr>
-                          <td><input type="checkbox"></input></td>                                  
-                          <td>Karam Merdeka Sepi</td>
-                          <td>Yudi Nugraha</td>
-                          <td style={{textAlign: 'center'}}>-</td>                                
-                          <td>Published 25/12/2016</td>
-                        </tr>
-                        <tr>
-                          <td><input type="checkbox"></input></td>                                
-                          <td>Hidup tenang dengan meninggalkan dunia</td>
-                          <td>Ardi Nugraha</td>
-                          <td style={{textAlign: 'center'}}>-</td>                                
-                          <td>Published 12/01/2017</td>
-                        </tr>
-                        <tr>
-                          <td><input type="checkbox"></input></td>                                
-                          <td>Sunyi Sepi</td>
-                          <td>Bayu Nugraha</td>
-                          <td style={{textAlign: 'center'}}>2</td>                                
-                          <td>Published 01/01/2017</td>
-                        </tr>
-                        <tr>
-                          <td><input type="checkbox"></input></td>                                
-                          <td>Keroncong Indonesia</td>
-                          <td>Waljinah</td>
-                          <td style={{textAlign: 'center'}}>7</td>                               
-                          <td>Published 12/12/2016</td>
-                        </tr>
-                        <tr>
-                          <td><input type="checkbox"></input></td>                                
-                          <td>Singgung Neraca</td>
-                          <td>Katimin</td>
-                          <td style={{textAlign: 'center'}}>2</td>                            
-                          <td>Published 22/12/2016</td>
-                        </tr>
-                        <tr>
-                          <td><input type="checkbox"></input></td>                                
-                          <td>Menata Hari</td>
-                          <td>Lukman</td>
-                          <td style={{textAlign: 'center'}}>1</td>                                
-                          <td>Published 21/01/2017</td>
-                        </tr>
-                        <tr>
-                          <td><input type="checkbox"></input></td>                                
-                          <td>Besok Mau Makan Apa</td>
-                          <td>Wulan</td>
-                          <td style={{textAlign: 'center'}}>-</td>      
-                          <td>Published 14/01/2017</td>
-                        </tr>
-                        <tr>
-                          <td><input type="checkbox"></input></td>                                  
-                          <td>Elok di tepi Pantai</td>
-                          <td>Sumarni</td>
-                          <td style={{textAlign: 'center'}}>15</td>
-                          <td>Published 30/12/2016</td>
-                        </tr>
-                        <tr>
-                          <td><input type="checkbox"></input></td>                                  
-                          <td>Hanya Gambaran</td>
-                          <td>Ida</td>
-                          <td style={{textAlign: 'center'}}>5</td>                                 
-                          <td>Published 25/12/2016</td>
-                        </tr>
-                      </tbody>
+                      <PageWithData/>
                     </table>
                   </div>
                 </div>
@@ -169,7 +94,5 @@ var Pages = React.createClass({
       </div>
     )},
 });
-
-
 
 export default Pages;

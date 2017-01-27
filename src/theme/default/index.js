@@ -21,11 +21,11 @@ const Theme = React.createClass({
 		console.log("url "+location.pathname.split("/").slice(1))
 		var rend_element
 		
-		if (location.pathname.split("/").slice(1) == "" || location.pathname.split("/").slice(1) == "index.html") {
+		if (location.pathname.split("/").slice(1) === "" || location.pathname.split("/").slice(1) === "index.html") {
 			rend_element = <Home/>;
-		} else if (location.pathname.split("/").slice(1) == "post") { 
+		} else if (location.pathname.split("/").slice(1) === "post") { 
 			rend_element = <Page/>;
-		} else if (location.pathname.split("/").slice(1) == "blogs") { 
+		} else if (location.pathname.split("/").slice(1) === "blogs") { 
 			rend_element = <Post/>;
 		} else {
 			rend_element = <Home/>;

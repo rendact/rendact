@@ -1,8 +1,55 @@
 import React from 'react';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 import $ from 'jquery';
 window.jQuery = $;
+//import images from '../../../public/images/photo4.jpg';
 
-import images from '../../../public/images/photo4.jpg';
+const postPosts = gql`
+query getPosts {
+     viewer{
+       allPosts{
+       	  edges{
+       	  	node{
+       	  	 image,
+	         title,
+	         author,
+	         category,
+		     tag,
+		     like,
+		     date
+	     }
+       }
+     }
+   }
+}`;
+
+class Post extends React.Component {
+    render() {
+        if (this.props.data.viewer) {
+            return (
+            <tbody>
+            	{this.props.data.viewer.allPosts.edges.map(function(item){
+                	return <tr key={item.node.title}>
+		                <td><input type="checkbox"></input></td>
+				        <td><img src={item.node.image} height="50" alt="thumbnail" /></td>
+		                <td><a href="#">{item.node.title}</a></td>
+		                <td><a href="#">{item.node.author}</a></td>
+		                <td><a href="#">{item.node.category}</a></td>
+				        <td><a href="#">{item.node.tag}</a></td>
+				        <td>{item.node.like}</td>
+				        <td>{item.node.date}</td>
+                	</tr>
+            	})}
+            </tbody>
+            )
+        }
+        else {
+            return <div></div>
+        }
+    }
+}
+const PostWithData = graphql(postPosts)(Post);
 
 var Posts = React.createClass({
 	componentDidMount: function(){
@@ -49,120 +96,10 @@ var Posts = React.createClass({
 	                            <th>Date</th>
 	                          </tr>
 	                        </thead>
-	                        <tbody>
-		                        <tr>
-		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" alt="thumbnail" /></td>
-		                            <td><a href="#">Satu</a></td>
-		                            <td><a href="#">Ardi Nugraha</a> </td>
-		                            <td><a href="#">satu</a></td>
-		                            <td><a href="#">satu</a></td>
-		                            <td>32</td>
-		                            <td>Published 12/01/2017</td>
-		                        </tr>
-		                         <tr>
-		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" alt="thumbnail" /></td>
-		                            <td><a href="#">Dua</a></td>
-		                            <td><a href="#">Dua</a> </td>
-		                            <td><a href="#">Dua</a></td>
-		                            <td><a href="#">Dua</a></td>
-		                            <td>32</td>
-		                            <td>Published 12/01/2017</td>
-		                        </tr>
-		                        <tr>
-		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" alt="thumbnail" /></td>
-		                            <td><a href="#">Tiga</a></td>
-		                            <td><a href="#">Tiga</a> </td>
-		                            <td><a href="#">Tiga</a></td>
-		                            <td><a href="#">Tiga</a></td>
-		                            <td>32</td>
-		                            <td>Published 12/01/2017</td>
-		                        </tr>
-	                            <tr>
-		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" alt="thumbnail" /></td>
-		                            <td><a href="#">Empat</a></td>
-		                            <td><a href="#">Empat</a> </td>
-		                            <td><a href="#">Empat</a></td>
-		                            <td><a href="#">Empat</a></td>
-		                            <td>32</td>
-		                            <td>Published 12/01/2017</td>
-		                        </tr>
-		                        <tr>
-		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" alt="thumbnail" /></td>
-		                            <td><a href="#">Lima</a></td>
-		                            <td><a href="#">Lima</a> </td>
-		                            <td><a href="#">Lima</a></td>
-		                            <td><a href="#">Lima</a></td>
-		                            <td>32</td>
-		                            <td>Published 12/01/2017</td>
-		                        </tr>
-	                            <tr>
-		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" alt="thumbnail" /></td>
-		                            <td><a href="#">Enam</a></td>
-		                            <td><a href="#">Enam</a> </td>
-		                            <td><a href="#">Enam</a></td>
-		                            <td><a href="#">Enam</a></td>
-		                            <td>32</td>
-		                            <td>Published 12/01/2017</td>
-		                        </tr>
-		                        <tr>
-		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" alt="thumbnail" /></td>
-		                            <td><a href="#">Tujuh</a></td>
-		                            <td><a href="#">Tujuh</a> </td>
-		                            <td><a href="#">Tujuh</a></td>
-		                            <td><a href="#">Tujuh</a></td>
-		                            <td>32</td>
-		                            <td>Published 12/01/2017</td>
-		                        </tr>
-	                            <tr>
-		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" alt="thumbnail" /></td>
-		                            <td><a href="#">Delapan</a></td>
-		                            <td><a href="#">Delapan</a> </td>
-		                            <td><a href="#">Delapan</a></td>
-		                            <td><a href="#">Delapan</a></td>
-		                            <td>32</td>
-		                            <td>Published 12/01/2017</td>
-		                        </tr>
-		                        <tr>
-		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" alt="thumbnail" /></td>
-		                            <td><a href="#">Sepuluh</a></td>
-		                            <td><a href="#">Sepuluh</a> </td>
-		                            <td><a href="#">Sepuluh</a></td>
-		                            <td><a href="#">Sepuluh</a></td>
-		                            <td>32</td>
-		                            <td>Published 12/01/2017</td>
-		                        </tr>
-		                        <tr>
-		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" alt="thumbnail" /></td>
-		                            <td><a href="#">Sebelas</a></td>
-		                            <td><a href="#">Sebelas</a> </td>
-		                            <td><a href="#">Sebelas</a></td>
-		                            <td><a href="#">Sebelas</a></td>
-		                            <td>32</td>
-		                            <td>Published 12/01/2017</td>
-		                        </tr>
-		                        <tr>
-		                            <td><input type="checkbox"></input></td>
-		                            <td><img src={images} height="50" alt="thumbnail" /></td>
-		                            <td><a href="#">Duabelas</a></td>
-		                            <td><a href="#">Duabelas</a> </td>
-		                            <td><a href="#">Duabelas</a></td>
-		                            <td><a href="#">Duabelas</a></td>
-		                            <td>32</td>
-		                            <td>Published 12/01/2017</td>
-		                        </tr>
-	                        </tbody>
+	                        <PostWithData/>
 	                      </table>
 	                    </div>
+
 	                  </div>
 	                </div>
 	              </div>
@@ -171,7 +108,5 @@ var Posts = React.createClass({
 		    </div>
 		)},
 });
-
-
 
 export default Posts;

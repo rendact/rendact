@@ -7,7 +7,7 @@ import {render} from 'react-dom'
 import {ApolloProvider} from 'react-apollo';
 import {BrowserRouter, Match, Miss, Redirect} from 'react-router'
 import client from './apollo';
-import {ThemeHome, ThemeSingle, ThemePage} from './admin/theme';
+import {ThemeHome, ThemeSingle} from './admin/theme';
 import Admin from './admin';
 import Login from './login';
 import Config from './config';
@@ -64,7 +64,7 @@ const Main = React.createClass({
 		  },
 		  body: data
 		}, (error, response, body) => {
-			if (!error && !body.errors && response.statusCode == 200) {
+			if (!error && !body.errors && response.statusCode === 200) {
 		    console.log(JSON.stringify(body, null, 2));
 		    Auth.authenticate(body.data.getUser);
 		  } else {

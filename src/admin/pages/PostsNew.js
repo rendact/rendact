@@ -4,10 +4,6 @@ window.jQuery = $;
 //window.CKEDITOR_BASEPATH = '/ckeditor/';
 //require('ckeditor');
 
-
-      
-      
-
 var NewPost = React.createClass({
   componentDidMount: function(){
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
@@ -26,9 +22,7 @@ var NewPost = React.createClass({
         });
         });
   },
-
-
-  
+ 
   render: function(){
     return (
     <div className="content-wrapper">
@@ -48,6 +42,7 @@ var NewPost = React.createClass({
               <div className="form-group"  style={{marginBottom:30}}>
                 <input style={{marginBottom:10}} type="text" className="form-control" placeholder="Input title here"/>
                 <p>Permalink : <a href="#">https://ussunnah.org/title </a> <button className="btn btn-default btn-sm btn-flat">Edit</button></p>
+                <p><button className="btn btn-default btn-sm btn-flat"><span className="fa-file-photo-o"></span> Add Image </button></p>
                 <form>
                   <textarea id="editor1" name="editor1" rows="25" style={{width: "100%"}} wrap="hard">
                     This is my textarea to be replaced with CKEditor.
@@ -155,7 +150,7 @@ var NewPost = React.createClass({
 
                           <m><div className="form-group">
                               <form className="form-inline">
-                                <select className="form-control" style={{marginRight: 10}}>
+                                <select className="form-control btn btn-flat btn-xs btn-default" style={{marginRight: 10, height: 20 }}>
                                   <option>Jan</option>
                                   <option>Feb</option>
                                   <option>Mar</option>
@@ -169,10 +164,10 @@ var NewPost = React.createClass({
                                   <option>Nov</option>
                                   <option>Des</option>
                                 </select>
-                                <input className="form-control" type="text" placeholder="day" style={{width: 50}}/>,
-                                <input className="form-control" type="text" placeholder="year" style={{marginLeft: 10, marginRight:5, width: 50}}/>@
-                                <input className="form-control" type="text" placeholder="hour" style={{marginLeft: 5,  width: 35}}/> : 
-                                <input className="form-control" type="text" placeholder="min" style={{width: 35}}/>
+                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" placeholder="day" style={{width: 50, height: 20}}/>,
+                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" placeholder="year" style={{marginLeft: 10, marginRight:5, width: 50, height: 20}}/>@
+                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" placeholder="hour" style={{marginLeft: 5,  width: 35, height: 20}}/> : 
+                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" placeholder="min" style={{width: 35, height: 20 }}/>
                               </form>
                                 <form className="form-inline" style={{marginTop: 10}}>
                                   <button className="btn btn-flat btn-xs btn-primary disabled" style={{marginRight: 10}}> OK </button>

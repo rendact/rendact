@@ -139,7 +139,7 @@ var Themes = React.createClass({
                    						onMouseOut={this.onMouseOut} >
               								<div className="thumbnail" 
                    							style={(state.hovering) ? {opacity: 0.5} : {}} >
-            									<img src={images1} />
+            									<img src={images1} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
@@ -154,7 +154,7 @@ var Themes = React.createClass({
           								<div className="col-md-4">
           								<div className="show-image">
               								<div className="thumbnail">
-            									<img src={images1} />
+            									<img src={images1} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
@@ -168,7 +168,7 @@ var Themes = React.createClass({
           								</div>
           								<div className="col-md-4">
               								<div className="thumbnail">
-            									<img src={images1} />
+            									<img src={images1} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
@@ -181,7 +181,7 @@ var Themes = React.createClass({
           								</div>
           								<div className="col-md-4">
               								<div className="thumbnail">
-            									<img src={images1} />
+            									<img src={images1} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
@@ -194,7 +194,7 @@ var Themes = React.createClass({
           								</div>
           								<div className="col-md-4">
               								<div className="thumbnail">
-            									<img src={images1} />
+            									<img src={images1} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
@@ -207,7 +207,7 @@ var Themes = React.createClass({
           								</div>
           								<div className="col-md-4">
               								<div className="thumbnail">
-            									<img src={images1} />
+            									<img src={images1} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
@@ -222,7 +222,7 @@ var Themes = React.createClass({
           							<Pane label="Free">
             							<div className="col-md-4">
               								<div className="thumbnail">
-            									<img src={images2} />
+            									<img src={images2} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
@@ -235,7 +235,7 @@ var Themes = React.createClass({
           								</div>
           								<div className="col-md-4">
               								<div className="thumbnail">
-            									<img src={images2} />
+            									<img src={images2} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
@@ -248,7 +248,7 @@ var Themes = React.createClass({
           								</div>
           								<div className="col-md-4">
               								<div className="thumbnail">
-            									<img src={images2} />
+            									<img src={images2} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
@@ -261,7 +261,7 @@ var Themes = React.createClass({
           								</div>
           								<div className="col-md-4">
               								<div className="thumbnail">
-            									<img src={images2} />
+            									<img src={images2} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
@@ -274,7 +274,7 @@ var Themes = React.createClass({
           								</div>
           								<div className="col-md-4">
               								<div className="thumbnail">
-            									<img src={images2} />
+            									<img src={images2} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
@@ -287,7 +287,7 @@ var Themes = React.createClass({
           								</div>
           								<div className="col-md-4">
               								<div className="thumbnail">
-            									<img src={images2} />
+            									<img src={images2} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
@@ -302,7 +302,7 @@ var Themes = React.createClass({
           							<Pane label="Premium">
             							<div className="col-md-4">
               								<div className="thumbnail">
-            									<img src={images3} />
+            									<img src={images3} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
@@ -315,7 +315,7 @@ var Themes = React.createClass({
           								</div>
           								<div className="col-md-4">
               								<div className="thumbnail">
-            									<img src={images3} />
+            									<img src={images3} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
@@ -328,7 +328,7 @@ var Themes = React.createClass({
           								</div>
           								<div className="col-md-4">
               								<div className="thumbnail">
-            									<img src={images3} />
+            									<img src={images3} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
@@ -341,7 +341,7 @@ var Themes = React.createClass({
           								</div>
           								<div className="col-md-4">
               								<div className="thumbnail">
-            									<img src={images3} />
+            									<img src={images3} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
@@ -354,7 +354,7 @@ var Themes = React.createClass({
           								</div>
           								<div className="col-md-4">
               								<div className="thumbnail">
-            									<img src={images3} />
+            									<img src={images3} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
@@ -367,7 +367,7 @@ var Themes = React.createClass({
           								</div>
           								<div className="col-md-4">
               								<div className="thumbnail">
-            									<img src={images3} />
+            									<img src={images3} alt="" />
             									<div className="caption">
                     								<p>Water
                     								<div className="pull-right box-tools">
