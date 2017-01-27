@@ -51,7 +51,7 @@ function getTemplateComponent(type){
 	}
 
 	try {
-		let Component = require('../theme/'+c.path+'/index.js').default;
+		let Component = require('../theme/'+c.path+'/layouts/Home.js').default;
 		if (type==="home") {
 			// pass
 		} else if (type==="post") {
@@ -67,6 +67,12 @@ function getTemplateComponent(type){
 }
 
 const ThemeHome = React.createClass({
+	componentDidMount: function(){
+		var c = window.config.theme;
+		require ('bootstrap/dist/css/bootstrap.css');
+		require('../theme/'+c.path+'/css/style.css');
+		require('../theme/'+c.path+'/function.js');
+	},
 	render: function() {
 		let Home = getTemplateComponent('home');
 		return <Home />
@@ -74,6 +80,12 @@ const ThemeHome = React.createClass({
 });
 
 const ThemeSingle = React.createClass({
+	componentDidMount: function(){
+		var c = window.config.theme;
+		require ('bootstrap/dist/css/bootstrap.css');
+		require('../theme/'+c.path+'/css/style.css');
+		require('../theme/'+c.path+'/function.js');
+	},
 	render: function() {
 		let Post = getTemplateComponent('post');
 		return <Post/>;
@@ -81,6 +93,12 @@ const ThemeSingle = React.createClass({
 });
 
 const ThemePage = React.createClass({
+	componentDidMount: function(){
+		var c = window.config.theme;
+		require ('bootstrap/dist/css/bootstrap.css');
+		require('../theme/'+c.path+'/css/style.css');
+		require('../theme/'+c.path+'/function.js');
+	},
 	render: function() {
 		let Page = getTemplateComponent('page');
 		return <Page/>;
