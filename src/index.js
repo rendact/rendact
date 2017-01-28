@@ -12,10 +12,10 @@ import Admin from './admin';
 import Login from './login';
 import Config from './config';
 
-const MatchWhenAuthorized = ({ component: Component, authState: authState, ...rest }) => (
+const MatchWhenAuthorized = ({ component: Component, authState: authState, userData: userData, ...rest }) => (
   <Match {...rest} render={props => (
     authState ? (
-      <Component {...props}/>
+      <Component userData={userData} {...props}/>
     ) : (
       <Redirect to={{
         pathname: '/login',
@@ -34,7 +34,11 @@ const MatchWhenUnauthorized = ({ component: Component, authState: authState, ...
 const Main = React.createClass({
 	getInitialState: function(){
 		return {
-			isAuthenticated:(localStorage.token && localStorage.token!=="")
+			isAuthenticated:(localStorage.token && localStorage.token!==""),
+			userData: {
+				name: null,
+				image: null
+			}
 		}
 	},
 	componentWillMount: function(){
@@ -57,7 +61,7 @@ const Main = React.createClass({
 		  },
 		  body: getUserQry
 		}, (error, response, body) => {
-			if (!error && !body.errors && response.statusCode === 200) {
+			if (!error && !body.errors && body.data != null && response.statusCode === 200) {
 		    this.signin(body.data.getUser);
 		  } else {
 		    this.signout();
@@ -66,6 +70,9 @@ const Main = React.createClass({
 	},
 	signin: function(userData){
 		this.setState({isAuthenticated:true});
+		this.setState({userData: {
+			name: userData.username
+		}});
     localStorage.username = userData.username;
 	},
 	signout: function(){
@@ -83,6 +90,7 @@ const Main = React.createClass({
 							pattern="/admin/:page?/:action?/:param1?/:param2?/:param3?/:param4?/:param5?" 
 							component={Admin}
 							authState={this.state.isAuthenticated}
+							userData={this.state.userData}
 						/>
 						<Match pattern="/article/:pageId?/:param1?/:param2?/:param3?/:param4?/:param5?" component={ThemeSingle}/>
 						<Match pattern="/blog/:postId?/:param1?/:param2?/:param3?/:param4?/:param5?" component={ThemeBlog}/>

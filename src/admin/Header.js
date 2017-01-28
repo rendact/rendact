@@ -6,6 +6,7 @@ const AdminHeader = React.createClass({
     location.reload();
   },
   render: function() {
+    var name = this.props.userData?this.props.userData.name:"";
     return (
       <header className="main-header">
       <nav className="navbar navbar-static-top">
@@ -82,14 +83,14 @@ const AdminHeader = React.createClass({
             <li className="dropdown user user-menu">
               <a href="#" className="dropdown-toggle" data-toggle="dropdown">
                 <img src="../../images/avatar-default.png" className="user-image" alt="User" />
-                <span className="hidden-xs">Ali Camarata</span>
+                <span className="hidden-xs">{name}</span>
               </a>
               <ul className="dropdown-menu">
                 <li className="user-header">
                   <img src="../../images/avatar-default.png" className="img-circle" alt="User" />
 
                   <p>
-                    Ali Camarata - Web Developer
+                    {name}
                     <small>Member since Nov. 2012</small>
                   </p>
                 </li>

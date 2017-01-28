@@ -14,7 +14,12 @@ const Login = React.createClass({
 		return {
 			errorMsg:null,
 			loadingMsg:null,
-			logged: (this.props.logged!=null?this.props.logged:false)
+			logged: (this.props.logged!=null?this.props.logged:false),
+			userData: {
+				name: null,
+				image: null
+			}
+
 		}
 	},
 	disableForm: function(state){
@@ -42,6 +47,7 @@ const Login = React.createClass({
 		      token
 		      user {
 		        id
+		        username
 		      }
 		    }
 		  }`,
@@ -66,6 +72,10 @@ const Login = React.createClass({
 			if (!error && !body.errors && response.statusCode === 200) {
 		    localStorage.token = body.data.loginUser.token;
 		    localStorage.userId = body.data.loginUser.user.id;
+		    
+		    this.setState({userData: {
+					name: body.data.loginUser.user.username
+				}});
 		    me.disableForm(false);
 		    me.setState({logged: true});
 		  } else {
@@ -130,7 +140,7 @@ const Login = React.createClass({
 			return loginPage;
 		} else {
 			window.history.pushState("", "", '/admin/');
-			return <Admin/>
+			return <Admin userData={this.state.userData}/>
 		}
 	}
 })
