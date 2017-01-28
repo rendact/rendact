@@ -3,6 +3,7 @@ import request from 'request';
 import $ from 'jquery';
 window.jQuery = $;
 
+import Admin from './admin';
 import Config from './config';
 import AdminLTEinit from './admin/lib/app.js';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -12,7 +13,8 @@ const Login = React.createClass({
 	getInitialState: function(){
 		return {
 			errorMsg:null,
-			loadingMsg:null
+			loadingMsg:null,
+			logged: (this.props.logged!=null?this.props.logged:false)
 		}
 	},
 	disableForm: function(state){
@@ -65,7 +67,7 @@ const Login = React.createClass({
 		    localStorage.token = body.data.loginUser.token;
 		    localStorage.userId = body.data.loginUser.user.id;
 		    me.disableForm(false);
-		    window.location.replace("/admin");
+		    me.setState({logged: true});
 		  } else {
 		  	if (body && body.errors) {
 		  		me.setState({errorMsg: body.errors[0].message});
@@ -75,11 +77,11 @@ const Login = React.createClass({
 			  me.disableForm(false);
 		  }
 		});
-
+		
 		event.preventDefault();
 	},
 	render: function(){
-		return (
+		const loginPage = (
 			<div className="login-box">
 			  <div className="login-logo">
 			    <a href="/"><b>Rendact</b></a>
@@ -123,6 +125,13 @@ const Login = React.createClass({
 				</div>
 			</div>
 			)
+
+		if (!this.state.logged ) {
+			return loginPage;
+		} else {
+			window.history.pushState("", "", '/admin/');
+			return <Admin/>
+		}
 	}
 })
 

@@ -12,21 +12,9 @@ import Admin from './admin';
 import Login from './login';
 import Config from './config';
 
-const Auth = {
-  isAuthenticated: (localStorage.token && localStorage.token!==""),
-  authenticate(data) {
-    this.isAuthenticated = true;
-    localStorage.username = data.username;
-  },
-  signout() {
-    this.isAuthenticated = false;
-    localStorage.token = "";
-  }
-}
-
-const MatchWhenAuthorized = ({ component: Component, ...rest }) => (
+const MatchWhenAuthorized = ({ component: Component, authState: authState, ...rest }) => (
   <Match {...rest} render={props => (
-    Auth.isAuthenticated ? (
+    authState ? (
       <Component {...props}/>
     ) : (
       <Redirect to={{
@@ -37,16 +25,9 @@ const MatchWhenAuthorized = ({ component: Component, ...rest }) => (
   )}/>
 )
 
-const MatchWhenUnauthorized = ({ component: Component, ...rest }) => (
+const MatchWhenUnauthorized = ({ component: Component, authState: authState, ...rest }) => (
   <Match {...rest} render={props => (
-    !Auth.isAuthenticated ? (
-      <Component {...props}/>
-    ) : (
-      <Redirect to={{
-        pathname: '/admin',
-        state: { from: props.location }
-      }}/>
-    )
+    <Component logged={authState} {...props}/>
   )}/>
 )
 
@@ -77,11 +58,21 @@ const Main = React.createClass({
 		  body: getUserQry
 		}, (error, response, body) => {
 			if (!error && !body.errors && response.statusCode === 200) {
-		    Auth.authenticate(body.data.getUser);
+		    this.signin(body.data.getUser);
 		  } else {
-		    Auth.signout();
+		    this.signout();
 		  }
 		});
+	},
+	signin: function(userData){
+		this.setState({isAuthenticated:true});
+    localStorage.username = userData.username;
+	},
+	signout: function(){
+		this.setState({isAuthenticated:false});
+    localStorage.token = "";
+    localStorage.userId = "";
+    localStorage.username = "";
 	},
 	render: function(){
 		return (
@@ -90,10 +81,16 @@ const Main = React.createClass({
 					<div id="router" style={{height: "100vh"}}>
 						<MatchWhenAuthorized 
 							pattern="/admin/:page?/:action?/:param1?/:param2?/:param3?/:param4?/:param5?" 
-							component={Admin}/>
+							component={Admin}
+							authState={this.state.isAuthenticated}
+						/>
 						<Match pattern="/article/:pageId?/:param1?/:param2?/:param3?/:param4?/:param5?" component={ThemeSingle}/>
 						<Match pattern="/blog/:postId?/:param1?/:param2?/:param3?/:param4?/:param5?" component={ThemeBlog}/>
-						<MatchWhenUnauthorized pattern="/login/:param1?" component={Login}/>
+						<MatchWhenUnauthorized 
+							pattern="/login/:param1?" 
+							component={Login}
+							authState={this.state.isAuthenticated}
+						/>
 						<Miss component={ThemeHome}/>
 					</div>
 				</BrowserRouter>
