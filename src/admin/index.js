@@ -25,7 +25,6 @@ import Skinning from './lib/skinning.js';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'jquery-ui/themes/base/core.css';
-//import '../../public/css/AdminLTE.css';
 
 require ('bootstrap');
 
