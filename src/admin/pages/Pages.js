@@ -5,12 +5,14 @@ import $ from 'jquery';
 window.jQuery = $;
 const postPages = gql`
   query getPages{
-  viewer{
-    allPages{
-      edges{
-        node{
+  viewer {
+    allPosts(where: {type: {eq: "page"}}) {
+      edges {
+        node {
           title,
-          author
+          author {
+            username
+          }
         }
       }
     }
@@ -23,11 +25,11 @@ class Page extends React.Component {
         if (this.props.data.viewer) {
             return (
             <tbody>
-            {this.props.data.viewer.allPages.edges.map(function(item){
+            {this.props.data.viewer.allPosts.edges.map(function(item){
                 return <tr key={item.node.title}>
                 <td><input type="checkbox"></input></td>
                 <td>{item.node.title}</td>
-                <td>{item.node.author}</td>
+                <td>{item.node.author.username}</td>
                 <td style={{textAlign: 'center'}}>5</td>
                 <td>Published 12/01/2017</td>              
                 </tr>
@@ -41,7 +43,8 @@ class Page extends React.Component {
 }
 
 const PageWithData = graphql(postPages)(Page);
-var Pages = React.createClass({
+
+const Pages = React.createClass({
   componentDidMount: function(){
     require ('datatables');
     require ('datatables/media/css/jquery.dataTables.min.css');
