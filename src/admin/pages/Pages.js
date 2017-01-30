@@ -3,6 +3,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import $ from 'jquery';
 window.jQuery = $;
+
 const postPages = gql`
   query getPages{
   viewer{
@@ -10,7 +11,9 @@ const postPages = gql`
       edges{
         node{
           title,
-          author
+          author,
+          comments,
+          createdAt
         }
       }
     }
@@ -24,12 +27,12 @@ class Page extends React.Component {
             return (
             <tbody>
             {this.props.data.viewer.allPages.edges.map(function(item){
-                return <tr key={item.node.title}>
+                return <tr key={item.node.id}>
                 <td><input type="checkbox"></input></td>
                 <td>{item.node.title}</td>
                 <td>{item.node.author}</td>
-                <td style={{textAlign: 'center'}}>5</td>
-                <td>Published 12/01/2017</td>              
+                <td>{item.node.comments}</td>
+                <td>{item.node.createdAt}</td>           
                 </tr>
             })}
             </tbody>
@@ -39,15 +42,10 @@ class Page extends React.Component {
             return <div></div>
     }
 }
-
 const PageWithData = graphql(postPages)(Page);
+
 var Pages = React.createClass({
-  componentDidMount: function(){
-    require ('datatables');
-    require ('datatables/media/css/jquery.dataTables.min.css');
-    require ('./Pages.css');
-    $('#pageListTbl').DataTable();
-  },
+ 
 
   render: function(){
     return (
@@ -78,7 +76,7 @@ var Pages = React.createClass({
                             <th><input type="checkbox"></input></th>                            
                             <th>Title</th>
                             <th>Author</th>
-                            <th style={{textAlign: 'center'}}>Comments</th>                             
+                            <th>Comments</th>                             
                             <th>Date</th>
                           </tr>
                       </thead>
@@ -93,6 +91,15 @@ var Pages = React.createClass({
         </div>
       </div>
     )},
+
+  componentDidMount: function(){
+    require ('datatables');
+    require ('datatables/media/css/jquery.dataTables.min.css');
+    require ('./Pages.css');
+   
+    $('#pageListTbl').DataTable();
+  },
+
 });
 
 export default Pages;
