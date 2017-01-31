@@ -1,10 +1,9 @@
 import React from 'react';
 import request from 'request';
-//import Router from 'react-router';
 import $ from 'jquery';
-//const jQuery = $;
 window.jQuery = $;
 
+import Admin from './admin';
 import Config from './config';
 import AdminLTEinit from './admin/lib/app.js';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -13,8 +12,21 @@ import '../public/css/Login.css';
 const Login = React.createClass({
 	getInitialState: function(){
 		return {
-			errorMsg:null
+			errorMsg:null,
+			loadingMsg:null,
+			logged: (this.props.logged!=null?this.props.logged:false),
+			userData: {
+				name: null,
+				image: null
+			}
+
 		}
+	},
+	disableForm: function(state){
+		$("#username").attr('disabled',state);
+		$("#password").attr('disabled',state);
+		$("#loginBtn").attr('disabled',state);
+		this.setState({loadingMsg: state?"Signing in...":null});
 	},
 	componentDidMount: function(){
 		require ('font-awesome/css/font-awesome.css');
@@ -24,6 +36,8 @@ const Login = React.createClass({
 		AdminLTEinit();
 	},
 	handleSubmit: function(event) {
+		var me = this;
+		this.disableForm(true);
 		var username = $("#username").val();
 		var password = $("#password").val();
 
@@ -33,6 +47,7 @@ const Login = React.createClass({
 		      token
 		      user {
 		        id
+		        username
 		      }
 		    }
 		  }`,
@@ -57,22 +72,26 @@ const Login = React.createClass({
 			if (!error && !body.errors && response.statusCode === 200) {
 		    localStorage.token = body.data.loginUser.token;
 		    localStorage.userId = body.data.loginUser.user.id;
-		    window.location.replace("/admin");
+		    
+		    this.setState({userData: {
+					name: body.data.loginUser.user.username
+				}});
+		    me.disableForm(false);
+		    me.setState({logged: true});
 		  } else {
-		  	if (body.errors) {
-		  		this.setState({errorMsg: body.errors[0].message});
+		  	if (body && body.errors) {
+		  		me.setState({errorMsg: body.errors[0].message});
 		  	} else {
-			  	this.setState({errorMsg: error});
-			    console.log(error);
-			    console.log(response.statusCode);
+		    	me.setState({errorMsg: error.toString()});
 			  }
+			  me.disableForm(false);
 		  }
 		});
-
+		
 		event.preventDefault();
 	},
 	render: function(){
-		return (
+		const loginPage = (
 			<div className="login-box">
 			  <div className="login-logo">
 			    <a href="/"><b>Rendact</b></a>
@@ -85,7 +104,6 @@ const Login = React.createClass({
 	            {this.state.errorMsg}
 	          </div>
 			    }
-			    <p className="error-msg has-error">{this.state.errorMsg}</p>
 			    <form id="login" onSubmit={this.handleSubmit} method="get">
 			      <div className="form-group has-feedback">
 			        <input id="username" className="form-control" placeholder="Username"/>
@@ -106,7 +124,8 @@ const Login = React.createClass({
 			          </div>
 			        </div>
 			        <div className="col-xs-4">
-			          <button type="submit" className="btn btn-primary btn-block btn-flat">Sign In</button>
+			          <button id="loginBtn" type="submit" className="btn btn-primary btn-block btn-flat">Sign In</button>
+			          <p>{this.state.loadingMsg}</p>
 			        </div>
 			      </div>
 			    </form>
@@ -116,6 +135,13 @@ const Login = React.createClass({
 				</div>
 			</div>
 			)
+
+		if (!this.state.logged ) {
+			return loginPage;
+		} else {
+			window.history.pushState("", "", '/admin/');
+			return <Admin userData={this.state.userData}/>
+		}
 	}
 })
 

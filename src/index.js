@@ -7,37 +7,15 @@ import {render} from 'react-dom'
 import {ApolloProvider} from 'react-apollo';
 import {BrowserRouter, Match, Miss, Redirect} from 'react-router'
 import client from './apollo';
-import {ThemeHome, ThemeSingle} from './admin/theme';
+import {ThemeHome, ThemeSingle, ThemeBlog} from './admin/theme';
 import Admin from './admin';
 import Login from './login';
 import Config from './config';
 
-let data = {
-  "query": `{ 
-  	getUser(id: "VXNlcjoy"){
-	      username,
-	      email
-    	}
-	  }`
-};
-
-
-const Auth = {
-  isAuthenticated: (localStorage.token && localStorage.token!==""),
-  authenticate(data) {
-    this.isAuthenticated = true;
-    localStorage.username = data.username;
-  },
-  signout() {
-    this.isAuthenticated = false;
-    localStorage.token = "";
-  }
-}
-
-const MatchWhenAuthorized = ({ component: Component, ...rest }) => (
+const MatchWhenAuthorized = ({ component: Component, authState: authState, userData: userData, ...rest }) => (
   <Match {...rest} render={props => (
-    Auth.isAuthenticated ? (
-      <Component {...props}/>
+    authState ? (
+      <Component userData={userData} {...props}/>
     ) : (
       <Redirect to={{
         pathname: '/login',
@@ -47,13 +25,32 @@ const MatchWhenAuthorized = ({ component: Component, ...rest }) => (
   )}/>
 )
 
+const MatchWhenUnauthorized = ({ component: Component, authState: authState, ...rest }) => (
+  <Match {...rest} render={props => (
+    <Component logged={authState} {...props}/>
+  )}/>
+)
+
 const Main = React.createClass({
 	getInitialState: function(){
 		return {
-			isAuthenticated:(localStorage.token && localStorage.token!=="")
+			isAuthenticated:(localStorage.token && localStorage.token!==""),
+			userData: {
+				name: null,
+				image: null
+			}
 		}
 	},
 	componentWillMount: function(){
+		let getUserQry = {
+		  "query": '{ 																' + 
+		  	'getUser(id: "'+localStorage.userId+'"){ 	' +
+			  '    username, 														' +
+			  '    email 																' +
+		    '	} 																			' +
+			  '}'
+		};
+
 		request({
 		  url: Config.scapholdUrl,
 		  method: "POST",
@@ -62,17 +59,27 @@ const Main = React.createClass({
 		    "content-type": "application/json",
 		    "Authorization": "Bearer " + localStorage.token
 		  },
-		  body: data
+		  body: getUserQry
 		}, (error, response, body) => {
-			if (!error && !body.errors && response.statusCode === 200) {
-		    console.log(JSON.stringify(body, null, 2));
-		    Auth.authenticate(body.data.getUser);
+			if (!error && !body.errors && body.data != null && response.statusCode === 200) {
+		    this.signin(body.data.getUser);
 		  } else {
-		    console.log(error);
-		    console.log(response.statusCode);
-		    Auth.signout();
+		    this.signout();
 		  }
 		});
+	},
+	signin: function(userData){
+		this.setState({isAuthenticated:true});
+		this.setState({userData: {
+			name: userData.username
+		}});
+    localStorage.username = userData.username;
+	},
+	signout: function(){
+		this.setState({isAuthenticated:false});
+    localStorage.token = "";
+    localStorage.userId = "";
+    localStorage.username = "";
 	},
 	render: function(){
 		return (
@@ -81,10 +88,17 @@ const Main = React.createClass({
 					<div id="router" style={{height: "100vh"}}>
 						<MatchWhenAuthorized 
 							pattern="/admin/:page?/:action?/:param1?/:param2?/:param3?/:param4?/:param5?" 
-							component={Admin}/>
-						<Match pattern="/page/:pageId?/:param1?/:param2?/:param3?/:param4?/:param5?" component={ThemeSingle}/>
-						<Match pattern="/article/:postId?/:param1?/:param2?/:param3?/:param4?/:param5?" component={ThemeSingle}/>
-						<Match pattern="/login/:param1?" component={Login}/>
+							component={Admin}
+							authState={this.state.isAuthenticated}
+							userData={this.state.userData}
+						/>
+						<Match pattern="/article/:pageId?/:param1?/:param2?/:param3?/:param4?/:param5?" component={ThemeSingle}/>
+						<Match pattern="/blog/:postId?/:param1?/:param2?/:param3?/:param4?/:param5?" component={ThemeBlog}/>
+						<MatchWhenUnauthorized 
+							pattern="/login/:param1?" 
+							component={Login}
+							authState={this.state.isAuthenticated}
+						/>
 						<Miss component={ThemeHome}/>
 					</div>
 				</BrowserRouter>

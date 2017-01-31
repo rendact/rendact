@@ -25,7 +25,6 @@ import Skinning from './lib/skinning.js';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'jquery-ui/themes/base/core.css';
-//import '../../public/css/AdminLTE.css';
 
 require ('bootstrap');
 
@@ -172,12 +171,10 @@ const Admin = React.createClass({
 		//PageLoader.openPage();
 	},
 	render: function() {
-		// switch (this.state.layout) or similar
-		console.log(this.state.page);
 		return (
 			<div className="wrapper">
         		
-        		<AdminHeader/>
+        		<AdminHeader userData={this.props.userData}/>
   				<SideMenu onClick={this.handleMenuClick} activeMenu={this.state.page+(this.state.action?'-':'')+this.state.action}/>
 				<PageLoader pageId={this.state.page} actionId={this.state.action} />
 				<Footer/>

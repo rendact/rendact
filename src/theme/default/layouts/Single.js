@@ -8,7 +8,7 @@ const Page = () => {
 
 	return (
 
-	<div>
+	<div className="application">
 		<Header/>
 		<div className="second-head">
 			<div className="container">
