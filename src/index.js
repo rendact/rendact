@@ -15,7 +15,7 @@ import Config from './config';
 const MatchWhenAuthorized = ({ component: Component, authState: authState, userData: userData, ...rest }) => (
   <Match {...rest} render={props => (
     authState ? (
-      <Component userData={userData} {...props}/>
+      <Component userData={userData} logged={authState} {...props}/>
     ) : (
       <Redirect to={{
         pathname: '/login',
@@ -69,17 +69,22 @@ const Main = React.createClass({
 		});
 	},
 	signin: function(userData){
-		this.setState({isAuthenticated:true});
-		this.setState({userData: {
-			name: userData.username
+		this.setState({
+			isAuthenticated:true, 
+			userData: {
+				name: userData.username
 		}});
     localStorage.username = userData.username;
 	},
 	signout: function(){
-		this.setState({isAuthenticated:false});
-    localStorage.token = "";
+		localStorage.token = "";
     localStorage.userId = "";
     localStorage.username = "";
+    this.setState({
+			isAuthenticated:false, 
+			userData: {
+				name: null
+		}});
 	},
 	render: function(){
 		return (

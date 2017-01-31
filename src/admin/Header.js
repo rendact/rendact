@@ -1,8 +1,15 @@
 import React from 'react';
+import {Redirect} from 'react-router'
 
 const AdminHeader = React.createClass({
+  getInitialState: function(){
+    return {
+      logged: (this.props.logged!=null?this.props.logged:false),
+    }
+  },
   handleSignout: function(){
     localStorage.token="";
+    //this.setState({logged: false});
     location.reload();
   },
   render: function() {

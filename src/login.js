@@ -1,4 +1,5 @@
 import React from 'react';
+import {Redirect} from 'react-router'
 import request from 'request';
 import $ from 'jquery';
 window.jQuery = $;
@@ -135,12 +136,17 @@ const Login = React.createClass({
 				</div>
 			</div>
 			)
-
+		
+		var from = this.props.location.state?this.props.location.state.from.pathname:this.props.location.pathname;
 		if (!this.state.logged ) {
 			return loginPage;
+		} else if (
+				from==="/admin" || from==="/admin/" || from==="/login" || from==="/login/" 
+			){
+			window.history.pushState("", "", '/admin');
+			return <Admin userData={this.state.userData} logged={this.state.logged}/>
 		} else {
-			window.history.pushState("", "", '/admin/');
-			return <Admin userData={this.state.userData}/>
+			return <Redirect to={{pathname: this.props.location.state.from.pathname}}/>
 		}
 	}
 })

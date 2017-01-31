@@ -159,6 +159,7 @@ const Admin = React.createClass({
 	},
 	getDefaultProps: function() {
 		return { 
+			logged: false,
 			params: {
 				page: 'dashboard',
 				action: ''
@@ -171,17 +172,25 @@ const Admin = React.createClass({
 		//PageLoader.openPage();
 	},
 	render: function() {
-		return (
-			<div className="wrapper">
-        		
-        		<AdminHeader userData={this.props.userData}/>
-  				<SideMenu onClick={this.handleMenuClick} activeMenu={this.state.page+(this.state.action?'-':'')+this.state.action}/>
-				<PageLoader pageId={this.state.page} actionId={this.state.action} />
-				<Footer/>
-				<ControlSidebar/>
-				<div className="control-sidebar-bg"></div>
-            </div>
-		);
+		if (this.props.logged) {
+			return (
+				<div className="wrapper">
+	        		
+	        <AdminHeader userData={this.props.userData} logged={this.props.logged}/>
+	  			<SideMenu onClick={this.handleMenuClick} activeMenu={this.state.page+(this.state.action?'-':'')+this.state.action}/>
+					<PageLoader pageId={this.state.page} actionId={this.state.action} />
+					<Footer/>
+					<ControlSidebar/>
+					<div className="control-sidebar-bg"></div>
+	      </div>
+			);
+		} else {
+			return (
+				<div className="wrapper">
+				<p>Loading...</p>
+				</div>
+			)
+		}
 	}
 });
 
