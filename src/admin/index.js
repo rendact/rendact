@@ -176,7 +176,7 @@ const Admin = React.createClass({
 			return (
 				<div className="wrapper">
 	        		
-	        <AdminHeader userData={this.props.userData} logged={this.props.logged}/>
+	        <AdminHeader profile={this.props.profile} logged={this.props.logged}/>
 	  			<SideMenu onClick={this.handleMenuClick} activeMenu={this.state.page+(this.state.action?'-':'')+this.state.action}/>
 					<PageLoader pageId={this.state.page} actionId={this.state.action} />
 					<Footer/>

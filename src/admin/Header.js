@@ -1,10 +1,9 @@
 import React from 'react';
-import {Redirect} from 'react-router'
 
 const AdminHeader = React.createClass({
   getInitialState: function(){
     return {
-      logged: (this.props.logged!=null?this.props.logged:false),
+      logged: (this.props.logged!=null?this.props.logged:false)
     }
   },
   handleSignout: function(){
@@ -13,7 +12,7 @@ const AdminHeader = React.createClass({
     location.reload();
   },
   render: function() {
-    var name = this.props.userData?this.props.userData.name:"";
+    var name = this.props.profile?this.props.profile.name:"";
     return (
       <header className="main-header">
       <nav className="navbar navbar-static-top">
