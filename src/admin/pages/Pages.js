@@ -3,6 +3,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import $ from 'jquery';
 window.jQuery = $;
+
 const postPages = gql`
 
 query getPages{
@@ -29,9 +30,9 @@ query getPages{
 } 
 `;
 
+
 class Page extends React.Component {
     render() {
-   debugger;
         if (this.props.data.viewer) {
             return (
             <tbody>
@@ -42,7 +43,9 @@ class Page extends React.Component {
                 <td><a href="#">{item.node.author.username}</a></td>
                 <td><a href="#">Post Status</a></td>
                 <td style={{textAlign: 'center'}}><a href="#">{item.node.comments.edges.length}</a></td>
-                <td><a href="#">{item.node.createdAt}</a></td>             
+                <td>{
+                  
+                }</td>       
                 </tr>
             })}
             </tbody>
@@ -50,18 +53,42 @@ class Page extends React.Component {
         }
         else 
             return <div></div>
-    }
-}
-
+ }}
 const PageWithData = graphql(postPages)(Page);
 
+
+
+
+var dataSet = 
+      [
+          [ "Tiger Nixon", "reatyu", "Edinburgh", "5421", "2011/04/25", "$320,800" ],
+          [ "Garrett Winters", "Accountant", "Tokyo", "8422", "2011/07/25", "$170,750" ],
+          [ "Ashton Cox", "Junior Technical Author", "San Francisco", "1562", "2009/01/12", "$86,000" ],
+      ];
+
+      $(document).ready(function() {
+        $('#pageListTbl').DataTable( {
+            data: dataSet,
+            columns: [
+                { title: "checkbox" },
+                { title: "Title" },
+                { title: "Auther" },
+                { title: "Status" },
+                { title: "Comments" },
+                { title: "Publish Date" }
+            ]
+        } );
+    } );
+
+
+
+
 var Pages = React.createClass({
-  componentDidMount: function(){
-    require ('datatables');
-    require ('datatables/media/css/jquery.dataTables.min.css');
-    require ('./Pages.css');
-    $('#pageListTbl').DataTable();
-  },
+   componentDidMount: function(){
+      require ('datatables');
+      require ('datatables/media/css/jquery.dataTables.min.css');
+      require ('./Pages.css');
+    },
 
   render: function(){
     return (
@@ -85,20 +112,10 @@ var Pages = React.createClass({
                       <div style={{marginTop: 10, marginBottom: 20}}>
                         <button className="btn btn-default" href="#" style={{marginRight: 10}}>Edit</button>
                         <button className="btn btn-default" href="#">Delete</button>
-                      </div>                   
-                      <table id="pageListTbl" className="display">                        
-                        <thead>
-                          <tr>
-                            <th><input type="checkbox"></input></th>
-                            <th>Title</th>
-                            <th>Author</th>
-                            <th>Post Status</th>
-                            <th style={{textAlign: 'center'}}>Comments</th>
-                            <th>Publish Date</th>
-                          </tr>
-                      </thead>
-                      <PageWithData/>
-                    </table>
+                      </div>                  
+                      <table id="pageListTbl" datatables="ng"  dt-options="dtOptions" className="display">                        
+                        
+                      </table>
                   </div>
                 </div>
               </div>
@@ -108,6 +125,8 @@ var Pages = React.createClass({
         </div>
       </div>
     )},
+
+    
 });
 
 export default Pages;
