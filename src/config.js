@@ -1,4 +1,3 @@
-
 const ContentTypeList = {
 	'posts': 	{id: 'posts', label: "Posts", icon: "fa-pencil-square-o"},
 	'news': 	{id: 'news', label: "News", icon: "fa-newspaper-o"},
@@ -56,6 +55,8 @@ const ActiveThemeConfig = {
 
 const config = {
 	scapholdUrl: 'https://us-west-2.api.scaphold.io/graphql/rendact',
+	auth0ClientId: 'ppT7SigAoZtxsMkivihT2O1PLS7TYBFf',
+	auth0Domain: 'rendact.auth0.com',
 	activeContentType: ActiveContentType,
 	contentTypeList: ContentTypeList,
 	menuList: MenuJson,

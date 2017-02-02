@@ -12,10 +12,10 @@ import Admin from './admin';
 import Login from './login';
 import Config from './config';
 
-const MatchWhenAuthorized = ({ component: Component, authState: authState, userData: userData, ...rest }) => (
+const MatchWhenAuthorized = ({ component: Component, authState: AuthState, profile: userData, ...rest }) => (
   <Match {...rest} render={props => (
-    authState ? (
-      <Component userData={userData} {...props}/>
+    AuthState ? (
+      <Component profile={userData} logged={AuthState} {...props}/>
     ) : (
       <Redirect to={{
         pathname: '/login',
@@ -25,9 +25,9 @@ const MatchWhenAuthorized = ({ component: Component, authState: authState, userD
   )}/>
 )
 
-const MatchWhenUnauthorized = ({ component: Component, authState: authState, ...rest }) => (
+const MatchWhenUnauthorized = ({ component: Component, authState: AuthState, ...rest }) => (
   <Match {...rest} render={props => (
-    <Component logged={authState} {...props}/>
+    <Component logged={AuthState} {...props}/>
   )}/>
 )
 
@@ -35,22 +35,57 @@ const Main = React.createClass({
 	getInitialState: function(){
 		return {
 			isAuthenticated:(localStorage.token && localStorage.token!==""),
-			userData: {
-				name: null,
-				image: null
-			}
+			profile: (localStorage.profile?localStorage.profile:{name: null,image: null})
 		}
 	},
 	componentWillMount: function(){
+		var isAuth0 = false;
+		if (!localStorage.token) return;
+
 		let getUserQry = {
 		  "query": '{ 																' + 
 		  	'getUser(id: "'+localStorage.userId+'"){ 	' +
-			  '    username, 														' +
+			  '    id, 																	' +
+			  '    username 														' +
+			  '    fullName 														' +
+			  '    gender 															' +
 			  '    email 																' +
+			  '    lastLogin 														' +
+			  '    createdAt														' +
 		    '	} 																			' +
 			  '}'
 		};
 
+		try {
+			var identities = JSON.parse(localStorage.profile).identities[0];
+			identities.userId = identities.user_id;
+			delete identities.user_id;
+
+			getUserQry = {
+			  "query": `mutation LoginUserWithAuth0Lock ($input: LoginUserWithAuth0LockInput!) {
+			    loginUserWithAuth0Lock(input: $input) {
+			      user {
+			      	id
+			      	username
+			      	fullName
+			      	gender
+			      	email
+			      	lastLogin
+			      	createdAt
+			      }
+			    }
+			  }`,
+			  "variables": {
+			    "input": {
+			      "identity": identities,
+			      "access_token": localStorage.token,
+			      "clientMutationId": Config.auth0ClientId
+			    }
+			  }
+			};
+			isAuth0 = true;
+		} catch(e) {}
+		
 		request({
 		  url: Config.scapholdUrl,
 		  method: "POST",
@@ -62,24 +97,54 @@ const Main = React.createClass({
 		  body: getUserQry
 		}, (error, response, body) => {
 			if (!error && !body.errors && body.data != null && response.statusCode === 200) {
-		    this.signin(body.data.getUser);
+				if (isAuth0) {
+					var p = JSON.parse(localStorage.getItem('profile'));
+					var p2 = {
+						id: p.user_id,
+		      	username: p.name,
+		      	fullName: p.given_name+" "+p.family_name,
+		      	gender: p.gender,
+		      	email: p.email,
+		      	lastLogin: p.updated_at,
+		      	createdAt: p.created_at
+					}
+					this.signin(p2);
+					//localStorage.profile = JSON.stringify(p2);
+				} else {
+					if (body.data.getUser) {
+		    		this.signin(body.data.getUser);
+		    		localStorage.profile = JSON.stringify(body.data.getUser);
+					}
+		    }
 		  } else {
 		    this.signout();
 		  }
 		});
 	},
-	signin: function(userData){
-		this.setState({isAuthenticated:true});
-		this.setState({userData: {
-			name: userData.username
-		}});
-    localStorage.username = userData.username;
+	signin: function(p){
+		var profile = {
+    	name: p.fullName?p.fullName:p.username,
+    	username: p.username,
+    	email: p.email,
+    	gender: p.gender,
+    	lastLogin: p.lastLogin,
+    	createdAt: p.createdAt
+    }
+    
+		this.setState({
+			isAuthenticated:true, 
+			profile: profile
+		});
 	},
 	signout: function(){
-		this.setState({isAuthenticated:false});
-    localStorage.token = "";
+		localStorage.token = "";
     localStorage.userId = "";
-    localStorage.username = "";
+    localStorage.profile = "";
+    localStorage.loginType = "";
+    this.setState({
+			isAuthenticated:false, 
+			profile: null});
+		$.ajax('https://rendact.auth0.com/v2/logout');
 	},
 	render: function(){
 		return (
@@ -90,7 +155,7 @@ const Main = React.createClass({
 							pattern="/admin/:page?/:action?/:param1?/:param2?/:param3?/:param4?/:param5?" 
 							component={Admin}
 							authState={this.state.isAuthenticated}
-							userData={this.state.userData}
+							profile={this.state.profile}
 						/>
 						<Match pattern="/article/:pageId?/:param1?/:param2?/:param3?/:param4?/:param5?" component={ThemeSingle}/>
 						<Match pattern="/blog/:postId?/:param1?/:param2?/:param3?/:param4?/:param5?" component={ThemeBlog}/>
