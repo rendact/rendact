@@ -1,57 +1,92 @@
 import React from 'react';
-import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
+import request from 'request';
 import $ from 'jquery';
 window.jQuery = $;
-const postPages = gql`
-  query getPages{
-  viewer {
-    allPosts(where: {type: {eq: "page"}}) {
-      edges {
-        node {
-          title,
-          author {
-            username
+import Config from '../../config';
+
+const Page = React.createClass({
+  getInitialState: function(){
+    return {
+      content: [<tr><td>Loading data...</td></tr>]
+    }
+  },
+  componentDidMount: function(){
+    //$('#pageListTbl').DataTable();
+  },
+  componentWillMount: function(){
+    let list = [];
+    let postPages = {"query": `
+      query getPages{
+      viewer {
+        allPosts(where: {type: {eq: "page"}}) {
+          edges {
+            node {
+              id
+              title,
+              author {
+                username
+              },
+              status,
+              comments{
+                edges{
+                  node{
+                    id
+                  }
+                }
+              },
+              createdAt
+            }
           }
         }
       }
-    }
-  }
-} 
-`;
-
-class Page extends React.Component {
-    render() {
-        if (this.props.data.viewer) {
-            return (
-            <tbody>
-            {this.props.data.viewer.allPosts.edges.map(function(item){
-                return <tr key={item.node.title}>
-                <td><input type="checkbox"></input></td>
-                <td>{item.node.title}</td>
-                <td>{item.node.author.username}</td>
-                <td style={{textAlign: 'center'}}>5</td>
-                <td>Published 12/01/2017</td>              
-                </tr>
-            })}
-            </tbody>
-            )
+      } 
+    `};
+    var me = this;
+    request({
+        url: Config.scapholdUrl,
+        method: "POST",
+        json: true,
+        headers: {
+          "content-type": "application/json",
+          "Authorization": "Bearer " + localStorage.token
+        },
+        body: postPages
+      }, (error, response, body) => {
+        if (body.data) {
+          //var datatable = $('#table').dataTable().api();
+          $.each(body.data.viewer.allPosts.edges, function(key, item){
+          
+            var dt = new Date(item.node.createdAt);
+            var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+            list.push(<tr key={item.node.id}>
+              <td style={{textAlign: 'center'}}><input type="checkbox"></input></td>
+              <td style={{textAlign: 'center'}}><a href="">{item.node.title}</a></td>
+              <td style={{textAlign: 'center'}}><a href="">{item.node.author.username}</a></td>
+              <td style={{textAlign: 'center'}}><a href="">{item.node.status}</a></td>
+              <td style={{textAlign: 'center'}}><a href="">{item.node.comments.edges.length}</a></td>            
+              <td style={{textAlign: 'center'}}>Published {date}</td>
+            </tr>)
+          });
         }
-        else 
-            return <div></div>
-    }
-}
+        me.setState({content: list});
+        $('#pageListTbl').DataTable();
+    });
+  },
+  render: function() {
+      return (
+        <tbody>{this.state.content}</tbody>
+      )
+  }
+});
 
-const PageWithData = graphql(postPages)(Page);
 
 const Pages = React.createClass({
   componentDidMount: function(){
     require ('datatables');
     require ('datatables/media/css/jquery.dataTables.min.css');
     require ('./Pages.css');
-    $('#pageListTbl').DataTable();
+    //$('#pageListTbl').DataTable();
   },
-
   render: function(){
     return (
       <div className="content-wrapper">
@@ -78,14 +113,15 @@ const Pages = React.createClass({
                       <table id="pageListTbl" className="display">                        
                         <thead>
                           <tr>
-                            <th><input type="checkbox"></input></th>                            
-                            <th>Title</th>
-                            <th>Author</th>
+                            <th style={{textAlign: 'center'}}><input type="checkbox"></input></th>                            
+                            <th style={{textAlign: 'center'}}>Title</th>
+                            <th style={{textAlign: 'center'}}>Author</th>
+                            <th style={{textAlign: 'center'}}>Post Status</th>
                             <th style={{textAlign: 'center'}}>Comments</th>                             
-                            <th>Date</th>
+                            <th style={{textAlign: 'center'}}>Publish Date</th>
                           </tr>
                       </thead>
-                      <PageWithData/>
+                      <Page/>
                     </table>
                   </div>
                 </div>
