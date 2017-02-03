@@ -1,6 +1,10 @@
 import React from 'react';
+import request from 'request';
 import $ from 'jquery';
 window.jQuery = $;
+
+import Admin from '../../admin/pages/Pages';
+import Config from '../../config';
 //window.CKEDITOR_BASEPATH = '/ckeditor/';
 //require('ckeditor');
 
@@ -37,7 +41,20 @@ var Input= React.createClass({
   }
 });
 
-var NewPost = React.createClass({
+var Perm= React.createClass({
+  render: function(){
+    return (
+      <div className="form-group">
+      <form className="form-inline">
+        <input type="text"/>
+        <button className="btn btn-default" style={{marginLeft: 10}}>OK</button>
+      </form>
+      </div>
+      )
+  }
+});
+
+const NewPost = React.createClass({
   componentDidMount: function(){
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
       window.CKEDITOR.replace('editor1', {
@@ -46,9 +63,34 @@ var NewPost = React.createClass({
     });
   },
 
-  getInitialState : function() {
-      return this.state = {inputList: []};
-        
+  getInitialState: function(){
+    return {
+      inputList: [],
+      textList: [],
+      errorMsg:null,
+      loadingMsg:null,
+      logged: (this.props.logged!=null?this.props.logged:false),
+      userData: {
+        name: null,
+        image: null
+      }
+
+
+    }
+     
+  },
+
+  onEditBtnClick: function(event) {
+        const textList = this.state.textList;
+        textList.length = 1;
+        $(document).ready(function(){
+          $("editBtn").click(function(){
+            $(this).hide();
+          });
+        });
+        this.setState({
+            textList: textList.concat(<Perm key={textList.length} />)
+        });
     },
 
   onAddBtnClick: function(event) {
@@ -59,8 +101,104 @@ var NewPost = React.createClass({
         });
     },
 
+handleSubmit: function(event) {
+    var me = this;
+    var title = $("#titlePage").val();
+    var content =  window.CKEDITOR.instances['editor1'].getData();
+    var titleTag = $("#titleTag").val();
+    var metaKeyword = $("#metaKeyword").val();
+    var metaDescription = $("#metaDescription").val();
+    var summary = $("#editor2").val();
+    
+    const data = {
+      "query": `
+    mutation createPost($input: CreatePostInput!) {
+        createPost(input: $input) {
+          changedPost {
+            title,
+            content,
+            titleTag
+        }
+      }
+    }
+    `,
+      "variables": {
+        "input": {
+          "title": title,
+          "content": content,
+          "titleTag": titleTag,
+          "type": "post"
+        }
+      }
+    };
+
+    request({
+      url: Config.scapholdUrl,
+      method: "POST",
+      json: true,
+      headers: {
+        "content-type": "application/json",
+        "Authorization": "Bearer " + localStorage.token
+      },
+      body: data
+    }, (error, response, body) => {
+      if (!error && !body.errors && response.statusCode === 200) {
+        me.setState({logged: true});
+      } else {
+        if (body && body.errors) {
+          me.setState({errorMsg: body.errors[0].message});
+        } else {
+          me.setState({errorMsg: error.toString()});
+        }
+      }
+    });
+    
+    const data1 = {
+      "query": `
+    mutation createPostMeta($input: CreatePostMetaInput!) {
+        createPostMeta(input: $input) {
+          changedPostMeta {
+            metaKeyword,
+            metaDescription,
+            summary
+        }
+      }
+    }
+    `,
+      "variables": {
+        "input": {
+          "metaKeyword": metaKeyword,
+          "metaDescription": metaDescription,
+          "summary": summary
+        }
+      }
+    };
+
+    request({
+      url: Config.scapholdUrl,
+      method: "POST",
+      json: true,
+      headers: {
+        "content-type": "application/json",
+        "Authorization": "Bearer " + localStorage.token
+      },
+      body: data1
+    }, (error, response, body) => {
+      if (!error && !body.errors && response.statusCode === 200) {
+        me.setState({logged: true});
+      } else {
+        if (body && body.errors) {
+          me.setState({errorMsg: body.errors[0].message});
+        } else {
+          me.setState({errorMsg: error.toString()});
+        }
+      }
+    });
+
+    event.preventDefault();
+  },
   render: function(){
-    return (
+    const newPage=(
       <div className="content-wrapper">
         <div className="container-fluid">
           <section className="content-header"  style={{marginBottom:20}}>
@@ -71,18 +209,30 @@ var NewPost = React.createClass({
                   <li className="active">Add New</li>
                 </ol>
           </section>
+          { this.state.errorMsg &&
+            <div className="alert alert-danger alert-dismissible">
+              <button type="button" className="close" data-dismiss="alert" aria-hidden="true">×</button>
+              {this.state.errorMsg}
+            </div>
+          }
+          <form onSubmit={this.handleSubmit} method="get">
           <div className="col-md-8">
             <div className="form-group"  style={{marginBottom:30}}>
-              <form>
-                <input style={{marginBottom: 20}} type="text" className="form-control" placeholder="Input Title Here"/>
-                  <form className="form-inline">
+              <div>
+                <input id="titlePage" style={{marginBottom: 20}} type="text" className="form-control" placeholder="Input Title Here"/>
+                  <div className="form-inline">
                     <p>Permalink: <a>https://ussunnah.org/title</a>
-                    <button className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
+                    <button onClick={this.onEditBtnClick} id="editBtn" className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
                       <span style={{fontSize: 12}}>Edit</span>
-                    </button></p>
-                  </form>
+                    </button>
+                    {this.state.textList.map(function(input, index) {
+                        return input;
+                    })}
+                    </p>
+                  </div>
                   <textarea id="editor1" name="editor1" rows="25" style={{width: "100%"}} wrap="hard"></textarea>
-              </form>
+                  <div id="trackingDiv"></div>
+              </div>
             </div>
             <div className="box box-info" style={{marginTop:20}}>
               <div className="box-header with-border">
@@ -93,7 +243,7 @@ var NewPost = React.createClass({
                 </div>
               </div>
               <div className="box-body pad">
-                <form className="form-horizonral">
+                <div className="form-horizonral">
                   <div className="form-group">
                     <div className="col-md-4">Preview</div>
                     <div className="col-md-8">
@@ -105,7 +255,7 @@ var NewPost = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4"><p>Title Tag</p></div>
                     <div className="col-md-8">
-                      <input type="text" style={{width: '100%'}}/>
+                      <input id="titleTag" type="text" style={{width: '100%'}}/>
                         <span className="help-block">Up to 65 characters recommended</span>
                         <span className="help-block">65 characters left</span>                     
                     </div>
@@ -113,7 +263,7 @@ var NewPost = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4"><p>Meta Description</p></div>
                     <div className="col-md-8">
-                      <textarea rows='2' style={{width:'100%'}}></textarea>
+                      <textarea id="metaDescription" rows='2' style={{width:'100%'}}></textarea>
                       <span className="help-block">160 characters maximum</span>
                       <span className="help-block">160 characters left</span>
                     </div>
@@ -122,13 +272,13 @@ var NewPost = React.createClass({
                     <div className="col-md-4"><p>Meta Keywords</p></div>
                     <div className="col-md-8">
                       <div className="form-group">
-                        <input type="text" style={{width: '100%'}}/>
+                        <input id="metaKeyword" type="text" style={{width: '100%'}}/>
                         <input type="checkbox"/> I want to use post tags in addition to my keywords
                         <span className="help-block"><b>News keywords </b><a>(?)</a></span>
                       </div>
                     </div>
                   </div>
-                </form> 
+                </div> 
                 </div>
               </div> 
               <div className="box box-info" style={{marginTop:20}}>
@@ -158,15 +308,15 @@ var NewPost = React.createClass({
                           </div>         
                     </div>
                     <div className="box-body pad">
-                      <form>
+                      <div>
                       <div className="form-group">
                         <button className="btn btn-default">Save Draft</button>
                         <div className="pull-right box-tools">
                         <button className="btn btn-default">Preview</button>
                         </div>
                       </div>
-                      </form>
-                      <form className="form-inline">
+                      </div>
+                      <div className="form-inline">
                       <div className="form-group">
                         <p>
                           <span className="glyphicon glyphicon-pencil" style={{marginRight: 10}}></span>
@@ -185,14 +335,14 @@ var NewPost = React.createClass({
                           })}
                           </p>
                       </div>
-                      </form> 
+                      </div> 
                     </div>
                     <div className="box-footer">        
-                      <button type="submit" className="btn btn-default">Clear Cache</button>
+                      <button className="btn btn-default">Clear Cache</button>
                       <div className="form-group" style={{marginTop: 10}}>
                         <a style={{color: 'red'}}><u>Move To Trash</u></a>
                         <div className="pull-right box-tools">
-                        <button type="submit" className="btn btn-primary">Publish</button>
+                        <button id="publishBtn" type="submit" className="btn btn-primary">Publish</button>
                         </div>
                       </div>
                     </div>
@@ -206,7 +356,7 @@ var NewPost = React.createClass({
                       </div>
                     </div>
                     <div className="box-body pad">
-                      <form>
+                      <div>
                       <div className="form-group">
                         <p><b>Parent</b></p>
                         <select>
@@ -217,17 +367,24 @@ var NewPost = React.createClass({
                         <p><b>Order</b></p>
                         <input type="text" placeholder="0" style={{width:40}}/>
                       </div>
-                      </form>                  
+                      </div>                  
                     </div>
                   </div>
 
               </div>
             </div>
           </div>
+          </form>
         
         </div>
       </div>
-  )
+      )
+   if (!this.state.logged ) {
+      return newPage;
+    } else {
+      window.history.pushState("", "", '/admin/pages');
+      return <Admin />
+    }
 }
 });
 
