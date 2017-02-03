@@ -18,7 +18,7 @@ const AdminHeader = React.createClass({
     var profile = this.props.profile;
     if (this.props.authService.getProfile())
       profile = this.props.authService.getProfile()
-    
+
     return (
       <header className="main-header">
       <nav className="navbar navbar-static-top">
@@ -95,14 +95,14 @@ const AdminHeader = React.createClass({
             <li className="dropdown user user-menu">
               <a href="#" className="dropdown-toggle" data-toggle="dropdown">
                 <img src="../../images/avatar-default.png" className="user-image" alt="User" />
-                <span className="hidden-xs"></span>
+                <span className="hidden-xs">{profile.name}</span>
               </a>
               <ul className="dropdown-menu">
                 <li className="user-header">
                   <img src="../../images/avatar-default.png" className="img-circle" alt="User" />
 
                   <p>
-                    
+                    {profile.name}
                     <small>Member since Nov. 2012</small>
                   </p>
                 </li>
