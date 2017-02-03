@@ -19,6 +19,7 @@ function AuthService(){
   })
 
   var _setToken = function(idToken) {    
+    console.log("set token: "+idToken);
     localStorage.setItem('token', idToken)
   }
 
@@ -34,6 +35,7 @@ function AuthService(){
       localStorage.setItem('token', authResult.idToken);
       localStorage.setItem('auth0_profile', JSON.stringify(profile));
       localStorage.setItem('loginType','auth0');
+      console.log("Auth0 authenticated");
       window.location = '/admin';
     });
   }
@@ -49,6 +51,7 @@ function AuthService(){
       createdAt: p.createdAt
     }
     localStorage.setItem('profile', JSON.stringify(profile));
+    console.log("set profile: "+JSON.stringify(profile));
   }
 
   this.checkAuth = function(cb){
@@ -86,8 +89,10 @@ function AuthService(){
             _setProfile(body.data.getUser);
           }
         }
+        console.log("checkAuth OK");
         cb(true);
       } else {
+        console.log("checkAuth FAILED");
         this.logout();
       }
     });
@@ -113,6 +118,7 @@ function AuthService(){
           localStorage.userId = p.id;
           _setProfile(p);
         }
+        console.log("doLogin OK");
         if (successFn) successFn();
       } else {
         if (failedFn) {
@@ -122,6 +128,7 @@ function AuthService(){
             failedFn(error.toString());
           }
         }
+        console.log("doLogin FAILED");
       }
     });
   }
@@ -139,6 +146,7 @@ function AuthService(){
   }
 
   this.getProfile = function() {
+    console.log("getProfile");
     return JSON.parse(localStorage.getItem('profile'))
   }
 

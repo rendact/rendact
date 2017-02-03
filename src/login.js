@@ -81,13 +81,9 @@ const Login = React.createClass({
 			      </div>
 			      <div className="row">
 			        <div className="col-xs-8">
-			          <div className="checkbox icheck">
 			            <label>
-			              <div className="icheckbox_square-blue" aria-checked="false" aria-disabled="false" style={{position: "relative"}}>
-			              <input type="checkbox" style={{position: "absolute", top: "-20%", left: -20, display: "block", width: "140%", height: "140%", margin: 0, padding: 0, background: "white", border: 0, opacity: 0}}/>
-			              <ins className="iCheck-helper" style={{position: "absolute", top: "-20%", left: -20, display: "block", width: "140%", height: "140%", margin: 0, padding: 0, background: "white", border: 0, opacity: 0}}></ins></div> Remember Me
+			              <input type="checkbox"/> Remember Me
 			            </label>
-			          </div>
 			        </div>
 			        <div className="col-xs-4">
 			          <button id="loginBtn" type="submit" className="btn btn-primary btn-block btn-flat">Sign In</button>
