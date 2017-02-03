@@ -3,7 +3,6 @@ import $ from 'jquery';
 const jQuery = $;
 window.jQuery = $;
 
-import {AuthService} from '../auth';
 import AdminHeader from './Header';
 import ControlSidebar from './ControlSidebar';
 import Footer from './Footer';
@@ -176,7 +175,7 @@ const Admin = React.createClass({
 			return (
 				<div className="wrapper">
 	        		
-	        <AdminHeader/>
+	        <AdminHeader authService={this.props.AuthService} />
 	  			<SideMenu onClick={this.handleMenuClick} activeMenu={this.state.page+(this.state.action?'-':'')+this.state.action}/>
 					<PageLoader pageId={this.state.page} actionId={this.state.action} />
 					<Footer/>

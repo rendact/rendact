@@ -1,18 +1,24 @@
 import React from 'react';
 
 const AdminHeader = React.createClass({
-  getInitialState: function(){
-    return {
-      logged: (this.props.logged!=null?this.props.logged:false)
+  getDefaultProps: function() {
+    return { 
+      profile: {
+        name: ''
+      }
     }
   },
   handleSignout: function(){
-    localStorage.token="";
+    //localStorage.token="";
     //this.setState({logged: false});
+    this.props.authService.logout();
     location.reload();
   },
   render: function() {
-    var name = this.props.profile?this.props.profile.name:"";
+    var profile = this.props.profile;
+    if (this.props.authService.getProfile())
+      profile = this.props.authService.getProfile()
+    
     return (
       <header className="main-header">
       <nav className="navbar navbar-static-top">
@@ -89,14 +95,14 @@ const AdminHeader = React.createClass({
             <li className="dropdown user user-menu">
               <a href="#" className="dropdown-toggle" data-toggle="dropdown">
                 <img src="../../images/avatar-default.png" className="user-image" alt="User" />
-                <span className="hidden-xs">{name}</span>
+                <span className="hidden-xs"></span>
               </a>
               <ul className="dropdown-menu">
                 <li className="user-header">
                   <img src="../../images/avatar-default.png" className="img-circle" alt="User" />
 
                   <p>
-                    {name}
+                    
                     <small>Member since Nov. 2012</small>
                   </p>
                 </li>

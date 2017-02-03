@@ -4,7 +4,7 @@ window.jQuery = $;
 import React from 'react';
 import {render} from 'react-dom'
 import {ApolloProvider} from 'react-apollo';
-import {BrowserRouter, Match, Miss, Redirect} from 'react-router'
+import {BrowserRouter, Match, Miss, Redirect, browserHistory, Router} from 'react-router'
 import {AuthService, MatchWhenAuthorized} from './auth'
 window.AuthService = AuthService;
 import client from './apollo';
@@ -16,7 +16,7 @@ const Main = React.createClass({
 	getInitialState: function(){
 		this.AuthService = new AuthService(this);
 		this.AuthService.checkAuth(this.onlogin);
-		return {logged: false};
+		return {logged: localStorage.getItem("token")?true:false};
 	},
 	onlogin: function(state){
 		this.setState({logged: state});
@@ -42,6 +42,7 @@ const Main = React.createClass({
 					      <Login logged={this.state.logged} 
 					      	onlogin={this.onlogin} 
 					      	authService={this.AuthService}
+					      	{...props}
 					      />
 					    )
 					  )}/>

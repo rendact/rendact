@@ -9,20 +9,23 @@ import Query from './query';
 import $ from 'jquery';
 window.jQuery = $;
 
-window.browserHistory = browserHistory;
-
 function AuthService(){
+  var me = this;
   this.lock = new Auth0Lock(Config.auth0ClientId, Config.auth0Domain, {
     auth: {
-      redirectUrl: 'http://localhost:3000/login',
+      redirectUrl: 'http://localhost:3000/login/redirect',
       responseType: 'token'
     }
   })
 
+  var _setToken = function(idToken) {    
+    localStorage.setItem('token', idToken)
+  }
+
   var _doAuthentication = function(authResult) {
-    this.setToken(authResult.idToken)
+    _setToken(authResult.idToken)
     
-    this.lock.getProfile(authResult.idToken, function(error, profile) {
+    me.lock.getProfile(authResult.idToken, function(error, profile) {
       if (error) {
         console.log("ERROR");
         console.log(error);
@@ -31,14 +34,10 @@ function AuthService(){
       localStorage.setItem('token', authResult.idToken);
       localStorage.setItem('auth0_profile', JSON.stringify(profile));
       localStorage.setItem('loginType','auth0');
-      //location = "/admin";
+      window.location = '/admin';
     });
   }
   this.lock.on('authenticated', _doAuthentication);
-  
-  var _setToken = function(idToken) {    
-    localStorage.setItem('token', idToken)
-  }
 
   var _setProfile = function(p) {
     var profile = {
@@ -58,9 +57,8 @@ function AuthService(){
     if (!localStorage.token) return;
 
     let getUserQry = Query.getUserQry(localStorage.userId);
-
     try {
-      var identities = JSON.parse(localStorage.profile).identities[0];
+      var identities = JSON.parse(localStorage.auth0_profile).identities[0];
       identities.userId = identities.user_id;
       delete identities.user_id;
 
@@ -81,11 +79,11 @@ function AuthService(){
       if (!error && !body.errors && body.data != null && response.statusCode === 200) {
         if (isAuth0) {
           var p = JSON.parse(localStorage.getItem('auth0_profile'));
-          _setProfile(p);
+          _setProfile({fullName:p.name,username:p.nickname,email:p.email,
+            gender:p.gender,lastLogin:p.updated_at,createdAt:p.created_at});
         } else {
           if (body.data.getUser) {
-            _setProfile(JSON.stringify(body.data.getUser));
-            
+            _setProfile(body.data.getUser);
           }
         }
         cb(true);

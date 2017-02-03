@@ -48,6 +48,15 @@ const Login = React.createClass({
 		this.props.authService.showPopup()
 	},
 	render: function(){
+		const redirect = (
+			<div>
+			<h2 style={{marginTop:100,width:"100%",textAlign:"center"}}>Redirecting...</h2>
+			</div>
+		)
+
+		if(this.props.params && this.props.params.param1==="redirect")
+			return redirect;
+		
 		const loginPage = (
 			<div className="login-box">
 			  <div className="login-logo">
@@ -86,15 +95,18 @@ const Login = React.createClass({
 			        </div>
 			      </div>
 			    </form>
-
-			    <a href="#" onClick={this.auth0LoginHandle}>Sign in with Auth0</a><br/>
+			    <div className="social-auth-links text-center">
+			    	<button type="button" className="btn btn-block btn-info btn-lg" onClick={this.auth0LoginHandle}>
+			    		Sign in with Auth0</button>
+			      	
+			    </div>
 			    <a href="#">I forgot my password</a><br/>
 			    <a href="register.html" className="text-center">Register a new membership</a>
 				</div>
 			</div>
 			)
 		
-		return loginPage;
+			return loginPage;
 	}
 })
 
