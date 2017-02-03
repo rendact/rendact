@@ -3,6 +3,7 @@ import $ from 'jquery';
 const jQuery = $;
 window.jQuery = $;
 
+import {AuthService} from '../auth';
 import AdminHeader from './Header';
 import ControlSidebar from './ControlSidebar';
 import Footer from './Footer';
@@ -159,7 +160,6 @@ const Admin = React.createClass({
 	},
 	getDefaultProps: function() {
 		return { 
-			logged: false,
 			params: {
 				page: 'dashboard',
 				action: ''
@@ -172,11 +172,11 @@ const Admin = React.createClass({
 		//PageLoader.openPage();
 	},
 	render: function() {
-		if (this.props.logged) {
+		if (this.props.AuthService.loggedIn()) {
 			return (
 				<div className="wrapper">
 	        		
-	        <AdminHeader profile={this.props.profile} logged={this.props.logged}/>
+	        <AdminHeader/>
 	  			<SideMenu onClick={this.handleMenuClick} activeMenu={this.state.page+(this.state.action?'-':'')+this.state.action}/>
 					<PageLoader pageId={this.state.page} actionId={this.state.action} />
 					<Footer/>

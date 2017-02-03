@@ -1,30 +1,16 @@
 import React from 'react';
-import {Redirect} from 'react-router'
-import request from 'request';
-import AuthService from './AuthService'
 import $ from 'jquery';
 window.jQuery = $;
 
-import Admin from './admin';
-import Config from './config';
 import AdminLTEinit from './admin/lib/app.js';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../public/css/Login.css';
-
-const auth = new AuthService('ppT7SigAoZtxsMkivihT2O1PLS7TYBFf', 'rendact.auth0.com');
-window.auth = auth;
 
 const Login = React.createClass({
 	getInitialState: function(){
 		return {
 			errorMsg:null,
-			loadingMsg:null,
-			logged: (this.props.logged!=null?this.props.logged:false),
-			profile: {
-				name: null,
-				image: null
-			}
-
+			loadingMsg:null
 		}
 	},
 	disableForm: function(state){
@@ -41,79 +27,27 @@ const Login = React.createClass({
 		AdminLTEinit();
 	},
 	handleSubmit: function(event) {
-		var me = this;
-		this.disableForm(true);
-		var username = $("#username").val();
-		var password = $("#password").val();
-
-		let data = {
-		  "query": `mutation LoginUserQuery ($input: LoginUserInput!) {
-		    loginUser(input: $input) {
-		      token
-		      user {
-		      	id
-		      	username
-		      	fullName
-		      	gender
-		      	email
-		      	lastLogin
-		      	createdAt
-		      }
-		    }
-		  }`,
-		  "variables": {
-		    "input": {
-		      "username": username,
-		      "password": password
-		    }
-		  }
-
-		};
-
-		request({
-		  url: Config.scapholdUrl,
-		  method: "POST",
-		  json: true,
-		  headers: {
-		    "content-type": "application/json"
-		  },
-		  body: data
-		}, (error, response, body) => {
-			if (!error && !body.errors && response.statusCode === 200) {
-				if (body.data.loginUser) {
-					var p = body.data.loginUser.user;
-			    localStorage.token = body.data.loginUser.token;
-			    localStorage.userId = p.id;
-			    var profile = {
-			    	name: p.fullName?p.fullName:p.username,
-			    	username: p.username,
-			    	email: p.email,
-			    	gender: p.gender,
-			    	lastLogin: p.lastLogin,
-			    	createdAt: p.createdAt
-			    }
-			    localStorage.profile = JSON.stringify(profile);
-			    this.setState({profile: profile});
-		  	}
-		    me.disableForm(false);
-		    me.setState({logged: true});
-		  } else {
-		  	if (body && body.errors) {
-		  		me.setState({errorMsg: body.errors[0].message});
-		  	} else {
-		    	me.setState({errorMsg: error.toString()});
-			  }
-			  me.disableForm(false);
-		  }
-		});
-		
 		event.preventDefault();
+		this.disableForm(true);
+
+		var username = $("#username").val();
+    var password = $("#password").val();
+
+		var me = this;
+		function successFn(){
+			me.disableForm(false);
+			me.props.onlogin(true);
+		}
+		function failedFn(msg){
+			me.setState({errorMsg: msg});
+	  	me.disableForm(false);
+		}
+		this.props.authService.doLogin(username, password, successFn, failedFn);
 	},
 	auth0LoginHandle: function(){
-		window.auth.login()
+		this.props.authService.showPopup()
 	},
 	render: function(){
-
 		const loginPage = (
 			<div className="login-box">
 			  <div className="login-logo">
@@ -160,17 +94,7 @@ const Login = React.createClass({
 			</div>
 			)
 		
-		var from = this.props.location.state?this.props.location.state.from.pathname:this.props.location.pathname;
-		if (!this.state.logged ) {
-			return loginPage;
-		} else if (
-				from==="/admin" || from==="/admin/" || from==="/login" || from==="/login/" 
-			){
-			window.history.pushState("", "", '/admin');
-			return <Admin profile={this.state.profile} logged={this.state.logged}/>
-		} else {
-			return <Redirect to={{pathname: this.props.location.state.from.pathname}}/>
-		}
+		return loginPage;
 	}
 })
 
