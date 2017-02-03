@@ -1,95 +1,92 @@
 import React from 'react';
-import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
+import request from 'request';
 import $ from 'jquery';
 window.jQuery = $;
+import Config from '../../config';
 
-const postPages = gql`
-
-query getPages{
-  viewer {
-    allPosts(where: {type: {eq: "page"}}) {
-      edges {
-        node {
-          title,
-          author {
-            username
-          },
-          comments{
-            edges{
-              node{
-                id
-              }
+const Page = React.createClass({
+  getInitialState: function(){
+    return {
+      content: [<tr><td>Loading data...</td></tr>]
+    }
+  },
+  componentDidMount: function(){
+    //$('#pageListTbl').DataTable();
+  },
+  componentWillMount: function(){
+    let list = [];
+    let postPages = {"query": `
+      query getPages{
+      viewer {
+        allPosts(where: {type: {eq: "page"}}) {
+          edges {
+            node {
+              id
+              title,
+              author {
+                username
+              },
+              status,
+              comments{
+                edges{
+                  node{
+                    id
+                  }
+                }
+              },
+              createdAt
             }
-          },
-          createdAt
+          }
         }
       }
-    }
-  }
-} 
-`;
-
-
-class Page extends React.Component {
-    render() {
-        if (this.props.data.viewer) {
-            return (
-            <tbody>
-            {this.props.data.viewer.allPosts.edges.map(function(item){
-                return <tr key={item.node.id}>
-                <td><a href="#"><input type="checkbox"></input></a></td>
-                <td><a href="#">{item.node.title}</a></td>
-                <td><a href="#">{item.node.author.username}</a></td>
-                <td><a href="#">Post Status</a></td>
-                <td style={{textAlign: 'center'}}><a href="#">{item.node.comments.edges.length}</a></td>
-                <td>{
-                  
-                }</td>       
-                </tr>
-            })}
-            </tbody>
-            )
+      } 
+    `};
+    var me = this;
+    request({
+        url: Config.scapholdUrl,
+        method: "POST",
+        json: true,
+        headers: {
+          "content-type": "application/json",
+          "Authorization": "Bearer " + localStorage.token
+        },
+        body: postPages
+      }, (error, response, body) => {
+        if (body.data) {
+          //var datatable = $('#table').dataTable().api();
+          $.each(body.data.viewer.allPosts.edges, function(key, item){
+          
+            var dt = new Date(item.node.createdAt);
+            var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+            list.push(<tr key={item.node.id}>
+              <td style={{textAlign: 'center'}}><input type="checkbox"></input></td>
+              <td style={{textAlign: 'center'}}><a href="">{item.node.title}</a></td>
+              <td style={{textAlign: 'center'}}><a href="">{item.node.author.username}</a></td>
+              <td style={{textAlign: 'center'}}><a href="">{item.node.status}</a></td>
+              <td style={{textAlign: 'center'}}><a href="">{item.node.comments.edges.length}</a></td>            
+              <td style={{textAlign: 'center'}}>Published {date}</td>
+            </tr>)
+          });
         }
-        else 
-            return <div></div>
- }}
-const PageWithData = graphql(postPages)(Page);
+        me.setState({content: list});
+        $('#pageListTbl').DataTable();
+    });
+  },
+  render: function() {
+      return (
+        <tbody>{this.state.content}</tbody>
+      )
+  }
+});
 
 
-
-
-var dataSet = 
-      [
-          [ "Tiger Nixon", "reatyu", "Edinburgh", "5421", "2011/04/25", "$320,800" ],
-          [ "Garrett Winters", "Accountant", "Tokyo", "8422", "2011/07/25", "$170,750" ],
-          [ "Ashton Cox", "Junior Technical Author", "San Francisco", "1562", "2009/01/12", "$86,000" ],
-      ];
-
-      $(document).ready(function() {
-        $('#pageListTbl').DataTable( {
-            data: dataSet,
-            columns: [
-                { title: "checkbox" },
-                { title: "Title" },
-                { title: "Auther" },
-                { title: "Status" },
-                { title: "Comments" },
-                { title: "Publish Date" }
-            ]
-        } );
-    } );
-
-
-
-
-var Pages = React.createClass({
-   componentDidMount: function(){
-      require ('datatables');
-      require ('datatables/media/css/jquery.dataTables.min.css');
-      require ('./Pages.css');
-    },
-
+const Pages = React.createClass({
+  componentDidMount: function(){
+    require ('datatables');
+    require ('datatables/media/css/jquery.dataTables.min.css');
+    require ('./Pages.css');
+    //$('#pageListTbl').DataTable();
+  },
   render: function(){
     return (
       <div className="content-wrapper">
@@ -112,10 +109,20 @@ var Pages = React.createClass({
                       <div style={{marginTop: 10, marginBottom: 20}}>
                         <button className="btn btn-default" href="#" style={{marginRight: 10}}>Edit</button>
                         <button className="btn btn-default" href="#">Delete</button>
-                      </div>                  
-                      <table id="pageListTbl" datatables="ng"  dt-options="dtOptions" className="display">                        
-                        
-                      </table>
+                      </div>                   
+                      <table id="pageListTbl" className="display">                        
+                        <thead>
+                          <tr>
+                            <th style={{textAlign: 'center'}}><input type="checkbox"></input></th>                            
+                            <th style={{textAlign: 'center'}}>Title</th>
+                            <th style={{textAlign: 'center'}}>Author</th>
+                            <th style={{textAlign: 'center'}}>Post Status</th>
+                            <th style={{textAlign: 'center'}}>Comments</th>                             
+                            <th style={{textAlign: 'center'}}>Publish Date</th>
+                          </tr>
+                      </thead>
+                      <Page/>
+                    </table>
                   </div>
                 </div>
               </div>
@@ -125,8 +132,6 @@ var Pages = React.createClass({
         </div>
       </div>
     )},
-
-    
 });
 
 export default Pages;
