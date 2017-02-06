@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 $( "span.menu" ).click(function() {
   $( ".top-menu" ).slideToggle( "slow", function() {
 	// Animation complete.

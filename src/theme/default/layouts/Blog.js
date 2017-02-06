@@ -5,7 +5,7 @@ import Header from '../includes/Header'
 import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
 //import RM from 
-const Post = () => {
+const Blog = () => {
 
 	return (
 
@@ -106,4 +106,4 @@ const Post = () => {
 	)
 }
 
-export default Post
+export default Blog

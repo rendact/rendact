@@ -4,6 +4,7 @@ window.jQuery = $;
 import React from 'react';
 import Config from '../config';
 window.config = Config;
+import NotFound from './NotFound'
 
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -71,11 +72,16 @@ const ThemeHome = React.createClass({
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
 		require('../theme/'+c.path+'/css/style.css');
-		require('../theme/'+c.path+'/function.js');
+		require('../theme/'+c.path+'/functions.js');
 	},
 	render: function() {
-		let Home = getTemplateComponent('home');
-		return <Home />
+		if (this.params && this.params.param1){
+			let Single = getTemplateComponent('single');
+			return <Single slug={this.params.param1} />
+		} else {
+			let Home = getTemplateComponent('home');
+			return <Home />
+		}
 	}
 });
 
@@ -84,11 +90,11 @@ const ThemeBlog = React.createClass({
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
 		require('../theme/'+c.path+'/css/style.css');
-		require('../theme/'+c.path+'/function.js');
+		require('../theme/'+c.path+'/functions.js');
 	},
 	render: function() {
-		let Post = getTemplateComponent('blog');
-		return <Post/>;
+		let Blog = getTemplateComponent('blog');
+		return <Blog/>;
 	}
 });
 
@@ -97,11 +103,18 @@ const ThemeSingle = React.createClass({
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
 		require('../theme/'+c.path+'/css/style.css');
-		require('../theme/'+c.path+'/function.js');
+		require('../theme/'+c.path+'/functions.js');
 	},
 	render: function() {
-		let Page = getTemplateComponent('single');
-		return <Page/>;
+		if (this.params.pageId){
+			let Single = getTemplateComponent('single');
+			return <Single postId={this.params.pageId}/>;
+		} else if (this.params.postId){
+			let Single = getTemplateComponent('single');
+			return <Single postId={this.params.postId}/>;
+		} else {
+			return <NotFound/>
+		}
 	}
 });
 
