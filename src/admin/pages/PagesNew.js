@@ -58,7 +58,8 @@ const NewPost = React.createClass({
   componentDidMount: function(){
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
       window.CKEDITOR.replace('editor1', {
-        height: 400
+        height: 400,
+        title: false
       });
     });
   },
@@ -68,32 +69,38 @@ const NewPost = React.createClass({
       inputList: [],
       textList: [],
       btnText: "Publish",
-      errorMsg:null
+      errorMsg:null,
+      slug:"",
+      permalinkEditing: false
     }
   },
 
-  onEditBtnClick: function(event) {
-        const textList = this.state.textList;
-        textList.length = 1;
-        $(document).ready(function(){
-          $("editBtn").click(function(){
-            $(this).hide();
-          });
-        });
-        this.setState({
-            textList: textList.concat(<Perm key={textList.length} />)
-        });
-    },
-
+  handlePermalinkBtn: function(event) {
+    var slug = this.state.slug;
+    $("#slugEditor").val(slug);
+    this.setState({permalinkEditing: true});
+  },
+  handlePermalinkChange: function(event) {
+    var slug = $("#slugEditor").val();
+    this.setState({slug:slug});
+  },
+  handleSavePermalinkBtn: function(event) {
+    this.setState({permalinkEditing: false});
+  },
+  handleTitleChange: function(event){
+    var title = $("#titlePage").val();
+    var slug = title.replace(" ","-").toLowerCase();
+    this.setState({slug: slug})
+  },
   onAddBtnClick: function(event) {
-        const inputList = this.state.inputList;
-        inputList.length = 1;
-        this.setState({
-            inputList: inputList.concat(<Input key={inputList.length} />)
-        });
-    },
+    const inputList = this.state.inputList;
+    inputList.length = 1;
+    this.setState({
+        inputList: inputList.concat(<Input key={inputList.length} />)
+    });
+  },
 
-handleSubmit: function(event) {
+  handleSubmit: function(event) {
     var me = this;
     var title = $("#titlePage").val();
     var content =  window.CKEDITOR.instances['editor1'].getData();
@@ -120,7 +127,8 @@ handleSubmit: function(event) {
           "content": content,
           "titleTag": titleTag,
           "type": "page",
-          "author": localStorage.getItem('userID')
+          "author": localStorage.getItem('userID'),
+          "slug": this.state.slug
         }
       }
     };
@@ -214,18 +222,27 @@ handleSubmit: function(event) {
           <div className="col-md-8">
             <div className="form-group"  style={{marginBottom:30}}>
               <div>
-                <input id="titlePage" style={{marginBottom: 20}} type="text" className="form-control" placeholder="Input Title Here" required/>
+                <input id="titlePage" style={{marginBottom: 20}} type="text" className="form-control" 
+                  placeholder="Input Title Here" required="true" onChange={this.handleTitleChange}/>
                   <div className="form-inline">
-                    <p>Permalink: <a>https://ussunnah.org/title</a>
-                    <button type="button" onClick={this.onEditBtnClick} id="editBtn" className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
-                      <span style={{fontSize: 12}}>Edit</span>
-                    </button>
-                    {this.state.textList.map(function(input, index) {
-                        return input;
-                    })}
-                    </p>
+                    { !this.state.permalinkEditing ? 
+                      ( <p>Permalink: 
+                        <a id="permalink">{Config.rootUrl}/{this.state.slug}</a><button type="button" onClick={this.handlePermalinkBtn} id="editBtn" className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
+                          <span style={{fontSize: 12}}>Edit</span>
+                        </button>
+                        </p>
+                      ) : (
+                        <p>Permalink: 
+                        <div className="form-group" id="permalinkEditor">
+                          <a id="permalink">{Config.rootUrl}/</a>
+                          <input id="slugEditor" value={this.state.slug} onChange={this.handlePermalinkChange}/>
+                          <button type="button" className="btn btn-default" onClick={this.handleSavePermalinkBtn}>OK</button>
+                        </div>
+                        </p>
+                      )
+                    }
                   </div>
-                  <textarea id="editor1" name="editor1" rows="25" style={{width: "100%"}} wrap="hard"></textarea>
+                  <textarea id="editor1" name="editor1" rows="25" style={{width: "100%"}} wrap="hard" required="true"></textarea>
                   <div id="trackingDiv"></div>
               </div>
             </div>
