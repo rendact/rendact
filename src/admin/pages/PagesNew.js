@@ -201,34 +201,12 @@ const NewPost = React.createClass({
     event.preventDefault();
   },
   componentWillMount: function(){
+    if (!this.props.postId) return;
+
     let list = [];
-    let postPages = {"query": `
-      query getPage{
-      viewer {
-        allPosts(where: {type: {eq: "page"}}) {
-          edges {
-            node {
-              id
-              title,
-              slug,
-              author {
-                username
-              },
-              status,
-              comments{
-                edges{
-                  node{
-                    id
-                  }
-                }
-              },
-              createdAt
-            }
-          }
-        }
-      }
-      } 
-    `};
+    let getPageQry = {"query": 
+      '{getPost(id:"'+this.props.postId+'"){ id,title,content,slug,author{username},status,comments{edges{node{id}}},createdAt}}'
+    };
     var me = this;
     request({
         url: Config.scapholdUrl,
@@ -238,34 +216,14 @@ const NewPost = React.createClass({
           "content-type": "application/json",
           "Authorization": "Bearer " + localStorage.token
         },
-        body: postPages
+        body: getPageQry
       }, (error, response, body) => {
-        if (body.data) {
-          //var datatable = $('#table').dataTable().api();
-          $.each(body.data.viewer.allPosts.edges, function(key, item){
-          
-            var dt = new Date(item.node.createdAt);
-            var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
-          });
+        if (!error) {
+          var values = body.data.getPost;
+          $("#titlePage").val(values.title);
+          $("#editor1").val(values.content);
+          me.setState({slug:values.slug});
         }
-        me.setState({content: list});
-        //$('#pageListTbl').DataTable();
-        $(document).ready(function () { 
-          var oTable = $('#pageListTbl').dataTable({
-              stateSave: true
-          });
-
-          var allPages = oTable.fnGetNodes();
-
-          $('body').on('click', '#selectAll', function () {
-              if ($(this).hasClass('allChecked')) {
-                  $('input[type="checkbox"]', allPages).prop('checked', false);
-              } else {
-                  $('input[type="checkbox"]', allPages).prop('checked', true);
-              }
-              $(this).toggleClass('allChecked');
-          })
-      });
     });
   },
   render: function(){
