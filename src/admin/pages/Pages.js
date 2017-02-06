@@ -59,7 +59,7 @@ const Page = React.createClass({
             var dt = new Date(item.node.createdAt);
             var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
             list.push(<tr key={item.node.id}>
-              <td style={{textAlign: 'center'}}><input type="checkbox"></input></td>
+              <td id="id" style={{textAlign: 'center'}}><input type="checkbox"></input></td>
               <td style={{textAlign: 'center'}}><a href="">{item.node.title}</a></td>
               <td style={{textAlign: 'center'}}><a href="">{item.node.author.username}</a></td>
               <td style={{textAlign: 'center'}}><a href="">{item.node.status}</a></td>
@@ -69,7 +69,23 @@ const Page = React.createClass({
           });
         }
         me.setState({content: list});
-        $('#pageListTbl').DataTable();
+        //$('#pageListTbl').DataTable();
+        $(document).ready(function () { 
+          var oTable = $('#pageListTbl').dataTable({
+              stateSave: true
+          });
+
+          var allPages = oTable.fnGetNodes();
+
+          $('body').on('click', '#selectAll', function () {
+              if ($(this).hasClass('allChecked')) {
+                  $('input[type="checkbox"]', allPages).prop('checked', false);
+              } else {
+                  $('input[type="checkbox"]', allPages).prop('checked', true);
+              }
+              $(this).toggleClass('allChecked');
+          })
+      });
     });
   },
   render: function() {
@@ -87,6 +103,45 @@ const Pages = React.createClass({
     require ('./Pages.css');
     //$('#pageListTbl').DataTable();
   },
+
+  handleSubmit: function(event) {
+  var me = this;
+  var id = $("#id").val();
+  const data = {
+    "query": `
+      mutation DeletePost($input: DeletePostInput!) {
+        deletePost(input: $input) {
+          changedPost {
+            id
+          }
+        }
+      }
+    `,
+    "variables": {
+      "input": {
+        "id": id
+      }
+    }
+  };
+
+  request({
+    url: "https://us-west-2.api.scaphold.io/graphql/scaphold-graphql",
+    method: "POST",
+    json: true,
+    headers: {
+      "content-type": "application/json",
+    },
+    body: data
+  }, (error, response, body) => {
+    if (!error && response.statusCode == 200) {
+      console.log(JSON.stringify(body, null, 2));
+    } else {
+      console.log(error);
+      console.log(response.statusCode);
+    }
+  });
+  },
+
   render: function(){
     return (
       <div className="content-wrapper">
@@ -113,7 +168,7 @@ const Pages = React.createClass({
                       <table id="pageListTbl" className="display">                        
                         <thead>
                           <tr>
-                            <th style={{textAlign: 'center'}}><input type="checkbox"></input></th>                            
+                            <th style={{textAlign: 'center'}}><input type="checkbox"id="selectAll"></input></th>                            
                             <th style={{textAlign: 'center'}}>Title</th>
                             <th style={{textAlign: 'center'}}>Author</th>
                             <th style={{textAlign: 'center'}}>Post Status</th>
