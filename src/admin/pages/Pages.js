@@ -55,14 +55,14 @@ const Page = React.createClass({
         if (body.data) {
           //var datatable = $('#table').dataTable().api();
           $.each(body.data.viewer.allPosts.edges, function(key, item){
-          
+            
             var dt = new Date(item.node.createdAt);
             var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
             list.push(<tr key={item.node.id}>
               <td id="id" style={{textAlign: 'center'}}><input type="checkbox"></input></td>
               <td style={{textAlign: 'center'}}><a href="">{item.node.title}</a></td>
-              <td style={{textAlign: 'center'}}><a href="">{item.node.author.username}</a></td>
-              <td style={{textAlign: 'center'}}><a href="">{item.node.status}</a></td>
+              <td style={{textAlign: 'center'}}><a href="">author.username</a></td>
+              <td style={{textAlign: 'center'}}><a href="">status</a></td>
               <td style={{textAlign: 'center'}}><a href="">{item.node.comments.edges.length}</a></td>            
               <td style={{textAlign: 'center'}}>Published {date}</td>
             </tr>)
@@ -72,11 +72,9 @@ const Page = React.createClass({
         //$('#pageListTbl').DataTable();
         $(document).ready(function () { 
           var oTable = $('#pageListTbl').dataTable({
-              stateSave: true
+              stateSave: true,
           });
-
           var allPages = oTable.fnGetNodes();
-
           $('body').on('click', '#selectAll', function () {
               if ($(this).hasClass('allChecked')) {
                   $('input[type="checkbox"]', allPages).prop('checked', false);
