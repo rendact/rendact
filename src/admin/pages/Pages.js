@@ -61,10 +61,10 @@ const Page = React.createClass({
             list.push(<tr key={item.node.id}>
               <td id="id" style={{textAlign: 'center'}}><input type="checkbox"></input></td>
               <td style={{textAlign: 'center'}}><a href="">{item.node.title}</a></td>
-              <td style={{textAlign: 'center'}}><a href="">{item.node.author.username}</a></td>
+              <td style={{textAlign: 'center'}}><a href="">{item.node.author?item.node.author.username:""}</a></td>
               <td style={{textAlign: 'center'}}><a href="">{item.node.status}</a></td>
               <td style={{textAlign: 'center'}}><a href="">{item.node.comments.edges.length}</a></td>            
-              <td style={{textAlign: 'center'}}>Published {date}</td>
+              <td style={{textAlign: 'center'}}>{date}</td>
             </tr>)
           });
         }
