@@ -4,7 +4,7 @@ window.jQuery = $;
 import React from 'react';
 import {render} from 'react-dom'
 import {ApolloProvider} from 'react-apollo';
-import {BrowserRouter, Match, Miss, Redirect, browserHistory, Router} from 'react-router'
+import {BrowserRouter, Match, Miss, Redirect} from 'react-router'
 import {AuthService, MatchWhenAuthorized} from './auth'
 window.AuthService = AuthService;
 import client from './apollo';
@@ -48,8 +48,7 @@ const Main = React.createClass({
 					      />
 					    )
 					  )}/>
-						<Match pattern="/:param1?" component={ThemeHome}/>
-						<Miss component={NotFound}/>
+						<Miss component={ThemeHome}/>
 					</div>
 				</BrowserRouter>
 			</ApolloProvider>

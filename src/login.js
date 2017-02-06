@@ -72,11 +72,11 @@ const Login = React.createClass({
 			    }
 			    <form id="login" onSubmit={this.handleSubmit} method="get">
 			      <div className="form-group has-feedback">
-			        <input id="username" className="form-control" placeholder="Username"/>
+			        <input id="username" className="form-control" placeholder="Username" required="true"/>
 			        <span className="glyphicon glyphicon-envelope form-control-feedback"></span>
 			      </div>
 			      <div className="form-group has-feedback">
-			        <input type="password" id="password" className="form-control" placeholder="Password"/>
+			        <input type="password" id="password" className="form-control" placeholder="Password" required="true"/>
 			        <span className="glyphicon glyphicon-lock form-control-feedback"></span>
 			      </div>
 			      <div className="row">
