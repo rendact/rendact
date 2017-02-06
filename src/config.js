@@ -63,4 +63,7 @@ const config = {
 	theme: ActiveThemeConfig
 }
 
+const PermalinkTypeList = ['post-id','slug'];
+const ActivePermalinkType = 'post-id';
+
 module.exports = config;

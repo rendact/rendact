@@ -47,7 +47,7 @@ const AdminHeader = React.createClass({
             </a>
           </li>
         </ul>
-        <a href="/" className="site-name">
+        <a href="/" className="site-name dropdown-toggle" data-toggle="dropdown">
           <span><i className="fa fa-home"></i> My Site</span>
         </a>
         <div className="navbar-custom-menu">

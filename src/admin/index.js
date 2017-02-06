@@ -127,7 +127,9 @@ const PageLoader = React.createClass({
 			'users' : <Users />,
 			'posts-new' : <NewPost />,
 			'pages-new' : <NewPage />,
-			'theme-new' : <NewTheme />
+			'theme-new' : <NewTheme />,
+			'posts-edit' : <NewPost postId={this.props.postId}/>,
+			'pages-edit' : <NewPage postId={this.props.postId}/>
 		}
 		if (map[page+action]) {
 			return map[page+action]
@@ -154,7 +156,8 @@ const Admin = React.createClass({
 	getInitialState: function() {
 		return {
 			page: this.props.params['page']?this.props.params['page']:'dashboard',
-			action: this.props.params['action']?this.props.params['action']:''
+			action: this.props.params['action']?this.props.params['action']:'',
+			postId: this.props.params['postId']?this.props.params['postId']:null
 		}
 	},
 	getDefaultProps: function() {
@@ -177,7 +180,7 @@ const Admin = React.createClass({
 	        		
 	        <AdminHeader authService={this.props.AuthService} />
 	  			<SideMenu onClick={this.handleMenuClick} activeMenu={this.state.page+(this.state.action?'-':'')+this.state.action}/>
-					<PageLoader pageId={this.state.page} actionId={this.state.action} />
+					<PageLoader pageId={this.state.page} actionId={this.state.action} postId={this.state.postId}/>
 					<Footer/>
 					<ControlSidebar/>
 					<div className="control-sidebar-bg"></div>

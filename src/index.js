@@ -11,6 +11,7 @@ import client from './apollo';
 import {ThemeHome, ThemeSingle, ThemeBlog} from './admin/theme';
 import Admin from './admin';
 import Login from './login';
+import NotFound from './admin/NotFound';
 
 const Main = React.createClass({
 	getInitialState: function(){
@@ -26,11 +27,12 @@ const Main = React.createClass({
 			<ApolloProvider client={client}>
 				<BrowserRouter>
 					<div id="router" style={{height: "100vh"}}>
-						<MatchWhenAuthorized pattern="/admin/:page?/:action?/:param1?/:param2?" 
+						<MatchWhenAuthorized pattern="/admin/:page?/:action?/:postId?" 
 							component={Admin} 
 							logged={this.state.logged}
 							authService={this.AuthService} />
-						<Match pattern="/article/:pageId?/:param1?/:param2?" component={ThemeSingle}/>
+						<Match pattern="/page/:pageId?/:param1?/:param2?" component={ThemeSingle}/>
+						<Match pattern="/post/:postId?/:param1?/:param2?" component={ThemeSingle}/>
 						<Match pattern="/blog/:postId?/:param1?/:param2?" component={ThemeBlog}/>
 						<Match pattern="/login/:param1?" render={props => (
 					    this.state.logged ? (
@@ -46,7 +48,8 @@ const Main = React.createClass({
 					      />
 					    )
 					  )}/>
-						<Miss component={ThemeHome}/>
+						<Match pattern="/:param1?" component={ThemeHome}/>
+						<Miss component={NotFound}/>
 					</div>
 				</BrowserRouter>
 			</ApolloProvider>

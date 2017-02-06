@@ -4,7 +4,7 @@ import Header from '../includes/Header'
 import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
 
-const Page = () => {
+const Single = () => {
 
 	return (
 
@@ -119,4 +119,4 @@ const Page = () => {
 	)
 }
 
-export default Page
+export default Single

@@ -3,7 +3,7 @@ import request from 'request';
 import $ from 'jquery';
 window.jQuery = $;
 
-import Admin from '../../admin/pages/Pages';
+import Admin from '../../admin/pages/PagesNew';
 import Config from '../../config';
 //window.CKEDITOR_BASEPATH = '/ckeditor/';
 //require('ckeditor');
@@ -33,7 +33,7 @@ var Input= React.createClass({
         <input type="text" placeholder="min" style={{width: 30, height: 20}}/>
       </form>
         <form className="form-inline" style={{marginTop: 10}}>
-          <button className="btn btn-default" style={{marginRight: 10}}>OK</button>
+          <button type="button" className="btn btn-default" style={{marginRight: 10}}>OK</button>
           <a><u>Cancel</u></a>
         </form>
       </div>
@@ -47,7 +47,7 @@ var Perm= React.createClass({
       <div className="form-group">
       <form className="form-inline">
         <input type="text"/>
-        <button className="btn btn-default" style={{marginLeft: 10}}>OK</button>
+        <button type="button" className="btn btn-default" style={{marginLeft: 10}}>OK</button>
       </form>
       </div>
       )
@@ -67,17 +67,9 @@ const NewPost = React.createClass({
     return {
       inputList: [],
       textList: [],
-      errorMsg:null,
-      loadingMsg:null,
-      logged: (this.props.logged!=null?this.props.logged:false),
-      userData: {
-        name: null,
-        image: null
-      }
-
-
+      btnText: "Publish",
+      errorMsg:null
     }
-     
   },
 
   onEditBtnClick: function(event) {
@@ -110,7 +102,7 @@ handleSubmit: function(event) {
     var metaDescription = $("#metaDescription").val();
     var summary = $("#editor2").val();
     
-    const data = {
+    const createPostQry = {
       "query": `
     mutation createPost($input: CreatePostInput!) {
         createPost(input: $input) {
@@ -127,7 +119,8 @@ handleSubmit: function(event) {
           "title": title,
           "content": content,
           "titleTag": titleTag,
-          "type": "post"
+          "type": "page",
+          "author": localStorage.getItem('userID')
         }
       }
     };
@@ -140,10 +133,11 @@ handleSubmit: function(event) {
         "content-type": "application/json",
         "Authorization": "Bearer " + localStorage.token
       },
-      body: data
+      body: createPostQry
     }, (error, response, body) => {
+      debugger;
       if (!error && !body.errors && response.statusCode === 200) {
-        me.setState({logged: true});
+        me.setState({btnText: "Save"});
       } else {
         if (body && body.errors) {
           me.setState({errorMsg: body.errors[0].message});
@@ -153,7 +147,7 @@ handleSubmit: function(event) {
       }
     });
     
-    const data1 = {
+    const createPostMetaQry = {
       "query": `
     mutation createPostMeta($input: CreatePostMetaInput!) {
         createPostMeta(input: $input) {
@@ -182,10 +176,11 @@ handleSubmit: function(event) {
         "content-type": "application/json",
         "Authorization": "Bearer " + localStorage.token
       },
-      body: data1
+      body: createPostMetaQry
     }, (error, response, body) => {
+
       if (!error && !body.errors && response.statusCode === 200) {
-        me.setState({logged: true});
+        me.setState({btnText: "Save"});
       } else {
         if (body && body.errors) {
           me.setState({errorMsg: body.errors[0].message});
@@ -219,10 +214,10 @@ handleSubmit: function(event) {
           <div className="col-md-8">
             <div className="form-group"  style={{marginBottom:30}}>
               <div>
-                <input id="titlePage" style={{marginBottom: 20}} type="text" className="form-control" placeholder="Input Title Here"/>
+                <input id="titlePage" style={{marginBottom: 20}} type="text" className="form-control" placeholder="Input Title Here" required/>
                   <div className="form-inline">
                     <p>Permalink: <a>https://ussunnah.org/title</a>
-                    <button onClick={this.onEditBtnClick} id="editBtn" className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
+                    <button type="button" onClick={this.onEditBtnClick} id="editBtn" className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
                       <span style={{fontSize: 12}}>Edit</span>
                     </button>
                     {this.state.textList.map(function(input, index) {
@@ -310,9 +305,9 @@ handleSubmit: function(event) {
                     <div className="box-body pad">
                       <div>
                       <div className="form-group">
-                        <button className="btn btn-default">Save Draft</button>
+                        <button type="button" className="btn btn-default">Save Draft</button>
                         <div className="pull-right box-tools">
-                        <button className="btn btn-default">Preview</button>
+                        <button type="button" className="btn btn-default">Preview</button>
                         </div>
                       </div>
                       </div>
@@ -338,11 +333,11 @@ handleSubmit: function(event) {
                       </div> 
                     </div>
                     <div className="box-footer">        
-                      <button className="btn btn-default">Clear Cache</button>
+                      <button type="button" className="btn btn-default">Clear Cache</button>
                       <div className="form-group" style={{marginTop: 10}}>
                         <a style={{color: 'red'}}><u>Move To Trash</u></a>
                         <div className="pull-right box-tools">
-                        <button id="publishBtn" type="submit" className="btn btn-primary">Publish</button>
+                        <button id="publishBtn" type="submit" className="btn btn-primary">{this.state.btnText}</button>
                         </div>
                       </div>
                     </div>
@@ -379,12 +374,8 @@ handleSubmit: function(event) {
         </div>
       </div>
       )
-   if (!this.state.logged ) {
-      return newPage;
-    } else {
-      window.history.pushState("", "", '/admin/pages');
-      return <Admin />
-    }
+  return newPage;
+
 }
 });
 

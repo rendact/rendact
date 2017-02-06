@@ -91,13 +91,13 @@ const Login = React.createClass({
 			        </div>
 			      </div>
 			    </form>
+			    <a href="#">I forgot my password</a><br/>
 			    <div className="social-auth-links text-center">
 			    	<button type="button" className="btn btn-block btn-info btn-lg" onClick={this.auth0LoginHandle}>
 			    		Sign in with Auth0</button>
-			      	
+			    	<button type="button" className="btn btn-block btn-warning btn-lg" >
+			    		Create account</button>
 			    </div>
-			    <a href="#">I forgot my password</a><br/>
-			    <a href="register.html" className="text-center">Register a new membership</a>
 				</div>
 			</div>
 			)
