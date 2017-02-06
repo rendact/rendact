@@ -23,6 +23,7 @@ const Page = React.createClass({
             node {
               id
               title,
+              slug,
               author {
                 username
               },
@@ -60,10 +61,11 @@ const Page = React.createClass({
             var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
             list.push(<tr key={item.node.id}>
               <td id="id" style={{textAlign: 'center'}}><input type="checkbox"></input></td>
-              <td style={{textAlign: 'center'}}><a href="">{item.node.title}</a></td>
+              <td style={{textAlign: 'center'}}><a href={"/admin/pages/edit/"+item.node.id} >{item.node.title}</a></td>
+              <td style={{textAlign: 'center'}}>{item.node.slug?item.node.slug:""}</td>
               <td style={{textAlign: 'center'}}><a href="">{item.node.author?item.node.author.username:""}</a></td>
-              <td style={{textAlign: 'center'}}><a href="">{item.node.status}</a></td>
-              <td style={{textAlign: 'center'}}><a href="">{item.node.comments.edges.length}</a></td>            
+              <td style={{textAlign: 'center'}}>{item.node.status}</td>
+              <td style={{textAlign: 'center'}}>{item.node.comments.edges.length}</td>            
               <td style={{textAlign: 'center'}}>{date}</td>
             </tr>)
           });
@@ -170,6 +172,7 @@ const Pages = React.createClass({
                           <tr>
                             <th style={{textAlign: 'center'}}><input type="checkbox"id="selectAll"></input></th>                            
                             <th style={{textAlign: 'center'}}>Title</th>
+                            <th style={{textAlign: 'center'}}>Slug</th>
                             <th style={{textAlign: 'center'}}>Author</th>
                             <th style={{textAlign: 'center'}}>Post Status</th>
                             <th style={{textAlign: 'center'}}>Comments</th>                             
