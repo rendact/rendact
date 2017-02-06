@@ -54,6 +54,7 @@ const ActiveThemeConfig = {
 }
 
 const config = {
+	rootUrl: 'http://localhost:3000',
 	scapholdUrl: 'https://us-west-2.api.scaphold.io/graphql/rendact',
 	auth0ClientId: 'ppT7SigAoZtxsMkivihT2O1PLS7TYBFf',
 	auth0Domain: 'rendact.auth0.com',

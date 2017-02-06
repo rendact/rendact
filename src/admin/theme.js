@@ -75,9 +75,10 @@ const ThemeHome = React.createClass({
 		require('../theme/'+c.path+'/functions.js');
 	},
 	render: function() {
-		if (this.params && this.params.param1){
+		var pathname = this.props.location.pathname.replace("/","");
+		if (pathname!==""){
 			let Single = getTemplateComponent('single');
-			return <Single slug={this.params.param1} />
+			return <Single slug={pathname} />
 		} else {
 			let Home = getTemplateComponent('home');
 			return <Home />
