@@ -5,14 +5,6 @@ window.jQuery = $;
 import Config from '../../config';
 
 const Page = React.createClass({
-  getInitialState: function(){
-    return {
-      content: [<tr><td>Loading data...</td></tr>]
-    }
-  },
-  componentDidMount: function(){
-    //$('#pageListTbl').DataTable();
-  },
   componentWillMount: function(){
     let list = [];
     let postPages = {"query": `
@@ -54,45 +46,34 @@ const Page = React.createClass({
         body: postPages
       }, (error, response, body) => {
         if (body.data) {
-          //var datatable = $('#table').dataTable().api();
+          var datatable = $('#pageListTbl').DataTable();
+          datatable.clear();
           $.each(body.data.viewer.allPosts.edges, function(key, item){
           
             var dt = new Date(item.node.createdAt);
             var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
-            list.push(<tr key={item.node.id}>
-              <td id="id" style={{textAlign: 'center'}}><input type="checkbox"></input></td>
-              <td style={{textAlign: 'center'}}><a href={"/admin/pages/edit/"+item.node.id} >{item.node.title}</a></td>
-              <td style={{textAlign: 'center'}}>{item.node.slug?item.node.slug:""}</td>
-              <td style={{textAlign: 'center'}}><a href="">{item.node.author?item.node.author.username:""}</a></td>
-              <td style={{textAlign: 'center'}}>{item.node.status}</td>
-              <td style={{textAlign: 'center'}}>{item.node.comments.edges.length}</td>            
-              <td style={{textAlign: 'center'}}>{date}</td>
-            </tr>)
+            var author = item.node.author?item.node.author.username:"";
+            var slug = item.node.slug?item.node.slug:"";
+            datatable.row.add([
+              '<input className="pageListCb" type="checkbox" id="cb-'+item.node.id+'" >',
+              '<a href={"/admin/pages/edit/"'+item.node.id+' >'+item.node.title+'</a>',
+              slug,
+              '<a href="">'+author+'</a>',
+              item.node.status,
+              item.node.comments.edges.length,
+              date
+            ])
           });
-        }
-        me.setState({content: list});
+          
+          datatable.draw();
+        //me.setState({content: list});
         //$('#pageListTbl').DataTable();
-        $(document).ready(function () { 
-          var oTable = $('#pageListTbl').dataTable({
-              stateSave: true
-          });
-
-          var allPages = oTable.fnGetNodes();
-
-          $('body').on('click', '#selectAll', function () {
-              if ($(this).hasClass('allChecked')) {
-                  $('input[type="checkbox"]', allPages).prop('checked', false);
-              } else {
-                  $('input[type="checkbox"]', allPages).prop('checked', true);
-              }
-              $(this).toggleClass('allChecked');
-          })
-      });
+        }
     });
   },
   render: function() {
       return (
-        <tbody>{this.state.content}</tbody>
+        <tbody><tr key="0"><td></td><td>Loading data...</td><td></td><td></td><td></td><td></td><td></td></tr></tbody>
       )
   }
 });
@@ -103,7 +84,7 @@ const Pages = React.createClass({
     require ('datatables');
     require ('datatables/media/css/jquery.dataTables.min.css');
     require ('./Pages.css');
-    //$('#pageListTbl').DataTable();
+    $('#pageListTbl').DataTable();
   },
 
   handleSubmit: function(event) {
@@ -170,7 +151,7 @@ const Pages = React.createClass({
                       <table id="pageListTbl" className="display">                        
                         <thead>
                           <tr>
-                            <th style={{textAlign: 'center'}}><input type="checkbox"id="selectAll"></input></th>                            
+                            <th style={{width:7}}><input type="checkbox" id="selectAll"></input></th>                            
                             <th style={{textAlign: 'center'}}>Title</th>
                             <th style={{textAlign: 'center'}}>Slug</th>
                             <th style={{textAlign: 'center'}}>Author</th>
