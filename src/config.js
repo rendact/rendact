@@ -53,6 +53,21 @@ const ActiveThemeConfig = {
 	version: '1.0'
 }
 
+const PermalinkTypeList = {
+	'post-id': {
+		id: 'post-id',
+		name: 'Post ID',
+		description: '...'
+	},
+	'slug': {
+		id: 'slug',
+		name: 'Slug',
+		description: '...'
+	}
+};
+
+const ActivePermalinkType = 'post-id';
+
 const config = {
 	rootUrl: 'http://localhost:3000',
 	scapholdUrl: 'https://us-west-2.api.scaphold.io/graphql/rendact',
@@ -61,10 +76,9 @@ const config = {
 	activeContentType: ActiveContentType,
 	contentTypeList: ContentTypeList,
 	menuList: MenuJson,
-	theme: ActiveThemeConfig
+	theme: ActiveThemeConfig,
+	permalinkTypeList: PermalinkTypeList,
+	activePermalinkType: ActivePermalinkType
 }
-
-const PermalinkTypeList = ['post-id','slug'];
-const ActivePermalinkType = 'post-id';
 
 module.exports = config;

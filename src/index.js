@@ -11,7 +11,6 @@ import client from './apollo';
 import {ThemeHome, ThemeSingle, ThemeBlog} from './admin/theme';
 import Admin from './admin';
 import Login from './login';
-import NotFound from './admin/NotFound';
 
 const Main = React.createClass({
 	getInitialState: function(){

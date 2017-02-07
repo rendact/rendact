@@ -3,38 +3,11 @@ import request from 'request';
 import $ from 'jquery';
 window.jQuery = $;
 import Config from '../../config';
+import Query from '../../query';
 
 const Page = React.createClass({
   componentWillMount: function(){
-    let list = [];
-    let postPages = {"query": `
-      query getPages{
-      viewer {
-        allPosts(where: {type: {eq: "page"}}) {
-          edges {
-            node {
-              id
-              title,
-              slug,
-              author {
-                username
-              },
-              status,
-              comments{
-                edges{
-                  node{
-                    id
-                  }
-                }
-              },
-              createdAt
-            }
-          }
-        }
-      }
-      } 
-    `};
-    var me = this;
+    
     request({
         url: Config.scapholdUrl,
         method: "POST",
@@ -43,7 +16,7 @@ const Page = React.createClass({
           "content-type": "application/json",
           "Authorization": "Bearer " + localStorage.token
         },
-        body: postPages
+        body: Query.getPageListQry
       }, (error, response, body) => {
         if (body.data) {
           var datatable = $('#pageListTbl').DataTable();
@@ -57,7 +30,7 @@ const Page = React.createClass({
             var status = item.node.status?item.node.status:"";
             datatable.row.add([
               '<input className="pageListCb" type="checkbox" id="cb-'+item.node.id+'" >',
-              '<a href={"/admin/pages/edit/"'+item.node.id+' >'+item.node.title+'</a>',
+              '<a href="/admin/pages/edit/'+item.node.id+'" >'+item.node.title+'</a>',
               slug,
               '<a href="">'+author+'</a>',
               '<center>'+status+'</center>',

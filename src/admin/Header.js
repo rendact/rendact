@@ -1,4 +1,5 @@
 import React from 'react';
+import Config from '../config'
 
 const AdminHeader = React.createClass({
   getDefaultProps: function() {
@@ -24,10 +25,10 @@ const AdminHeader = React.createClass({
       <nav className="navbar navbar-static-top">
         <a href="#" className="logo dropdown-toggle" data-toggle="dropdown">
           <span className="logo-mini">
-            <img src="../../images/icon-32.png" className="img-circle" alt="Rendact Logo"/> 
+            <img src={Config.rootUrl+"/images/icon-32.png"} className="img-circle" alt="Rendact Logo"/> 
           </span>
           <span className="logo-lg" style={{paddingRight:10}}>
-            <img src="../../images/icon-32.png" className="img-circle" alt="Rendact Logo"/> 
+            <img src={Config.rootUrl+"/images/icon-32.png"} className="img-circle" alt="Rendact Logo"/> 
           </span>
         </a>
         <ul className="dropdown-menu logo-menu">
@@ -94,12 +95,12 @@ const AdminHeader = React.createClass({
             </li>
             <li className="dropdown user user-menu">
               <a href="#" className="dropdown-toggle" data-toggle="dropdown">
-                <img src="../../images/avatar-default.png" className="user-image" alt="User" />
+                <img src={Config.rootUrl+"/images/avatar-default.png"} className="user-image" alt="User" />
                 <span className="hidden-xs">{profile.name}</span>
               </a>
               <ul className="dropdown-menu">
                 <li className="user-header">
-                  <img src="../../images/avatar-default.png" className="img-circle" alt="User" />
+                  <img src={Config.rootUrl+"/images/avatar-default.png"} className="img-circle" alt="User" />
 
                   <p>
                     {profile.name}
