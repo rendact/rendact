@@ -54,20 +54,18 @@ const Page = React.createClass({
             var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
             var author = item.node.author?item.node.author.username:"";
             var slug = item.node.slug?item.node.slug:"";
+            var status = item.node.status?item.node.status:"";
             datatable.row.add([
               '<input className="pageListCb" type="checkbox" id="cb-'+item.node.id+'" >',
               '<a href={"/admin/pages/edit/"'+item.node.id+' >'+item.node.title+'</a>',
               slug,
               '<a href="">'+author+'</a>',
-              item.node.status,
-              item.node.comments.edges.length,
-              date
+              '<center>'+status+'</center>',
+              '<center>'+item.node.comments.edges.length+'</center>',
+              '<center>'+date+'</center>'
             ])
           });
-          
           datatable.draw();
-        //me.setState({content: list});
-        //$('#pageListTbl').DataTable();
         }
     });
   },
@@ -85,44 +83,6 @@ const Pages = React.createClass({
     require ('datatables/media/css/jquery.dataTables.min.css');
     require ('./Pages.css');
     $('#pageListTbl').DataTable();
-  },
-
-  handleSubmit: function(event) {
-  var me = this;
-  var id = $("#id").val();
-  const data = {
-    "query": `
-      mutation DeletePost($input: DeletePostInput!) {
-        deletePost(input: $input) {
-          changedPost {
-            id
-          }
-        }
-      }
-    `,
-    "variables": {
-      "input": {
-        "id": id
-      }
-    }
-  };
-
-  request({
-    url: "https://us-west-2.api.scaphold.io/graphql/scaphold-graphql",
-    method: "POST",
-    json: true,
-    headers: {
-      "content-type": "application/json",
-    },
-    body: data
-  }, (error, response, body) => {
-    if (!error && response.statusCode == 200) {
-      console.log(JSON.stringify(body, null, 2));
-    } else {
-      console.log(error);
-      console.log(response.statusCode);
-    }
-  });
   },
 
   render: function(){
@@ -145,13 +105,13 @@ const Pages = React.createClass({
                   <div className="row">
                     <div className="col-xs-12">
                       <div style={{marginTop: 10, marginBottom: 20}}>
-                        <button className="btn btn-default" href="#" style={{marginRight: 10}}>Edit</button>
-                        <button className="btn btn-default" href="#">Delete</button>
+                        <button className="btn btn-default btn-flat" style={{marginRight: 10}} id="editBtn" onClick={this.handleEditBtn}> Edit </button>
+                        <button className="btn btn-default btn-flat" id="deleteBtn" onClick={this.handleDeleteBtn}> Delete </button>
                       </div>                   
                       <table id="pageListTbl" className="display">                        
                         <thead>
                           <tr>
-                            <th style={{width:7}}><input type="checkbox" id="selectAll"></input></th>                            
+                            <th style={{width:7}}><input type="checkbox" id="selectAll"></input></th>
                             <th style={{textAlign: 'center'}}>Title</th>
                             <th style={{textAlign: 'center'}}>Slug</th>
                             <th style={{textAlign: 'center'}}>Author</th>
