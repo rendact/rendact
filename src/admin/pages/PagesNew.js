@@ -3,8 +3,8 @@ import request from 'request';
 import $ from 'jquery';
 window.jQuery = $;
 
-import Admin from '../../admin/pages/PagesNew';
 import Config from '../../config';
+import Query from '../../query';
 //window.CKEDITOR_BASEPATH = '/ckeditor/';
 //require('ckeditor');
 
@@ -41,19 +41,6 @@ var Input= React.createClass({
   }
 });
 
-var Perm= React.createClass({
-  render: function(){
-    return (
-      <div className="form-group">
-      <form className="form-inline">
-        <input type="text"/>
-        <button type="button" className="btn btn-default" style={{marginLeft: 10}}>OK</button>
-      </form>
-      </div>
-      )
-  }
-});
-
 const NewPost = React.createClass({
   componentDidMount: function(){
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
@@ -68,10 +55,11 @@ const NewPost = React.createClass({
     return {
       inputList: [],
       textList: [],
-      btnText: "Publish",
+      loadingMsg: null,
       errorMsg:null,
       slug:"",
-      permalinkEditing: false
+      permalinkEditing: false,
+      mode: this.props.postId?"update":"create"
     }
   },
 
@@ -99,8 +87,12 @@ const NewPost = React.createClass({
         inputList: inputList.concat(<Input key={inputList.length} />)
     });
   },
-
+  disableForm: function(state){
+    $("#publishBtn").attr('disabled',state);
+    this.setState({loadingMsg: state?"Saving...":null});
+  },
   handleSubmit: function(event) {
+    this.disableForm(true);
     var me = this;
     var title = $("#titlePage").val();
     var content =  window.CKEDITOR.instances['editor1'].getData();
@@ -109,29 +101,11 @@ const NewPost = React.createClass({
     var metaDescription = $("#metaDescription").val();
     var summary = $("#editor2").val();
     
-    const createPostQry = {
-      "query": `
-    mutation createPost($input: CreatePostInput!) {
-        createPost(input: $input) {
-          changedPost {
-            title,
-            content,
-            titleTag
-        }
-      }
-    }
-    `,
-      "variables": {
-        "input": {
-          "title": title,
-          "content": content,
-          "titleTag": titleTag,
-          "type": "page",
-          "author": localStorage.getItem('userID'),
-          "slug": this.state.slug
-        }
-      }
-    };
+    var qry = "";
+    if (this.state.mode==="create")
+      qry = Query.getCreatePostQry(title, content, titleTag, localStorage.getItem('userId'), this.state.slug);
+    else 
+      qry = Query.getUpdatePostQry(this.props.postId, title, content, titleTag, localStorage.getItem('userId'), this.state.slug);
 
     request({
       url: Config.scapholdUrl,
@@ -141,11 +115,10 @@ const NewPost = React.createClass({
         "content-type": "application/json",
         "Authorization": "Bearer " + localStorage.token
       },
-      body: createPostQry
+      body: qry
     }, (error, response, body) => {
-      debugger;
       if (!error && !body.errors && response.statusCode === 200) {
-        me.setState({btnText: "Save"});
+        me.setState({mode: "update"});
       } else {
         if (body && body.errors) {
           me.setState({errorMsg: body.errors[0].message});
@@ -155,27 +128,6 @@ const NewPost = React.createClass({
       }
     });
     
-    const createPostMetaQry = {
-      "query": `
-    mutation createPostMeta($input: CreatePostMetaInput!) {
-        createPostMeta(input: $input) {
-          changedPostMeta {
-            metaKeyword,
-            metaDescription,
-            summary
-        }
-      }
-    }
-    `,
-      "variables": {
-        "input": {
-          "metaKeyword": metaKeyword,
-          "metaDescription": metaDescription,
-          "summary": summary
-        }
-      }
-    };
-
     request({
       url: Config.scapholdUrl,
       method: "POST",
@@ -184,11 +136,11 @@ const NewPost = React.createClass({
         "content-type": "application/json",
         "Authorization": "Bearer " + localStorage.token
       },
-      body: createPostMetaQry
+      body: Query.getCreatePostMetaQry(metaKeyword, metaDescription, summary)
     }, (error, response, body) => {
 
       if (!error && !body.errors && response.statusCode === 200) {
-        me.setState({btnText: "Save"});
+        
       } else {
         if (body && body.errors) {
           me.setState({errorMsg: body.errors[0].message});
@@ -196,6 +148,7 @@ const NewPost = React.createClass({
           me.setState({errorMsg: error.toString()});
         }
       }
+      me.disableForm(false);
     });
 
     event.preventDefault();
@@ -203,10 +156,6 @@ const NewPost = React.createClass({
   componentWillMount: function(){
     if (!this.props.postId) return;
 
-    let list = [];
-    let getPageQry = {"query": 
-      '{getPost(id:"'+this.props.postId+'"){ id,title,content,slug,author{username},status,comments{edges{node{id}}},createdAt}}'
-    };
     var me = this;
     request({
         url: Config.scapholdUrl,
@@ -216,7 +165,7 @@ const NewPost = React.createClass({
           "content-type": "application/json",
           "Authorization": "Bearer " + localStorage.token
         },
-        body: getPageQry
+        body: Query.getPageQry(this.props.postId)
       }, (error, response, body) => {
         if (!error) {
           var values = body.data.getPost;
@@ -380,7 +329,8 @@ const NewPost = React.createClass({
                       <div className="form-group" style={{marginTop: 10}}>
                         <a style={{color: 'red'}}><u>Move To Trash</u></a>
                         <div className="pull-right box-tools">
-                        <button id="publishBtn" type="submit" className="btn btn-primary">{this.state.btnText}</button>
+                        <button id="publishBtn" type="submit" className="btn btn-primary">{this.state.mode==="update"?"Save":"Publish"}</button>
+                        <p>{this.state.loadingMsg}</p>
                         </div>
                       </div>
                     </div>
