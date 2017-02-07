@@ -60,13 +60,21 @@ const Page = React.createClass({
             var dt = new Date(item.node.createdAt);
             var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
             list.push(<tr key={item.node.id}>
-              <td id="id" style={{textAlign: 'center'}}><input type="checkbox" value={item.node.id}></input></td>
-              <td style={{textAlign: 'center'}}><a href={"/admin/pages/edit/"+item.node.id} >{item.node.title}</a></td>
-              <td style={{textAlign: 'center'}}>{item.node.slug?item.node.slug:""}</td>
+
+              <td><input className="pageListCb" id={"cb-"+item.node.id} type="checkbox"></input></td>
+
+              <td><a href={"/admin/pages/edit/"+item.node.id} >{item.node.title}</a></td>
+
+              <td>{item.node.slug?item.node.slug:""}</td>
+
               <td style={{textAlign: 'center'}}><a href="">{item.node.author?item.node.author.username:""}</a></td>
+
               <td style={{textAlign: 'center'}}>{item.node.status}</td>
+
               <td style={{textAlign: 'center'}}>{item.node.comments.edges.length}</td>            
+
               <td style={{textAlign: 'center'}}>{date}</td>
+
             </tr>)
           });
         }
@@ -106,44 +114,6 @@ const Pages = React.createClass({
     //$('#pageListTbl').DataTable();
   },
 
-  handleSubmit: function(event) {
-  var me = this;
-  var id = $("#id").val();
-  const data = {
-    "query": `
-      mutation DeletePost($input: DeletePostInput!) {
-        deletePost(input: $input) {
-          changedPost {
-            id
-          }
-        }
-      }
-    `,
-    "variables": {
-      "input": {
-        "id": id
-      }
-    }
-  };
-
-  request({
-    url: "https://us-west-2.api.scaphold.io/graphql/scaphold-graphql",
-    method: "POST",
-    json: true,
-    headers: {
-      "content-type": "application/json",
-    },
-    body: data
-  }, (error, response, body) => {
-    if (!error && response.statusCode == 200) {
-      console.log(JSON.stringify(body, null, 2));
-    } else {
-      console.log(error);
-      console.log(response.statusCode);
-    }
-  });
-  },
-
   render: function(){
     return (
       <div className="content-wrapper">
@@ -164,8 +134,8 @@ const Pages = React.createClass({
                   <div className="row">
                     <div className="col-xs-12">
                       <div style={{marginTop: 10, marginBottom: 20}}>
-                        <button className="btn btn-default" href="#" style={{marginRight: 10}}>Edit</button>
-                        <button className="btn btn-default" href="#">Delete</button>
+                        <button className="btn btn-default btn-flat" style={{marginRight: 10}} id="editBtn" onClick={this.handleEditBtn}> Edit </button>
+                        <button className="btn btn-default btn-flat" id="deleteBtn" onClick={this.handleDeleteBtn}> Delete </button>
                       </div>                   
                       <table id="pageListTbl" className="display">                        
                         <thead>
