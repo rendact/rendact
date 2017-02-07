@@ -60,7 +60,7 @@ const Page = React.createClass({
             var dt = new Date(item.node.createdAt);
             var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
             list.push(<tr key={item.node.id}>
-              <td id="id" style={{textAlign: 'center'}}><input type="checkbox"></input></td>
+              <td id="id" style={{textAlign: 'center'}}><input type="checkbox" value={item.node.id}></input></td>
               <td style={{textAlign: 'center'}}><a href={"/admin/pages/edit/"+item.node.id} >{item.node.title}</a></td>
               <td style={{textAlign: 'center'}}>{item.node.slug?item.node.slug:""}</td>
               <td style={{textAlign: 'center'}}><a href="">{item.node.author?item.node.author.username:""}</a></td>
