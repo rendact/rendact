@@ -55,6 +55,7 @@ const NewPost = React.createClass({
     return {
       inputList: [],
       textList: [],
+      noticeTxt: null,
       loadingMsg: null,
       errorMsg:null,
       slug:"",
@@ -102,11 +103,13 @@ const NewPost = React.createClass({
     var summary = $("#editor2").val();
     
     var qry = "";
-    if (this.state.mode==="create")
+    if (this.state.mode==="create"){
       qry = Query.getCreatePostQry(title, content, titleTag, localStorage.getItem('userId'), this.state.slug);
-    else 
+      me.setState({noticeTxt:"Page Published!"});
+    }else{ 
       qry = Query.getUpdatePostQry(this.props.postId, title, content, titleTag, localStorage.getItem('userId'), this.state.slug);
-
+      me.setState({noticeTxt:"Page Updated!"});
+    }
     request({
       url: Config.scapholdUrl,
       method: "POST",
@@ -180,12 +183,16 @@ const NewPost = React.createClass({
       <div className="content-wrapper">
         <div className="container-fluid">
           <section className="content-header"  style={{marginBottom:20}}>
-              <h1>Add New Page</h1>
+              <h1>{this.state.mode==="update"?"Edit Current Page":"Add New Page"}</h1>
                 <ol className="breadcrumb">
                   <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
                   <li>Pages</li>
                   <li className="active">Add New</li>
                 </ol>
+               // <div className="alert alert-info alert-dismissible">
+               // <button type="button" className="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+               //   <h4>{this.state.noticeTxt}</h4>
+               // </div>
           </section>
           { this.state.errorMsg &&
             <div className="alert alert-danger alert-dismissible">
@@ -223,7 +230,7 @@ const NewPost = React.createClass({
             </div>
             <div className="box box-info" style={{marginTop:20}}>
               <div className="box-header with-border">
-                <h3 className="box-title">Smart Crawl</h3>         
+                <h3 className="box-title">SEO</h3>         
                 <div className="pull-right box-tools">
                   <button type="button" className="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
                     <i className="fa fa-minus"></i></button>
