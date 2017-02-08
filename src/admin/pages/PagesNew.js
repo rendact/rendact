@@ -215,6 +215,21 @@ const NewPost = React.createClass({
                   <div id="trackingDiv"></div>
               </div>
             </div>
+            
+            <div className="box box-info" style={{marginTop:20}}>
+                <div className="box-header with-border">
+                  <h3 className="box-title">Summary</h3>         
+                  <div className="pull-right box-tools">
+                    <button type="button" className="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+                    <i className="fa fa-minus"></i></button>
+                  </div>
+                </div>
+                <div className="box-body pad">
+                <textarea id="editor2" name="editor2" wrap="hard" rows="3" style={{width: '100%'}}>
+                </textarea>                 
+                </div>
+              </div>
+
             <div className="box box-info" style={{marginTop:20}}>
               <div className="box-header with-border">
                 <h3 className="box-title">SEO</h3>         
@@ -261,19 +276,7 @@ const NewPost = React.createClass({
                 </div> 
                 </div>
               </div> 
-              <div className="box box-info" style={{marginTop:20}}>
-                <div className="box-header with-border">
-                  <h3 className="box-title">Summary</h3>         
-                  <div className="pull-right box-tools">
-                    <button type="button" className="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
-                    <i className="fa fa-minus"></i></button>
-                  </div>
-                </div>
-                <div className="box-body pad">
-                <textarea id="editor2" name="editor2" wrap="hard" rows="3" style={{width: '100%'}}>
-                </textarea>                 
-                </div>
-              </div>                  
+                                
             </div>
 
             <div className="col-md-4 col-sm-6 col-xs-12">
