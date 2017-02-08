@@ -6,8 +6,8 @@ import Config from '../../config';
 import Query from '../../query';
 
 const Page = React.createClass({
-  componentWillMount: function(){
-    
+  componentDidMount: function(){
+    var me = this;
     request({
         url: Config.scapholdUrl,
         method: "POST",
@@ -19,7 +19,9 @@ const Page = React.createClass({
         body: Query.getPageListQry
       }, (error, response, body) => {
         if (body.data) {
-          var datatable = $('#pageListTbl').DataTable();
+          //var datatable = $('#pageListTbl').DataTable();
+          
+          var datatable = me.props.datatable;
           datatable.clear();
           $.each(body.data.viewer.allPosts.edges, function(key, item){
           
@@ -29,7 +31,7 @@ const Page = React.createClass({
             var slug = item.node.slug?item.node.slug:"";
             var status = item.node.status?item.node.status:"";
             datatable.row.add([
-              '<input className="pageListCb" type="checkbox" id="cb-'+item.node.id+'" >',
+              '<input class="pageListCb" type="checkbox" id="cb-'+item.node.id+'" >',
               '<a href="/admin/pages/edit/'+item.node.id+'" >'+item.node.title+'</a>',
               slug,
               '<a href="">'+author+'</a>',
@@ -51,13 +53,41 @@ const Page = React.createClass({
 
 
 const Pages = React.createClass({
-  componentDidMount: function(){
+  getInitialState: function(){
     require ('datatables');
     require ('datatables/media/css/jquery.dataTables.min.css');
     require ('./Pages.css');
-    $('#pageListTbl').DataTable();
-  },
 
+    return {
+      dt: null
+    }
+  },
+  componentDidMount: function(){
+    var datatable = $('#pageListTbl').DataTable({
+      sDom: '<"H"r>t<"F"ip>',
+    });
+    
+    datatable.columns(1).every( function () {
+        var that = this;
+ 
+        $( '#searchBox', this.footer() ).on( 'keyup change', function () {
+
+            if ( that.search() !== this.value ) {
+                that
+                    .search( this.value )
+                    .draw();
+            }
+        } );
+    } );
+    
+    this.setState({dt: datatable})
+  },
+  handleFilterBtn: function(){
+    var status = $("#statusFilter").val();
+    this.state.dt.columns(4).every( function () {
+        this.search( status ).draw();
+    } );
+  },
   render: function(){
     return (
       <div className="content-wrapper">
@@ -78,10 +108,19 @@ const Pages = React.createClass({
                   <div className="row">
                     <div className="col-xs-12">
                       <div style={{marginTop: 10, marginBottom: 20}}>
-                        <button className="btn btn-default btn-flat" style={{marginRight: 10}} id="editBtn" onClick={this.handleEditBtn}> Edit </button>
-                        <button className="btn btn-default btn-flat" id="deleteBtn" onClick={this.handleDeleteBtn}> Delete </button>
+                          <button className="btn btn-default btn-flat" id="deleteBtn" style={{marginRight:10}} onClick={this.handleDeleteBtn}>Delete</button>
+                          <select className="btn select" id="dateFilter" style={{marginRight:5,height:35}}>
+                            <option>January 2017</option>
+                          </select>
+                          <select className="btn select" id="statusFilter" style={{marginRight:5,height:35}}>
+                            <option value="">All</option>
+                            <option value="published">Published</option>
+                            <option value="draft">Draft</option>
+                          </select>
+                          <button className="btn btn-default btn-flat" id="filterBtn" onClick={this.handleFilterBtn}>Filter</button>
+                        <input className="pull-right" placeholder="Search..." id="searchBox" />
                       </div>                   
-                      <table id="pageListTbl" className="display">                        
+                      <table id="pageListTbl" className="display">
                         <thead>
                           <tr>
                             <th style={{width:7}}><input type="checkbox" id="selectAll"></input></th>
@@ -93,7 +132,7 @@ const Pages = React.createClass({
                             <th style={{textAlign: 'center'}}>Publish Date</th>
                           </tr>
                       </thead>
-                      <Page/>
+                      <Page datatable={this.state.dt}/>
                     </table>
                   </div>
                 </div>
