@@ -29,7 +29,7 @@ const Page = React.createClass({
             var slug = item.node.slug?item.node.slug:"";
             var status = item.node.status?item.node.status:"";
             datatable.row.add([
-              '<input className="pageListCb" type="checkbox" id="cb-'+item.node.id+'" >',
+              '<input class="pageListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
               '<a href="/admin/pages/edit/'+item.node.id+'" >'+item.node.title+'</a>',
               slug,
               '<a href="">'+author+'</a>',
@@ -49,13 +49,52 @@ const Page = React.createClass({
   }
 });
 
-
 const Pages = React.createClass({
   componentDidMount: function(){
     require ('datatables');
     require ('datatables/media/css/jquery.dataTables.min.css');
     require ('./Pages.css');
-    $('#pageListTbl').DataTable();
+    $('#pageListTbl').DataTable(); 
+  },
+
+  handleDeleteBtn: function(event){
+    var check = $("input.pageListCb:checked")[0].id.split("-")[1];
+
+    const data = {
+      "query": `
+        mutation DeletePost($user: DeletePostInput!) {
+          deletePost(input: $user) {
+            changedPost {
+              id
+            }
+          }
+        }
+      `,
+      "variables": {
+        "user": {
+          "id": check
+        }
+      }
+    };
+
+    request({
+      url: Config.scapholdUrl,
+      method: "POST",
+      json: true,
+      headers: {
+        "content-type": "application/json",
+        "Authorization": "Bearer " + localStorage.token
+      },
+      body: data
+    }, (error, response, body) => {
+      if (!error && response.statusCode === 200) {
+        console.log(JSON.stringify(body, null, 2));
+      } else {
+        console.log(error);
+        console.log(response.statusCode);
+      }
+    });
+   
   },
 
   render: function(){
