@@ -8,38 +8,6 @@ import Query from '../../query';
 //window.CKEDITOR_BASEPATH = '/ckeditor/';
 //require('ckeditor');
 
-var Input= React.createClass({
-  render: function(){
-    return (
-      <div className="form-group">
-      <form className="form-inline">
-        <select style={{marginRight: 10, height: 20}}>
-          <option>Jan</option>
-          <option>Feb</option>
-          <option>Mar</option>
-          <option>Apr</option>
-          <option>May</option>
-          <option>June</option>
-          <option>July</option>
-          <option>Aug</option>
-          <option>Sep</option>
-          <option>Oct</option>
-          <option>Nov</option>
-          <option>Des</option>
-        </select>
-        <input type="text" placeholder="day" style={{width: 40, height: 20}}/>,
-        <input type="text" placeholder="year" style={{marginLeft: 10, marginRight:5, height: 20, width: 40}}/>@
-        <input type="text" placeholder="hour" style={{marginLeft: 5, height: 20, width: 30}}/>:
-        <input type="text" placeholder="min" style={{width: 30, height: 20}}/>
-      </form>
-        <form className="form-inline" style={{marginTop: 10}}>
-          <button type="button" className="btn btn-default" style={{marginRight: 10}}>OK</button>
-          <a><u>Cancel</u></a>
-        </form>
-      </div>
-      )
-  }
-});
 
 const NewPost = React.createClass({
   componentDidMount: function(){
@@ -49,12 +17,40 @@ const NewPost = React.createClass({
         title: false
       });
     });
+
+    $(document).ready(function(){
+      $("m").hide();
+        $("#hide").click(function(){
+            $("m").hide(1000);
+        });
+        $("#show").click(function(){
+            $("m").show(1000);
+        });
+        });
+
+    $(document).ready(function(){
+      $("v").hide();
+        $("#hideVis").click(function(){
+            $("v").hide(1000);
+        });
+        $("#showVis").click(function(){
+            $("v").show(1000);
+        });
+        });
+
+    $(document).ready(function(){
+      $("s").hide();
+        $("#hideStat").click(function(){
+            $("s").hide(1000);
+        });
+        $("#showStat").click(function(){
+            $("s").show(1000);
+        });
+        });
   },
 
   getInitialState: function(){
     return {
-      inputList: [],
-      textList: [],
       noticeTxt: null,
       loadingMsg: null,
       errorMsg:null,
@@ -81,13 +77,7 @@ const NewPost = React.createClass({
     var slug = title.replace(" ","-").toLowerCase();
     this.setState({slug: slug})
   },
-  onAddBtnClick: function(event) {
-    const inputList = this.state.inputList;
-    inputList.length = 1;
-    this.setState({
-        inputList: inputList.concat(<Input key={inputList.length} />)
-    });
-  },
+
   disableForm: function(state){
     $("#publishBtn").attr('disabled',state);
     this.setState({loadingMsg: state?"Saving...":null});
@@ -189,10 +179,7 @@ const NewPost = React.createClass({
                   <li>Pages</li>
                   <li className="active">Add New</li>
                 </ol>
-               // <div className="alert alert-info alert-dismissible">
-               // <button type="button" className="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-               //   <h4>{this.state.noticeTxt}</h4>
-               // </div>
+               
           </section>
           { this.state.errorMsg &&
             <div className="alert alert-danger alert-dismissible">
@@ -241,9 +228,9 @@ const NewPost = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4">Preview</div>
                     <div className="col-md-8">
-                      <p><a href="#">My Title</a></p>
+                      <p><a href="#">{this.state.slug===""?"Judul Masih Kosong":this.state.slug}</a></p>
                       <p>Some descriptions...</p>
-                      <p><span className="help-block"><a style={{color: 'green'}}>https://ussunah.org/temp-title/</a> - <a>Cache</a> - <a>Similar</a></span></p>
+                      <p><span className="help-block"><a style={{color: 'green'}}>{Config.rootUrl}/{this.state.slug}</a> - <a>Cache</a> - <a>Similar</a></span></p>
                     </div>
                   </div>
                   <div className="form-group">
@@ -267,7 +254,6 @@ const NewPost = React.createClass({
                     <div className="col-md-8">
                       <div className="form-group">
                         <input id="metaKeyword" type="text" style={{width: '100%'}}/>
-                        <input type="checkbox"/> I want to use post tags in addition to my keywords
                         <span className="help-block"><b>News keywords </b><a>(?)</a></span>
                       </div>
                     </div>
@@ -302,44 +288,99 @@ const NewPost = React.createClass({
                           </div>         
                     </div>
                     <div className="box-body pad">
-                      <div>
+                      
                       <div className="form-group">
-                        <button type="button" className="btn btn-default">Save Draft</button>
-                        <div className="pull-right box-tools">
-                        <button type="button" className="btn btn-default">Preview</button>
+                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-pushpin" style={{marginRight:'10'}}></span>
+                          Status: <b>Draft </b>
+                          <button type="button" className="btn btn-flat btn-xs btn-default" id="showStat"> Edit </button></p>
+                          <s><div className="form-group">
+                                <form className="form-inline">
+                                  <select style={{marginRight: 10, height: 30}}>
+                                    <option>Draft</option>
+                                    <option>Pending Review</option>
+                                  </select>
+                                  <button type="button" className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}>OK</button>
+                                  <button type="button" className="btn btn-flat btn-xs btn-default" id="hideStat">Cancel</button>
+                                </form>
+                              </div>
+                          </s>
                         </div>
-                      </div>
-                      </div>
-                      <div className="form-inline">
-                      <div className="form-group">
-                        <p>
-                          <span className="glyphicon glyphicon-pencil" style={{marginRight: 10}}></span>
-                          Status: <b>Draft </b><a><u>Edit</u></a>
-                        </p>
-                        <p>
-                          <span className="glyphicon glyphicon-sunglasses" style={{marginRight: 10}}></span>
-                          Visibility: <b>Public </b><a><u>Edit</u></a>
-                          </p>
-                        <p>
-                          <span className="glyphicon glyphicon-calendar" style={{marginRight: 10}}></span>
-                          Publish <b>Immediately </b>
-                          <a onClick={this.onAddBtnClick}><u>Edit</u></a>
-                          {this.state.inputList.map(function(input, index) {
-                            return input;
-                          })}
-                          </p>
-                      </div>
+                        <div className="form-group">
+                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:'10'}}></span>Visibility: <b>Public </b>
+                          <button type="button" className="btn btn-flat btn-xs btn-default" id="showVis"> Edit </button></p>
+                          <v><div>
+                            <div className="radio">
+                              <label>
+                                <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked/>
+                                Public
+                              </label>
+                            </div>
+                            <div className="radio">
+                              <label>
+                                <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2"/>
+                                Password Protected
+                              </label>
+                            </div>
+                            <div className="radio disabled">
+                              <label>
+                                <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3"/>
+                                Private
+                              </label>
+                            </div>
+                            <form className="form-inline" style={{marginTop: 10}}>
+                              <button type="button" className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}>OK</button>
+                              <button type="button" className="btn btn-flat btn-xs btn-default" id="hideVis">Cancel</button>
+                            </form>
+                            </div>
+                          </v>
+                        </div>
+                        <div className="form-group">
+                          <p><span className="glyphicon glyphicon-calendar" style={{marginRight: 10}}></span>Publish <b>Immediately </b>
+                          <button type="button" className="btn btn-flat btn-xs btn-default" id="show"> Edit </button></p>
+
+                          <m><div className="form-group">
+                              <form className="form-inline">
+                                <select className="form-control btn btn-flat btn-xs btn-default" style={{marginRight: 10, height: 20 }}>
+                                  <option>Jan</option>
+                                  <option>Feb</option>
+                                  <option>Mar</option>
+                                  <option>Apr</option>
+                                  <option>May</option>
+                                  <option>June</option>
+                                  <option>July</option>
+                                  <option>Aug</option>
+                                  <option>Sep</option>
+                                  <option>Oct</option>
+                                  <option>Nov</option>
+                                  <option>Des</option>
+                                </select>
+                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" placeholder="day" style={{width: 50, height: 20}}/>,
+                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" placeholder="year" style={{marginLeft: 10, marginRight:5, width: 50, height: 20}}/>@
+                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" placeholder="hour" style={{marginLeft: 5,  width: 35, height: 20}}/> : 
+                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" placeholder="min" style={{width: 35, height: 20 }}/>
+                              </form>
+                                <form className="form-inline" style={{marginTop: 10}}>
+                                  <button type="button" className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}> OK </button>
+                                </form>
+                                <button type="button" style={{marginTop: 10}} className="btn btn-flat btn-xs btn-default" id="hide">Cancel</button>
+                              </div></m>
                       </div> 
                     </div>
-                    <div className="box-footer">        
-                      <button type="button" className="btn btn-default">Clear Cache</button>
-                      <div className="form-group" style={{marginTop: 10}}>
-                        <a style={{color: 'red'}}><u>Move To Trash</u></a>
-                        <div className="pull-right box-tools">
-                        <button id="publishBtn" type="submit" className="btn btn-primary">{this.state.mode==="update"?"Save":"Publish"}</button>
-                        <p>{this.state.loadingMsg}</p>
-                        </div>
-                      </div>
+                    <div className="box-footer">
+                      <div className="form-group pull-right">
+                        <button type="button" className="btn btn-default btn-flat disabled" >Preview</button> 
+                          <div className="btn-group">
+                            <button type="submit" id="publishBtn" className="btn btn-primary btn-flat">{this.state.mode==="update"?"Save":"Publish"}</button>
+                            <button type="button" className="btn btn-primary btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                              <span className="caret"></span>
+                              <span className="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <ul className="dropdown-menu" role="menu">
+                              <li><a href="#">Save as draft</a></li>
+                            </ul>
+                          </div>
+                          <p>{this.state.loadingMsg}</p>
+                      </div>        
                     </div>
                   </div>
                   <div className="box box-info" style={{marginTop:20}}>
