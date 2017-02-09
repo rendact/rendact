@@ -5,9 +5,19 @@ window.jQuery = $;
 import Config from '../../config';
 import Query from '../../query';
 
-const Page = React.createClass({
-  componentDidMount: function(){
-    var me = this;
+const Pages = React.createClass({
+  getInitialState: function(){
+    require ('datatables');
+    require ('datatables/media/css/jquery.dataTables.min.css');
+    require ('./Pages.css');
+
+    return {
+      dt: null,
+      errorMsg: null,
+      loadingMsg: null
+    }
+  },
+  loadData: function(datatable) {
     request({
         url: Config.scapholdUrl,
         method: "POST",
@@ -19,9 +29,6 @@ const Page = React.createClass({
         body: Query.getPageListQry
       }, (error, response, body) => {
         if (body.data) {
-          //var datatable = $('#pageListTbl').DataTable();
-          
-          var datatable = me.props.datatable;
           datatable.clear();
           $.each(body.data.viewer.allPosts.edges, function(key, item){
           
@@ -44,27 +51,17 @@ const Page = React.createClass({
         }
     });
   },
-  render: function() {
-      return (
-        <tbody><tr key="0"><td></td><td>Loading data...</td><td></td><td></td><td></td><td></td><td></td></tr></tbody>
-      )
-  }
-});
-
-const Pages = React.createClass({
-  getInitialState: function(){
-    require ('datatables');
-    require ('datatables/media/css/jquery.dataTables.min.css');
-    require ('./Pages.css');
-
-    return {
-      dt: null
-    }
+  disableForm: function(state){
+    $("#filterBtn").attr('disabled',state);
+    $("#deleteBtn").attr('disabled',state);
+    $("#dateFilter").attr('disabled',state);
+    $("#statusFilter").attr('disabled',state);
+    this.setState({loadingMsg: state?"Processing...":null});
   },
-
   handleDeleteBtn: function(event){
+    this.disableForm(true);
     var check = $("input.pageListCb:checked")[0].id.split("-")[1];
-
+    var me = this;
     const data = {
       "query": `
         mutation DeletePost($user: DeletePostInput!) {
@@ -94,10 +91,13 @@ const Pages = React.createClass({
     }, (error, response, body) => {
       if (!error && response.statusCode === 200) {
         console.log(JSON.stringify(body, null, 2));
+        this.loadData(me.state.dt);
       } else {
         console.log(error);
         console.log(response.statusCode);
+        me.setState({errorMsg: error});
       }
+      this.disableForm(false);
     });   
   },
   componentDidMount: function(){
@@ -108,17 +108,17 @@ const Pages = React.createClass({
     datatable.columns(1).every( function () {
         var that = this;
  
-        $( '#searchBox', this.footer() ).on( 'keyup change', function () {
-
+        $('#searchBox', this.footer() ).on( 'keyup change', function () {
             if ( that.search() !== this.value ) {
                 that
                     .search( this.value )
                     .draw();
             }
-        } );
+        });
     } );
     
-    this.setState({dt: datatable})
+    this.setState({dt: datatable});
+    this.loadData(datatable);
   },
   handleFilterBtn: function(){
     var status = $("#statusFilter").val();
@@ -130,7 +130,7 @@ const Pages = React.createClass({
     return (
       <div className="content-wrapper">
         <div className="container-fluid">
-          <section className="content-header">
+          <section className="content-header" style={{marginBottom:20}}>
             <h1>
               Page List
             </h1>
@@ -139,6 +139,18 @@ const Pages = React.createClass({
               <li className="active">Page List</li>
             </ol>
           </section>  
+          { this.state.errorMsg &&
+            <div className="alert alert-danger alert-dismissible">
+              <button type="button" className="close" data-dismiss="alert" aria-hidden="true">×</button>
+              {this.state.errorMsg}
+            </div>
+          }
+          { this.state.loadingMsg &&
+            <div className="alert alert-warning alert-dismissible">
+              <button type="button" className="close" data-dismiss="warning" aria-hidden="true">×</button>
+              {this.state.loadingMsg}
+            </div>
+          }
           <section className="content">
             <div className="box box-default">
               <div className="box-body">
@@ -170,7 +182,7 @@ const Pages = React.createClass({
                             <th style={{textAlign: 'center'}}>Publish Date</th>
                           </tr>
                       </thead>
-                      <Page datatable={this.state.dt}/>
+                      <tbody><tr key="0"><td></td><td>Loading data...</td><td></td><td></td><td></td><td></td><td></td></tr></tbody>
                     </table>
                   </div>
                 </div>
