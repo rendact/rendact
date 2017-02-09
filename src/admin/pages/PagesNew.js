@@ -18,7 +18,7 @@ const NewPost = React.createClass({
       });
     });
 
-    $(document).ready(function(){
+
       $("m").hide();
         $("#hide").click(function(){
             $("m").hide(1000);
@@ -26,9 +26,9 @@ const NewPost = React.createClass({
         $("#show").click(function(){
             $("m").show(1000);
         });
-        });
 
-    $(document).ready(function(){
+
+
       $("v").hide();
         $("#hideVis").click(function(){
             $("v").hide(1000);
@@ -36,9 +36,9 @@ const NewPost = React.createClass({
         $("#showVis").click(function(){
             $("v").show(1000);
         });
-        });
 
-    $(document).ready(function(){
+
+
       $("s").hide();
         $("#hideStat").click(function(){
             $("s").hide(1000);
@@ -46,7 +46,7 @@ const NewPost = React.createClass({
         $("#showStat").click(function(){
             $("s").show(1000);
         });
-        });
+
   },
 
   getInitialState: function(){
@@ -55,6 +55,7 @@ const NewPost = React.createClass({
       loadingMsg: null,
       errorMsg:null,
       slug:"",
+      slug2:"",
       permalinkEditing: false,
       mode: this.props.postId?"update":"create"
     }
@@ -77,6 +78,10 @@ const NewPost = React.createClass({
     var slug = title.replace(" ","-").toLowerCase();
     this.setState({slug: slug})
   },
+  handleSummaryChange: function(event){
+    var slug2 = $("#editor2").val();
+    this.setState({slug2: slug2})
+  },
 
   disableForm: function(state){
     $("#publishBtn").attr('disabled',state);
@@ -96,7 +101,7 @@ const NewPost = React.createClass({
     if (this.state.mode==="create"){
       qry = Query.getCreatePostQry(title, content, titleTag, localStorage.getItem('userId'), this.state.slug);
       me.setState({noticeTxt:"Page Published!"});
-    }else{ 
+    }else{
       qry = Query.getUpdatePostQry(this.props.postId, title, content, titleTag, localStorage.getItem('userId'), this.state.slug);
       me.setState({noticeTxt:"Page Updated!"});
     }
@@ -225,7 +230,7 @@ const NewPost = React.createClass({
                   </div>
                 </div>
                 <div className="box-body pad">
-                <textarea id="editor2" name="editor2" wrap="hard" rows="3" style={{width: '100%'}}>
+                <textarea id="editor2" name="editor2" wrap="hard" rows="3" style={{width: '100%'}} onChange={this.handleSummaryChange}>
                 </textarea>                 
                 </div>
               </div>
@@ -259,7 +264,7 @@ const NewPost = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4"><p>Meta Description</p></div>
                     <div className="col-md-8">
-                      <textarea id="metaDescription" rows='2' style={{width:'100%'}}></textarea>
+                      <textarea id="metaDescription" rows='2' style={{width:'100%'}} value={this.state.slug2}></textarea>
                       <span className="help-block">160 characters maximum</span>
                       <span className="help-block">160 characters left</span>
                     </div>

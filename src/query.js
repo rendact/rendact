@@ -83,6 +83,7 @@ const getCreatePostQry = function(title, content, titleTag, userId, slug){
           "title": title,
           "content": content,
           "titleTag": titleTag,
+          "status": "published",
           "type": "page",
           "authorId": userId,
           "slug": slug
@@ -110,6 +111,7 @@ const getUpdatePostQry = function(id, title, content, titleTag, userId, slug){
           "title": title,
           "content": content,
           "titleTag": titleTag,
+          "status": "draft",
           "type": "page",
           "authorId": userId,
           "slug": slug
