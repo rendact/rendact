@@ -85,7 +85,7 @@ const Pages = React.createClass({
         "content-type": "application/json",
         "Authorization": "Bearer " + localStorage.token
       },
-      body: Query.deletePostQry
+      body: Query.deletePostQry(idList)
     }, (error, response, body) => {
       if (!error && response.statusCode === 200) {
         console.log(JSON.stringify(body, null, 2));

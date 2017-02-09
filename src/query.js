@@ -175,7 +175,8 @@ const getPageListQry = {"query": `
       } 
     `};
 
-const deletePostQry = {
+const deletePostQry = function(idList){
+  return {
     "query": `
       mutation DeletePost($post: DeletePostInput!) {
         deletePost(input: $post) {
@@ -190,7 +191,8 @@ const deletePostQry = {
         "id": idList
       }
     }
-  };
+  }
+};
 
 const queries = {
 	getUserQry: getUserQry,
