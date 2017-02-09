@@ -4,6 +4,7 @@ import $ from 'jquery';
 window.jQuery = $;
 import Config from '../../config';
 import Query from '../../query';
+import Fn from '../lib/functions';
 
 const Pages = React.createClass({
   getInitialState: function(){
@@ -14,10 +15,12 @@ const Pages = React.createClass({
     return {
       dt: null,
       errorMsg: null,
-      loadingMsg: null
+      loadingMsg: null,
+      monthList: []
     }
   },
   loadData: function(datatable) {
+    var me = this;
     request({
         url: Config.scapholdUrl,
         method: "POST",
@@ -30,13 +33,17 @@ const Pages = React.createClass({
       }, (error, response, body) => {
         if (body.data) {
           datatable.clear();
+          var monthList = ["all"];
           $.each(body.data.viewer.allPosts.edges, function(key, item){
-          
             var dt = new Date(item.node.createdAt);
             var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
             var author = item.node.author?item.node.author.username:"";
             var slug = item.node.slug?item.node.slug:"";
             var status = item.node.status?item.node.status:"";
+
+            var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
+            if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
+
             datatable.row.add([
               '<input class="pageListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
               '<a href="/admin/pages/edit/'+item.node.id+'" >'+item.node.title+'</a>',
@@ -47,6 +54,7 @@ const Pages = React.createClass({
               '<center>'+date+'</center>'
             ])
           });
+          me.setState({monthList: monthList});
           datatable.draw();
         }
     });
@@ -59,25 +67,15 @@ const Pages = React.createClass({
     this.setState({loadingMsg: state?"Processing...":null});
   },
   handleDeleteBtn: function(event){
+    var checkedRow = $("input.pageListCb:checked");
+    if (checkedRow.length == 0) {
+      this.setState({errorMsg: "Please choose item to be deleted"});
+      return;
+    }
+
     this.disableForm(true);
-    var check = $("input.pageListCb:checked")[0].id.split("-")[1];
+    var idList =checkedRow[0].id.split("-")[1];
     var me = this;
-    const data = {
-      "query": `
-        mutation DeletePost($user: DeletePostInput!) {
-          deletePost(input: $user) {
-            changedPost {
-              id
-            }
-          }
-        }
-      `,
-      "variables": {
-        "user": {
-          "id": check
-        }
-      }
-    };
 
     request({
       url: Config.scapholdUrl,
@@ -87,7 +85,7 @@ const Pages = React.createClass({
         "content-type": "application/json",
         "Authorization": "Bearer " + localStorage.token
       },
-      body: data
+      body: Query.deletePostQry
     }, (error, response, body) => {
       if (!error && response.statusCode === 200) {
         console.log(JSON.stringify(body, null, 2));
@@ -122,8 +120,15 @@ const Pages = React.createClass({
   },
   handleFilterBtn: function(){
     var status = $("#statusFilter").val();
-    this.state.dt.columns(4).every( function () {
-        this.search( status ).draw();
+    var date = $("#dateFilter").val();
+
+    var searchValue = {
+      4: status,
+      6: date
+    }
+
+    this.state.dt.columns([4,6]).every( function () {
+        this.search( searchValue[this.index()] ).draw();
     } );
   },
   render: function(){
@@ -160,7 +165,15 @@ const Pages = React.createClass({
                       <div style={{marginTop: 10, marginBottom: 20}}>
                           <button className="btn btn-default btn-flat" id="deleteBtn" style={{marginRight:10}} onClick={this.handleDeleteBtn}>Delete</button>
                           <select className="btn select" id="dateFilter" style={{marginRight:5,height:35}}>
-                            <option>January 2017</option>
+                            {this.state.monthList.map(function(item){
+                              if (item=="all")
+                                return <option key="0" value="">All</option>
+                              var s = item.split("/");
+                              var monthList = Fn.getMonthList();
+                              var month = monthList[parseInt(s[1])-1];
+                              var year = s[0];
+                              return <option key={item} value={item}>{month+" "+year}</option>
+                            })}
                           </select>
                           <select className="btn select" id="statusFilter" style={{marginRight:5,height:35}}>
                             <option value="">All</option>

@@ -175,6 +175,23 @@ const getPageListQry = {"query": `
       } 
     `};
 
+const deletePostQry = {
+    "query": `
+      mutation DeletePost($post: DeletePostInput!) {
+        deletePost(input: $post) {
+          changedPost {
+            id
+          }
+        }
+      }
+    `,
+    "variables": {
+      "post": {
+        "id": idList
+      }
+    }
+  };
+
 const queries = {
 	getUserQry: getUserQry,
   getLoginAuth0Mtn: getLoginAuth0Mtn,
@@ -183,7 +200,8 @@ const queries = {
   getCreatePostMetaQry: getCreatePostMetaQry,
   getPageQry: getPageQry,
   getUpdatePostQry: getUpdatePostQry,
-  getPageListQry: getPageListQry
+  getPageListQry: getPageListQry,
+  deletePostQry: deletePostQry
 }
 
 module.exports = queries;
