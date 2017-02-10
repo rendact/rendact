@@ -86,6 +86,7 @@ const Pages = React.createClass({
     this.disableForm(true);
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
     var me = this;
+
 $( "#delete-confirm" ).dialog({
       resizable: false,
       width: 400,
@@ -108,6 +109,9 @@ $( "#delete-confirm" ).dialog({
       });
       
       (error, response, body) => {
+
+
+
       if (!error && !body.errors && response.statusCode === 200) {
         console.log(JSON.stringify(body, null, 2));
         this.loadData(me.state.dt);

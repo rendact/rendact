@@ -31,8 +31,6 @@ const NewPost = React.createClass({
             $("m").show(1000);
         });
 
-
-
       $("v").hide();
         $("#hideVis").click(function(){
             $("v").hide(1000);
@@ -41,8 +39,6 @@ const NewPost = React.createClass({
             $("v").show(1000);
         });
 
-
-
       $("s").hide();
         $("#hideStat").click(function(){
             $("s").hide(1000);
@@ -50,6 +46,23 @@ const NewPost = React.createClass({
         $("#showStat").click(function(){
             $("s").show(1000);
         });
+
+      $("k").hide();
+        $("#passwordRadios").click(function(){
+            $("k").show(1000);
+        });
+
+      var d = new Date();
+      var year = d.getFullYear();
+      var month = d.getMonth();
+      var day = d.getDate();
+      var hour = d.getHours();
+      var minute = d.getMinutes();
+      $("#yy").val(year);
+      $("#dd").val(day);
+      $("#mm option[value="+(month+1)+"]").prop("selected", true);
+      $("#hh").val(hour);
+      $("#min").val(minute);
 
   },
 
@@ -62,6 +75,11 @@ const NewPost = React.createClass({
       slug:"",
       content:"",
       summary:"",
+      draft:"Draft",
+      immediately:"",
+      immediatelyStatus:false,
+      visibilityTxt:"",
+      visibilityStatus:false,
       permalinkEditing: false,
       mode: this.props.postId?"update":"create",
       pageList: null,
@@ -99,13 +117,27 @@ const NewPost = React.createClass({
     var titleTag = $("#titleTag").val();
     this.setState({titleTagLeftCharacter: 65-(titleTag.length)});
   },
-  handleTitleTagChange: function(event){
-    var titleTag = $("#titleTag").val();
-    this.setState({titleTagLeftCharacter: 65-(titleTag.length)});
-  },
   handleMetaDescriptionChange: function(event){
     var metaDescription = $("#metaDescription").val();
     this.setState({metaDescriptionLeftCharacter: 160-(metaDescription.length)});
+  },
+  saveImmediately: function(event){
+    this.setState({immediatelyStatus: true});
+    var day = $("#dd").val();
+    var year = $("#yy").val();
+    var hour = $("#hh").val();
+    var min = $("#min").val();
+    this.setState({immediately: $("#mm option:selected").text() + " " + day + " " + year + " " + "@" + " " + hour + ":" + min});
+    $("m").hide();
+  },
+  saveDraft: function(event){
+    this.setState({draft: $("#draftSelect option:selected").text()});
+    $("s").hide();
+  },
+  saveVisibility: function(event){
+    this.setState({visibilityStatus: true});
+    this.setState({visibilityTxt: $("input[name=radiosName]:checked").val()});
+    $("v").hide();
   },
   disableForm: function(state){
     $("#publishBtn").attr('disabled',state);
@@ -120,13 +152,22 @@ const NewPost = React.createClass({
     var metaKeyword = $("#metaKeyword").val();
     var metaDescription = $("#metaDescription").val();
     var summary = $("#editor2").val();
+    var draft = $("#draftSelect option:selected").text();
+    var visibility = $("input[name=radiosName]:checked").val();
+    var passwordPage = $("#passwordPage").val();
+    var year = $("#yy").val();
+    var month = $("#mm option:selected").text();
+    var day = $("#dd").val();
+    var hour = $("#hh").val();
+    var min = $("#min").val();
+    var publishDate = year+"-"+month+"-"+day+"@"+hour+":"+min ;
     
     var qry = "";
     if (this.state.mode==="create"){
-      qry = Query.getCreatePostQry(title, content, titleTag, localStorage.getItem('userId'), this.state.slug);
+      qry = Query.getCreatePostQry(title, content, titleTag, draft, visibility, passwordPage, publishDate, localStorage.getItem('userId'), this.state.slug);
       me.setState({noticeTxt:"Page Published!"});
     }else{
-      qry = Query.getUpdatePostQry(this.props.postId, title, content, titleTag, localStorage.getItem('userId'), this.state.slug);
+      qry = Query.getUpdatePostQry(this.props.postId, title, content, titleTag, draft, visibility, passwordPage, publishDate, localStorage.getItem('userId'), this.state.slug);
       me.setState({noticeTxt:"Page Updated!"});
     }
     request({
@@ -343,76 +384,85 @@ const NewPost = React.createClass({
                       
                       <div className="form-group">
                           <p style={{fontSize: 14}}><span className="glyphicon glyphicon-pushpin" style={{marginRight:10}}></span>
-                          Status: <b>Draft </b>
+                          Status: <b>{this.state.draft} </b>
                           <button type="button" className="btn btn-flat btn-xs btn-default" id="showStat"> Edit </button></p>
                           <s><div className="form-group">
                                 <form className="form-inline">
-                                  <select style={{marginRight: 10, height: 30}}>
+                                  <select id="draftSelect" style={{marginRight: 10, height: 30}}>
+                                    <option>Published</option>
                                     <option>Draft</option>
                                     <option>Pending Review</option>
                                   </select>
-                                  <button type="button" className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}>OK</button>
+                                  <button type="button" onClick={this.saveDraft} className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}>OK</button>
                                   <button type="button" className="btn btn-flat btn-xs btn-default" id="hideStat">Cancel</button>
                                 </form>
                               </div>
                           </s>
                         </div>
+
                         <div className="form-group">
-                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>Public </b>
+                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>{this.state.visibilityStatus===false?"Public":this.state.visibilityTxt} </b>
                           <button type="button" className="btn btn-flat btn-xs btn-default" id="showVis"> Edit </button></p>
                           <v><div>
                             <div className="radio">
                               <label>
-                                <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked/>
+                                <input type="radio" name="radiosName" id="publicRadios" value="Public"/>
                                 Public
                               </label>
                             </div>
                             <div className="radio">
                               <label>
-                                <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2"/>
+                                <input type="radio" name="radiosName" id="passwordRadios" value="Password Protected"/>
                                 Password Protected
                               </label>
                             </div>
-                            <div className="radio disabled">
+                            <k>
+                              <div className="form-group">
+                              <p>Password:</p>
+                              <input type="password" id="passwordPage"/>
+                              </div>
+                            </k>
+                            <div className="radio">
                               <label>
-                                <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3"/>
+                                <input type="radio" name="radiosName" id="privateRadios" value="Private"/>
                                 Private
                               </label>
                             </div>
                             <form className="form-inline" style={{marginTop: 10}}>
-                              <button type="button" className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}>OK</button>
+                              <button type="button" onClick={this.saveVisibility} className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}>OK</button>
                               <button type="button" className="btn btn-flat btn-xs btn-default" id="hideVis">Cancel</button>
                             </form>
                             </div>
                           </v>
                         </div>
+
                         <div className="form-group">
-                          <p><span className="glyphicon glyphicon-calendar" style={{marginRight: 10}}></span>Publish <b>Immediately </b>
+                          <p><span className="glyphicon glyphicon-calendar" style={{marginRight: 10}}></span>Publish <b>{this.state.immediatelyStatus===false?"Immediately":this.state.immediately} </b>
                           <button type="button" className="btn btn-flat btn-xs btn-default" id="show"> Edit </button></p>
 
                           <m><div className="form-group">
                               <form className="form-inline">
-                                <select className="form-control btn btn-flat btn-xs btn-default" style={{marginRight: 10, height: 20 }}>
-                                  <option>Jan</option>
-                                  <option>Feb</option>
-                                  <option>Mar</option>
-                                  <option>Apr</option>
-                                  <option>May</option>
-                                  <option>June</option>
-                                  <option>July</option>
-                                  <option>Aug</option>
-                                  <option>Sep</option>
-                                  <option>Oct</option>
-                                  <option>Nov</option>
-                                  <option>Des</option>
+                                <select id="mm" name="mm" className="form-control btn btn-flat btn-xs btn-default" style={{marginRight: 10, height: 20 }}>
+                                  <option value="1">Jan</option>
+                                  <option value="2">Feb</option>
+                                  <option value="3">Mar</option>
+                                  <option value="4">Apr</option>
+                                  <option value="5">May</option>
+                                  <option value="6">June</option>
+                                  <option value="7">July</option>
+                                  <option value="8">Aug</option>
+                                  <option value="9">Sep</option>
+                                  <option value="10">Oct</option>
+                                  <option value="11">Nov</option>
+                                  <option value="12">Des</option>
                                 </select>
-                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" placeholder="day" style={{width: 50, height: 20}}/>,
-                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" placeholder="year" style={{marginLeft: 10, marginRight:5, width: 50, height: 20}}/>@
-                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" placeholder="hour" style={{marginLeft: 5,  width: 35, height: 20}}/> : 
-                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" placeholder="min" style={{width: 35, height: 20 }}/>
+                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" id="dd" style={{width: 50, height: 20}}/>,
+                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" id="yy" style={{marginLeft: 10, marginRight:5, width: 50, height: 20}}/>@
+                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" id="hh" style={{marginLeft: 5,  width: 35, height: 20}}/> : 
+                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" id="min" style={{width: 35, height: 20 }}/>
                               </form>
                                 <form className="form-inline" style={{marginTop: 10}}>
-                                  <button type="button" className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}> OK </button>
+                                  <button type="button" id="immediatelyOkBtn" onClick={this.saveImmediately} className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}> OK </button>
                                 </form>
                                 <button type="button" style={{marginTop: 10}} className="btn btn-flat btn-xs btn-default" id="hide">Cancel</button>
                               </div></m>
@@ -428,7 +478,7 @@ const NewPost = React.createClass({
                               <span className="sr-only">Toggle Dropdown</span>
                             </button>
                             <ul className="dropdown-menu" role="menu">
-                              <li><a href="#">Save as draft</a></li>
+                              <li><button type="submit" className="btn btn-default btn-flat">{this.state.draft==="Draft"?"Save As Draft":""}</button></li>
                             </ul>
                           </div>
                           <p>{this.state.loadingMsg}</p>
