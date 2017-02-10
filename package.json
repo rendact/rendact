@@ -27,7 +27,8 @@
     "react-fastclick": "^2.1.2",
     "react-fontawesome": "^1.1.0",
     "react-router": "^4.0.0-alpha.6",
-    "react-router-scroll": "^0.3.2"
+    "react-router-scroll": "^0.3.2",
+    "request": "^2.55.0"
   },
   "scripts": {
     "start": "react-scripts start",

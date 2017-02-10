@@ -11,11 +11,15 @@ import Query from '../../query';
 
 const NewPost = React.createClass({
   componentDidMount: function(){
+    var me = this;
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
       window.CKEDITOR.replace('editor1', {
         height: 400,
         title: false
       });
+      for (var i in window.CKEDITOR.instances) {
+        window.CKEDITOR.instances[i].on('change', me.handleContentChange);
+      }
     });
 
 
@@ -54,10 +58,15 @@ const NewPost = React.createClass({
       noticeTxt: null,
       loadingMsg: null,
       errorMsg:null,
+      title:"",
       slug:"",
-      slug2:"",
+      content:"",
+      summary:"",
       permalinkEditing: false,
-      mode: this.props.postId?"update":"create"
+      mode: this.props.postId?"update":"create",
+      pageList: null,
+      titleTagLeftCharacter: 65,
+      metaDescriptionLeftCharacter: 160
     }
   },
 
@@ -76,13 +85,28 @@ const NewPost = React.createClass({
   handleTitleChange: function(event){
     var title = $("#titlePage").val();
     var slug = title.replace(" ","-").toLowerCase();
-    this.setState({slug: slug})
+    this.setState({title: title, slug: slug})
+  },
+  handleContentChange: function(event){
+    var content = $(window.CKEDITOR.instances['editor1'].getData()).text();
+    this.setState({content: content})
   },
   handleSummaryChange: function(event){
-    var slug2 = $("#editor2").val();
-    this.setState({slug2: slug2})
+    var summary = $("#editor2").val();
+    this.setState({summary: summary})
   },
-
+  handleTitleTagChange: function(event){
+    var titleTag = $("#titleTag").val();
+    this.setState({titleTagLeftCharacter: 65-(titleTag.length)});
+  },
+  handleTitleTagChange: function(event){
+    var titleTag = $("#titleTag").val();
+    this.setState({titleTagLeftCharacter: 65-(titleTag.length)});
+  },
+  handleMetaDescriptionChange: function(event){
+    var metaDescription = $("#metaDescription").val();
+    this.setState({metaDescriptionLeftCharacter: 160-(metaDescription.length)});
+  },
   disableForm: function(state){
     $("#publishBtn").attr('disabled',state);
     this.setState({loadingMsg: state?"Saving...":null});
@@ -152,6 +176,26 @@ const NewPost = React.createClass({
     event.preventDefault();
   },
   componentWillMount: function(){
+    var me = this;
+    request({
+        url: Config.scapholdUrl,
+        method: "POST",
+        json: true,
+        headers: {
+          "content-type": "application/json",
+          "Authorization": "Bearer " + localStorage.token
+        },
+        body: Query.getPageListQry
+      }, (error, response, body) => {
+        if (!error) {
+          var pageList = [];
+          $.each(body.data.viewer.allPosts.edges, function(key, item){
+            pageList.push((<option key={item.node.id} value={item.node.id}>{item.node.title}</option>));
+          })
+          me.setState({pageList: pageList});
+        }
+    });
+
     if (!this.props.postId) return;
 
     var me = this;
@@ -169,7 +213,7 @@ const NewPost = React.createClass({
           var values = body.data.getPost;
           $("#titlePage").val(values.title);
           $("#editor1").val(values.content);
-          me.setState({slug:values.slug});
+          me.setState({title: values.title, slug:values.slug, content: values.content});
         }
     });
   },
@@ -248,25 +292,25 @@ const NewPost = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4">Preview</div>
                     <div className="col-md-8">
-                      <p><a href="#">{this.state.slug===""?"Judul Masih Kosong":this.state.slug}</a></p>
-                      <p>Some descriptions...</p>
+                      <p><a href="#">{this.state.title===""?"No Title":this.state.title.substring(0,71)}</a></p>
+                      <p>{this.state.content===""?"":this.state.content.substring(0,100)}</p>
                       <p><span className="help-block"><a style={{color: 'green'}}>{Config.rootUrl}/{this.state.slug}</a> - <a>Cache</a> - <a>Similar</a></span></p>
                     </div>
                   </div>
                   <div className="form-group">
                     <div className="col-md-4"><p>Title Tag</p></div>
                     <div className="col-md-8">
-                      <input id="titleTag" type="text" style={{width: '100%'}}/>
-                        <span className="help-block">Up to 65 characters recommended</span>
-                        <span className="help-block">65 characters left</span>                     
+                      <input id="titleTag" type="text" style={{width: '100%'}} placeholder={this.state.title} onChange={this.handleTitleTagChange}/>
+                        <span className="help-block">Up to 65 characters recommended<br/>
+                        {this.state.titleTagLeftCharacter} characters left</span>                     
                     </div>
                   </div>
                   <div className="form-group">
                     <div className="col-md-4"><p>Meta Description</p></div>
                     <div className="col-md-8">
-                      <textarea id="metaDescription" rows='2' style={{width:'100%'}} value={this.state.slug2}></textarea>
-                      <span className="help-block">160 characters maximum</span>
-                      <span className="help-block">160 characters left</span>
+                      <textarea id="metaDescription" rows='2' style={{width:'100%'}} placeholder={this.state.summary} onChange={this.handleMetaDescriptionChange}></textarea>
+                      <span className="help-block">160 characters maximum<br/>
+                      {this.state.metaDescriptionLeftCharacter} characters left</span>
                     </div>
                   </div>
                   <div className="form-group">
@@ -298,7 +342,7 @@ const NewPost = React.createClass({
                     <div className="box-body pad">
                       
                       <div className="form-group">
-                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-pushpin" style={{marginRight:'10'}}></span>
+                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-pushpin" style={{marginRight:10}}></span>
                           Status: <b>Draft </b>
                           <button type="button" className="btn btn-flat btn-xs btn-default" id="showStat"> Edit </button></p>
                           <s><div className="form-group">
@@ -314,7 +358,7 @@ const NewPost = React.createClass({
                           </s>
                         </div>
                         <div className="form-group">
-                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:'10'}}></span>Visibility: <b>Public </b>
+                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>Public </b>
                           <button type="button" className="btn btn-flat btn-xs btn-default" id="showVis"> Edit </button></p>
                           <v><div>
                             <div className="radio">
@@ -404,9 +448,7 @@ const NewPost = React.createClass({
                       <div className="form-group">
                         <p><b>Parent</b></p>
                         <select>
-                          <option>No Parent</option>
-                          <option>Home</option>
-                          <option>Category</option>
+                          {this.state.pageList}
                         </select>
                         <p><b>Order</b></p>
                         <input type="text" placeholder="0" style={{width:40}}/>
@@ -414,7 +456,6 @@ const NewPost = React.createClass({
                       </div>                  
                     </div>
                   </div>
-
               </div>
             </div>
           </div>
