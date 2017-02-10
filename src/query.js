@@ -68,7 +68,7 @@ const loginUserQry = function(username, password){
     }
 }
 
-const getCreatePostQry = function(title, content, titleTag, draft, visibility, passwordPage, createDate, userId, slug){
+const getCreatePostQry = function(title, content, titleTag, draft, visibility, passwordPage, publishDate, userId, slug){
   return {
       "query": `
     mutation createPost($input: CreatePostInput!) {
@@ -89,6 +89,7 @@ const getCreatePostQry = function(title, content, titleTag, draft, visibility, p
           "status": draft,
           "visibility": visibility,
           "passwordPage": passwordPage,
+          "publishDate": publishDate,
           "type": "page",
           "authorId": userId,
           "slug": slug
@@ -97,7 +98,7 @@ const getCreatePostQry = function(title, content, titleTag, draft, visibility, p
     }
   };
 
-const getUpdatePostQry = function(id, title, content, titleTag, draft, visibility, passwordPage, createDate, userId, slug){
+const getUpdatePostQry = function(id, title, content, titleTag, draft, visibility, passwordPage, publishDate, userId, slug){
   return {
       "query": `
     mutation updatePost($input: UpdatePostInput!) {
@@ -119,6 +120,7 @@ const getUpdatePostQry = function(id, title, content, titleTag, draft, visibilit
           "status": draft,
           "visibility": visibility,
           "passwordPage": passwordPage,
+          "publishDate": publishDate,
           "type": "page",
           "authorId": userId,
           "slug": slug

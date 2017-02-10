@@ -155,19 +155,19 @@ const NewPost = React.createClass({
     var draft = $("#draftSelect option:selected").text();
     var visibility = $("input[name=radiosName]:checked").val();
     var passwordPage = $("#passwordPage").val();
-    //var year = $("#yy").val();
-    //var month = $("#mm option:selected").text();
-    //var day = $("#dd").val();
-    //var hour = $("#hh").val();
-    //var min = $("#min").val();
-    //var createDate = year+"-"+month+"-"+day+"T"+hour+":"+min ;
+    var year = $("#yy").val();
+    var month = $("#mm option:selected").text();
+    var day = $("#dd").val();
+    var hour = $("#hh").val();
+    var min = $("#min").val();
+    var publishDate = year+"-"+month+"-"+day+"@"+hour+":"+min ;
     
     var qry = "";
     if (this.state.mode==="create"){
-      qry = Query.getCreatePostQry(title, content, titleTag, draft, visibility, passwordPage, localStorage.getItem('userId'), this.state.slug);
+      qry = Query.getCreatePostQry(title, content, titleTag, draft, visibility, passwordPage, publishDate, localStorage.getItem('userId'), this.state.slug);
       me.setState({noticeTxt:"Page Published!"});
     }else{
-      qry = Query.getUpdatePostQry(this.props.postId, title, content, titleTag, draft, visibility, passwordPage, localStorage.getItem('userId'), this.state.slug);
+      qry = Query.getUpdatePostQry(this.props.postId, title, content, titleTag, draft, visibility, passwordPage, publishDate, localStorage.getItem('userId'), this.state.slug);
       me.setState({noticeTxt:"Page Updated!"});
     }
     request({
