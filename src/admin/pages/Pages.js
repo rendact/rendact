@@ -7,13 +7,13 @@ import Query from '../../query';
 import Fn from '../lib/functions';
 
 const Pages = React.createClass({
-
   getInitialState: function(){
     require ('datatables');
     require ('datatables/media/css/jquery.dataTables.min.css');
     require ('./Pages.css');
     require ('jquery-ui/themes/base/dialog.css');
     require ('jquery-ui/ui/widgets/dialog');
+
     return {
       dt: null,
       errorMsg: null,
@@ -82,19 +82,19 @@ const Pages = React.createClass({
         }}
       });
       return;
-    }               
-    this.disableForm(true);
-    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
+    }
     var me = this;
 
-$( "#delete-confirm" ).dialog({
+    $( "#delete-confirm" ).dialog({
       resizable: false,
       width: 400,
       closeText: "",
       modal: true,
       buttons: {
         OK: function() {
-          $( this ).dialog( "close" );
+          me.disableForm(true);
+          var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
+          
           request({
             url: Config.scapholdUrl,
             method: "POST",
@@ -104,28 +104,27 @@ $( "#delete-confirm" ).dialog({
               "Authorization": "Bearer " + localStorage.token
             },
             body: Query.deletePostQry(idList)
-          }) 
-        }}
-      });
-      
-      (error, response, body) => {
-
-
-
-      if (!error && !body.errors && response.statusCode === 200) {
-        console.log(JSON.stringify(body, null, 2));
-        this.loadData(me.state.dt);
-      } else {
-        console.log(error);
-        console.log(body.errors);
-        console.log(response.statusCode);
-        me.setState({errorMsg: error?error:body.errors});
+          }, (error, response, body) => {
+            if (!error && !body.errors && response.statusCode === 200) {
+              console.log(JSON.stringify(body, null, 2));
+              me.loadData(me.state.dt);
+            } else {
+              console.log(error);
+              console.log(body.errors);
+              console.log(response.statusCode);
+              me.setState({errorMsg: error?error:body.errors});
+            }
+            me.disableForm(false);
+            $( this ).dialog( "close" );
+          });  
+        },
+        Cancel: function() {
+          $( this ).dialog( "close" );
+          return
+        }
       }
-      this.disableForm(false);
-    };   
-},
-    
-          
+    });
+  },
   componentDidMount: function(){
     var datatable = $('#pageListTbl').DataTable({
       sDom: '<"H"r>t<"F"ip>',
@@ -159,18 +158,9 @@ $( "#delete-confirm" ).dialog({
         this.search( searchValue[this.index()] ).draw();
     } );
   },
-
   render: function(){
     return (
       <div className="content-wrapper">
-
-<div id="delete-confirm" title="Delete page?">
-  <p>Are you sure want to delete?</p>
-</div>
-<div id="delete-noitem" title="Choose item">
-<p>Please choose item to be deleted</p>
-</div>
-
         <div className="container-fluid">
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
@@ -238,6 +228,12 @@ $( "#delete-confirm" ).dialog({
                 </div>
               </div>
              </div>
+            </div>
+            <div id="delete-confirm" title="Delete page?">
+              <p>Are you sure want to delete?</p>
+            </div>
+            <div id="delete-noitem" title="Choose item">
+              <p>Please choose item to be deleted</p>
             </div>
           </section>
         </div>
