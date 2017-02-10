@@ -7,11 +7,13 @@ import Query from '../../query';
 import Fn from '../lib/functions';
 
 const Pages = React.createClass({
+
   getInitialState: function(){
     require ('datatables');
     require ('datatables/media/css/jquery.dataTables.min.css');
     require ('./Pages.css');
-
+    require ('jquery-ui/themes/base/dialog.css');
+    require ('jquery-ui/ui/widgets/dialog');
     return {
       dt: null,
       errorMsg: null,
@@ -69,35 +71,57 @@ const Pages = React.createClass({
   handleDeleteBtn: function(event){
     var checkedRow = $("input.pageListCb:checked");
     if (checkedRow.length == 0) {
-      this.setState({errorMsg: "Please choose item to be deleted"});
+      //this.setState({errorMsg: "Please choose item to be deleted"});
+      $( "#delete-noitem" ).dialog({
+        modal: true,
+        closeText: "",
+        buttons: {
+          OK: function() {
+            $( this ).dialog( "close" );
+            return
+        }}
+      });
       return;
-    }
-
+    }               
     this.disableForm(true);
-    var idList =checkedRow[0].id.split("-")[1];
+    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
     var me = this;
-
-    request({
-      url: Config.scapholdUrl,
-      method: "POST",
-      json: true,
-      headers: {
-        "content-type": "application/json",
-        "Authorization": "Bearer " + localStorage.token
-      },
-      body: Query.deletePostQry(idList)
-    }, (error, response, body) => {
-      if (!error && response.statusCode === 200) {
+$( "#delete-confirm" ).dialog({
+      resizable: false,
+      width: 400,
+      closeText: "",
+      modal: true,
+      buttons: {
+        OK: function() {
+          $( this ).dialog( "close" );
+          request({
+            url: Config.scapholdUrl,
+            method: "POST",
+            json: true,
+            headers: {
+              "content-type": "application/json",
+              "Authorization": "Bearer " + localStorage.token
+            },
+            body: Query.deletePostQry(idList)
+          }) 
+        }}
+      });
+      
+      (error, response, body) => {
+      if (!error && !body.errors && response.statusCode === 200) {
         console.log(JSON.stringify(body, null, 2));
         this.loadData(me.state.dt);
       } else {
         console.log(error);
+        console.log(body.errors);
         console.log(response.statusCode);
-        me.setState({errorMsg: error});
+        me.setState({errorMsg: error?error:body.errors});
       }
       this.disableForm(false);
-    });   
-  },
+    };   
+},
+    
+          
   componentDidMount: function(){
     var datatable = $('#pageListTbl').DataTable({
       sDom: '<"H"r>t<"F"ip>',
@@ -131,9 +155,18 @@ const Pages = React.createClass({
         this.search( searchValue[this.index()] ).draw();
     } );
   },
+
   render: function(){
     return (
       <div className="content-wrapper">
+
+<div id="delete-confirm" title="Delete page?">
+  <p>Are you sure want to delete?</p>
+</div>
+<div id="delete-noitem" title="Choose item">
+<p>Please choose item to be deleted</p>
+</div>
+
         <div className="container-fluid">
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
