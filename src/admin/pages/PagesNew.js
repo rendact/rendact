@@ -258,12 +258,20 @@ const NewPost = React.createClass({
         }
     });
   },
+  handleAddNewBtn: function(event) {
+    window.location = Config.rootUrl+"/admin/pages/new";
+  },
+
   render: function(){
     const newPage=(
       <div className="content-wrapper">
         <div className="container-fluid">
           <section className="content-header"  style={{marginBottom:20}}>
-              <h1>{this.state.mode==="update"?"Edit Current Page":"Add New Page"}</h1>
+              <h1>{this.state.mode==="update"?"Edit Current Page":"Add New Page"}
+              { this.state.mode==="update" &&
+                <small style={{marginLeft: 5}}><button onClick={this.handleAddNewBtn}>Add new</button></small>
+              }
+              </h1>
                 <ol className="breadcrumb">
                   <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
                   <li>Pages</li>
