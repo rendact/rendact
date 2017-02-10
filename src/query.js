@@ -1,3 +1,6 @@
+import $ from 'jquery';
+window.jQuery = $;
+
 const getUserQry  = function(userId){
     return {
       "query": '{                                 ' + 
@@ -178,21 +181,14 @@ const getPageListQry = {"query": `
     `};
 
 const deletePostQry = function(idList){
+  var query = "mutation { ";
+  $.each(idList, function(key, val){
+    query += ' DeletePost'+key+': deletePost(input: {id: "'+val+'"}){ changedPost{ id } }'; 
+  });
+  query += "}";
+
   return {
-    "query": `
-      mutation DeletePost($post: DeletePostInput!) {
-        deletePost(input: $post) {
-          changedPost {
-            id
-          }
-        }
-      }
-    `,
-    "variables": {
-      "post": {
-        "id": idList
-      }
-    }
+    "query": query
   }
 };
 

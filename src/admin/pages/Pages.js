@@ -74,7 +74,7 @@ const Pages = React.createClass({
     }
 
     this.disableForm(true);
-    var idList =checkedRow[0].id.split("-")[1];
+    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
     var me = this;
 
     request({
@@ -87,13 +87,14 @@ const Pages = React.createClass({
       },
       body: Query.deletePostQry(idList)
     }, (error, response, body) => {
-      if (!error && response.statusCode === 200) {
+      if (!error && !body.errors && response.statusCode === 200) {
         console.log(JSON.stringify(body, null, 2));
         this.loadData(me.state.dt);
       } else {
         console.log(error);
+        console.log(body.errors);
         console.log(response.statusCode);
-        me.setState({errorMsg: error});
+        me.setState({errorMsg: error?error:body.errors});
       }
       this.disableForm(false);
     });   
