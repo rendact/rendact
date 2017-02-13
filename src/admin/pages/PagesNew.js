@@ -132,13 +132,36 @@ const NewPost = React.createClass({
     var hour = $("#hh").val();
     var min = $("#min").val();
     var publishDate = year+"-"+month+"-"+day+"@"+hour+":"+min ;
+    var parentPage = $("#parentPage").val();
+    var pageOrder = $("#pageOrder").val();
     
     var qry = "";
     if (this.state.mode==="create"){
-      qry = Query.getCreatePostQry(title, content, titleTag, draft, visibility, passwordPage, publishDate, localStorage.getItem('userId'), this.state.slug);
+      qry = Query.getCreatePostQry(
+        title, 
+        content, 
+        titleTag, 
+        draft, 
+        visibility, 
+        passwordPage, 
+        publishDate, 
+        localStorage.getItem('userId'), 
+        this.state.slug,
+        parentPage,
+        pageOrder);
       me.setState({noticeTxt:"Page Published!"});
     }else{
-      qry = Query.getUpdatePostQry(this.props.postId, title, content, titleTag, draft, visibility, passwordPage, publishDate, localStorage.getItem('userId'), this.state.slug);
+      qry = Query.getUpdatePostQry(title, 
+        content, 
+        titleTag, 
+        draft, 
+        visibility, 
+        passwordPage, 
+        publishDate, 
+        localStorage.getItem('userId'), 
+        this.state.slug,
+        parentPage,
+        pageOrder);
       me.setState({noticeTxt:"Page Updated!"});
     }
     request({
@@ -200,7 +223,7 @@ const NewPost = React.createClass({
         body: Query.getPageListQry
       }, (error, response, body) => {
         if (!error) {
-          var pageList = [];
+          var pageList = [(<option key="0" value="">(no parent)</option>)];
           $.each(body.data.viewer.allPosts.edges, function(key, item){
             pageList.push((<option key={item.node.id} value={item.node.id}>{item.node.title}</option>));
           })
@@ -264,7 +287,7 @@ const NewPost = React.createClass({
                   placeholder="Input Title Here" required="true" onChange={this.handleTitleChange}/>
                   <div className="form-inline">
                     { !this.state.permalinkEditing ? 
-                      ( <p>Permalink: 
+                      ( <p>Permalink: &nbsp;
                         <a id="permalink">{Config.rootUrl}/{this.state.slug}</a><button type="button" onClick={this.handlePermalinkBtn} id="editBtn" className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
                           <span style={{fontSize: 12}}>Edit</span>
                         </button>
@@ -439,7 +462,7 @@ const NewPost = React.createClass({
                     </div>
                     <div className="box-footer">
                       <div className="form-group pull-right">
-                        <button type="button" className="btn btn-default btn-flat disabled" >Preview</button> 
+                        <button type="button" className="btn btn-default btn-flat disabled" style={{marginRight: 5}}>Preview</button> 
                           <div className="btn-group">
                             <button type="submit" id="publishBtn" className="btn btn-primary btn-flat">{this.state.mode==="update"?"Save":"Publish"}</button>
                             <button type="button" className="btn btn-primary btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -466,11 +489,13 @@ const NewPost = React.createClass({
                       <div>
                       <div className="form-group">
                         <p><b>Parent</b></p>
-                        <select>
+                        <select id="parentPage" style={{width: 250}}>
                           {this.state.pageList}
                         </select>
+                      </div>
+                      <div className="form-group">
                         <p><b>Order</b></p>
-                        <input type="text" placeholder="0" style={{width:40}}/>
+                        <input type="text" id="pageOrder" placeholder="0" style={{width:50}} min="0" step="1" data-bind="value:pageOrder"/>
                       </div>
                       </div>                  
                     </div>

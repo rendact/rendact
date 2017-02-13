@@ -255,11 +255,11 @@ const Pages = React.createClass({
                         <thead>
                           <tr>
                             <th style={{width:7}}><input type="checkbox" id="selectAll"></input></th>
-                            <th style={{textAlign: 'center'}}>Title</th>
+                            <th style={{width: 400, textAlign: 'center'}}>Title</th>
                             <th style={{textAlign: 'center'}}>Slug</th>
                             <th style={{textAlign: 'center'}}>Author</th>
                             <th style={{textAlign: 'center'}}>Post Status</th>
-                            <th style={{textAlign: 'center'}}>Comments</th>                             
+                            <th style={{width:30, textAlign: 'center'}}>Comments</th>                             
                             <th style={{textAlign: 'center'}}>Publish Date</th>
                           </tr>
                       </thead>

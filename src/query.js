@@ -68,7 +68,8 @@ const loginUserQry = function(username, password){
     }
 }
 
-const getCreatePostQry = function(title, content, titleTag, draft, visibility, passwordPage, publishDate, userId, slug){
+const getCreatePostQry = function(title, content, titleTag, draft, visibility, passwordPage, 
+  publishDate, userId, slug, parentPage, pageOrder){
   return {
       "query": `
     mutation createPost($input: CreatePostInput!) {
@@ -92,13 +93,16 @@ const getCreatePostQry = function(title, content, titleTag, draft, visibility, p
           "publishDate": publishDate,
           "type": "page",
           "authorId": userId,
-          "slug": slug
+          "slug": slug,
+          "parent": parentPage,
+          "order": pageOrder
         }
       }
     }
   };
 
-const getUpdatePostQry = function(id, title, content, titleTag, draft, visibility, passwordPage, publishDate, userId, slug){
+const getUpdatePostQry = function(id, title, content, titleTag, draft, visibility, passwordPage, 
+  publishDate, userId, slug, parentPage, pageOrder){
   return {
       "query": `
     mutation updatePost($input: UpdatePostInput!) {
@@ -123,7 +127,9 @@ const getUpdatePostQry = function(id, title, content, titleTag, draft, visibilit
           "publishDate": publishDate,
           "type": "page",
           "authorId": userId,
-          "slug": slug
+          "slug": slug,
+          "parent": parentPage,
+          "order": pageOrder
         }
       }
     }
