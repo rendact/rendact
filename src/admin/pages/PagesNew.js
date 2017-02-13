@@ -22,47 +22,17 @@ const NewPost = React.createClass({
       }
     });
 
-
-      $("m").hide();
-        $("#hide").click(function(){
-            $("m").hide(1000);
-        });
-        $("#show").click(function(){
-            $("m").show(1000);
-        });
-
-      $("v").hide();
-        $("#hideVis").click(function(){
-            $("v").hide(1000);
-        });
-        $("#showVis").click(function(){
-            $("v").show(1000);
-        });
-
-      $("s").hide();
-        $("#hideStat").click(function(){
-            $("s").hide(1000);
-        });
-        $("#showStat").click(function(){
-            $("s").show(1000);
-        });
-
-      $("k").hide();
-        $("#passwordRadios").click(function(){
-            $("k").show(1000);
-        });
-
-      var d = new Date();
-      var year = d.getFullYear();
-      var month = d.getMonth();
-      var day = d.getDate();
-      var hour = d.getHours();
-      var minute = d.getMinutes();
-      $("#yy").val(year);
-      $("#dd").val(day);
-      $("#mm option[value="+(month+1)+"]").prop("selected", true);
-      $("#hh").val(hour);
-      $("#min").val(minute);
+    var d = new Date();
+    var year = d.getFullYear();
+    var month = d.getMonth();
+    var day = d.getDate();
+    var hour = d.getHours();
+    var minute = d.getMinutes();
+    $("#yy").val(year);
+    $("#dd").val(day);
+    $("#mm option[value="+(month+1)+"]").prop("selected", true);
+    $("#hh").val(hour);
+    $("#min").val(minute);
 
   },
 
@@ -154,7 +124,8 @@ const NewPost = React.createClass({
     var summary = $("#editor2").val();
     var draft = $("#draftSelect option:selected").text();
     var visibility = $("input[name=radiosName]:checked").val();
-    var passwordPage = $("#passwordPage").val();
+    //var passwordPage = $("#passwordPage").val();
+    var passwordPage = "";
     var year = $("#yy").val();
     var month = $("#mm option:selected").text();
     var day = $("#dd").val();
@@ -393,8 +364,9 @@ const NewPost = React.createClass({
                       <div className="form-group">
                           <p style={{fontSize: 14}}><span className="glyphicon glyphicon-pushpin" style={{marginRight:10}}></span>
                           Status: <b>{this.state.draft} </b>
-                          <button type="button" className="btn btn-flat btn-xs btn-default" id="showStat"> Edit </button></p>
-                          <s><div className="form-group">
+                          <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption"> Edit </button></p>
+                          <div id="statusOption" className="collapse">
+                            <div className="form-group">
                                 <form className="form-inline">
                                   <select id="draftSelect" style={{marginRight: 10, height: 30}}>
                                     <option>Published</option>
@@ -402,16 +374,16 @@ const NewPost = React.createClass({
                                     <option>Pending Review</option>
                                   </select>
                                   <button type="button" onClick={this.saveDraft} className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}>OK</button>
-                                  <button type="button" className="btn btn-flat btn-xs btn-default" id="hideStat">Cancel</button>
+                                  <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption">Cancel</button>
                                 </form>
-                              </div>
-                          </s>
+                            </div>
+                          </div>
                         </div>
 
                         <div className="form-group">
                           <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>{this.state.visibilityStatus===false?"Public":this.state.visibilityTxt} </b>
-                          <button type="button" className="btn btn-flat btn-xs btn-default" id="showVis"> Edit </button></p>
-                          <v><div>
+                          <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#visibilityOption"> Edit </button></p>
+                          <div id="visibilityOption" className="collapse">
                             <div className="radio">
                               <label>
                                 <input type="radio" name="radiosName" id="publicRadios" value="Public"/>
@@ -420,35 +392,23 @@ const NewPost = React.createClass({
                             </div>
                             <div className="radio">
                               <label>
-                                <input type="radio" name="radiosName" id="passwordRadios" value="Password Protected"/>
-                                Password Protected
-                              </label>
-                            </div>
-                            <k>
-                              <div className="form-group">
-                              <p>Password:</p>
-                              <input type="password" id="passwordPage"/>
-                              </div>
-                            </k>
-                            <div className="radio">
-                              <label>
                                 <input type="radio" name="radiosName" id="privateRadios" value="Private"/>
                                 Private
                               </label>
                             </div>
                             <form className="form-inline" style={{marginTop: 10}}>
                               <button type="button" onClick={this.saveVisibility} className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}>OK</button>
-                              <button type="button" className="btn btn-flat btn-xs btn-default" id="hideVis">Cancel</button>
+                              <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#visibilityOption">Cancel</button>
                             </form>
                             </div>
-                          </v>
                         </div>
 
                         <div className="form-group">
                           <p><span className="glyphicon glyphicon-calendar" style={{marginRight: 10}}></span>Publish <b>{this.state.immediatelyStatus===false?"Immediately":this.state.immediately} </b>
-                          <button type="button" className="btn btn-flat btn-xs btn-default" id="show"> Edit </button></p>
+                          <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#scheduleOption"> Edit </button></p>
 
-                          <m><div className="form-group">
+                          <div id="scheduleOption" className="collapse">
+                            <div className="form-group">
                               <form className="form-inline">
                                 <select id="mm" name="mm" className="form-control btn btn-flat btn-xs btn-default" style={{marginRight: 10, height: 20 }}>
                                   <option value="1">Jan</option>
@@ -472,8 +432,9 @@ const NewPost = React.createClass({
                                 <form className="form-inline" style={{marginTop: 10}}>
                                   <button type="button" id="immediatelyOkBtn" onClick={this.saveImmediately} className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}> OK </button>
                                 </form>
-                                <button type="button" style={{marginTop: 10}} className="btn btn-flat btn-xs btn-default" id="hide">Cancel</button>
-                              </div></m>
+                                <button type="button" style={{marginTop: 10}} className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#scheduleOption">Cancel</button>
+                              </div>
+                          </div>
                       </div> 
                     </div>
                     <div className="box-footer">
