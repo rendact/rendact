@@ -50,6 +50,7 @@ function AuthService(){
       lastLogin: p.lastLogin,
       createdAt: p.createdAt
     }
+    localStorage.setItem("userId", p.id);
     localStorage.setItem('profile', JSON.stringify(profile));
     console.log("set profile: "+JSON.stringify(profile));
   }
@@ -81,12 +82,18 @@ function AuthService(){
     }, (error, response, body) => {
       if (!error && !body.errors && body.data != null && response.statusCode === 200) {
         if (isAuth0) {
-          var p = JSON.parse(localStorage.getItem('auth0_profile'));
-          _setProfile({fullName:p.name,username:p.nickname,email:p.email,
-            gender:p.gender,lastLogin:p.updated_at,createdAt:p.created_at});
+          if (body.data.loginUserWithAuth0Lock.user) {
+            _setProfile(body.data.loginUserWithAuth0Lock.user);
+          } else {
+            console.log("checkAuth FAILED - no user data");
+            this.logout();  
+          }
         } else {
           if (body.data.getUser) {
             _setProfile(body.data.getUser);
+          } else {
+            console.log("checkAuth FAILED - no user data");
+            this.logout();  
           }
         }
         console.log("checkAuth OK");
@@ -155,6 +162,7 @@ function AuthService(){
     localStorage.removeItem('userId');
     localStorage.removeItem('profile');
     localStorage.removeItem('loginType');
+    localStorage.removeItem('auth0_profile');
     $.ajax('https://rendact.auth0.com/v2/logout');
   }
 
