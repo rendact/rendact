@@ -38,33 +38,55 @@ const Pages = React.createClass({
         },
         body: Query.getPageListQry
       }, (error, response, body) => {
-        if (body.data) {
-          datatable.clear();
-          var monthList = ["all"];
-          $.each(body.data.viewer.allPosts.edges, function(key, item){
-            var dt = new Date(item.node.createdAt);
-            var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
-            var author = item.node.author?item.node.author.username:"";
-            var slug = item.node.slug?item.node.slug:"";
-            var status = item.node.status?item.node.status:"";
+        if (!error && !body.error) {
+          if (body.data) {
+            datatable.clear();
+            var monthList = ["all"];
+            $.each(body.data.viewer.allPosts.edges, function(key, item){
+              var dt = new Date(item.node.createdAt);
+              var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+              var author = item.node.author?item.node.author.username:"";
+              var slug = item.node.slug?item.node.slug:"";
+              var status = item.node.status?item.node.status:"";
 
-            var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
-            if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
+              var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
+              if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
 
-            datatable.row.add([
-              '<input class="pageListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
-              '<a href="/admin/pages/edit/'+item.node.id+'" >'+item.node.title+'</a>',
-              slug,
-              '<a href="">'+author+'</a>',
-              '<center>'+status+'</center>',
-              '<center>'+item.node.comments.edges.length+'</center>',
-              '<center>'+date+'</center>'
-            ])
-          });
-          me.setState({monthList: monthList});
-          datatable.draw();
+              datatable.row.add([
+                '<input class="pageListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
+                '<a href="/admin/pages/edit/'+item.node.id+'" >'+item.node.title+'</a>',
+                slug,
+                '<a href="">'+author+'</a>',
+                '<center>'+status+'</center>',
+                '<center>'+item.node.comments.edges.length+'</center>',
+                '<center>'+date+'</center>'
+              ])
+            });
+            me.setState({monthList: monthList});
+            datatable.draw();
+          }else{
+            if (error)
+              swal(
+                'Failed!',
+                error,
+                'warning'
+              )
+            else if (body.error)
+              swal(
+                'Failed!',
+                body.error,
+                'warning'
+              )
+            else 
+              swal(
+                'Failed!',
+                'Unknown error',
+                'warning'
+              )
+          }
         }
-    });
+      } 
+    );
   },
   disableForm: function(state){
     $("#filterBtn").attr('disabled',state);
@@ -93,42 +115,56 @@ const Pages = React.createClass({
       return;
     }
     var me = this;
-
+    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
     swal({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        type: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-      }).then(function(isConfirm) {
-        if (isConfirm){
-          me.disableForm(true);
-          var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
-          
-          request({
-            url: Config.scapholdUrl,
-            method: "POST",
-            json: true,
-            headers: {
-              "content-type": "application/json",
-              "Authorization": "Bearer " + localStorage.token
-            },
-            body: Query.deletePostQry(idList)
-          }, (error, response, body) => {
-            if (!error && !body.errors && response.statusCode === 200) {
-              console.log(JSON.stringify(body, null, 2));
-              me.loadData(me.state.dt);
-            } else {
-              console.log(error);
-              console.log(body.errors);
-              console.log(response.statusCode);
-              me.setState({errorMsg: error?error:body.errors});
-            }
-            me.disableForm(false);
-            $( this ).dialog( "close" );
-          })}})},
+      title: 'Sure want to delete?',
+      text: "You might lost some data!",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel!',
+      confirmButtonClass: 'btn btn-success',
+      cancelButtonClass: 'btn btn-danger',
+      buttonsStyling: false
+    }).then(function () {
+      request({
+        url: Config.scapholdUrl,
+        method: "POST",
+        json: true,
+        headers: {
+          "content-type": "application/json",
+          "Authorization": "Bearer " + localStorage.token
+        },
+        body: Query.deletePostQry(idList)
+      }, (error, response, body) => {
+        if (!error && !body.errors && response.statusCode === 200) {
+          console.log(JSON.stringify(body, null, 2));
+          me.loadData(me.state.dt);
+        } else {
+          if (error)
+            swal(
+              'Failed!',
+              error,
+              'warning'
+            )
+          else if (body.error)
+            swal(
+              'Failed!',
+              body.error,
+              'warning'
+            )
+          else 
+            swal(
+              'Failed!',
+              'Unknown error',
+              'warning'
+            )
+        }
+        me.disableForm(false);
+      });  
+    })},
         
   componentDidMount: function(){
     var datatable = $('#pageListTbl').DataTable({
