@@ -25,6 +25,7 @@ import Skinning from './lib/skinning.js';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'jquery-ui/themes/base/core.css';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 require ('bootstrap');
 
