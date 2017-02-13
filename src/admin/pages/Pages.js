@@ -5,8 +5,13 @@ window.jQuery = $;
 import Config from '../../config';
 import Query from '../../query';
 import Fn from '../lib/functions';
+// ES6 Modules
+import { default as swal } from 'sweetalert2';
+
 
 const Pages = React.createClass({
+
+
   getInitialState: function(){
     require ('datatables');
     require ('datatables/media/css/jquery.dataTables.min.css');
@@ -70,28 +75,35 @@ const Pages = React.createClass({
   },
   handleDeleteBtn: function(event){
     var checkedRow = $("input.pageListCb:checked");
-    if (checkedRow.length == 0) {
+    if (checkedRow.length === 0) {
       //this.setState({errorMsg: "Please choose item to be deleted"});
-      $( "#delete-noitem" ).dialog({
-        modal: true,
-        closeText: "",
-        buttons: {
-          OK: function() {
-            $( this ).dialog( "close" );
-            return
-        }}
-      });
+      swal({
+        title: 'Warning!',
+        text: 'Please choose item to be deleted',
+        timer: 5000
+      }).then(
+        function () {},
+        // handling the promise rejection
+        function (dismiss) {
+          if (dismiss === 'timer') {
+            console.log('I was closed by the timer')
+          }
+        }
+      );
       return;
     }
     var me = this;
 
-    $( "#delete-confirm" ).dialog({
-      resizable: false,
-      width: 400,
-      closeText: "",
-      modal: true,
-      buttons: {
-        OK: function() {
+    swal({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then(function(isConfirm) {
+        if (isConfirm){
           me.disableForm(true);
           var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
           
@@ -116,15 +128,8 @@ const Pages = React.createClass({
             }
             me.disableForm(false);
             $( this ).dialog( "close" );
-          });  
-        },
-        Cancel: function() {
-          $( this ).dialog( "close" );
-          return
-        }
-      }
-    });
-  },
+          })}})},
+        
   componentDidMount: function(){
     var datatable = $('#pageListTbl').DataTable({
       sDom: '<"H"r>t<"F"ip>',
@@ -193,7 +198,7 @@ const Pages = React.createClass({
                           <button className="btn btn-default btn-flat" id="deleteBtn" style={{marginRight:10}} onClick={this.handleDeleteBtn}>Delete</button>
                           <select className="btn select" id="dateFilter" style={{marginRight:5,height:35}}>
                             {this.state.monthList.map(function(item){
-                              if (item=="all")
+                              if (item==="all")
                                 return <option key="0" value="">All</option>
                               var s = item.split("/");
                               var monthList = Fn.getMonthList();
@@ -228,12 +233,6 @@ const Pages = React.createClass({
                 </div>
               </div>
              </div>
-            </div>
-            <div id="delete-confirm" title="Delete page?">
-              <p>Are you sure want to delete?</p>
-            </div>
-            <div id="delete-noitem" title="Choose item">
-              <p>Please choose item to be deleted</p>
             </div>
           </section>
         </div>
