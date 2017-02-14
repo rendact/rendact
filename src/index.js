@@ -11,6 +11,7 @@ import client from './apollo';
 import {ThemeHome, ThemeSingle, ThemeBlog} from './admin/theme';
 import Admin from './admin';
 import Login from './login';
+import Register from './register';
 
 const Main = React.createClass({
 	getInitialState: function(){
@@ -33,6 +34,7 @@ const Main = React.createClass({
 						<Match pattern="/page/:pageId?/:param1?/:param2?" component={ThemeSingle}/>
 						<Match pattern="/post/:postId?/:param1?/:param2?" component={ThemeSingle}/>
 						<Match pattern="/blog/:postId?/:param1?/:param2?" component={ThemeBlog}/>
+						<Match pattern="/register/:param1?" component={Register}/>
 						<Match pattern="/login/:param1?" render={props => (
 					    this.state.logged ? (
 					      <Redirect to={{
