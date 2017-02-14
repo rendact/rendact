@@ -8,9 +8,7 @@ import Fn from '../lib/functions';
 // ES6 Modules
 import { default as swal } from 'sweetalert2';
 
-
 const Pages = React.createClass({
-
 
   getInitialState: function(){
     require ('datatables');

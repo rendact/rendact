@@ -192,6 +192,32 @@ const getPageListQry = {"query": `
       } 
     `};
 
+const getPostListQry = {"query": `
+        query getPosts{
+        viewer {
+          allPosts(where: {type: {eq: "post"}}) {
+            edges {
+              node{
+              id
+              title,
+              author{
+                username
+              },
+              categories{
+                edges{
+                  node{
+                    name
+                  }
+                }
+              },
+              createdAt
+            }
+            }
+          }
+        }
+        } 
+      `};
+
 const deletePostQry = function(idList){
   var query = "mutation { ";
   $.each(idList, function(key, val){
