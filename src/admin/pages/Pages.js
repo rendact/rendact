@@ -127,6 +127,7 @@ const Pages = React.createClass({
       cancelButtonClass: 'btn btn-danger',
       buttonsStyling: false
     }).then(function () {
+      me.disableForm(true);
       request({
         url: Config.scapholdUrl,
         method: "POST",
@@ -180,7 +181,9 @@ const Pages = React.createClass({
                     .search( this.value )
                     .draw();
             }
+            return null;
         });
+        return null;
     } );
     
     this.setState({dt: datatable});
@@ -198,6 +201,7 @@ const Pages = React.createClass({
 
     this.state.dt.columns([4,6]).every( function () {
         this.search( searchValue[this.index()] ).draw();
+        return null;
     } );
   },
   render: function(){
@@ -236,7 +240,7 @@ const Pages = React.createClass({
                           <select className="btn select" id="dateFilter" style={{marginRight:5,height:35}}>
                             {this.state.monthList.map(function(item){
                               if (item==="all")
-                                return <option key="0" value="">All</option>
+                                return (<option key="0" value="">All</option>);
                               var s = item.split("/");
                               var monthList = Fn.getMonthList();
                               var month = monthList[parseInt(s[1])-1];

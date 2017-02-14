@@ -134,7 +134,8 @@ const NewPost = React.createClass({
     var publishDate = year+"-"+month+"-"+day+"@"+hour+":"+min ;
     var parentPage = $("#parentPage").val();
     var pageOrder = $("#pageOrder").val();
-    try  {var pageOrderInt=parseInt(pageOrder)} catch(e) {var pageOrderInt=0}
+    var pageOrderInt = 0;
+    try  {pageOrderInt=parseInt(pageOrder)} catch(e) {}
     
     var qry = "";
     if (this.state.mode==="create"){
@@ -234,7 +235,6 @@ const NewPost = React.createClass({
 
     if (!this.props.postId) return;
 
-    var me = this;
     request({
         url: Config.scapholdUrl,
         method: "POST",

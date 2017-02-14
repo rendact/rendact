@@ -203,6 +203,7 @@ const getPostListQry = {"query": `
               author{
                 username
               },
+              status,
               categories{
                 edges{
                   node{
@@ -239,7 +240,8 @@ const queries = {
   getPageQry: getPageQry,
   getUpdatePostQry: getUpdatePostQry,
   getPageListQry: getPageListQry,
-  deletePostQry: deletePostQry
+  deletePostQry: deletePostQry,
+  getPostListQry: getPostListQry
 }
 
 module.exports = queries;
