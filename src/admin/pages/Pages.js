@@ -170,7 +170,9 @@ const Pages = React.createClass({
     var datatable = $('#pageListTbl').DataTable({
       sDom: '<"H"r>t<"F"ip>',
     });
-    
+    $('#selectAll').click(function () {
+        $(':checkbox', datatable.rows().nodes()).prop('checked', this.checked);
+    });
     datatable.columns(1).every( function () {
         var that = this;
  
@@ -186,6 +188,7 @@ const Pages = React.createClass({
     this.setState({dt: datatable});
     this.loadData(datatable);
   },
+
   handleFilterBtn: function(){
     var status = $("#statusFilter").val();
     var date = $("#dateFilter").val();
