@@ -134,6 +134,7 @@ const NewPost = React.createClass({
     var publishDate = year+"-"+month+"-"+day+"@"+hour+":"+min ;
     var parentPage = $("#parentPage").val();
     var pageOrder = $("#pageOrder").val();
+    try  {var pageOrderInt=parseInt(pageOrder)} catch(e) {var pageOrderInt=0}
     
     var qry = "";
     if (this.state.mode==="create"){
@@ -148,7 +149,7 @@ const NewPost = React.createClass({
         localStorage.getItem('userId'), 
         this.state.slug,
         parentPage,
-        pageOrder);
+        pageOrderInt);
       me.setState({noticeTxt:"Page Published!"});
     }else{
       qry = Query.getUpdatePostQry(title, 
@@ -161,7 +162,7 @@ const NewPost = React.createClass({
         localStorage.getItem('userId'), 
         this.state.slug,
         parentPage,
-        pageOrder);
+        pageOrderInt);
       me.setState({noticeTxt:"Page Updated!"});
     }
     request({
