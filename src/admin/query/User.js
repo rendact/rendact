@@ -41,9 +41,39 @@ const getUserListQry = {
     }`
 };
 
+const createUserMtn = function(username, password, email, fullname, gender) {
+  return {
+      "query": `mutation CreateUserQuery ($input: CreateUserInput!) {
+        createUser(input: $input) {
+          token
+          changedUser {
+            id
+            username
+            fullName
+            gender
+            email
+            lastLogin
+            createdAt
+          }
+        }
+      }`,
+      "variables": {
+        "input": {
+          "username": username,
+          "fullName": fullname,
+          "password": password,
+          "email": email,
+          "gender": gender
+        }
+      }
+
+    }
+}
+
 const queries = {
   getUserQry: getUserQry,
-  getUserListQry: getUserListQry
+  getUserListQry: getUserListQry,
+  createUserMtn: createUserMtn
 }
 
 module.exports = queries;

@@ -1,7 +1,10 @@
 import React from 'react';
+import request from 'request';
 import $ from 'jquery';
 window.jQuery = $;
 
+import Config from './config';
+import Query from './admin/query';
 import AdminLTEinit from './admin/lib/app.js';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../public/css/Login.css';
@@ -15,9 +18,12 @@ const Register = React.createClass({
 	},
 	disableForm: function(state){
 		$("#username").attr('disabled',state);
+		$("#fullname").attr('disabled',state);
+		$("#email").attr('disabled',state);
 		$("#password").attr('disabled',state);
-		$("#loginBtn").attr('disabled',state);
-		this.setState({loadingMsg: state?"Signing in...":null});
+		$("#repassword").attr('disabled',state);
+		$("#registerBtn").attr('disabled',state);
+		this.setState({loadingMsg: state?"Sending...":null});
 	},
 	componentDidMount: function(){
 		require ('font-awesome/css/font-awesome.css');
@@ -26,23 +32,73 @@ const Register = React.createClass({
 
 		AdminLTEinit();
 	},
+	setProfile: function(p) {
+    var profile = {
+      name: p.fullName?p.fullName:p.username,
+      username: p.username,
+      email: p.email,
+      gender: p.gender,
+      lastLogin: p.lastLogin,
+      createdAt: p.createdAt
+    }
+    localStorage.setItem("userId", p.id);
+    localStorage.setItem('profile', JSON.stringify(profile));
+    console.log("set profile: "+JSON.stringify(profile));
+  },
 	handleSubmit: function(event) {
 		event.preventDefault();
-		this.disableForm(true);
 
+		var fullname = $("#fullname").val();
 		var username = $("#username").val();
+		var email = $("#email").val();
+		var gender = $("#gender").val();
     var password = $("#password").val();
+    var repassword = $("#repassword").val();
 
+    if (password!=repassword) {
+    	this.setState({errorMsg: "Password is not match"});
+    	return;
+    }
+
+    if (gender==="") {
+    	this.setState({errorMsg: "Select a gender"});
+    	return;
+    }
+
+    this.disableForm(true);
 		var me = this;
-		function successFn(){
-			me.disableForm(false);
-			me.props.onlogin(true);
-		}
-		function failedFn(msg){
-			me.setState({errorMsg: msg});
-	  	me.disableForm(false);
-		}
-		this.props.authService.doLogin(username, password, successFn, failedFn);
+		console.log("register user");
+    
+    request({
+      url: Config.scapholdUrl,
+      method: "POST",
+      json: true,
+      headers: {
+        "content-type": "application/json"
+      },
+      body: Query.createUserMtn(username, password, email, fullname, gender)
+    }, (error, response, body) => {
+      if (!error && !body.errors && response.statusCode === 200) {
+        if (body.data.createUser) {
+          var p = body.data.createUser.changedUser;
+          localStorage.token = body.data.createUser.token;
+          me.setProfile(p);
+        }
+        console.log("register OK");
+        me.disableForm(false);
+        window.location = '/admin';
+      } else {
+      	me.disableForm(false);
+      	if (error) {
+      		me.setState({errorMsg: error.message})
+      	} else if (body.errors){
+      		me.setState({errorMsg: body.errors[0].message})
+      	} else {
+      		me.setState({errorMsg: "Unknown error"})
+      	}
+        console.log("doLogin FAILED");
+      }
+    });
 	},
 	auth0LoginHandle: function(){
 		this.props.authService.showPopup()
@@ -65,34 +121,50 @@ const Register = React.createClass({
 
 			  <div className="register-box-body">
 			    <p className="login-box-msg">Register a new membership</p>
-
-			    <form action="../../index.html" method="post">
+			    { this.state.errorMsg &&
+			    	<div className="alert alert-danger alert-dismissible">
+	            <button type="button" className="close" data-dismiss="alert" aria-hidden="true">×</button>
+	            {this.state.errorMsg}
+	          </div>
+			    }
+			    <form id="register" onSubmit={this.handleSubmit} method="post">
 			      <div className="form-group has-feedback">
-			        <input type="text" className="form-control" placeholder="Full name" />
+			        <input type="text" className="form-control" id="fullname" placeholder="Full name" required="true"/>
 			        <span className="glyphicon glyphicon-user form-control-feedback"></span>
 			      </div>
 			      <div className="form-group has-feedback">
-			        <input type="email" className="form-control" placeholder="Email" />
+			        <select id="gender" placeholder="Gender" className="form-control select">
+			        	<option key="" value="" default>Select your gender...</option>
+			        	<option key="male" value="malez">Male</option>
+			        	<option key="female" value="female">Female</option>
+			        </select>
+			      </div>
+			      <div className="form-group has-feedback">
+			        <input type="text" className="form-control" id="username" placeholder="User name" required="true"/>
+			        <span className="glyphicon glyphicon-user form-control-feedback"></span>
+			      </div>
+			      <div className="form-group has-feedback">
+			        <input type="email" className="form-control" id="email" placeholder="Email" required="true"/>
 			        <span className="glyphicon glyphicon-envelope form-control-feedback"></span>
 			      </div>
 			      <div className="form-group has-feedback">
-			        <input type="password" className="form-control" placeholder="Password" />
+			        <input type="password" className="form-control" id="password" placeholder="Password" required="true"/>
 			        <span className="glyphicon glyphicon-lock form-control-feedback"></span>
 			      </div>
 			      <div className="form-group has-feedback">
-			        <input type="password" className="form-control" placeholder="Retype password" />
+			        <input type="password" className="form-control" id="repassword" placeholder="Retype password" required="true"/>
 			        <span className="glyphicon glyphicon-log-in form-control-feedback"></span>
 			      </div>
 			      <div className="row">
 			        <div className="col-xs-8">
-			          <div className="checkbox icheck">
+			          <div className="checkbox">
 			            <label>
 			              <input type="checkbox"/> I agree to the <a href="#">terms</a>
 			            </label>
 			          </div>
 			        </div>
 			        <div className="col-xs-4">
-			          <button type="submit" className="btn btn-primary btn-block btn-flat">Register</button>
+			          <button type="submit" id="registerBtn" className="btn btn-primary btn-block btn-flat">Register</button>
 			        </div>
 			      </div>
 			    </form>
