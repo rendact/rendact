@@ -22,7 +22,7 @@ const Posts = React.createClass({
 	      monthList: []
 	    }
 	  },
-	loadData: function(datatable) {
+	loadData: function(datatable, callback) {
 		var me = this;
 	    request({
 	        url: Config.scapholdUrl,
@@ -64,6 +64,9 @@ const Posts = React.createClass({
 	                '<center>'+date+'</center>'
 	              ])
 	            });
+
+              if (callback) callback.call();
+
 	            me.setState({monthList: monthList});
 	            datatable.draw();
 	          }else{
@@ -123,7 +126,7 @@ const Posts = React.createClass({
       cancelButtonText: 'No, cancel!',
       confirmButtonClass: 'btn btn-success',
       cancelButtonClass: 'btn btn-danger',
-      buttonsStyling: false
+      buttonsStyling: true
     }).then(function () {
     	me.disableForm(true);
       request({
@@ -138,7 +141,9 @@ const Posts = React.createClass({
       }, (error, response, body) => {
         if (!error && !body.errors && response.statusCode === 200) {
           console.log(JSON.stringify(body, null, 2));
-          me.loadData(me.state.dt);
+          var here = me;
+          var cb = function(){here.disableForm(false)}
+          me.loadData(me.state.dt, cb);
         } else {
           if (error)
             swal(
@@ -158,8 +163,8 @@ const Posts = React.createClass({
               'Unknown error',
               'warning'
             )
+          me.disableForm(false);
         }
-        me.disableForm(false);
       });  
    })},
 

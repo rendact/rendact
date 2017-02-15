@@ -24,7 +24,7 @@ const Pages = React.createClass({
       monthList: []
     }
   },
-  loadData: function(datatable) {
+  loadData: function(datatable, callback) {
     var me = this;
     console.log(Query.getPageListQry)
     request({
@@ -61,6 +61,9 @@ const Pages = React.createClass({
                 '<center>'+date+'</center>'
               ])
             });
+
+            if (callback) callback.call();
+
             me.setState({monthList: monthList});
             datatable.draw();
           }else{
@@ -124,9 +127,9 @@ const Pages = React.createClass({
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, cancel!',
-      confirmButtonClass: 'btn btn-success',
-      cancelButtonClass: 'btn btn-danger',
-      buttonsStyling: false
+      confirmButtonClass: 'btn swal-btn-success',
+      cancelButtonClass: 'btn swal-btn-danger',
+      buttonsStyling: true
     }).then(function () {
       me.disableForm(true);
       request({
@@ -141,7 +144,9 @@ const Pages = React.createClass({
       }, (error, response, body) => {
         if (!error && !body.errors && response.statusCode === 200) {
           console.log(JSON.stringify(body, null, 2));
-          me.loadData(me.state.dt);
+          var here = me;
+          var cb = function(){here.disableForm(false)}
+          me.loadData(me.state.dt, cb);
         } else {
           if (error)
             swal(
@@ -161,8 +166,8 @@ const Pages = React.createClass({
               'Unknown error',
               'warning'
             )
+          me.disableForm(false);
         }
-        me.disableForm(false);
       });  
     })},
         

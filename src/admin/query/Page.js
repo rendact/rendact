@@ -4,7 +4,7 @@ window.jQuery = $;
 const getPageListQry = {"query": `
   query getPages{
   viewer {
-    allPosts(where: {type: {eq: "page"}}) {
+    allPosts(where: {type: {eq: "page"}, deleteDate: {isNull: true}}) {
       edges {
         node {
           id
@@ -128,7 +128,7 @@ const getPageQry = function(postId){
 const deletePostQry = function(idList){
   var query = "mutation { ";
   $.each(idList, function(key, val){
-    query += ' DeletePost'+key+': deletePost(input: {id: "'+val+'"}){ changedPost{ id } }'; 
+    query += ' DeletePost'+key+': updatePost(input: {id: "'+val+'", deleteDate: "'+new Date()+'"}){ changedPost{ id } }'; 
   });
   query += "}";
 
