@@ -1,3 +1,6 @@
+import $ from 'jquery';
+window.jQuery = $;
+
 const getPageListQry = {"query": `
   query getPages{
   viewer {
@@ -27,7 +30,7 @@ const getPageListQry = {"query": `
 `};
 
 const getCreatePostQry = function(title, content, titleTag, draft, visibility, passwordPage, 
-  publishDate, userId, slug, parentPage, pageOrder){
+  publishDate, userId, slug, parentPage, pageOrder, type){
   return {
       "query": `
     mutation createPost($input: CreatePostInput!) {
@@ -49,7 +52,7 @@ const getCreatePostQry = function(title, content, titleTag, draft, visibility, p
           "visibility": visibility,
           "passwordPage": passwordPage,
           "publishDate": publishDate,
-          "type": "page",
+          "type": type,
           "authorId": userId,
           "slug": slug,
           "parent": parentPage,
@@ -60,7 +63,7 @@ const getCreatePostQry = function(title, content, titleTag, draft, visibility, p
   };
 
 const getUpdatePostQry = function(id, title, content, titleTag, draft, visibility, passwordPage, 
-  publishDate, userId, slug, parentPage, pageOrder){
+  publishDate, userId, slug, parentPage, pageOrder, type){
   return {
       "query": `
     mutation updatePost($input: UpdatePostInput!) {
@@ -83,7 +86,7 @@ const getUpdatePostQry = function(id, title, content, titleTag, draft, visibilit
           "visibility": visibility,
           "passwordPage": passwordPage,
           "publishDate": publishDate,
-          "type": "page",
+          "type": type,
           "authorId": userId,
           "slug": slug,
           "parent": parentPage,

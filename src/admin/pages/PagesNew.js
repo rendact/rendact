@@ -9,7 +9,7 @@ import Query from '../query';
 //require('ckeditor');
 
 
-const NewPost = React.createClass({
+const NewPage = React.createClass({
   componentDidMount: function(){
     var me = this;
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
@@ -136,6 +136,7 @@ const NewPost = React.createClass({
     var pageOrder = $("#pageOrder").val();
     var pageOrderInt = 0;
     try  {pageOrderInt=parseInt(pageOrder)} catch(e) {}
+    var type = "page";
     
     var qry = "";
     if (this.state.mode==="create"){
@@ -150,7 +151,8 @@ const NewPost = React.createClass({
         localStorage.getItem('userId'), 
         this.state.slug,
         parentPage,
-        pageOrderInt);
+        pageOrderInt,
+        type);
       me.setState({noticeTxt:"Page Published!"});
     }else{
       qry = Query.getUpdatePostQry(title, 
@@ -163,7 +165,8 @@ const NewPost = React.createClass({
         localStorage.getItem('userId'), 
         this.state.slug,
         parentPage,
-        pageOrderInt);
+        pageOrderInt,
+        type);
       me.setState({noticeTxt:"Page Updated!"});
     }
     request({
@@ -514,4 +517,4 @@ const NewPost = React.createClass({
 }
 });
 
-export default NewPost;
+export default NewPage;

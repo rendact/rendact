@@ -25,8 +25,24 @@ const getPostListQry = {"query": `
   } 
 `};
 
+const getAllCategoryQry = {
+  "query": `query getCategories{
+    viewer {
+      allCategories {
+        edges {
+          node {
+            id,
+            name
+          }
+        }
+      }
+    }
+  }`
+}
+
 const queries = {
-  getPostListQry: getPostListQry
+  getPostListQry: getPostListQry,
+  getAllCategoryQry: getAllCategoryQry
 }
 
 module.exports = queries;

@@ -1,5 +1,3 @@
-import $ from 'jquery';
-window.jQuery = $;
 import User from './User.js'
 import Page from './Page.js'
 import Login from './Login.js'
@@ -15,7 +13,8 @@ const queries = {
   getUpdatePostQry: Page.getUpdatePostQry,
   getPageListQry: Page.getPageListQry,
   deletePostQry: Page.deletePostQry,
-  getPostListQry: Post.getPostListQry
+  getPostListQry: Post.getPostListQry,
+  getAllCategoryQry: Post.getAllCategoryQry
 }
 
 module.exports = queries;
