@@ -3,7 +3,7 @@ import request from 'request';
 import $ from 'jquery';
 window.jQuery = $;
 import Config from '../../config';
-import Query from '../../query';
+import Query from '../query';
 import Fn from '../lib/functions';
 // ES6 Modules
 import { default as swal } from 'sweetalert2';
@@ -26,6 +26,7 @@ const Pages = React.createClass({
   },
   loadData: function(datatable) {
     var me = this;
+    console.log(Query.getPageListQry)
     request({
         url: Config.scapholdUrl,
         method: "POST",

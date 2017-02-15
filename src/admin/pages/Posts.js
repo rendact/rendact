@@ -3,7 +3,7 @@ import request from 'request';
 import $ from 'jquery';
 window.jQuery = $;
 import Config from '../../config';
-import Query from '../../query';
+import Query from '../query';
 import Fn from '../lib/functions';
 import { default as swal } from 'sweetalert2';
 

@@ -4,7 +4,7 @@ import $ from 'jquery';
 window.jQuery = $;
 
 import Config from '../../config';
-import Query from '../../query';
+import Query from '../query';
 //window.CKEDITOR_BASEPATH = '/ckeditor/';
 //require('ckeditor');
 
