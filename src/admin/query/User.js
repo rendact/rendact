@@ -14,9 +14,36 @@ const getUserQry  = function(userId){
     }
 };
 
+const getUserListQry = {
+"query": `query getUsers{
+        viewer {
+        allUsers {
+          edges {
+            node {
+              id,
+              username,
+              email,
+              fullName,
+              gender,
+              lastLogin,
+              posts {
+                edges {
+                  node {
+                    id
+                  }
+                }
+              }
+              
+            }
+          }
+        }
+      }
+    }`
+};
 
 const queries = {
-  getUserQry: getUserQry
+  getUserQry: getUserQry,
+  getUserListQry: getUserListQry
 }
 
 module.exports = queries;

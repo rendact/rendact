@@ -14,7 +14,8 @@ const queries = {
   getPageListQry: Page.getPageListQry,
   deletePostQry: Page.deletePostQry,
   getPostListQry: Post.getPostListQry,
-  getAllCategoryQry: Post.getAllCategoryQry
+  getAllCategoryQry: Post.getAllCategoryQry,
+  getUserListQry: User.getUserListQry
 }
 
 module.exports = queries;
