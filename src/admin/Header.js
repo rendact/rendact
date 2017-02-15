@@ -1,7 +1,13 @@
 import React from 'react';
 import Config from '../config'
+import { Redirect } from 'react-router'
 
 const AdminHeader = React.createClass({
+  getInitialState: function(){
+    return {
+      goToProfile: false
+    }
+  },
   getDefaultProps: function() {
     return { 
       profile: {
@@ -20,7 +26,7 @@ const AdminHeader = React.createClass({
     if (this.props.authService.getProfile())
       profile = this.props.authService.getProfile()
 
-    return (
+    let header = (
       <header className="main-header">
       <nav className="navbar navbar-static-top">
         <a href="#" className="logo dropdown-toggle" data-toggle="dropdown">
@@ -109,7 +115,7 @@ const AdminHeader = React.createClass({
                 </li>
                 <li className="user-footer">
                   <div className="pull-left">
-                    <a href="#" className="btn btn-default btn-flat">Profile</a>
+                    <a href="#" onClick={this.props.onProfileClick} className="btn btn-default btn-flat">Profile</a>
                   </div>
                   <div className="pull-right">
                     <a href="#" className="btn btn-default btn-flat" onClick={this.handleSignout}>Sign out</a>
@@ -125,6 +131,8 @@ const AdminHeader = React.createClass({
       </nav>
     </header>
     )
+    
+    return header;
   }
 });
 
