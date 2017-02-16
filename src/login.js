@@ -1,7 +1,4 @@
 import React from 'react';
-import $ from 'jquery';
-window.jQuery = $;
-
 import AdminLTEinit from './admin/lib/app.js';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../public/css/Login.css';
@@ -14,9 +11,9 @@ const Login = React.createClass({
 		}
 	},
 	disableForm: function(state){
-		$("#username").attr('disabled',state);
-		$("#password").attr('disabled',state);
-		$("#loginBtn").attr('disabled',state);
+		document.getElementById("username").attributes.disabled = state;
+    document.getElementById("password").attributes.disabled = state;
+    document.getElementById("loginBtn").attributes.disabled = state;
 		this.setState({loadingMsg: state?"Signing in...":null});
 	},
 	componentDidMount: function(){
@@ -30,8 +27,8 @@ const Login = React.createClass({
 		event.preventDefault();
 		this.disableForm(true);
 
-		var username = $("#username").val();
-    var password = $("#password").val();
+		var username = document.getElementById("username").value;
+    var password = document.getElementById("password").value;
 
 		var me = this;
 		function successFn(){

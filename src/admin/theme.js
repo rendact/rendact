@@ -1,6 +1,3 @@
-import $ from 'jquery';
-window.jQuery = $;
-
 import React from 'react';
 import Config from '../config';
 window.config = Config;

@@ -1,5 +1,4 @@
-import $ from 'jquery';
-window.jQuery = $;
+import _ from 'lodash';
 
 const getPageListQry = {"query": `
   query getPages{
@@ -127,8 +126,8 @@ const getPageQry = function(postId){
 
 const deletePostQry = function(idList){
   var query = "mutation { ";
-  $.each(idList, function(key, val){
-    query += ' DeletePost'+key+': updatePost(input: {id: "'+val+'", deleteDate: "'+new Date()+'"}){ changedPost{ id } }'; 
+  _.forEach(idList, function(val){
+    query += ' DeletePost'+val+': updatePost(input: {id: "'+val+'", deleteDate: "'+new Date()+'"}){ changedPost{ id } }'; 
   });
   query += "}";
 
