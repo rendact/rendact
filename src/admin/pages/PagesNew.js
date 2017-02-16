@@ -76,8 +76,7 @@ const NewPage = React.createClass({
   handleTitleChange: function(event){
     var title = $("#titlePage").val();
     var slug = title.replace(" ","-").toLowerCase();
-    this.setState({title: title});
-    {$("#titlePage").val()===title? this.setState({slug: slug+"-2"}) : this.setState({slug: slug})};
+    this.setState({title: title, slug: slug});
   },
   handleContentChange: function(event){
     var content = $(window.CKEDITOR.instances['editor1'].getData()).text();
