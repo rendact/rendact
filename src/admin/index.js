@@ -16,6 +16,7 @@ import Users from './pages/Users';
 import NewPost from './pages/PostsNew';
 import NewPage from './pages/PagesNew';
 import NewTheme from './pages/ThemesNew';
+import Profile from './pages/Profile';
 import NotFound from './NotFound';
 
 import Config from '../config';
@@ -121,6 +122,7 @@ const PageLoader = React.createClass({
 		var map = {
 			'dashboard' : <Dashboard />,
 			'settings' : <Settings />,
+			'profile' : <Profile />,
 			'posts' : <Posts />,
 			'pages' : <Pages />,
 			'themes' : <Themes />,
@@ -169,6 +171,12 @@ const Admin = React.createClass({
 			}
 		}
 	},
+	handleProfileClick: function(){
+		this.setState({
+			page: 'profile'
+		})
+		window.history.pushState("", "", '/admin/profile');
+	},
 	handleMenuClick: function(pageId){
 		var pg = pageId.split("-");
 		this.setState({page: pg[0], action: pg[1]?pg[1]:''})
@@ -179,7 +187,7 @@ const Admin = React.createClass({
 			return (
 				<div className="wrapper">
 	        		
-	        <AdminHeader authService={this.props.AuthService} />
+	        <AdminHeader authService={this.props.AuthService} onProfileClick={this.handleProfileClick} />
 	  			<SideMenu onClick={this.handleMenuClick} activeMenu={this.state.page+(this.state.action?'-':'')+this.state.action}/>
 					<PageLoader pageId={this.state.page} actionId={this.state.action} postId={this.state.postId}/>
 					<Footer/>

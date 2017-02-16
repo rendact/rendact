@@ -4,12 +4,12 @@ import $ from 'jquery';
 window.jQuery = $;
 
 import Config from '../../config';
-import Query from '../../query';
+import Query from '../query';
 //window.CKEDITOR_BASEPATH = '/ckeditor/';
 //require('ckeditor');
 
 
-const NewPost = React.createClass({
+const NewPage = React.createClass({
   componentDidMount: function(){
     var me = this;
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
@@ -134,7 +134,9 @@ const NewPost = React.createClass({
     var publishDate = year+"-"+month+"-"+day+"@"+hour+":"+min ;
     var parentPage = $("#parentPage").val();
     var pageOrder = $("#pageOrder").val();
-    try  {var pageOrderInt=parseInt(pageOrder)} catch(e) {var pageOrderInt=0}
+    var pageOrderInt = 0;
+    try  {pageOrderInt=parseInt(pageOrder)} catch(e) {}
+    var type = "page";
     
     var qry = "";
     if (this.state.mode==="create"){
@@ -149,7 +151,8 @@ const NewPost = React.createClass({
         localStorage.getItem('userId'), 
         this.state.slug,
         parentPage,
-        pageOrderInt);
+        pageOrderInt,
+        type);
       me.setState({noticeTxt:"Page Published!"});
     }else{
       qry = Query.getUpdatePostQry(title, 
@@ -162,7 +165,8 @@ const NewPost = React.createClass({
         localStorage.getItem('userId'), 
         this.state.slug,
         parentPage,
-        pageOrderInt);
+        pageOrderInt,
+        type);
       me.setState({noticeTxt:"Page Updated!"});
     }
     request({
@@ -234,7 +238,6 @@ const NewPost = React.createClass({
 
     if (!this.props.postId) return;
 
-    var me = this;
     request({
         url: Config.scapholdUrl,
         method: "POST",
@@ -514,4 +517,4 @@ const NewPost = React.createClass({
 }
 });
 
-export default NewPost;
+export default NewPage;

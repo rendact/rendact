@@ -3,7 +3,7 @@ import request from 'request';
 import $ from 'jquery';
 window.jQuery = $;
 import Config from '../../config';
-import Query from '../../query';
+import Query from '../query';
 import Fn from '../lib/functions';
 // ES6 Modules
 import { default as swal } from 'sweetalert2';
@@ -24,8 +24,9 @@ const Pages = React.createClass({
       monthList: []
     }
   },
-  loadData: function(datatable) {
+  loadData: function(datatable, callback) {
     var me = this;
+    console.log(Query.getPageListQry)
     request({
         url: Config.scapholdUrl,
         method: "POST",
@@ -60,6 +61,9 @@ const Pages = React.createClass({
                 '<center>'+date+'</center>'
               ])
             });
+
+            if (callback) callback.call();
+
             me.setState({monthList: monthList});
             datatable.draw();
           }else{
@@ -123,10 +127,11 @@ const Pages = React.createClass({
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, cancel!',
-      confirmButtonClass: 'btn btn-success',
-      cancelButtonClass: 'btn btn-danger',
-      buttonsStyling: false
+      confirmButtonClass: 'btn swal-btn-success',
+      cancelButtonClass: 'btn swal-btn-danger',
+      buttonsStyling: true
     }).then(function () {
+      me.disableForm(true);
       request({
         url: Config.scapholdUrl,
         method: "POST",
@@ -139,7 +144,9 @@ const Pages = React.createClass({
       }, (error, response, body) => {
         if (!error && !body.errors && response.statusCode === 200) {
           console.log(JSON.stringify(body, null, 2));
-          me.loadData(me.state.dt);
+          var here = me;
+          var cb = function(){here.disableForm(false)}
+          me.loadData(me.state.dt, cb);
         } else {
           if (error)
             swal(
@@ -159,8 +166,8 @@ const Pages = React.createClass({
               'Unknown error',
               'warning'
             )
+          me.disableForm(false);
         }
-        me.disableForm(false);
       });  
     })},
         
@@ -180,7 +187,9 @@ const Pages = React.createClass({
                     .search( this.value )
                     .draw();
             }
+            return null;
         });
+        return null;
     } );
     
     this.setState({dt: datatable});
@@ -198,6 +207,7 @@ const Pages = React.createClass({
 
     this.state.dt.columns([4,6]).every( function () {
         this.search( searchValue[this.index()] ).draw();
+        return null;
     } );
   },
   render: function(){
@@ -236,7 +246,7 @@ const Pages = React.createClass({
                           <select className="btn select" id="dateFilter" style={{marginRight:5,height:35}}>
                             {this.state.monthList.map(function(item){
                               if (item==="all")
-                                return <option key="0" value="">All</option>
+                                return (<option key="0" value="">All</option>);
                               var s = item.split("/");
                               var monthList = Fn.getMonthList();
                               var month = monthList[parseInt(s[1])-1];

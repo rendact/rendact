@@ -5,7 +5,7 @@ import {browserHistory, Match, Redirect } from 'react-router'
 window.browserHistory = browserHistory;
 window.Redirect = Redirect;
 import Config from './config';
-import Query from './query';
+import Query from './admin/query';
 import $ from 'jquery';
 window.jQuery = $;
 
