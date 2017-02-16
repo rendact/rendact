@@ -107,7 +107,9 @@ const Posts = React.createClass({
 	                    .search( this.value )
 	                    .draw();
 	            }
+	            return;
 	        });
+	        return;
 	    } );
 	    
 	    this.setState({dt: datatable});
