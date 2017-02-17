@@ -9,6 +9,7 @@ const queries = {
   loginUserQry: Login.loginUserQry,
   getCreatePostQry: Page.getCreatePostQry,
   createPostMetaMtn: Page.createPostMetaMtn,
+  updatePostMetaMtn: Page.updatePostMetaMtn,
   getPageQry: Page.getPageQry,
   getUpdatePostQry: Page.getUpdatePostQry,
   getPageListQry: Page.getPageListQry,
@@ -17,7 +18,8 @@ const queries = {
   getAllCategoryQry: Post.getAllCategoryQry,
   getUserListQry: User.getUserListQry,
   createUserMtn: User.createUserMtn,
-  getPostQry: Post.getPostQry
+  getPostQry: Post.getPostQry,
+  checkSlugQry: Page.checkSlugQry
 }
 
 module.exports = queries;

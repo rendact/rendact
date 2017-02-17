@@ -121,12 +121,12 @@ const createPostMetaMtn = function(postId, metaKeyword, metaDescription, titleTa
   };
 }
 
-const updatePostMetaMtn = function(postMetaId, metaKeyword, metaDescription, titleTag){
+const updatePostMetaMtn = function(postMetaId, postId, metaKeyword, metaDescription, titleTag){
   return {
     "query": 'mutation{'
-    + 'insertKeyword: updatePostMeta(input: {id: "'+postMetaId+'", item: "metaKeyword", value: "'+metaKeyword+'"}){ changedPostMeta{ id } } '
-    + 'insertDescription: updatePostMeta(input: {id: "'+postMetaId+'", item: "metaDescription", value: "'+metaDescription+'"}){ changedPostMeta{ id } } '
-    + 'insertSummary: updatePostMeta(input: {id: "'+postMetaId+'", item: "titleTag", value: "'+titleTag+'"}){ changedPostMeta{ id } } '
+    + 'insertKeyword: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "metaKeyword", value: "'+metaKeyword+'"}){ changedPostMeta{ id } } '
+    + 'insertDescription: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "metaDescription", value: "'+metaDescription+'"}){ changedPostMeta{ id } } '
+    + 'insertSummary: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "titleTag", value: "'+titleTag+'"}){ changedPostMeta{ id } } '
     + '}'
   };
 }
@@ -152,13 +152,21 @@ const deletePostQry = function(idList){
   }
 };
 
+const checkSlugQry = function(slug){
+  return {
+    query: 'query checkSlug{ viewer { allPosts(where: {type: {eq: "page"}, slug: {eq: "'+slug+'"}}) { edges { node { id } } } } }'
+  }
+}
+
 const queries = {
   getPageListQry: getPageListQry,
   getCreatePostQry: getCreatePostQry,
   getUpdatePostQry: getUpdatePostQry,
   createPostMetaMtn: createPostMetaMtn,
+  updatePostMetaMtn: updatePostMetaMtn,
   getPageQry: getPageQry,
-  deletePostQry: deletePostQry
+  deletePostQry: deletePostQry,
+  checkSlugQry: checkSlugQry
 }
 
 module.exports = queries;

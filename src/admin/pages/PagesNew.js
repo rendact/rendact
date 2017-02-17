@@ -63,15 +63,38 @@ const NewPage = React.createClass({
     this.setState({permalinkEditing: true});
   },
   handlePermalinkChange: function(event) {
-    var slug = $("#slugcontent").val();
-    this.setState({slug:slug});
+    
   },
   handleSavePermalinkBtn: function(event) {
-    this.setState({permalinkEditing: false});
+    var slug = $("#slugcontent").val();
+    var me = this;
+    request({
+      url: Config.scapholdUrl,
+      method: "POST",
+      json: true,
+      headers: {
+        "content-type": "application/json",
+        "Authorization": "Bearer " + localStorage.token
+      },
+      body: Query.checkSlugQry(slug)
+    }, (error, response, body) => {
+      if (!error && !body.errors && response.statusCode === 200) {
+        var slugCount = body.data.viewer.allPosts.edges.length;
+        if (me.state.mode=="create") {
+          if (slugCount > 0) me.setState({permalinkEditing: false, slug: slug+"-2"});
+          else me.setState({permalinkEditing: false, slug: slug});
+        } else {
+          if (slugCount > 1) me.setState({permalinkEditing: false, slug: slug+"-2"});
+          else me.setState({permalinkEditing: false, slug: slug});
+        }
+      } else {
+        me.setState({errorMsg: "error when checking slug"});
+      }
+    });
   },
   handleTitleChange: function(event){
     var title = $("#titlePage").val();
-    var slug = title.replace(" ","-").toLowerCase();
+    var slug = title.split(" ").join("-").toLowerCase();
     this.setState({title: title, slug: slug});
   },
   handleContentChange: function(event){
@@ -123,7 +146,7 @@ const NewPage = React.createClass({
     var summary = $("#summary").val();
     var status = $("#statusSelect option:selected").text();
     var visibility = $("input[name=radiosName]:checked").val();
-    //var passwordPage = $("#passwordPage").val();
+    
     var passwordPage = "";
     var year = $("#yy").val();
     var month = $("#mm option:selected").text();
@@ -188,11 +211,17 @@ const NewPage = React.createClass({
       if (!error && !body.errors && response.statusCode === 200) {
         var here = me;
         var postMetaId = "";
+        var postId = "";
+        var pmQry = "";
         
-        try {
+        if (me.state.mode==="create"){
+          postId = body.data.createPost.changedPost.id;
           postMetaId = body.data.createPost.changedPost.meta.edges[0].node.id;
-        } catch(e) {
+          pmQry = Query.createPostMetaMtn(postMetaId, postId, metaKeyword, metaDescription, titleTag);
+        } else {
+          postId = body.data.updatePost.changedPost.id;
           postMetaId = body.data.updatePost.changedPost.meta.edges[0].node.id;
+          pmQry = Query.updatePostMetaMtn(postMetaId, postId, metaKeyword, metaDescription, titleTag);
         }
         request({
           url: Config.scapholdUrl,
@@ -202,7 +231,7 @@ const NewPage = React.createClass({
             "content-type": "application/json",
             "Authorization": "Bearer " + localStorage.token
           },
-          body: Query.createPostMetaMtn(postMetaId, metaKeyword, metaDescription, titleTag)
+          body: pmQry
         }, (error, response, body) => {
           if (!error && !body.errors && response.statusCode === 200) {
             
@@ -280,7 +309,7 @@ const NewPage = React.createClass({
     }
     document.getElementById("titlePage").value = v.title;
     document.getElementById("content").value = v.content;
-    window.CKEDITOR.instances['content'].getData(v.content);
+    window.CKEDITOR.instances['content'].setData(v.content);
     document.getElementById("summary").value = v.summary;
     document.getElementById("statusSelect").value = v.status;
     document.getElementById("parentPage").value = v.parent;
