@@ -28,18 +28,17 @@ const getPageListQry = {"query": `
   } 
 `};
 
-const getCreatePostQry = function(title, content, titleTag, draft, visibility, passwordPage, 
-  publishDate, userId, slug, summary, metaDescription, metaKeyword, parentPage, pageOrder){
+const getCreatePostQry = function(title, content, draft, visibility, passwordPage, 
+  publishDate, userId, slug, summary, parentPage, pageOrder){
   return {
       "query": `
     mutation createPost($input: CreatePostInput!) {
         createPost(input: $input) {
           changedPost {
+            id,
             title,
             content,
-            titleTag,
-            summary,
-            metaKeyword
+            summary
         }
       }
     }
@@ -48,7 +47,6 @@ const getCreatePostQry = function(title, content, titleTag, draft, visibility, p
         "input": {
           "title": title,
           "content": content,
-          "titleTag": titleTag,
           "status": draft,
           "visibility": visibility,
           "passwordPage": passwordPage,
@@ -57,8 +55,6 @@ const getCreatePostQry = function(title, content, titleTag, draft, visibility, p
           "authorId": userId,
           "slug": slug,
           "summary": summary,
-          "metaDescription": metaDescription,
-          "metaKeyword": metaKeyword,
           "parent": parentPage,
           "order": pageOrder
         }
@@ -66,8 +62,8 @@ const getCreatePostQry = function(title, content, titleTag, draft, visibility, p
     }
   };
 
-const getUpdatePostQry = function(id, title, content, titleTag, draft, visibility, passwordPage, 
-  publishDate, userId, slug, summary, metaDescription, metaKeyword, parentPage, pageOrder){
+const getUpdatePostQry = function(id, title, content, draft, visibility, passwordPage, 
+  publishDate, userId, slug, summary, parentPage, pageOrder){
   return {
       "query": `
     mutation updatePost($input: UpdatePostInput!) {
@@ -75,10 +71,7 @@ const getUpdatePostQry = function(id, title, content, titleTag, draft, visibilit
           changedPost {
             title,
             content,
-            titleTag,
-            summary,
-            metaDescription,
-            metaKeyword
+            summary
         }
       }
     }
@@ -88,7 +81,6 @@ const getUpdatePostQry = function(id, title, content, titleTag, draft, visibilit
           "id": id,
           "title": title,
           "content": content,
-          "titleTag": titleTag,
           "status": draft,
           "visibility": visibility,
           "passwordPage": passwordPage,
@@ -97,8 +89,6 @@ const getUpdatePostQry = function(id, title, content, titleTag, draft, visibilit
           "authorId": userId,
           "slug": slug,
           "summary": summary,
-          "metaDescription": metaDescription,
-          "metaKeyword": metaKeyword,
           "parent": parentPage,
           "order": pageOrder
         }
@@ -106,12 +96,12 @@ const getUpdatePostQry = function(id, title, content, titleTag, draft, visibilit
     }
   };
 
-const createPostMetaMtn = function(postId, metaKeyword, metaDescription, summary){
+const createPostMetaMtn = function(postId, metaKeyword, metaDescription, titleTag){
   return {
     "query": 'mutation{'
-    + 'insertKeyword: createPostMeta(input: {postId: "'+postId+'", item: "metaKeyword", value: "'+metaKeyword+'"}){ changedPost{ id } } '
-    + 'insertDescription: createPostMeta(input: {postId: "'+postId+'", item: "metaDescription", value: "'+metaDescription+'"}){ changedPost{ id } } '
-    + 'insertSummary: createPostMeta(input: {postId: "'+postId+'", item: "summary", value: "'+summary+'"}){ changedPost{ id } } '
+    + 'insertKeyword: createPostMeta(input: {postId: "'+postId+'", item: "metaKeyword", value: "'+metaKeyword+'"}){ changedPostMeta{ id } } '
+    + 'insertDescription: createPostMeta(input: {postId: "'+postId+'", item: "metaDescription", value: "'+metaDescription+'"}){ changedPostMeta{ id } } '
+    + 'insertSummary: createPostMeta(input: {postId: "'+postId+'", item: "titleTag", value: "'+titleTag+'"}){ changedPostMeta{ id } } '
     + '}'
   };
 }

@@ -3,23 +3,20 @@ import request from 'request';
 import _ from 'lodash';
 import $ from 'jquery';
 window.jQuery = $;
-
 import Config from '../../config';
 import Query from '../query';
-//window.CKcontent_BASEPATH = '/ckcontent/';
-//require('ckcontent');
 
 
 const NewPage = React.createClass({
   componentDidMount: function(){
     var me = this;
-    $.getScript("https://cdn.ckcontent.com/4.6.2/standard/ckcontent.js", function(data, status, xhr){
-      window.CKcontent.replace('content', {
+    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
+      window.CKEDITOR.replace('content', {
         height: 400,
         title: false
       });
-      for (var i in window.CKcontent.instances) {
-        window.CKcontent.instances[i].on('change', me.handleContentChange);
+      for (var i in window.CKEDITOR.instances) {
+        window.CKEDITOR.instances[i].on('change', me.handleContentChange);
       }
     });
 
@@ -77,7 +74,7 @@ const NewPage = React.createClass({
     this.setState({title: title, slug: slug});
   },
   handleContentChange: function(event){
-    var content = $(window.CKcontent.instances['content'].getData()).text();
+    var content = $(window.CKEDITOR.instances['content'].getData()).text();
     this.setState({content: content})
   },
   handleSummaryChange: function(event){
@@ -111,16 +108,19 @@ const NewPage = React.createClass({
     $("#publishBtn").attr('disabled',state);
     this.setState({loadingMsg: state?"Saving...":null});
   },
+  handleErrorMsgClose: function(){
+    this.setState({errorMsg: ""});
+  },
   handleSubmit: function(event) {
-    this.disableForm(true);
+    event.preventDefault();
     var me = this;
     var title = $("#titlePage").val();
-    var content =  window.CKcontent.instances['content'].getData();
+    var content =  window.CKEDITOR.instances['content'].getData();
     var titleTag = $("#titleTag").val();
     var metaKeyword = $("#metaKeyword").val();
     var metaDescription = $("#metaDescription").val();
     var summary = $("#summary").val();
-    var draft = $("#draftSelect option:selected").text();
+    var status = $("#statusSelect option:selected").text();
     var visibility = $("input[name=radiosName]:checked").val();
     //var passwordPage = $("#passwordPage").val();
     var passwordPage = "";
@@ -135,22 +135,25 @@ const NewPage = React.createClass({
     var pageOrderInt = 0;
     try  {pageOrderInt=parseInt(pageOrder)} catch(e) {}
     var type = "page";
-    
+
+    if (title.length<=3) {
+      this.setState({errorMsg: "Title is to short!"});
+      return;
+    }
+
+    this.disableForm(true);
     var qry = "";
     if (this.state.mode==="create"){
       qry = Query.getCreatePostQry(
         title, 
         content, 
-        titleTag, 
-        draft, 
+        status, 
         visibility, 
         passwordPage, 
         publishDate, 
         localStorage.getItem('userId'), 
         this.state.slug,
         summary,
-        metaDescription,
-        metaKeyword,
         parentPage,
         pageOrderInt,
         type);
@@ -158,16 +161,13 @@ const NewPage = React.createClass({
     }else{
       qry = Query.getUpdatePostQry(title, 
         content, 
-        titleTag, 
-        draft, 
+        status, 
         visibility, 
         passwordPage, 
         publishDate, 
         localStorage.getItem('userId'), 
         this.state.slug,
         summary,
-        metaDescription,
-        metaKeyword,
         parentPage,
         pageOrderInt,
         type);
@@ -184,6 +184,30 @@ const NewPage = React.createClass({
       body: qry
     }, (error, response, body) => {
       if (!error && !body.errors && response.statusCode === 200) {
+        var here = me;
+        request({
+          url: Config.scapholdUrl,
+          method: "POST",
+          json: true,
+          headers: {
+            "content-type": "application/json",
+            "Authorization": "Bearer " + localStorage.token
+          },
+          body: Query.createPostMetaMtn(body.data.createPost.changedPost.id, metaKeyword, metaDescription, titleTag)
+        }, (error, response, body) => {
+
+          if (!error && !body.errors && response.statusCode === 200) {
+            
+          } else {
+            if (body && body.errors) {
+              here.setState({errorMsg: body.errors[0].message});
+            } else {
+              here.setState({errorMsg: error.toString()});
+            }
+          }
+          here.disableForm(false);
+        });
+
         me.setState({mode: "update"});
       } else {
         if (body && body.errors) {
@@ -193,31 +217,6 @@ const NewPage = React.createClass({
         }
       }
     });
-    
-    request({
-      url: Config.scapholdUrl,
-      method: "POST",
-      json: true,
-      headers: {
-        "content-type": "application/json",
-        "Authorization": "Bearer " + localStorage.token
-      },
-      body: Query.createPostMetaMtn(this.props.postId, metaKeyword, metaDescription, summary)
-    }, (error, response, body) => {
-
-      if (!error && !body.errors && response.statusCode === 200) {
-        
-      } else {
-        if (body && body.errors) {
-          me.setState({errorMsg: body.errors[0].message});
-        } else {
-          me.setState({errorMsg: error.toString()});
-        }
-      }
-      me.disableForm(false);
-    });
-
-    event.preventDefault();
   },
   componentWillMount: function(){
     var me = this;
@@ -270,6 +269,7 @@ const NewPage = React.createClass({
     }
     document.getElementById("titlePage").value = v.title;
     document.getElementById("content").value = v.content;
+    window.CKEDITOR.instances['content'].getData(v.content);
     document.getElementById("summary").value = v.summary;
     document.getElementById("statusSelect").value = v.status;
     document.getElementById("parentPage").value = v.parent;
@@ -280,6 +280,9 @@ const NewPage = React.createClass({
     }
     if (_.has(meta, "metaDescription")){
       document.getElementById("metaDescription").value = meta.metaDescription;
+    }
+    if (_.has(meta, "titleTag")){
+      document.getElementById("titleTag").value = meta.titleTag;
     }
     this.setState({title: v.title, slug:v.slug, content: v.content, summary: v.summary, status: v.status});
   },
@@ -303,7 +306,7 @@ const NewPage = React.createClass({
           </section>
           { this.state.errorMsg &&
             <div className="alert alert-danger alert-dismissible">
-              <button type="button" className="close" data-dismiss="alert" aria-hidden="true">×</button>
+              <button type="button" className="close" data-dismiss="alert">×</button>
               {this.state.errorMsg}
             </div>
           }
@@ -364,7 +367,7 @@ const NewPage = React.createClass({
                     <div className="col-md-4">Preview</div>
                     <div className="col-md-8">
                       <p><a href="#">{this.state.title===""?"No Title":this.state.title.substring(0,71)}</a></p>
-                      <p>{this.state.content===""?"":this.state.content.substring(0,100)}</p>
+                      <p>{this.state.content===""?"":this.state.content.substring(0,100).replace(/(<([^>]+)>)/ig,"")}</p>
                       <p><span className="help-block"><a style={{color: 'green'}}>{Config.rootUrl}/{this.state.slug}</a> - <a>Cache</a> - <a>Similar</a></span></p>
                     </div>
                   </div>
