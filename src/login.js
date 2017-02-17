@@ -92,8 +92,8 @@ const Login = React.createClass({
 			    <div className="social-auth-links text-center">
 			    	<button type="button" className="btn btn-block btn-info btn-lg" onClick={this.auth0LoginHandle}>
 			    		Sign in with Auth0</button>
-			    	<button type="button" className="btn btn-block btn-warning btn-lg" >
-			    		Create account</button>
+			    	<a href="/register" className="btn btn-block btn-warning btn-lg" >
+			    		Create account</a>
 			    </div>
 				</div>
 			</div>

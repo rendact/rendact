@@ -55,7 +55,7 @@ const Posts = React.createClass({
 	              datatable.row.add([
 	                '<input class="postListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
 	                '<center>'+img+'</center>',
-	                '<a href="#" >'+item.node.title+'</a>',
+	                '<a href="/admin/posts/edit/'+item.node.id+'" >'+item.node.title+'</a>',
 	                '<a href="">'+author+'</a>',
 	                '<center>'+categories+'</center>',
 	                '<center>'+tag+'</center>',

@@ -16,7 +16,8 @@ const queries = {
   getPostListQry: Post.getPostListQry,
   getAllCategoryQry: Post.getAllCategoryQry,
   getUserListQry: User.getUserListQry,
-  createUserMtn: User.createUserMtn
+  createUserMtn: User.createUserMtn,
+  getPostQry: Post.getPostQry
 }
 
 module.exports = queries;
