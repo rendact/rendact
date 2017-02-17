@@ -42,9 +42,12 @@ const NewPage = React.createClass({
       loadingMsg: null,
       errorMsg:null,
       title:"",
+      titleTag:"",
       slug:"",
       content:"",
       summary:"",
+      metaDescription:"",
+      metaKeyword:"",
       draft:"Draft",
       immediately:"",
       immediatelyStatus:false,
@@ -73,7 +76,7 @@ const NewPage = React.createClass({
   handleTitleChange: function(event){
     var title = $("#titlePage").val();
     var slug = title.replace(" ","-").toLowerCase();
-    this.setState({title: title, slug: slug})
+    this.setState({title: title, slug: slug});
   },
   handleContentChange: function(event){
     var content = $(window.CKEDITOR.instances['editor1'].getData()).text();
@@ -150,6 +153,9 @@ const NewPage = React.createClass({
         publishDate, 
         localStorage.getItem('userId'), 
         this.state.slug,
+        summary,
+        metaDescription,
+        metaKeyword,
         parentPage,
         pageOrderInt,
         type);
@@ -164,6 +170,9 @@ const NewPage = React.createClass({
         publishDate, 
         localStorage.getItem('userId'), 
         this.state.slug,
+        summary,
+        metaDescription,
+        metaKeyword,
         parentPage,
         pageOrderInt,
         type);
@@ -252,7 +261,12 @@ const NewPage = React.createClass({
           var values = body.data.getPost;
           $("#titlePage").val(values.title);
           $("#editor1").val(values.content);
-          me.setState({title: values.title, slug:values.slug, content: values.content});
+          $("#titleTag").val(values.titleTag);
+          $("#editor2").val(values.summary);
+          $("#metaDescription").val(values.metaDescription);
+          $("#metaKeyword").val(values.metaKeyword);
+          me.setState({title: values.title, titleTag: values.titleTag, slug:values.slug, content: values.content, summary: values.summary,
+            metaDescription: values.metaDescription, metaKeyword:values.metaKeyword});
         }
     });
   },
@@ -267,7 +281,7 @@ const NewPage = React.createClass({
           <section className="content-header"  style={{marginBottom:20}}>
               <h1>{this.state.mode==="update"?"Edit Current Page":"Add New Page"}
               { this.state.mode==="update" &&
-                <small style={{marginLeft: 5}}><button onClick={this.handleAddNewBtn}>Add new</button></small>
+                <small style={{marginLeft: 5}}><button className="btn btn-default" style={{color: "blue"}} onClick={this.handleAddNewBtn}>Add new</button></small>
               }
               </h1>
                 <ol className="breadcrumb">

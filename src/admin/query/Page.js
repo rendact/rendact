@@ -29,7 +29,7 @@ const getPageListQry = {"query": `
 `};
 
 const getCreatePostQry = function(title, content, titleTag, draft, visibility, passwordPage, 
-  publishDate, userId, slug, parentPage, pageOrder, type){
+  publishDate, userId, slug, summary, metaDescription, metaKeyword, parentPage, pageOrder){
   return {
       "query": `
     mutation createPost($input: CreatePostInput!) {
@@ -37,7 +37,9 @@ const getCreatePostQry = function(title, content, titleTag, draft, visibility, p
           changedPost {
             title,
             content,
-            titleTag
+            titleTag,
+            summary,
+            metaKeyword
         }
       }
     }
@@ -51,9 +53,12 @@ const getCreatePostQry = function(title, content, titleTag, draft, visibility, p
           "visibility": visibility,
           "passwordPage": passwordPage,
           "publishDate": publishDate,
-          "type": type,
+          "type": "page",
           "authorId": userId,
           "slug": slug,
+          "summary": summary,
+          "metaDescription": metaDescription,
+          "metaKeyword": metaKeyword,
           "parent": parentPage,
           "order": pageOrder
         }
@@ -62,7 +67,7 @@ const getCreatePostQry = function(title, content, titleTag, draft, visibility, p
   };
 
 const getUpdatePostQry = function(id, title, content, titleTag, draft, visibility, passwordPage, 
-  publishDate, userId, slug, parentPage, pageOrder, type){
+  publishDate, userId, slug, summary, metaDescription, metaKeyword, parentPage, pageOrder){
   return {
       "query": `
     mutation updatePost($input: UpdatePostInput!) {
@@ -70,7 +75,10 @@ const getUpdatePostQry = function(id, title, content, titleTag, draft, visibilit
           changedPost {
             title,
             content,
-            titleTag
+            titleTag,
+            summary,
+            metaDescription,
+            metaKeyword
         }
       }
     }
@@ -85,9 +93,12 @@ const getUpdatePostQry = function(id, title, content, titleTag, draft, visibilit
           "visibility": visibility,
           "passwordPage": passwordPage,
           "publishDate": publishDate,
-          "type": type,
+          "type": "page",
           "authorId": userId,
           "slug": slug,
+          "summary": summary,
+          "metaDescription": metaDescription,
+          "metaKeyword": metaKeyword,
           "parent": parentPage,
           "order": pageOrder
         }
@@ -120,7 +131,13 @@ const getCreatePostMetaQry = function(metaKeyword, metaDescription, summary){
 
 const getPageQry = function(postId){
   return {"query": 
-      '{getPost(id:"'+postId+'"){ id,title,content,slug,author{username},status,comments{edges{node{id}}},createdAt}}'
+      '{getPost(id:"'+postId+'"){ id,title,content,slug,titleTag,summary,metaDescription,metaKeyword,author{username},status,comments{edges{node{id}}},createdAt}}'
+    }
+  };
+
+const getPageMetaQry = function(postId){
+  return {"query": 
+      '{getPostMeta(id:"'+postId+'"){ id,summary,metaKeyword,metaDescription,createdAt}}'
     }
   };
 
@@ -142,6 +159,7 @@ const queries = {
   getUpdatePostQry: getUpdatePostQry,
   getCreatePostMetaQry: getCreatePostMetaQry,
   getPageQry: getPageQry,
+  getPageMetaQry: getPageMetaQry,
   deletePostQry: deletePostQry
 }
 
