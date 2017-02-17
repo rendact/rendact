@@ -38,7 +38,14 @@ const getCreatePostQry = function(title, content, draft, visibility, passwordPag
             id,
             title,
             content,
-            summary
+            summary,
+            meta {
+              edges {
+                node {
+                  id
+                }
+              }
+            }
         }
       }
     }
@@ -69,9 +76,17 @@ const getUpdatePostQry = function(id, title, content, draft, visibility, passwor
     mutation updatePost($input: UpdatePostInput!) {
         updatePost(input: $input) {
           changedPost {
+            id,
             title,
             content,
-            summary
+            summary,
+            meta {
+              edges {
+                node {
+                  id
+                }
+              }
+            }
         }
       }
     }
@@ -105,6 +120,17 @@ const createPostMetaMtn = function(postId, metaKeyword, metaDescription, titleTa
     + '}'
   };
 }
+
+const updatePostMetaMtn = function(postMetaId, metaKeyword, metaDescription, titleTag){
+  return {
+    "query": 'mutation{'
+    + 'insertKeyword: updatePostMeta(input: {id: "'+postMetaId+'", item: "metaKeyword", value: "'+metaKeyword+'"}){ changedPostMeta{ id } } '
+    + 'insertDescription: updatePostMeta(input: {id: "'+postMetaId+'", item: "metaDescription", value: "'+metaDescription+'"}){ changedPostMeta{ id } } '
+    + 'insertSummary: updatePostMeta(input: {id: "'+postMetaId+'", item: "titleTag", value: "'+titleTag+'"}){ changedPostMeta{ id } } '
+    + '}'
+  };
+}
+
 
 const getPageQry = function(postId){
   return {"query": 

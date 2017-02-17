@@ -43,6 +43,7 @@ const NewPage = React.createClass({
       slug:"",
       content:"",
       summary:"",
+      parent:"",
       status:"Draft",
       immediately:"",
       immediatelyStatus:false,
@@ -159,7 +160,9 @@ const NewPage = React.createClass({
         type);
       me.setState({noticeTxt:"Page Published!"});
     }else{
-      qry = Query.getUpdatePostQry(title, 
+      qry = Query.getUpdatePostQry(
+        this.props.postId,
+        title, 
         content, 
         status, 
         visibility, 
@@ -169,8 +172,7 @@ const NewPage = React.createClass({
         this.state.slug,
         summary,
         parentPage,
-        pageOrderInt,
-        type);
+        pageOrderInt);
       me.setState({noticeTxt:"Page Updated!"});
     }
     request({
@@ -185,6 +187,13 @@ const NewPage = React.createClass({
     }, (error, response, body) => {
       if (!error && !body.errors && response.statusCode === 200) {
         var here = me;
+        var postMetaId = "";
+        
+        try {
+          postMetaId = body.data.createPost.changedPost.meta.edges[0].node.id;
+        } catch(e) {
+          postMetaId = body.data.updatePost.changedPost.meta.edges[0].node.id;
+        }
         request({
           url: Config.scapholdUrl,
           method: "POST",
@@ -193,9 +202,8 @@ const NewPage = React.createClass({
             "content-type": "application/json",
             "Authorization": "Bearer " + localStorage.token
           },
-          body: Query.createPostMetaMtn(body.data.createPost.changedPost.id, metaKeyword, metaDescription, titleTag)
+          body: Query.createPostMetaMtn(postMetaId, metaKeyword, metaDescription, titleTag)
         }, (error, response, body) => {
-
           if (!error && !body.errors && response.statusCode === 200) {
             
           } else {
@@ -233,29 +241,32 @@ const NewPage = React.createClass({
         if (!error) {
           var pageList = [(<option key="0" value="">(no parent)</option>)];
           $.each(body.data.viewer.allPosts.edges, function(key, item){
-            pageList.push((<option key={item.node.id} value={item.node.id}>{item.node.title}</option>));
+            pageList.push((<option key={item.node.id} value={item.node.id} checked={me.state.parent==item.node.id}>
+              {item.node.title}</option>));
           })
           me.setState({pageList: pageList});
+
+          if (!me.props.postId) return;
+          var here = me;
+          request({
+              url: Config.scapholdUrl,
+              method: "POST",
+              json: true,
+              headers: {
+                "content-type": "application/json",
+                "Authorization": "Bearer " + localStorage.token
+              },
+              body: Query.getPageQry(this.props.postId)
+            }, (error, response, body) => {
+              if (!error) {
+                var values = body.data.getPost;
+                here.setFormValues(values);
+              }
+          });
+
         }
     });
 
-    if (!this.props.postId) return;
-
-    request({
-        url: Config.scapholdUrl,
-        method: "POST",
-        json: true,
-        headers: {
-          "content-type": "application/json",
-          "Authorization": "Bearer " + localStorage.token
-        },
-        body: Query.getPageQry(this.props.postId)
-      }, (error, response, body) => {
-        if (!error) {
-          var values = body.data.getPost;
-          me.setFormValues(values);
-        }
-    });
   },
   handleAddNewBtn: function(event) {
     window.location = Config.rootUrl+"/admin/pages/new";
@@ -284,7 +295,7 @@ const NewPage = React.createClass({
     if (_.has(meta, "titleTag")){
       document.getElementById("titleTag").value = meta.titleTag;
     }
-    this.setState({title: v.title, slug:v.slug, content: v.content, summary: v.summary, status: v.status});
+    this.setState({title: v.title, slug:v.slug, content: v.content, summary: v.summary, status: v.status, parent: v.parent});
   },
 
   render: function(){
