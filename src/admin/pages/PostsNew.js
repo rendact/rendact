@@ -271,7 +271,7 @@ const NewPost = React.createClass({
       });
     }
     document.getElementById("titlePost").value = v.title;
-    document.getElementById("content").value = v.title;
+    document.getElementById("content").value = v.content;
     document.getElementById("summary").value = v.summary;
     document.getElementById("statusSelect").value = v.status;
     document.getElementsByName("visibilityRadio")[v.visibility=="Public"?0:1].checked = true;

@@ -106,38 +106,21 @@ const getUpdatePostQry = function(id, title, content, titleTag, draft, visibilit
     }
   };
 
-const getCreatePostMetaQry = function(metaKeyword, metaDescription, summary){
+const createPostMetaMtn = function(postId, metaKeyword, metaDescription, summary){
   return {
-      "query": `
-        mutation createPostMeta($input: CreatePostMetaInput!) {
-          createPostMeta(input: $input) {
-            changedPostMeta {
-              metaKeyword,
-              metaDescription,
-              summary
-            }
-          }
-        }
-    `,
-      "variables": {
-        "input": {
-          "metaKeyword": metaKeyword,
-          "metaDescription": metaDescription,
-          "summary": summary
-        }
-      }
-    }
+    "query": 'mutation{'
+    + 'insertKeyword: createPostMeta(input: {postId: "'+postId+'", item: "metaKeyword", value: "'+metaKeyword+'"}){ changedPost{ id } } '
+    + 'insertDescription: createPostMeta(input: {postId: "'+postId+'", item: "metaDescription", value: "'+metaDescription+'"}){ changedPost{ id } } '
+    + 'insertSummary: createPostMeta(input: {postId: "'+postId+'", item: "summary", value: "'+summary+'"}){ changedPost{ id } } '
+    + '}'
   };
+}
 
 const getPageQry = function(postId){
   return {"query": 
-      '{getPost(id:"'+postId+'"){ id,title,content,slug,titleTag,summary,metaDescription,metaKeyword,author{username},status,comments{edges{node{id}}},createdAt}}'
-    }
-  };
-
-const getPageMetaQry = function(postId){
-  return {"query": 
-      '{getPostMeta(id:"'+postId+'"){ id,summary,metaKeyword,metaDescription,createdAt}}'
+      '{getPost(id:"'+postId+'"){ id,title,content,slug,author{username},status,visibility,parent,order,'
+      +'summary,category{edges{node{category{id,name}}}}comments{edges{node{id}}},meta{edges{node{item,value}'
+      +'}}createdAt}}'
     }
   };
 
@@ -157,9 +140,8 @@ const queries = {
   getPageListQry: getPageListQry,
   getCreatePostQry: getCreatePostQry,
   getUpdatePostQry: getUpdatePostQry,
-  getCreatePostMetaQry: getCreatePostMetaQry,
+  createPostMetaMtn: createPostMetaMtn,
   getPageQry: getPageQry,
-  getPageMetaQry: getPageMetaQry,
   deletePostQry: deletePostQry
 }
 

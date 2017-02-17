@@ -1,24 +1,25 @@
 import React from 'react';
 import request from 'request';
+import _ from 'lodash';
 import $ from 'jquery';
 window.jQuery = $;
 
 import Config from '../../config';
 import Query from '../query';
-//window.CKEDITOR_BASEPATH = '/ckeditor/';
-//require('ckeditor');
+//window.CKcontent_BASEPATH = '/ckcontent/';
+//require('ckcontent');
 
 
 const NewPage = React.createClass({
   componentDidMount: function(){
     var me = this;
-    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
-      window.CKEDITOR.replace('editor1', {
+    $.getScript("https://cdn.ckcontent.com/4.6.2/standard/ckcontent.js", function(data, status, xhr){
+      window.CKcontent.replace('content', {
         height: 400,
         title: false
       });
-      for (var i in window.CKEDITOR.instances) {
-        window.CKEDITOR.instances[i].on('change', me.handleContentChange);
+      for (var i in window.CKcontent.instances) {
+        window.CKcontent.instances[i].on('change', me.handleContentChange);
       }
     });
 
@@ -42,13 +43,10 @@ const NewPage = React.createClass({
       loadingMsg: null,
       errorMsg:null,
       title:"",
-      titleTag:"",
       slug:"",
       content:"",
       summary:"",
-      metaDescription:"",
-      metaKeyword:"",
-      draft:"Draft",
+      status:"Draft",
       immediately:"",
       immediatelyStatus:false,
       visibilityTxt:"",
@@ -63,11 +61,11 @@ const NewPage = React.createClass({
 
   handlePermalinkBtn: function(event) {
     var slug = this.state.slug;
-    $("#slugEditor").val(slug);
+    $("#slugcontent").val(slug);
     this.setState({permalinkEditing: true});
   },
   handlePermalinkChange: function(event) {
-    var slug = $("#slugEditor").val();
+    var slug = $("#slugcontent").val();
     this.setState({slug:slug});
   },
   handleSavePermalinkBtn: function(event) {
@@ -79,11 +77,11 @@ const NewPage = React.createClass({
     this.setState({title: title, slug: slug});
   },
   handleContentChange: function(event){
-    var content = $(window.CKEDITOR.instances['editor1'].getData()).text();
+    var content = $(window.CKcontent.instances['content'].getData()).text();
     this.setState({content: content})
   },
   handleSummaryChange: function(event){
-    var summary = $("#editor2").val();
+    var summary = $("#summary").val();
     this.setState({summary: summary})
   },
   handleTitleTagChange: function(event){
@@ -101,16 +99,13 @@ const NewPage = React.createClass({
     var hour = $("#hh").val();
     var min = $("#min").val();
     this.setState({immediately: $("#mm option:selected").text() + " " + day + " " + year + " " + "@" + " " + hour + ":" + min});
-    $("m").hide();
   },
   saveDraft: function(event){
     this.setState({draft: $("#draftSelect option:selected").text()});
-    $("s").hide();
   },
   saveVisibility: function(event){
     this.setState({visibilityStatus: true});
     this.setState({visibilityTxt: $("input[name=radiosName]:checked").val()});
-    $("v").hide();
   },
   disableForm: function(state){
     $("#publishBtn").attr('disabled',state);
@@ -120,11 +115,11 @@ const NewPage = React.createClass({
     this.disableForm(true);
     var me = this;
     var title = $("#titlePage").val();
-    var content =  window.CKEDITOR.instances['editor1'].getData();
+    var content =  window.CKcontent.instances['content'].getData();
     var titleTag = $("#titleTag").val();
     var metaKeyword = $("#metaKeyword").val();
     var metaDescription = $("#metaDescription").val();
-    var summary = $("#editor2").val();
+    var summary = $("#summary").val();
     var draft = $("#draftSelect option:selected").text();
     var visibility = $("input[name=radiosName]:checked").val();
     //var passwordPage = $("#passwordPage").val();
@@ -207,7 +202,7 @@ const NewPage = React.createClass({
         "content-type": "application/json",
         "Authorization": "Bearer " + localStorage.token
       },
-      body: Query.getCreatePostMetaQry(metaKeyword, metaDescription, summary)
+      body: Query.createPostMetaMtn(this.props.postId, metaKeyword, metaDescription, summary)
     }, (error, response, body) => {
 
       if (!error && !body.errors && response.statusCode === 200) {
@@ -259,19 +254,34 @@ const NewPage = React.createClass({
       }, (error, response, body) => {
         if (!error) {
           var values = body.data.getPost;
-          $("#titlePage").val(values.title);
-          $("#editor1").val(values.content);
-          $("#titleTag").val(values.titleTag);
-          $("#editor2").val(values.summary);
-          $("#metaDescription").val(values.metaDescription);
-          $("#metaKeyword").val(values.metaKeyword);
-          me.setState({title: values.title, titleTag: values.titleTag, slug:values.slug, content: values.content, summary: values.summary,
-            metaDescription: values.metaDescription, metaKeyword:values.metaKeyword});
+          me.setFormValues(values);
         }
     });
   },
   handleAddNewBtn: function(event) {
     window.location = Config.rootUrl+"/admin/pages/new";
+  },
+  setFormValues: function(v){
+    var meta = {};
+    if (v.meta.edges.length>0) {
+      _.forEach(v.meta.edges, function(i){
+        meta[i.node.item] = i.node.value;
+      });
+    }
+    document.getElementById("titlePage").value = v.title;
+    document.getElementById("content").value = v.content;
+    document.getElementById("summary").value = v.summary;
+    document.getElementById("statusSelect").value = v.status;
+    document.getElementById("parentPage").value = v.parent;
+    document.getElementById("pageOrder").value = v.order;
+    document.getElementsByName("visibilityRadio")[v.visibility=="Public"?0:1].checked = true;
+    if (_.has(meta, "metaKeyword")){
+      document.getElementById("metaKeyword").value = meta.metaKeyword;
+    }
+    if (_.has(meta, "metaDescription")){
+      document.getElementById("metaDescription").value = meta.metaDescription;
+    }
+    this.setState({title: v.title, slug:v.slug, content: v.content, summary: v.summary, status: v.status});
   },
 
   render: function(){
@@ -312,16 +322,16 @@ const NewPage = React.createClass({
                         </p>
                       ) : (
                         <p>Permalink: 
-                        <div className="form-group" id="permalinkEditor">
+                        <div className="form-group" id="permalinkcontent">
                           <a id="permalink">{Config.rootUrl}/</a>
-                          <input id="slugEditor" value={this.state.slug} onChange={this.handlePermalinkChange}/>
+                          <input id="slugcontent" value={this.state.slug} onChange={this.handlePermalinkChange}/>
                           <button type="button" className="btn btn-default" onClick={this.handleSavePermalinkBtn}>OK</button>
                         </div>
                         </p>
                       )
                     }
                   </div>
-                  <textarea id="editor1" name="editor1" rows="25" style={{width: "100%"}} wrap="hard" required="true"></textarea>
+                  <textarea id="content" name="content" rows="25" style={{width: "100%"}} wrap="hard" required="true"></textarea>
                   <div id="trackingDiv"></div>
               </div>
             </div>
@@ -335,7 +345,7 @@ const NewPage = React.createClass({
                   </div>
                 </div>
                 <div className="box-body pad">
-                <textarea id="editor2" name="editor2" wrap="hard" rows="3" style={{width: '100%'}} onChange={this.handleSummaryChange}>
+                <textarea id="summary" name="summary" wrap="hard" rows="3" style={{width: '100%'}} onChange={this.handleSummaryChange}>
                 </textarea>                 
                 </div>
               </div>
@@ -404,12 +414,12 @@ const NewPage = React.createClass({
                       
                       <div className="form-group">
                           <p style={{fontSize: 14}}><span className="glyphicon glyphicon-pushpin" style={{marginRight:10}}></span>
-                          Status: <b>{this.state.draft} </b>
+                          Status: <b>{this.state.status} </b>
                           <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption"> Edit </button></p>
                           <div id="statusOption" className="collapse">
                             <div className="form-group">
                                 <form className="form-inline">
-                                  <select id="draftSelect" style={{marginRight: 10, height: 30}}>
+                                  <select id="statusSelect" style={{marginRight: 10, height: 30}}>
                                     <option>Published</option>
                                     <option>Draft</option>
                                     <option>Pending Review</option>
@@ -427,13 +437,13 @@ const NewPage = React.createClass({
                           <div id="visibilityOption" className="collapse">
                             <div className="radio">
                               <label>
-                                <input type="radio" name="radiosName" id="publicRadios" value="Public"/>
+                                <input type="radio" name="visibilityRadio" id="public" value="Public"/>
                                 Public
                               </label>
                             </div>
                             <div className="radio">
                               <label>
-                                <input type="radio" name="radiosName" id="privateRadios" value="Private"/>
+                                <input type="radio" name="visibilityRadio" id="private" value="Private"/>
                                 Private
                               </label>
                             </div>
@@ -488,7 +498,7 @@ const NewPage = React.createClass({
                               <span className="sr-only">Toggle Dropdown</span>
                             </button>
                             <ul className="dropdown-menu" role="menu">
-                              <li><button type="submit" className="btn btn-default btn-flat">{this.state.draft==="Draft"?"Save As Draft":""}</button></li>
+                              <li><button type="submit" className="btn btn-default btn-flat">{this.state.status==="Draft"?"Save As Draft":""}</button></li>
                             </ul>
                           </div>
                           <p>{this.state.loadingMsg}</p>

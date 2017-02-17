@@ -8,7 +8,7 @@ const queries = {
   getLoginAuth0Mtn: Login.getLoginAuth0Mtn,
   loginUserQry: Login.loginUserQry,
   getCreatePostQry: Page.getCreatePostQry,
-  getCreatePostMetaQry: Page.getCreatePostMetaQry,
+  createPostMetaMtn: Page.createPostMetaMtn,
   getPageQry: Page.getPageQry,
   getUpdatePostQry: Page.getUpdatePostQry,
   getPageListQry: Page.getPageListQry,
