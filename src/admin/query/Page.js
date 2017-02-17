@@ -142,8 +142,8 @@ const getPageQry = function(postId){
 
 const deletePostQry = function(idList){
   var query = "mutation { ";
-  _.forEach(idList, function(val){
-    query += ' DeletePost'+val+': updatePost(input: {id: "'+val+'", deleteDate: "'+new Date()+'"}){ changedPost{ id } }'; 
+  _.forEach(idList, function(val, index){
+    query += ' DeletePost'+index+' : updatePost(input: {id: "'+val+'", deleteDate: "'+new Date()+'"}){ changedPost{ id } }'; 
   });
   query += "}";
 

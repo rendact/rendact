@@ -47,8 +47,7 @@ const NewPage = React.createClass({
       status:"Draft",
       immediately:"",
       immediatelyStatus:false,
-      visibilityTxt:"",
-      visibilityStatus:false,
+      visibilityTxt:"Public",
       permalinkEditing: false,
       mode: this.props.postId?"update":"create",
       pageList: null,
@@ -125,8 +124,7 @@ const NewPage = React.createClass({
     this.setState({draft: $("#draftSelect option:selected").text()});
   },
   saveVisibility: function(event){
-    this.setState({visibilityStatus: true});
-    this.setState({visibilityTxt: $("input[name=radiosName]:checked").val()});
+    this.setState({visibilityTxt: $("input[name=visibilityRadio]:checked").val()});
   },
   disableForm: function(state){
     $("#publishBtn").attr('disabled',state);
@@ -134,6 +132,9 @@ const NewPage = React.createClass({
   },
   handleErrorMsgClose: function(){
     this.setState({errorMsg: ""});
+  },
+  handleNoticeClose: function(){
+    this.setState({noticeTxt: ""});
   },
   handleSubmit: function(event) {
     event.preventDefault();
@@ -145,7 +146,7 @@ const NewPage = React.createClass({
     var metaDescription = $("#metaDescription").val();
     var summary = $("#summary").val();
     var status = $("#statusSelect option:selected").text();
-    var visibility = $("input[name=radiosName]:checked").val();
+    var visibility = $("input[name=visibilityRadio]:checked").val();
     
     var passwordPage = "";
     var year = $("#yy").val();
@@ -167,6 +168,7 @@ const NewPage = React.createClass({
 
     this.disableForm(true);
     var qry = "";
+    var noticeTxt = "";
     if (this.state.mode==="create"){
       qry = Query.getCreatePostQry(
         title, 
@@ -181,7 +183,7 @@ const NewPage = React.createClass({
         parentPage,
         pageOrderInt,
         type);
-      me.setState({noticeTxt:"Page Published!"});
+      noticeTxt = "Page Published!";
     }else{
       qry = Query.getUpdatePostQry(
         this.props.postId,
@@ -196,7 +198,7 @@ const NewPage = React.createClass({
         summary,
         parentPage,
         pageOrderInt);
-      me.setState({noticeTxt:"Page Updated!"});
+      noticeTxt = "Page Updated!";
     }
     request({
       url: Config.scapholdUrl,
@@ -216,12 +218,15 @@ const NewPage = React.createClass({
         
         if (me.state.mode==="create"){
           postId = body.data.createPost.changedPost.id;
-          postMetaId = body.data.createPost.changedPost.meta.edges[0].node.id;
-          pmQry = Query.createPostMetaMtn(postMetaId, postId, metaKeyword, metaDescription, titleTag);
+          pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag);
         } else {
           postId = body.data.updatePost.changedPost.id;
-          postMetaId = body.data.updatePost.changedPost.meta.edges[0].node.id;
-          pmQry = Query.updatePostMetaMtn(postMetaId, postId, metaKeyword, metaDescription, titleTag);
+          if (body.data.updatePost.changedPost.meta.edges.length==0) {
+            pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag);
+          } else {
+            postMetaId = body.data.updatePost.changedPost.meta.edges[0].node.id;
+            pmQry = Query.updatePostMetaMtn(postMetaId, postId, metaKeyword, metaDescription, titleTag);
+          }
         }
         request({
           url: Config.scapholdUrl,
@@ -242,6 +247,7 @@ const NewPage = React.createClass({
               here.setState({errorMsg: error.toString()});
             }
           }
+          here.setState({noticeTxt: noticeTxt});
           here.disableForm(false);
         });
 
@@ -324,7 +330,9 @@ const NewPage = React.createClass({
     if (_.has(meta, "titleTag")){
       document.getElementById("titleTag").value = meta.titleTag;
     }
-    this.setState({title: v.title, slug:v.slug, content: v.content, summary: v.summary, status: v.status, parent: v.parent});
+    this.setState({title: v.title, content: v.content, summary: v.summary, 
+      status: v.status, parent: v.parent, visibilityTxt: v.visibility});
+    this.handleTitleChange();
   },
 
   render: function(){
@@ -346,8 +354,14 @@ const NewPage = React.createClass({
           </section>
           { this.state.errorMsg &&
             <div className="alert alert-danger alert-dismissible">
-              <button type="button" className="close" data-dismiss="alert">×</button>
+              <button type="button" className="close" onClick={this.handleErrorMsgClose}>×</button>
               {this.state.errorMsg}
+            </div>
+          }
+          { this.state.noticeTxt &&
+            <div className="alert alert-info alert-dismissible">
+              <button type="button" className="close" onClick={this.handleNoticeClose}>×</button>
+              {this.state.noticeTxt}
             </div>
           }
           <form onSubmit={this.handleSubmit} method="get">
@@ -467,7 +481,8 @@ const NewPage = React.createClass({
                                     <option>Draft</option>
                                     <option>Pending Review</option>
                                   </select>
-                                  <button type="button" onClick={this.saveDraft} className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}>OK</button>
+                                  <button type="button" onClick={this.saveDraft} className="btn btn-flat btn-xs btn-primary" 
+                                  style={{marginRight: 10}} data-toggle="collapse" data-target="#statusOption">OK</button>
                                   <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption">Cancel</button>
                                 </form>
                             </div>
@@ -475,7 +490,7 @@ const NewPage = React.createClass({
                         </div>
 
                         <div className="form-group">
-                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>{this.state.visibilityStatus===false?"Public":this.state.visibilityTxt} </b>
+                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>{this.state.visibilityTxt} </b>
                           <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#visibilityOption"> Edit </button></p>
                           <div id="visibilityOption" className="collapse">
                             <div className="radio">
@@ -491,7 +506,8 @@ const NewPage = React.createClass({
                               </label>
                             </div>
                             <form className="form-inline" style={{marginTop: 10}}>
-                              <button type="button" onClick={this.saveVisibility} className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}>OK</button>
+                              <button type="button" onClick={this.saveVisibility} className="btn btn-flat btn-xs btn-primary" 
+                              style={{marginRight: 10}} data-toggle="collapse" data-target="#visibilityOption">OK</button>
                               <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#visibilityOption">Cancel</button>
                             </form>
                             </div>
@@ -524,9 +540,10 @@ const NewPage = React.createClass({
                                 <input className="form-control btn btn-flat btn-xs btn-default" type="text" id="min" style={{width: 35, height: 20 }}/>
                               </form>
                                 <form className="form-inline" style={{marginTop: 10}}>
-                                  <button type="button" id="immediatelyOkBtn" onClick={this.saveImmediately} className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}> OK </button>
+                                  <button type="button" id="immediatelyOkBtn" onClick={this.saveImmediately} className="btn btn-flat btn-xs btn-primary" 
+                                  style={{marginRight: 10}} data-toggle="collapse" data-target="#scheduleOption"> OK </button>
+                                  <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#scheduleOption">Cancel</button>
                                 </form>
-                                <button type="button" style={{marginTop: 10}} className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#scheduleOption">Cancel</button>
                               </div>
                           </div>
                       </div> 
