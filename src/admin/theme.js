@@ -1,7 +1,9 @@
 import React from 'react';
+import request from 'request';
 import Config from '../config';
 window.config = Config;
-import NotFound from './NotFound'
+import NotFound from './NotFound';
+import Query from './query';
 
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -65,6 +67,36 @@ function getTemplateComponent(type){
 }
 
 const ThemeHome = React.createClass({
+	getInitialState: function(){
+		return {
+			isSlugExist: false,
+			slug: null
+		}
+	},
+	componentWillMount: function(){
+		var me = this;
+		var slug = this.props.location.pathname.replace("/","");
+		request({
+      url: Config.scapholdUrl,
+      method: "POST",
+      json: true,
+      headers: {
+        "content-type": "application/json",
+        "Authorization": "Bearer " + localStorage.token
+      },
+      body: Query.checkSlugQry(slug)
+    }, (error, response, body) => {
+      if (!error && !body.errors && response.statusCode === 200) {
+        var slugCount = body.data.viewer.allPosts.edges.length;
+        if (slugCount > 0) {
+        	me.setState({isSlugExist: true});
+        }
+      } else {
+        me.setState({errorMsg: "error when checking slug"});
+      }
+      me.setState({slug: slug});
+    });
+	},
 	componentDidMount: function(){
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
@@ -72,10 +104,12 @@ const ThemeHome = React.createClass({
 		require('../theme/'+c.path+'/functions.js');
 	},
 	render: function() {
-		var pathname = this.props.location.pathname.replace("/","");
-		if (pathname!==""){
+		if (this.state.slug){
 			let Single = getTemplateComponent('single');
-			return <Single slug={pathname} />
+			if (this.state.isSlugExist)
+				return <Single slug={this.state.slug} />
+			else 
+				return <NotFound/>
 		} else {
 			let Home = getTemplateComponent('home');
 			return <Home />
@@ -104,6 +138,7 @@ const ThemeSingle = React.createClass({
 		require('../theme/'+c.path+'/functions.js');
 	},
 	render: function() {
+		debugger;
 		if (this.params.pageId){
 			let Single = getTemplateComponent('single');
 			return <Single postId={this.params.pageId}/>;
