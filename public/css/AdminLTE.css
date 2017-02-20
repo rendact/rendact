@@ -4976,3 +4976,9 @@ table.text-center th {
   margin: 0;
   border-radius: 0;
 }
+.add-new-post-btn {
+  color: white;
+  margin-top: -10px;
+  font-size: 10px;
+  height: 25px
+}

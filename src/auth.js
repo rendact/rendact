@@ -167,10 +167,10 @@ function AuthService(){
   //this.checkAuth();
 }
 
-const MatchWhenAuthorized = ({ component: Component, logged: Logged, authService: AuthService, ...rest }) => (
+const MatchWhenAuthorized = ({ component: Component, logged: Logged, authService: AuthService, onlogin: OnLogin, ...rest }) => (
   <Match {...rest} render={props => (
     Logged ? (
-      <Component AuthService={AuthService} logged={Logged} {...props}/>
+      <Component AuthService={AuthService} onlogin={OnLogin} logged={Logged} {...props}/>
     ) : (
       <Redirect to={{
         pathname: '/login',

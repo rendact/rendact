@@ -15,12 +15,6 @@ const AdminHeader = React.createClass({
       }
     }
   },
-  handleSignout: function(){
-    //localStorage.token="";
-    //this.setState({logged: false});
-    this.props.authService.logout();
-    location.reload();
-  },
   render: function() {
     var profile = this.props.profile;
     if (this.props.authService.getProfile())
@@ -118,7 +112,7 @@ const AdminHeader = React.createClass({
                     <a href="#" onClick={this.props.onProfileClick} className="btn btn-default btn-flat">Profile</a>
                   </div>
                   <div className="pull-right">
-                    <a href="#" className="btn btn-default btn-flat" onClick={this.handleSignout}>Sign out</a>
+                    <a href="#" className="btn btn-default btn-flat" onClick={this.props.handleSignout}>Sign out</a>
                   </div>
                 </li>
               </ul>

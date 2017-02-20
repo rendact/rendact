@@ -304,7 +304,16 @@ const NewPage = React.createClass({
 
   },
   handleAddNewBtn: function(event) {
-    window.location = Config.rootUrl+"/admin/pages/new";
+    this.resetForm();
+  },
+  resetForm: function(){
+    document.getElementById("pageForm").reset();
+    window.CKEDITOR.instances['content'].setData(null);
+    this.setState({title:"", slug:"", content:"", summary:"", parent:"",
+      status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
+      permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160});
+    this.handleTitleChange();
+    window.history.pushState("", "", '/admin/pages/new');
   },
   setFormValues: function(v){
     var meta = {};
@@ -342,13 +351,15 @@ const NewPage = React.createClass({
           <section className="content-header"  style={{marginBottom:20}}>
               <h1>{this.state.mode==="update"?"Edit Current Page":"Add New Page"}
               { this.state.mode==="update" &&
-                <small style={{marginLeft: 5}}><button className="btn btn-default" style={{color: "blue"}} onClick={this.handleAddNewBtn}>Add new</button></small>
+                <small style={{marginLeft: 5}}>
+                  <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
+                </small>
               }
               </h1>
                 <ol className="breadcrumb">
                   <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
                   <li>Pages</li>
-                  <li className="active">Add New</li>
+                  <li className="active">{this.state.mode==="update"?"Edit Page":"Add New"}</li>
                 </ol>
                
           </section>
@@ -364,7 +375,7 @@ const NewPage = React.createClass({
               {this.state.noticeTxt}
             </div>
           }
-          <form onSubmit={this.handleSubmit} method="get">
+          <form onSubmit={this.handleSubmit} id="pageForm" method="get">
           <div className="col-md-8">
             <div className="form-group"  style={{marginBottom:30}}>
               <div>

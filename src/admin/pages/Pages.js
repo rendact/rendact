@@ -41,6 +41,7 @@ const Pages = React.createClass({
           if (body.data) {
             datatable.clear();
             var monthList = ["all"];
+            var here = me;
             $.each(body.data.viewer.allPosts.edges, function(key, item){
               var dt = new Date(item.node.createdAt);
               var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
@@ -53,7 +54,7 @@ const Pages = React.createClass({
 
               datatable.row.add([
                 '<input class="pageListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
-                '<a href="/admin/pages/edit/'+item.node.id+'" >'+item.node.title+'</a>',
+                '<a class="tableItem" href="#" id="tableItem-'+item.node.id+'" >'+item.node.title+'</a>',
                 slug,
                 '<a href="">'+author+'</a>',
                 '<center>'+status+'</center>',
@@ -62,10 +63,16 @@ const Pages = React.createClass({
               ])
             });
 
-            if (callback) callback.call();
-
             me.setState({monthList: monthList});
             datatable.draw();
+
+            $(".tableItem").click(function(event){
+              event.preventDefault();
+              var postId = this.id.split("-")[1];
+              here.handleViewPage(postId);
+            });
+
+            if (callback) callback.call();
           }else{
             if (error)
               swal(
@@ -195,7 +202,9 @@ const Pages = React.createClass({
     this.setState({dt: datatable});
     this.loadData(datatable);
   },
-
+  handleAddNewBtn: function(event) {
+    this.props.handleAddNewPage();
+  },
   handleFilterBtn: function(){
     var status = $("#statusFilter").val();
     var date = $("#dateFilter").val();
@@ -210,6 +219,9 @@ const Pages = React.createClass({
         return null;
     } );
   },
+  handleViewPage: function(postId){
+    this.props.handleViewPage('pages','edit', postId);
+  },
   render: function(){
     return (
       <div className="content-wrapper">
@@ -217,6 +229,9 @@ const Pages = React.createClass({
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
               Page List
+              <small style={{marginLeft: 5}}>
+                <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
+              </small>
             </h1>
             <ol className="breadcrumb">
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>

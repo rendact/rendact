@@ -44,6 +44,9 @@ const Login = React.createClass({
 	auth0LoginHandle: function(){
 		this.props.authService.showPopup()
 	},
+	handleErrorMsgClose: function(){
+		this.setState({errorMsg: ""});
+	},
 	render: function(){
 		const redirect = (
 			<div>
@@ -63,7 +66,7 @@ const Login = React.createClass({
 			    <p className="login-box-msg">Sign in to start your session</p>
 			    { this.state.errorMsg &&
 			    	<div className="alert alert-danger alert-dismissible">
-	            <button type="button" className="close" data-dismiss="alert" aria-hidden="true">×</button>
+	            <button type="button" className="close" data-dismiss="alert" onClick={this.handleErrorMsgClose}>×</button>
 	            {this.state.errorMsg}
 	          </div>
 			    }

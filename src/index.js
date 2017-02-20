@@ -16,7 +16,7 @@ const Main = React.createClass({
 		this.AuthService.checkAuth(this.onlogin);
 		return {logged: localStorage.getItem("token")?true:false};
 	},
-	onlogin: function(state){
+	setLogged: function(state){
 		this.setState({logged: state});
 	},
 	render: function(){
@@ -26,6 +26,7 @@ const Main = React.createClass({
 					<div id="router" style={{height: "100vh"}}>
 						<MatchWhenAuthorized pattern="/admin/:page?/:action?/:postId?" 
 							component={Admin} 
+							onlogin={this.setLogged} 
 							logged={this.state.logged}
 							authService={this.AuthService} />
 						<Match pattern="/page/:pageId?/:param1?/:param2?" component={ThemeSingle}/>
@@ -40,7 +41,7 @@ const Main = React.createClass({
 					      }}/>
 					    ) : (
 					      <Login logged={this.state.logged} 
-					      	onlogin={this.onlogin} 
+					      	onlogin={this.setLogged} 
 					      	authService={this.AuthService}
 					      	{...props}
 					      />
