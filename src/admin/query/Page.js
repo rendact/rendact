@@ -111,22 +111,24 @@ const getUpdatePostQry = function(id, title, content, draft, visibility, passwor
     }
   };
 
-const createPostMetaMtn = function(postId, metaKeyword, metaDescription, titleTag){
+const createPostMetaMtn = function(postId, metaKeyword, metaDescription, titleTag, pageTemplate){
   return {
     "query": 'mutation{'
     + 'insertKeyword: createPostMeta(input: {postId: "'+postId+'", item: "metaKeyword", value: "'+metaKeyword+'"}){ changedPostMeta{ id } } '
     + 'insertDescription: createPostMeta(input: {postId: "'+postId+'", item: "metaDescription", value: "'+metaDescription+'"}){ changedPostMeta{ id } } '
     + 'insertSummary: createPostMeta(input: {postId: "'+postId+'", item: "titleTag", value: "'+titleTag+'"}){ changedPostMeta{ id } } '
+    + 'insertTemplate: createPostMeta(input: {postId: "'+postId+'", item: "pageTemplate", value: "'+pageTemplate+'"}){ changedPostMeta{ id } } '
     + '}'
   };
 }
 
-const updatePostMetaMtn = function(postMetaId, postId, metaKeyword, metaDescription, titleTag){
+const updatePostMetaMtn = function(postMetaId, postId, metaKeyword, metaDescription, titleTag, pageTemplate){
   return {
     "query": 'mutation{'
     + 'insertKeyword: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "metaKeyword", value: "'+metaKeyword+'"}){ changedPostMeta{ id } } '
     + 'insertDescription: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "metaDescription", value: "'+metaDescription+'"}){ changedPostMeta{ id } } '
     + 'insertSummary: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "titleTag", value: "'+titleTag+'"}){ changedPostMeta{ id } } '
+    + 'insertTemplate: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "template", value: "'+pageTemplate+'"}){ changedPostMeta{ id } } '
     + '}'
   };
 }
