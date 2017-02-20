@@ -29,6 +29,34 @@ const getPageListQry = {"query": `
   } 
 `};
 
+  const getPageDelQry = {"query": `
+      query getPages{
+        viewer {
+          allPosts(where: {type: {eq: "page"}, deleteDate: {isNull: false}}) {
+            edges {
+              node {
+                id
+                title,
+                slug,
+                author {
+                  username
+                },
+                status,
+                comments{
+                  edges{
+                    node{
+                      id
+                    }
+                  }
+                },
+                createdAt
+               }
+            }
+          }
+        }
+        } 
+      `}; 
+      
 const getCreatePostQry = function(title, content, titleTag, draft, visibility, passwordPage, 
   publishDate, userId, slug, parentPage, pageOrder, type){
   return {
@@ -139,6 +167,7 @@ const deletePostQry = function(idList){
 
 const queries = {
   getPageListQry: getPageListQry,
+  getPageDelQry: getPageDelQry,
   getCreatePostQry: getCreatePostQry,
   getUpdatePostQry: getUpdatePostQry,
   getCreatePostMetaQry: getCreatePostMetaQry,

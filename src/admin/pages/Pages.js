@@ -24,9 +24,19 @@ const Pages = React.createClass({
       monthList: []
     }
   },
-  loadData: function(datatable, callback) {
+  loadData: function(datatable, callback, status) {
+                        
     var me = this;
-    console.log(Query.getPageListQry)
+    var q1 = Query.getPageDelQry; 
+    var q2 = Query.getPageListQry;
+    var query = "";
+    if (me.status==='Del') {
+      query = q1;
+    }else{
+      query = q2;
+    };
+    console.log(query)
+    //console.log(Query.getPageDelQry)
     request({
         url: Config.scapholdUrl,
         method: "POST",
@@ -35,7 +45,8 @@ const Pages = React.createClass({
           "content-type": "application/json",
           "Authorization": "Bearer " + localStorage.token
         },
-        body: Query.getPageListQry
+        body: query
+        //body: Query.getPageDelQry
       }, (error, response, body) => {
         if (!error && !body.error) {
           if (body.data) {
@@ -197,7 +208,15 @@ const Pages = React.createClass({
   },
 
   handleFilterBtn: function(){
-    var status = $("#statusFilter").val();
+    var status1 = "Del"; 
+    var status2 = $("#statusFilter").val();
+    var status = "";
+    if ("#statusFilter"==="deleted") {
+      status = status1;
+    }else{
+      status = status2;
+    };
+    //var status = $("#statusFilter").val();
     var date = $("#dateFilter").val();
 
     var searchValue = {
@@ -258,6 +277,7 @@ const Pages = React.createClass({
                             <option value="">All</option>
                             <option value="published">Published</option>
                             <option value="draft">Draft</option>
+                            <option className="deleted" value="deleted">Deleted</option>
                           </select>
                           <button className="btn btn-default btn-flat" id="filterBtn" onClick={this.handleFilterBtn}>Filter</button>
                         <input className="pull-right" placeholder="Search..." id="searchBox" />
