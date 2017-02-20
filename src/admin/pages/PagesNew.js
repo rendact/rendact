@@ -147,6 +147,7 @@ const NewPage = React.createClass({
     var summary = $("#summary").val();
     var status = $("#statusSelect option:selected").text();
     var visibility = $("input[name=visibilityRadio]:checked").val();
+    var pageTemplate = $("#pageTemplate option:selected").text();
     
     var passwordPage = "";
     var year = $("#yy").val();
@@ -218,14 +219,14 @@ const NewPage = React.createClass({
         
         if (me.state.mode==="create"){
           postId = body.data.createPost.changedPost.id;
-          pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag);
+          pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag, pageTemplate);
         } else {
           postId = body.data.updatePost.changedPost.id;
           if (body.data.updatePost.changedPost.meta.edges.length==0) {
-            pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag);
+            pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag, pageTemplate);
           } else {
             postMetaId = body.data.updatePost.changedPost.meta.edges[0].node.id;
-            pmQry = Query.updatePostMetaMtn(postMetaId, postId, metaKeyword, metaDescription, titleTag);
+            pmQry = Query.updatePostMetaMtn(postMetaId, postId, metaKeyword, metaDescription, titleTag, pageTemplate);
           }
         }
         request({
@@ -318,6 +319,7 @@ const NewPage = React.createClass({
     window.CKEDITOR.instances['content'].setData(v.content);
     document.getElementById("summary").value = v.summary;
     document.getElementById("statusSelect").value = v.status;
+    document.getElementById("pageTemplate").value = v.status;
     document.getElementById("parentPage").value = v.parent;
     document.getElementById("pageOrder").value = v.order;
     document.getElementsByName("visibilityRadio")[v.visibility=="Public"?0:1].checked = true;
@@ -373,14 +375,20 @@ const NewPage = React.createClass({
                   <div className="form-inline">
                     { !this.state.permalinkEditing ? 
                       ( <p>Permalink: &nbsp;
-                        <a id="permalink">{Config.rootUrl}/{this.state.slug}</a><button type="button" onClick={this.handlePermalinkBtn} id="editBtn" className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
+                        {this.state.mode==="update"?(
+                          <a id="permalink" href={Config.rootUrl+'/'+this.state.slug}>{Config.rootUrl}/{this.state.slug}</a>
+                          ) : (
+                          <a id="permalink" href="#">{Config.rootUrl}/{this.state.slug}</a>
+                          )
+                        }
+                        <button type="button" onClick={this.handlePermalinkBtn} id="editBtn" className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
                           <span style={{fontSize: 12}}>Edit</span>
                         </button>
                         </p>
                       ) : (
                         <p>Permalink: 
                         <div className="form-group" id="permalinkcontent">
-                          <a id="permalink">{Config.rootUrl}/</a>
+                          <a id="permalink" href="#">{Config.rootUrl}/</a>
                           <input id="slugcontent" value={this.state.slug} onChange={this.handlePermalinkChange}/>
                           <button type="button" className="btn btn-default" onClick={this.handleSavePermalinkBtn}>OK</button>
                         </div>
@@ -579,6 +587,15 @@ const NewPage = React.createClass({
                         <p><b>Parent</b></p>
                         <select id="parentPage" style={{width: 250}}>
                           {this.state.pageList}
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <p><b>Page  Template</b></p>
+                        <select id="pageTemplate" style={{width: 250}}>
+                          <option>Default Theme</option>
+                          <option>Theme 1</option>
+                          <option>Theme 2</option>
+                          <option>Theme 3</option>
                         </select>
                       </div>
                       <div className="form-group">
