@@ -68,7 +68,8 @@ const NewPage = React.createClass({
     var slug = $("#slugcontent").val();
     var me = this;
     this.setState({permalinkInProcess: true});
-    riques( Query.checkSlugQry(slug), 
+    riques( Query.checkSlugQry(slug),
+
       function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
           var slugCount = body.data.viewer.allPosts.edges.length;
@@ -89,7 +90,27 @@ const NewPage = React.createClass({
   handleTitleChange: function(event){
     var title = $("#titlePage").val();
     var slug = title.split(" ").join("-").toLowerCase();
-    this.setState({title: title, slug: slug});
+    var me = this;
+    this.setState({permalinkInProcess: true});
+    riques( Query.checkSlugQry(slug),
+
+      function(error, response, body) {
+        if (!error && !body.errors && response.statusCode === 200) {
+          var slugCount = body.data.viewer.allPosts.edges.length;
+          if (me.state.mode==="create") {
+            if (slugCount > 0) me.setState({permalinkEditing: false, slug: slug+"-2"});
+            else me.setState({permalinkEditing: false, slug: slug});
+          } else {
+            if (slugCount > 1) me.setState({permalinkEditing: false, slug: slug+"-2"});
+            else me.setState({permalinkEditing: false, slug: slug});
+          }
+        } else {
+          me.setState({errorMsg: "error when checking slug"});
+        }
+        me.setState({permalinkInProcess: false});
+      }
+    );
+    me.setState({title: title, slug: slug});
   },
   handleContentChange: function(event){
     var content = $(window.CKEDITOR.instances['content'].getData()).text();
