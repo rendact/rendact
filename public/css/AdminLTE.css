@@ -65,6 +65,13 @@ body {
   margin-left: 230px;
   z-index: 820;
 }
+.content-wrapper-full {
+  -webkit-transition: -webkit-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+  -moz-transition: -moz-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+  -o-transition: -o-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+  z-index: 820;
+}
 .layout-top-nav .content-wrapper,
 .layout-top-nav .right-side,
 .layout-top-nav .main-footer {
@@ -95,6 +102,7 @@ body {
   }
 }
 .content-wrapper,
+.content-wrapper-full,
 .right-side {
   min-height: 100%;
   background-color: #ecf0f5;
