@@ -1,10 +1,10 @@
 import React from 'react';
-import request from 'request';
 import _ from 'lodash';
 import $ from 'jquery';
 window.jQuery = $;
 import Config from '../../config';
 import Query from '../query';
+import {riques, setValue, getValue} from '../../utils';
 
 
 const NewPage = React.createClass({
@@ -16,7 +16,8 @@ const NewPage = React.createClass({
         title: false
       });
       for (var i in window.CKEDITOR.instances) {
-        window.CKEDITOR.instances[i].on('change', me.handleContentChange);
+        if (window.CKEDITOR.instances.hasOwnProperty(i))
+          window.CKEDITOR.instances[i].on('change', me.handleContentChange);
       }
     });
 
@@ -67,29 +68,23 @@ const NewPage = React.createClass({
   handleSavePermalinkBtn: function(event) {
     var slug = $("#slugcontent").val();
     var me = this;
-    request({
-      url: Config.scapholdUrl,
-      method: "POST",
-      json: true,
-      headers: {
-        "content-type": "application/json",
-        "Authorization": "Bearer " + localStorage.token
-      },
-      body: Query.checkSlugQry(slug)
-    }, (error, response, body) => {
-      if (!error && !body.errors && response.statusCode === 200) {
-        var slugCount = body.data.viewer.allPosts.edges.length;
-        if (me.state.mode=="create") {
-          if (slugCount > 0) me.setState({permalinkEditing: false, slug: slug+"-2"});
-          else me.setState({permalinkEditing: false, slug: slug});
+
+    riques( Query.checkSlugQry(slug), 
+      function(error, response, body) {
+        if (!error && !body.errors && response.statusCode === 200) {
+          var slugCount = body.data.viewer.allPosts.edges.length;
+          if (me.state.mode==="create") {
+            if (slugCount > 0) me.setState({permalinkEditing: false, slug: slug+"-2"});
+            else me.setState({permalinkEditing: false, slug: slug});
+          } else {
+            if (slugCount > 1) me.setState({permalinkEditing: false, slug: slug+"-2"});
+            else me.setState({permalinkEditing: false, slug: slug});
+          }
         } else {
-          if (slugCount > 1) me.setState({permalinkEditing: false, slug: slug+"-2"});
-          else me.setState({permalinkEditing: false, slug: slug});
+          me.setState({errorMsg: "error when checking slug"});
         }
-      } else {
-        me.setState({errorMsg: "error when checking slug"});
       }
-    });
+    );
   },
   handleTitleChange: function(event){
     var title = $("#titlePage").val();
@@ -118,7 +113,8 @@ const NewPage = React.createClass({
     var year = $("#yy").val();
     var hour = $("#hh").val();
     var min = $("#min").val();
-    this.setState({immediately: $("#mm option:selected").text() + " " + day + " " + year + " " + "@" + " " + hour + ":" + min});
+    var time = $("#mm option:selected").text() + " " + day + " " + year + " @ " + hour + ":" + min;
+    this.setState({immediately: time});
   },
   saveDraft: function(event){
     this.setState({draft: $("#draftSelect option:selected").text()});
@@ -139,10 +135,10 @@ const NewPage = React.createClass({
   handleSubmit: function(event) {
     event.preventDefault();
     var me = this;
-    var title = $("#titlePage").val();
+    var title = getValue("titlePage");
     var content =  window.CKEDITOR.instances['content'].getData();
-    var titleTag = $("#titleTag").val();
-    var metaKeyword = $("#metaKeyword").val();
+    var titleTag = getValue("titleTag");
+    var metaKeyword = getValue("metaKeyword");
     var metaDescription = $("#metaDescription").val();
     var summary = $("#summary").val();
     var status = $("#statusSelect option:selected").text();
@@ -159,7 +155,7 @@ const NewPage = React.createClass({
     var parentPage = $("#parentPage").val();
     var pageOrder = $("#pageOrder").val();
     var pageOrderInt = 0;
-    try  {pageOrderInt=parseInt(pageOrder)} catch(e) {}
+    try  {pageOrderInt=parseInt(pageOrder,10)} catch(e) {}
     var type = "page";
 
     if (title.length<=3) {
@@ -168,141 +164,90 @@ const NewPage = React.createClass({
     }
 
     this.disableForm(true);
-    var qry = "";
-    var noticeTxt = "";
+    var qry = "", noticeTxt = "";
     if (this.state.mode==="create"){
-      qry = Query.getCreatePostQry(
-        title, 
-        content, 
-        status, 
-        visibility, 
-        passwordPage, 
-        publishDate, 
-        localStorage.getItem('userId'), 
-        this.state.slug,
-        summary,
-        parentPage,
-        pageOrderInt,
-        type);
+      qry = Query.getCreatePostQry(title, content, status, visibility, passwordPage, publishDate, 
+        localStorage.getItem('userId'), this.state.slug, summary, parentPage, pageOrderInt, type);
       noticeTxt = "Page Published!";
     }else{
-      qry = Query.getUpdatePostQry(
-        this.props.postId,
-        title, 
-        content, 
-        status, 
-        visibility, 
-        passwordPage, 
-        publishDate, 
-        localStorage.getItem('userId'), 
-        this.state.slug,
-        summary,
-        parentPage,
-        pageOrderInt);
+      qry = Query.getUpdatePostQry(this.props.postId, title, content, status, visibility, passwordPage, 
+        publishDate, localStorage.getItem('userId'), this.state.slug, summary, parentPage, pageOrderInt);
       noticeTxt = "Page Updated!";
     }
-    request({
-      url: Config.scapholdUrl,
-      method: "POST",
-      json: true,
-      headers: {
-        "content-type": "application/json",
-        "Authorization": "Bearer " + localStorage.token
-      },
-      body: qry
-    }, (error, response, body) => {
-      if (!error && !body.errors && response.statusCode === 200) {
-        var here = me;
-        var postMetaId = "";
-        var postId = "";
-        var pmQry = "";
-        
-        if (me.state.mode==="create"){
-          postId = body.data.createPost.changedPost.id;
-          pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag, pageTemplate);
-        } else {
-          postId = body.data.updatePost.changedPost.id;
-          if (body.data.updatePost.changedPost.meta.edges.length==0) {
+
+    riques(qry, 
+      function(error, response, body){
+        if (!error && !body.errors && response.statusCode === 200) {
+          var here = me;
+          var postMetaId = "";
+          var postId = "";
+          var pmQry = "";
+          
+          if (me.state.mode==="create"){
+            postId = body.data.createPost.changedPost.id;
             pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag, pageTemplate);
           } else {
-            postMetaId = body.data.updatePost.changedPost.meta.edges[0].node.id;
-            pmQry = Query.updatePostMetaMtn(postMetaId, postId, metaKeyword, metaDescription, titleTag, pageTemplate);
-          }
-        }
-        request({
-          url: Config.scapholdUrl,
-          method: "POST",
-          json: true,
-          headers: {
-            "content-type": "application/json",
-            "Authorization": "Bearer " + localStorage.token
-          },
-          body: pmQry
-        }, (error, response, body) => {
-          if (!error && !body.errors && response.statusCode === 200) {
-            
-          } else {
-            if (body && body.errors) {
-              here.setState({errorMsg: body.errors[0].message});
+            postId = body.data.updatePost.changedPost.id;
+            if (body.data.updatePost.changedPost.meta.edges.length===0) {
+              pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag, pageTemplate);
             } else {
-              here.setState({errorMsg: error.toString()});
+              postMetaId = body.data.updatePost.changedPost.meta.edges[0].node.id;
+              pmQry = Query.updatePostMetaMtn(postMetaId, postId, metaKeyword, metaDescription, titleTag, pageTemplate);
             }
           }
-          here.setState({noticeTxt: noticeTxt});
-          here.disableForm(false);
-        });
 
-        me.setState({mode: "update"});
-      } else {
-        if (body && body.errors) {
-          me.setState({errorMsg: body.errors[0].message});
+          riques(pmQry, 
+            function(error, response, body) {
+              if (!error && !body.errors && response.statusCode === 200) {
+                here.setState({noticeTxt: noticeTxt}); 
+              } else {
+                if (body && body.errors) {
+                  here.setState({errorMsg: body.errors[0].message});
+                } else {
+                  here.setState({errorMsg: error.toString()});
+                }
+              }
+              here.disableForm(false);
+            }
+          );
+
+          me.setState({mode: "update"});
         } else {
-          me.setState({errorMsg: error.toString()});
+          if (body && body.errors) {
+            me.setState({errorMsg: body.errors[0].message});
+          } else {
+            me.setState({errorMsg: error.toString()});
+          }
         }
       }
-    });
+    );
   },
   componentWillMount: function(){
     var me = this;
-    request({
-        url: Config.scapholdUrl,
-        method: "POST",
-        json: true,
-        headers: {
-          "content-type": "application/json",
-          "Authorization": "Bearer " + localStorage.token
-        },
-        body: Query.getPageListQry
-      }, (error, response, body) => {
+
+    riques(Query.getPageListQry,
+      function(error, response, body) {
         if (!error) {
           var pageList = [(<option key="0" value="">(no parent)</option>)];
           $.each(body.data.viewer.allPosts.edges, function(key, item){
-            pageList.push((<option key={item.node.id} value={item.node.id} checked={me.state.parent==item.node.id}>
+            pageList.push((<option key={item.node.id} value={item.node.id} checked={me.state.parent=item.node.id}>
               {item.node.title}</option>));
           })
           me.setState({pageList: pageList});
 
           if (!me.props.postId) return;
           var here = me;
-          request({
-              url: Config.scapholdUrl,
-              method: "POST",
-              json: true,
-              headers: {
-                "content-type": "application/json",
-                "Authorization": "Bearer " + localStorage.token
-              },
-              body: Query.getPageQry(this.props.postId)
-            }, (error, response, body) => {
+
+          riques(Query.getPageQry(here.props.postId),
+            function(error, response, body) {
               if (!error) {
                 var values = body.data.getPost;
                 here.setFormValues(values);
               }
-          });
-
+            }
+          )
         }
     });
-
   },
   handleAddNewBtn: function(event) {
     this.resetForm();
@@ -323,23 +268,23 @@ const NewPage = React.createClass({
         meta[i.node.item] = i.node.value;
       });
     }
-    document.getElementById("titlePage").value = v.title;
-    document.getElementById("content").value = v.content;
+    setValue("titlePage", v.title);
+    setValue("content", v.content);
     window.CKEDITOR.instances['content'].setData(v.content);
-    document.getElementById("summary").value = v.summary;
-    document.getElementById("statusSelect").value = v.status;
-    document.getElementById("pageTemplate").value = v.status;
-    document.getElementById("parentPage").value = v.parent;
-    document.getElementById("pageOrder").value = v.order;
-    document.getElementsByName("visibilityRadio")[v.visibility=="Public"?0:1].checked = true;
+    setValue("summary", v.summary);
+    setValue("statusSelect", v.status);
+    setValue("pageTemplate", v.status);
+    setValue("parentPage", v.parent);
+    setValue("pageOrder", v.order);
+    document.getElementsByName("visibilityRadio")[v.visibility==="Public"?0:1].checked = true;
     if (_.has(meta, "metaKeyword")){
-      document.getElementById("metaKeyword").value = meta.metaKeyword;
+      setValue("metaKeyword", meta.metaKeyword);
     }
     if (_.has(meta, "metaDescription")){
-      document.getElementById("metaDescription").value = meta.metaDescription;
+      setValue("metaDescription", meta.metaDescription);
     }
     if (_.has(meta, "titleTag")){
-      document.getElementById("titleTag").value = meta.titleTag;
+      setValue("titleTag", meta.titleTag);
     }
     this.setState({title: v.title, content: v.content, summary: v.summary, 
       status: v.status, parent: v.parent, visibilityTxt: v.visibility});

@@ -1,13 +1,11 @@
 import React from 'react';
-import request from 'request';
 import _ from 'lodash';
 import $ from 'jquery';
 window.jQuery = $;
-
 import Config from '../../config';
 import Query from '../query';
-//window.CKEDITOR_BASEPATH = '/ckeditor/';
-//require('ckeditor');
+
+import {riques, setValue,} from '../../utils';
 
 const NewPost = React.createClass({
   componentDidMount: function(){
@@ -20,7 +18,8 @@ const NewPost = React.createClass({
         title: false
       });
       for (var i in window.CKEDITOR.instances) {
-        window.CKEDITOR.instances[i].on('change', me.handleContentChange);
+        if (window.CKEDITOR.instances.hasOwnProperty(i))
+          window.CKEDITOR.instances[i].on('change', me.handleContentChange);
       }
     });
 
@@ -99,23 +98,22 @@ const NewPost = React.createClass({
     var year = $("#yy").val();
     var hour = $("#hh").val();
     var min = $("#min").val();
-    this.setState({immediately: $("#mm option:selected").text() + " " + day + " " + year + " " + "@" + " " + hour + ":" + min});
-    $("m").hide();
+    var time = $("#mm option:selected").text() + " " + day + " " + year + " @ " + hour + ":" + min
+    this.setState({immediately: time});
   },
   saveDraft: function(event){
     this.setState({draft: $("#statusSelect option:selected").text()});
-    $("s").hide();
   },
   saveVisibility: function(event){
     this.setState({visibilityStatus: true});
     this.setState({visibilityTxt: $("input[name=radiosName]:checked").val()});
-    $("v").hide();
   },
   disableForm: function(state){
     $("#publishBtn").attr('disabled',state);
     this.setState({loadingMsg: state?"Saving...":null});
   },
   handleSubmit: function(event) {
+    event.preventDefault();
     this.disableForm(true);
     var me = this;
     var title = $("#titlePost").val();
@@ -137,85 +135,48 @@ const NewPost = React.createClass({
     var parentPost = $("#parentPost").val();
     var postOrder = $("#postOrder").val();
     var postOrderInt = 0;
-    try  {postOrderInt=parseInt(postOrderInt)} catch(e) {}
+    try  {postOrderInt=parseInt(postOrder,10)} catch(e) {}
     var type = "post";
     
     var qry = "";
     if (this.state.mode==="create"){
-      qry = Query.getCreatePostQry(
-        title, 
-        content, 
-        titleTag, 
-        draft, 
-        visibility, 
-        passwordPage, 
-        publishDate, 
-        localStorage.getItem('userId'), 
-        this.state.slug,
-        parentPost,
-        postOrderInt,
-        type);
+      qry = Query.getCreatePostQry(title, content, titleTag, draft, visibility, passwordPage, 
+        publishDate, localStorage.getItem('userId'), this.state.slug, parentPost, postOrderInt, type);
       me.setState({noticeTxt:"Post Published!"});
     }else{
-      qry = Query.getUpdatePostQry(title, 
-        content, 
-        titleTag, 
-        draft, 
-        visibility, 
-        passwordPage, 
-        publishDate, 
-        localStorage.getItem('userId'), 
-        this.state.slug,
-        parentPost,
-        postOrderInt,
-        type);
+      qry = Query.getUpdatePostQry(title, content, titleTag, draft, visibility, passwordPage, 
+        publishDate, localStorage.getItem('userId'), this.state.slug, parentPost, postOrderInt, type);
       me.setState({noticeTxt:"Post Updated!"});
     }
-    request({
-      url: Config.scapholdUrl,
-      method: "POST",
-      json: true,
-      headers: {
-        "content-type": "application/json",
-        "Authorization": "Bearer " + localStorage.token
-      },
-      body: qry
-    }, (error, response, body) => {
-      if (!error && !body.errors && response.statusCode === 200) {
-        me.setState({mode: "update"});
-      } else {
-        if (body && body.errors) {
-          me.setState({errorMsg: body.errors[0].message});
+
+    riques(qry, 
+      function(error, response, body) {
+        if (!error && !body.errors && response.statusCode === 200) {
+          me.setState({mode: "update"});
         } else {
-          me.setState({errorMsg: error.toString()});
+          if (body && body.errors) {
+            me.setState({errorMsg: body.errors[0].message});
+          } else {
+            me.setState({errorMsg: error.toString()});
+          }
         }
       }
-    });
+    );
     
-    request({
-      url: Config.scapholdUrl,
-      method: "POST",
-      json: true,
-      headers: {
-        "content-type": "application/json",
-        "Authorization": "Bearer " + localStorage.token
-      },
-      body: Query.getCreatePostMetaQry(metaKeyword, metaDescription, summary)
-    }, (error, response, body) => {
-
-      if (!error && !body.errors && response.statusCode === 200) {
-        
-      } else {
-        if (body && body.errors) {
-          me.setState({errorMsg: body.errors[0].message});
+    riques(Query.getCreatePostMetaQry(metaKeyword, metaDescription, summary), 
+      function(error, response, body) {
+        if (!error && !body.errors && response.statusCode === 200) {
+          
         } else {
-          me.setState({errorMsg: error.toString()});
+          if (body && body.errors) {
+            me.setState({errorMsg: body.errors[0].message});
+          } else {
+            me.setState({errorMsg: error.toString()});
+          }
         }
+        me.disableForm(false);
       }
-      me.disableForm(false);
-    });
-
-    event.preventDefault();
+    );
   },
   onTagKeyDown: function(event){
     debugger;
@@ -223,16 +184,8 @@ const NewPost = React.createClass({
   },
   componentWillMount: function(){
     var me = this;
-    request({
-        url: Config.scapholdUrl,
-        method: "POST",
-        json: true,
-        headers: {
-          "content-type": "application/json",
-          "Authorization": "Bearer " + localStorage.token
-        },
-        body: Query.getAllCategoryQry
-      }, (error, response, body) => {
+    riques(Query.getAllCategoryQry, 
+      function(error, response, body) {
         if (!error) {
           var categoryList = [];
           $.each(body.data.viewer.allCategories.edges, function(key, item){
@@ -240,28 +193,31 @@ const NewPost = React.createClass({
           })
           me.setState({categoryList: categoryList});
         }
-    });
+      }
+    );
 
     if (!this.props.postId) return;
 
-    request({
-        url: Config.scapholdUrl,
-        method: "POST",
-        json: true,
-        headers: {
-          "content-type": "application/json",
-          "Authorization": "Bearer " + localStorage.token
-        },
-        body: Query.getPostQry(this.props.postId)
-      }, (error, response, body) => {
+    riques(Query.getPostQry(this.props.postId), 
+      function(error, response, body) {
         if (!error) {
           var values = body.data.getPost;
           me.setFormValues(values);
         }
-    });
+      }
+    );
   },
   handleAddNewBtn: function(event) {
-    window.location = Config.rootUrl+"/admin/posts/new";
+    this.resetForm();
+  },
+  resetForm: function(){
+    document.getElementById("postForm").reset();
+    window.CKEDITOR.instances['content'].setData(null);
+    this.setState({title:"", slug:"", content:"", summary:"", parent:"",
+      status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
+      permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160});
+    this.handleTitleChange();
+    window.history.pushState("", "", '/admin/posts/new');
   },
   setFormValues: function(v){
     var meta = {};
@@ -270,16 +226,16 @@ const NewPost = React.createClass({
         meta[i.node.item] = i.node.value;
       });
     }
-    document.getElementById("titlePost").value = v.title;
-    document.getElementById("content").value = v.content;
-    document.getElementById("summary").value = v.summary;
-    document.getElementById("statusSelect").value = v.status;
-    document.getElementsByName("visibilityRadio")[v.visibility=="Public"?0:1].checked = true;
+    setValue("titlePost", v.title);
+    setValue("content", v.content);
+    setValue("summary", v.summary);
+    setValue("statusSelect", v.status);
+    document.getElementById("visibilityRadio")[v.visibility==="Public"?0:1].checked = true;
     if (_.has(meta, "metaKeyword")){
-      document.getElementById("metaKeyword").value = meta.metaKeyword;
+      setValue("metaKeyword", meta.metaKeyword);
     }
     if (_.has(meta, "metaDescription")){
-      document.getElementById("metaDescription").value = meta.metaDescription;
+      setValue("metaDescription", meta.metaDescription);
     }
     this.setState({title: v.title, slug:v.slug, content: v.content, summary: v.summary, status: v.status});
   },
@@ -306,7 +262,7 @@ const NewPost = React.createClass({
               {this.state.errorMsg}
             </div>
           }
-          <form onSubmit={this.handleSubmit} method="get">
+          <form onSubmit={this.handleSubmit} id="postForm" method="get">
           <div className="col-md-8">
             <div className="form-group"  style={{marginBottom:30}}>
               <div>

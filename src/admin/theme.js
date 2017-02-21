@@ -1,10 +1,9 @@
 import React from 'react';
-import request from 'request';
 import Config from '../config';
 window.config = Config;
 import NotFound from './NotFound';
 import Query from './query';
-
+import {riques} from '../utils';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
 
@@ -85,25 +84,19 @@ const ThemeHome = React.createClass({
 	componentWillMount: function(){
 		var me = this;
 
-		request({
-      url: Config.scapholdUrl,
-      method: "POST",
-      json: true,
-      headers: {
-        "content-type": "application/json"
-      },
-      body: Query.checkSlugQry(this.state.slug)
-    }, (error, response, body) => {
-      if (!error && !body.errors && response.statusCode === 200) {
-        var slugCount = body.data.viewer.allPosts.edges.length;
-        if (slugCount > 0) {
-        	me.setState({isSlugExist: true});
-        }
-      } else {
-        me.setState({errorMsg: "error when checking slug"});
-      }
-      me.setState({loadDone: true});
-    });
+		riques(Query.checkSlugQry(this.state.slug), 
+			(error, response, body) => {
+	      if (!error && !body.errors && response.statusCode === 200) {
+	        var slugCount = body.data.viewer.allPosts.edges.length;
+	        if (slugCount > 0) {
+	        	me.setState({isSlugExist: true});
+	        }
+	      } else {
+	        me.setState({errorMsg: "error when checking slug"});
+	      }
+	      me.setState({loadDone: true});
+	    }
+		);
 	},
 	componentDidMount: function(){
 		var c = window.config.theme;

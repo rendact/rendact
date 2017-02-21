@@ -1,6 +1,5 @@
 import React from 'react';
 import Config from '../config'
-import { Redirect } from 'react-router'
 
 const AdminHeader = React.createClass({
   getInitialState: function(){

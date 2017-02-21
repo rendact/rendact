@@ -6,6 +6,7 @@ window.browserHistory = browserHistory;
 window.Redirect = Redirect;
 import Config from './config';
 import Query from './admin/query';
+import {riques} from './utils';
 
 function AuthService(){
   var me = this;
@@ -68,39 +69,32 @@ function AuthService(){
       isAuth0 = true;
     } catch(e) {}
     
-    request({
-      url: Config.scapholdUrl,
-      method: "POST",
-      json: true,
-      headers: {
-        "content-type": "application/json",
-        "Authorization": "Bearer " + localStorage.token
-      },
-      body: getUserQry
-    }, (error, response, body) => {
-      if (!error && !body.errors && body.data != null && response.statusCode === 200) {
-        if (isAuth0) {
-          if (body.data.loginUserWithAuth0Lock.user) {
-            _setProfile(body.data.loginUserWithAuth0Lock.user);
+    riques(getUserQry, 
+      function(error, response, body) {
+        if (!error && !body.errors && body.data != null && response.statusCode === 200) {
+          if (isAuth0) {
+            if (body.data.loginUserWithAuth0Lock.user) {
+              _setProfile(body.data.loginUserWithAuth0Lock.user);
+            } else {
+              console.log("checkAuth FAILED - no user data");
+              this.logout();  
+            }
           } else {
-            console.log("checkAuth FAILED - no user data");
-            this.logout();  
+            if (body.data.getUser) {
+              _setProfile(body.data.getUser);
+            } else {
+              console.log("checkAuth FAILED - no user data");
+              this.logout();  
+            }
           }
+          console.log("checkAuth OK");
+          cb(true);
         } else {
-          if (body.data.getUser) {
-            _setProfile(body.data.getUser);
-          } else {
-            console.log("checkAuth FAILED - no user data");
-            this.logout();  
-          }
+          console.log("checkAuth FAILED");
+          this.logout();
         }
-        console.log("checkAuth OK");
-        cb(true);
-      } else {
-        console.log("checkAuth FAILED");
-        this.logout();
       }
-    });
+    );
   }
 
   this.doLogin = function(username, password, successFn, failedFn){

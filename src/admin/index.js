@@ -1,5 +1,4 @@
 import React from 'react';
-import {Redirect} from 'react-router'
 import $ from 'jquery';
 const jQuery = $;
 window.jQuery = $;

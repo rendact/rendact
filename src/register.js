@@ -52,7 +52,7 @@ const Register = React.createClass({
     var password = document.getElementById("password").value
     var repassword = document.getElementById("repassword").value
 
-    if (password!=repassword) {
+    if (password!==repassword) {
     	this.setState({errorMsg: "Password is not match"});
     	return;
     }

@@ -1,11 +1,9 @@
 import React from 'react';
-import request from 'request';
 import $ from 'jquery';
 window.jQuery = $;
-import Config from '../../config';
 import Query from '../query';
 import Fn from '../lib/functions';
-// ES6 Modules
+import {riques} from '../../utils';
 import { default as swal } from 'sweetalert2';
 
 const Pages = React.createClass({
@@ -26,75 +24,64 @@ const Pages = React.createClass({
   },
   loadData: function(datatable, callback) {
     var me = this;
-    console.log(Query.getPageListQry)
-    request({
-        url: Config.scapholdUrl,
-        method: "POST",
-        json: true,
-        headers: {
-          "content-type": "application/json",
-          "Authorization": "Bearer " + localStorage.token
-        },
-        body: Query.getPageListQry
-      }, (error, response, body) => {
-        if (!error && !body.error) {
-          if (body.data) {
-            datatable.clear();
-            var monthList = ["all"];
-            var here = me;
-            $.each(body.data.viewer.allPosts.edges, function(key, item){
-              var dt = new Date(item.node.createdAt);
-              var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
-              var author = item.node.author?item.node.author.username:"";
-              var slug = item.node.slug?item.node.slug:"";
-              var status = item.node.status?item.node.status:"";
+    riques(Query.getPageListQry, 
+      function(error, response, body) {
+        if (body.data) {
+          datatable.clear();
+          var monthList = ["all"];
+          var here = me;
+          $.each(body.data.viewer.allPosts.edges, function(key, item){
+            var dt = new Date(item.node.createdAt);
+            var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+            var author = item.node.author?item.node.author.username:"";
+            var slug = item.node.slug?item.node.slug:"";
+            var status = item.node.status?item.node.status:"";
 
-              var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
-              if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
+            var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
+            if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
 
-              datatable.row.add([
-                '<input class="pageListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
-                '<a class="tableItem" href="#" id="tableItem-'+item.node.id+'" >'+item.node.title+'</a>',
-                slug,
-                '<a href="">'+author+'</a>',
-                '<center>'+status+'</center>',
-                '<center>'+item.node.comments.edges.length+'</center>',
-                '<center>'+date+'</center>'
-              ])
-            });
+            datatable.row.add([
+              '<input class="pageListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
+              '<a class="tableItem" href="#" id="tableItem-'+item.node.id+'" >'+item.node.title+'</a>',
+              slug,
+              '<a href="">'+author+'</a>',
+              '<center>'+status+'</center>',
+              '<center>'+item.node.comments.edges.length+'</center>',
+              '<center>'+date+'</center>'
+            ])
+          });
 
-            me.setState({monthList: monthList});
-            datatable.draw();
+          me.setState({monthList: monthList});
+          datatable.draw();
 
-            $(".tableItem").click(function(event){
-              event.preventDefault();
-              var postId = this.id.split("-")[1];
-              here.handleViewPage(postId);
-            });
+          $(".tableItem").click(function(event){
+            event.preventDefault();
+            var postId = this.id.split("-")[1];
+            here.handleViewPage(postId);
+          });
 
-            if (callback) callback.call();
-          }else{
-            if (error)
-              swal(
-                'Failed!',
-                error,
-                'warning'
-              )
-            else if (body.error)
-              swal(
-                'Failed!',
-                body.error,
-                'warning'
-              )
-            else 
-              swal(
-                'Failed!',
-                'Unknown error',
-                'warning'
-              )
-          }
+          if (callback) callback.call();
+        }else{
+          if (error)
+            swal(
+              'Failed!',
+              error,
+              'warning'
+            )
+          else if (body.error)
+            swal(
+              'Failed!',
+              body.error,
+              'warning'
+            )
+          else 
+            swal(
+              'Failed!',
+              'Unknown error',
+              'warning'
+            )
         }
-      } 
+      }
     );
   },
   disableForm: function(state){
@@ -139,43 +126,36 @@ const Pages = React.createClass({
       buttonsStyling: true
     }).then(function () {
       me.disableForm(true);
-      request({
-        url: Config.scapholdUrl,
-        method: "POST",
-        json: true,
-        headers: {
-          "content-type": "application/json",
-          "Authorization": "Bearer " + localStorage.token
-        },
-        body: Query.deletePostQry(idList)
-      }, (error, response, body) => {
-        if (!error && !body.errors && response.statusCode === 200) {
-          console.log(JSON.stringify(body, null, 2));
-          var here = me;
-          var cb = function(){here.disableForm(false)}
-          me.loadData(me.state.dt, cb);
-        } else {
-          if (error)
-            swal(
-              'Failed!',
-              error,
-              'warning'
-            )
-          else if (body.error)
-            swal(
-              'Failed!',
-              body.error,
-              'warning'
-            )
-          else 
-            swal(
-              'Failed!',
-              'Unknown error',
-              'warning'
-            )
-          me.disableForm(false);
+      riques(Query.deletePostQry(idList), 
+        function(error, response, body) {
+          if (!error && !body.errors && response.statusCode === 200) {
+            console.log(JSON.stringify(body, null, 2));
+            var here = me;
+            var cb = function(){here.disableForm(false)}
+            me.loadData(me.state.dt, cb);
+          } else {
+            if (error)
+              swal(
+                'Failed!',
+                error,
+                'warning'
+              )
+            else if (body.error)
+              swal(
+                'Failed!',
+                body.error,
+                'warning'
+              )
+            else 
+              swal(
+                'Failed!',
+                'Unknown error',
+                'warning'
+              )
+            me.disableForm(false);
+          }
         }
-      });  
+      );
     })},
         
   componentDidMount: function(){
@@ -264,7 +244,7 @@ const Pages = React.createClass({
                                 return (<option key="0" value="">All</option>);
                               var s = item.split("/");
                               var monthList = Fn.getMonthList();
-                              var month = monthList[parseInt(s[1])-1];
+                              var month = monthList[parseInt(s[1],10)-1];
                               var year = s[0];
                               return <option key={item} value={item}>{month+" "+year}</option>
                             })}
