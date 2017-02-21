@@ -143,7 +143,6 @@ const ThemeSingle = React.createClass({
 		require('../theme/'+c.path+'/functions.js');
 	},
 	render: function() {
-		debugger;
 		if (this.params.pageId){
 			let Single = getTemplateComponent('single');
 			return <Single postId={this.params.pageId}/>;
@@ -156,8 +155,27 @@ const ThemeSingle = React.createClass({
 	}
 });
 
+const getTemplates = function(){
+	var template = [{
+			id: "default",
+			name: "Default Template"
+		}];
+	//var c = window.config.theme;
+	try {
+		//let Component = require('../theme/'+c.path+'/layouts/Template.js').default;
+		template = [{
+			id: "default",
+			name: "Default Template"
+		}]
+	} catch(e) {
+		
+	}
+	return template;
+}
+
 module.exports = {
 	ThemeHome: ThemeHome,
 	ThemeSingle: ThemeSingle,
-	ThemeBlog: ThemeBlog
+	ThemeBlog: ThemeBlog,
+	getTemplates: getTemplates
 }

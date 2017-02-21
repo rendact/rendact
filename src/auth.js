@@ -69,6 +69,7 @@ function AuthService(){
       isAuth0 = true;
     } catch(e) {}
     
+    var me = this;
     riques(getUserQry, 
       function(error, response, body) {
         if (!error && !body.errors && body.data != null && response.statusCode === 200) {
@@ -77,21 +78,21 @@ function AuthService(){
               _setProfile(body.data.loginUserWithAuth0Lock.user);
             } else {
               console.log("checkAuth FAILED - no user data");
-              this.logout();  
+              me.logout();  
             }
           } else {
             if (body.data.getUser) {
               _setProfile(body.data.getUser);
             } else {
               console.log("checkAuth FAILED - no user data");
-              this.logout();  
+              me.logout();  
             }
           }
           console.log("checkAuth OK");
-          cb(true);
+          if (cb) cb(true);
         } else {
           console.log("checkAuth FAILED");
-          this.logout();
+          me.logout();
         }
       }
     );

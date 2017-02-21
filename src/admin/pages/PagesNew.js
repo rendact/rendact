@@ -5,6 +5,7 @@ window.jQuery = $;
 import Config from '../../config';
 import Query from '../query';
 import {riques, setValue, getValue} from '../../utils';
+import {getTemplates} from '../theme';
 
 
 const NewPage = React.createClass({
@@ -53,7 +54,8 @@ const NewPage = React.createClass({
       mode: this.props.postId?"update":"create",
       pageList: null,
       titleTagLeftCharacter: 65,
-      metaDescriptionLeftCharacter: 160
+      metaDescriptionLeftCharacter: 160,
+      permalinkInProcess: false
     }
   },
 
@@ -62,13 +64,10 @@ const NewPage = React.createClass({
     $("#slugcontent").val(slug);
     this.setState({permalinkEditing: true});
   },
-  handlePermalinkChange: function(event) {
-    
-  },
   handleSavePermalinkBtn: function(event) {
     var slug = $("#slugcontent").val();
     var me = this;
-
+    this.setState({permalinkInProcess: true});
     riques( Query.checkSlugQry(slug), 
       function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
@@ -83,6 +82,7 @@ const NewPage = React.createClass({
         } else {
           me.setState({errorMsg: "error when checking slug"});
         }
+        me.setState({permalinkInProcess: false});
       }
     );
   },
@@ -273,7 +273,6 @@ const NewPage = React.createClass({
     window.CKEDITOR.instances['content'].setData(v.content);
     setValue("summary", v.summary);
     setValue("statusSelect", v.status);
-    setValue("pageTemplate", v.status);
     setValue("parentPage", v.parent);
     setValue("pageOrder", v.order);
     document.getElementsByName("visibilityRadio")[v.visibility==="Public"?0:1].checked = true;
@@ -282,6 +281,9 @@ const NewPage = React.createClass({
     }
     if (_.has(meta, "metaDescription")){
       setValue("metaDescription", meta.metaDescription);
+    }
+    if (_.has(meta, "pageTemplate")){
+      setValue("pageTemplate", meta.pageTemplate);
     }
     if (_.has(meta, "titleTag")){
       setValue("titleTag", meta.titleTag);
@@ -292,6 +294,7 @@ const NewPage = React.createClass({
   },
 
   render: function(){
+    var templates = getTemplates();
     const newPage=(
       <div className="content-wrapper">
         <div className="container-fluid">
@@ -339,15 +342,17 @@ const NewPage = React.createClass({
                         }
                         <button type="button" onClick={this.handlePermalinkBtn} id="editBtn" className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
                           <span style={{fontSize: 12}}>Edit</span>
-                        </button>
+                        </button> 
+                        { this.state.permalinkInProcess && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
                         </p>
                       ) : (
                         <p>Permalink: 
                         <div className="form-group" id="permalinkcontent">
                           <a id="permalink" href="#">{Config.rootUrl}/</a>
-                          <input id="slugcontent" value={this.state.slug} onChange={this.handlePermalinkChange}/>
+                          <input id="slugcontent" defaultValue={this.state.slug}/>
                           <button type="button" className="btn btn-default" onClick={this.handleSavePermalinkBtn}>OK</button>
                         </div>
+                        { this.state.permalinkInProcess && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
                         </p>
                       )
                     }
@@ -548,10 +553,11 @@ const NewPage = React.createClass({
                       <div className="form-group">
                         <p><b>Page  Template</b></p>
                         <select id="pageTemplate" style={{width: 250}}>
-                          <option>Default Theme</option>
-                          <option>Theme 1</option>
-                          <option>Theme 2</option>
-                          <option>Theme 3</option>
+                        { templates ?
+                          templates.map(function(item, index){
+                            return (<option key={item.id} selected={index===0?true:false}>{item.name}</option>)
+                          }) : ""
+                        }
                         </select>
                       </div>
                       <div className="form-group">

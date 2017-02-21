@@ -70,10 +70,38 @@ const createUserMtn = function(username, password, email, fullname, gender) {
     }
 }
 
+const saveProfileMtn = function(name, username, email, gender){
+  return {
+    "query": `mutation UpdateUserQuery ($input: UpdateUserInput!) {
+        updateUser(input: $input) {
+          changedUser {
+            id
+            username
+            fullName
+            gender
+            email
+            lastLogin
+            createdAt
+          }
+        }
+      }`,
+      "variables": {
+        "input": {
+          "id": localStorage.userId,
+          "username": username,
+          "fullName": name,
+          "email": email,
+          "gender": gender
+        }
+      }
+  }
+}
+
 const queries = {
   getUserQry: getUserQry,
   getUserListQry: getUserListQry,
-  createUserMtn: createUserMtn
+  createUserMtn: createUserMtn,
+  saveProfileMtn: saveProfileMtn
 }
 
 module.exports = queries;

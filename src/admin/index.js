@@ -193,7 +193,10 @@ const Admin = React.createClass({
 				page: pageId,
 				action: actionId
 			})
-			window.history.pushState("", "", '/admin/'+pageId+'/'+actionId);
+			if (actionId)
+				window.history.pushState("", "", '/admin/'+pageId+'/'+actionId);
+			else 
+				window.history.pushState("", "", '/admin/'+pageId);
 		}
 	},
 	handleMenuClick: function(pageId){

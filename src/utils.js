@@ -18,7 +18,7 @@ const setValue = function(element, value) {
 	document.getElementById(element).value = value;
 }
 
-const getValue = function(element) {
+let getValue = function(element) {
 	return document.getElementById(element).value;
 }
 
