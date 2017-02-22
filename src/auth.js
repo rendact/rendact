@@ -46,6 +46,7 @@ function AuthService(){
       username: p.username,
       email: p.email,
       gender: p.gender,
+      image: p.image,
       lastLogin: p.lastLogin,
       createdAt: p.createdAt
     }

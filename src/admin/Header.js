@@ -19,6 +19,10 @@ const AdminHeader = React.createClass({
     if (this.props.authService.getProfile())
       profile = this.props.authService.getProfile()
 
+    var image = Config.rootUrl+"/images/avatar-default.png";
+    if (JSON.parse(localStorage.getItem("profile")).image)
+      image = JSON.parse(localStorage.getItem("profile")).image;
+
     let header = (
       <header className="main-header">
       <nav className="navbar navbar-static-top">
@@ -94,12 +98,12 @@ const AdminHeader = React.createClass({
             </li>
             <li className="dropdown user user-menu">
               <a href="#" className="dropdown-toggle" data-toggle="dropdown">
-                <img src={Config.rootUrl+"/images/avatar-default.png"} className="user-image" alt="User" />
+                <img src={image} className="user-image" alt="User" />
                 <span className="hidden-xs">{profile.name}</span>
               </a>
               <ul className="dropdown-menu">
                 <li className="user-header">
-                  <img src={Config.rootUrl+"/images/avatar-default.png"} className="img-circle" alt="User" />
+                  <img src={image} className="img-circle" alt="User" />
 
                   <p>
                     {profile.name}

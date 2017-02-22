@@ -1,12 +1,28 @@
 import React from 'react';
 import Query from '../query';
+import Dropzone from 'react-dropzone';
+import Config from '../../config'
 import {riques, getValue, setValue} from '../../utils';
+
+window.getBase64Image = function(img) {
+  var canvas = document.createElement("canvas");
+  canvas.width = img.width;
+  canvas.height = img.height;
+  var ctx = canvas.getContext("2d");
+  ctx.drawImage(img, 0, 0);
+  var dataURL = canvas.toDataURL("image/png");
+  return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+}
 
 var Profile = React.createClass({
 	getInitialState: function(){
+		var image = Config.rootUrl+"/images/avatar-default.png";
+		if (JSON.parse(localStorage.getItem("profile")).image)
+			image = JSON.parse(localStorage.getItem("profile")).image;
 		return {
 			isSaving: false,
-			errorMsg: null
+			errorMsg: null,
+			avatar: image
 		}
 	},
 	setProfile: function(p) {
@@ -15,6 +31,7 @@ var Profile = React.createClass({
       username: p.username,
       email: p.email,
       gender: p.gender,
+      image: p.image,
       lastLogin: p.lastLogin,
       createdAt: p.createdAt
     }
@@ -28,10 +45,11 @@ var Profile = React.createClass({
 		var username = getValue("username");
 		var email = getValue("email");
 		var gender = getValue("gender");
+		var image = this.state.avatar;
 		//var bio = getValue("bio");
 
 		this.setState({isSaving: true});
-		riques(Query.saveProfileMtn(name, username, email, gender), 
+		riques(Query.saveProfileMtn(name, username, email, gender, image), 
 			function(error, response, body){
 				if(!error && !body.errors) {
 					var p = body.data.updateUser.changedUser;
@@ -40,6 +58,7 @@ var Profile = React.createClass({
 					setValue("email", p.email);
 					setValue("gender",p.gender);
 
+					me.setState({avatar: p.image})
           me.setProfile(p);
 				} else {
 					if (error){
@@ -54,6 +73,15 @@ var Profile = React.createClass({
 				me.setState({isSaving: false});
 			}
 		);
+	},
+	handleImageDrop: function(accepted){
+		var me = this;
+		var reader = new FileReader();
+    reader.onloadend = function(res) {
+      var imageBase64 = res.target.result;
+      me.setState({avatar: imageBase64});
+    }
+    reader.readAsDataURL(accepted[0]);
 	},
 	render: function(){
 		let p = JSON.parse(localStorage.getItem("profile"));
@@ -89,6 +117,19 @@ var Profile = React.createClass({
 										<input type="text" name="name" id="name" className="form-control" defaultValue={p.name}/>
 										<p className="help-block">Your great full name</p>
 									</div>
+								</div>
+
+								<div className="form-group">
+							  	<label htmlFor="name" className="col-md-3">Picture</label>
+							  	<div className="col-md-9">
+									<Dropzone onDrop={this.handleImageDrop}>
+										<div className="avatar-container">
+				              <img src={this.state.avatar} id="avatar"/> 
+										  <div className="avatar-overlay"></div>
+										  <div className="avatar-button"><a href="#"> Change </a></div>
+										</div>
+			            </Dropzone>
+								</div>
 								</div>
 
 					  			<div className="form-group">

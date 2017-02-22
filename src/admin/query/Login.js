@@ -8,6 +8,7 @@ const getLoginAuth0Mtn = function(identities, token, clientId){
               fullName
               gender
               email
+              image
               lastLogin
               createdAt
             }
@@ -34,6 +35,7 @@ const loginUserQry = function(username, password){
             fullName
             gender
             email
+            image
             lastLogin
             createdAt
           }

@@ -6,6 +6,7 @@ const getUserQry  = function(userId){
         '    username                             ' +
         '    fullName                             ' +
         '    gender                               ' +
+        '    image                                ' +
         '    email                                ' +
         '    lastLogin                            ' +
         '    createdAt                            ' +
@@ -52,6 +53,7 @@ const createUserMtn = function(username, password, email, fullname, gender) {
             fullName
             gender
             email
+            image
             lastLogin
             createdAt
           }
@@ -70,7 +72,7 @@ const createUserMtn = function(username, password, email, fullname, gender) {
     }
 }
 
-const saveProfileMtn = function(name, username, email, gender){
+const saveProfileMtn = function(name, username, email, gender, image){
   return {
     "query": `mutation UpdateUserQuery ($input: UpdateUserInput!) {
         updateUser(input: $input) {
@@ -80,6 +82,7 @@ const saveProfileMtn = function(name, username, email, gender){
             fullName
             gender
             email
+            image
             lastLogin
             createdAt
           }
@@ -91,7 +94,8 @@ const saveProfileMtn = function(name, username, email, gender){
           "username": username,
           "fullName": name,
           "email": email,
-          "gender": gender
+          "gender": gender,
+          "image": image
         }
       }
   }
