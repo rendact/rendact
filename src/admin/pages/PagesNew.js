@@ -58,59 +58,46 @@ const NewPage = React.createClass({
       permalinkInProcess: false
     }
   },
+  checkSlug: function(slug){
+    var me = this;
+    this.setState({permalinkInProcess: true});
+    riques( Query.checkSlugQry(slug),
 
+      function(error, response, body) {
+        if (!error && !body.errors && response.statusCode === 200) {
+          var slugCount = body.data.viewer.allPosts.edges.length;
+          if (me.state.mode==="create") {
+            if (slugCount > 0) me.setState({permalinkEditing: false, slug: slug+"-"+slugCount});
+            else me.setState({permalinkEditing: false, slug: slug});
+          } else {
+            if (slugCount > 1) me.setState({permalinkEditing: false, slug: slug+"-"+slugCount});
+            else me.setState({permalinkEditing: false, slug: slug});
+          }
+        } else {
+          me.setState({errorMsg: "error when checking slug"});
+        }
+        me.setState({permalinkInProcess: false});
+      }
+    );
+  },
   handlePermalinkBtn: function(event) {
     var slug = this.state.slug;
     $("#slugcontent").val(slug);
     this.setState({permalinkEditing: true});
   },
+  handleTitleBlur: function(event) {
+    var title = $("#titlePage").val();
+    var slug = title.split(" ").join("-").toLowerCase();
+    this.checkSlug(slug);
+  },
   handleSavePermalinkBtn: function(event) {
     var slug = $("#slugcontent").val();
-    var me = this;
-    this.setState({permalinkInProcess: true});
-    riques( Query.checkSlugQry(slug),
-
-      function(error, response, body) {
-        if (!error && !body.errors && response.statusCode === 200) {
-          var slugCount = body.data.viewer.allPosts.edges.length;
-          if (me.state.mode==="create") {
-            if (slugCount > 0) me.setState({permalinkEditing: false, slug: slug+"-2"});
-            else me.setState({permalinkEditing: false, slug: slug});
-          } else {
-            if (slugCount > 1) me.setState({permalinkEditing: false, slug: slug+"-2"});
-            else me.setState({permalinkEditing: false, slug: slug});
-          }
-        } else {
-          me.setState({errorMsg: "error when checking slug"});
-        }
-        me.setState({permalinkInProcess: false});
-      }
-    );
+    this.checkSlug(slug);
   },
   handleTitleChange: function(event){
     var title = $("#titlePage").val();
     var slug = title.split(" ").join("-").toLowerCase();
-    var me = this;
-    this.setState({permalinkInProcess: true});
-    riques( Query.checkSlugQry(slug),
-
-      function(error, response, body) {
-        if (!error && !body.errors && response.statusCode === 200) {
-          var slugCount = body.data.viewer.allPosts.edges.length;
-          if (me.state.mode==="create") {
-            if (slugCount > 0) me.setState({permalinkEditing: false, slug: slug+"-2"});
-            else me.setState({permalinkEditing: false, slug: slug});
-          } else {
-            if (slugCount > 1) me.setState({permalinkEditing: false, slug: slug+"-2"});
-            else me.setState({permalinkEditing: false, slug: slug});
-          }
-        } else {
-          me.setState({errorMsg: "error when checking slug"});
-        }
-        me.setState({permalinkInProcess: false});
-      }
-    );
-    me.setState({title: title, slug: slug});
+    this.setState({title: title});
   },
   handleContentChange: function(event){
     var content = $(window.CKEDITOR.instances['content'].getData()).text();
@@ -181,6 +168,11 @@ const NewPage = React.createClass({
 
     if (title.length<=3) {
       this.setState({errorMsg: "Title is to short!"});
+      return;
+    }
+
+    if (!content) {
+      this.setState({errorMsg: "Content can't be empty"});
       return;
     }
 
@@ -351,7 +343,7 @@ const NewPage = React.createClass({
             <div className="form-group"  style={{marginBottom:30}}>
               <div>
                 <input id="titlePage" style={{marginBottom: 20}} type="text" className="form-control" 
-                  placeholder="Input Title Here" required="true" onChange={this.handleTitleChange}/>
+                  placeholder="Input Title Here" required="true" onChange={this.handleTitleChange} onBlur={this.handleTitleBlur}/>
                   <div className="form-inline">
                     { !this.state.permalinkEditing ? 
                       ( <p>Permalink: &nbsp;

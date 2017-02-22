@@ -156,7 +156,7 @@ const deletePostQry = function(idList){
 
 const checkSlugQry = function(slug){
   return {
-    query: 'query checkSlug{ viewer { allPosts(where: {type: {eq: "page"}, slug: {eq: "'+slug+'"}}) { edges { node { id } } } } }'
+    query: 'query checkSlug{ viewer { allPosts(where: {type: {eq: "page"}, slug: {like: "'+slug+'"}}) { edges { node { id } } } } }'
   }
 }
 
