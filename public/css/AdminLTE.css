@@ -65,6 +65,13 @@ body {
   margin-left: 230px;
   z-index: 820;
 }
+.content-wrapper-full {
+  -webkit-transition: -webkit-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+  -moz-transition: -moz-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+  -o-transition: -o-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+  z-index: 820;
+}
 .layout-top-nav .content-wrapper,
 .layout-top-nav .right-side,
 .layout-top-nav .main-footer {
@@ -95,6 +102,7 @@ body {
   }
 }
 .content-wrapper,
+.content-wrapper-full,
 .right-side {
   min-height: 100%;
   background-color: #ecf0f5;
@@ -4975,4 +4983,61 @@ table.text-center th {
   border: none;
   margin: 0;
   border-radius: 0;
+}
+.add-new-post-btn {
+  color: white;
+  margin-top: -10px;
+  font-size: 10px;
+  height: 25px
+}
+.avatar-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+
+.avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: #FFF;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.5s ease;
+}
+
+.avatar-container:hover .avatar-overlay {
+  display: block;
+  background: rgba(0, 0, 0, .3);
+}
+
+.avatar-container img {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  left: 0;
+}
+
+.avatar-button {
+  position: absolute;
+  width: 200px;
+  left:0;
+  top: 90px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity .35s ease;
+}
+
+.avatar-button a {
+  width: 200px;
+  padding: 12px 48px;
+  text-align: center;
+  color: white;
+  border: solid 2px white;
+  z-index: 1;
+}
+
+.avatar-container:hover .avatar-button {
+  opacity: 1;
 }

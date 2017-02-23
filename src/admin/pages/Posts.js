@@ -192,9 +192,9 @@ const Posts = React.createClass({
 	                    .search( this.value )
 	                    .draw();
 	            }
-	            return;
+	            return null;
 	        });
-	        return;
+	        return null;
 	    } );
 	    
 	    this.setState({dt: datatable});
@@ -212,6 +212,7 @@ const Posts = React.createClass({
 
     this.state.dt.columns([7,8]).every( function () {
         this.search( searchValue[this.index()] ).draw();
+        return null;
     } );
   },
 
@@ -254,7 +255,7 @@ const Posts = React.createClass({
                                 return <option key="0" value="">All</option>
                               var s = item.split("/");
                               var monthList = Fn.getMonthList();
-                              var month = monthList[parseInt(s[1])-1];
+                              var month = monthList[parseInt(s[1],10)-1];
                               var year = s[0];
                               return <option key={item} value={item}>{month+" "+year}</option>
                             })}

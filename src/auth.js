@@ -6,6 +6,8 @@ window.browserHistory = browserHistory;
 window.Redirect = Redirect;
 import Config from './config';
 import Query from './admin/query';
+import {riques} from './utils';
+import _ from 'lodash';
 
 function AuthService(){
   var me = this;
@@ -17,7 +19,7 @@ function AuthService(){
   })
 
   var _setToken = function(idToken) {    
-    console.log("set token: "+idToken);
+    //console.log("set token: "+idToken);
     localStorage.setItem('token', idToken)
   }
 
@@ -40,17 +42,20 @@ function AuthService(){
   this.lock.on('authenticated', _doAuthentication);
 
   var _setProfile = function(p) {
+    var metaBio = _.find(p.meta.edges, {"node": {"item": "bio"}});
     var profile = {
       name: p.fullName?p.fullName:p.username,
       username: p.username,
       email: p.email,
       gender: p.gender,
+      image: p.image,
       lastLogin: p.lastLogin,
-      createdAt: p.createdAt
+      createdAt: p.createdAt,
+      biography: metaBio?metaBio.node.value:""
     }
     localStorage.setItem("userId", p.id);
     localStorage.setItem('profile', JSON.stringify(profile));
-    console.log("set profile: "+JSON.stringify(profile));
+    //console.log("set profile: "+JSON.stringify(profile));
   }
 
   this.checkAuth = function(cb){
@@ -68,39 +73,33 @@ function AuthService(){
       isAuth0 = true;
     } catch(e) {}
     
-    request({
-      url: Config.scapholdUrl,
-      method: "POST",
-      json: true,
-      headers: {
-        "content-type": "application/json",
-        "Authorization": "Bearer " + localStorage.token
-      },
-      body: getUserQry
-    }, (error, response, body) => {
-      if (!error && !body.errors && body.data != null && response.statusCode === 200) {
-        if (isAuth0) {
-          if (body.data.loginUserWithAuth0Lock.user) {
-            _setProfile(body.data.loginUserWithAuth0Lock.user);
+    var me = this;
+    riques(getUserQry, 
+      function(error, response, body) {
+        if (!error && !body.errors && body.data != null && response.statusCode === 200) {
+          if (isAuth0) {
+            if (body.data.loginUserWithAuth0Lock.user) {
+              _setProfile(body.data.loginUserWithAuth0Lock.user);
+            } else {
+              console.log("checkAuth FAILED - no user data");
+              me.logout();  
+            }
           } else {
-            console.log("checkAuth FAILED - no user data");
-            this.logout();  
+            if (body.data.getUser) {
+              _setProfile(body.data.getUser);
+            } else {
+              console.log("checkAuth FAILED - no user data");
+              me.logout();  
+            }
           }
+          console.log("checkAuth OK");
+          if (cb) cb(true);
         } else {
-          if (body.data.getUser) {
-            _setProfile(body.data.getUser);
-          } else {
-            console.log("checkAuth FAILED - no user data");
-            this.logout();  
-          }
+          console.log("checkAuth FAILED");
+          me.logout();
         }
-        console.log("checkAuth OK");
-        cb(true);
-      } else {
-        console.log("checkAuth FAILED");
-        this.logout();
       }
-    });
+    );
   }
 
   this.doLogin = function(username, password, successFn, failedFn){
@@ -167,10 +166,10 @@ function AuthService(){
   //this.checkAuth();
 }
 
-const MatchWhenAuthorized = ({ component: Component, logged: Logged, authService: AuthService, ...rest }) => (
+const MatchWhenAuthorized = ({ component: Component, logged: Logged, authService: AuthService, onlogin: OnLogin, ...rest }) => (
   <Match {...rest} render={props => (
     Logged ? (
-      <Component AuthService={AuthService} logged={Logged} {...props}/>
+      <Component AuthService={AuthService} onlogin={OnLogin} logged={Logged} {...props}/>
     ) : (
       <Redirect to={{
         pathname: '/login',

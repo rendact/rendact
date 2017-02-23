@@ -24,6 +24,7 @@
     "react-apollo": "^0.4.5",
     "react-bootstrap": "^0.30.2",
     "react-dom": "^15.4.1",
+    "react-dropzone": "^3.10.0",
     "react-fastclick": "^2.1.2",
     "react-fontawesome": "^1.1.0",
     "react-router": "^4.0.0-alpha.6",

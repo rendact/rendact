@@ -1,13 +1,11 @@
 import React from 'react';
-import request from 'request';
 import _ from 'lodash';
 import $ from 'jquery';
 window.jQuery = $;
-
 import Config from '../../config';
 import Query from '../query';
-//window.CKEDITOR_BASEPATH = '/ckeditor/';
-//require('ckeditor');
+import {riques, setValue, getValue} from '../../utils';
+
 
 const NewPost = React.createClass({
   componentDidMount: function(){
@@ -20,7 +18,8 @@ const NewPost = React.createClass({
         title: false
       });
       for (var i in window.CKEDITOR.instances) {
-        window.CKEDITOR.instances[i].on('change', me.handleContentChange);
+        if (window.CKEDITOR.instances.hasOwnProperty(i))
+          window.CKEDITOR.instances[i].on('change', me.handleContentChange);
       }
     });
 
@@ -46,6 +45,7 @@ const NewPost = React.createClass({
       title:"",
       slug:"",
       content:"",
+      category: "",
       summary:"",
       status:"Draft",
       immediately:"",
@@ -59,23 +59,41 @@ const NewPost = React.createClass({
       metaDescriptionLeftCharacter: 160
     }
   },
+  checkSlug: function(slug){
+    var me = this;
+    this.setState({permalinkInProcess: true});
+    riques( Query.checkSlugQry(slug),
 
+      function(error, response, body) {
+        if (!error && !body.errors && response.statusCode === 200) {
+          var slugCount = body.data.viewer.allPosts.edges.length;
+          if (me.state.mode==="create") {
+            if (slugCount > 0) me.setState({permalinkEditing: false, slug: slug+"-"+slugCount});
+            else me.setState({permalinkEditing: false, slug: slug});
+          } else {
+            if (slugCount > 1) me.setState({permalinkEditing: false, slug: slug+"-"+slugCount});
+            else me.setState({permalinkEditing: false, slug: slug});
+          }
+        } else {
+          me.setState({errorMsg: "error when checking slug"});
+        }
+        me.setState({permalinkInProcess: false});
+      }
+    );
+  },
   handlePermalinkBtn: function(event) {
     var slug = this.state.slug;
-    $("#slugEditor").val(slug);
+    $("#slugcontent").val(slug);
     this.setState({permalinkEditing: true});
   },
-  handlePermalinkChange: function(event) {
-    var slug = $("#slugEditor").val();
-    this.setState({slug:slug});
-  },
   handleSavePermalinkBtn: function(event) {
-    this.setState({permalinkEditing: false});
+    var slug = $("#slugcontent").val();
+    this.checkSlug(slug);
   },
   handleTitleChange: function(event){
     var title = $("#titlePost").val();
-    var slug = title.replace(" ","-").toLowerCase();
-    this.setState({title: title, slug: slug})
+    var slug = title.split(" ").join("-").toLowerCase();
+    this.setState({title: title});
   },
   handleContentChange: function(event){
     var content = $(window.CKEDITOR.instances['content'].getData()).text();
@@ -99,33 +117,37 @@ const NewPost = React.createClass({
     var year = $("#yy").val();
     var hour = $("#hh").val();
     var min = $("#min").val();
-    this.setState({immediately: $("#mm option:selected").text() + " " + day + " " + year + " " + "@" + " " + hour + ":" + min});
-    $("m").hide();
+    var time = $("#mm option:selected").text() + " " + day + " " + year + " @ " + hour + ":" + min
+    this.setState({immediately: time});
   },
   saveDraft: function(event){
     this.setState({draft: $("#statusSelect option:selected").text()});
-    $("s").hide();
   },
   saveVisibility: function(event){
-    this.setState({visibilityStatus: true});
-    this.setState({visibilityTxt: $("input[name=radiosName]:checked").val()});
-    $("v").hide();
+    this.setState({visibilityTxt: $("input[name=visibilityRadio]:checked").val()});
   },
   disableForm: function(state){
     $("#publishBtn").attr('disabled',state);
     this.setState({loadingMsg: state?"Saving...":null});
   },
+  handleErrorMsgClose: function(){
+    this.setState({errorMsg: ""});
+  },
+  handleNoticeClose: function(){
+    this.setState({noticeTxt: ""});
+  },
   handleSubmit: function(event) {
-    this.disableForm(true);
+    event.preventDefault();
     var me = this;
-    var title = $("#titlePost").val();
+    var title = getValue("titlePost");
     var content =  window.CKEDITOR.instances['content'].getData();
-    var titleTag = $("#titleTag").val();
-    var metaKeyword = $("#metaKeyword").val();
-    var metaDescription = $("#metaDescription").val();
+    var titleTag = getValue("titleTag");
+    var metaKeyword = getValue("metaKeyword");
+    var metaDescription = getValue("metaDescription");
     var summary = $("#summary").val();
-    var draft = $("#statusSelect option:selected").text();
+    var status = $("#statusSelect option:selected").text();
     var visibility = $("input[name=radiosName]:checked").val();
+    var category = $("#categoryCheckbox").val();
     //var passwordPage = $("#passwordPage").val();
     var passwordPage = "";
     var year = $("#yy").val();
@@ -134,88 +156,76 @@ const NewPost = React.createClass({
     var hour = $("#hh").val();
     var min = $("#min").val();
     var publishDate = year+"-"+month+"-"+day+"@"+hour+":"+min ;
-    var parentPost = $("#parentPost").val();
-    var postOrder = $("#postOrder").val();
-    var postOrderInt = 0;
-    try  {postOrderInt=parseInt(postOrderInt)} catch(e) {}
     var type = "post";
-    
-    var qry = "";
-    if (this.state.mode==="create"){
-      qry = Query.getCreatePostQry(
-        title, 
-        content, 
-        titleTag, 
-        draft, 
-        visibility, 
-        passwordPage, 
-        publishDate, 
-        localStorage.getItem('userId'), 
-        this.state.slug,
-        parentPost,
-        postOrderInt,
-        type);
-      me.setState({noticeTxt:"Post Published!"});
-    }else{
-      qry = Query.getUpdatePostQry(title, 
-        content, 
-        titleTag, 
-        draft, 
-        visibility, 
-        passwordPage, 
-        publishDate, 
-        localStorage.getItem('userId'), 
-        this.state.slug,
-        parentPost,
-        postOrderInt,
-        type);
-      me.setState({noticeTxt:"Post Updated!"});
+
+    if (title.length<=3) {
+      this.setState({errorMsg: "Title is to short!"});
+      return;
     }
-    request({
-      url: Config.scapholdUrl,
-      method: "POST",
-      json: true,
-      headers: {
-        "content-type": "application/json",
-        "Authorization": "Bearer " + localStorage.token
-      },
-      body: qry
-    }, (error, response, body) => {
-      if (!error && !body.errors && response.statusCode === 200) {
-        me.setState({mode: "update"});
-      } else {
-        if (body && body.errors) {
-          me.setState({errorMsg: body.errors[0].message});
+
+    if (!content) {
+      this.setState({errorMsg: "Content can't be empty"});
+      return;
+    }
+    debugger;
+    this.disableForm(true);
+    var qry = "", noticeTxt = "";
+    if (this.state.mode==="create"){
+      qry = Query.getCreatePostQry(title, content, status, visibility, passwordPage, publishDate, 
+        localStorage.getItem('userId'), this.state.slug, summary, category, type);
+      noticeTxt = "Post Published!";
+    }else{
+      qry = Query.getUpdatePostQry(this.props.postId, title, content, status, visibility, passwordPage, 
+        publishDate, localStorage.getItem('userId'), this.state.slug, summary, category);
+      noticeTxt = "Post Updated!";
+    }
+
+    riques(qry, 
+      function(error, response, body) {
+        if (!error && !body.errors && response.statusCode === 200) {
+          var here = me;
+          var postMetaId = "";
+          var postId = "";
+          var pmQry = "";
+
+          if (me.state.mode==="create"){
+            postId = body.data.createPost.changedPost.id;
+            pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag, null);
+          } else {
+            postId = body.data.updatePost.changedPost.id;
+            if (body.data.updatePost.changedPost.meta.edges.length===0) {
+              pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag, null);
+            } else {
+              postMetaId = body.data.updatePost.changedPost.meta.edges[0].node.id;
+              pmQry = Query.updatePostMetaMtn(postMetaId, postId, metaKeyword, metaDescription, titleTag, null);
+            }
+          }
+
+          riques(pmQry, 
+            function(error, response, body) {
+              if (!error && !body.errors && response.statusCode === 200) {
+                here.setState({noticeTxt: noticeTxt}); 
+              } else {
+                if (body && body.errors) {
+                  here.setState({errorMsg: body.errors[0].message});
+                } else {
+                  here.setState({errorMsg: error.toString()});
+                }
+              }
+              here.disableForm(false);
+            }
+          );
+
+           me.setState({mode: "update"});
         } else {
-          me.setState({errorMsg: error.toString()});
+          if (body && body.errors) {
+            me.setState({errorMsg: body.errors[0].message});
+          } else {
+            me.setState({errorMsg: error.toString()});
+          }
         }
       }
-    });
-    
-    request({
-      url: Config.scapholdUrl,
-      method: "POST",
-      json: true,
-      headers: {
-        "content-type": "application/json",
-        "Authorization": "Bearer " + localStorage.token
-      },
-      body: Query.getCreatePostMetaQry(metaKeyword, metaDescription, summary)
-    }, (error, response, body) => {
-
-      if (!error && !body.errors && response.statusCode === 200) {
-        
-      } else {
-        if (body && body.errors) {
-          me.setState({errorMsg: body.errors[0].message});
-        } else {
-          me.setState({errorMsg: error.toString()});
-        }
-      }
-      me.disableForm(false);
-    });
-
-    event.preventDefault();
+    );  
   },
   onTagKeyDown: function(event){
     debugger;
@@ -223,45 +233,40 @@ const NewPost = React.createClass({
   },
   componentWillMount: function(){
     var me = this;
-    request({
-        url: Config.scapholdUrl,
-        method: "POST",
-        json: true,
-        headers: {
-          "content-type": "application/json",
-          "Authorization": "Bearer " + localStorage.token
-        },
-        body: Query.getAllCategoryQry
-      }, (error, response, body) => {
+    riques(Query.getAllCategoryQry, 
+      function(error, response, body) {
         if (!error) {
           var categoryList = [];
           $.each(body.data.viewer.allCategories.edges, function(key, item){
-            categoryList.push((<div><input key={item.node.id} type="checkbox" value=""/> {item.node.name}</div>));
+            categoryList.push((<div><input key={item.node.id} id="categoryCheckbox" name="categoryCheckbox" type="checkbox" value={item.node.name} /> {item.node.name}</div>));
           })
           me.setState({categoryList: categoryList});
         }
-    });
+      }
+    );
 
     if (!this.props.postId) return;
 
-    request({
-        url: Config.scapholdUrl,
-        method: "POST",
-        json: true,
-        headers: {
-          "content-type": "application/json",
-          "Authorization": "Bearer " + localStorage.token
-        },
-        body: Query.getPostQry(this.props.postId)
-      }, (error, response, body) => {
+    riques(Query.getPostQry(this.props.postId), 
+      function(error, response, body) {
         if (!error) {
           var values = body.data.getPost;
           me.setFormValues(values);
         }
-    });
+      }
+    );
   },
   handleAddNewBtn: function(event) {
-    window.location = Config.rootUrl+"/admin/posts/new";
+    this.resetForm();
+  },
+  resetForm: function(){
+    document.getElementById("postForm").reset();
+    window.CKEDITOR.instances['content'].setData(null);
+    this.setState({title:"", slug:"", content:"", summary:"",
+      status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
+      permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160});
+    this.handleTitleChange();
+    window.history.pushState("", "", '/admin/posts/new');
   },
   setFormValues: function(v){
     var meta = {};
@@ -270,16 +275,16 @@ const NewPost = React.createClass({
         meta[i.node.item] = i.node.value;
       });
     }
-    document.getElementById("titlePost").value = v.title;
-    document.getElementById("content").value = v.content;
-    document.getElementById("summary").value = v.summary;
-    document.getElementById("statusSelect").value = v.status;
-    document.getElementsByName("visibilityRadio")[v.visibility=="Public"?0:1].checked = true;
+    setValue("titlePost", v.title);
+    setValue("content", v.content);
+    setValue("summary", v.summary);
+    setValue("statusSelect", v.status);
+    document.getElementById("visibilityRadio")[v.visibility==="Public"?0:1].checked = true;
     if (_.has(meta, "metaKeyword")){
-      document.getElementById("metaKeyword").value = meta.metaKeyword;
+      setValue("metaKeyword", meta.metaKeyword);
     }
     if (_.has(meta, "metaDescription")){
-      document.getElementById("metaDescription").value = meta.metaDescription;
+      setValue("metaDescription", meta.metaDescription);
     }
     this.setState({title: v.title, slug:v.slug, content: v.content, summary: v.summary, status: v.status});
   },
@@ -290,42 +295,58 @@ const NewPost = React.createClass({
           <section className="content-header"  style={{marginBottom:20}}>
               <h1>{this.state.mode==="update"?"Edit Current Post":"Add New Post"}
               { this.state.mode==="update" &&
-                <small style={{marginLeft: 5}}><button onClick={this.handleAddNewBtn}>Add new</button></small>
+                <small style={{marginLeft: 5}}>
+                  <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
+                </small>
               }
               </h1>
                 <ol className="breadcrumb">
                   <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
                   <li>Posts</li>
-                  <li className="active">Add New</li>
+                  <li className="active">{this.state.mode==="update"?"Edit Post":"Add New"}</li>
                 </ol>
                
           </section>
           { this.state.errorMsg &&
             <div className="alert alert-danger alert-dismissible">
-              <button type="button" className="close" data-dismiss="alert" aria-hidden="true">×</button>
+              <button type="button" className="close" onClick={this.handleErrorMsgClose}>×</button>
               {this.state.errorMsg}
             </div>
           }
-          <form onSubmit={this.handleSubmit} method="get">
+          { this.state.noticeTxt &&
+            <div className="alert alert-info alert-dismissible">
+              <button type="button" className="close" onClick={this.handleNoticeClose}>×</button>
+              {this.state.noticeTxt}
+            </div>
+          }
+          <form onSubmit={this.handleSubmit} id="postForm" method="get">
           <div className="col-md-8">
             <div className="form-group"  style={{marginBottom:30}}>
               <div>
                 <input id="titlePost" style={{marginBottom: 20}} type="text" className="form-control" 
-                  placeholder="Input Title Here" required="true" onChange={this.handleTitleChange}/>
+                  placeholder="Input Title Here" required="true" onChange={this.handleTitleChange} onBlur={this.handleTitleBlur}/>
                   <div className="form-inline">
                     { !this.state.permalinkEditing ? 
                       ( <p>Permalink: &nbsp;
-                        <a id="permalink">{Config.rootUrl}/{this.state.slug}</a><button type="button" onClick={this.handlePermalinkBtn} id="editBtn" className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
+                        {this.state.mode==="update"?(
+                          <a id="permalink" href={Config.rootUrl+'/'+this.state.slug}>{Config.rootUrl}/{this.state.slug}</a>
+                          ) : (
+                          <a id="permalink" href="#">{Config.rootUrl}/{this.state.slug}</a>
+                          )
+                        }
+                        <button type="button" onClick={this.handlePermalinkBtn} id="editBtn" className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
                           <span style={{fontSize: 12}}>Edit</span>
-                        </button>
+                        </button> 
+                        { this.state.permalinkInProcess && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
                         </p>
                       ) : (
                         <p>Permalink: 
-                        <div className="form-group" id="permalinkEditor">
-                          <a id="permalink">{Config.rootUrl}/</a>
-                          <input id="slugEditor" value={this.state.slug} onChange={this.handlePermalinkChange}/>
+                        <div className="form-group" id="permalinkcontent">
+                          <a id="permalink" href="#">{Config.rootUrl}/</a>
+                          <input id="slugcontent" defaultValue={this.state.slug}/>
                           <button type="button" className="btn btn-default" onClick={this.handleSavePermalinkBtn}>OK</button>
                         </div>
+                        { this.state.permalinkInProcess && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
                         </p>
                       )
                     }
@@ -363,7 +384,7 @@ const NewPost = React.createClass({
                     <div className="col-md-4">Preview</div>
                     <div className="col-md-8">
                       <p><a href="#">{this.state.title===""?"No Title":this.state.title.substring(0,71)}</a></p>
-                      <p>{this.state.content===""?"":this.state.content.substring(0,100)}</p>
+                      <p>{this.state.content===""?"":this.state.content.substring(0,100).replace(/(<([^>]+)>)/ig,"")}</p>
                       <p><span className="help-block"><a style={{color: 'green'}}>{Config.rootUrl}/{this.state.slug}</a> - <a>Cache</a> - <a>Similar</a></span></p>
                     </div>
                   </div>
@@ -423,7 +444,8 @@ const NewPost = React.createClass({
                                     <option>Draft</option>
                                     <option>Pending Review</option>
                                   </select>
-                                  <button type="button" onClick={this.saveDraft} className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}>OK</button>
+                                  <button type="button" onClick={this.saveDraft} className="btn btn-flat btn-xs btn-primary" 
+                                  style={{marginRight: 10}} data-toggle="collapse" data-target="#statusOption">OK</button>
                                   <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption">Cancel</button>
                                 </form>
                             </div>
@@ -447,7 +469,8 @@ const NewPost = React.createClass({
                               </label>
                             </div>
                             <form className="form-inline" style={{marginTop: 10}}>
-                              <button type="button" onClick={this.saveVisibility} className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}>OK</button>
+                              <button type="button" onClick={this.saveVisibility} className="btn btn-flat btn-xs btn-primary" 
+                              style={{marginRight: 10}} data-toggle="collapse" data-target="#visibilityOption">OK</button>
                               <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#visibilityOption">Cancel</button>
                             </form>
                             </div>
@@ -480,7 +503,8 @@ const NewPost = React.createClass({
                                 <input className="form-control btn btn-flat btn-xs btn-default" type="text" id="min" style={{width: 35, height: 20 }}/>
                               </form>
                                 <form className="form-inline" style={{marginTop: 10}}>
-                                  <button type="button" id="immediatelyOkBtn" onClick={this.saveImmediately} className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}> OK </button>
+                                  <button type="button" id="immediatelyOkBtn" onClick={this.saveImmediately} className="btn btn-flat btn-xs btn-primary" 
+                                  style={{marginRight: 10}} data-toggle="collapse" data-target="#scheduleOption"> OK </button>
                                   <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#scheduleOption">Cancel</button>
                                 </form>
                               </div>

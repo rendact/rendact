@@ -7,20 +7,25 @@ const queries = {
   getUserQry: User.getUserQry,
   getLoginAuth0Mtn: Login.getLoginAuth0Mtn,
   loginUserQry: Login.loginUserQry,
-  getCreatePostQry: Page.getCreatePostQry,
+  getCreatePageQry: Page.getCreatePageQry,
   createPostMetaMtn: Page.createPostMetaMtn,
   updatePostMetaMtn: Page.updatePostMetaMtn,
   getPageQry: Page.getPageQry,
-  getUpdatePostQry: Page.getUpdatePostQry,
+  getUpdatePageQry: Page.getUpdatePageQry,
   getPageListQry: Page.getPageListQry,
   getPageDelQry: Page.getPageDelQry,
   deletePostQry: Page.deletePostQry,
+  getCreatePostQry: Post.getCreatePostQry,
+  getUpdatePostQry: Post.getUpdatePostQry,
   getPostListQry: Post.getPostListQry,
   getAllCategoryQry: Post.getAllCategoryQry,
   getUserListQry: User.getUserListQry,
   createUserMtn: User.createUserMtn,
   getPostQry: Post.getPostQry,
-  checkSlugQry: Page.checkSlugQry
+  checkSlugQry: Page.checkSlugQry,
+  saveProfileMtn: User.saveProfileMtn,
+  saveUserMetaMtn: User.saveUserMetaMtn,
+  createUserMetaMtn: User.createUserMetaMtn
 }
 
 module.exports = queries;

@@ -1,6 +1,5 @@
 import React from 'react';
 import Config from '../config'
-import { Redirect } from 'react-router'
 
 const AdminHeader = React.createClass({
   getInitialState: function(){
@@ -15,16 +14,14 @@ const AdminHeader = React.createClass({
       }
     }
   },
-  handleSignout: function(){
-    //localStorage.token="";
-    //this.setState({logged: false});
-    this.props.authService.logout();
-    location.reload();
-  },
   render: function() {
     var profile = this.props.profile;
     if (this.props.authService.getProfile())
       profile = this.props.authService.getProfile()
+
+    var image = Config.rootUrl+"/images/avatar-default.png";
+    if (JSON.parse(localStorage.getItem("profile")).image)
+      image = JSON.parse(localStorage.getItem("profile")).image;
 
     let header = (
       <header className="main-header">
@@ -101,12 +98,12 @@ const AdminHeader = React.createClass({
             </li>
             <li className="dropdown user user-menu">
               <a href="#" className="dropdown-toggle" data-toggle="dropdown">
-                <img src={Config.rootUrl+"/images/avatar-default.png"} className="user-image" alt="User" />
+                <img src={image} className="user-image" alt="User" />
                 <span className="hidden-xs">{profile.name}</span>
               </a>
               <ul className="dropdown-menu">
                 <li className="user-header">
-                  <img src={Config.rootUrl+"/images/avatar-default.png"} className="img-circle" alt="User" />
+                  <img src={image} className="img-circle" alt="User" />
 
                   <p>
                     {profile.name}
@@ -118,7 +115,7 @@ const AdminHeader = React.createClass({
                     <a href="#" onClick={this.props.onProfileClick} className="btn btn-default btn-flat">Profile</a>
                   </div>
                   <div className="pull-right">
-                    <a href="#" className="btn btn-default btn-flat" onClick={this.handleSignout}>Sign out</a>
+                    <a href="#" className="btn btn-default btn-flat" onClick={this.props.handleSignout}>Sign out</a>
                   </div>
                 </li>
               </ul>

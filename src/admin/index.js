@@ -113,6 +113,12 @@ const PageLoader = React.createClass({
 	getDefaultProps: function() {
 		return {pageId: "dashboard", actionId: ''}
 	},
+	handleAddNewPost: function(){
+		this.props.handleNav('posts','new')
+	},
+	handleAddNewPage: function(){
+		this.props.handleNav('pages','new')
+	},
 	render: function() {
 		var page = this.props.pageId;
 		var action = "";
@@ -123,8 +129,8 @@ const PageLoader = React.createClass({
 			'dashboard' : <Dashboard />,
 			'settings' : <Settings />,
 			'profile' : <Profile />,
-			'posts' : <Posts />,
-			'pages' : <Pages />,
+			'posts' : <Posts handleAddNewPost={this.handleAddNewPost}/>,
+			'pages' : <Pages handleViewPage={this.props.handleNav} handleAddNewPage={this.handleAddNewPage}/>,
 			'themes' : <Themes />,
 			'plugins' : <Plugins />,
 			'users' : <Users />,
@@ -172,24 +178,44 @@ const Admin = React.createClass({
 		}
 	},
 	handleProfileClick: function(){
-		this.setState({
-			page: 'profile'
-		})
-		window.history.pushState("", "", '/admin/profile');
+		this.redirectToPage('profile')
+	},
+	redirectToPage: function(pageId, actionId, postId){
+		if (postId) {
+			this.setState({
+				page: pageId,
+				action: actionId,
+				postId: postId
+			})
+			window.history.pushState("", "", '/admin/'+pageId+'/'+actionId+'/'+postId);
+		} else {
+			this.setState({
+				page: pageId,
+				action: actionId
+			})
+			if (actionId)
+				window.history.pushState("", "", '/admin/'+pageId+'/'+actionId);
+			else 
+				window.history.pushState("", "", '/admin/'+pageId);
+		}
 	},
 	handleMenuClick: function(pageId){
 		var pg = pageId.split("-");
 		this.setState({page: pg[0], action: pg[1]?pg[1]:''})
 		//PageLoader.openPage();
 	},
+	handleSignout: function(){
+		this.props.AuthService.logout();
+		this.props.onlogin(false);
+	},
 	render: function() {
 		if (this.props.AuthService.loggedIn()) {
 			return (
 				<div className="wrapper">
 	        		
-	        <AdminHeader authService={this.props.AuthService} onProfileClick={this.handleProfileClick} />
+	        <AdminHeader authService={this.props.AuthService} handleSignout={this.handleSignout} onProfileClick={this.handleProfileClick} />
 	  			<SideMenu onClick={this.handleMenuClick} activeMenu={this.state.page+(this.state.action?'-':'')+this.state.action}/>
-					<PageLoader pageId={this.state.page} actionId={this.state.action} postId={this.state.postId}/>
+					<PageLoader pageId={this.state.page} actionId={this.state.action} postId={this.state.postId} handleNav={this.redirectToPage}/>
 					<Footer/>
 					<ControlSidebar/>
 					<div className="control-sidebar-bg"></div>

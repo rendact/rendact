@@ -1,12 +1,9 @@
 import React from 'react';
-import request from 'request';
 import _ from 'lodash';
 import $ from 'jquery';
 window.jQuery = $;
-import Config from '../../config';
 import Query from '../query';
-import Fn from '../lib/functions';
-// ES6 Modules
+import {riques} from '../../utils';
 import { default as swal } from 'sweetalert2';
 
 const Users = React.createClass({
@@ -25,18 +22,10 @@ const Users = React.createClass({
     }
   },
   loadData: function(datatable, callback) {
-    var me = this;
     console.log(Query.getUserListQry)
-    request({
-        url: Config.scapholdUrl,
-        method: "POST",
-        json: true,
-        headers: {
-          "content-type": "application/json",
-          "Authorization": "Bearer " + localStorage.token
-        },
-        body: Query.getUserListQry
-      }, (error, response, body) => {
+
+    riques(Query.getUserListQry, 
+      function(error, response, body) {
         if (!error && !body.error) {
           if (body.data) {
             datatable.clear();
@@ -77,7 +66,7 @@ const Users = React.createClass({
               )
           }
         }
-      } 
+      }
     );
   },
   disableForm: function(state){
@@ -122,43 +111,37 @@ const Users = React.createClass({
       buttonsStyling: true
     }).then(function () {
       me.disableForm(true);
-      request({
-        url: Config.scapholdUrl,
-        method: "POST",
-        json: true,
-        headers: {
-          "content-type": "application/json",
-          "Authorization": "Bearer " + localStorage.token
-        },
-        body: Query.deletePostQry(idList)
-      }, (error, response, body) => {
-        if (!error && !body.errors && response.statusCode === 200) {
-          console.log(JSON.stringify(body, null, 2));
-          var here = me;
-          var cb = function(){here.disableForm(false)}
-          me.loadData(me.state.dt, cb);
-        } else {
-          if (error)
-            swal(
-              'Failed!',
-              error,
-              'warning'
-            )
-          else if (body.error)
-            swal(
-              'Failed!',
-              body.error,
-              'warning'
-            )
-          else 
-            swal(
-              'Failed!',
-              'Unknown error',
-              'warning'
-            )
-          me.disableForm(false);
+
+      riques(Query.deletePostQry(idList), 
+        function(error, response, body) {
+          if (!error && !body.errors && response.statusCode === 200) {
+            console.log(JSON.stringify(body, null, 2));
+            var here = me;
+            var cb = function(){here.disableForm(false)}
+            me.loadData(me.state.dt, cb);
+          } else {
+            if (error)
+              swal(
+                'Failed!',
+                error,
+                'warning'
+              )
+            else if (body.error)
+              swal(
+                'Failed!',
+                body.error,
+                'warning'
+              )
+            else 
+              swal(
+                'Failed!',
+                'Unknown error',
+                'warning'
+              )
+            me.disableForm(false);
+          }
         }
-      });  
+      );
     })},
         
   componentDidMount: function(){
