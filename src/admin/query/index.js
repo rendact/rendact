@@ -8,7 +8,8 @@ const queries = {
   getLoginAuth0Mtn: Login.getLoginAuth0Mtn,
   loginUserQry: Login.loginUserQry,
   getCreatePostQry: Page.getCreatePostQry,
-  getCreatePostMetaQry: Page.getCreatePostMetaQry,
+  createPostMetaMtn: Page.createPostMetaMtn,
+  updatePostMetaMtn: Page.updatePostMetaMtn,
   getPageQry: Page.getPageQry,
   getUpdatePostQry: Page.getUpdatePostQry,
   getPageListQry: Page.getPageListQry,
@@ -17,7 +18,9 @@ const queries = {
   getPostListQry: Post.getPostListQry,
   getAllCategoryQry: Post.getAllCategoryQry,
   getUserListQry: User.getUserListQry,
-  createUserMtn: User.createUserMtn
+  createUserMtn: User.createUserMtn,
+  getPostQry: Post.getPostQry,
+  checkSlugQry: Page.checkSlugQry
 }
 
 module.exports = queries;

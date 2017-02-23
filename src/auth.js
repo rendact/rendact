@@ -6,8 +6,6 @@ window.browserHistory = browserHistory;
 window.Redirect = Redirect;
 import Config from './config';
 import Query from './admin/query';
-import $ from 'jquery';
-window.jQuery = $;
 
 function AuthService(){
   var me = this;
@@ -163,7 +161,7 @@ function AuthService(){
     localStorage.removeItem('profile');
     localStorage.removeItem('loginType');
     localStorage.removeItem('auth0_profile');
-    $.ajax('https://rendact.auth0.com/v2/logout');
+    request({url: 'https://rendact.auth0.com/v2/logout'});
   }
 
   //this.checkAuth();

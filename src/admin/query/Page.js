@@ -1,5 +1,4 @@
-import $ from 'jquery';
-window.jQuery = $;
+import _ from 'lodash';
 
 const getPageListQry = {"query": `
   query getPages{
@@ -29,6 +28,7 @@ const getPageListQry = {"query": `
   } 
 `};
 
+
   const getPageDelQry = {"query": `
       query getPages{
         viewer {
@@ -57,16 +57,25 @@ const getPageListQry = {"query": `
         } 
       `}; 
       
-const getCreatePostQry = function(title, content, titleTag, draft, visibility, passwordPage, 
-  publishDate, userId, slug, parentPage, pageOrder, type){
+
+const getCreatePostQry = function(title, content, draft, visibility, passwordPage, 
+  publishDate, userId, slug, summary, parentPage, pageOrder){
   return {
       "query": `
     mutation createPost($input: CreatePostInput!) {
         createPost(input: $input) {
           changedPost {
+            id,
             title,
             content,
-            titleTag
+            summary,
+            meta {
+              edges {
+                node {
+                  id
+                }
+              }
+            }
         }
       }
     }
@@ -75,14 +84,14 @@ const getCreatePostQry = function(title, content, titleTag, draft, visibility, p
         "input": {
           "title": title,
           "content": content,
-          "titleTag": titleTag,
           "status": draft,
           "visibility": visibility,
           "passwordPage": passwordPage,
           "publishDate": publishDate,
-          "type": type,
+          "type": "page",
           "authorId": userId,
           "slug": slug,
+          "summary": summary,
           "parent": parentPage,
           "order": pageOrder
         }
@@ -90,16 +99,24 @@ const getCreatePostQry = function(title, content, titleTag, draft, visibility, p
     }
   };
 
-const getUpdatePostQry = function(id, title, content, titleTag, draft, visibility, passwordPage, 
-  publishDate, userId, slug, parentPage, pageOrder, type){
+const getUpdatePostQry = function(id, title, content, draft, visibility, passwordPage, 
+  publishDate, userId, slug, summary, parentPage, pageOrder){
   return {
       "query": `
     mutation updatePost($input: UpdatePostInput!) {
         updatePost(input: $input) {
           changedPost {
+            id,
             title,
             content,
-            titleTag
+            summary,
+            meta {
+              edges {
+                node {
+                  id
+                }
+              }
+            }
         }
       }
     }
@@ -109,14 +126,14 @@ const getUpdatePostQry = function(id, title, content, titleTag, draft, visibilit
           "id": id,
           "title": title,
           "content": content,
-          "titleTag": titleTag,
           "status": draft,
           "visibility": visibility,
           "passwordPage": passwordPage,
           "publishDate": publishDate,
-          "type": type,
+          "type": "page",
           "authorId": userId,
           "slug": slug,
+          "summary": summary,
           "parent": parentPage,
           "order": pageOrder
         }
@@ -124,39 +141,39 @@ const getUpdatePostQry = function(id, title, content, titleTag, draft, visibilit
     }
   };
 
-const getCreatePostMetaQry = function(metaKeyword, metaDescription, summary){
+const createPostMetaMtn = function(postId, metaKeyword, metaDescription, titleTag){
   return {
-      "query": `
-        mutation createPostMeta($input: CreatePostMetaInput!) {
-          createPostMeta(input: $input) {
-            changedPostMeta {
-              metaKeyword,
-              metaDescription,
-              summary
-            }
-          }
-        }
-    `,
-      "variables": {
-        "input": {
-          "metaKeyword": metaKeyword,
-          "metaDescription": metaDescription,
-          "summary": summary
-        }
-      }
-    }
+    "query": 'mutation{'
+    + 'insertKeyword: createPostMeta(input: {postId: "'+postId+'", item: "metaKeyword", value: "'+metaKeyword+'"}){ changedPostMeta{ id } } '
+    + 'insertDescription: createPostMeta(input: {postId: "'+postId+'", item: "metaDescription", value: "'+metaDescription+'"}){ changedPostMeta{ id } } '
+    + 'insertSummary: createPostMeta(input: {postId: "'+postId+'", item: "titleTag", value: "'+titleTag+'"}){ changedPostMeta{ id } } '
+    + '}'
   };
+}
+
+const updatePostMetaMtn = function(postMetaId, postId, metaKeyword, metaDescription, titleTag){
+  return {
+    "query": 'mutation{'
+    + 'insertKeyword: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "metaKeyword", value: "'+metaKeyword+'"}){ changedPostMeta{ id } } '
+    + 'insertDescription: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "metaDescription", value: "'+metaDescription+'"}){ changedPostMeta{ id } } '
+    + 'insertSummary: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "titleTag", value: "'+titleTag+'"}){ changedPostMeta{ id } } '
+    + '}'
+  };
+}
+
 
 const getPageQry = function(postId){
   return {"query": 
-      '{getPost(id:"'+postId+'"){ id,title,content,slug,author{username},status,comments{edges{node{id}}},createdAt}}'
+      '{getPost(id:"'+postId+'"){ id,title,content,slug,author{username},status,visibility,parent,order,'
+      +'summary,category{edges{node{category{id,name}}}}comments{edges{node{id}}},meta{edges{node{item,value}'
+      +'}}createdAt}}'
     }
   };
 
 const deletePostQry = function(idList){
   var query = "mutation { ";
-  $.each(idList, function(key, val){
-    query += ' DeletePost'+key+': updatePost(input: {id: "'+val+'", deleteDate: "'+new Date()+'"}){ changedPost{ id } }'; 
+  _.forEach(idList, function(val, index){
+    query += ' DeletePost'+index+' : updatePost(input: {id: "'+val+'", deleteDate: "'+new Date()+'"}){ changedPost{ id } }'; 
   });
   query += "}";
 
@@ -165,14 +182,22 @@ const deletePostQry = function(idList){
   }
 };
 
+const checkSlugQry = function(slug){
+  return {
+    query: 'query checkSlug{ viewer { allPosts(where: {type: {eq: "page"}, slug: {eq: "'+slug+'"}}) { edges { node { id } } } } }'
+  }
+}
+
 const queries = {
   getPageListQry: getPageListQry,
   getPageDelQry: getPageDelQry,
   getCreatePostQry: getCreatePostQry,
   getUpdatePostQry: getUpdatePostQry,
-  getCreatePostMetaQry: getCreatePostMetaQry,
+  createPostMetaMtn: createPostMetaMtn,
+  updatePostMetaMtn: updatePostMetaMtn,
   getPageQry: getPageQry,
-  deletePostQry: deletePostQry
+  deletePostQry: deletePostQry,
+  checkSlugQry: checkSlugQry
 }
 
 module.exports = queries;

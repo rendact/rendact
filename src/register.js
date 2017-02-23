@@ -1,8 +1,5 @@
 import React from 'react';
 import request from 'request';
-import $ from 'jquery';
-window.jQuery = $;
-
 import Config from './config';
 import Query from './admin/query';
 import AdminLTEinit from './admin/lib/app.js';
@@ -17,12 +14,12 @@ const Register = React.createClass({
 		}
 	},
 	disableForm: function(state){
-		$("#username").attr('disabled',state);
-		$("#fullname").attr('disabled',state);
-		$("#email").attr('disabled',state);
-		$("#password").attr('disabled',state);
-		$("#repassword").attr('disabled',state);
-		$("#registerBtn").attr('disabled',state);
+		document.getElementById("username").attributes.disabled = state;
+		document.getElementById("fullname").attributes.disabled = state;
+		document.getElementById("email").attributes.disabled = state;
+		document.getElementById("password").attributes.disabled = state;
+		document.getElementById("repassword").attributes.disabled = state;
+		document.getElementById("registerBtn").attributes.disabled = state;
 		this.setState({loadingMsg: state?"Sending...":null});
 	},
 	componentDidMount: function(){
@@ -48,12 +45,12 @@ const Register = React.createClass({
 	handleSubmit: function(event) {
 		event.preventDefault();
 
-		var fullname = $("#fullname").val();
-		var username = $("#username").val();
-		var email = $("#email").val();
-		var gender = $("#gender").val();
-    var password = $("#password").val();
-    var repassword = $("#repassword").val();
+		var fullname = document.getElementById("fullname").value;
+		var username = document.getElementById("username").value
+		var email = document.getElementById("email").value
+		var gender = document.getElementById("gender").value
+    var password = document.getElementById("password").value
+    var repassword = document.getElementById("repassword").value
 
     if (password!=repassword) {
     	this.setState({errorMsg: "Password is not match"});

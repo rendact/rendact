@@ -1,5 +1,6 @@
 import React from 'react';
 import request from 'request';
+import _ from 'lodash';
 import $ from 'jquery';
 window.jQuery = $;
 import Config from '../../config';
@@ -39,7 +40,7 @@ const Users = React.createClass({
         if (!error && !body.error) {
           if (body.data) {
             datatable.clear();
-            $.each(body.data.viewer.allUsers.edges, function(key, item){
+            _.forEach(body.data.viewer.allUsers.edges, function(item){
               var img = "<img src='/images/photo1.png' width='100' />";
               datatable.row.add([
                 '<input class="userListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
@@ -80,10 +81,10 @@ const Users = React.createClass({
     );
   },
   disableForm: function(state){
-    $("#filterBtn").attr('disabled',state);
-    $("#deleteBtn").attr('disabled',state);
-    $("#dateFilter").attr('disabled',state);
-    $("#statusFilter").attr('disabled',state);
+    document.getElementById("filterBtn").attributes.disabled = state;
+    document.getElementById("deleteBtn").attributes.disabled = state;
+    document.getElementById("dateFilter").attributes.disabled = state;
+    document.getElementById("statusFilter").attributes.disabled = state;
     this.setState({loadingMsg: state?"Processing...":null});
   },
   handleDeleteBtn: function(event){
@@ -164,6 +165,7 @@ const Users = React.createClass({
     var datatable = $('#userListTbl').DataTable({
       sDom: '<"H"r>t<"F"ip>',
     });
+    
     $('#selectAll').click(function () {
         $(':checkbox', datatable.rows().nodes()).prop('checked', this.checked);
     });
@@ -180,7 +182,6 @@ const Users = React.createClass({
         });
         return null;
     } );
-    
     this.setState({dt: datatable});
     this.loadData(datatable);
   },

@@ -1,5 +1,6 @@
 import React from 'react';
 import request from 'request';
+import _ from 'lodash';
 import $ from 'jquery';
 window.jQuery = $;
 
@@ -14,7 +15,7 @@ const NewPost = React.createClass({
     require('../lib/bootstrap-tagsinput.css');
     var me = this;
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
-      window.CKEDITOR.replace('editor1', {
+      window.CKEDITOR.replace('content', {
         height: 400,
         title: false
       });
@@ -46,7 +47,7 @@ const NewPost = React.createClass({
       slug:"",
       content:"",
       summary:"",
-      draft:"Draft",
+      status:"Draft",
       immediately:"",
       immediatelyStatus:false,
       visibilityTxt:"",
@@ -77,11 +78,11 @@ const NewPost = React.createClass({
     this.setState({title: title, slug: slug})
   },
   handleContentChange: function(event){
-    var content = $(window.CKEDITOR.instances['editor1'].getData()).text();
+    var content = $(window.CKEDITOR.instances['content'].getData()).text();
     this.setState({content: content})
   },
   handleSummaryChange: function(event){
-    var summary = $("#editor2").val();
+    var summary = $("#summary").val();
     this.setState({summary: summary})
   },
   handleTitleTagChange: function(event){
@@ -102,7 +103,7 @@ const NewPost = React.createClass({
     $("m").hide();
   },
   saveDraft: function(event){
-    this.setState({draft: $("#draftSelect option:selected").text()});
+    this.setState({draft: $("#statusSelect option:selected").text()});
     $("s").hide();
   },
   saveVisibility: function(event){
@@ -118,12 +119,12 @@ const NewPost = React.createClass({
     this.disableForm(true);
     var me = this;
     var title = $("#titlePost").val();
-    var content =  window.CKEDITOR.instances['editor1'].getData();
+    var content =  window.CKEDITOR.instances['content'].getData();
     var titleTag = $("#titleTag").val();
     var metaKeyword = $("#metaKeyword").val();
     var metaDescription = $("#metaDescription").val();
-    var summary = $("#editor2").val();
-    var draft = $("#draftSelect option:selected").text();
+    var summary = $("#summary").val();
+    var draft = $("#statusSelect option:selected").text();
     var visibility = $("input[name=radiosName]:checked").val();
     //var passwordPage = $("#passwordPage").val();
     var passwordPage = "";
@@ -255,16 +256,33 @@ const NewPost = React.createClass({
       }, (error, response, body) => {
         if (!error) {
           var values = body.data.getPost;
-          $("#titlePost").val(values.title);
-          $("#editor1").val(values.content);
-          me.setState({title: values.title, slug:values.slug, content: values.content});
+          me.setFormValues(values);
         }
     });
   },
   handleAddNewBtn: function(event) {
     window.location = Config.rootUrl+"/admin/posts/new";
   },
-
+  setFormValues: function(v){
+    var meta = {};
+    if (v.meta.edges.length>0) {
+      _.forEach(v.meta.edges, function(i){
+        meta[i.node.item] = i.node.value;
+      });
+    }
+    document.getElementById("titlePost").value = v.title;
+    document.getElementById("content").value = v.content;
+    document.getElementById("summary").value = v.summary;
+    document.getElementById("statusSelect").value = v.status;
+    document.getElementsByName("visibilityRadio")[v.visibility=="Public"?0:1].checked = true;
+    if (_.has(meta, "metaKeyword")){
+      document.getElementById("metaKeyword").value = meta.metaKeyword;
+    }
+    if (_.has(meta, "metaDescription")){
+      document.getElementById("metaDescription").value = meta.metaDescription;
+    }
+    this.setState({title: v.title, slug:v.slug, content: v.content, summary: v.summary, status: v.status});
+  },
   render: function(){
     const newPost=(
       <div className="content-wrapper">
@@ -312,7 +330,7 @@ const NewPost = React.createClass({
                       )
                     }
                   </div>
-                  <textarea id="editor1" name="editor1" rows="25" style={{width: "100%"}} wrap="hard" required="true"></textarea>
+                  <textarea id="content" name="content" rows="25" style={{width: "100%"}} wrap="hard" required="true"></textarea>
                   <div id="trackingDiv"></div>
               </div>
             </div>
@@ -326,7 +344,7 @@ const NewPost = React.createClass({
                   </div>
                 </div>
                 <div className="box-body pad">
-                <textarea id="editor2" name="editor2" wrap="hard" rows="3" style={{width: '100%'}} onChange={this.handleSummaryChange}>
+                <textarea id="summary" name="summary" wrap="hard" rows="3" style={{width: '100%'}} onChange={this.handleSummaryChange}>
                 </textarea>                 
                 </div>
               </div>
@@ -395,12 +413,12 @@ const NewPost = React.createClass({
                       
                       <div className="form-group">
                           <p style={{fontSize: 14}}><span className="glyphicon glyphicon-pushpin" style={{marginRight:10}}></span>
-                          Status: <b>{this.state.draft} </b>
+                          Status: <b>{this.state.status} </b>
                           <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption"> Edit </button></p>
                           <div id="statusOption" className="collapse">
                             <div className="form-group">
                                 <form className="form-inline">
-                                  <select id="draftSelect" style={{marginRight: 10, height: 30}}>
+                                  <select id="statusSelect" style={{marginRight: 10, height: 30}}>
                                     <option>Published</option>
                                     <option>Draft</option>
                                     <option>Pending Review</option>
@@ -418,13 +436,13 @@ const NewPost = React.createClass({
                           <div id="visibilityOption" className="collapse">
                             <div className="radio">
                               <label>
-                                <input type="radio" name="radiosName" id="publicRadios" value="Public"/>
+                                <input type="radio" name="visibilityRadio" id="public" value="Public"/>
                                 Public
                               </label>
                             </div>
                             <div className="radio">
                               <label>
-                                <input type="radio" name="radiosName" id="privateRadios" value="Private"/>
+                                <input type="radio" name="visibilityRadio" id="private" value="Private"/>
                                 Private
                               </label>
                             </div>
@@ -463,8 +481,8 @@ const NewPost = React.createClass({
                               </form>
                                 <form className="form-inline" style={{marginTop: 10}}>
                                   <button type="button" id="immediatelyOkBtn" onClick={this.saveImmediately} className="btn btn-flat btn-xs btn-primary" style={{marginRight: 10}}> OK </button>
+                                  <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#scheduleOption">Cancel</button>
                                 </form>
-                                <button type="button" style={{marginTop: 10}} className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#scheduleOption">Cancel</button>
                               </div>
                           </div>
                       </div> 
@@ -479,7 +497,7 @@ const NewPost = React.createClass({
                               <span className="sr-only">Toggle Dropdown</span>
                             </button>
                             <ul className="dropdown-menu" role="menu">
-                              <li><button type="submit" className="btn btn-default btn-flat">{this.state.draft==="Draft"?"Save As Draft":""}</button></li>
+                              <li><button type="submit" className="btn btn-default btn-flat">{this.state.status==="Draft"?"Save As Draft":""}</button></li>
                             </ul>
                           </div>
                           <p>{this.state.loadingMsg}</p>

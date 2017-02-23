@@ -24,19 +24,9 @@ const Pages = React.createClass({
       monthList: []
     }
   },
-  loadData: function(datatable, callback, status) {
-                        
+  loadData: function(datatable, callback) {
     var me = this;
-    var q1 = Query.getPageDelQry; 
-    var q2 = Query.getPageListQry;
-    var query = "";
-    if (me.status==='Del') {
-      query = q1;
-    }else{
-      query = q2;
-    };
-    console.log(query)
-    //console.log(Query.getPageDelQry)
+    console.log(Query.getPageListQry)
     request({
         url: Config.scapholdUrl,
         method: "POST",
@@ -45,12 +35,12 @@ const Pages = React.createClass({
           "content-type": "application/json",
           "Authorization": "Bearer " + localStorage.token
         },
-        body: query
-        //body: Query.getPageDelQry
+        body: Query.getPageListQry
       }, (error, response, body) => {
-        if (!error && !body.error) {
+        if (!error && !body.error) { 
           if (body.data) {
             datatable.clear();
+            datatable.draw();
             var monthList = ["all"];
             $.each(body.data.viewer.allPosts.edges, function(key, item){
               var dt = new Date(item.node.createdAt);
@@ -191,7 +181,6 @@ const Pages = React.createClass({
     });
     datatable.columns(1).every( function () {
         var that = this;
- 
         $('#searchBox', this.footer() ).on( 'keyup change', function () {
             if ( that.search() !== this.value ) {
                 that
@@ -202,32 +191,94 @@ const Pages = React.createClass({
         });
         return null;
     } );
-    
     this.setState({dt: datatable});
     this.loadData(datatable);
   },
 
-  handleFilterBtn: function(){
-    var status1 = "Del"; 
-    var status2 = $("#statusFilter").val();
-    var status = "";
-    if ("#statusFilter"==="deleted") {
-      status = status1;
-    }else{
-      status = status2;
-    };
-    //var status = $("#statusFilter").val();
-    var date = $("#dateFilter").val();
+  handleFilterBtn: function(datatable, callback){
+    var datatable = $('#pageListTbl').DataTable();
+    var status = $("#statusFilter").val();
+    if(status==='deleted'){
+      
+        var me = this;
+        console.log(Query.getPageDelQry)
+        request({
+            url: Config.scapholdUrl,
+            method: "POST",
+            json: true,
+            headers: {
+              "content-type": "application/json",
+              "Authorization": "Bearer " + localStorage.token
+            },
+            body: Query.getPageDelQry
+          }, (error, response, body) => {
+            if (!error && !body.error) { 
+              if (body.data) {
+                datatable.clear();
+                datatable.draw();
+                var monthList = ["all"];
+                $.each(body.data.viewer.allPosts.edges, function(key, item){
+                  var dt = new Date(item.node.createdAt);
+                  var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+                  var author = item.node.author?item.node.author.username:"";
+                  var slug = item.node.slug?item.node.slug:"";
+                  var status = item.node.status?item.node.status:"";
 
-    var searchValue = {
-      4: status,
-      6: date
-    }
+                  var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
+                  if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
 
-    this.state.dt.columns([4,6]).every( function () {
-        this.search( searchValue[this.index()] ).draw();
-        return null;
-    } );
+                  datatable.row.add([
+                    '<input class="pageListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
+                    '<a href="/admin/pages/edit/'+item.node.id+'" >'+item.node.title+'</a>',
+                    slug,
+                    '<a href="">'+author+'</a>',
+                    '<center>'+status+'</center>',
+                    '<center>'+item.node.comments.edges.length+'</center>',
+                    '<center>'+date+'</center>'
+                  ])
+                });
+
+                if (callback) callback.call();
+
+                me.setState({monthList: monthList});
+                datatable.draw();
+              }/*else{
+                if (error)
+                  swal(
+                    'Failed!',
+                    error,
+                    'warning'
+                  )
+                else if (body.error)
+                  swal(
+                    'Failed!',
+                    body.error,
+                    'warning'
+                  )
+                else 
+                  swal(
+                    'Failed!',
+                    'Unknown error',
+                    'warning'
+                  )
+              }*/
+            }
+          } 
+        );
+      }else{
+        var status = $("#statusFilter").val();
+        var date = $("#dateFilter").val();
+        var searchValue = {
+          4: status,
+          6: date
+        };
+        this.loadData(
+          this.state.dt.columns([4,6]).every( function () {
+            this.search( searchValue[this.index()] ).draw();
+            return null;
+          })
+        )
+    } ;
   },
   render: function(){
     return (
@@ -277,7 +328,7 @@ const Pages = React.createClass({
                             <option value="">All</option>
                             <option value="published">Published</option>
                             <option value="draft">Draft</option>
-                            <option className="deleted" value="deleted">Deleted</option>
+                            <option value="deleted">Deleted</option>
                           </select>
                           <button className="btn btn-default btn-flat" id="filterBtn" onClick={this.handleFilterBtn}>Filter</button>
                         <input className="pull-right" placeholder="Search..." id="searchBox" />
