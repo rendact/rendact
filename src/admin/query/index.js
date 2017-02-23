@@ -20,7 +20,9 @@ const queries = {
   createUserMtn: User.createUserMtn,
   getPostQry: Post.getPostQry,
   checkSlugQry: Page.checkSlugQry,
-  saveProfileMtn: User.saveProfileMtn
+  saveProfileMtn: User.saveProfileMtn,
+  saveUserMetaMtn: User.saveUserMetaMtn,
+  createUserMetaMtn: User.createUserMetaMtn
 }
 
 module.exports = queries;

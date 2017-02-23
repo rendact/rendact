@@ -7,6 +7,7 @@ window.Redirect = Redirect;
 import Config from './config';
 import Query from './admin/query';
 import {riques} from './utils';
+import _ from 'lodash';
 
 function AuthService(){
   var me = this;
@@ -18,7 +19,7 @@ function AuthService(){
   })
 
   var _setToken = function(idToken) {    
-    console.log("set token: "+idToken);
+    //console.log("set token: "+idToken);
     localStorage.setItem('token', idToken)
   }
 
@@ -41,6 +42,7 @@ function AuthService(){
   this.lock.on('authenticated', _doAuthentication);
 
   var _setProfile = function(p) {
+    var metaBio = _.find(p.meta.edges, {"node": {"item": "bio"}});
     var profile = {
       name: p.fullName?p.fullName:p.username,
       username: p.username,
@@ -48,11 +50,12 @@ function AuthService(){
       gender: p.gender,
       image: p.image,
       lastLogin: p.lastLogin,
-      createdAt: p.createdAt
+      createdAt: p.createdAt,
+      biography: metaBio?metaBio.node.value:""
     }
     localStorage.setItem("userId", p.id);
     localStorage.setItem('profile', JSON.stringify(profile));
-    console.log("set profile: "+JSON.stringify(profile));
+    //console.log("set profile: "+JSON.stringify(profile));
   }
 
   this.checkAuth = function(cb){
