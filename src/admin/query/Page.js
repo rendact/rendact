@@ -28,7 +28,7 @@ const getPageListQry = {"query": `
   } 
 `};
 
-const getCreatePostQry = function(title, content, draft, visibility, passwordPage, 
+const getCreatePageQry = function(title, content, draft, visibility, passwordPage, 
   publishDate, userId, slug, summary, parentPage, pageOrder){
   return {
       "query": `
@@ -69,7 +69,7 @@ const getCreatePostQry = function(title, content, draft, visibility, passwordPag
     }
   };
 
-const getUpdatePostQry = function(id, title, content, draft, visibility, passwordPage, 
+const getUpdatePageQry = function(id, title, content, draft, visibility, passwordPage, 
   publishDate, userId, slug, summary, parentPage, pageOrder){
   return {
       "query": `
@@ -162,8 +162,8 @@ const checkSlugQry = function(slug){
 
 const queries = {
   getPageListQry: getPageListQry,
-  getCreatePostQry: getCreatePostQry,
-  getUpdatePostQry: getUpdatePostQry,
+  getCreatePageQry: getCreatePageQry,
+  getUpdatePageQry: getUpdatePageQry,
   createPostMetaMtn: createPostMetaMtn,
   updatePostMetaMtn: updatePostMetaMtn,
   getPageQry: getPageQry,

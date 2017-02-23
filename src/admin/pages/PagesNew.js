@@ -125,7 +125,7 @@ const NewPage = React.createClass({
     this.setState({immediately: time});
   },
   saveDraft: function(event){
-    this.setState({draft: $("#draftSelect option:selected").text()});
+    this.setState({draft: $("#statusSelect option:selected").text()});
   },
   saveVisibility: function(event){
     this.setState({visibilityTxt: $("input[name=visibilityRadio]:checked").val()});
@@ -179,11 +179,11 @@ const NewPage = React.createClass({
     this.disableForm(true);
     var qry = "", noticeTxt = "";
     if (this.state.mode==="create"){
-      qry = Query.getCreatePostQry(title, content, status, visibility, passwordPage, publishDate, 
+      qry = Query.getCreatePageQry(title, content, status, visibility, passwordPage, publishDate, 
         localStorage.getItem('userId'), this.state.slug, summary, parentPage, pageOrderInt, type);
       noticeTxt = "Page Published!";
     }else{
-      qry = Query.getUpdatePostQry(this.props.postId, title, content, status, visibility, passwordPage, 
+      qry = Query.getUpdatePageQry(this.props.postId, title, content, status, visibility, passwordPage, 
         publishDate, localStorage.getItem('userId'), this.state.slug, summary, parentPage, pageOrderInt);
       noticeTxt = "Page Updated!";
     }
