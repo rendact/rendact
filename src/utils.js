@@ -22,6 +22,10 @@ let getValue = function(element) {
 	return document.getElementById(element).value;
 }
 
+let getValueName = function(element){
+  return document.getElementsByName(element);
+}
+
 module.exports = {
 	riques: riques,
 	setValue: setValue,

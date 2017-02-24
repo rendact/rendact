@@ -4,7 +4,7 @@ import $ from 'jquery';
 window.jQuery = $;
 import Config from '../../config';
 import Query from '../query';
-import {riques, setValue, getValue} from '../../utils';
+import {riques, setValue, getValue, getValueName} from '../../utils';
 
 
 const NewPost = React.createClass({
@@ -167,16 +167,15 @@ const NewPost = React.createClass({
       this.setState({errorMsg: "Content can't be empty"});
       return;
     }
-    debugger;
     this.disableForm(true);
     var qry = "", noticeTxt = "";
     if (this.state.mode==="create"){
       qry = Query.getCreatePostQry(title, content, status, visibility, passwordPage, publishDate, 
-        localStorage.getItem('userId'), this.state.slug, summary, category, type);
+        localStorage.getItem('userId'), this.state.slug, summary, type);
       noticeTxt = "Post Published!";
     }else{
       qry = Query.getUpdatePostQry(this.props.postId, title, content, status, visibility, passwordPage, 
-        publishDate, localStorage.getItem('userId'), this.state.slug, summary, category);
+        publishDate, localStorage.getItem('userId'), this.state.slug, summary);
       noticeTxt = "Post Updated!";
     }
 
@@ -187,19 +186,27 @@ const NewPost = React.createClass({
           var postMetaId = "";
           var postId = "";
           var pmQry = "";
+          var copQry = "";
+          var categoryOfPostId = "";
+          var categoryId = getValueName("categoryCheckbox");
 
           if (me.state.mode==="create"){
             postId = body.data.createPost.changedPost.id;
             pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag, null);
+            copQry = Query.getCreateCategoryOfPostQry(postId, categoryId);
           } else {
             postId = body.data.updatePost.changedPost.id;
             if (body.data.updatePost.changedPost.meta.edges.length===0) {
               pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag, null);
+              copQry = Query.getCreateCategoryOfPostQry(postId, categoryId);
             } else {
               postMetaId = body.data.updatePost.changedPost.meta.edges[0].node.id;
               pmQry = Query.updatePostMetaMtn(postMetaId, postId, metaKeyword, metaDescription, titleTag, null);
+              categoryOfPostId = body.data.updatePost.changedPost.category.edges[0].node.id;
+              copQry = Query.getUpdateCategoryOfPostQry(categoryOfPostId, postId, categoryId);
             }
           }
+          debugger;
 
           riques(pmQry, 
             function(error, response, body) {
@@ -216,7 +223,22 @@ const NewPost = React.createClass({
             }
           );
 
-           me.setState({mode: "update"});
+          riques(copQry, 
+            function(error, response, body) {
+              if (!error && !body.errors && response.statusCode === 200) {
+                here.setState({noticeTxt: noticeTxt}); 
+              } else {
+                if (body && body.errors) {
+                  here.setState({errorMsg: body.errors[0].message});
+                } else {
+                  here.setState({errorMsg: error.toString()});
+                }
+              }
+              here.disableForm(false);
+            }
+          );
+
+          me.setState({mode: "update"});
         } else {
           if (body && body.errors) {
             me.setState({errorMsg: body.errors[0].message});
@@ -238,7 +260,7 @@ const NewPost = React.createClass({
         if (!error) {
           var categoryList = [];
           $.each(body.data.viewer.allCategories.edges, function(key, item){
-            categoryList.push((<div><input key={item.node.id} id="categoryCheckbox" name="categoryCheckbox" type="checkbox" value={item.node.name} /> {item.node.name}</div>));
+            categoryList.push((<div><input key={item.node.id} id="categoryCheckbox" name="categoryCheckbox" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
           })
           me.setState({categoryList: categoryList});
         }
