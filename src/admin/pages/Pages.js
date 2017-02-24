@@ -290,11 +290,13 @@ const Pages = React.createClass({
     this.props.handleAddNewPage();
   },
   handleFilterBtn: function(event){
+    this.disableForm(true);
     var status = $("#statusFilter").val();
     if (status==='deleted'){
       var me = this;
       this.loadData(this.state.dt, "deleted", function(){
         me.setState({deleteMode: true});
+        me.disableForm(false);
       });
     }else{
       var date = $("#dateFilter").val();
@@ -309,6 +311,7 @@ const Pages = React.createClass({
           this.search( searchValue[this.index()] ).draw();
           return null;
         })
+        me.disableForm(false);
       })
     } ;
   },
@@ -351,7 +354,7 @@ const Pages = React.createClass({
                     <div className="col-xs-12">
                       <div style={{marginTop: 10, marginBottom: 20}}>
                           <button className="btn btn-default btn-flat" id="deleteBtn" style={{marginRight:10}} 
-                            onClick={this.handleDeleteBtn} disabled={this.state.deleteMode}>Delete</button>
+                            onClick={this.handleDeleteBtn} disabled={this.state.deleteMode}><span className="glyphicon glyphicon-trash" ></span> Delete</button>
                           <select className="btn select" id="dateFilter" style={{marginRight:5,height:35}}>
                             {this.state.monthList.map(function(item){
                               if (item==="all")
@@ -369,7 +372,7 @@ const Pages = React.createClass({
                             <option value="draft">Draft</option>
                             <option value="deleted">Deleted</option>
                           </select>
-                          <button className="btn btn-default btn-flat" id="filterBtn" style={{marginRight:10}} onClick={this.handleFilterBtn}>Filter</button>
+                          <button className="btn btn-default btn-flat" id="filterBtn" style={{marginRight:10}} onClick={this.handleFilterBtn}><span className="glyphicon glyphicon-filter" ></span> Filter</button>
                           { this.state.deleteMode && 
                             [<button className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}>Delete Permanently</button>,
                              <button className="btn btn-default btn-flat" id="emptyTrashBtn" onClick={this.handleEmptyTrash}>Empty Trash</button>]
