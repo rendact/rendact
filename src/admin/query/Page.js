@@ -31,7 +31,7 @@ const getPageListQry = {"query": `
   const getPageDelQry = {"query": `
       query getPages{
         viewer {
-          allPosts(where: {type: {eq: "page"}, deleteDate: {isNull: false}}) {
+          allPosts(where: {type: {eq: "page"}, status: {eq: "Deleted"}}) {
             edges {
               node {
                 id
@@ -176,7 +176,19 @@ const getPageQry = function(postId){
 const deletePostQry = function(idList){
   var query = "mutation { ";
   _.forEach(idList, function(val, index){
-    query += ' DeletePost'+index+' : updatePost(input: {id: "'+val+'", deleteDate: "'+new Date()+'"}){ changedPost{ id } }'; 
+    query += ' DeletePost'+index+' : updatePost(input: {id: "'+val+'", status: "Deleted", deleteDate: "'+new Date()+'"}){ changedPost{ id } }'; 
+  });
+  query += "}";
+
+  return {
+    "query": query
+  }
+};
+
+const deletePostPermanentQry = function(idList){
+  var query = "mutation { ";
+  _.forEach(idList, function(val, index){
+    query += ' DeletePost'+index+' : deletePost(input: {id: "'+val+'"}){ changedPost{ id } }'; 
   });
   query += "}";
 
@@ -200,6 +212,7 @@ const queries = {
   updatePostMetaMtn: updatePostMetaMtn,
   getPageQry: getPageQry,
   deletePostQry: deletePostQry,
+  deletePostPermanentQry: deletePostPermanentQry,
   checkSlugQry: checkSlugQry
 }
 

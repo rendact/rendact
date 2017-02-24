@@ -19,12 +19,19 @@ const Pages = React.createClass({
       dt: null,
       errorMsg: null,
       loadingMsg: null,
-      monthList: []
+      monthList: [],
+      deleteMode: false
     }
   },
-  loadData: function(datatable, callback) {
+  loadData: function(datatable, type, callback) {
     var me = this;
-    riques(Query.getPageListQry, 
+    var qry = "";
+    if (type==="deleted")
+      qry = Query.getPageDelQry;
+    else 
+      qry = Query.getPageListQry;
+      
+    riques(qry, 
       function(error, response, body) {
         if (body.data) {
           datatable.clear();
@@ -132,32 +139,129 @@ const Pages = React.createClass({
             console.log(JSON.stringify(body, null, 2));
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, cb);
+            me.loadData(me.state.dt, "deleted", cb);
           } else {
             if (error)
-              swal(
-                'Failed!',
-                error,
-                'warning'
-              )
+              swal('Failed!', error,'warning')
             else if (body.error)
-              swal(
-                'Failed!',
-                body.error,
-                'warning'
-              )
+              swal('Failed!', body.error, 'warning')
             else 
-              swal(
-                'Failed!',
-                'Unknown error',
-                'warning'
-              )
+              swal('Failed!','Unknown error','warning')
             me.disableForm(false);
           }
         }
       );
     })},
-        
+  handleDeletePermanent: function(event){
+    var checkedRow = $("input.pageListCb:checked");
+    if (checkedRow.length === 0) {
+      //this.setState({errorMsg: "Please choose item to be deleted"});
+      swal({
+        title: 'Warning!',
+        text: 'Please choose item to be deleted',
+        timer: 5000
+      }).then(
+        function () {},
+        // handling the promise rejection
+        function (dismiss) {
+          if (dismiss === 'timer') {
+            console.log('I was closed by the timer')
+          }
+        }
+      );
+      return;
+    }
+    var me = this;
+    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
+    swal({
+      title: 'Sure want to delete permanently?',
+      text: "You might lost some data forever!",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel!',
+      confirmButtonClass: 'btn swal-btn-success',
+      cancelButtonClass: 'btn swal-btn-danger',
+      buttonsStyling: true
+    }).then(function () {
+      me.disableForm(true);
+      riques(Query.deletePostPermanentQry(idList), 
+        function(error, response, body) {
+          if (!error && !body.errors && response.statusCode === 200) {
+            console.log(JSON.stringify(body, null, 2));
+            var here = me;
+            var cb = function(){here.disableForm(false)}
+            me.loadData(me.state.dt, "deleted", cb);
+          } else {
+            if (error)
+              swal('Failed!', error,'warning')
+            else if (body.error)
+              swal('Failed!', body.error, 'warning')
+            else 
+              swal('Failed!','Unknown error','warning')
+            me.disableForm(false);
+          }
+        }
+      );
+    })
+  },
+  handleEmptyTrash: function(event){
+    var checkedRow = $("input.pageListCb");
+    if (checkedRow.length === 0) {
+      //this.setState({errorMsg: "Please choose item to be deleted"});
+      swal({
+        title: 'Warning!',
+        text: 'Please choose item to be deleted',
+        timer: 5000
+      }).then(
+        function () {},
+        // handling the promise rejection
+        function (dismiss) {
+          if (dismiss === 'timer') {
+            console.log('I was closed by the timer')
+          }
+        }
+      );
+      return;
+    }
+    var me = this;
+    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
+    swal({
+      title: 'Sure want to empty trash?',
+      text: "You might lost some data forever!",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel!',
+      confirmButtonClass: 'btn swal-btn-success',
+      cancelButtonClass: 'btn swal-btn-danger',
+      buttonsStyling: true
+    }).then(function () {
+      me.disableForm(true);
+      riques(Query.deletePostPermanentQry(idList), 
+        function(error, response, body) {
+          if (!error && !body.errors && response.statusCode === 200) {
+            console.log(JSON.stringify(body, null, 2));
+            var here = me;
+            var cb = function(){here.disableForm(false)}
+            me.loadData(me.state.dt, "deleted", cb);
+          } else {
+            if (error)
+              swal('Failed!', error,'warning')
+            else if (body.error)
+              swal('Failed!', body.error, 'warning')
+            else 
+              swal('Failed!','Unknown error','warning')
+            me.disableForm(false);
+          }
+        }
+      );
+    })
+  },
   componentDidMount: function(){
     var datatable = $('#pageListTbl').DataTable({
       sDom: '<"H"r>t<"F"ip>',
@@ -180,88 +284,32 @@ const Pages = React.createClass({
     } );
     
     this.setState({dt: datatable});
-    this.loadData(datatable);
+    this.loadData(datatable, "all");
   },
   handleAddNewBtn: function(event) {
     this.props.handleAddNewPage();
   },
-  handleFilterBtn: function(datatable, callback){
-    var datatable = $('#pageListTbl').DataTable();
+  handleFilterBtn: function(event){
     var status = $("#statusFilter").val();
-    if(status==='deleted'){      
+    if (status==='deleted'){
       var me = this;
-      riques(Query.getPageDelQry, 
-        function(error, response, body) {
-          if (body.data) {debugger;
-            datatable.clear();
-            var monthList = ["all"];
-            var here = me;
-            $.each(body.data.viewer.allPosts.edges, function(key, item){
-              var dt = new Date(item.node.createdAt);
-              var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
-              var author = item.node.author?item.node.author.username:"";
-              var slug = item.node.slug?item.node.slug:"";
-              var status = item.node.status?item.node.status:"";
-
-              var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
-              if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
-
-              datatable.row.add([
-                '<input class="pageListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
-                '<a class="tableItem" href="#" id="tableItem-'+item.node.id+'" >'+item.node.title+'</a>',
-                slug,
-                '<a href="">'+author+'</a>',
-                '<center>'+status+'</center>',
-                '<center>'+item.node.comments.edges.length+'</center>',
-                '<center>'+date+'</center>'
-              ])
-            });
-            status==='';
-            me.setState({monthList: monthList});
-            datatable.draw();
-
-            $(".tableItem").click(function(event){
-              event.preventDefault();
-              var postId = this.id.split("-")[1];
-              here.handleViewPage(postId);
-            });
-
-            if (callback) callback.call();
-          }else{
-            if (error)
-              swal(
-                'Failed!',
-                error,
-                'warning'
-              )
-            else if (body.error)
-              swal(
-                'Failed!',
-                body.error,
-                'warning'
-              )
-            else 
-              swal(
-                'Failed!',
-                'Unknown error',
-                'warning'
-              )
-          }
-        }
-      );
+      this.loadData(this.state.dt, "deleted", function(){
+        me.setState({deleteMode: true});
+      });
     }else{
-        var status = $("#statusFilter").val();
-        var date = $("#dateFilter").val();
-        var searchValue = {
-          4: status,
-          6: date
-        };
-        this.loadData(
-          this.state.dt.columns([4,6]).every( function () {
-            this.search( searchValue[this.index()] ).draw();
-            return null;
-          })
-        )
+      var date = $("#dateFilter").val();
+      var searchValue = {
+        4: status,
+        6: date
+      };
+      var me = this;
+      this.loadData(this.state.dt, "all", function(){
+        me.setState({deleteMode: false});
+        me.state.dt.columns([4,6]).every( function () {
+          this.search( searchValue[this.index()] ).draw();
+          return null;
+        })
+      })
     } ;
   },
   handleViewPage: function(postId){
@@ -302,7 +350,8 @@ const Pages = React.createClass({
                   <div className="row">
                     <div className="col-xs-12">
                       <div style={{marginTop: 10, marginBottom: 20}}>
-                          <button className="btn btn-default btn-flat" id="deleteBtn" style={{marginRight:10}} onClick={this.handleDeleteBtn}>Delete</button>
+                          <button className="btn btn-default btn-flat" id="deleteBtn" style={{marginRight:10}} 
+                            onClick={this.handleDeleteBtn} disabled={this.state.deleteMode}>Delete</button>
                           <select className="btn select" id="dateFilter" style={{marginRight:5,height:35}}>
                             {this.state.monthList.map(function(item){
                               if (item==="all")
@@ -314,13 +363,17 @@ const Pages = React.createClass({
                               return <option key={item} value={item}>{month+" "+year}</option>
                             })}
                           </select>
-                          <select className="btn select" id="statusFilter" style={{marginRight:5,height:35}}>
+                          <select className="btn select" id="statusFilter" onChange={this.handleStatusFilter} style={{marginRight:5,height:35}}>
                             <option value="">All</option>
                             <option value="published">Published</option>
                             <option value="draft">Draft</option>
                             <option value="deleted">Deleted</option>
                           </select>
-                          <button className="btn btn-default btn-flat" id="filterBtn" onClick={this.handleFilterBtn}>Filter</button>
+                          <button className="btn btn-default btn-flat" id="filterBtn" style={{marginRight:10}} onClick={this.handleFilterBtn}>Filter</button>
+                          { this.state.deleteMode && 
+                            [<button className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}>Delete Permanently</button>,
+                             <button className="btn btn-default btn-flat" id="emptyTrashBtn" onClick={this.handleEmptyTrash}>Empty Trash</button>]
+                          }
                         <input className="pull-right" placeholder="Search..." id="searchBox" />
                       </div>                   
                       <table id="pageListTbl" className="display">
