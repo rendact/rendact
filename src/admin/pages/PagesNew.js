@@ -7,7 +7,6 @@ import Query from '../query';
 import {riques, setValue, getValue} from '../../utils';
 import {getTemplates} from '../theme';
 
-
 const NewPage = React.createClass({
   componentDidMount: function(){
     var me = this;

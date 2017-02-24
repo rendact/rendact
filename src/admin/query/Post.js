@@ -44,7 +44,7 @@ const getAllCategoryQry = {
 }
 
 const getCreatePostQry = function(title, content, draft, visibility, passwordPage, 
-  publishDate, userId, slug, summary, category){
+  publishDate, userId, slug, summary){
   return {
       "query": `
     mutation createPost($input: CreatePostInput!) {
@@ -55,6 +55,13 @@ const getCreatePostQry = function(title, content, draft, visibility, passwordPag
             content,
             summary,
             meta {
+              edges {
+                node {
+                  id
+                }
+              }
+            }
+            category {
               edges {
                 node {
                   id
@@ -76,15 +83,14 @@ const getCreatePostQry = function(title, content, draft, visibility, passwordPag
           "type": "page",
           "authorId": userId,
           "slug": slug,
-          "summary": summary,
-          "category": category
+          "summary": summary
         }
       }
     }
   };
 
 const getUpdatePostQry = function(id, title, content, draft, visibility, passwordPage, 
-  publishDate, userId, slug, summary, category){
+  publishDate, userId, slug, summary){
   return {
       "query": `
     mutation updatePost($input: UpdatePostInput!) {
@@ -95,6 +101,13 @@ const getUpdatePostQry = function(id, title, content, draft, visibility, passwor
             content,
             summary,
             meta {
+              edges {
+                node {
+                  id
+                }
+              }
+            }
+            category {
               edges {
                 node {
                   id
@@ -117,8 +130,52 @@ const getUpdatePostQry = function(id, title, content, draft, visibility, passwor
           "type": "page",
           "authorId": userId,
           "slug": slug,
-          "summary": summary,
-          "category": category
+          "summary": summary
+        }
+      }
+    }
+  };
+
+  const getCreateCategoryOfPostQry = function(postId, categoryId){
+  return {
+      "query": `
+    mutation createCategoryOfPost($input: CreateCategoryOfPostInput!) {
+        createCategoryOfPost(input: $input) {
+          changedCategoryOfPost {
+            id,
+            post,
+            category
+        }
+      }
+    }
+    `,
+      "variables": {
+        "input": {
+          "post": postId,
+          "category": categoryId
+        }
+      }
+    }
+  };
+
+const getUpdateCategoryOfPostQry = function(id, postId, categoryId){
+  return {
+      "query": `
+    mutation updateCategoryOfPost($input: UpdateCategoryOfPostInput!) {
+        updateCategoryOfPost(input: $input) {
+          changedCategoryOfPost {
+            id,
+            post,
+            category
+        }
+      }
+    }
+    `,
+      "variables": {
+        "input": {
+          "id": id,
+          "post": postId,
+          "category": categoryId
         }
       }
     }
@@ -132,11 +189,6 @@ const getPostQry = function(postId){
     }
   };
 
-  const checkSlugQry = function(slug){
-  return {
-    query: 'query checkSlug{ viewer { allPosts(where: {type: {eq: "page"}, slug: {like: "'+slug+'"}}) { edges { node { id } } } } }'
-  }
-}
 
 
 const queries = {
@@ -145,7 +197,8 @@ const queries = {
   getPostQry: getPostQry,
   getCreatePostQry: getCreatePostQry,
   getUpdatePostQry: getUpdatePostQry,
-  checkSlugQry: checkSlugQry
+  getCreateCategoryOfPostQry: getCreateCategoryOfPostQry,
+  getUpdateCategoryOfPostQry, getUpdateCategoryOfPostQry
 }
 
 module.exports = queries;
