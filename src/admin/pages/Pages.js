@@ -188,11 +188,11 @@ const Pages = React.createClass({
   handleFilterBtn: function(datatable, callback){
     var datatable = $('#pageListTbl').DataTable();
     var status = $("#statusFilter").val();
-    if(status==='deleted'){
+    if(status==='deleted'){      
       var me = this;
       riques(Query.getPageDelQry, 
         function(error, response, body) {
-          if (body.data) {
+          if (body.data) {debugger;
             datatable.clear();
             var monthList = ["all"];
             var here = me;
@@ -216,7 +216,7 @@ const Pages = React.createClass({
                 '<center>'+date+'</center>'
               ])
             });
-
+            status==='';
             me.setState({monthList: monthList});
             datatable.draw();
 
