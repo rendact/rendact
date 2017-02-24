@@ -2,7 +2,7 @@ import React from 'react';
 import Query from '../query';
 import Dropzone from 'react-dropzone';
 import Config from '../../config'
-import {riques, getValue, setValue} from '../../utils';
+import {riques, getValue} from '../../utils';
 import _ from 'lodash';
 
 window.getBase64Image = function(img) {
@@ -82,7 +82,7 @@ var Profile = React.createClass({
           var userMetaData0 = {"bio": bio};
 
           var qry = '';
-          var mode = ''
+          var mode = '';
           var userMetaData = [];
           if (p.meta.edges.length>0) {
           	mode = 'update';
@@ -182,7 +182,7 @@ var Profile = React.createClass({
 							  	<div className="col-md-9">
 									<Dropzone onDrop={this.handleImageDrop}>
 										<div className="avatar-container">
-				              <img src={this.state.avatar} id="avatar"/> 
+				              <img src={this.state.avatar} alt='' id="avatar"/> 
 										  <div className="avatar-overlay"></div>
 										  <div className="avatar-button"><a href="#"> Change </a></div>
 										</div>
