@@ -11,6 +11,7 @@ const getLoginAuth0Mtn = function(identities, token, clientId){
               image
               lastLogin
               createdAt
+              meta { edges { node { id, item, value } }}
             }
           }
         }`,
@@ -38,6 +39,7 @@ const loginUserQry = function(username, password){
             image
             lastLogin
             createdAt
+            meta { edges { node { id, item, value } }}
           }
         }
       }`,
