@@ -188,8 +188,10 @@ const Pages = React.createClass({
   handleFilterBtn: function(datatable, callback){
     var datatable = $('#pageListTbl').DataTable();
     var status = $("#statusFilter").val();
-    if(status==='deleted'){      
+    if(status==='deleted'){
+      status==='';
       var me = this;
+      me.disableForm(true);
       riques(Query.getPageDelQry, 
         function(error, response, body) {
           if (body.data) {debugger;
@@ -216,7 +218,7 @@ const Pages = React.createClass({
                 '<center>'+date+'</center>'
               ])
             });
-            status==='';
+
             me.setState({monthList: monthList});
             datatable.draw();
 
@@ -227,6 +229,7 @@ const Pages = React.createClass({
             });
 
             if (callback) callback.call();
+            me.disableForm(false);
           }else{
             if (error)
               swal(
@@ -302,7 +305,7 @@ const Pages = React.createClass({
                   <div className="row">
                     <div className="col-xs-12">
                       <div style={{marginTop: 10, marginBottom: 20}}>
-                          <button className="btn btn-default btn-flat" id="deleteBtn" style={{marginRight:10}} onClick={this.handleDeleteBtn}>Delete</button>
+                          <button className="btn btn-default btn-flat" id="deleteBtn" style={{marginRight:10}} onClick={this.handleDeleteBtn}><span className="glyphicon glyphicon-trash" ></span> Delete</button>
                           <select className="btn select" id="dateFilter" style={{marginRight:5,height:35}}>
                             {this.state.monthList.map(function(item){
                               if (item==="all")
@@ -320,7 +323,7 @@ const Pages = React.createClass({
                             <option value="draft">Draft</option>
                             <option value="deleted">Deleted</option>
                           </select>
-                          <button className="btn btn-default btn-flat" id="filterBtn" onClick={this.handleFilterBtn}>Filter</button>
+                          <button className="btn btn-default btn-flat" id="filterBtn" onClick={this.handleFilterBtn}><span className="glyphicon glyphicon-filter" ></span> Filter</button>
                         <input className="pull-right" placeholder="Search..." id="searchBox" />
                       </div>                   
                       <table id="pageListTbl" className="display">
