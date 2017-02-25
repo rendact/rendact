@@ -28,7 +28,8 @@ const queries = {
   checkSlugQry: Page.checkSlugQry,
   saveProfileMtn: User.saveProfileMtn,
   saveUserMetaMtn: User.saveUserMetaMtn,
-  createUserMetaMtn: User.createUserMetaMtn
+  createUserMetaMtn: User.createUserMetaMtn,
+  changePasswordMtn: User.changePasswordMtn
 }
 
 module.exports = queries;

@@ -55,7 +55,7 @@ const Users = React.createClass({
             else if (body.error)
               swal(
                 'Failed!',
-                body.error,
+                body.errors[0].message,
                 'warning'
               )
             else 

@@ -78,7 +78,7 @@ const Pages = React.createClass({
           else if (body.error)
             swal(
               'Failed!',
-              body.error,
+              body.errors[0].message,
               'warning'
             )
           else 
@@ -198,7 +198,7 @@ const Pages = React.createClass({
             if (error)
               swal('Failed!', error,'warning')
             else if (body.error)
-              swal('Failed!', body.error, 'warning')
+              swal('Failed!', body.errors[0].message, 'warning')
             else 
               swal('Failed!','Unknown error','warning')
             me.disableForm(false);
@@ -253,7 +253,7 @@ const Pages = React.createClass({
             if (error)
               swal('Failed!', error,'warning')
             else if (body.error)
-              swal('Failed!', body.error, 'warning')
+              swal('Failed!', body.errors[0].message, 'warning')
             else 
               swal('Failed!','Unknown error','warning')
             me.disableForm(false);

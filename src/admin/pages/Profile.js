@@ -23,7 +23,9 @@ var Profile = React.createClass({
 		return {
 			isSaving: false,
 			errorMsg: null,
-			avatar: image
+			noticeTxt: null,
+			avatar: image,
+			passwordActive: false
 		}
 	},
 	setProfile: function(p) {
@@ -64,17 +66,29 @@ var Profile = React.createClass({
 		var image = this.state.avatar;
 		var bio = getValue("bio");
 
+		// Change password
+		var oldPassword = getValue("old-password");
+		var password = getValue("new-password");
+    var repassword = getValue("new-password-2");
+    var changePassword = false;
+
+    if (password) {
+    	if (!oldPassword) {
+    		this.setState({errorMsg: "Please fill your old password"});
+	    	return;
+    	}
+    	if (password!==repassword) {
+	    	this.setState({errorMsg: "Password is not match"});
+	    	return;
+	    }
+	    changePassword = true;
+    }
+
 		this.setState({isSaving: true});
 		riques(Query.saveProfileMtn(name, username, email, gender, image), 
 			function(error, response, body){
 				if(!error && !body.errors) {
 					var p = body.data.updateUser.changedUser;
-					/*
-					setValue("name", p.fullName);
-					setValue("username", p.username);
-					setValue("email", p.email);
-					setValue("gender",p.gender);
-					*/
 					me.setState({avatar: p.image})
           me.setProfile(p);
           var here = me;
@@ -103,14 +117,16 @@ var Profile = React.createClass({
 						function(error, response, body){
 							if(!error && !body.errors) {
 								var o = _.find(body.data, "changedUserMeta");
-								if (o.changedUserMeta)
+								if (o.changedUserMeta) {
 									here.setUserMeta(o.changedUserMeta);
+									here.setState({noticeTxt: "Profile saved"});
+								}
 							} else {
 								if (error){
 									here.setState({errorMsg: error})
 								}
 								else if (body.errors) {
-									here.setState({errorMsg: body.errors})
+									here.setState({errorMsg: body.errors[0].message})
 								} else {
 									here.setState({errorMsg: "Unknown error"})
 								}
@@ -123,7 +139,7 @@ var Profile = React.createClass({
 						me.setState({errorMsg: error})
 					}
 					else if (body.errors) {
-						me.setState({errorMsg: body.errors})
+						me.setState({errorMsg: body.errors[0].message})
 					} else {
 						me.setState({errorMsg: "Unknown error"})
 					}
@@ -131,6 +147,25 @@ var Profile = React.createClass({
 				//me.setState({isSaving: false});
 			}
 		);
+		
+		if (changePassword) {
+			riques(Query.changePasswordMtn(oldPassword, password), 
+				function(error, response, body){
+					if(!error && !body.errors) {
+						me.setState({noticeTxt: "Password changed"});
+					} else {
+						if (error){
+							me.setState({errorMsg: error})
+						}
+						else if (body.errors) {
+							me.setState({errorMsg: body.errors[0].message})
+						} else {
+							me.setState({errorMsg: "Unknown error"})
+						}
+					}
+				}
+			);
+		}
 	},
 	handleImageDrop: function(accepted){
 		var me = this;
@@ -141,12 +176,23 @@ var Profile = React.createClass({
     }
     reader.readAsDataURL(accepted[0]);
 	},
+	handlePasswordChange: function(event){
+		var password = getValue("new-password");
+		if (password) {
+			this.setState({passwordActive: true})
+		} else {
+			this.setState({passwordActive: false})
+		}
+	},
+	handleErrorMsgClose: function(){
+    this.setState({errorMsg: ""});
+  },
 	render: function(){
 		let p = JSON.parse(localStorage.getItem("profile"));
 		return (
 			<div className="content-wrapper">
 				<div className="container-fluid">
-				<section className="content-header">
+				<section className="content-header" style={{marginBottom:20}}>
 			      <h1>
 			        Profile
 			      </h1>
@@ -162,6 +208,12 @@ var Profile = React.createClass({
               {this.state.errorMsg}
             </div>
           }
+          { this.state.noticeTxt &&
+            <div className="alert alert-info alert-dismissible">
+              <button type="button" className="close" onClick={this.handleNoticeClose}>×</button>
+              {this.state.noticeTxt}
+            </div>
+          }
 
 			    <section className="content">
 			    	<div className="row">
@@ -172,7 +224,7 @@ var Profile = React.createClass({
 					  			<div className="form-group">
 								  	<label htmlFor="name" className="col-md-3">Name</label>
 								  	<div className="col-md-9">
-										<input type="text" name="name" id="name" className="form-control" defaultValue={p.name}/>
+										<input type="text" name="name" id="name" className="form-control" defaultValue={p.name} required="true"/>
 										<p className="help-block">Your great full name</p>
 									</div>
 								</div>
@@ -193,7 +245,7 @@ var Profile = React.createClass({
 					  			<div className="form-group">
 								  	<label htmlFor="tagline" className="col-md-3">Username</label>
 								  	<div className="col-md-9">
-										<input type="text" name="username" id="username" className="form-control" defaultValue={p.username}/>
+										<input type="text" name="username" id="username" className="form-control" defaultValue={p.username} required="true"/>
 										<p className="help-block">The short unique name describes you</p>
 									</div>
 								</div>
@@ -201,7 +253,7 @@ var Profile = React.createClass({
 					  			<div className="form-group">
 								  	<label htmlFor="keywoards" className="col-md-3">Email</label>
 								  	<div className="col-md-9">
-										<input type="text" name="email" id="email" className="form-control" defaultValue={p.email}/>
+										<input type="text" name="email" id="email" className="form-control" defaultValue={p.email} disabled/>
 									</div>
 								</div>
 
@@ -233,6 +285,28 @@ var Profile = React.createClass({
 								 	<label htmlFor="homeUrl" className="col-md-3">Last login</label>
 								 	<div className="col-md-9">
 										<input type="text" name="gender" className="form-control" defaultValue={p.lastLogin} disabled/>
+									</div>
+								</div>
+
+								<h4 style={{marginBottom: 20}}>Change Password</h4>
+								<div className="form-group">
+								 	<label htmlFor="old-password" className="col-md-3">Old password</label>
+								 	<div className="col-md-9">
+										<input type="password" name="old-password" id="old-password" className="form-control" style={{width:200}}/>
+									</div>
+								</div>
+
+								<div className="form-group">
+								 	<label htmlFor="new-password" className="col-md-3">New password</label>
+								 	<div className="col-md-9">
+										<input type="password" name="new-password" id="new-password" className="form-control" onChange={this.handlePasswordChange} style={{width:200}}/>
+									</div>
+								</div>
+
+								<div className="form-group">
+								 	<label htmlFor="new-password-2" className="col-md-3">Re-type new password</label>
+								 	<div className="col-md-9">
+										<input type="password" name="new-password-2" id="new-password-2" className="form-control" style={{width:200}} disabled={!this.state.passwordActive}/>
 									</div>
 								</div>
 								
