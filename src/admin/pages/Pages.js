@@ -27,9 +27,9 @@ const Pages = React.createClass({
       itemSelected: false
     }
   },
-  componentWillMount: function(event){
+  componentWillMount: function(){
     var counterChecked = 0;
-    $('#pageListTbl').on('change', 'input[type="checkbox"]', function() {
+    $('body').on('change', 'input[type="checkbox"]', function() {
         this.checked ? counterChecked++ : counterChecked--;
         counterChecked > 0 ? $('#deleteBtn').prop("disabled", false): 
         $('#deleteBtn').prop("disabled", true);
@@ -69,6 +69,7 @@ const Pages = React.createClass({
               '<center>'+date+'</center>'
             ])
           });
+
           me.setState({monthList: monthList});
           datatable.draw();
 
@@ -335,7 +336,6 @@ const Pages = React.createClass({
     var datatable = $('#pageListTbl').DataTable({
       sDom: '<"H"r>t<"F"ip>',
     });
-    
     $('#selectAll').click(function () {
         $(':checkbox', datatable.rows().nodes()).prop('checked', this.checked);
     });
@@ -351,7 +351,8 @@ const Pages = React.createClass({
             return null;
         });
         return null;
-    } );  
+    } );
+    
     this.setState({dt: datatable});
     this.loadData(datatable, "all");
   },
@@ -372,10 +373,10 @@ const Pages = React.createClass({
       var searchValue = {
         4: status
       };
-      var me = this;
+      var re = this;
       this.loadData(this.state.dt, "all", function(){
-        me.setState({deleteMode: false});
-        me.state.dt.columns([4]).every( function () {
+        re.setState({deleteMode: false});
+        re.state.dt.columns([4]).every( function () {
           this.search( searchValue[this.index()] ).draw();
           return null;
         })
@@ -398,10 +399,10 @@ const Pages = React.createClass({
         
         6: date
       };
-      var me = this;
+      var te = this;
       this.loadData(this.state.dt, "all", function(){
-        me.setState({deleteMode: false});
-        me.state.dt.columns([6]).every( function () {
+        te.setState({deleteMode: false});
+        te.state.dt.columns([6]).every( function () {
           this.search( searchValue[this.index()] ).draw();
           return null;
         })

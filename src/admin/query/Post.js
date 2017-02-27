@@ -198,7 +198,7 @@ const queries = {
   getCreatePostQry: getCreatePostQry,
   getUpdatePostQry: getUpdatePostQry,
   getCreateCategoryOfPostQry: getCreateCategoryOfPostQry,
-  getUpdateCategoryOfPostQry, getUpdateCategoryOfPostQry
+  getUpdateCategoryOfPostQry: getUpdateCategoryOfPostQry
 }
 
 module.exports = queries;

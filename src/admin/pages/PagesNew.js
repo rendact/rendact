@@ -25,13 +25,15 @@ const NewPage = React.createClass({
     var year = d.getFullYear();
     var month = d.getMonth();
     var day = d.getDate();
+    var hour = '';
+    var minute = '';
     if (d.getHours()<10) {
-      var hour = "0"+d.getHours();
-    }else var hour = d.getHours();
+      hour = "0"+d.getHours();
+    }else hour = d.getHours();
     
     if (d.getMinutes()<10) {
-      var minute = "0"+d.getMinutes();
-    }else var minute = d.getMinutes();
+      minute = "0"+d.getMinutes();
+    }else minute = d.getMinutes();
     
     $("#yy").val(year);
     $("#dd").val(day);
@@ -39,7 +41,7 @@ const NewPage = React.createClass({
     $("#hh").val(hour);
     $("#min").val(minute);
 
-    if (this.state.visibilityTxt=="Public") {
+    if (this.state.visibilityTxt==="Public") {
       $("#public").attr("checked", true);
     }else $("#private").attr("checked", true);
 
@@ -105,7 +107,7 @@ const NewPage = React.createClass({
   },
   handleTitleChange: function(event){
     var title = $("#titlePage").val();
-    var slug = title.split(" ").join("-").toLowerCase();
+    //var slug = title.split(" ").join("-").toLowerCase();
     this.setState({title: title});
   },
   handleContentChange: function(event){

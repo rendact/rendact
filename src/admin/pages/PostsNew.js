@@ -92,7 +92,7 @@ const NewPost = React.createClass({
   },
   handleTitleChange: function(event){
     var title = $("#titlePost").val();
-    var slug = title.split(" ").join("-").toLowerCase();
+    //var slug = title.split(" ").join("-").toLowerCase();
     this.setState({title: title});
   },
   handleContentChange: function(event){
@@ -147,7 +147,7 @@ const NewPost = React.createClass({
     var summary = $("#summary").val();
     var status = $("#statusSelect option:selected").text();
     var visibility = $("input[name=radiosName]:checked").val();
-    var category = $("#categoryCheckbox").val();
+    //var category = $("#categoryCheckbox").val();
     //var passwordPage = $("#passwordPage").val();
     var passwordPage = "";
     var year = $("#yy").val();
