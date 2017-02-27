@@ -375,7 +375,9 @@ const NewPage = React.createClass({
   resetForm: function(){
     document.getElementById("pageForm").reset();
     window.CKEDITOR.instances['content'].setData(null);
-    this.setState({title:"", slug:"", content:"", summary:"", parent:"",
+    this.setState({
+      noticeTxt: null, loadingMsg: null, errorMsg:null,
+      title:"", slug:"", content:"", summary:"", parent:"",
       status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
       permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160});
     this.handleTitleChange();
