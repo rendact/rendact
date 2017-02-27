@@ -3,7 +3,7 @@ import _ from 'lodash';
 const getPageListQry = {"query": `
   query getPages{
   viewer {
-    allPosts(where: {type: {eq: "page"}, deleteDate: {isNull: true}}) {
+    allPosts(where: {type: {eq: "page"}, status: {ne: "Deleted"}}) {
       edges {
         node {
           id
