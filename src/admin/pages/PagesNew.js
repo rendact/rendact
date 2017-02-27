@@ -25,13 +25,23 @@ const NewPage = React.createClass({
     var year = d.getFullYear();
     var month = d.getMonth();
     var day = d.getDate();
-    var hour = d.getHours();
-    var minute = d.getMinutes();
+    if (d.getHours()<10) {
+      var hour = "0"+d.getHours();
+    }else var hour = d.getHours();
+    
+    if (d.getMinutes()<10) {
+      var minute = "0"+d.getMinutes();
+    }else var minute = d.getMinutes();
+    
     $("#yy").val(year);
     $("#dd").val(day);
     $("#mm option[value="+(month+1)+"]").prop("selected", true);
     $("#hh").val(hour);
     $("#min").val(minute);
+
+    if (this.state.visibilityTxt=="Public") {
+      $("#public").attr("checked", true);
+    }else $("#private").attr("checked", true);
 
   },
 
@@ -124,7 +134,103 @@ const NewPage = React.createClass({
     this.setState({immediately: time});
   },
   saveDraft: function(event){
-    this.setState({draft: $("#statusSelect option:selected").text()});
+    this.setState({status: $("#statusSelect option:selected").text()});
+  },
+  saveDraftBtn: function(event){
+    event.preventDefault();
+    var me = this;
+    var title = getValue("titlePage");
+    var content =  window.CKEDITOR.instances['content'].getData();
+    var titleTag = getValue("titleTag");
+    var status = "Draft";
+    var metaKeyword = getValue("metaKeyword");
+    var metaDescription = $("#metaDescription").val();
+    var summary = $("#summary").val();
+    var visibility = $("input[name=visibilityRadio]:checked").val();
+    var pageTemplate = $("#pageTemplate option:selected").text();
+    
+    var passwordPage = "";
+    var year = $("#yy").val();
+    var month = $("#mm option:selected").text();
+    var day = $("#dd").val();
+    var hour = $("#hh").val();
+    var min = $("#min").val();
+    var publishDate = year+"-"+month+"-"+day+"@"+hour+":"+min ;
+    var parentPage = $("#parentPage").val();
+    var pageOrder = $("#pageOrder").val();
+    var pageOrderInt = 0;
+    try  {pageOrderInt=parseInt(pageOrder,10)} catch(e) {}
+    var type = "page";
+
+    if (title.length<=3) {
+      this.setState({errorMsg: "Title is to short!"});
+      return;
+    }
+
+    if (!content) {
+      this.setState({errorMsg: "Content can't be empty"});
+      return;
+    }
+
+    this.disableForm(true);
+    var qry = "", noticeTxt = "";
+    if (this.state.mode==="create"){
+      qry = Query.getCreatePageQry(title, content, status, visibility, passwordPage, publishDate, 
+        localStorage.getItem('userId'), this.state.slug, summary, parentPage, pageOrderInt, type);
+      noticeTxt = "Page Published!";
+    }else{
+      qry = Query.getUpdatePageQry(this.props.postId, title, content, status, visibility, passwordPage, 
+        publishDate, localStorage.getItem('userId'), this.state.slug, summary, parentPage, pageOrderInt);
+      noticeTxt = "Page Updated!";
+    }
+
+    riques(qry, 
+      function(error, response, body){
+        if (!error && !body.errors && response.statusCode === 200) {
+          var here = me;
+          var postMetaId = "";
+          var postId = "";
+          var pmQry = "";
+          
+          if (me.state.mode==="create"){
+            postId = body.data.createPost.changedPost.id;
+            pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag, pageTemplate);
+          } else {
+            postId = body.data.updatePost.changedPost.id;
+            if (body.data.updatePost.changedPost.meta.edges.length===0) {
+              pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag, pageTemplate);
+            } else {
+              postMetaId = body.data.updatePost.changedPost.meta.edges[0].node.id;
+              pmQry = Query.updatePostMetaMtn(postMetaId, postId, metaKeyword, metaDescription, titleTag, pageTemplate);
+            }
+          }
+
+          riques(pmQry, 
+            function(error, response, body) {
+              if (!error && !body.errors && response.statusCode === 200) {
+                here.setState({noticeTxt: noticeTxt}); 
+              } else {
+                if (body && body.errors) {
+                  here.setState({errorMsg: body.errors[0].message});
+                } else {
+                  here.setState({errorMsg: error.toString()});
+                }
+              }
+              here.disableForm(false);
+            }
+          );
+
+          me.setState({mode: "update"});
+        } else {
+          if (body && body.errors) {
+            me.setState({errorMsg: body.errors[0].message});
+          } else {
+            me.setState({errorMsg: error.toString()});
+          }
+        }
+      }
+    );
+    
   },
   saveVisibility: function(event){
     this.setState({visibilityTxt: $("input[name=visibilityRadio]:checked").val()});
@@ -271,6 +377,7 @@ const NewPage = React.createClass({
       status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
       permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160});
     this.handleTitleChange();
+    $("#publishedNotice").hide();
     window.history.pushState("", "", '/admin/pages/new');
   },
   setFormValues: function(v){
@@ -332,7 +439,7 @@ const NewPage = React.createClass({
             </div>
           }
           { this.state.noticeTxt &&
-            <div className="alert alert-info alert-dismissible">
+            <div className="alert alert-info alert-dismissible" id="publishedNotice">
               <button type="button" className="close" onClick={this.handleNoticeClose}>×</button>
               {this.state.noticeTxt}
             </div>
@@ -459,7 +566,6 @@ const NewPage = React.createClass({
                                 <form className="form-inline">
                                   <select id="statusSelect" style={{marginRight: 10, height: 30}}>
                                     <option>Published</option>
-                                    <option>Draft</option>
                                     <option>Pending Review</option>
                                   </select>
                                   <button type="button" onClick={this.saveDraft} className="btn btn-flat btn-xs btn-primary" 
@@ -539,7 +645,7 @@ const NewPage = React.createClass({
                               <span className="sr-only">Toggle Dropdown</span>
                             </button>
                             <ul className="dropdown-menu" role="menu">
-                              <li><button type="submit" className="btn btn-default btn-flat">{this.state.status==="Draft"?"Save As Draft":""}</button></li>
+                              <li><button onClick={this.saveDraftBtn} className="btn btn-default btn-flat">{this.state.status==="Draft"?"Save As Draft":""}</button></li>
                             </ul>
                           </div>
                           <p>{this.state.loadingMsg}</p>
