@@ -23,6 +23,14 @@ const Pages = React.createClass({
       deleteMode: false
     }
   },
+  componentWillMount: function(){
+    var counterChecked = 0;
+    $('body').on('change', 'input[type="checkbox"]', function() {
+        this.checked ? counterChecked++ : counterChecked--;
+        counterChecked > 0 ? $('#deleteBtn').prop("disabled", false): 
+        $('#deleteBtn').prop("disabled", true);
+    });
+  },
   loadData: function(datatable, type, callback) {
     var me = this;
     var qry = "";
@@ -97,12 +105,6 @@ const Pages = React.createClass({
     $("#dateFilter").attr('disabled',state);
     $("#statusFilter").attr('disabled',state);
     this.setState({loadingMsg: state?"Processing...":null});
-  },
-  componentDidMount: function(){
-    //var checkedRow = $("input.pageListCb:checked");
-    $('#input.pageListCb').change(function () {
-        $('#deleteBtn').prop("disabled", !this.checked);
-    }).change()
   },
   handleDeleteBtn: function(event){
     var checkedRow = $("input.pageListCb:checked");
@@ -295,7 +297,7 @@ const Pages = React.createClass({
   handleAddNewBtn: function(event) {
     this.props.handleAddNewPage();
   },
-  handleFilterBtn: function(event){
+  /*handleFilterBtn: function(event){
     this.disableForm(true);
     var status = $("#statusFilter").val();
     if (status==='deleted'){
@@ -314,6 +316,56 @@ const Pages = React.createClass({
       this.loadData(this.state.dt, "all", function(){
         me.setState({deleteMode: false});
         me.state.dt.columns([4,6]).every( function () {
+          this.search( searchValue[this.index()] ).draw();
+          return null;
+        })
+        me.disableForm(false);
+      })
+    } ;
+  },*/
+  handleStatusFilter: function(event){
+    this.disableForm(true);
+    var status = $("#statusFilter").val();
+    if (status==='deleted'){
+      var me = this;
+      this.loadData(this.state.dt, "deleted", function(){
+        me.setState({deleteMode: true});
+        me.disableForm(false);
+      });
+    }else{
+      var searchValue = {
+        4: status
+      };
+      var me = this;
+      this.loadData(this.state.dt, "all", function(){
+        me.setState({deleteMode: false});
+        me.state.dt.columns([4]).every( function () {
+          this.search( searchValue[this.index()] ).draw();
+          return null;
+        })
+        me.disableForm(false);
+      })
+    } ;
+  },
+  handleDateFilter: function(event){
+    this.disableForm(true);
+    var status = $("#statusFilter").val();
+    if (status==='deleted'){
+      var me = this;
+      this.loadData(this.state.dt, "deleted", function(){
+        me.setState({deleteMode: true});
+        me.disableForm(false);
+      });
+    }else{
+      var date = $("#dateFilter").val();
+      var searchValue = {
+        
+        6: date
+      };
+      var me = this;
+      this.loadData(this.state.dt, "all", function(){
+        me.setState({deleteMode: false});
+        me.state.dt.columns([6]).every( function () {
           this.search( searchValue[this.index()] ).draw();
           return null;
         })
@@ -360,9 +412,14 @@ const Pages = React.createClass({
                     <div className="col-xs-12">
                       <div style={{marginTop: 10, marginBottom: 20}}>
                           <button className="btn btn-default btn-flat" id="deleteBtn" style={{marginRight:10}} 
-                            onClick={this.handleDeleteBtn} disabled={this.state.deleteMode}><span className="glyphicon glyphicon-trash" ></span> Delete</button>
-                            <i>Show: </i>
-                          <select className="btn select" id="dateFilter" style={{marginRight:5,height:35}}>
+                            onClick={this.handleDeleteBtn} disabled={this.state.deleteMode}><span className="glyphicon glyphicon-trash" ></span> Delete</button>                           
+                          <select className="btn select" id="statusFilter" onChange={this.handleStatusFilter} style={{marginRight:5,height:35}}>
+                            <option value="">All Statuses</option>
+                            <option value="published">Published</option>
+                            <option value="draft">Draft</option>
+                            <option value="deleted">Deleted</option>
+                          </select>
+                          <select className="btn select" id="dateFilter" onChange={this.handleDateFilter} style={{marginRight:5,height:35}}>
                             {this.state.monthList.map(function(item){
                               if (item==="all")
                                 return (<option key="0" value="">All Months</option>);
@@ -372,15 +429,8 @@ const Pages = React.createClass({
                               var year = s[0];
                               return <option key={item} value={item}>{month+" "+year}</option>
                             })}
-                          </select>
-                          <select className="btn select" id="statusFilter" onChange={this.handleStatusFilter} style={{marginRight:5,height:35}}>
-                            <option value="">All Statuses</option>
-                            <option value="published">Published</option>
-                            <option value="draft">Draft</option>
-                            <option value="deleted">Deleted</option>
-                          </select>
-                          <button className="btn btn-default btn-flat" id="filterBtn" style={{marginRight:10}} onClick={this.handleFilterBtn}><span className="glyphicon glyphicon-filter" ></span> Filter</button>
-                          { this.state.deleteMode && 
+                          </select>            
+                            { this.state.deleteMode && 
                             [<button className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}>Delete Permanently</button>,
                              <button className="btn btn-default btn-flat" id="emptyTrashBtn" onClick={this.handleEmptyTrash}>Empty Trash</button>]
                           }                        
