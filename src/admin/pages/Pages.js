@@ -21,7 +21,10 @@ const Pages = React.createClass({
       errorMsg: null,
       loadingMsg: null,
       monthList: [],
-      deleteMode: false
+      deleteMode: false,
+      statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
+      activeStatus: "All",
+      itemSelected: false
     }
   },
   componentWillMount: function(){
@@ -75,6 +78,11 @@ const Pages = React.createClass({
             var postId = this.id.split("-")[1];
             here.handleViewPage(postId);
           });
+          $(".pageListCb").click( function(){
+             var checkedRow = $("input.pageListCb:checked");
+            here.setState({itemSelected: checkedRow.length>0})
+          });
+
 
           if (callback) callback.call();
         }else{
@@ -353,8 +361,9 @@ const Pages = React.createClass({
   },
   handleStatusFilter: function(event){
     this.disableForm(true);
-    var status = $("#statusFilter").val();
-    if (status==='deleted'){
+    var status = event.target.text;
+    this.setState({activeStatus: status});
+    if (status==='Deleted'){
       var me = this;
       this.loadData(this.state.dt, "deleted", function(){
         me.setState({deleteMode: true});
@@ -439,18 +448,10 @@ const Pages = React.createClass({
                   <div className="row">
                     <div className="col-xs-12">
                       <div style={{marginTop: 10, marginBottom: 20}}>
-                          <button className="btn btn-default btn-flat" id="deleteBtn" style={{marginRight:10}} 
-                            onClick={this.handleDeleteBtn} disabled={this.state.deleteMode}><span className="glyphicon glyphicon-trash" ></span> Delete</button>                           
-                          <select className="btn select" id="statusFilter" onChange={this.handleStatusFilter} style={{marginRight:5,height:35}}>
-                            <option value="">All Statuses</option>
-                            <option value="published">Published</option>
-                            <option value="draft">Draft</option>
-                            <option value="deleted">Deleted</option>
-                          </select>
-                          <select className="btn select" id="dateFilter" onChange={this.handleDateFilter} style={{marginRight:5,height:35}}>
+                          <select className="btn select" id="dateFilter" onChange={this.handleDateFilter} style={{marginRight:10,height:35}}>
                             {this.state.monthList.map(function(item){
                               if (item==="all")
-                                return (<option key="0" value="">All Months</option>);
+                                return (<option key="0" value="">Show all months</option>);
                               var s = item.split("/");
                               var monthList = Fn.getMonthList();
                               var month = monthList[parseInt(s[1],10)-1];
@@ -458,20 +459,35 @@ const Pages = React.createClass({
                               return <option key={item} value={item}>{month+" "+year}</option>
                             })}
                           </select>            
-                            { this.state.deleteMode && 
-                            [<button className="btn btn-default btn-flat" id="recover" style={{marginRight:10}} onClick={this.handleRecover}>Recover</button>,
-                             <button className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}>Delete Permanently</button>,
-                             <button className="btn btn-default btn-flat" id="emptyTrashBtn" onClick={this.handleEmptyTrash}>Empty Trash</button>]
+                          <button className="btn btn-default btn-flat" id="deleteBtn" onClick={this.handleDeleteBtn} style={{marginRight:10}} 
+                          disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete</button>
+                          { this.state.deleteMode && 
+                            [<button className="btn btn-default btn-flat" id="recover" style={{marginRight:10}} onClick={this.handleRecover}>
+                                <span className="fa fa-support" ></span> Recover</button>,
+                             <button className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}>
+                                <span className="fa fa-trash-o" ></span> Delete Permanently</button>,
+                             <button className="btn btn-default btn-flat" id="emptyTrashBtn" onClick={this.handleEmptyTrash}>
+                                <span className="fa fa-trash" ></span> Empty Trash</button>]
                           }                        
-                      <div className="box-tools pull-right">
-                        <div className="input-group" style={{width: 200}}>
-                          <input type="text" id="searchBox" className="form-control" placeholder="Search"/>
+                        <div className="box-tools pull-right">
+                          <div className="input-group" style={{width: 200}}>
+                            <input type="text" id="searchBox" className="form-control" placeholder="Search"/>
 
-                          <div className="input-group-btn">
-                            <button className="btn btn-default"><i className="fa fa-search"></i></button>
+                            <div className="input-group-btn">
+                              <button className="btn btn-default"><i className="fa fa-search"></i></button>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                        <div className="box-tools" style={{marginTop: 10}}>
+                          <b>Status:</b> {this.state.statusList.map(function(item, index, array){
+                            var last = (index===(array.length-1));
+                            var border = last?"":"1px solid";
+                            var color = item===this.state.activeStatus?{color: "black", fontWeight: "bold"}:{};
+                            return <span style={{paddingRight: 7, paddingLeft: 7, borderRight: border}}>
+                                    <a href="#" onClick={this.handleStatusFilter} style={color}>{item}</a>
+                                   </span>
+                          }.bind(this))}
+                        </div>
                       </div>                   
                       <table id="pageListTbl" className="display">
                         <thead>
