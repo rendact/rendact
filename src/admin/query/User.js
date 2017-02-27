@@ -129,13 +129,34 @@ const createUserMetaMtn = function(arr){
   }
 }
 
+const changePasswordMtn = function(oldPass, newPass){
+  return {
+    "query": `mutation ChangePassword($input: ChangeUserPasswordInput!)
+      { 
+        changeUserPassword(input: $input){
+          changedUser{
+            id
+          }
+        }
+      }`,
+    "variables": {
+      input: {
+        id: localStorage.getItem("userId"),
+        oldPassword: oldPass, 
+        newPassword: newPass
+      }
+    }
+  }
+}
+
 const queries = {
   getUserQry: getUserQry,
   getUserListQry: getUserListQry,
   createUserMtn: createUserMtn,
   saveProfileMtn: saveProfileMtn,
   saveUserMetaMtn: saveUserMetaMtn,
-  createUserMetaMtn: createUserMetaMtn
+  createUserMetaMtn: createUserMetaMtn,
+  changePasswordMtn: changePasswordMtn
 }
 
 module.exports = queries;
