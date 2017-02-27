@@ -197,6 +197,19 @@ const deletePostPermanentQry = function(idList){
   }
 };
 
+const recoverPostQry = function(idList){
+  var query = "mutation { ";
+  _.forEach(idList, function(val, index){
+    query += ' RecoverPost'+index+' : updatePost(input: {id: "'+val+'", status: "Published", deleteDate: ""}){ changedPost{ id } }'; 
+  });
+  query += "}";
+
+  return {
+    "query": query
+  }
+};
+
+
 const checkSlugQry = function(slug){
   return {
     query: 'query checkSlug{ viewer { allPosts(where: {type: {eq: "page"}, slug: {like: "'+slug+'"}}) { edges { node { id } } } } }'
@@ -213,7 +226,8 @@ const queries = {
   getPageQry: getPageQry,
   deletePostQry: deletePostQry,
   deletePostPermanentQry: deletePostPermanentQry,
-  checkSlugQry: checkSlugQry
+  checkSlugQry: checkSlugQry,
+  recoverPostQry: recoverPostQry
 }
 
 module.exports = queries;

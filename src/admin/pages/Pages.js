@@ -5,6 +5,7 @@ import Query from '../query';
 import Fn from '../lib/functions';
 import {riques} from '../../utils';
 import { default as swal } from 'sweetalert2';
+import _ from 'lodash';
 
 const Pages = React.createClass({
 
@@ -100,10 +101,9 @@ const Pages = React.createClass({
     );
   },
   disableForm: function(state){
-    $("#filterBtn").attr('disabled',state);
-    $("#deleteBtn").attr('disabled',state);
-    $("#dateFilter").attr('disabled',state);
-    $("#statusFilter").attr('disabled',state);
+    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
+    _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;})
+    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
     this.setState({loadingMsg: state?"Processing...":null});
   },
   handleDeleteBtn: function(event){
@@ -270,6 +270,60 @@ const Pages = React.createClass({
       );
     })
   },
+  handleRecover: function(event){
+    var checkedRow = $("input.pageListCb:checked");
+    if (checkedRow.length === 0) {
+      //this.setState({errorMsg: "Please choose item to be deleted"});
+      swal({
+        title: 'Warning!',
+        text: 'Please choose item to be recovered',
+        timer: 5000
+      }).then(
+        function () {},
+        // handling the promise rejection
+        function (dismiss) {
+          if (dismiss === 'timer') {
+            console.log('I was closed by the timer')
+          }
+        }
+      );
+      return;
+    }
+    var me = this;
+    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
+    swal({
+      title: 'Sure want to recover?',
+      text: "Please look carefully!",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, recover it!',
+      cancelButtonText: 'No, cancel!',
+      confirmButtonClass: 'btn swal-btn-success',
+      cancelButtonClass: 'btn swal-btn-danger',
+      buttonsStyling: true
+    }).then(function () {
+      me.disableForm(true);
+      riques(Query.recoverPostQry(idList), 
+        function(error, response, body) {
+          if (!error && !body.errors && response.statusCode === 200) {
+            console.log(JSON.stringify(body, null, 2));
+            var here = me;
+            var cb = function(){here.disableForm(false)}
+            me.loadData(me.state.dt, "deleted", cb);
+          } else {
+            if (error)
+              swal('Failed!', error,'warning')
+            else if (body.error)
+              swal('Failed!', body.error, 'warning')
+            else 
+              swal('Failed!','Unknown error','warning')
+            me.disableForm(false);
+          }
+        }
+      );
+    })},
   componentDidMount: function(){
     var datatable = $('#pageListTbl').DataTable({
       sDom: '<"H"r>t<"F"ip>',
@@ -297,32 +351,6 @@ const Pages = React.createClass({
   handleAddNewBtn: function(event) {
     this.props.handleAddNewPage();
   },
-  /*handleFilterBtn: function(event){
-    this.disableForm(true);
-    var status = $("#statusFilter").val();
-    if (status==='deleted'){
-      var me = this;
-      this.loadData(this.state.dt, "deleted", function(){
-        me.setState({deleteMode: true});
-        me.disableForm(false);
-      });
-    }else{
-      var date = $("#dateFilter").val();
-      var searchValue = {
-        4: status,
-        6: date
-      };
-      var me = this;
-      this.loadData(this.state.dt, "all", function(){
-        me.setState({deleteMode: false});
-        me.state.dt.columns([4,6]).every( function () {
-          this.search( searchValue[this.index()] ).draw();
-          return null;
-        })
-        me.disableForm(false);
-      })
-    } ;
-  },*/
   handleStatusFilter: function(event){
     this.disableForm(true);
     var status = $("#statusFilter").val();
@@ -431,7 +459,8 @@ const Pages = React.createClass({
                             })}
                           </select>            
                             { this.state.deleteMode && 
-                            [<button className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}>Delete Permanently</button>,
+                            [<button className="btn btn-default btn-flat" id="recover" style={{marginRight:10}} onClick={this.handleRecover}>Recover</button>,
+                             <button className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}>Delete Permanently</button>,
                              <button className="btn btn-default btn-flat" id="emptyTrashBtn" onClick={this.handleEmptyTrash}>Empty Trash</button>]
                           }                        
                       <div className="box-tools pull-right">
@@ -453,7 +482,7 @@ const Pages = React.createClass({
                             <th style={{textAlign: 'center'}}>Author</th>
                             <th style={{textAlign: 'center'}}>Status</th>
                             <th style={{width:30, textAlign: 'center'}}>Comments</th>                             
-                            <th style={{textAlign: 'center'}}>Date</th>
+                            <th style={{textAlign: 'center'}}>Published</th>
                           </tr>
                       </thead>
                       <tbody><tr key="0"><td></td><td>Loading data...</td><td></td><td></td><td></td><td></td><td></td></tr></tbody>
