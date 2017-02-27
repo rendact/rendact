@@ -23,9 +23,9 @@ const Pages = React.createClass({
       deleteMode: false
     }
   },
-  componentWillMount: function(){
+  componentWillMount: function(event){
     var counterChecked = 0;
-    $('body').on('change', 'input[type="checkbox"]', function() {
+    $('#pageListTbl').on('change', 'input[type="checkbox"]', function() {
         this.checked ? counterChecked++ : counterChecked--;
         counterChecked > 0 ? $('#deleteBtn').prop("disabled", false): 
         $('#deleteBtn').prop("disabled", true);
@@ -65,7 +65,6 @@ const Pages = React.createClass({
               '<center>'+date+'</center>'
             ])
           });
-
           me.setState({monthList: monthList});
           datatable.draw();
 
@@ -274,6 +273,7 @@ const Pages = React.createClass({
     var datatable = $('#pageListTbl').DataTable({
       sDom: '<"H"r>t<"F"ip>',
     });
+    
     $('#selectAll').click(function () {
         $(':checkbox', datatable.rows().nodes()).prop('checked', this.checked);
     });
@@ -289,8 +289,7 @@ const Pages = React.createClass({
             return null;
         });
         return null;
-    } );
-    
+    } );  
     this.setState({dt: datatable});
     this.loadData(datatable, "all");
   },
