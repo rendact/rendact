@@ -5,6 +5,7 @@ import Query from '../query';
 import Fn from '../lib/functions';
 import {riques} from '../../utils';
 import { default as swal } from 'sweetalert2';
+import _ from 'lodash';
 
 const Pages = React.createClass({
 
@@ -20,7 +21,10 @@ const Pages = React.createClass({
       errorMsg: null,
       loadingMsg: null,
       monthList: [],
-      deleteMode: false
+      deleteMode: false,
+      statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
+      activeStatus: "All",
+      itemSelected: false
     }
   },
   componentWillMount: function(event){
@@ -73,6 +77,11 @@ const Pages = React.createClass({
             var postId = this.id.split("-")[1];
             here.handleViewPage(postId);
           });
+          $(".pageListCb").click( function(){
+             var checkedRow = $("input.pageListCb:checked");
+            here.setState({itemSelected: checkedRow.length>0})
+          });
+
 
           if (callback) callback.call();
         }else{
@@ -99,10 +108,9 @@ const Pages = React.createClass({
     );
   },
   disableForm: function(state){
-    $("#filterBtn").attr('disabled',state);
-    $("#deleteBtn").attr('disabled',state);
-    $("#dateFilter").attr('disabled',state);
-    $("#statusFilter").attr('disabled',state);
+    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
+    _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;})
+    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
     this.setState({loadingMsg: state?"Processing...":null});
   },
   handleDeleteBtn: function(event){
@@ -269,6 +277,60 @@ const Pages = React.createClass({
       );
     })
   },
+  handleRecover: function(event){
+    var checkedRow = $("input.pageListCb:checked");
+    if (checkedRow.length === 0) {
+      //this.setState({errorMsg: "Please choose item to be deleted"});
+      swal({
+        title: 'Warning!',
+        text: 'Please choose item to be recovered',
+        timer: 5000
+      }).then(
+        function () {},
+        // handling the promise rejection
+        function (dismiss) {
+          if (dismiss === 'timer') {
+            console.log('I was closed by the timer')
+          }
+        }
+      );
+      return;
+    }
+    var me = this;
+    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
+    swal({
+      title: 'Sure want to recover?',
+      text: "Please look carefully!",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, recover it!',
+      cancelButtonText: 'No, cancel!',
+      confirmButtonClass: 'btn swal-btn-success',
+      cancelButtonClass: 'btn swal-btn-danger',
+      buttonsStyling: true
+    }).then(function () {
+      me.disableForm(true);
+      riques(Query.recoverPostQry(idList), 
+        function(error, response, body) {
+          if (!error && !body.errors && response.statusCode === 200) {
+            console.log(JSON.stringify(body, null, 2));
+            var here = me;
+            var cb = function(){here.disableForm(false)}
+            me.loadData(me.state.dt, "deleted", cb);
+          } else {
+            if (error)
+              swal('Failed!', error,'warning')
+            else if (body.error)
+              swal('Failed!', body.error, 'warning')
+            else 
+              swal('Failed!','Unknown error','warning')
+            me.disableForm(false);
+          }
+        }
+      );
+    })},
   componentDidMount: function(){
     var datatable = $('#pageListTbl').DataTable({
       sDom: '<"H"r>t<"F"ip>',
@@ -296,36 +358,11 @@ const Pages = React.createClass({
   handleAddNewBtn: function(event) {
     this.props.handleAddNewPage();
   },
-  /*handleFilterBtn: function(event){
-    this.disableForm(true);
-    var status = $("#statusFilter").val();
-    if (status==='deleted'){
-      var me = this;
-      this.loadData(this.state.dt, "deleted", function(){
-        me.setState({deleteMode: true});
-        me.disableForm(false);
-      });
-    }else{
-      var date = $("#dateFilter").val();
-      var searchValue = {
-        4: status,
-        6: date
-      };
-      var me = this;
-      this.loadData(this.state.dt, "all", function(){
-        me.setState({deleteMode: false});
-        me.state.dt.columns([4,6]).every( function () {
-          this.search( searchValue[this.index()] ).draw();
-          return null;
-        })
-        me.disableForm(false);
-      })
-    } ;
-  },*/
   handleStatusFilter: function(event){
     this.disableForm(true);
-    var status = $("#statusFilter").val();
-    if (status==='deleted'){
+    var status = event.target.text;
+    this.setState({activeStatus: status});
+    if (status==='Deleted'){
       var me = this;
       this.loadData(this.state.dt, "deleted", function(){
         me.setState({deleteMode: true});
@@ -410,18 +447,10 @@ const Pages = React.createClass({
                   <div className="row">
                     <div className="col-xs-12">
                       <div style={{marginTop: 10, marginBottom: 20}}>
-                          <button className="btn btn-default btn-flat" id="deleteBtn" style={{marginRight:10}} 
-                            onClick={this.handleDeleteBtn} disabled={this.state.deleteMode}><span className="glyphicon glyphicon-trash" ></span> Delete</button>                           
-                          <select className="btn select" id="statusFilter" onChange={this.handleStatusFilter} style={{marginRight:5,height:35}}>
-                            <option value="">All Statuses</option>
-                            <option value="published">Published</option>
-                            <option value="draft">Draft</option>
-                            <option value="deleted">Deleted</option>
-                          </select>
-                          <select className="btn select" id="dateFilter" onChange={this.handleDateFilter} style={{marginRight:5,height:35}}>
+                          <select className="btn select" id="dateFilter" onChange={this.handleDateFilter} style={{marginRight:10,height:35}}>
                             {this.state.monthList.map(function(item){
                               if (item==="all")
-                                return (<option key="0" value="">All Months</option>);
+                                return (<option key="0" value="">Show all months</option>);
                               var s = item.split("/");
                               var monthList = Fn.getMonthList();
                               var month = monthList[parseInt(s[1],10)-1];
@@ -429,19 +458,35 @@ const Pages = React.createClass({
                               return <option key={item} value={item}>{month+" "+year}</option>
                             })}
                           </select>            
-                            { this.state.deleteMode && 
-                            [<button className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}>Delete Permanently</button>,
-                             <button className="btn btn-default btn-flat" id="emptyTrashBtn" onClick={this.handleEmptyTrash}>Empty Trash</button>]
+                          <button className="btn btn-default btn-flat" id="deleteBtn" onClick={this.handleDeleteBtn} style={{marginRight:10}} 
+                          disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete</button>
+                          { this.state.deleteMode && 
+                            [<button className="btn btn-default btn-flat" id="recover" style={{marginRight:10}} onClick={this.handleRecover}>
+                                <span className="fa fa-support" ></span> Recover</button>,
+                             <button className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}>
+                                <span className="fa fa-trash-o" ></span> Delete Permanently</button>,
+                             <button className="btn btn-default btn-flat" id="emptyTrashBtn" onClick={this.handleEmptyTrash}>
+                                <span className="fa fa-trash" ></span> Empty Trash</button>]
                           }                        
-                      <div className="box-tools pull-right">
-                        <div className="input-group" style={{width: 200}}>
-                          <input type="text" id="searchBox" className="form-control" placeholder="Search"/>
+                        <div className="box-tools pull-right">
+                          <div className="input-group" style={{width: 200}}>
+                            <input type="text" id="searchBox" className="form-control" placeholder="Search"/>
 
-                          <div className="input-group-btn">
-                            <button className="btn btn-default"><i className="fa fa-search"></i></button>
+                            <div className="input-group-btn">
+                              <button className="btn btn-default"><i className="fa fa-search"></i></button>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                        <div className="box-tools" style={{marginTop: 10}}>
+                          <b>Status:</b> {this.state.statusList.map(function(item, index, array){
+                            var last = (index===(array.length-1));
+                            var border = last?"":"1px solid";
+                            var color = item===this.state.activeStatus?{color: "black", fontWeight: "bold"}:{};
+                            return <span style={{paddingRight: 7, paddingLeft: 7, borderRight: border}}>
+                                    <a href="#" onClick={this.handleStatusFilter} style={color}>{item}</a>
+                                   </span>
+                          }.bind(this))}
+                        </div>
                       </div>                   
                       <table id="pageListTbl" className="display">
                         <thead>
@@ -452,7 +497,7 @@ const Pages = React.createClass({
                             <th style={{textAlign: 'center'}}>Author</th>
                             <th style={{textAlign: 'center'}}>Status</th>
                             <th style={{width:30, textAlign: 'center'}}>Comments</th>                             
-                            <th style={{textAlign: 'center'}}>Date</th>
+                            <th style={{textAlign: 'center'}}>Published</th>
                           </tr>
                       </thead>
                       <tbody><tr key="0"><td></td><td>Loading data...</td><td></td><td></td><td></td><td></td><td></td></tr></tbody>

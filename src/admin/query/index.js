@@ -29,7 +29,8 @@ const queries = {
   saveProfileMtn: User.saveProfileMtn,
   saveUserMetaMtn: User.saveUserMetaMtn,
   createUserMetaMtn: User.createUserMetaMtn,
-  changePasswordMtn: User.changePasswordMtn
+  changePasswordMtn: User.changePasswordMtn,
+  recoverPostQry: Page.recoverPostQry
 }
 
 module.exports = queries;
