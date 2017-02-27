@@ -1,14 +1,28 @@
 import React from 'react';
 import $ from 'jquery';
 window.jQuery = $;
+import _ from 'lodash';
 import Query from '../query';
 import Fn from '../lib/functions';
 import {riques} from '../../utils';
 import { default as swal } from 'sweetalert2';
-import _ from 'lodash';
+
+const errorCallback = function(msg1, msg2){
+  if (msg1) swal('Failed!', msg1, 'warning')
+  else if (msg2) swal('Failed!', msg2, 'warning')
+  else swal('Failed!', 'Unknown error','warning')
+}
+
+const defaultSwalStyling = {
+  showCancelButton: true,
+  confirmButtonColor: '#3085d6',
+  cancelButtonColor: '#d33',
+  confirmButtonClass: 'btn swal-btn-success',
+  cancelButtonClass: 'btn swal-btn-danger',
+  buttonsStyling: true
+}
 
 const Pages = React.createClass({
-
   getInitialState: function(){
     require ('datatables');
     require ('datatables/media/css/jquery.dataTables.min.css');
@@ -27,29 +41,17 @@ const Pages = React.createClass({
       itemSelected: false
     }
   },
-  componentWillMount: function(){
-    var counterChecked = 0;
-    $('body').on('change', 'input[type="checkbox"]', function() {
-        this.checked ? counterChecked++ : counterChecked--;
-        counterChecked > 0 ? $('#deleteBtn').prop("disabled", false): 
-        $('#deleteBtn').prop("disabled", true);
-    });
-  },
   loadData: function(datatable, type, callback) {
     var me = this;
-    var qry = "";
-    if (type==="deleted")
-      qry = Query.getPageDelQry;
-    else 
-      qry = Query.getPageListQry;
-      
+    var qry = (type==="deleted")?Query.getPageDelQry:Query.getPageListQry;
+    
     riques(qry, 
       function(error, response, body) {
         if (body.data) {
           datatable.clear();
           var monthList = ["all"];
           var here = me;
-          $.each(body.data.viewer.allPosts.edges, function(key, item){
+          _.forEach(body.data.viewer.allPosts.edges, function(item){
             var dt = new Date(item.node.createdAt);
             var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
             var author = item.node.author?item.node.author.username:"";
@@ -79,31 +81,13 @@ const Pages = React.createClass({
             here.handleViewPage(postId);
           });
           $(".pageListCb").click( function(){
-             var checkedRow = $("input.pageListCb:checked");
+            var checkedRow = $("input.pageListCb:checked");
             here.setState({itemSelected: checkedRow.length>0})
           });
 
-
           if (callback) callback.call();
-        }else{
-          if (error)
-            swal(
-              'Failed!',
-              error,
-              'warning'
-            )
-          else if (body.error)
-            swal(
-              'Failed!',
-              body.errors[0].message,
-              'warning'
-            )
-          else 
-            swal(
-              'Failed!',
-              'Unknown error',
-              'warning'
-            )
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
         }
       }
     );
@@ -115,54 +99,25 @@ const Pages = React.createClass({
     this.setState({loadingMsg: state?"Processing...":null});
   },
   handleDeleteBtn: function(event){
-    var checkedRow = $("input.pageListCb:checked");
-    if (checkedRow.length === 0) {
-      //this.setState({errorMsg: "Please choose item to be deleted"});
-      swal({
-        title: 'Warning!',
-        text: 'Please choose item to be deleted',
-        timer: 5000
-      }).then(
-        function () {},
-        // handling the promise rejection
-        function (dismiss) {
-          if (dismiss === 'timer') {
-            console.log('I was closed by the timer')
-          }
-        }
-      );
-      return;
-    }
     var me = this;
+    var checkedRow = $("input.pageListCb:checked");
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
-    swal({
+    swal(_.merge({
       title: 'Sure want to delete?',
       text: "You might lost some data!",
       type: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, cancel!',
-      confirmButtonClass: 'btn swal-btn-success',
-      cancelButtonClass: 'btn swal-btn-danger',
-      buttonsStyling: true
-    }).then(function () {
+    },defaultSwalStyling)).then(function () {
       me.disableForm(true);
       riques(Query.deletePostQry(idList), 
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
-            console.log(JSON.stringify(body, null, 2));
             var here = me;
             var cb = function(){here.disableForm(false)}
             me.loadData(me.state.dt, "deleted", cb);
           } else {
-            if (error)
-              swal('Failed!', error,'warning')
-            else if (body.error)
-              swal('Failed!', body.error, 'warning')
-            else 
-              swal('Failed!','Unknown error','warning')
+            errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
           }
         }
@@ -170,53 +125,24 @@ const Pages = React.createClass({
     })},
   handleDeletePermanent: function(event){
     var checkedRow = $("input.pageListCb:checked");
-    if (checkedRow.length === 0) {
-      //this.setState({errorMsg: "Please choose item to be deleted"});
-      swal({
-        title: 'Warning!',
-        text: 'Please choose item to be deleted',
-        timer: 5000
-      }).then(
-        function () {},
-        // handling the promise rejection
-        function (dismiss) {
-          if (dismiss === 'timer') {
-            console.log('I was closed by the timer')
-          }
-        }
-      );
-      return;
-    }
     var me = this;
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
-    swal({
+    swal(_.merge({
       title: 'Sure want to delete permanently?',
       text: "You might lost some data forever!",
       type: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, cancel!',
-      confirmButtonClass: 'btn swal-btn-success',
-      cancelButtonClass: 'btn swal-btn-danger',
-      buttonsStyling: true
-    }).then(function () {
+    },defaultSwalStyling)).then(function () {
       me.disableForm(true);
       riques(Query.deletePostPermanentQry(idList), 
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
-            console.log(JSON.stringify(body, null, 2));
             var here = me;
             var cb = function(){here.disableForm(false)}
             me.loadData(me.state.dt, "deleted", cb);
           } else {
-            if (error)
-              swal('Failed!', error,'warning')
-            else if (body.error)
-              swal('Failed!', body.errors[0].message, 'warning')
-            else 
-              swal('Failed!','Unknown error','warning')
+            errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
           }
         }
@@ -225,53 +151,24 @@ const Pages = React.createClass({
   },
   handleEmptyTrash: function(event){
     var checkedRow = $("input.pageListCb");
-    if (checkedRow.length === 0) {
-      //this.setState({errorMsg: "Please choose item to be deleted"});
-      swal({
-        title: 'Warning!',
-        text: 'Please choose item to be deleted',
-        timer: 5000
-      }).then(
-        function () {},
-        // handling the promise rejection
-        function (dismiss) {
-          if (dismiss === 'timer') {
-            console.log('I was closed by the timer')
-          }
-        }
-      );
-      return;
-    }
     var me = this;
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
-    swal({
+    swal(_.merge({
       title: 'Sure want to empty trash?',
       text: "You might lost some data forever!",
       type: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, cancel!',
-      confirmButtonClass: 'btn swal-btn-success',
-      cancelButtonClass: 'btn swal-btn-danger',
-      buttonsStyling: true
-    }).then(function () {
+      cancelButtonText: 'No, cancel!'
+    }, defaultSwalStyling)).then(function () {
       me.disableForm(true);
       riques(Query.deletePostPermanentQry(idList), 
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
-            console.log(JSON.stringify(body, null, 2));
             var here = me;
             var cb = function(){here.disableForm(false)}
             me.loadData(me.state.dt, "deleted", cb);
           } else {
-            if (error)
-              swal('Failed!', error,'warning')
-            else if (body.error)
-              swal('Failed!', body.errors[0].message, 'warning')
-            else 
-              swal('Failed!','Unknown error','warning')
+            errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
           }
         }
@@ -280,38 +177,15 @@ const Pages = React.createClass({
   },
   handleRecover: function(event){
     var checkedRow = $("input.pageListCb:checked");
-    if (checkedRow.length === 0) {
-      //this.setState({errorMsg: "Please choose item to be deleted"});
-      swal({
-        title: 'Warning!',
-        text: 'Please choose item to be recovered',
-        timer: 5000
-      }).then(
-        function () {},
-        // handling the promise rejection
-        function (dismiss) {
-          if (dismiss === 'timer') {
-            console.log('I was closed by the timer')
-          }
-        }
-      );
-      return;
-    }
     var me = this;
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
-    swal({
+    swal(_.merge({
       title: 'Sure want to recover?',
       text: "Please look carefully!",
       type: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, recover it!',
       cancelButtonText: 'No, cancel!',
-      confirmButtonClass: 'btn swal-btn-success',
-      cancelButtonClass: 'btn swal-btn-danger',
-      buttonsStyling: true
-    }).then(function () {
+    },defaultSwalStyling)).then(function () {
       me.disableForm(true);
       riques(Query.recoverPostQry(idList), 
         function(error, response, body) {
@@ -321,41 +195,12 @@ const Pages = React.createClass({
             var cb = function(){here.disableForm(false)}
             me.loadData(me.state.dt, "deleted", cb);
           } else {
-            if (error)
-              swal('Failed!', error,'warning')
-            else if (body.error)
-              swal('Failed!', body.error, 'warning')
-            else 
-              swal('Failed!','Unknown error','warning')
+            errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
           }
         }
       );
     })},
-  componentDidMount: function(){
-    var datatable = $('#pageListTbl').DataTable({
-      sDom: '<"H"r>t<"F"ip>',
-    });
-    $('#selectAll').click(function () {
-        $(':checkbox', datatable.rows().nodes()).prop('checked', this.checked);
-    });
-    datatable.columns(1).every( function () {
-        var that = this;
- 
-        $('#searchBox', this.footer() ).on( 'keyup change', function () {
-            if ( that.search() !== this.value ) {
-                that
-                    .search( this.value )
-                    .draw();
-            }
-            return null;
-        });
-        return null;
-    } );
-    
-    this.setState({dt: datatable});
-    this.loadData(datatable, "all");
-  },
   handleAddNewBtn: function(event) {
     this.props.handleAddNewPage();
   },
@@ -395,10 +240,7 @@ const Pages = React.createClass({
       });
     }else{
       var date = $("#dateFilter").val();
-      var searchValue = {
-        
-        6: date
-      };
+      var searchValue = { 6: date };
       var te = this;
       this.loadData(this.state.dt, "all", function(){
         te.setState({deleteMode: false});
@@ -412,6 +254,26 @@ const Pages = React.createClass({
   },
   handleViewPage: function(postId){
     this.props.handleViewPage('pages','edit', postId);
+  },
+  componentDidMount: function(){
+    var datatable = $('#pageListTbl').DataTable({sDom: '<"H"r>t<"F"ip>'});
+    $('#selectAll').click(function () {
+        $(':checkbox', datatable.rows().nodes()).prop('checked', this.checked);
+    });
+    datatable.columns(1).every( function () {
+        var that = this;
+        $('#searchBox', this.footer() ).on( 'keyup change', function () {
+            if ( that.search() !== this.value ) {
+                that.search( this.value )
+                    .draw();
+            }
+            return null;
+        });
+        return null;
+    } );
+    
+    this.setState({dt: datatable});
+    this.loadData(datatable, "all");
   },
   render: function(){
     return (
@@ -462,12 +324,11 @@ const Pages = React.createClass({
                           <button className="btn btn-default btn-flat" id="deleteBtn" onClick={this.handleDeleteBtn} style={{marginRight:10}} 
                           disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete</button>
                           { this.state.deleteMode && 
-                            [<button className="btn btn-default btn-flat" id="recover" style={{marginRight:10}} onClick={this.handleRecover}>
-                                <span className="fa fa-support" ></span> Recover</button>,
-                             <button className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}>
-                                <span className="fa fa-trash-o" ></span> Delete Permanently</button>,
-                             <button className="btn btn-default btn-flat" id="emptyTrashBtn" onClick={this.handleEmptyTrash}>
-                                <span className="fa fa-trash" ></span> Empty Trash</button>]
+                            [<button className="btn btn-default btn-flat" id="recover" style={{marginRight:10}} onClick={this.handleRecover}
+                             disabled={!this.state.itemSelected} ><span className="fa fa-support" ></span> Recover</button>,
+                             <button className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}
+                             disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete Permanently</button>,
+                             <button className="btn btn-default btn-flat" id="emptyTrashBtn" onClick={this.handleEmptyTrash}><span className="fa fa-trash" ></span> Empty Trash</button>]
                           }                        
                         <div className="box-tools pull-right">
                           <div className="input-group" style={{width: 200}}>
@@ -483,7 +344,7 @@ const Pages = React.createClass({
                             var last = (index===(array.length-1));
                             var border = last?"":"1px solid";
                             var color = item===this.state.activeStatus?{color: "black", fontWeight: "bold"}:{};
-                            return <span style={{paddingRight: 7, paddingLeft: 7, borderRight: border}}>
+                            return <span key={index} style={{paddingRight: 7, paddingLeft: 7, borderRight: border}}>
                                     <a href="#" onClick={this.handleStatusFilter} style={color}>{item}</a>
                                    </span>
                           }.bind(this))}

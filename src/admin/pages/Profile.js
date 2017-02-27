@@ -92,21 +92,16 @@ var Profile = React.createClass({
 					me.setState({avatar: p.image})
           me.setProfile(p);
           var here = me;
-
           var userMetaData0 = {"bio": bio};
-
           var qry = '';
-          var mode = '';
           var userMetaData = [];
           if (p.meta.edges.length>0) {
-          	mode = 'update';
           	_.forEach(p.meta.edges, function(item, index){
           		if (_.has(userMetaData0, item.node.item))
           			userMetaData.push({id: item.node.id, item: item.node.item, value: userMetaData0[item.node.item]});
           	});
           	qry = Query.saveUserMetaMtn(userMetaData);
           } else {
-          	mode = 'create';
           	_.forEach(userMetaData0, function(value, key){
           		userMetaData.push({item: key, value: value});
           	});

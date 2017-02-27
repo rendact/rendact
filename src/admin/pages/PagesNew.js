@@ -6,8 +6,37 @@ import Config from '../../config';
 import Query from '../query';
 import {riques, setValue, getValue} from '../../utils';
 import {getTemplates} from '../theme';
+import { default as swal } from 'sweetalert2';
+
+const errorCallback = function(msg1, msg2){
+  if (msg1) swal('Failed!', msg1, 'warning')
+  else if (msg2) swal('Failed!', msg2, 'warning')
+  else swal('Failed!', 'Unknown error','warning')
+}
 
 const NewPage = React.createClass({
+  getInitialState: function(){
+    return {
+      noticeTxt: null,
+      loadingMsg: null,
+      errorMsg:null,
+      title:"",
+      slug:"",
+      content:"",
+      summary:"",
+      parent:"",
+      status:"Draft",
+      immediately:"",
+      immediatelyStatus:false,
+      visibilityTxt:"Public",
+      permalinkEditing: false,
+      mode: this.props.postId?"update":"create",
+      pageList: null,
+      titleTagLeftCharacter: 65,
+      metaDescriptionLeftCharacter: 160,
+      permalinkInProcess: false
+    }
+  },
   componentDidMount: function(){
     var me = this;
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
@@ -46,34 +75,10 @@ const NewPage = React.createClass({
     }else $("#private").attr("checked", true);
 
   },
-
-  getInitialState: function(){
-    return {
-      noticeTxt: null,
-      loadingMsg: null,
-      errorMsg:null,
-      title:"",
-      slug:"",
-      content:"",
-      summary:"",
-      parent:"",
-      status:"Draft",
-      immediately:"",
-      immediatelyStatus:false,
-      visibilityTxt:"Public",
-      permalinkEditing: false,
-      mode: this.props.postId?"update":"create",
-      pageList: null,
-      titleTagLeftCharacter: 65,
-      metaDescriptionLeftCharacter: 160,
-      permalinkInProcess: false
-    }
-  },
   checkSlug: function(slug){
     var me = this;
     this.setState({permalinkInProcess: true});
     riques( Query.checkSlugQry(slug),
-
       function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
           var slugCount = body.data.viewer.allPosts.edges.length;
@@ -85,11 +90,170 @@ const NewPage = React.createClass({
             else me.setState({permalinkEditing: false, slug: slug});
           }
         } else {
-          me.setState({errorMsg: "error when checking slug"});
+          errorCallback(error, body.errors?body.errors[0].message:null);
         }
         me.setState({permalinkInProcess: false});
       }
     );
+  },
+  saveImmediately: function(event){
+    this.setState({immediatelyStatus: true});
+    var day = $("#dd").val();
+    var year = $("#yy").val();
+    var hour = $("#hh").val();
+    var min = $("#min").val();
+    var time = $("#mm option:selected").text() + " " + day + " " + year + " @ " + hour + ":" + min;
+    this.setState({immediately: time});
+  },
+  saveDraft: function(event){
+    this.setState({status: $("#statusSelect option:selected").text()});
+  },
+  saveDraftBtn: function(event){
+    event.preventDefault();
+    this.disableForm(true);
+
+    var me = this;
+    var v = this.getFormValues();
+
+    if (v.title.length<=3) {
+      this.setState({errorMsg: "Title is to short!"});
+      return;
+    }
+
+    if (!v.content) {
+      this.setState({errorMsg: "Content can't be empty"});
+      return;
+    }
+    
+    var qry = "", noticeTxt = "";
+    if (this.state.mode==="create"){
+      qry = Query.getCreatePageQry(v.title, v.content, v.status, v.visibility, v.passwordPage, v.publishDate, 
+        localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder, v.type);
+      noticeTxt = "Page Published!";
+    }else{
+      qry = Query.getUpdatePageQry(this.props.postId, v.title, v.content, v.status, v.visibility, v.passwordPage, 
+        v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder);
+      noticeTxt = "Page Updated!";
+    }
+
+    riques(qry, 
+      function(error, response, body){
+        if (!error && !body.errors && response.statusCode === 200) {
+          var here = me;
+          var postMetaId = "";
+          var postId = "";
+          var pmQry = "";
+          
+          if (me.state.mode==="create"){
+            postId = body.data.createPost.changedPost.id;
+            pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
+          } else {
+            postId = body.data.updatePost.changedPost.id;
+            if (body.data.updatePost.changedPost.meta.edges.length===0) {
+              pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
+            } else {
+              postMetaId = body.data.updatePost.changedPost.meta.edges[0].node.id;
+              pmQry = Query.updatePostMetaMtn(postMetaId, postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
+            }
+          }
+
+          riques(pmQry, 
+            function(error, response, body) {
+              if (!error && !body.errors && response.statusCode === 200) {
+                here.setState({noticeTxt: noticeTxt}); 
+              } else {
+                errorCallback(error, body.errors?body.errors[0].message:null);
+              }
+              here.disableForm(false);
+            }
+          );
+
+          me.setState({mode: "update"});
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+      }
+    );
+    
+  },
+  saveVisibility: function(event){
+    this.setState({visibilityTxt: $("input[name=visibilityRadio]:checked").val()});
+  },
+  disableForm: function(state){
+    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
+    _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;})
+    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
+    this.setState({loadingMsg: state?"Processing...":null});
+  },
+  resetForm: function(){
+    document.getElementById("pageForm").reset();
+    window.CKEDITOR.instances['content'].setData(null);
+    this.setState({
+      noticeTxt: null, loadingMsg: null, errorMsg:null,
+      title:"", slug:"", content:"", summary:"", parent:"",
+      status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
+      permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160});
+    this.handleTitleChange();
+    $("#publishedNotice").hide();
+    window.history.pushState("", "", '/admin/pages/new');
+  },
+  getFormValues: function(){
+    var year = $("#yy").val();
+    var month = $("#mm option:selected").text();
+    var day = $("#dd").val();
+    var hour = $("#hh").val();
+    var min = $("#min").val();
+    var pageOrder = $("#pageOrder").val();
+    var pageOrderInt = 0;
+    try  {pageOrderInt=parseInt(pageOrder,10)} catch(e) {}
+  
+    return {
+      title: getValue("titlePage"),
+      content: window.CKEDITOR.instances['content'].getData(),
+      titleTag: getValue("titleTag"),
+      status: "Draft",
+      metaKeyword: getValue("metaKeyword"),
+      metaDescription: $("#metaDescription").val(),
+      summary: $("#summary").val(),
+      visibility: $("input[name=visibilityRadio]:checked").val(),
+      pageTemplate: $("#pageTemplate option:selected").text(),
+      passwordPage: "",
+      publishDate: year+"-"+month+"-"+day+"@"+hour+":"+min,
+      parentPage: $("#parentPage").val(),
+      pageOrder: pageOrderInt,
+      type: "page"
+    }
+  },
+  setFormValues: function(v){
+    var meta = {};
+    if (v.meta.edges.length>0) {
+      _.forEach(v.meta.edges, function(i){
+        meta[i.node.item] = i.node.value;
+      });
+    }
+    setValue("titlePage", v.title);
+    setValue("content", v.content);
+    window.CKEDITOR.instances['content'].setData(v.content);
+    setValue("summary", v.summary);
+    setValue("statusSelect", v.status);
+    setValue("parentPage", v.parent);
+    setValue("pageOrder", v.order);
+    document.getElementsByName("visibilityRadio")[v.visibility==="Public"?0:1].checked = true;
+    if (_.has(meta, "metaKeyword")){
+      setValue("metaKeyword", meta.metaKeyword);
+    }
+    if (_.has(meta, "metaDescription")){
+      setValue("metaDescription", meta.metaDescription);
+    }
+    if (_.has(meta, "pageTemplate")){
+      setValue("pageTemplate", meta.pageTemplate);
+    }
+    if (_.has(meta, "titleTag")){
+      setValue("titleTag", meta.titleTag);
+    }
+    this.setState({title: v.title, content: v.content, summary: v.summary, 
+      status: v.status, parent: v.parent, visibilityTxt: v.visibility});
+    this.handleTitleChange();
   },
   handlePermalinkBtn: function(event) {
     var slug = this.state.slug;
@@ -126,121 +290,6 @@ const NewPage = React.createClass({
     var metaDescription = $("#metaDescription").val();
     this.setState({metaDescriptionLeftCharacter: 160-(metaDescription.length)});
   },
-  saveImmediately: function(event){
-    this.setState({immediatelyStatus: true});
-    var day = $("#dd").val();
-    var year = $("#yy").val();
-    var hour = $("#hh").val();
-    var min = $("#min").val();
-    var time = $("#mm option:selected").text() + " " + day + " " + year + " @ " + hour + ":" + min;
-    this.setState({immediately: time});
-  },
-  saveDraft: function(event){
-    this.setState({status: $("#statusSelect option:selected").text()});
-  },
-  saveDraftBtn: function(event){
-    event.preventDefault();
-    var me = this;
-    var title = getValue("titlePage");
-    var content =  window.CKEDITOR.instances['content'].getData();
-    var titleTag = getValue("titleTag");
-    var status = "Draft";
-    var metaKeyword = getValue("metaKeyword");
-    var metaDescription = $("#metaDescription").val();
-    var summary = $("#summary").val();
-    var visibility = $("input[name=visibilityRadio]:checked").val();
-    var pageTemplate = $("#pageTemplate option:selected").text();
-    
-    var passwordPage = "";
-    var year = $("#yy").val();
-    var month = $("#mm option:selected").text();
-    var day = $("#dd").val();
-    var hour = $("#hh").val();
-    var min = $("#min").val();
-    var publishDate = year+"-"+month+"-"+day+"@"+hour+":"+min ;
-    var parentPage = $("#parentPage").val();
-    var pageOrder = $("#pageOrder").val();
-    var pageOrderInt = 0;
-    try  {pageOrderInt=parseInt(pageOrder,10)} catch(e) {}
-    var type = "page";
-
-    if (title.length<=3) {
-      this.setState({errorMsg: "Title is to short!"});
-      return;
-    }
-
-    if (!content) {
-      this.setState({errorMsg: "Content can't be empty"});
-      return;
-    }
-
-    this.disableForm(true);
-    var qry = "", noticeTxt = "";
-    if (this.state.mode==="create"){
-      qry = Query.getCreatePageQry(title, content, status, visibility, passwordPage, publishDate, 
-        localStorage.getItem('userId'), this.state.slug, summary, parentPage, pageOrderInt, type);
-      noticeTxt = "Page Published!";
-    }else{
-      qry = Query.getUpdatePageQry(this.props.postId, title, content, status, visibility, passwordPage, 
-        publishDate, localStorage.getItem('userId'), this.state.slug, summary, parentPage, pageOrderInt);
-      noticeTxt = "Page Updated!";
-    }
-
-    riques(qry, 
-      function(error, response, body){
-        if (!error && !body.errors && response.statusCode === 200) {
-          var here = me;
-          var postMetaId = "";
-          var postId = "";
-          var pmQry = "";
-          
-          if (me.state.mode==="create"){
-            postId = body.data.createPost.changedPost.id;
-            pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag, pageTemplate);
-          } else {
-            postId = body.data.updatePost.changedPost.id;
-            if (body.data.updatePost.changedPost.meta.edges.length===0) {
-              pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag, pageTemplate);
-            } else {
-              postMetaId = body.data.updatePost.changedPost.meta.edges[0].node.id;
-              pmQry = Query.updatePostMetaMtn(postMetaId, postId, metaKeyword, metaDescription, titleTag, pageTemplate);
-            }
-          }
-
-          riques(pmQry, 
-            function(error, response, body) {
-              if (!error && !body.errors && response.statusCode === 200) {
-                here.setState({noticeTxt: noticeTxt}); 
-              } else {
-                if (body && body.errors) {
-                  here.setState({errorMsg: body.errors[0].message});
-                } else {
-                  here.setState({errorMsg: error.toString()});
-                }
-              }
-              here.disableForm(false);
-            }
-          );
-
-          me.setState({mode: "update"});
-        } else {
-          if (body && body.errors) {
-            me.setState({errorMsg: body.errors[0].message});
-          } else {
-            me.setState({errorMsg: error.toString()});
-          }
-        }
-      }
-    );
-    
-  },
-  saveVisibility: function(event){
-    this.setState({visibilityTxt: $("input[name=visibilityRadio]:checked").val()});
-  },
-  disableForm: function(state){
-    $("#publishBtn").attr('disabled',state);
-    this.setState({loadingMsg: state?"Saving...":null});
-  },
   handleErrorMsgClose: function(){
     this.setState({errorMsg: ""});
   },
@@ -250,35 +299,14 @@ const NewPage = React.createClass({
   handleSubmit: function(event) {
     event.preventDefault();
     var me = this;
-    var title = getValue("titlePage");
-    var content =  window.CKEDITOR.instances['content'].getData();
-    var titleTag = getValue("titleTag");
-    var metaKeyword = getValue("metaKeyword");
-    var metaDescription = $("#metaDescription").val();
-    var summary = $("#summary").val();
-    var status = $("#statusSelect option:selected").text();
-    var visibility = $("input[name=visibilityRadio]:checked").val();
-    var pageTemplate = $("#pageTemplate option:selected").text();
-    
-    var passwordPage = "";
-    var year = $("#yy").val();
-    var month = $("#mm option:selected").text();
-    var day = $("#dd").val();
-    var hour = $("#hh").val();
-    var min = $("#min").val();
-    var publishDate = year+"-"+month+"-"+day+"@"+hour+":"+min ;
-    var parentPage = $("#parentPage").val();
-    var pageOrder = $("#pageOrder").val();
-    var pageOrderInt = 0;
-    try  {pageOrderInt=parseInt(pageOrder,10)} catch(e) {}
-    var type = "page";
+    var v = this.getFormValues();
 
-    if (title.length<=3) {
+    if (v.title.length<=3) {
       this.setState({errorMsg: "Title is to short!"});
       return;
     }
 
-    if (!content) {
+    if (!v.content) {
       this.setState({errorMsg: "Content can't be empty"});
       return;
     }
@@ -286,12 +314,12 @@ const NewPage = React.createClass({
     this.disableForm(true);
     var qry = "", noticeTxt = "";
     if (this.state.mode==="create"){
-      qry = Query.getCreatePageQry(title, content, status, visibility, passwordPage, publishDate, 
-        localStorage.getItem('userId'), this.state.slug, summary, parentPage, pageOrderInt, type);
+      qry = Query.getCreatePageQry(v.title, v.content, v.status, v.visibility, v.passwordPage, v.publishDate, 
+        localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder, v.type);
       noticeTxt = "Page Published!";
     }else{
-      qry = Query.getUpdatePageQry(this.props.postId, title, content, status, visibility, passwordPage, 
-        publishDate, localStorage.getItem('userId'), this.state.slug, summary, parentPage, pageOrderInt);
+      qry = Query.getUpdatePageQry(this.props.postId, v.title, v.content, v.status, v.visibility, v.passwordPage, 
+        v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder);
       noticeTxt = "Page Updated!";
     }
 
@@ -305,14 +333,14 @@ const NewPage = React.createClass({
           
           if (me.state.mode==="create"){
             postId = body.data.createPost.changedPost.id;
-            pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag, pageTemplate);
+            pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
           } else {
             postId = body.data.updatePost.changedPost.id;
             if (body.data.updatePost.changedPost.meta.edges.length===0) {
-              pmQry = Query.createPostMetaMtn(postId, metaKeyword, metaDescription, titleTag, pageTemplate);
+              pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
             } else {
               postMetaId = body.data.updatePost.changedPost.meta.edges[0].node.id;
-              pmQry = Query.updatePostMetaMtn(postMetaId, postId, metaKeyword, metaDescription, titleTag, pageTemplate);
+              pmQry = Query.updatePostMetaMtn(postMetaId, postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
             }
           }
 
@@ -321,11 +349,7 @@ const NewPage = React.createClass({
               if (!error && !body.errors && response.statusCode === 200) {
                 here.setState({noticeTxt: noticeTxt}); 
               } else {
-                if (body && body.errors) {
-                  here.setState({errorMsg: body.errors[0].message});
-                } else {
-                  here.setState({errorMsg: error.toString()});
-                }
+                errorCallback(error, body.errors?body.errors[0].message:null);
               }
               here.disableForm(false);
             }
@@ -333,23 +357,18 @@ const NewPage = React.createClass({
 
           me.setState({mode: "update"});
         } else {
-          if (body && body.errors) {
-            me.setState({errorMsg: body.errors[0].message});
-          } else {
-            me.setState({errorMsg: error.toString()});
-          }
+          errorCallback(error, body.errors?body.errors[0].message:null);
         }
       }
     );
   },
   componentWillMount: function(){
     var me = this;
-
     riques(Query.getPageListQry,
       function(error, response, body) {
         if (!error) {
           var pageList = [(<option key="0" value="">(no parent)</option>)];
-          $.each(body.data.viewer.allPosts.edges, function(key, item){
+          _.forEach(body.data.viewer.allPosts.edges, function(item){
             pageList.push((<option key={item.node.id} value={item.node.id} checked={me.state.parent=item.node.id}>
               {item.node.title}</option>));
           })
@@ -372,50 +391,6 @@ const NewPage = React.createClass({
   handleAddNewBtn: function(event) {
     this.resetForm();
   },
-  resetForm: function(){
-    document.getElementById("pageForm").reset();
-    window.CKEDITOR.instances['content'].setData(null);
-    this.setState({
-      noticeTxt: null, loadingMsg: null, errorMsg:null,
-      title:"", slug:"", content:"", summary:"", parent:"",
-      status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
-      permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160});
-    this.handleTitleChange();
-    $("#publishedNotice").hide();
-    window.history.pushState("", "", '/admin/pages/new');
-  },
-  setFormValues: function(v){
-    var meta = {};
-    if (v.meta.edges.length>0) {
-      _.forEach(v.meta.edges, function(i){
-        meta[i.node.item] = i.node.value;
-      });
-    }
-    setValue("titlePage", v.title);
-    setValue("content", v.content);
-    window.CKEDITOR.instances['content'].setData(v.content);
-    setValue("summary", v.summary);
-    setValue("statusSelect", v.status);
-    setValue("parentPage", v.parent);
-    setValue("pageOrder", v.order);
-    document.getElementsByName("visibilityRadio")[v.visibility==="Public"?0:1].checked = true;
-    if (_.has(meta, "metaKeyword")){
-      setValue("metaKeyword", meta.metaKeyword);
-    }
-    if (_.has(meta, "metaDescription")){
-      setValue("metaDescription", meta.metaDescription);
-    }
-    if (_.has(meta, "pageTemplate")){
-      setValue("pageTemplate", meta.pageTemplate);
-    }
-    if (_.has(meta, "titleTag")){
-      setValue("titleTag", meta.titleTag);
-    }
-    this.setState({title: v.title, content: v.content, summary: v.summary, 
-      status: v.status, parent: v.parent, visibilityTxt: v.visibility});
-    this.handleTitleChange();
-  },
-
   render: function(){
     var templates = getTemplates();
     const newPage=(
@@ -567,15 +542,13 @@ const NewPage = React.createClass({
                           <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption"> Edit </button></p>
                           <div id="statusOption" className="collapse">
                             <div className="form-group">
-                                <form className="form-inline">
-                                  <select id="statusSelect" style={{marginRight: 10, height: 30}}>
-                                    <option>Published</option>
-                                    <option>Pending Review</option>
-                                  </select>
-                                  <button type="button" onClick={this.saveDraft} className="btn btn-flat btn-xs btn-primary" 
-                                  style={{marginRight: 10}} data-toggle="collapse" data-target="#statusOption">OK</button>
-                                  <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption">Cancel</button>
-                                </form>
+                                <select id="statusSelect" style={{marginRight: 10, height: 30}}>
+                                  <option>Published</option>
+                                  <option>Pending Review</option>
+                                </select>
+                                <button type="button" onClick={this.saveDraft} className="btn btn-flat btn-xs btn-primary" 
+                                style={{marginRight: 10}} data-toggle="collapse" data-target="#statusOption">OK</button>
+                                <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption">Cancel</button>
                             </div>
                           </div>
                         </div>
@@ -596,12 +569,12 @@ const NewPage = React.createClass({
                                 Private
                               </label>
                             </div>
-                            <form className="form-inline" style={{marginTop: 10}}>
+                            <div className="form-inline" style={{marginTop: 10}}>
                               <button type="button" onClick={this.saveVisibility} className="btn btn-flat btn-xs btn-primary" 
                               style={{marginRight: 10}} data-toggle="collapse" data-target="#visibilityOption">OK</button>
                               <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#visibilityOption">Cancel</button>
-                            </form>
                             </div>
+                          </div>
                         </div>
 
                         <div className="form-group">
@@ -610,7 +583,7 @@ const NewPage = React.createClass({
 
                           <div id="scheduleOption" className="collapse">
                             <div className="form-group">
-                              <form className="form-inline">
+                              <div className="form-inline">
                                 <select id="mm" name="mm" className="form-control btn btn-flat btn-xs btn-default" style={{marginRight: 10, height: 20 }}>
                                   <option value="1">Jan</option>
                                   <option value="2">Feb</option>
@@ -629,13 +602,13 @@ const NewPage = React.createClass({
                                 <input className="form-control btn btn-flat btn-xs btn-default" type="text" id="yy" style={{marginLeft: 10, marginRight:5, width: 50, height: 20}}/>@
                                 <input className="form-control btn btn-flat btn-xs btn-default" type="text" id="hh" style={{marginLeft: 5,  width: 35, height: 20}}/> : 
                                 <input className="form-control btn btn-flat btn-xs btn-default" type="text" id="min" style={{width: 35, height: 20 }}/>
-                              </form>
-                                <form className="form-inline" style={{marginTop: 10}}>
-                                  <button type="button" id="immediatelyOkBtn" onClick={this.saveImmediately} className="btn btn-flat btn-xs btn-primary" 
-                                  style={{marginRight: 10}} data-toggle="collapse" data-target="#scheduleOption"> OK </button>
-                                  <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#scheduleOption">Cancel</button>
-                                </form>
                               </div>
+                              <div className="form-inline" style={{marginTop: 10}}>
+                                <button type="button" id="immediatelyOkBtn" onClick={this.saveImmediately} className="btn btn-flat btn-xs btn-primary" 
+                                style={{marginRight: 10}} data-toggle="collapse" data-target="#scheduleOption"> OK </button>
+                                <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#scheduleOption">Cancel</button>
+                              </div>
+                            </div>
                           </div>
                       </div> 
                     </div>
@@ -674,10 +647,10 @@ const NewPage = React.createClass({
                       </div>
                       <div className="form-group">
                         <p><b>Page  Template</b></p>
-                        <select id="pageTemplate" style={{width: 250}}>
+                        <select id="pageTemplate" style={{width: 250}} defaultValue={templates?templates[0].item:null}>
                         { templates ?
                           templates.map(function(item, index){
-                            return (<option key={item.id} selected={index===0?true:false}>{item.name}</option>)
+                            return (<option key={item.id}>{item.name}</option>)
                           }) : ""
                         }
                         </select>
