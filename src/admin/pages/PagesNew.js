@@ -127,11 +127,11 @@ const NewPage = React.createClass({
     
     var qry = "", noticeTxt = "";
     if (this.state.mode==="create"){
-      qry = Query.getCreatePageQry(v.title, v.content, v.status, v.visibility, v.passwordPage, v.publishDate, 
+      qry = Query.getCreatePageQry(v.title, v.content, "Draft", v.visibility, v.passwordPage, v.publishDate, 
         localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder, v.type);
       noticeTxt = "Page Published!";
     }else{
-      qry = Query.getUpdatePageQry(this.props.postId, v.title, v.content, v.status, v.visibility, v.passwordPage, 
+      qry = Query.getUpdatePageQry(this.props.postId, v.title, v.content, "Draft", v.visibility, v.passwordPage, 
         v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder);
       noticeTxt = "Page Updated!";
     }
@@ -210,16 +210,16 @@ const NewPage = React.createClass({
     return {
       title: getValue("titlePage"),
       content: window.CKEDITOR.instances['content'].getData(),
+      status: getValue("statusSelect"),
       titleTag: getValue("titleTag"),
-      status: "Draft",
       metaKeyword: getValue("metaKeyword"),
-      metaDescription: $("#metaDescription").val(),
-      summary: $("#summary").val(),
+      metaDescription: getValue("metaDescription"),
+      summary: getValue("summary"),
       visibility: $("input[name=visibilityRadio]:checked").val(),
       pageTemplate: $("#pageTemplate option:selected").text(),
       passwordPage: "",
       publishDate: year+"-"+month+"-"+day+"@"+hour+":"+min,
-      parentPage: $("#parentPage").val(),
+      parentPage: getValue("parentPage"),
       pageOrder: pageOrderInt,
       type: "page"
     }
