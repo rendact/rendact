@@ -50,26 +50,6 @@ const NewPage = React.createClass({
       }
     });
 
-    var d = new Date();
-    var year = d.getFullYear();
-    var month = d.getMonth();
-    var day = d.getDate();
-    var hour = '';
-    var minute = '';
-    if (d.getHours()<10) {
-      hour = "0"+d.getHours();
-    }else hour = d.getHours();
-    
-    if (d.getMinutes()<10) {
-      minute = "0"+d.getMinutes();
-    }else minute = d.getMinutes();
-    
-    $("#yy").val(year);
-    $("#dd").val(day);
-    $("#mm option[value="+(month+1)+"]").prop("selected", true);
-    $("#hh").val(hour);
-    $("#min").val(minute);
-
     if (this.state.visibilityTxt==="Public") {
       $("#public").attr("checked", true);
     }else $("#private").attr("checked", true);
@@ -98,11 +78,7 @@ const NewPage = React.createClass({
   },
   saveImmediately: function(event){
     this.setState({immediatelyStatus: true});
-    var day = $("#dd").val();
-    var year = $("#yy").val();
-    var hour = $("#hh").val();
-    var min = $("#min").val();
-    var time = $("#mm option:selected").text() + " " + day + " " + year + " @ " + hour + ":" + min;
+    var time = $("#datepicker").val();
     this.setState({immediately: time});
   },
   saveDraft: function(event){
@@ -198,11 +174,7 @@ const NewPage = React.createClass({
     window.history.pushState("", "", '/admin/pages/new');
   },
   getFormValues: function(){
-    var year = $("#yy").val();
-    var month = $("#mm option:selected").text();
-    var day = $("#dd").val();
-    var hour = $("#hh").val();
-    var min = $("#min").val();
+    var time = $("#datepicker").val();
     var pageOrder = $("#pageOrder").val();
     var pageOrderInt = 0;
     try  {pageOrderInt=parseInt(pageOrder,10)} catch(e) {}
@@ -218,7 +190,7 @@ const NewPage = React.createClass({
       visibility: $("input[name=visibilityRadio]:checked").val(),
       pageTemplate: $("#pageTemplate option:selected").text(),
       passwordPage: "",
-      publishDate: year+"-"+month+"-"+day+"@"+hour+":"+min,
+      publishDate: time,
       parentPage: $("#parentPage").val(),
       pageOrder: pageOrderInt,
       type: "page"
@@ -387,6 +359,7 @@ const NewPage = React.createClass({
           )
         }
     });
+
   },
   handleAddNewBtn: function(event) {
     this.resetForm();
@@ -583,25 +556,12 @@ const NewPage = React.createClass({
 
                           <div id="scheduleOption" className="collapse">
                             <div className="form-group">
-                              <div className="form-inline">
-                                <select id="mm" name="mm" className="form-control btn btn-flat btn-xs btn-default" style={{marginRight: 10, height: 20 }}>
-                                  <option value="1">Jan</option>
-                                  <option value="2">Feb</option>
-                                  <option value="3">Mar</option>
-                                  <option value="4">Apr</option>
-                                  <option value="5">May</option>
-                                  <option value="6">June</option>
-                                  <option value="7">July</option>
-                                  <option value="8">Aug</option>
-                                  <option value="9">Sep</option>
-                                  <option value="10">Oct</option>
-                                  <option value="11">Nov</option>
-                                  <option value="12">Des</option>
-                                </select>
-                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" id="dd" style={{width: 50, height: 20}}/>,
-                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" id="yy" style={{marginLeft: 10, marginRight:5, width: 50, height: 20}}/>@
-                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" id="hh" style={{marginLeft: 5,  width: 35, height: 20}}/> : 
-                                <input className="form-control btn btn-flat btn-xs btn-default" type="text" id="min" style={{width: 35, height: 20 }}/>
+                              <label>Date:</label>
+                              <div className="input-group date">
+                                <div className="input-group-addon">
+                                  <i className="fa fa-calendar"></i>
+                                </div>
+                                <input type="date" className="form-control pull-right" id="datepicker"/>
                               </div>
                               <div className="form-inline" style={{marginTop: 10}}>
                                 <button type="button" id="immediatelyOkBtn" onClick={this.saveImmediately} className="btn btn-flat btn-xs btn-primary" 
