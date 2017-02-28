@@ -37,6 +37,7 @@ const Pages = React.createClass({
       monthList: [],
       deleteMode: false,
       statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
+      dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
       activeStatus: "All",
       itemSelected: false
     }
@@ -93,8 +94,12 @@ const Pages = React.createClass({
     );
   },
   disableForm: function(state){
+    var me = this;
     _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
-    _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;})
+    _.forEach(document.getElementsByTagName('button'), function(el){ 
+      if (_.indexOf(me.state.dynamicStateBtnList, el.id) < 0)
+        el.disabled = state;
+    })
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
     this.setState({loadingMsg: state?"Processing...":null});
   },
@@ -225,7 +230,7 @@ const Pages = React.createClass({
           this.search( searchValue[this.index()] ).draw();
           return null;
         })
-        me.disableForm(false);
+        re.disableForm(false);
       })
     } ;
   },
@@ -248,7 +253,7 @@ const Pages = React.createClass({
           this.search( searchValue[this.index()] ).draw();
           return null;
         })
-        me.disableForm(false);
+        te.disableForm(false);
       })
     } ;
   },
@@ -324,11 +329,11 @@ const Pages = React.createClass({
                           <button className="btn btn-default btn-flat" id="deleteBtn" onClick={this.handleDeleteBtn} style={{marginRight:10}} 
                           disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete</button>
                           { this.state.deleteMode && 
-                            [<button className="btn btn-default btn-flat" id="recover" style={{marginRight:10}} onClick={this.handleRecover}
+                            [<button key="recoverBtn" className="btn btn-default btn-flat" id="recoverBtn" style={{marginRight:10}} onClick={this.handleRecover}
                              disabled={!this.state.itemSelected} ><span className="fa fa-support" ></span> Recover</button>,
-                             <button className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}
+                             <button key="deletePermanentBtn" className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}
                              disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete Permanently</button>,
-                             <button className="btn btn-default btn-flat" id="emptyTrashBtn" onClick={this.handleEmptyTrash}><span className="fa fa-trash" ></span> Empty Trash</button>]
+                             <button key="emptyTrashBtn" className="btn btn-default btn-flat" id="emptyTrashBtn" onClick={this.handleEmptyTrash}><span className="fa fa-trash" ></span> Empty Trash</button>]
                           }                        
                         <div className="box-tools pull-right">
                           <div className="input-group" style={{width: 200}}>
