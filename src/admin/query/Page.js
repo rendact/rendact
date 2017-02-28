@@ -168,7 +168,7 @@ const updatePostMetaMtn = function(postMetaId, postId, metaKeyword, metaDescript
 const getPageQry = function(postId){
   return {"query": 
       '{getPost(id:"'+postId+'"){ id,title,content,slug,author{username},status,visibility,parent,order,'
-      +'summary,category{edges{node{category{id,name}}}}comments{edges{node{id}}},meta{edges{node{item,value}'
+      +'summary,publishDate,category{edges{node{category{id,name}}}}comments{edges{node{id}}},meta{edges{node{item,value}'
       +'}}createdAt}}'
     }
   };

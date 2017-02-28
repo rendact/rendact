@@ -7,6 +7,7 @@ import Query from '../query';
 import {riques, setValue, getValue} from '../../utils';
 import {getTemplates} from '../theme';
 import { default as swal } from 'sweetalert2';
+import DatePicker from 'react-bootstrap-date-picker';
 
 const errorCallback = function(msg1, msg2){
   if (msg1) swal('Failed!', msg1, 'warning')
@@ -27,14 +28,15 @@ const NewPage = React.createClass({
       parent:"",
       status:"Draft",
       immediately:"",
-      immediatelyStatus:false,
+      immediatelyStatus:this.props.postId?false:true,
       visibilityTxt:"Public",
       permalinkEditing: false,
       mode: this.props.postId?"update":"create",
       pageList: null,
       titleTagLeftCharacter: 65,
       metaDescriptionLeftCharacter: 160,
-      permalinkInProcess: false
+      permalinkInProcess: false,
+      publishDate: new Date()
     }
   },
   componentDidMount: function(){
@@ -167,14 +169,13 @@ const NewPage = React.createClass({
     this.setState({
       noticeTxt: null, loadingMsg: null, errorMsg:null,
       title:"", slug:"", content:"", summary:"", parent:"",
-      status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
+      status:"Draft", immediately:"", immediatelyStatus:true, visibilityTxt:"Public", publishDate: new Date(),
       permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160});
     this.handleTitleChange();
     $("#publishedNotice").hide();
     window.history.pushState("", "", '/admin/pages/new');
   },
   getFormValues: function(){
-    var time = $("#datepicker").val();
     var pageOrder = $("#pageOrder").val();
     var pageOrderInt = 0;
     try  {pageOrderInt=parseInt(pageOrder,10)} catch(e) {}
@@ -190,7 +191,7 @@ const NewPage = React.createClass({
       visibility: $("input[name=visibilityRadio]:checked").val(),
       pageTemplate: $("#pageTemplate option:selected").text(),
       passwordPage: "",
-      publishDate: time,
+      publishDate: this.state.publishDate,
       parentPage: getValue("parentPage"),
       pageOrder: pageOrderInt,
       type: "page"
@@ -203,6 +204,7 @@ const NewPage = React.createClass({
         meta[i.node.item] = i.node.value;
       });
     }
+    var pubDate = v.publishDate? new Date(v.publishDate) : new Date();
     setValue("titlePage", v.title);
     setValue("content", v.content);
     window.CKEDITOR.instances['content'].setData(v.content);
@@ -210,6 +212,8 @@ const NewPage = React.createClass({
     setValue("statusSelect", v.status);
     setValue("parentPage", v.parent);
     setValue("pageOrder", v.order);
+    setValue("hours", pubDate.getHours());
+    setValue("minutes", pubDate.getMinutes());
     document.getElementsByName("visibilityRadio")[v.visibility==="Public"?0:1].checked = true;
     if (_.has(meta, "metaKeyword")){
       setValue("metaKeyword", meta.metaKeyword);
@@ -224,8 +228,14 @@ const NewPage = React.createClass({
       setValue("titleTag", meta.titleTag);
     }
     this.setState({title: v.title, content: v.content, summary: v.summary, 
-      status: v.status, parent: v.parent, visibilityTxt: v.visibility});
+      status: v.status, parent: v.parent, visibilityTxt: v.visibility, 
+      publishDate: pubDate, slug: v.slug});
     this.handleTitleChange();
+  },
+  formatDate: function(date){
+    var min = date.getMinutes();
+    if (min.length<2) min = "0"+min;
+    return date.getDate()+"/"+(1+date.getMonth())+"/"+date.getFullYear()+" "+date.getHours()+":"+min;
   },
   handlePermalinkBtn: function(event) {
     var slug = this.state.slug;
@@ -267,6 +277,17 @@ const NewPage = React.createClass({
   },
   handleNoticeClose: function(){
     this.setState({noticeTxt: ""});
+  },
+  handleDateChange: function(date){
+    this.setState({immediatelyStatus: false, publishDate: new Date(date)});
+  },
+  handleTimeChange: function(event){
+    var hours = getValue("hours");
+    var minutes = getValue("minutes");
+    var d = this.state.publishDate;
+    d.setHours(parseInt(hours, 10));
+    d.setMinutes(parseInt(minutes, 10));
+    this.setState({publishDate: d})
   },
   handleSubmit: function(event) {
     event.preventDefault();
@@ -551,17 +572,20 @@ const NewPage = React.createClass({
                         </div>
 
                         <div className="form-group">
-                          <p><span className="glyphicon glyphicon-calendar" style={{marginRight: 10}}></span>Publish <b>{this.state.immediatelyStatus===false?"Immediately":this.state.immediately} </b>
+                          <p><span className="glyphicon glyphicon-calendar" style={{marginRight: 10}}></span>{this.state.immediatelyStatus===true?
+                            (<span>Publish <b>Immediately</b></span>):<span>Published at <b>{this.formatDate(this.state.publishDate)}</b></span>} 
                           <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#scheduleOption"> Edit </button></p>
 
                           <div id="scheduleOption" className="collapse">
                             <div className="form-group">
-                              <label>Date:</label>
-                              <div className="input-group date">
-                                <div className="input-group-addon">
-                                  <i className="fa fa-calendar"></i>
+                              <div className="row">
+                                <div className="col-md-6">
+                                  <DatePicker style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.state.publishDate.toISOString()} onChange={this.handleDateTimeChange}/>
                                 </div>
-                                <input type="date" className="form-control pull-right" id="datepicker"/>
+                                <div className="col-md-6">
+                                  <input type="text" id="hours" style={{width: 30, height: 34, textAlign: "center"}} defaultValue={new Date().getHours()} onChange={this.handleDateTimeChange}/> : 
+                                  <input type="text" id="minutes" style={{width: 30, height: 34, textAlign: "center"}} defaultValue={new Date().getMinutes()} onChange={this.handleDateTimeChange}/>
+                                </div>
                               </div>
                               <div className="form-inline" style={{marginTop: 10}}>
                                 <button type="button" id="immediatelyOkBtn" onClick={this.saveImmediately} className="btn btn-flat btn-xs btn-primary" 
