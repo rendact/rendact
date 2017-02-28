@@ -147,7 +147,7 @@ const createPostMetaMtn = function(postId, metaKeyword, metaDescription, titleTa
     "query": 'mutation{'
     + 'insertKeyword: createPostMeta(input: {postId: "'+postId+'", item: "metaKeyword", value: "'+metaKeyword+'"}){ changedPostMeta{ id } } '
     + 'insertDescription: createPostMeta(input: {postId: "'+postId+'", item: "metaDescription", value: "'+metaDescription+'"}){ changedPostMeta{ id } } '
-    + 'insertSummary: createPostMeta(input: {postId: "'+postId+'", item: "titleTag", value: "'+titleTag+'"}){ changedPostMeta{ id } } '
+    + 'insertTitleTag: createPostMeta(input: {postId: "'+postId+'", item: "titleTag", value: "'+titleTag+'"}){ changedPostMeta{ id } } '
     + 'insertTemplate: createPostMeta(input: {postId: "'+postId+'", item: "pageTemplate", value: "'+pageTemplate+'"}){ changedPostMeta{ id } } '
     + '}'
   };
@@ -158,7 +158,7 @@ const updatePostMetaMtn = function(postMetaId, postId, metaKeyword, metaDescript
     "query": 'mutation{'
     + 'insertKeyword: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "metaKeyword", value: "'+metaKeyword+'"}){ changedPostMeta{ id } } '
     + 'insertDescription: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "metaDescription", value: "'+metaDescription+'"}){ changedPostMeta{ id } } '
-    + 'insertSummary: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "titleTag", value: "'+titleTag+'"}){ changedPostMeta{ id } } '
+    + 'insertTitleTag: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "titleTag", value: "'+titleTag+'"}){ changedPostMeta{ id } } '
     + 'insertTemplate: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "template", value: "'+pageTemplate+'"}){ changedPostMeta{ id } } '
     + '}'
   };
@@ -168,7 +168,7 @@ const updatePostMetaMtn = function(postMetaId, postId, metaKeyword, metaDescript
 const getPageQry = function(postId){
   return {"query": 
       '{getPost(id:"'+postId+'"){ id,title,content,slug,author{username},status,visibility,parent,order,'
-      +'summary,publishDate,category{edges{node{category{id,name}}}}comments{edges{node{id}}},meta{edges{node{item,value}'
+      +'summary,category{edges{node{category{id,name}}}}comments{edges{node{id}}},meta{edges{node{item,value}'
       +'}}createdAt}}'
     }
   };
