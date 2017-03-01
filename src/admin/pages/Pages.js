@@ -84,6 +84,11 @@ const Pages = React.createClass({
           $(".pageListCb").click( function(){
             here.checkDynamicButtonState();
           });
+          $('#selectAll').click(function () {
+            $(':checkbox', datatable.rows().nodes()).prop('checked', this.checked);
+            var checked = $("#selectAll:checked");
+            here.setState({itemSelected: checked.length>0})
+          });
 
           if (callback) callback.call();
         } else {
@@ -260,10 +265,8 @@ const Pages = React.createClass({
     this.props.handleViewPage('pages','edit', postId);
   },
   componentDidMount: function(){
-    var datatable = $('#pageListTbl').DataTable({sDom: '<"H"r>t<"F"ip>'});
-    $('#selectAll').click(function () {
-        $(':checkbox', datatable.rows().nodes()).prop('checked', this.checked);
-    });
+    var datatable = $('#pageListTbl').DataTable({sDom: '<"H"r>t<"F"ip>'}); 
+
     datatable.columns(1).every( function () {
         var that = this;
         $('#searchBox', this.footer() ).on( 'keyup change', function () {
@@ -324,9 +327,11 @@ const Pages = React.createClass({
                               var year = s[0];
                               return <option key={item} value={item}>{month+" "+year}</option>
                             })}
-                          </select>            
-                          <button className="btn btn-default btn-flat" id="deleteBtn" onClick={this.handleDeleteBtn} style={{marginRight:10}} 
-                          disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete</button>
+                          </select>      
+                          { !this.state.deleteMode &&    
+                            [<button className="btn btn-default btn-flat" id="deleteBtn" onClick={this.handleDeleteBtn} style={{marginRight:10}} 
+                            disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete</button>]
+                          }   
                           { this.state.deleteMode && 
                             [<button key="recoverBtn" className="btn btn-default btn-flat" id="recoverBtn" style={{marginRight:10}} onClick={this.handleRecover}
                              disabled={!this.state.itemSelected} ><span className="fa fa-support" ></span> Recover</button>,
