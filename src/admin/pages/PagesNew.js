@@ -36,7 +36,8 @@ const NewPage = React.createClass({
       titleTagLeftCharacter: 65,
       metaDescriptionLeftCharacter: 160,
       permalinkInProcess: false,
-      publishDate: new Date()
+      publishDate: new Date(),
+      publishDateReset: new Date()
     }
   },
   componentDidMount: function(){
@@ -232,7 +233,7 @@ const NewPage = React.createClass({
     }
     this.setState({title: v.title, content: v.content, summary: v.summary, 
       status: v.status, parent: v.parent, visibilityTxt: v.visibility, 
-      publishDate: pubDate, slug: v.slug});
+      publishDate: pubDate, publishDateReset: pubDate, slug: v.slug});
     this.handleTitleChange();
   },
   formatDate: function(date){
@@ -291,6 +292,10 @@ const NewPage = React.createClass({
     d.setHours(parseInt(hours, 10));
     d.setMinutes(parseInt(minutes, 10));
     this.setState({publishDate: d})
+  },
+  handlePublishDateCancel: function(event){
+    var resetDate = this.state.publishDateReset;
+    this.setState({publishDate: resetDate});
   },
   handleSubmit: function(event) {
     event.preventDefault();
@@ -593,7 +598,7 @@ const NewPage = React.createClass({
                               <div className="form-inline" style={{marginTop: 10}}>
                                 <button type="button" id="immediatelyOkBtn" onClick={this.saveImmediately} className="btn btn-flat btn-xs btn-primary" 
                                 style={{marginRight: 10}} data-toggle="collapse" data-target="#scheduleOption"> OK </button>
-                                <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#scheduleOption">Cancel</button>
+                                <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#scheduleOption" onClick={this.handlePublishDateCancel}>Cancel</button>
                               </div>
                             </div>
                           </div>
