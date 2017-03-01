@@ -79,8 +79,10 @@ const NewPage = React.createClass({
     );
   },
   saveImmediately: function(event){
-    this.setState({immediatelyStatus: true});
-    var time = $("#datepicker").val();
+    this.setState({immediatelyStatus: false});
+    var hours = $("#hours").val();
+    var minute = $("#minute").val();
+    var time = this.state.publishDate + hours + minute;
     this.setState({immediately: time});
   },
   saveDraft: function(event){
@@ -580,11 +582,11 @@ const NewPage = React.createClass({
                             <div className="form-group">
                               <div className="row">
                                 <div className="col-md-6">
-                                  <DatePicker style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.state.publishDate.toISOString()} onChange={this.handleDateTimeChange}/>
+                                  <DatePicker id="datepicker" style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.state.publishDate.toISOString()} onChange={this.handleDateChange}/>
                                 </div>
                                 <div className="col-md-6">
-                                  <input type="text" id="hours" style={{width: 30, height: 34, textAlign: "center"}} defaultValue={new Date().getHours()} onChange={this.handleDateTimeChange}/> : 
-                                  <input type="text" id="minutes" style={{width: 30, height: 34, textAlign: "center"}} defaultValue={new Date().getMinutes()} onChange={this.handleDateTimeChange}/>
+                                  <input type="text" id="hours" style={{width: 30, height: 34, textAlign: "center"}} defaultValue={new Date().getHours()} onChange={this.handleTimeChange}/> : 
+                                  <input type="text" id="minutes" style={{width: 30, height: 34, textAlign: "center"}} defaultValue={new Date().getMinutes()} onChange={this.handleTimeChange}/>
                                 </div>
                               </div>
                               <div className="form-inline" style={{marginTop: 10}}>
