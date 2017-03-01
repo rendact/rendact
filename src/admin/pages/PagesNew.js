@@ -41,8 +41,9 @@ const NewPage = React.createClass({
   },
   componentDidMount: function(){
     var me = this;
-    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
+    $.getScript("https://cdn.ckeditor.com/4.6.2/standard-all/ckeditor.js", function(data, status, xhr){
       window.CKEDITOR.replace('content', {
+        extraPlugins: 'justify',
         height: 400,
         title: false
       });
