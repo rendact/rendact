@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 const getPageListQry = function(s) {
-  var status = '{ne: "'+s+'"}';
+  var status = '{ne: "Deleted"}';
   if (s==="Deleted" || s==="Draft" || s==="Pending Review")
     status = '{eq: "'+s+'"}';
 
