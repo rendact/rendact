@@ -44,7 +44,7 @@ const Pages = React.createClass({
   },
   loadData: function(datatable, type, callback) {
     var me = this;
-    var qry = (type==="deleted")?Query.getPageDelQry:Query.getPageListQry;
+    var qry = Query.getPageListQry(type);
     
     riques(qry, 
       function(error, response, body) {
@@ -82,8 +82,7 @@ const Pages = React.createClass({
             here.handleViewPage(postId);
           });
           $(".pageListCb").click( function(){
-            var checkedRow = $("input.pageListCb:checked");
-            here.setState({itemSelected: checkedRow.length>0})
+            here.checkDynamicButtonState();
           });
 
           if (callback) callback.call();
@@ -102,6 +101,13 @@ const Pages = React.createClass({
     })
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
     this.setState({loadingMsg: state?"Processing...":null});
+    if (!state) {
+      this.checkDynamicButtonState();
+    }
+  },
+  checkDynamicButtonState: function(){
+    var checkedRow = $("input.pageListCb:checked");
+    this.setState({itemSelected: checkedRow.length>0})
   },
   handleDeleteBtn: function(event){
     var me = this;
@@ -120,7 +126,7 @@ const Pages = React.createClass({
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, "deleted", cb);
+            me.loadData(me.state.dt, "All", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -145,7 +151,7 @@ const Pages = React.createClass({
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, "deleted", cb);
+            me.loadData(me.state.dt, "Deleted", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -171,7 +177,7 @@ const Pages = React.createClass({
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, "deleted", cb);
+            me.loadData(me.state.dt, "Deleted", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -198,7 +204,7 @@ const Pages = React.createClass({
             console.log(JSON.stringify(body, null, 2));
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, "deleted", cb);
+            me.loadData(me.state.dt, "Deleted", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -215,31 +221,24 @@ const Pages = React.createClass({
     this.setState({activeStatus: status});
     if (status==='Deleted'){
       var me = this;
-      this.loadData(this.state.dt, "deleted", function(){
+      this.loadData(this.state.dt, "Deleted", function(){
         me.setState({deleteMode: true});
         me.disableForm(false);
       });
     }else{
-      var searchValue = {
-        4: status
-      };
       var re = this;
-      this.loadData(this.state.dt, "all", function(){
+      this.loadData(this.state.dt, status, function(){
         re.setState({deleteMode: false});
-        re.state.dt.columns([4]).every( function () {
-          this.search( searchValue[this.index()] ).draw();
-          return null;
-        })
         re.disableForm(false);
       })
     } ;
   },
   handleDateFilter: function(event){
     this.disableForm(true);
-    var status = $("#statusFilter").val();
-    if (status==='deleted'){
+    var status = this.state.activeStatus;
+    if (status==='Deleted'){
       var me = this;
-      this.loadData(this.state.dt, "deleted", function(){
+      this.loadData(this.state.dt, "Deleted", function(){
         me.setState({deleteMode: true});
         me.disableForm(false);
       });
@@ -247,7 +246,7 @@ const Pages = React.createClass({
       var date = $("#dateFilter").val();
       var searchValue = { 6: date };
       var te = this;
-      this.loadData(this.state.dt, "all", function(){
+      this.loadData(this.state.dt, status, function(){
         te.setState({deleteMode: false});
         te.state.dt.columns([6]).every( function () {
           this.search( searchValue[this.index()] ).draw();
@@ -278,7 +277,7 @@ const Pages = React.createClass({
     } );
     
     this.setState({dt: datatable});
-    this.loadData(datatable, "all");
+    this.loadData(datatable, "All");
   },
   render: function(){
     return (

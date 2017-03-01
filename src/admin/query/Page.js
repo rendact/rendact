@@ -1,32 +1,16 @@
 import _ from 'lodash';
 
-const getPageListQry = {"query": `
-  query getPages{
-  viewer {
-    allPosts(where: {type: {eq: "page"}, status: {ne: "Deleted"}}) {
-      edges {
-        node {
-          id
-          title,
-          slug,
-          author {
-            username
-          },
-          status,
-          comments{
-            edges{
-              node{
-                id
-              }
-            }
-          },
-          createdAt
-        }
-      }
-    }
-  }
-  } 
-`};
+const getPageListQry = function(s) {
+  var status = '{ne: "'+s+'"}';
+  if (s==="Deleted" || s==="Draft" || s==="Pending Review")
+    status = '{eq: "'+s+'"}';
+
+  return {
+    "query": 
+      'query getPages{viewer {allPosts(where: {type: {eq: "page"}, status: '+status+'}) { edges { node { '
+     +'id,title,slug,author{username},status,comments{edges{node{id}}},createdAt}}}}}'
+  };
+}
 
   const getPageDelQry = {"query": `
       query getPages{
