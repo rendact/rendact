@@ -86,8 +86,7 @@ const Pages = React.createClass({
           });
           $('#selectAll').click(function () {
             $(':checkbox', datatable.rows().nodes()).prop('checked', this.checked);
-            var checked = $("#selectAll:checked");
-            here.setState({itemSelected: checked.length>0})
+            here.checkDynamicButtonState();
           });
 
           if (callback) callback.call();
