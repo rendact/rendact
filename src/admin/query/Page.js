@@ -12,36 +12,6 @@ const getPageListQry = function(s) {
   };
 }
 
-  const getPageDelQry = {"query": `
-      query getPages{
-        viewer {
-          allPosts(where: {type: {eq: "page"}, status: {eq: "Deleted"}}) {
-            edges {
-              node {
-                id
-                title,
-                slug,
-                author {
-                  username
-                },
-                status,
-                comments{
-                  edges{
-                    node{
-                      id
-                    }
-                  }
-                },
-                createdAt
-               }
-            }
-          }
-        }
-        } 
-      `}; 
-      
-
-
 const getCreatePageQry = function(title, content, draft, visibility, passwordPage, 
 
   publishDate, userId, slug, summary, parentPage, pageOrder){
@@ -58,6 +28,7 @@ const getCreatePageQry = function(title, content, draft, visibility, passwordPag
               edges {
                 node {
                   id
+                  item
                 }
               }
             }
@@ -99,6 +70,7 @@ const getUpdatePageQry = function(id, title, content, draft, visibility, passwor
               edges {
                 node {
                   id
+                  item
                 }
               }
             }
@@ -137,15 +109,15 @@ const createPostMetaMtn = function(postId, metaKeyword, metaDescription, titleTa
   };
 }
 
-const updatePostMetaMtn = function(postMetaId, postId, metaKeyword, metaDescription, titleTag, pageTemplate){
+const updatePostMetaMtn = function(postId, data){
+  var query = "mutation { ";
+  _.forEach(data, function(val, index){
+    query += ' UpdatePostMeta'+index+' : updatePostMeta(input: {id: "'+val.postMetaId+'", item: "'+val.item+'", value: "'+val.value+'"}){ changedPostMeta{ id } }'; 
+  });
+  query += "}";
   return {
-    "query": 'mutation{'
-    + 'insertKeyword: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "metaKeyword", value: "'+metaKeyword+'"}){ changedPostMeta{ id } } '
-    + 'insertDescription: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "metaDescription", value: "'+metaDescription+'"}){ changedPostMeta{ id } } '
-    + 'insertTitleTag: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "titleTag", value: "'+titleTag+'"}){ changedPostMeta{ id } } '
-    + 'insertTemplate: updatePostMeta(input: {id: "'+postMetaId+'", postId: "'+postId+'", item: "template", value: "'+pageTemplate+'"}){ changedPostMeta{ id } } '
-    + '}'
-  };
+    "query": query
+  }
 }
 
 
@@ -202,7 +174,6 @@ const checkSlugQry = function(slug){
 
 const queries = {
   getPageListQry: getPageListQry,
-  getPageDelQry: getPageDelQry,
   getCreatePageQry: getCreatePageQry,
   getUpdatePageQry: getUpdatePageQry,
   createPostMetaMtn: createPostMetaMtn,

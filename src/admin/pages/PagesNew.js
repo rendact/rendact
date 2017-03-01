@@ -183,7 +183,7 @@ const NewPage = React.createClass({
     var pageOrder = $("#pageOrder").val();
     var pageOrderInt = 0;
     try  {pageOrderInt=parseInt(pageOrder,10)} catch(e) {}
-  
+    
     return {
       title: getValue("titlePage"),
       content: window.CKEDITOR.instances['content'].getData(),
@@ -235,6 +235,9 @@ const NewPage = React.createClass({
       status: v.status, parent: v.parent, visibilityTxt: v.visibility, 
       publishDate: pubDate, publishDateReset: pubDate, slug: v.slug});
     this.handleTitleChange();
+    this.handleTitleTagChange();
+    this.handleMetaDescriptionChange();
+    this.handleSummaryChange();
   },
   formatDate: function(date){
     var min = date.getMinutes();
@@ -328,7 +331,6 @@ const NewPage = React.createClass({
       function(error, response, body){
         if (!error && !body.errors && response.statusCode === 200) {
           var here = me;
-          var postMetaId = "";
           var postId = "";
           var pmQry = "";
           
@@ -340,8 +342,15 @@ const NewPage = React.createClass({
             if (body.data.updatePost.changedPost.meta.edges.length===0) {
               pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
             } else {
-              postMetaId = body.data.updatePost.changedPost.meta.edges[0].node.id;
-              pmQry = Query.updatePostMetaMtn(postMetaId, postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
+              var data = [];
+              _.forEach(body.data.updatePost.changedPost.meta.edges, function(item){
+                data.push({
+                  postMetaId: item.node.id,
+                  item: item.node.item,
+                  value: _.has(v, item.node.item)?v[item.node.item]:null
+                });
+              });
+              pmQry = Query.updatePostMetaMtn(postId, data);
             }
           }
 
@@ -365,7 +374,7 @@ const NewPage = React.createClass({
   },
   componentWillMount: function(){
     var me = this;
-    riques(Query.getPageListQry,
+    riques(Query.getPageListQry("All"),
       function(error, response, body) {
         if (!error) {
           var pageList = [(<option key="0" value="">(no parent)</option>)];
@@ -497,7 +506,7 @@ const NewPage = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4"><p>Title Tag</p></div>
                     <div className="col-md-8">
-                      <input id="titleTag" type="text" style={{width: '100%'}} placeholder={this.state.title} onChange={this.handleTitleTagChange}/>
+                      <input id="titleTag" type="text" style={{width: '100%'}} placeholder={this.state.title} onChange={this.handleTitleTagChange} maxLength="65" />
                         <span className="help-block">Up to 65 characters recommended<br/>
                         {this.state.titleTagLeftCharacter} characters left</span>                     
                     </div>
@@ -505,7 +514,8 @@ const NewPage = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4"><p>Meta Description</p></div>
                     <div className="col-md-8">
-                      <textarea id="metaDescription" rows='2' style={{width:'100%'}} placeholder={this.state.summary} onChange={this.handleMetaDescriptionChange}></textarea>
+                      <textarea id="metaDescription" rows='2' style={{width:'100%'}} placeholder={this.state.summary} 
+                        onChange={this.handleMetaDescriptionChange} maxLength="160"></textarea>
                       <span className="help-block">160 characters maximum<br/>
                       {this.state.metaDescriptionLeftCharacter} characters left</span>
                     </div>
