@@ -6,6 +6,7 @@ import Query from '../query';
 import Fn from '../lib/functions';
 import {riques} from '../../utils';
 import { default as swal } from 'sweetalert2';
+import Config from '../../config';
 
 const errorCallback = function(msg1, msg2){
   if (msg1) swal('Failed!', msg1, 'warning')
@@ -13,22 +14,11 @@ const errorCallback = function(msg1, msg2){
   else swal('Failed!', 'Unknown error','warning')
 }
 
-const defaultSwalStyling = {
-  showCancelButton: true,
-  confirmButtonColor: '#3085d6',
-  cancelButtonColor: '#d33',
-  confirmButtonClass: 'btn swal-btn-success',
-  cancelButtonClass: 'btn swal-btn-danger',
-  buttonsStyling: true
-}
-
 const Pages = React.createClass({
   getInitialState: function(){
     require ('datatables');
     require ('datatables/media/css/jquery.dataTables.min.css');
     require ('./Pages.css');
-    require ('jquery-ui/themes/base/dialog.css');
-    require ('jquery-ui/ui/widgets/dialog');
 
     return {
       dt: null,
@@ -123,7 +113,7 @@ const Pages = React.createClass({
       type: 'warning',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, cancel!',
-    },defaultSwalStyling)).then(function () {
+    },Config.defaultSwalStyling)).then(function () {
       me.disableForm(true);
       riques(Query.deletePostQry(idList), 
         function(error, response, body) {
@@ -148,7 +138,7 @@ const Pages = React.createClass({
       type: 'warning',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, cancel!',
-    },defaultSwalStyling)).then(function () {
+    },Config.defaultSwalStyling)).then(function () {
       me.disableForm(true);
       riques(Query.deletePostPermanentQry(idList), 
         function(error, response, body) {
@@ -174,7 +164,7 @@ const Pages = React.createClass({
       type: 'warning',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, cancel!'
-    }, defaultSwalStyling)).then(function () {
+    }, Config.defaultSwalStyling)).then(function () {
       me.disableForm(true);
       riques(Query.deletePostPermanentQry(idList), 
         function(error, response, body) {
@@ -200,7 +190,7 @@ const Pages = React.createClass({
       type: 'warning',
       confirmButtonText: 'Yes, recover it!',
       cancelButtonText: 'No, cancel!',
-    },defaultSwalStyling)).then(function () {
+    },Config.defaultSwalStyling)).then(function () {
       me.disableForm(true);
       riques(Query.recoverPostQry(idList), 
         function(error, response, body) {
@@ -217,7 +207,7 @@ const Pages = React.createClass({
       );
     })},
   handleAddNewBtn: function(event) {
-    this.props.handleAddNewPage();
+    this.props.handleNav('pages','new');
   },
   handleStatusFilter: function(event){
     this.disableForm(true);
@@ -261,7 +251,7 @@ const Pages = React.createClass({
     } ;
   },
   handleViewPage: function(postId){
-    this.props.handleViewPage('pages','edit', postId);
+    this.props.handleNav('pages','edit', postId);
   },
   componentDidMount: function(){
     var datatable = $('#pageListTbl').DataTable({sDom: '<"H"r>t<"F"ip>'}); 

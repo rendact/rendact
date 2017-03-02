@@ -68,6 +68,15 @@ const PermalinkTypeList = {
 
 const ActivePermalinkType = 'post-id';
 
+const defaultSwalStyling = {
+  showCancelButton: true,
+  confirmButtonColor: '#3085d6',
+  cancelButtonColor: '#d33',
+  confirmButtonClass: 'btn swal-btn-success',
+  cancelButtonClass: 'btn swal-btn-danger',
+  buttonsStyling: true
+}
+
 const config = {
 	rootUrl: 'http://localhost:3000',
 	scapholdUrl: 'https://us-west-2.api.scaphold.io/graphql/rendact',
@@ -78,7 +87,8 @@ const config = {
 	menuList: MenuJson,
 	theme: ActiveThemeConfig,
 	permalinkTypeList: PermalinkTypeList,
-	activePermalinkType: ActivePermalinkType
+	activePermalinkType: ActivePermalinkType,
+	defaultSwalStyling: defaultSwalStyling
 }
 
 module.exports = config;

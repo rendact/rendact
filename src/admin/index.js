@@ -16,6 +16,7 @@ import Users from './pages/Users';
 import NewPost from './pages/PostsNew';
 import NewPage from './pages/PagesNew';
 import NewTheme from './pages/ThemesNew';
+import NewUser from './pages/UsersNew';
 import Profile from './pages/Profile';
 import NotFound from './NotFound';
 
@@ -113,12 +114,6 @@ const PageLoader = React.createClass({
 	getDefaultProps: function() {
 		return {pageId: "dashboard", actionId: ''}
 	},
-	handleAddNewPost: function(){
-		this.props.handleNav('posts','new')
-	},
-	handleAddNewPage: function(){
-		this.props.handleNav('pages','new')
-	},
 	render: function() {
 		var page = this.props.pageId;
 		var action = "";
@@ -129,16 +124,18 @@ const PageLoader = React.createClass({
 			'dashboard' : <Dashboard />,
 			'settings' : <Settings />,
 			'profile' : <Profile />,
-			'posts' : <Posts handleAddNewPost={this.handleAddNewPost}/>,
-			'pages' : <Pages handleViewPage={this.props.handleNav} handleAddNewPage={this.handleAddNewPage}/>,
+			'posts' : <Posts handleNav={this.props.handleNav}/>,
+			'pages' : <Pages handleNav={this.props.handleNav}/>,
 			'themes' : <Themes />,
 			'plugins' : <Plugins />,
-			'users' : <Users />,
+			'users' : <Users handleNav={this.props.handleNav}/>,
 			'posts-new' : <NewPost />,
 			'pages-new' : <NewPage />,
 			'theme-new' : <NewTheme />,
+			'users-new' : <NewUser />,
 			'posts-edit' : <NewPost postId={this.props.postId}/>,
-			'pages-edit' : <NewPage postId={this.props.postId}/>
+			'pages-edit' : <NewPage postId={this.props.postId}/>,
+			'users-edit' : <NewUser userId={this.props.postId}/>,
 		}
 		if (map[page+action]) {
 			return map[page+action]
