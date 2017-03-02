@@ -13,7 +13,6 @@ const queries = {
   getPageQry: Page.getPageQry,
   getUpdatePageQry: Page.getUpdatePageQry,
   getPageListQry: Page.getPageListQry,
-  getPageDelQry: Page.getPageDelQry,
   deletePostQry: Page.deletePostQry,
   deletePostPermanentQry: Page.deletePostPermanentQry,
   getCreatePostQry: Post.getCreatePostQry,
