@@ -35,22 +35,29 @@ const Users = React.createClass({
   loadData: function(datatable, type, callback) {
     var me = this;
 
-    riques(Query.getUserListQry, 
+    riques(Query.getUserListByTypeQry(type), 
       function(error, response, body) {
         if (!error && !body.error) {
           if (body.data) {
             var here = me;
             datatable.clear();
             _.forEach(body.data.viewer.allUsers.edges, function(item){
-              var img = "<img src='/images/photo1.png' width='100' />";
+              var roles = "Guest";
+              var rolesLen = item.node.roles.edges.length;
+              if (rolesLen>0) {
+                roles = _.join(
+                  _.map(item.node.roles.edges, function(item){
+                    return item.node.name;
+                  }), " ,");
+              }
               datatable.row.add([
                 '<input class="userListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
-                '<center>'+img+'</center>',
+                '<center><img src='+item.node.image+' width="50" /></center>',
                 '<a class="tableItem" href="#" id="tableItem-'+item.node.id+'" >'+item.node.username+'</a>',
                 '<center>'+item.node.email+'</center>',
                 '<center>'+item.node.fullName+'</center>',
                 '<center>'+item.node.gender+'</center>',
-                '<center>Administrator</center>',
+                '<center>'+roles+'</center>',
                 '<center>'+item.node.posts.edges.length+'</center>'
               ])
             });

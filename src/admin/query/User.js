@@ -21,11 +21,20 @@ const getUserListQry = {
               email,
               fullName,
               gender,
+              image,
               lastLogin,
               posts {
                 edges {
                   node {
                     id
+                  }
+                }
+              }
+              roles {
+                edges {
+                  node {
+                    id
+                    name
                   }
                 }
               }
@@ -35,6 +44,50 @@ const getUserListQry = {
         }
       }
     }`
+};
+
+const getUserListByTypeQry = function(type){
+  var typeQry = "";
+
+  if (type!=="All") {
+    typeQry = '(where: {roles:  {node: {name: {eq: "'+type+'"}}}})';
+  }
+
+  return {
+    "query": `query getUsers{` +
+       `viewer {
+        allUsers `+typeQry+`{
+          edges {
+            node {
+              id,
+              username,
+              email,
+              fullName,
+              gender,
+              image,
+              lastLogin,
+              posts {
+                edges {
+                  node {
+                    id
+                  }
+                }
+              }
+              roles {
+                edges {
+                  node {
+                    id
+                    name
+                  }
+                }
+              }
+              
+            }
+          }
+        }
+      }
+    }`
+  }
 };
 
 const createUserMtn = function(username, password, email, fullname, gender) {
@@ -152,6 +205,7 @@ const changePasswordMtn = function(oldPass, newPass){
 const queries = {
   getUserQry: getUserQry,
   getUserListQry: getUserListQry,
+  getUserListByTypeQry: getUserListByTypeQry,
   createUserMtn: createUserMtn,
   saveProfileMtn: saveProfileMtn,
   saveUserMetaMtn: saveUserMetaMtn,

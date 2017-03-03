@@ -22,6 +22,7 @@ const queries = {
   getCreateCategoryOfPostQry: Post.getCreateCategoryOfPostQry,
   getUpdateCategoryOfPostQry: Post.getUpdateCategoryOfPostQry,
   getUserListQry: User.getUserListQry,
+  getUserListByTypeQry: User.getUserListByTypeQry,
   createUserMtn: User.createUserMtn,
   getPostQry: Post.getPostQry,
   checkSlugQry: Page.checkSlugQry,
