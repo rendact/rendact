@@ -22,6 +22,7 @@ const queries = {
   getCreateCategoryOfPostQry: Post.getCreateCategoryOfPostQry,
   getUpdateCategoryOfPostQry: Post.getUpdateCategoryOfPostQry,
   getUserListQry: User.getUserListQry,
+  getUserListByTypeQry: User.getUserListByTypeQry,
   createUserMtn: User.createUserMtn,
   getPostQry: Post.getPostQry,
   checkSlugQry: Page.checkSlugQry,
@@ -29,7 +30,8 @@ const queries = {
   saveUserMetaMtn: User.saveUserMetaMtn,
   createUserMetaMtn: User.createUserMetaMtn,
   changePasswordMtn: User.changePasswordMtn,
-  recoverPostQry: Page.recoverPostQry
+  recoverPostQry: Page.recoverPostQry,
+  addRoleToUser: User.addRoleToUser
 }
 
 module.exports = queries;

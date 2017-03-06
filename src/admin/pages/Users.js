@@ -3,7 +3,6 @@ import $ from 'jquery';
 window.jQuery = $;
 import _ from 'lodash';
 import Query from '../query';
-import Fn from '../lib/functions';
 import {riques} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
@@ -26,7 +25,7 @@ const Users = React.createClass({
       loadingMsg: null,
       monthList: [],
       deleteMode: false,
-      statusList: ["All", "Administrator", "Editor", "Author", "Subscriber", "Guest"],
+      statusList: ["All", "Administrator", "Editor", "Author", "Subscriber", "Guest", "No Role"],
       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
       activeStatus: "All",
       itemSelected: false
@@ -35,22 +34,34 @@ const Users = React.createClass({
   loadData: function(datatable, type, callback) {
     var me = this;
 
-    riques(Query.getUserListQry, 
+    riques(Query.getUserListByTypeQry(type), 
       function(error, response, body) {
         if (!error && !body.error) {
           if (body.data) {
             var here = me;
             datatable.clear();
             _.forEach(body.data.viewer.allUsers.edges, function(item){
-              var img = "<img src='/images/photo1.png' width='100' />";
+              var roles = "No Role";
+              var img = item.node.image?item.node.image:Config.rootUrl+"/images/avatar-default.png";
+              var rolesLen = item.node.roles.edges.length;
+              if (rolesLen>0) {
+                roles = _.join(
+                  _.map(item.node.roles.edges, function(item){
+                    return item.node.name;
+                  }), " ,");
+              }
+              if (type==="No Role"){
+                if (rolesLen>0) return;
+              }
+
               datatable.row.add([
                 '<input class="userListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
-                '<center>'+img+'</center>',
+                '<center><img src='+img+' width="50" /></center>',
                 '<a class="tableItem" href="#" id="tableItem-'+item.node.id+'" >'+item.node.username+'</a>',
                 '<center>'+item.node.email+'</center>',
                 '<center>'+item.node.fullName+'</center>',
                 '<center>'+item.node.gender+'</center>',
-                '<center>Administrator</center>',
+                '<center>'+roles+'</center>',
                 '<center>'+item.node.posts.edges.length+'</center>'
               ])
             });

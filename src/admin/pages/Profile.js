@@ -4,6 +4,8 @@ import Dropzone from 'react-dropzone';
 import Config from '../../config'
 import {riques, getValue} from '../../utils';
 import _ from 'lodash';
+import DatePicker from 'react-bootstrap-date-picker';
+
 window.getBase64Image = function(img) {
   var canvas = document.createElement("canvas");
   canvas.width = img.width;
@@ -84,30 +86,31 @@ var Profile = React.createClass({
 	    }
 
 		this.setState({isSaving: true});
-		riques(Query.saveProfileMtn(name, username, email, gender, image), 
-			function(error, response, body){ 
-				if(!error && !body.errors) { 
+		riques(Query.saveProfileMtn(localStorage.getItem("userId"), name, username, email, gender, image), 
+			function(error, response, body){
+				if(!error && !body.errors) {
 					var p = body.data.updateUser.changedUser;
 					me.setState({avatar: p.image})
-			        me.setProfile(p);
-			        var here = me;
-			        var userMetaData0 = {"bio": bio};
-			        var qry = '';
-			        var userMetaData = [];
-			        if (p.meta.edges.length>0) {
-			          	_.forEach(p.meta.edges, function(item, index){
-			          		if (_.has(userMetaData0, item.node.item))
-			          			userMetaData.push({id: item.node.id, item: item.node.item, value: userMetaData0[item.node.item]});
-				        });
-			          	qry = Query.saveUserMetaMtn(userMetaData);
-			        } else {
-			          	_.forEach(userMetaData0, function(value, key){
-			          		userMetaData.push({item: key, value: value});
-			          	});
-			          	qry = Query.createUserMetaMtn(userMetaData);
-			        }
-		          
-		          	riques(qry, 
+          me.setProfile(p);
+          var here = me;
+          var userMetaData0 = {"bio": bio};
+          var qry = '';
+
+          var userMetaData = [];
+          if (p.meta.edges.length>0) {
+          	_.forEach(p.meta.edges, function(item, index){
+          		if (_.has(userMetaData0, item.node.item))
+          			userMetaData.push({id: item.node.id, item: item.node.item, value: userMetaData0[item.node.item]});
+          	});
+          	qry = Query.saveUserMetaMtn(localStorage.getItem("userId"), userMetaData);
+          } else {
+          	_.forEach(userMetaData0, function(value, key){
+          		userMetaData.push({item: key, value: value});
+          	});
+          	qry = Query.createUserMetaMtn(userMetaData);
+          }
+          
+          riques(qry, 
 						function(error, response, body){
 							if(!error && !body.errors) {
 								var o = _.find(body.data, "changedUserMeta");
@@ -244,6 +247,13 @@ var Profile = React.createClass({
 									</div>
 								</div>
 
+								<div className="form-group">
+								  	<label htmlFor="birth" className="col-md-3">Date of Birth</label>
+								  	<div className="col-md-9">
+										<DatePicker id="datepicker" style={{width: "100%", padddingRight: 0, textAlign: "left"}} />
+									</div>
+								</div>
+
 					  			<div className="form-group">
 								  	<label htmlFor="keywoards" className="col-md-3">Email</label>
 								  	<div className="col-md-9">
@@ -251,7 +261,14 @@ var Profile = React.createClass({
 									</div>
 								</div>
 
-					  		<div className="form-group">
+								<div className="form-group">
+								  	<label htmlFor="telepon" className="col-md-3">Telepon</label>
+								  	<div className="col-md-9">
+										<input type="text" name="telepon" id="telepon" className="form-control" defaultValue={p.telepon} required="true"/>
+									</div>
+								</div>
+
+					  			<div className="form-group">
 								 	<label htmlFor="homeUrl" className="col-md-3">Gender</label>
 								 	<div className="col-md-9">
 										<select id="gender" name="gender" defaultValue={p.gender} style={{width: 150}}>
@@ -265,6 +282,13 @@ var Profile = React.createClass({
 								 	<label htmlFor="homeUrl" className="col-md-3">Biography</label>
 								 	<div className="col-md-9">
 										<textarea name="bio" id="bio" className="form-control">{p.biography}</textarea>
+									</div>
+								</div>
+
+								<div className="form-group">
+								  	<label htmlFor="location" className="col-md-3">Location</label>
+								  	<div className="col-md-9">
+										<input type="text" name="location" id="location" className="form-control" defaultValue={p.location} required="true"/>
 									</div>
 								</div>
 
@@ -301,6 +325,35 @@ var Profile = React.createClass({
 								 	<label htmlFor="new-password-2" className="col-md-3">Re-type new password</label>
 								 	<div className="col-md-9">
 										<input type="password" name="new-password-2" id="new-password-2" className="form-control" style={{width:200}} disabled={!this.state.passwordActive}/>
+									</div>
+								</div>
+
+								<h4 style={{marginBottom: 20}}>Social Media</h4>
+								<div className="form-group">
+								  	<label htmlFor="facebook" className="col-md-3">Facebook</label>
+								  	<div className="col-md-9">
+										<input type="text" name="facebook" id="facebook" className="form-control" defaultValue={p.facebook} required="true"/>
+									</div>
+								</div>
+
+								<div className="form-group">
+								  	<label htmlFor="twitter" className="col-md-3">Twitter</label>
+								  	<div className="col-md-9">
+										<input type="text" name="twitter" id="twitter" className="form-control" defaultValue={p.twitter} required="true"/>
+									</div>
+								</div>
+
+								<div className="form-group">
+								  	<label htmlFor="instagram" className="col-md-3">Instagram</label>
+								  	<div className="col-md-9">
+										<input type="text" name="instagram" id="instagram" className="form-control" defaultValue={p.instagram} required="true"/>
+									</div>
+								</div>
+
+								<div className="form-group">
+								  	<label htmlFor="path" className="col-md-3">Path</label>
+								  	<div className="col-md-9">
+										<input type="text" name="path" id="path" className="form-control" defaultValue={p.path} required="true"/>
 									</div>
 								</div>
 								
