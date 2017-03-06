@@ -4,6 +4,7 @@ import Dropzone from 'react-dropzone';
 import Config from '../../config'
 import {riques, getValue} from '../../utils';
 import _ from 'lodash';
+import DatePicker from 'react-bootstrap-date-picker';
 
 window.getBase64Image = function(img) {
   var canvas = document.createElement("canvas");
@@ -29,32 +30,32 @@ var Profile = React.createClass({
 		}
 	},
 	setProfile: function(p) {
-		var metaBio = _.find(p.meta.edges, {"node": {"item": "bio"}});
-    var profile = {
-      name: p.fullName?p.fullName:p.username,
-      username: p.username,
-      email: p.email,
-      gender: p.gender,
-      image: p.image,
-      lastLogin: p.lastLogin,
-      createdAt: p.createdAt,
-      biography: metaBio?metaBio.node.value:""
-    }
-    localStorage.setItem('profile', JSON.stringify(profile));
-  },
-  setUserMeta: function(meta){
-  	var metaBio = "";
-  	if (_.isArray(meta)) {
-  		metaBio = _.find(meta, {"node": {"item": "bio"}})
-  							 .node.value;
-  	} else {
-  		metaBio = _.find([meta], {"item": "bio"}).value;
-  	}
-  	
-  	var profile = JSON.parse(localStorage.getItem("profile"));
-  	profile.biography = metaBio;
-  	localStorage.setItem('profile', JSON.stringify(profile));
-  },
+	  var metaBio = _.find(p.meta.edges, {"node": {"item": "bio"}});
+      var profile = {
+	      name: p.fullName?p.fullName:p.username,
+	      username: p.username,
+	      email: p.email,
+	      gender: p.gender,
+	      image: p.image,
+	      lastLogin: p.lastLogin,
+	      createdAt: p.createdAt,
+	      biography: metaBio?metaBio.node.value:""
+	  }
+	  localStorage.setItem('profile', JSON.stringify(profile));
+  	},
+  	setUserMeta: function(meta){
+	  	var metaBio = "";
+	  	if (_.isArray(meta)) {
+	  		metaBio = _.find(meta, {"node": {"item": "bio"}})
+	  							 .node.value;
+	  	} else {
+	  		metaBio = _.find([meta], {"item": "bio"}).value;
+	  	}
+	  	
+	  	var profile = JSON.parse(localStorage.getItem("profile"));
+	  	profile.biography = metaBio;
+	  	localStorage.setItem('profile', JSON.stringify(profile));
+  	},
 	handleSubmitBtn: function(event){
 		event.preventDefault();
 		
@@ -162,15 +163,15 @@ var Profile = React.createClass({
 				}
 			);
 		}
-	},
+	}, 
 	handleImageDrop: function(accepted){
 		var me = this;
 		var reader = new FileReader();
-    reader.onloadend = function(res) {
-      var imageBase64 = res.target.result;
-      me.setState({avatar: imageBase64});
-    }
-    reader.readAsDataURL(accepted[0]);
+	    reader.onloadend = function(res) {
+	      var imageBase64 = res.target.result;
+	      me.setState({avatar: imageBase64});
+	    }
+	    reader.readAsDataURL(accepted[0]);
 	},
 	handlePasswordChange: function(event){
 		var password = getValue("new-password");
@@ -181,8 +182,8 @@ var Profile = React.createClass({
 		}
 	},
 	handleErrorMsgClose: function(){
-    this.setState({errorMsg: ""});
-  },
+	    this.setState({errorMsg: ""});
+	},
 	render: function(){
 		let p = JSON.parse(localStorage.getItem("profile"));
 		return (
@@ -190,7 +191,7 @@ var Profile = React.createClass({
 				<div className="container-fluid">
 				<section className="content-header" style={{marginBottom:20}}>
 			      <h1>
-			        Profile
+			        My Profile
 			      </h1>
 			      <ol className="breadcrumb">
 			        <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
@@ -198,7 +199,7 @@ var Profile = React.createClass({
 			      </ol>
 			    </section>
 
-			    { this.state.errorMsg &&
+		  { this.state.errorMsg &&
             <div className="alert alert-danger alert-dismissible">
               <button type="button" className="close" onClick={this.handleErrorMsgClose}>×</button>
               {this.state.errorMsg}
@@ -246,6 +247,13 @@ var Profile = React.createClass({
 									</div>
 								</div>
 
+								<div className="form-group">
+								  	<label htmlFor="birth" className="col-md-3">Date of Birth</label>
+								  	<div className="col-md-9">
+										<DatePicker id="datepicker" style={{width: "100%", padddingRight: 0, textAlign: "left"}} />
+									</div>
+								</div>
+
 					  			<div className="form-group">
 								  	<label htmlFor="keywoards" className="col-md-3">Email</label>
 								  	<div className="col-md-9">
@@ -253,7 +261,14 @@ var Profile = React.createClass({
 									</div>
 								</div>
 
-					  		<div className="form-group">
+								<div className="form-group">
+								  	<label htmlFor="telepon" className="col-md-3">Telepon</label>
+								  	<div className="col-md-9">
+										<input type="text" name="telepon" id="telepon" className="form-control" defaultValue={p.telepon} required="true"/>
+									</div>
+								</div>
+
+					  			<div className="form-group">
 								 	<label htmlFor="homeUrl" className="col-md-3">Gender</label>
 								 	<div className="col-md-9">
 										<select id="gender" name="gender" defaultValue={p.gender} style={{width: 150}}>
@@ -267,6 +282,13 @@ var Profile = React.createClass({
 								 	<label htmlFor="homeUrl" className="col-md-3">Biography</label>
 								 	<div className="col-md-9">
 										<textarea name="bio" id="bio" className="form-control">{p.biography}</textarea>
+									</div>
+								</div>
+
+								<div className="form-group">
+								  	<label htmlFor="location" className="col-md-3">Location</label>
+								  	<div className="col-md-9">
+										<input type="text" name="location" id="location" className="form-control" defaultValue={p.location} required="true"/>
 									</div>
 								</div>
 
@@ -305,14 +327,43 @@ var Profile = React.createClass({
 										<input type="password" name="new-password-2" id="new-password-2" className="form-control" style={{width:200}} disabled={!this.state.passwordActive}/>
 									</div>
 								</div>
+
+								<h4 style={{marginBottom: 20}}>Social Media</h4>
+								<div className="form-group">
+								  	<label htmlFor="facebook" className="col-md-3">Facebook</label>
+								  	<div className="col-md-9">
+										<input type="text" name="facebook" id="facebook" className="form-control" defaultValue={p.facebook} required="true"/>
+									</div>
+								</div>
+
+								<div className="form-group">
+								  	<label htmlFor="twitter" className="col-md-3">Twitter</label>
+								  	<div className="col-md-9">
+										<input type="text" name="twitter" id="twitter" className="form-control" defaultValue={p.twitter} required="true"/>
+									</div>
+								</div>
+
+								<div className="form-group">
+								  	<label htmlFor="instagram" className="col-md-3">Instagram</label>
+								  	<div className="col-md-9">
+										<input type="text" name="instagram" id="instagram" className="form-control" defaultValue={p.instagram} required="true"/>
+									</div>
+								</div>
+
+								<div className="form-group">
+								  	<label htmlFor="path" className="col-md-3">Path</label>
+								  	<div className="col-md-9">
+										<input type="text" name="path" id="path" className="form-control" defaultValue={p.path} required="true"/>
+									</div>
+								</div>
 								
 								<div className="form-group">
 									<div className="col-md-9">
 										<div className="btn-group">
-											<input type="submit" value="Save" className="btn btn-primary" />
+											<input type="submit" value="Update Profile" className="btn btn-primary btn-sm" />
 										</div>
 										{ this.state.isSaving &&
-											<p>Saving...</p>
+											<p>Updating...</p>
 										}
 									</div>
 								</div>
