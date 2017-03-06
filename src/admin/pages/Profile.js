@@ -85,7 +85,7 @@ var Profile = React.createClass({
     }
 
 		this.setState({isSaving: true});
-		riques(Query.saveProfileMtn(name, username, email, gender, image), 
+		riques(Query.saveProfileMtn(localStorage.getItem("userId"), name, username, email, gender, image), 
 			function(error, response, body){
 				if(!error && !body.errors) {
 					var p = body.data.updateUser.changedUser;

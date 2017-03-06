@@ -3,6 +3,8 @@ import Query from '../query';
 import Config from '../../config'
 import {riques, getValue, setValue} from '../../utils';
 import _ from 'lodash';
+import { default as swal } from 'sweetalert2';
+import Dropzone from 'react-dropzone';
 
 window.getBase64Image = function(img) {
   var canvas = document.createElement("canvas");
@@ -14,11 +16,16 @@ window.getBase64Image = function(img) {
   return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
 }
 
+const errorCallback = function(msg1, msg2){
+  if (msg1) swal('Failed!', msg1, 'warning')
+  else if (msg2) swal('Failed!', msg2, 'warning')
+  else swal('Failed!', 'Unknown error','warning')
+}
+
 var NewUser = React.createClass({
 	getInitialState: function(){
 		var image = Config.rootUrl+"/images/avatar-default.png";
-		if (JSON.parse(localStorage.getItem("profile")).image)
-			image = JSON.parse(localStorage.getItem("profile")).image;
+		
 		return {
 			isSaving: false,
 			errorMsg: null,
@@ -28,13 +35,31 @@ var NewUser = React.createClass({
 			mode: this.props.userId?"update":"create"
 		}
 	},
-	setFormValues: function(){
-		var p = JSON.parse(localStorage.getItem("profile"));
-
-		setValue("fullname", p.name);
-		setValue("gender", p.gender);
-		setValue("username", p.username);
-		setValue("email", p.email);
+	loadData: function(){
+		var me = this;
+		riques(Query.getUserQry(this.props.userId),
+			function(error, response, body){
+				if (!error && !body.errors) {
+          var values = body.data.getUser;
+          me.setFormValues(values);
+        } else {
+        	errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+			}
+		);
+	},
+	setFormValues: function(v){
+		setValue("name", v.fullName);
+		setValue("username", v.username);
+		setValue("email", v.email);
+		setValue("gender", v.gender);
+		if (v.image) this.setState({avatar: v.image});
+		if (v.meta.edges.length>0){
+			var meta = v.meta.edges;
+			_.forEach(meta, function(item){
+				setValue(item.node.item, item.node.value);
+			});
+		}
 	},
 	handleSubmitBtn: function(event){
 		event.preventDefault();
@@ -66,12 +91,11 @@ var NewUser = React.createClass({
     }
 
 		this.setState({isSaving: true});
-		riques(Query.saveProfileMtn(name, username, email, gender, image), 
+		riques(Query.saveProfileMtn(this.props.userId, name, username, email, gender, image), 
 			function(error, response, body){
 				if(!error && !body.errors) {
 					var p = body.data.updateUser.changedUser;
 					me.setState({avatar: p.image})
-          me.setProfile(p);
           var here = me;
           var userMetaData0 = {"bio": bio};
           var qry = '';
@@ -81,7 +105,7 @@ var NewUser = React.createClass({
           		if (_.has(userMetaData0, item.node.item))
           			userMetaData.push({id: item.node.id, item: item.node.item, value: userMetaData0[item.node.item]});
           	});
-          	qry = Query.saveUserMetaMtn(userMetaData);
+          	qry = Query.saveUserMetaMtn(here.props.userId, userMetaData);
           } else {
           	_.forEach(userMetaData0, function(value, key){
           		userMetaData.push({item: key, value: value});
@@ -94,7 +118,6 @@ var NewUser = React.createClass({
 							if(!error && !body.errors) {
 								var o = _.find(body.data, "changedUserMeta");
 								if (o.changedUserMeta) {
-									here.setUserMeta(o.changedUserMeta);
 									here.setState({noticeTxt: "Profile saved"});
 								}
 							} else {
@@ -120,7 +143,6 @@ var NewUser = React.createClass({
 						me.setState({errorMsg: "Unknown error"})
 					}
 				}
-				//me.setState({isSaving: false});
 			}
 		);
 		
@@ -165,11 +187,10 @@ var NewUser = React.createClass({
   },
   componentDidMount: function(){
   	if (this.state.mode==="update") {
-  		this.setFormValues()
-  	}
+	  	this.loadData();
+	  }
   },
 	render: function(){
-		let p = JSON.parse(localStorage.getItem("profile"));
 		return (
 			<div className="content-wrapper">
 				<div className="container-fluid">
@@ -184,7 +205,7 @@ var NewUser = React.createClass({
 			      </h1>
 			      <ol className="breadcrumb">
 			        <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-			        <li className="active">Add User</li>
+			        <li className="active">Profile</li>
 			      </ol>
 			    </section>
 
@@ -208,27 +229,30 @@ var NewUser = React.createClass({
 			    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" id="profileForm">
 			    			
 					  			<div className="form-group">
-								  	<label htmlFor="name" className="col-md-3">Full Name</label>
+								  	<label htmlFor="name" className="col-md-3">Name</label>
 								  	<div className="col-md-9">
-										<input type="text" className="form-control" id="fullname" placeholder="Full name" required="true"/>
+										<input type="text" name="name" id="name" className="form-control" required="true"/>
 										<p className="help-block">Your great full name</p>
 									</div>
 								</div>
 
 								<div className="form-group">
-								 	<label htmlFor="homeUrl" className="col-md-3">Gender</label>
-								 	<div className="col-md-9">
-										<select id="gender" name="gender" defaultValue={p.gender} style={{width: 150}}>
-											<option key="male" value="male" >Male</option>
-											<option key="female" value="female" >Female</option>
-										</select> 
-									</div>
+							  	<label htmlFor="name" className="col-md-3">Picture</label>
+							  	<div className="col-md-9">
+									<Dropzone onDrop={this.handleImageDrop}>
+										<div className="avatar-container">
+				              <img src={this.state.avatar} alt='' id="avatar"/> 
+										  <div className="avatar-overlay"></div>
+										  <div className="avatar-button"><a href="#"> Change </a></div>
+										</div>
+			            </Dropzone>
+								</div>
 								</div>
 
-					  		<div className="form-group">
-							  	<label htmlFor="tagline" className="col-md-3">Username</label>
-							  	<div className="col-md-9">
-										<input type="text" className="form-control" id="username" placeholder="User name" required="true"/>
+					  			<div className="form-group">
+								  	<label htmlFor="tagline" className="col-md-3">Username</label>
+								  	<div className="col-md-9">
+										<input type="text" name="username" id="username" className="form-control" required="true"/>
 										<p className="help-block">The short unique name describes you</p>
 									</div>
 								</div>
@@ -236,21 +260,46 @@ var NewUser = React.createClass({
 					  			<div className="form-group">
 								  	<label htmlFor="keywoards" className="col-md-3">Email</label>
 								  	<div className="col-md-9">
-										<input type="email" className="form-control" id="email" placeholder="Email" required="true"/>
+										<input type="text" name="email" id="email" className="form-control" disabled/>
+									</div>
+								</div>
+
+					  		<div className="form-group">
+								 	<label htmlFor="homeUrl" className="col-md-3">Gender</label>
+								 	<div className="col-md-9">
+										<select id="gender" name="gender" defaultValue="Male" style={{width: 150}}>
+											<option key="male" value="Male" >Male</option>
+											<option key="female" value="Female" >Female</option>
+										</select> 
 									</div>
 								</div>
 
 								<div className="form-group">
-								 	<label htmlFor="new-password" className="col-md-3">Password</label>
+								 	<label htmlFor="homeUrl" className="col-md-3">Biography</label>
 								 	<div className="col-md-9">
-										<input type="password" className="form-control" id="password" placeholder="Password" style={{width:200}} required="true"/>
+										<textarea name="bio" id="bio" className="form-control"></textarea>
+									</div>
+								</div>
+
+								<h4 style={{marginBottom: 20}}>Change Password</h4>
+								<div className="form-group">
+								 	<label htmlFor="old-password" className="col-md-3">Old password</label>
+								 	<div className="col-md-9">
+										<input type="password" name="old-password" id="old-password" className="form-control" style={{width:200}}/>
 									</div>
 								</div>
 
 								<div className="form-group">
-								 	<label htmlFor="new-password-2" className="col-md-3">Re-type password</label>
+								 	<label htmlFor="new-password" className="col-md-3">New password</label>
 								 	<div className="col-md-9">
-										<input type="password" name="new-password-2" id="repassword" placeholder="Retype password" className="form-control" style={{width:200}} disabled={!this.state.passwordActive}/>
+										<input type="password" name="new-password" id="new-password" className="form-control" onChange={this.handlePasswordChange} style={{width:200}}/>
+									</div>
+								</div>
+
+								<div className="form-group">
+								 	<label htmlFor="new-password-2" className="col-md-3">Re-type new password</label>
+								 	<div className="col-md-9">
+										<input type="password" name="new-password-2" id="new-password-2" className="form-control" style={{width:200}} disabled={!this.state.passwordActive}/>
 									</div>
 								</div>
 								

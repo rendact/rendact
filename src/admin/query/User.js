@@ -121,7 +121,7 @@ const createUserMtn = function(username, password, email, fullname, gender) {
     }
 }
 
-const saveProfileMtn = function(name, username, email, gender, image){
+const saveProfileMtn = function(userId, name, username, email, gender, image){
   return {
     "query": `mutation UpdateUserQuery ($input: UpdateUserInput!) {
         updateUser(input: $input) {
@@ -148,7 +148,7 @@ const saveProfileMtn = function(name, username, email, gender, image){
       }`,
       "variables": {
         "input": {
-          "id": localStorage.userId,
+          "id": userId,
           "username": username,
           "fullName": name,
           "email": email,
@@ -160,14 +160,28 @@ const saveProfileMtn = function(name, username, email, gender, image){
 }
 
 const saveUserMetaMtn = function(userId, arr){
-  var query = "mutation { ";
+  var variables = {};
+  var query = "mutation (";
+  var i = 0;
+  query += 
+    _.join(
+    _.map(arr, function(item){
+      return "$input"+i+": UpdateUserMetaInput!"
+    }), ",");
+  query += ") {";
   _.forEach(arr, function(val, index){
-    query += ' UpdateUserMeta'+index+' : updateUserMeta(input: {id: "'+val.id+'", userId: "'+userId+'", item: "'+val.item+'", value: "'+val.value+'"}){ changedUserMeta{ id item value } }'; 
+    query += ' UpdateUserMeta'+index+' : updateUserMeta(input: $input'+index+'){ changedUserMeta{ id item value } }'; 
+    variables["input"+index] = {
+      id: val.id,
+      userId: userId,
+      item: val.item,
+      value: val.value
+    }
   });
   query += "}";
-
   return {
-    "query": query
+    "query": query,
+    "variables": variables
   }
 }
 
@@ -244,7 +258,8 @@ const queries = {
   saveProfileMtn: saveProfileMtn,
   saveUserMetaMtn: saveUserMetaMtn,
   createUserMetaMtn: createUserMetaMtn,
-  changePasswordMtn: changePasswordMtn
+  changePasswordMtn: changePasswordMtn,
+  addRoleToUser: addRoleToUser
 }
 
 module.exports = queries;

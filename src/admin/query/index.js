@@ -30,7 +30,8 @@ const queries = {
   saveUserMetaMtn: User.saveUserMetaMtn,
   createUserMetaMtn: User.createUserMetaMtn,
   changePasswordMtn: User.changePasswordMtn,
-  recoverPostQry: Page.recoverPostQry
+  recoverPostQry: Page.recoverPostQry,
+  addRoleToUser: User.addRoleToUser
 }
 
 module.exports = queries;

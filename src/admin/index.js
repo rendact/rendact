@@ -56,7 +56,7 @@ const SideMenu = React.createClass({
 			    <section className="sidebar">
 			      <div className="user-panel user-panel-hidden">
 			      	<div className="pull-left image">
-			          <img src="../../images/avatar-default.png" className="img-circle" alt="User" />
+			          <img src={Config.rootUrl+"/images/avatar-default.png"} className="img-circle" alt="User" />
 			        </div>
 			        <div className="pull-left info">
 			          <p>Ali Camarata</p>

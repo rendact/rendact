@@ -88,7 +88,8 @@ const config = {
 	theme: ActiveThemeConfig,
 	permalinkTypeList: PermalinkTypeList,
 	activePermalinkType: ActivePermalinkType,
-	defaultSwalStyling: defaultSwalStyling
+	defaultSwalStyling: defaultSwalStyling,
+	guestRoleId: "Um9sZTo1"
 }
 
 module.exports = config;
