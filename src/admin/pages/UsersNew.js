@@ -32,7 +32,8 @@ var NewUser = React.createClass({
 			noticeTxt: null,
 			avatar: image,
 			passwordActive: false,
-			mode: this.props.userId?"update":"create"
+			mode: this.props.userId?"update":"create",
+			roleList: [<option key="norole" value="No Role">No Role</option>]
 		}
 	},
 	loadData: function(){
@@ -60,6 +61,10 @@ var NewUser = React.createClass({
 				setValue(item.node.item, item.node.value);
 			});
 		}
+		if (v.roles.edges.length>0){
+			var role = v.roles.edges;
+			setValue("role", role[0].node.name);
+		}
 	},
 	handleSubmitBtn: function(event){
 		event.preventDefault();
@@ -71,6 +76,7 @@ var NewUser = React.createClass({
 		var gender = getValue("gender");
 		var image = this.state.avatar;
 		var bio = getValue("bio");
+		var roleId = getValue("role");
 
 		// Change password
 		var oldPassword = getValue("old-password");
@@ -100,6 +106,8 @@ var NewUser = React.createClass({
           var userMetaData0 = {"bio": bio};
           var qry = '';
           var userMetaData = [];
+
+          // Save user meta
           if (p.meta.edges.length>0) {
           	_.forEach(p.meta.edges, function(item, index){
           		if (_.has(userMetaData0, item.node.item))
@@ -113,6 +121,35 @@ var NewUser = React.createClass({
           	qry = Query.createUserMetaMtn(userMetaData);
           }
           
+          riques(qry, 
+						function(error, response, body){
+							if(!error && !body.errors) {
+								var o = _.find(body.data, "changedUserMeta");
+								if (o.changedUserMeta) {
+									here.setState({noticeTxt: "Profile saved"});
+								}
+							} else {
+								if (error){
+									here.setState({errorMsg: error})
+								}
+								else if (body.errors) {
+									here.setState({errorMsg: body.errors[0].message})
+								} else {
+									here.setState({errorMsg: "Unknown error"})
+								}
+							}
+							here.setState({isSaving: false});
+						}
+					);
+
+					// Save user role
+					
+					if (p.roles.edges.length>0) {
+          	qry = Query.updateRoleUser(here.props.userId, roleId, "readwrite");
+          } else {
+          	qry = Query.addRoleToUser(here.props.userId, roleId, "readwrite");
+          }
+          debugger;
           riques(qry, 
 						function(error, response, body){
 							if(!error && !body.errors) {
@@ -184,6 +221,21 @@ var NewUser = React.createClass({
 	},
 	handleErrorMsgClose: function(){
     this.setState({errorMsg: ""});
+  },
+  componentWillMount: function(){
+  	var me = this;
+  	riques( Query.getRolesQry,
+  		function(error, response, body){
+  			if (body.data) {
+            var here = me;
+            var roleList = me.state.roleList;
+            _.forEach(body.data.viewer.allRoles.edges, function(item){
+            	roleList.push(<option key={item.node.id} value={item.node.id}>{item.node.name}</option>);
+            });
+            here.setState({roleList: roleList});
+          }
+  		}
+  	);
   },
   componentDidMount: function(){
   	if (this.state.mode==="update") {
@@ -281,7 +333,16 @@ var NewUser = React.createClass({
 									</div>
 								</div>
 
-								<h4 style={{marginBottom: 20}}>Change Password</h4>
+								<h4 style={{marginBottom: 20}}>Role and password</h4>
+								<div className="form-group">
+								 	<label htmlFor="homeUrl" className="col-md-3">Role</label>
+								 	<div className="col-md-9">
+										<select id="role" name="role" defaultValue="No Role" style={{width: 150}}>
+											{this.state.roleList}
+										</select> 
+									</div>
+								</div>
+
 								<div className="form-group">
 								 	<label htmlFor="old-password" className="col-md-3">Old password</label>
 								 	<div className="col-md-9">

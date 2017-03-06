@@ -2,11 +2,12 @@ import _ from 'lodash';
 
 const getUserQry  = function(userId){
     return {
-      "query": '{                                 ' + 
-        'getUser(id: "'+userId+'"){  ' +
-        '    id, username, fullName, gender, image, email, lastLogin, createdAt, meta { edges { node { item, value } }}' +
-        ' }                                       ' +
-        '}'
+      "query": `{
+        getUser(id: "`+userId+`"){
+        id, username, fullName, gender, image, email, lastLogin, createdAt, 
+        meta { edges { node { item, value } }} roles { edges { node { id, name } }}
+        }                                       
+      }`
     }
 };
 
@@ -143,6 +144,14 @@ const saveProfileMtn = function(userId, name, username, email, gender, image){
                 }
               }
             }
+            roles {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
           }
         }
       }`,
@@ -236,7 +245,9 @@ const addRoleToUser = function(userId, roleId, accessLevel){
       { 
         addToUserRolesConnection(input: $input){
           changedUserRoles{
-            id
+            user {
+              id
+            }
           }
         }
       }`,
@@ -250,6 +261,45 @@ const addRoleToUser = function(userId, roleId, accessLevel){
   }
 }
 
+const updateRoleUser = function(userId, roleId, accessLevel){
+  return {
+    "query": `mutation UpdateUserRolesConnection($input: UpdateUserRolesConnectionInput!)
+      { 
+        updateUserRolesConnection(input: $input){
+          changedUserRoles{
+            user {
+              id
+            }
+          }
+        }
+      }`,
+    "variables": {
+      input: {
+        userId: userId,
+        roleId: roleId, 
+        accessLevel: accessLevel
+      }
+    }
+  }
+}
+
+const getRolesQry = {
+  "query": `
+    query getRoles{
+      viewer{
+        allRoles{
+          edges {
+            node{
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+  `
+}
+
 const queries = {
   getUserQry: getUserQry,
   getUserListQry: getUserListQry,
@@ -259,7 +309,9 @@ const queries = {
   saveUserMetaMtn: saveUserMetaMtn,
   createUserMetaMtn: createUserMetaMtn,
   changePasswordMtn: changePasswordMtn,
-  addRoleToUser: addRoleToUser
+  addRoleToUser: addRoleToUser,
+  updateRoleUser: updateRoleUser,
+  getRolesQry: getRolesQry
 }
 
 module.exports = queries;
