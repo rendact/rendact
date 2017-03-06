@@ -69,20 +69,20 @@ var Profile = React.createClass({
 		// Change password
 		var oldPassword = getValue("old-password");
 		var password = getValue("new-password");
-    var repassword = getValue("new-password-2");
-    var changePassword = false;
+	    var repassword = getValue("new-password-2");
+	    var changePassword = false;
 
-    if (password) {
-    	if (!oldPassword) {
-    		this.setState({errorMsg: "Please fill your old password"});
-	    	return;
-    	}
-    	if (password!==repassword) {
-	    	this.setState({errorMsg: "Password is not match"});
-	    	return;
+	    if (password) {
+	    	if (!oldPassword) {
+	    		this.setState({errorMsg: "Please fill your old password"});
+		    	return;
+	    	}
+	    	if (password!==repassword) {
+		    	this.setState({errorMsg: "Password is not match"});
+		    	return;
+		    }
+		    changePassword = true;
 	    }
-	    changePassword = true;
-    }
 
 		this.setState({isSaving: true});
 		riques(Query.saveProfileMtn(localStorage.getItem("userId"), name, username, email, gender, image), 
@@ -175,7 +175,7 @@ var Profile = React.createClass({
 	handlePasswordChange: function(event){
 		var password = getValue("new-password");
 		if (password) {
-			this.setState({passwordActive: true})
+			this.setState({passwordActive: true});
 		} else {
 			this.setState({passwordActive: false})
 		}
@@ -230,11 +230,11 @@ var Profile = React.createClass({
 							  	<div className="col-md-9">
 									<Dropzone onDrop={this.handleImageDrop}>
 										<div className="avatar-container">
-				              <img src={this.state.avatar} alt='' id="avatar"/> 
+				              			  <img src={this.state.avatar} alt='' id="avatar"/> 
 										  <div className="avatar-overlay"></div>
 										  <div className="avatar-button"><a href="#"> Change </a></div>
 										</div>
-			            </Dropzone>
+			            			</Dropzone>
 								</div>
 								</div>
 
