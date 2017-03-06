@@ -28,32 +28,32 @@ var Profile = React.createClass({
 		}
 	},
 	setProfile: function(p) {
-		var metaBio = _.find(p.meta.edges, {"node": {"item": "bio"}});
-    var profile = {
-      name: p.fullName?p.fullName:p.username,
-      username: p.username,
-      email: p.email,
-      gender: p.gender,
-      image: p.image,
-      lastLogin: p.lastLogin,
-      createdAt: p.createdAt,
-      biography: metaBio?metaBio.node.value:""
-    }
-    localStorage.setItem('profile', JSON.stringify(profile));
-  },
-  setUserMeta: function(meta){
-  	var metaBio = "";
-  	if (_.isArray(meta)) {
-  		metaBio = _.find(meta, {"node": {"item": "bio"}})
-  							 .node.value;
-  	} else {
-  		metaBio = _.find([meta], {"item": "bio"}).value;
-  	}
-  	
-  	var profile = JSON.parse(localStorage.getItem("profile"));
-  	profile.biography = metaBio;
-  	localStorage.setItem('profile', JSON.stringify(profile));
-  },
+	  var metaBio = _.find(p.meta.edges, {"node": {"item": "bio"}});
+      var profile = {
+	      name: p.fullName?p.fullName:p.username,
+	      username: p.username,
+	      email: p.email,
+	      gender: p.gender,
+	      image: p.image,
+	      lastLogin: p.lastLogin,
+	      createdAt: p.createdAt,
+	      biography: metaBio?metaBio.node.value:""
+	  }
+	  localStorage.setItem('profile', JSON.stringify(profile));
+  	},
+  	setUserMeta: function(meta){
+	  	var metaBio = "";
+	  	if (_.isArray(meta)) {
+	  		metaBio = _.find(meta, {"node": {"item": "bio"}})
+	  							 .node.value;
+	  	} else {
+	  		metaBio = _.find([meta], {"item": "bio"}).value;
+	  	}
+	  	
+	  	var profile = JSON.parse(localStorage.getItem("profile"));
+	  	profile.biography = metaBio;
+	  	localStorage.setItem('profile', JSON.stringify(profile));
+  	},
 	handleSubmitBtn: function(event){
 		event.preventDefault();
 		
@@ -85,8 +85,8 @@ var Profile = React.createClass({
 
 		this.setState({isSaving: true});
 		riques(Query.saveProfileMtn(name, username, email, gender, image), 
-			function(error, response, body){
-				if(!error && !body.errors) {
+			function(error, response, body){ 
+				if(!error && !body.errors) { 
 					var p = body.data.updateUser.changedUser;
 					me.setState({avatar: p.image})
 			        me.setProfile(p);
@@ -98,16 +98,16 @@ var Profile = React.createClass({
 			          	_.forEach(p.meta.edges, function(item, index){
 			          		if (_.has(userMetaData0, item.node.item))
 			          			userMetaData.push({id: item.node.id, item: item.node.item, value: userMetaData0[item.node.item]});
-			        });
-          	qry = Query.saveUserMetaMtn(userMetaData);
-          } else {
-          	_.forEach(userMetaData0, function(value, key){
-          		userMetaData.push({item: key, value: value});
-          	});
-          	qry = Query.createUserMetaMtn(userMetaData);
-          }
-          
-          riques(qry, 
+				        });
+			          	qry = Query.saveUserMetaMtn(userMetaData);
+			        } else {
+			          	_.forEach(userMetaData0, function(value, key){
+			          		userMetaData.push({item: key, value: value});
+			          	});
+			          	qry = Query.createUserMetaMtn(userMetaData);
+			        }
+		          
+		          	riques(qry, 
 						function(error, response, body){
 							if(!error && !body.errors) {
 								var o = _.find(body.data, "changedUserMeta");
@@ -160,15 +160,15 @@ var Profile = React.createClass({
 				}
 			);
 		}
-	},
+	}, 
 	handleImageDrop: function(accepted){
 		var me = this;
 		var reader = new FileReader();
-    reader.onloadend = function(res) {
-      var imageBase64 = res.target.result;
-      me.setState({avatar: imageBase64});
-    }
-    reader.readAsDataURL(accepted[0]);
+	    reader.onloadend = function(res) {
+	      var imageBase64 = res.target.result;
+	      me.setState({avatar: imageBase64});
+	    }
+	    reader.readAsDataURL(accepted[0]);
 	},
 	handlePasswordChange: function(event){
 		var password = getValue("new-password");
@@ -179,8 +179,8 @@ var Profile = React.createClass({
 		}
 	},
 	handleErrorMsgClose: function(){
-    this.setState({errorMsg: ""});
-  },
+	    this.setState({errorMsg: ""});
+	},
 	render: function(){
 		let p = JSON.parse(localStorage.getItem("profile"));
 		return (
@@ -188,7 +188,7 @@ var Profile = React.createClass({
 				<div className="container-fluid">
 				<section className="content-header" style={{marginBottom:20}}>
 			      <h1>
-			        Profile
+			        My Profile
 			      </h1>
 			      <ol className="breadcrumb">
 			        <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
@@ -196,7 +196,7 @@ var Profile = React.createClass({
 			      </ol>
 			    </section>
 
-			    { this.state.errorMsg &&
+		  { this.state.errorMsg &&
             <div className="alert alert-danger alert-dismissible">
               <button type="button" className="close" onClick={this.handleErrorMsgClose}>×</button>
               {this.state.errorMsg}
@@ -307,10 +307,10 @@ var Profile = React.createClass({
 								<div className="form-group">
 									<div className="col-md-9">
 										<div className="btn-group">
-											<input type="submit" value="Save" className="btn btn-primary" />
+											<input type="submit" value="Update Profile" className="btn btn-primary btn-sm" />
 										</div>
 										{ this.state.isSaving &&
-											<p>Saving...</p>
+											<p>Updating...</p>
 										}
 									</div>
 								</div>
