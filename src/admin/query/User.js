@@ -48,8 +48,9 @@ const getUserListQry = {
 
 const getUserListByTypeQry = function(type){
   var typeQry = "";
-
-  if (type!=="All") {
+  if (type==="No Role") {
+    typeQry = "";
+  } else if (type!=="All") {
     typeQry = '(where: {roles:  {node: {name: {eq: "'+type+'"}}}})';
   }
 
@@ -158,10 +159,10 @@ const saveProfileMtn = function(name, username, email, gender, image){
   }
 }
 
-const saveUserMetaMtn = function(arr){
+const saveUserMetaMtn = function(userId, arr){
   var query = "mutation { ";
   _.forEach(arr, function(val, index){
-    query += ' UpdateUserMeta'+index+' : updateUserMeta(input: {id: "'+val.id+'", userId: "'+localStorage.getItem("userId")+'", item: "'+val.item+'", value: "'+val.value+'"}){ changedUserMeta{ id item value } }'; 
+    query += ' UpdateUserMeta'+index+' : updateUserMeta(input: {id: "'+val.id+'", userId: "'+userId+'", item: "'+val.item+'", value: "'+val.value+'"}){ changedUserMeta{ id item value } }'; 
   });
   query += "}";
 
@@ -171,14 +172,27 @@ const saveUserMetaMtn = function(arr){
 }
 
 const createUserMetaMtn = function(arr){
-  var query = "mutation { ";
+  var variables = {};
+  var query = "mutation (";
+  var i = 0;
+  query += 
+    _.join(
+    _.map(arr, function(item){
+      return "$input"+i+": CreateUserMetaInput!"
+    }), ",");
+  query += ") {";
   _.forEach(arr, function(val, index){
-    query += ' CreateUserMeta'+index+' : createUserMeta(input: {userId: "'+localStorage.getItem("userId")+'", item: "'+val.item+'", value: "'+val.value+'"}){ changedUserMeta{ id item value } }'; 
+    query += ' CreateUserMeta'+index+' : createUserMeta(input: $input'+index+'){ changedUserMeta{ id item value } }'; 
+    variables["input"+index] = {
+      userId: localStorage.getItem("userId"),
+      item: val.item,
+      value: val.value
+    }
   });
   query += "}";
-
   return {
-    "query": query
+    "query": query,
+    "variables": variables
   }
 }
 
@@ -197,6 +211,26 @@ const changePasswordMtn = function(oldPass, newPass){
         id: localStorage.getItem("userId"),
         oldPassword: oldPass, 
         newPassword: newPass
+      }
+    }
+  }
+}
+
+const addRoleToUser = function(userId, roleId, accessLevel){
+  return {
+    "query": `mutation AddToUserRolesConnection($input: AddToUserRolesConnectionInput!)
+      { 
+        addToUserRolesConnection(input: $input){
+          changedUserRoles{
+            id
+          }
+        }
+      }`,
+    "variables": {
+      input: {
+        userId: userId,
+        roleId: roleId, 
+        accessLevel: accessLevel
       }
     }
   }
