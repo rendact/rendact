@@ -41,7 +41,7 @@ function AuthService(){
   }
   this.lock.on('authenticated', _doAuthentication);
 
-  var _setProfile = function(p) {
+  var _setProfile = function(p) { 
     var metaBio = _.find(p.meta.edges, {"node": {"item": "bio"}});
     var profile = {
       name: p.fullName?p.fullName:p.username,
@@ -51,7 +51,15 @@ function AuthService(){
       image: p.image,
       lastLogin: p.lastLogin,
       createdAt: p.createdAt,
-      biography: metaBio?metaBio.node.value:""
+      biography: metaBio?metaBio.node.value:"",
+      birth: p.dateOfBirth?p.dateOfBirth:"",
+      phone: p.phone?p.phone:"",
+      country: p.country?p.country:"",
+      timezone: p.timezone?p.timezone:"",
+      website: p.website?p.website:"",
+      facebook: p.facebook?p.facebook:"",
+      twitter: p.twitter?p.twitter:"",
+      linkedin: p.linkedin?p.linkedin:""
     }
     localStorage.setItem("userId", p.id);
     localStorage.setItem('profile', JSON.stringify(profile));

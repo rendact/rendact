@@ -4,7 +4,7 @@ const getUserQry  = function(userId){
     return {
       "query": '{                                 ' + 
         'getUser(id: "'+userId+'"){  ' +
-        '    id, username, fullName, gender, image, email, lastLogin, createdAt, meta { edges { node { item, value } }}' +
+        '    id,country, facebook, linkedin, timezone, twitter, phone, dateOfBirth, website, username, fullName, gender, image, email, lastLogin, createdAt, meta { edges { node { item, value } }}' +
         ' }                                       ' +
         '}'
     }
@@ -121,7 +121,7 @@ const createUserMtn = function(username, password, email, fullname, gender) {
     }
 }
 
-const saveProfileMtn = function(userId, name, username, email, gender, image){
+const saveProfileMtn = function(userId, name, username, email, gender, image, phone, country, timezone, website, facebook, twitter, linkedin){
   return {
     "query": `mutation UpdateUserQuery ($input: UpdateUserInput!) {
         updateUser(input: $input) {
@@ -132,6 +132,14 @@ const saveProfileMtn = function(userId, name, username, email, gender, image){
             gender
             email
             image
+            
+            phone 
+            country 
+            timezone 
+            website 
+            facebook 
+            twitter
+            linkedin
             lastLogin
             createdAt
             meta {
@@ -153,7 +161,15 @@ const saveProfileMtn = function(userId, name, username, email, gender, image){
           "fullName": name,
           "email": email,
           "gender": gender,
-          "image": image
+          "image": image,
+          
+          "phone":  phone, 
+          "country":  country, 
+          "timezone":  timezone, 
+          "website":  website,
+          "facebook":  facebook, 
+          "twitter":  twitter,
+          "linkedin": linkedin,
         }
       }
   }
