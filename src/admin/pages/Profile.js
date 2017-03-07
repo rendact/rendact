@@ -26,45 +26,62 @@ var Profile = React.createClass({
 			errorMsg: null,
 			noticeTxt: null,
 			avatar: image,
-			passwordActive: false
+			passwordActive: false,
+			userMetaList: ["bio","website","facebook","twitter","linkedin","phone","timezone"]
 		}
 	},
 	setProfile: function(p) {
-	  var metaBio = _.find(p.meta.edges, {"node": {"item": "bio"}});
-      var profile = {
-		  name: p.fullName?p.fullName:p.username,
+		var meta = {}
+		_.forEach(this.state.userMetaList, function(item){
+			meta[item] = _.find(p.meta.edges, {"node": {"item": item}});
+		})
+	  
+    var profile = {
+		  	name: p.fullName?p.fullName:p.username,
 	      username: p.username,
 	      email: p.email,
 	      gender: p.gender,
 	      image: p.image,
 	      lastLogin: p.lastLogin,
 	      createdAt: p.createdAt,
-	      biography: metaBio?metaBio.node.value:"",
+	      biography: meta["bio"]?meta["bio"].node.value:"",
 	      birth: p.dateOfBirth?p.dateOfBirth:"",
-	      phone: p.phone?p.phone:"",
+	      phone: meta["phone"]?meta["phone"].node.value:"",
 	      country: p.country?p.country:"",
-	      timezone: p.timezone?p.timezone:"",
-	      website: p.website?p.website:"",
-	      facebook: p.facebook?p.facebook:"",
-	      twitter: p.twitter?p.twitter:"",
-	      linkedin: p.linkedin?p.linkedin:""
+	      timezone: meta["timezone"]?meta["timezone"].node.value:"",
+	      website: meta["website"]?meta["website"].node.value:"",
+	      facebook: meta["facebook"]?meta["facebook"].node.value:"",
+	      twitter: meta["twitter"]?meta["twitter"].node.value:"",
+	      linkedin: meta["linkedin"]?meta["linkedin"].node.value:"",
 	  }
 	  localStorage.setItem('profile', JSON.stringify(profile));
-  	},
-  	setUserMeta: function(meta){
-	  	var metaBio = "";
-	  	if (_.isArray(meta)) {
-	  		metaBio = _.find(meta, {"node": {"item": "bio"}})
-	  							 .node.value;
-	  	} else {
-	  		metaBio = _.find([meta], {"item": "bio"}).value;
-	  	}
-	  	
-	  	var profile = JSON.parse(localStorage.getItem("profile"));
-	  	profile.biography = metaBio;
-	  	localStorage.setItem('profile', JSON.stringify(profile));
-  	},
-	handleSubmitBtn: function(event){debugger;
+  },
+  setUserMeta: function(m){
+  	var meta = {}
+  	debugger;
+  	if (_.isArray(m)) {
+  		_.forEach(this.state.userMetaList, function(item){
+  			var i = _.find(m, {"node": {"item": item}});
+				meta[item] = i?i.node.value:"";
+			})
+  	} else {
+  		_.forEach(this.state.userMetaList, function(item){
+  			var i = _.find([m], {"item": item})
+  			meta[item] = i?i.value:"";
+  		});
+  	}
+  	
+  	var profile = JSON.parse(localStorage.getItem("profile"));
+  	profile.biography = meta["bio"];
+  	profile.phone = meta["phone"];
+  	profile.timezone = meta["timezone"];
+  	profile.website = meta["website"];
+  	profile.facebook = meta["facebook"];
+  	profile.twitter = meta["twitter"];
+  	profile.linkedin = meta["linkedin"];
+  	localStorage.setItem('profile', JSON.stringify(profile));
+	},
+	handleSubmitBtn: function(event){
 		event.preventDefault();
 		
 		var me = this;
@@ -101,14 +118,22 @@ var Profile = React.createClass({
 	    }
 
 		this.setState({isSaving: true});
-		riques(Query.saveProfileMtn(localStorage.getItem("userId"), name, username, email, gender, image, phone, country, timezone, website, facebook, twitter, linkedin), 
+		riques(Query.saveProfileMtn(localStorage.getItem("userId"), name, username, email, gender, image, country), 
 			function(error, response, body){
 				if(!error && !body.errors) {
 					var p = body.data.updateUser.changedUser;
 					me.setState({avatar: p.image})
           me.setProfile(p);
           var here = me;
-          var userMetaData0 = {"bio": bio};
+          var userMetaData0 = {
+          	"bio": bio,
+          	"website": website,
+          	"facebook": facebook,
+          	"twitter": twitter,
+          	"linkedin": linkedin,
+          	"timezone": timezone,
+          	"phone": phone
+          };
           var qry = '';
 
           var userMetaData = [];
@@ -257,7 +282,7 @@ var Profile = React.createClass({
 					  			<div className="form-group">
 								  	<label htmlFor="tagline" className="col-md-3">Username</label>
 								  	<div className="col-md-9">
-										<input type="text" name="username" id="username" className="form-control" defaultValue={p.username} required="true"/>
+										<input type="text" name="username" id="username" className="form-control" defaultValue={p.username} disabled/>
 										<p className="help-block">The short unique name describes you</p>
 									</div>
 								</div>
@@ -289,7 +314,7 @@ var Profile = React.createClass({
 								<div className="form-group">
 								  	<label htmlFor="phone" className="col-md-3">Phone</label>
 								  	<div className="col-md-9">
-										<input type="text" name="phone" id="phone" className="form-control" defaultValue={p.phone} required="true"/>
+										<input type="text" name="phone" id="phone" className="form-control" defaultValue={p.phone} />
 									</div>
 								</div>
 
@@ -303,14 +328,14 @@ var Profile = React.createClass({
 								<div className="form-group">
 								  	<label htmlFor="country" className="col-md-3">Country</label>
 								  	<div className="col-md-9">
-										<input type="text" name="country" id="country" className="form-control" defaultValue={p.country} required="true"/>
+										<input type="text" name="country" id="country" className="form-control" defaultValue={p.country} />
 									</div>
 								</div>
 
 								<div className="form-group">
 								  	<label htmlFor="timezone" className="col-md-3">Timezone</label>
 								  	<div className="col-md-9">
-										<input type="text" name="timezone" id="timezone" className="form-control" defaultValue={p.timezone} required="true"/>
+										<input type="text" name="timezone" id="timezone" className="form-control" defaultValue={p.timezone} />
 									</div>
 								</div>
 
@@ -325,6 +350,35 @@ var Profile = React.createClass({
 								 	<label htmlFor="homeUrl" className="col-md-3">Last login</label>
 								 	<div className="col-md-9">
 										<input type="text" name="gender" className="form-control" defaultValue={p.lastLogin} disabled/>
+									</div>
+								</div>
+
+								<h4 style={{marginBottom: 20}}>Social Media Accounts</h4>
+								<div className="form-group">
+								  	<label htmlFor="website" className="col-md-3">Website</label>
+								  	<div className="col-md-9">
+										<input type="text" name="website" id="website" className="form-control" defaultValue={p.website} />
+									</div>
+								</div>
+
+								<div className="form-group">
+								  	<label htmlFor="facebook" className="col-md-3">Facebook Account</label>
+								  	<div className="col-md-9">
+										<input type="text" name="facebook" id="facebook" className="form-control" defaultValue={p.facebook} />
+									</div>
+								</div>
+
+								<div className="form-group">
+								  	<label htmlFor="twitter" className="col-md-3">Twitter Account</label>
+								  	<div className="col-md-9">
+										<input type="text" name="twitter" id="twitter" className="form-control" defaultValue={p.twitter} />
+									</div>
+								</div>
+
+								<div className="form-group">
+								  	<label htmlFor="linkedin" className="col-md-3">Linkedin Account</label>
+								  	<div className="col-md-9">
+										<input type="text" name="linkedin" id="linkedin" className="form-control" defaultValue={p.linkedin} />
 									</div>
 								</div>
 
@@ -347,35 +401,6 @@ var Profile = React.createClass({
 								 	<label htmlFor="new-password-2" className="col-md-3">Re-type new password</label>
 								 	<div className="col-md-9">
 										<input type="password" name="new-password-2" id="new-password-2" className="form-control" style={{width:200}} disabled={!this.state.passwordActive}/>
-									</div>
-								</div>
-
-								<h4 style={{marginBottom: 20}}>Social Media</h4>
-								<div className="form-group">
-								  	<label htmlFor="website" className="col-md-3">Website</label>
-								  	<div className="col-md-9">
-										<input type="text" name="website" id="website" className="form-control" defaultValue={p.website} required="true"/>
-									</div>
-								</div>
-
-								<div className="form-group">
-								  	<label htmlFor="facebook" className="col-md-3">Facebook Account</label>
-								  	<div className="col-md-9">
-										<input type="text" name="facebook" id="facebook" className="form-control" defaultValue={p.facebook} required="true"/>
-									</div>
-								</div>
-
-								<div className="form-group">
-								  	<label htmlFor="twitter" className="col-md-3">Twitter Account</label>
-								  	<div className="col-md-9">
-										<input type="text" name="twitter" id="twitter" className="form-control" defaultValue={p.twitter} required="true"/>
-									</div>
-								</div>
-
-								<div className="form-group">
-								  	<label htmlFor="linkedin" className="col-md-3">Linkedin Account</label>
-								  	<div className="col-md-9">
-										<input type="text" name="linkedin" id="linkedin" className="form-control" defaultValue={p.linkedin} required="true"/>
 									</div>
 								</div>
 															

@@ -8,8 +8,8 @@ const riques = function(query, callback){
       json: true,
       headers: {
         "content-type": "application/json",
-        //"Authorization": "Bearer " + localStorage.token
-        "Authorization": "Bearer " + Config.adminToken
+        "Authorization": "Bearer " + localStorage.token
+        //"Authorization": "Bearer " + Config.adminToken
       },
       body: query
     }, callback);

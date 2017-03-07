@@ -5,7 +5,7 @@ const getUserQry  = function(userId){
 
       "query": `{
         getUser(id: "`+userId+`"){
-        id, username, fullName, gender, image, email, lastLogin, createdAt, country, facebook, linkedin, timezone, twitter, phone, dateOfBirth, website,
+        id, username, fullName, gender, image, email, lastLogin, createdAt, country, dateOfBirth,
         meta { edges { node { item, value } }} roles { edges { node { id, name } }}
         }                                       
       }`
@@ -124,7 +124,7 @@ const createUserMtn = function(username, password, email, fullname, gender) {
     }
 }
 
-const saveProfileMtn = function(userId, name, username, email, gender, image, phone, country, timezone, website, facebook, twitter, linkedin){
+const saveProfileMtn = function(userId, name, username, email, gender, image, country){
   return {
     "query": `mutation UpdateUserQuery ($input: UpdateUserInput!) {
         updateUser(input: $input) {
@@ -135,14 +135,7 @@ const saveProfileMtn = function(userId, name, username, email, gender, image, ph
             gender
             email
             image
-            
-            phone 
             country 
-            timezone 
-            website 
-            facebook 
-            twitter
-            linkedin
             lastLogin
             createdAt
             meta {
@@ -173,14 +166,7 @@ const saveProfileMtn = function(userId, name, username, email, gender, image, ph
           "email": email,
           "gender": gender,
           "image": image,
-          
-          "phone":  phone, 
-          "country":  country, 
-          "timezone":  timezone, 
-          "website":  website,
-          "facebook":  facebook, 
-          "twitter":  twitter,
-          "linkedin": linkedin,
+          "country": country
         }
       }
   }
@@ -193,7 +179,9 @@ const saveUserMetaMtn = function(userId, arr){
   query += 
     _.join(
     _.map(arr, function(item){
-      return "$input"+i+": UpdateUserMetaInput!"
+      var str = "$input"+i+": UpdateUserMetaInput!";
+      i++;
+      return str;
     }), ",");
   query += ") {";
   _.forEach(arr, function(val, index){
@@ -219,7 +207,9 @@ const createUserMetaMtn = function(arr){
   query += 
     _.join(
     _.map(arr, function(item){
-      return "$input"+i+": CreateUserMetaInput!"
+      var str = "$input"+i+": CreateUserMetaInput!";
+      i++;
+      return str;
     }), ",");
   query += ") {";
   _.forEach(arr, function(val, index){
