@@ -31,7 +31,9 @@ const queries = {
   createUserMetaMtn: User.createUserMetaMtn,
   changePasswordMtn: User.changePasswordMtn,
   recoverPostQry: Page.recoverPostQry,
-  addRoleToUser: User.addRoleToUser
+  addRoleToUser: User.addRoleToUser,
+  updateRoleUser: User.updateRoleUser,
+  getRolesQry: User.getRolesQry
 }
 
 module.exports = queries;
