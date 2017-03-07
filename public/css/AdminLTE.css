@@ -5041,3 +5041,7 @@ table.text-center th {
 .avatar-container:hover .avatar-button {
   opacity: 1;
 }
+
+div.passwordTester > span.ReactPasswordStrength-strength-desc {
+  right: 22px;
+} 

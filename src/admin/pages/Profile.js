@@ -1,8 +1,9 @@
 import React from 'react';
+import ReactPasswordStrength from 'react-password-strength';
 import Query from '../query';
 import Dropzone from 'react-dropzone';
 import Config from '../../config'
-import {riques, getValue} from '../../utils';
+import {riques, getValue, setValue} from '../../utils';
 import _ from 'lodash';
 import DatePicker from 'react-bootstrap-date-picker';
 
@@ -56,29 +57,12 @@ var Profile = React.createClass({
 	  }
 	  localStorage.setItem('profile', JSON.stringify(profile));
   },
-  setUserMeta: function(m){
-  	var meta = {}
-  	debugger;
-  	if (_.isArray(m)) {
-  		_.forEach(this.state.userMetaList, function(item){
-  			var i = _.find(m, {"node": {"item": item}});
-				meta[item] = i?i.node.value:"";
-			})
-  	} else {
-  		_.forEach(this.state.userMetaList, function(item){
-  			var i = _.find([m], {"item": item})
-  			meta[item] = i?i.value:"";
-  		});
-  	}
-  	
+  setUserMeta: function(metaList){
   	var profile = JSON.parse(localStorage.getItem("profile"));
-  	profile.biography = meta["bio"];
-  	profile.phone = meta["phone"];
-  	profile.timezone = meta["timezone"];
-  	profile.website = meta["website"];
-  	profile.facebook = meta["facebook"];
-  	profile.twitter = meta["twitter"];
-  	profile.linkedin = meta["linkedin"];
+		_.forEach(this.state.userMetaList, function(item){
+			var i = _.find(metaList, {"item": item});
+			profile[i.item] = i?i.value:"";
+		})
   	localStorage.setItem('profile', JSON.stringify(profile));
 	},
 	handleSubmitBtn: function(event){
@@ -153,9 +137,13 @@ var Profile = React.createClass({
           riques(qry, 
 						function(error, response, body){
 							if(!error && !body.errors) {
-								var o = _.find(body.data, "changedUserMeta");
-								if (o.changedUserMeta) {
-									here.setUserMeta(o.changedUserMeta);
+								var metaList = [];
+								_.forEach(body.data, function(item){
+									metaList.push(item.changedUserMeta);
+								});
+								
+								if (metaList.length>0) {
+									here.setUserMeta(metaList);
 									here.setState({noticeTxt: "Profile saved"});
 								}
 							} else {
@@ -223,6 +211,20 @@ var Profile = React.createClass({
 	},
 	handleErrorMsgClose: function(){
 	    this.setState({errorMsg: ""});
+	},
+	handleGeneratePassword: function(event){
+		event.preventDefault();
+		var Password = require('node-password').Password;
+		var pw = new Password();
+		setValue("new-password", pw);
+		setValue("new-password-2", pw);
+	},
+	handleShowPassword: function(event){
+		var checked = event.target.checked;
+		if (checked)
+			document.getElementById("new-password").setAttribute("type","text")
+		else
+			document.getElementById("new-password").setAttribute("type","password")
 	},
 	render: function(){ 
 		let p = JSON.parse(localStorage.getItem("profile"));
@@ -386,21 +388,34 @@ var Profile = React.createClass({
 								<div className="form-group">
 								 	<label htmlFor="old-password" className="col-md-3">Old password</label>
 								 	<div className="col-md-9">
-										<input type="password" name="old-password" id="old-password" className="form-control" style={{width:200}}/>
+										<input type="password" name="old-password" id="old-password" className="form-control" style={{width:300}}/>
 									</div>
 								</div>
 
 								<div className="form-group">
 								 	<label htmlFor="new-password" className="col-md-3">New password</label>
 								 	<div className="col-md-9">
-										<input type="password" name="new-password" id="new-password" className="form-control" onChange={this.handlePasswordChange} style={{width:200}}/>
+								 			<ReactPasswordStrength
+											  className="passwordTester"
+											  style={{ width: 300, display: "inline-block" }}
+											  minLength={5}
+											  minScore={2}
+											  changeCallback={this.handlePasswordChange}
+											  scoreWords={['weak', 'okay', 'good', 'strong', 'stronger']}
+											  inputProps={{ name: "new-password", id:"new-password", value: "OK" }}
+											  value="OK"
+											/>
+											<button className="btn" onClick={this.handleGeneratePassword} style={{height: 52, marginLeft: 5, marginBottom: 5}}>Generate</button>
+											<div>
+												<input type="checkbox" id="togglePassword" onChange={this.handleShowPassword}/> Show password
+											</div>
 									</div>
 								</div>
 
 								<div className="form-group">
 								 	<label htmlFor="new-password-2" className="col-md-3">Re-type new password</label>
 								 	<div className="col-md-9">
-										<input type="password" name="new-password-2" id="new-password-2" className="form-control" style={{width:200}} disabled={!this.state.passwordActive}/>
+										<input type="password" name="new-password-2" id="new-password-2" className="form-control" style={{width:300}} disabled={!this.state.passwordActive}/>
 									</div>
 								</div>
 															
