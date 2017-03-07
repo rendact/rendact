@@ -32,7 +32,7 @@ const queries = {
   changePasswordMtn: User.changePasswordMtn,
   recoverPostQry: Page.recoverPostQry,
   addRoleToUser: User.addRoleToUser,
-  updateRoleUser: User.updateRoleUser,
+  deleteRoleUser: User.deleteRoleUser,
   getRolesQry: User.getRolesQry
 }
 

@@ -279,11 +279,11 @@ const addRoleToUser = function(userId, roleId, accessLevel){
   }
 }
 
-const updateRoleUser = function(userId, roleId, accessLevel){
+const deleteRoleUser = function(userId, roleId){
   return {
-    "query": `mutation UpdateUserRolesConnection($input: UpdateUserRolesConnectionInput!)
+    "query": `mutation RemoveFromUserRolesConnection($input: RemoveFromUserRolesConnectionInput!)
       { 
-        updateUserRolesConnection(input: $input){
+        removeFromUserRolesConnection(input: $input){
           changedUserRoles{
             user {
               id
@@ -294,8 +294,7 @@ const updateRoleUser = function(userId, roleId, accessLevel){
     "variables": {
       input: {
         userId: userId,
-        roleId: roleId, 
-        accessLevel: accessLevel
+        roleId: roleId
       }
     }
   }
@@ -328,7 +327,7 @@ const queries = {
   createUserMetaMtn: createUserMetaMtn,
   changePasswordMtn: changePasswordMtn,
   addRoleToUser: addRoleToUser,
-  updateRoleUser: updateRoleUser,
+  deleteRoleUser: deleteRoleUser,
   getRolesQry: getRolesQry
 }
 

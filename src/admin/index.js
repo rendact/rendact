@@ -22,7 +22,7 @@ import NotFound from './NotFound';
 
 import Config from '../config';
 import AdminLTEinit from './lib/app.js';
-import Skinning from './lib/skinning.js';
+//import Skinning from './lib/skinning.js';
 
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -157,7 +157,7 @@ const Admin = React.createClass({
 		require ('jquery-ui/ui/widgets/tooltip')
 
 		AdminLTEinit();
-		Skinning(jQuery, jQuery.AdminLTE);
+		//Skinning(jQuery, jQuery.AdminLTE);
 	},
 	getInitialState: function() {
 		return {

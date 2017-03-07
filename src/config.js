@@ -89,7 +89,8 @@ const config = {
 	permalinkTypeList: PermalinkTypeList,
 	activePermalinkType: ActivePermalinkType,
 	defaultSwalStyling: defaultSwalStyling,
-	guestRoleId: "Um9sZTo1"
+	guestRoleId: "Um9sZTo1",
+	adminToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoic2NhcGhvbGQuc3VwZXJ1c2VyIiwiZXhwIjo4NjQwMDAwMDAwMDAwMDAwLCJpYXQiOjE0ODg4NzMyODUsImF1ZCI6Ikp0Z2Z5WklRMnBKajlySThFOWU2MTdoUWNrMFJueEFuIiwiaXNzIjoiaHR0cHM6Ly9zY2FwaG9sZC5hdXRoMC5jb20vIiwic3ViIjoiMWY1ZDY3ZGYtZDQ2My00ZTliLWI0NDctOWUyMGEyNjhjYjUxIn0.GgTXH8Vie2PoZToBiMhz2CqQyB-dHqgi9VQeMJJThlM"
 }
 
 module.exports = config;

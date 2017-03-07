@@ -33,7 +33,8 @@ var NewUser = React.createClass({
 			avatar: image,
 			passwordActive: false,
 			mode: this.props.userId?"update":"create",
-			roleList: [<option key="norole" value="No Role">No Role</option>]
+			roleList: [],
+			userRole: []
 		}
 	},
 	loadData: function(){
@@ -61,9 +62,18 @@ var NewUser = React.createClass({
 				setValue(item.node.item, item.node.value);
 			});
 		}
+		
 		if (v.roles.edges.length>0){
-			var role = v.roles.edges;
-			setValue("role", role[0].node.name);
+			var roles = _.map(v.roles.edges, function(item){
+				return item.node.id
+			});
+			this.setState({userRole: roles});
+			var rolesInput = document.getElementsByName("roles[]");
+			_.forEach(rolesInput, function(item){
+				if (_.indexOf(roles, item.value) > -1) {
+					item.checked = true;
+				}
+			});
 		}
 	},
 	handleSubmitBtn: function(event){
@@ -129,56 +139,14 @@ var NewUser = React.createClass({
 									here.setState({noticeTxt: "Profile saved"});
 								}
 							} else {
-								if (error){
-									here.setState({errorMsg: error})
-								}
-								else if (body.errors) {
-									here.setState({errorMsg: body.errors[0].message})
-								} else {
-									here.setState({errorMsg: "Unknown error"})
-								}
+								errorCallback(error, body.errors?body.errors[0].message:null);
 							}
 							here.setState({isSaving: false});
 						}
 					);
 
-					// Save user role
-					
-					if (p.roles.edges.length>0) {
-          	qry = Query.updateRoleUser(here.props.userId, roleId, "readwrite");
-          } else {
-          	qry = Query.addRoleToUser(here.props.userId, roleId, "readwrite");
-          }
-          debugger;
-          riques(qry, 
-						function(error, response, body){
-							if(!error && !body.errors) {
-								var o = _.find(body.data, "changedUserMeta");
-								if (o.changedUserMeta) {
-									here.setState({noticeTxt: "Profile saved"});
-								}
-							} else {
-								if (error){
-									here.setState({errorMsg: error})
-								}
-								else if (body.errors) {
-									here.setState({errorMsg: body.errors[0].message})
-								} else {
-									here.setState({errorMsg: "Unknown error"})
-								}
-							}
-							here.setState({isSaving: false});
-						}
-					);
 				} else {
-					if (error){
-						me.setState({errorMsg: error})
-					}
-					else if (body.errors) {
-						me.setState({errorMsg: body.errors[0].message})
-					} else {
-						me.setState({errorMsg: "Unknown error"})
-					}
+					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
 			}
 		);
@@ -189,18 +157,34 @@ var NewUser = React.createClass({
 					if(!error && !body.errors) {
 						me.setState({noticeTxt: "Password changed"});
 					} else {
-						if (error){
-							me.setState({errorMsg: error})
-						}
-						else if (body.errors) {
-							me.setState({errorMsg: body.errors[0].message})
-						} else {
-							me.setState({errorMsg: "Unknown error"})
-						}
+						errorCallback(error, body.errors?body.errors[0].message:null);
 					}
 				}
 			);
 		}
+	},
+	handleRoleChange: function(event){
+		debugger;
+		var qry = '';
+		var roleId = event.target.value;
+		var checked = event.target.checked;
+
+		if (checked) {
+			qry = Query.addRoleToUser(this.props.userId, roleId, "admin");
+		} else {
+			qry = Query.deleteRoleUser(this.props.userId, roleId);	
+		}
+		var me = this;
+    riques(qry, 
+			function(error, response, body){
+				if(!error && !body.errors) {
+					me.setState({noticeTxt: "Role saved"});
+				} else {
+					errorCallback(error, body.errors?body.errors[0].message:null);
+				}
+				me.setState({isSaving: false});
+			}
+		);
 	},
 	handleImageDrop: function(accepted){
 		var me = this;
@@ -222,6 +206,9 @@ var NewUser = React.createClass({
 	handleErrorMsgClose: function(){
     this.setState({errorMsg: ""});
   },
+  handleNoticeClose: function(){
+    this.setState({noticeTxt: ""});
+  },
   componentWillMount: function(){
   	var me = this;
   	riques( Query.getRolesQry,
@@ -229,9 +216,14 @@ var NewUser = React.createClass({
   			if (body.data) {
             var here = me;
             var roleList = me.state.roleList;
-            _.forEach(body.data.viewer.allRoles.edges, function(item){
-            	roleList.push(<option key={item.node.id} value={item.node.id}>{item.node.name}</option>);
-            });
+            for (var i=1;i < body.data.viewer.allRoles.edges.length; i++) {
+            	var item = body.data.viewer.allRoles.edges[i];
+            	roleList.push(
+            		<div className="form-group" key={item.node.id}>
+            			<input type="checkbox" name="roles[]" value={item.node.id} onChange={here.handleRoleChange}/> 
+            			<label style={{marginLeft: 5}}>{item.node.name}</label>
+            		</div>);
+            }
             here.setState({roleList: roleList});
           }
   		}
@@ -337,9 +329,7 @@ var NewUser = React.createClass({
 								<div className="form-group">
 								 	<label htmlFor="homeUrl" className="col-md-3">Role</label>
 								 	<div className="col-md-9">
-										<select id="role" name="role" defaultValue="No Role" style={{width: 150}}>
-											{this.state.roleList}
-										</select> 
+										{this.state.roleList}
 									</div>
 								</div>
 
