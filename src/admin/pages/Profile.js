@@ -6,6 +6,8 @@ import Config from '../../config'
 import {riques, getValue, setValue} from '../../utils';
 import _ from 'lodash';
 import DatePicker from 'react-bootstrap-date-picker';
+import TimezonePicker from 'react-bootstrap-timezone-picker';
+import CountrySelect from '../lib/CountrySelect'
 
 window.getBase64Image = function(img) {
   var canvas = document.createElement("canvas");
@@ -28,7 +30,9 @@ var Profile = React.createClass({
 			noticeTxt: null,
 			avatar: image,
 			passwordActive: false,
-			userMetaList: ["bio","website","facebook","twitter","linkedin","phone","timezone"]
+			userMetaList: ["bio","website","facebook","twitter","linkedin","phone","timezone"],
+			timezone: "",
+			country: ""
 		}
 	},
 	setProfile: function(p) {
@@ -78,7 +82,8 @@ var Profile = React.createClass({
 		//var birth = getValue("birth");
 		var phone = getValue("phone");
 		var country = getValue("country");
-		var timezone = getValue("timezone");
+		//var timezone = getValue("timezone");
+		var timezone = this.state.timezone;
 		var website = getValue("website");
 		var facebook = getValue("facebook");
 		var twitter = getValue("twitter");
@@ -226,6 +231,12 @@ var Profile = React.createClass({
 		else
 			document.getElementById("new-password").setAttribute("type","password")
 	},
+	handleTimezoneChange: function(tz){
+		this.setState({timezone: tz});
+	},
+	componentDidMount: function(){
+		require ('react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css');
+	},
 	render: function(){ 
 		let p = JSON.parse(localStorage.getItem("profile"));
 		return (
@@ -330,14 +341,20 @@ var Profile = React.createClass({
 								<div className="form-group">
 								  	<label htmlFor="country" className="col-md-3">Country</label>
 								  	<div className="col-md-9">
-										<input type="text" name="country" id="country" className="form-control" defaultValue={p.country} />
+								  	<CountrySelect id="country" name="country" defaultValue={p.country}/>
 									</div>
 								</div>
 
 								<div className="form-group">
 								  	<label htmlFor="timezone" className="col-md-3">Timezone</label>
 								  	<div className="col-md-9">
-										<input type="text" name="timezone" id="timezone" className="form-control" defaultValue={p.timezone} />
+										<TimezonePicker
+										  absolute      = {true}
+										  defaultValue  = {p.timezone}
+										  style         = {{width: 300}}
+										  placeholder   = "Select timezone..."
+										  onChange      = {this.handleTimezoneChange}
+										/>
 									</div>
 								</div>
 
