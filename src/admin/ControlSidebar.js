@@ -88,7 +88,12 @@ const ControlSidebar = React.createClass({
   },
 
   handleCheckBox: function(){
-
+    var checked = $("input.setting:checked");
+    if (checked){
+      alert($('input').serialize());
+    }else{
+      alert($('input').serialize());
+    }
   },
 
   handleDataSkin: function(e){
@@ -147,6 +152,7 @@ const ControlSidebar = React.createClass({
   },
 
   render: function(){
+    let p = JSON.parse(localStorage.getItem("profile"));
     return (
       <aside className="control-sidebar control-sidebar-dark">
           <ul className="nav nav-tabs nav-justified control-sidebar-tabs">
@@ -159,7 +165,7 @@ const ControlSidebar = React.createClass({
                 <h4 className="control-sidebar-heading">Layout Options</h4>
                 <div className='form-group'>
                   <label className='control-sidebar-subheading'>
-                    <input type='checkbox' onClick={this.handleDataLayout} data-layout='profile-hide' className='pull-right'/>
+                    <input type='checkbox' onClick={this.handleDataLayout} data-layout='profile-hide' className='pull-right' />
                     Toggle Profile Box
                   </label>
                   <p>Toggle the profile box in the left sidebar(show or hidden)</p>
@@ -395,7 +401,7 @@ const ControlSidebar = React.createClass({
                 <div className="form-group">
                   <label className="control-sidebar-subheading">
                     Report panel usage
-                    <input type="checkbox" className="pull-right" onChange={this.handleCheckBox} checked/>
+                    <input type="checkbox" className="pull-right" onChange={this.handleCheckBox} class="setting" id="a" value="report"/>
                   </label>
 
                   <p>
@@ -406,7 +412,7 @@ const ControlSidebar = React.createClass({
                 <div className="form-group">
                   <label className="control-sidebar-subheading">
                     Allow mail redirect
-                    <input type="checkbox" className="pull-right" onChange={this.handleCheckBox} checked/>
+                    <input type="checkbox" className="pull-right" onChange={this.handleCheckBox} class="setting" id="b" value="Allow"/>
                   </label>
 
                   <p>
@@ -417,7 +423,7 @@ const ControlSidebar = React.createClass({
                 <div className="form-group">
                   <label className="control-sidebar-subheading">
                     Expose author name in posts
-                    <input type="checkbox" className="pull-right" onChange={this.handleCheckBox} checked/>
+                    <input type="checkbox" className="pull-right" onChange={this.handleCheckBox} class="setting" id="c" value="expose"/>
                   </label>
 
                   <p>
@@ -430,14 +436,14 @@ const ControlSidebar = React.createClass({
                 <div className="form-group">
                   <label className="control-sidebar-subheading">
                     Show me as online
-                    <input type="checkbox" className="pull-right" onChange={this.handleCheckBox} checked/>
+                    <input type="checkbox" className="pull-right" onChange={this.handleCheckBox}  class="setting" id="d" value="show"/>
                   </label>
                 </div>
 
                 <div className="form-group">
                   <label className="control-sidebar-subheading">
                     Turn off notifications
-                    <input type="checkbox" className="pull-right" onChange={this.handleCheckBox}/>
+                    <input type="checkbox" className="pull-right" onChange={this.handleCheckBox} class="setting" id="e" value="turnOff"/>
                   </label>
                 </div>
 
