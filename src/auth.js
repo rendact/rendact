@@ -42,24 +42,29 @@ function AuthService(){
   this.lock.on('authenticated', _doAuthentication);
 
   var _setProfile = function(p) { 
-    var metaBio = _.find(p.meta.edges, {"node": {"item": "bio"}});
+    var meta = {}
+    var metaList = ["bio","website","facebook","twitter","linkedin","phone","timezone"];
+    _.forEach(metaList, function(item){
+      meta[item] = _.find(p.meta.edges, {"node": {"item": item}});
+    })
+    
     var profile = {
-      name: p.fullName?p.fullName:p.username,
-      username: p.username,
-      email: p.email,
-      gender: p.gender,
-      image: p.image,
-      lastLogin: p.lastLogin,
-      createdAt: p.createdAt,
-      biography: metaBio?metaBio.node.value:"",
-      birth: p.dateOfBirth?p.dateOfBirth:"",
-      phone: p.phone?p.phone:"",
-      country: p.country?p.country:"",
-      timezone: p.timezone?p.timezone:"",
-      website: p.website?p.website:"",
-      facebook: p.facebook?p.facebook:"",
-      twitter: p.twitter?p.twitter:"",
-      linkedin: p.linkedin?p.linkedin:""
+        name: p.fullName?p.fullName:p.username,
+        username: p.username,
+        email: p.email,
+        gender: p.gender,
+        image: p.image,
+        lastLogin: p.lastLogin,
+        createdAt: p.createdAt,
+        biography: meta["bio"]?meta["bio"].node.value:"",
+        birth: p.dateOfBirth?p.dateOfBirth:"",
+        phone: meta["phone"]?meta["phone"].node.value:"",
+        country: p.country?p.country:"",
+        timezone: meta["timezone"]?meta["timezone"].node.value:"",
+        website: meta["website"]?meta["website"].node.value:"",
+        facebook: meta["facebook"]?meta["facebook"].node.value:"",
+        twitter: meta["twitter"]?meta["twitter"].node.value:"",
+        linkedin: meta["linkedin"]?meta["linkedin"].node.value:"",
     }
     localStorage.setItem("userId", p.id);
     localStorage.setItem('profile', JSON.stringify(profile));
