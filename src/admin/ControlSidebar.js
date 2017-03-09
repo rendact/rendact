@@ -223,7 +223,7 @@ const ControlSidebar = React.createClass({
       <aside className="control-sidebar control-sidebar-dark">
           <ul className="nav nav-tabs nav-justified control-sidebar-tabs">
             <li className="active"><a href="#control-sidebar-theme-demo-options-tab" data-toggle="tab"><i className="fa fa-wrench"></i></a></li>
-            <li><a href="#control-sidebar-home-tab" data-toggle="tab"><i className="fa fa-home"></i></a></li>
+            {/* <li><a href="#control-sidebar-home-tab" data-toggle="tab"><i className="fa fa-home"></i></a></li> */}
             <li><a href="#control-sidebar-settings-tab" data-toggle="tab"><i className="fa fa-gears"></i></a></li>
           </ul>
           <div className="tab-content">
@@ -353,6 +353,7 @@ const ControlSidebar = React.createClass({
                 </div>
             </div>
 
+            {/* 
             <div className="tab-pane" id="control-sidebar-home-tab">
               <h3 className="control-sidebar-heading">Recent Activity</h3>
               <ul className="control-sidebar-menu">
@@ -455,6 +456,8 @@ const ControlSidebar = React.createClass({
               </ul>
 
             </div>
+            */}
+
             <div className="tab-pane" id="control-sidebar-stats-tab">Stats Tab Content</div>
             <div className="tab-pane" id="control-sidebar-settings-tab">
               <form method="post">
