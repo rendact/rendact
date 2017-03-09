@@ -39,7 +39,7 @@ var NewUser = React.createClass({
 			mode: this.props.userId?"update":"create",
 			roleList: [],
 			userRole: [],
-			userMetaList: ["bio","website","facebook","twitter","linkedin","phone","timezone"],
+			userMetaList: Config.userMetaList,
 			timezone: "",
 			country: ""
 		}

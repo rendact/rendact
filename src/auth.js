@@ -43,7 +43,7 @@ function AuthService(){
 
   var _setProfile = function(p) { 
     var meta = {}
-    var metaList = ["bio","website","facebook","twitter","linkedin","phone","timezone"];
+    var metaList = Config.userMetaList;
     _.forEach(metaList, function(item){
       meta[item] = _.find(p.meta.edges, {"node": {"item": item}});
     })
@@ -65,6 +65,7 @@ function AuthService(){
         facebook: meta["facebook"]?meta["facebook"].node.value:"",
         twitter: meta["twitter"]?meta["twitter"].node.value:"",
         linkedin: meta["linkedin"]?meta["linkedin"].node.value:"",
+        userPrefConfig: meta["userPrefConfig"]?meta["userPrefConfig"].node.value:""
     }
     localStorage.setItem("userId", p.id);
     localStorage.setItem('profile', JSON.stringify(profile));

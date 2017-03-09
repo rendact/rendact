@@ -30,7 +30,7 @@ var Profile = React.createClass({
 			noticeTxt: null,
 			avatar: image,
 			passwordActive: false,
-			userMetaList: ["bio","website","facebook","twitter","linkedin","phone","timezone"],
+			userMetaList: Config.userMetaList,
 			timezone: "",
 			country: ""
 		}
@@ -58,6 +58,7 @@ var Profile = React.createClass({
 	      facebook: meta["facebook"]?meta["facebook"].node.value:"",
 	      twitter: meta["twitter"]?meta["twitter"].node.value:"",
 	      linkedin: meta["linkedin"]?meta["linkedin"].node.value:"",
+	      userPrefConfig: meta["userPrefConfig"]?meta["userPrefConfig"].node.value:""
 	  }
 	  localStorage.setItem('profile', JSON.stringify(profile));
   },

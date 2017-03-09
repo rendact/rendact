@@ -1,10 +1,12 @@
 import React from 'react';
 import $ from 'jquery';
-window.$ = $;
-
+import Query from './query';
+import Config from '../config';
+import _ from 'lodash';
 import {riques} from '../utils';
 import { default as swal } from 'sweetalert2';
-import Config from '../config';
+
+window.$ = $;
 
 const errorCallback = function(msg1, msg2){
   if (msg1) swal('Failed!', msg1, 'warning')
@@ -28,6 +30,13 @@ const mySkins = [
     ];
 
 const ControlSidebar = React.createClass({
+  getInitialState: function(){
+    return {
+      isSaving: false,
+      errorMsg: null,
+      noticeTxt: null
+    }
+  },
   componentDidMount: function(){
     require('./lib/app.js');
     
@@ -96,7 +105,7 @@ const ControlSidebar = React.createClass({
       else $("body").addClass("sidebar-collapse");
       this.setLSValue('sidebar-collapse', checked);
     }
-    if (configName==="expandOnHover") {
+    if (configName==="expand-on-hover") {
       e.target.setAttribute('disabled', checked);
       if (checked){
         $.AdminLTE.pushMenu.expandOnHover();
@@ -121,54 +130,42 @@ const ControlSidebar = React.createClass({
     }
   },
 
-  handleDataEnable: function(){
-    $(this).attr('disabled', true);
-      //AdminLTE.pushMenu.expandOnHover();
-      if (!$('body').hasClass('sidebar-collapse'))
-        $("[data-layout='sidebar-collapse']").click();
-  },
-
   handleSaveBtn: function(event){
-    var userMetaData = [];
+    var userPrefConfig = {
+      "profile-hide": this.getLSValue('user-panel-box'),
+      "sidebar-collapse": this.getLSValue('sidebar-collapse'),
+      "sidebar-expand-on-hover": this.getLSValue('sidebar-expand-on-hover'),
+      "control-sidebar-open": this.getLSValue('control-sidebar-open'),
+      "skin": this.getLSValue('skin')
+    }
 
-    /*
-    riques(Query.saveUserMetaMtn(localStorage.getItem("userId"), userMetaData), 
+    var userPrefConfigStr = JSON.stringify(userPrefConfig);
+    var userMetaData = [{item: "userPrefConfig", value: userPrefConfigStr}]
+    var me = this;
+    var qry = '';
+
+    var p = JSON.parse(localStorage.getItem("profile"));
+    if (p.userPrefConfig!=null & p.userPrefConfig!=="") {
+      qry = Query.saveUserMetaMtn(localStorage.getItem("userId"), userMetaData) 
+    } else {
+      qry = Query.createUserMetaMtn(localStorage.getItem("userId"), userMetaData)
+    }
+
+    riques(qry, 
       function(error, response, body){
         if(!error && !body.errors) {
-          var metaList = [];
-          _.forEach(body.data, function(item){
-            metaList.push(item.changedUserMeta);
-          });
-          
-          if (metaList.length>0) {
-            here.setUserMeta(metaList);
-            here.setState({noticeTxt: "Profile saved"});
-          } else {
-            riques(Query.createUserMetaMtn(localStorage.getItem("userId"), userMetaData)
-              function(error, response, body){
-                if(!error && !body.errors) {
-                  var metaList = [];
-                  _.forEach(body.data, function(item){
-                    metaList.push(item.changedUserMeta);
-                  });
-
-                  if (metaList.length>0) {
-                    here.setUserMeta(metaList);
-                    here.setState({noticeTxt: "Profile saved"});
-                  }
-                } else {
-                  errorCallback(error, body.errors?body.errors[0].message:null);
-                }
-              }
-            );
+          debugger;
+          var cfg = _.find(body.data, {changedUserMeta: {item: "userPrefConfig"}});
+          if (cfg) {
+            p.userPrefConfig = cfg.changedUserMeta.value;
+            localStorage.setItem("profile", p);
           }
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
-        here.setState({isSaving: false});
+        me.setState({isSaving: false});
       }
     );
-    */
   },
 
   resetOption: function(){
@@ -199,7 +196,7 @@ const ControlSidebar = React.createClass({
     }
 
     var sidebarExpandHover = this.getLSValue('sidebar-expand-on-hover');
-    $("[data-layout='expandOnHover']").prop('checked', sidebarExpandHover==='true');
+    $("[data-layout='expand-on-hover']").prop('checked', sidebarExpandHover==='true');
     if (sidebarExpandHover==="true"){
       $.AdminLTE.pushMenu.expandOnHover();
       if (!$('body').hasClass('sidebar-collapse')) $("body").addClass("sidebar-collapse");
@@ -247,7 +244,7 @@ const ControlSidebar = React.createClass({
                 
                 <div className='form-group'>
                   <label className='control-sidebar-subheading'>
-                    <input type='checkbox' onClick={this.handleDataEnable} data-layout='expandOnHover' className='pull-right'/>
+                    <input type='checkbox' onClick={this.handleDataLayout} data-layout='expand-on-hover' className='pull-right'/>
                     Sidebar Expand on Hover
                   </label>
                   <p>Let the sidebar mini expand on hover</p>
@@ -349,7 +346,7 @@ const ControlSidebar = React.createClass({
                   </li>
                 </ul>
                 <div className="form-group">
-                  <input type="button" onChange={this.handleSaveBtn} className="btn btn-primary" style={{width: "100%"}} value="Save" />
+                  <input type="button" onClick={this.handleSaveBtn} className="btn btn-primary" style={{width: "100%"}} value="Save" />
                 </div>
             </div>
 
