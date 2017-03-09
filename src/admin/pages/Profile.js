@@ -349,11 +349,11 @@ var Profile = React.createClass({
 								  	<label htmlFor="timezone" className="col-md-3">Timezone</label>
 								  	<div className="col-md-9">
 										<TimezonePicker
-										  absolute      = {true}
-										  defaultValue  = {p.timezone}
-										  style         = {{width: 300}}
-										  placeholder   = "Select timezone..."
-										  onChange      = {this.handleTimezoneChange}
+										  absolute={true}
+										  defaultValue={p.timezone}
+										  style={{width: 300}}
+										  placeholder="Select timezone..."
+										  onChange={this.handleTimezoneChange}
 										/>
 									</div>
 								</div>
