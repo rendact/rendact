@@ -200,7 +200,7 @@ const saveUserMetaMtn = function(userId, arr){
   }
 }
 
-const createUserMetaMtn = function(arr){
+const createUserMetaMtn = function(userId, arr){
   var variables = {};
   var query = "mutation (";
   var i = 0;
@@ -215,7 +215,7 @@ const createUserMetaMtn = function(arr){
   _.forEach(arr, function(val, index){
     query += ' CreateUserMeta'+index+' : createUserMeta(input: $input'+index+'){ changedUserMeta{ id item value } }'; 
     variables["input"+index] = {
-      userId: localStorage.getItem("userId"),
+      userId: userId,
       item: val.item,
       value: val.value
     }

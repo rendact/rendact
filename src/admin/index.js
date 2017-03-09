@@ -50,16 +50,19 @@ const SideMenu = React.createClass({
 		$("#menu-"+this.state.activeMenu).parent("ul").parent("li").addClass("active");
 	},
 	render: function() {
-		
+		let p = JSON.parse(localStorage.getItem("profile"));
+		var image = Config.rootUrl+"/images/avatar-default.png";
+    if (p.image)
+      image = p.image;
 		return (
 			<aside className="main-sidebar">
 			    <section className="sidebar">
 			      <div className="user-panel user-panel-hidden">
 			      	<div className="pull-left image">
-			          <img src={Config.rootUrl+"/images/avatar-default.png"} className="img-circle" alt="User" />
+			          <img src={image} className="img-circle" alt="User" />
 			        </div>
 			        <div className="pull-left info">
-			          <p>Ali Camarata</p>
+			          <p>{p.name}</p>
 			          <a href="#"><i className="fa fa-circle text-success"></i> Online</a>
 			        </div>
 			      </div>
