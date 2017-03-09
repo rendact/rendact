@@ -42,10 +42,12 @@ const ControlSidebar = React.createClass({
     //Fix the problem with right sidebar and layout boxed
     if (cls === "layout-boxed")
       $.AdminLTE.controlSidebar._fix($(".control-sidebar-bg"));
+
     if ($('body').hasClass('fixed') && cls === 'fixed') {
       //AdminLTE.pushMenu.expandOnHover();
       //AdminLTE.layout.activate();
     }
+
     if (cls === "profile-hide") {
       $(".user-panel").toggleClass("user-panel-hidden");
       localStorage.setItem("user-panel-box", !$(".user-panel").hasClass("user-panel-hidden"));
@@ -77,8 +79,9 @@ const ControlSidebar = React.createClass({
     if($(this).hasClass('knob'))
         return;
     e.preventDefault();
-    this.changeSkin($(this).data('skin'));
-    this.setLSValue('skin', $(this).data('skin'));
+    var skinName = e.currentTarget.getAttribute("data-skin");
+    this.changeSkin(skinName);
+    this.setLSValue('skin', skinName);
   },
 
   handleDataLayout: function(e){
@@ -108,23 +111,16 @@ const ControlSidebar = React.createClass({
     }
 
     if (configName==="control-sidebar-open") {
-      this.changeLayout('control-sidebar-open');
-      var slide = !$.AdminLTE.options.controlSidebarOptions.slide;
-      $.AdminLTE.options.controlSidebarOptions.slide = slide;
-      if (!slide)
-        $('.control-sidebar').removeClass('control-sidebar-open');
-    }
-  },
-
-  handleDataSidebarSKin: function(){
-    var sidebar = $(".control-sidebar");
-      if (sidebar.hasClass("control-sidebar-dark")) {
-        sidebar.removeClass("control-sidebar-dark")
-        sidebar.addClass("control-sidebar-light")
+      $.AdminLTE.options.controlSidebarOptions.slide = checked;
+      if (checked) {
+        $('.control-sidebar').addClass('control-sidebar-open');
+        $('body').addClass('control-sidebar-open');
       } else {
-        sidebar.removeClass("control-sidebar-light")
-        sidebar.addClass("control-sidebar-dark")
+        $('.control-sidebar').removeClass('control-sidebar-open');
+        $('body').removeClass('control-sidebar-open');
       }
+      this.setLSValue('control-sidebar-open', checked);
+    }
   },
 
   handleDataEnable: function(){
@@ -178,13 +174,6 @@ const ControlSidebar = React.createClass({
   },
 
   resetOption: function(){
-      // Reset options
-    if ($('body').hasClass('fixed')) {
-      $("[data-layout='fixed']").attr('checked', 'checked');
-    }
-    if ($('body').hasClass('layout-boxed')) {
-      $("[data-layout='layout-boxed']").attr('checked', 'checked');
-    }
     if ($('body').hasClass('sidebar-collapse')) {
       $("[data-layout='sidebar-collapse']").attr('checked', 'checked');
     }
@@ -219,50 +208,7 @@ const ControlSidebar = React.createClass({
     }
     else {
       $("body").removeClass("sidebar-collapse");
-    }
-    
-    //Add the change skin listener
-    $("[data-skin]").on('click', function (e) {
-      if($(this).hasClass('knob'))
-        return;
-      e.preventDefault();
-      me.changeSkin($(this).data('skin'));
-    });
-
-    //Add the layout manager
-    $("[data-layout]").on('click', function () {
-      me.changeLayout($(this).data('layout'));
-    });
-
-    $("[data-controlsidebar]").on('click', function () {
-      me.changeLayout($(this).data('controlsidebar'));
-      var slide = !$.AdminLTE.options.controlSidebarOptions.slide;
-      $.AdminLTE.options.controlSidebarOptions.slide = slide;
-      if (!slide)
-        $('.control-sidebar').removeClass('control-sidebar-open');
-    });
-
-    $("[data-sidebarskin='toggle']").on('click', function () {
-      var sidebar = $(".control-sidebar");
-      if (sidebar.hasClass("control-sidebar-dark")) {
-        sidebar.removeClass("control-sidebar-dark")
-        sidebar.addClass("control-sidebar-light")
-      } else {
-        sidebar.removeClass("control-sidebar-light")
-        sidebar.addClass("control-sidebar-dark")
-      }
-    });
-
-    // Reset options
-    if ($('body').hasClass('fixed')) {
-      $("[data-layout='fixed']").attr('checked', 'checked');
-    }
-    if ($('body').hasClass('layout-boxed')) {
-      $("[data-layout='layout-boxed']").attr('checked', 'checked');
-    }
-    if ($('body').hasClass('sidebar-collapse')) {
-      $("[data-layout='sidebar-collapse']").attr('checked', 'checked');
-    }
+    }    
   },
 
   getLSValue: function(item){
@@ -311,7 +257,7 @@ const ControlSidebar = React.createClass({
                 
                 <div className='form-group'>
                   <label className='control-sidebar-subheading'>
-                    <input type='checkbox' onClick={this.handleDataControlSidebar} data-layout='control-sidebar-open' className='pull-right'/>
+                    <input type='checkbox' onClick={this.handleDataLayout} data-layout='control-sidebar-open' className='pull-right'/>
                     Toggle Right Sidebar Slide
                   </label>
                   <p>Toggle between slide over content and push content effects</p>
