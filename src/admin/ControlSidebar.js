@@ -90,9 +90,7 @@ const ControlSidebar = React.createClass({
   handleCheckBox: function(){
     var checked = $("input.setting:checked");
     if (checked){
-      alert($('input').serialize());
-    }else{
-      alert($('input').serialize());
+      alert("a");
     }
   },
 
