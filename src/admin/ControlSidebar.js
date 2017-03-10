@@ -1,7 +1,6 @@
 import React from 'react';
 import $ from 'jquery';
 import Query from './query';
-import Config from '../config';
 import _ from 'lodash';
 import {riques} from '../utils';
 import { default as swal } from 'sweetalert2';
@@ -66,6 +65,7 @@ const ControlSidebar = React.createClass({
   },
 
   changeSkin: function(cls){
+    if (cls===null) cls = 'skin-blue';
     $.each(mySkins, function (i) {
       $("body").removeClass(mySkins[i]);
     });
@@ -73,6 +73,11 @@ const ControlSidebar = React.createClass({
     $("body").addClass(cls);
     this.setLSValue('skin', cls);
     return false;
+  },
+
+  disableForm: function(state){
+    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
+    _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;})
   },
 
   handleCheckBox: function(){
@@ -101,8 +106,8 @@ const ControlSidebar = React.createClass({
       this.setLSValue('user-panel-box', checked);
     }
     if (configName==="sidebar-collapse") {
-      if (checked) $("body").removeClass("sidebar-collapse");
-      else $("body").addClass("sidebar-collapse");
+      if (checked) $("body").addClass("sidebar-collapse");
+      else $("body").removeClass("sidebar-collapse");
       this.setLSValue('sidebar-collapse', checked);
     }
     if (configName==="expand-on-hover") {
@@ -130,39 +135,74 @@ const ControlSidebar = React.createClass({
     }
   },
 
+  handleSetting: function(e){
+    var configName = e.target.getAttribute("data-setting");
+    var checked = e.target.checked;
+
+    if (configName==="report-panel-usage") {
+      this.setLSValue('report-panel-usage', checked);
+    }
+
+    if (configName==="allow-email-redirect") {
+      this.setLSValue('allow-email-redirect', checked);
+    }
+
+    if (configName==="expose-author-name") {
+      this.setLSValue('expose-author-name', checked);
+    }
+
+    if (configName==="show-as-online") {
+      this.setLSValue('show-as-online', checked);
+    }
+
+    if (configName==="turn-off-notification") {
+      this.setLSValue('turn-off-notification', checked);
+    }    
+
+  },
+
   handleSaveBtn: function(event){
+    this.disableForm(true);
     var userPrefConfig = {
       "profile-hide": this.getLSValue('user-panel-box'),
       "sidebar-collapse": this.getLSValue('sidebar-collapse'),
       "sidebar-expand-on-hover": this.getLSValue('sidebar-expand-on-hover'),
       "control-sidebar-open": this.getLSValue('control-sidebar-open'),
-      "skin": this.getLSValue('skin')
+      "skin": this.getLSValue('skin'),
+      "report-panel-usage": this.getLSValue('report-panel-usage'),
+      "allow-email-redirect": this.getLSValue('allow-email-redirect'),
+      "expose-author-name": this.getLSValue('expose-author-name'),
+      "show-as-online": this.getLSValue('show-as-online'),
+      "turn-off-notification": this.getLSValue('turn-off-notification')
     }
 
     var userPrefConfigStr = JSON.stringify(userPrefConfig);
-    var userMetaData = [{item: "userPrefConfig", value: userPrefConfigStr}]
+    var p = JSON.parse(localStorage.getItem("profile"));
     var me = this;
     var qry = '';
+    var userMetaData = [];
 
-    var p = JSON.parse(localStorage.getItem("profile"));
-    if (p.userPrefConfig!=null & p.userPrefConfig!=="") {
+    var metaIdList = JSON.parse(localStorage.getItem("metaIdList"));
+    if (metaIdList.userPrefConfig && metaIdList.userPrefConfig!=="" && metaIdList.userPrefConfig!==null) {
+      userMetaData = [{id: metaIdList.userPrefConfig, item: "userPrefConfig", value: userPrefConfigStr}]
       qry = Query.saveUserMetaMtn(localStorage.getItem("userId"), userMetaData) 
     } else {
+      userMetaData = [{item: "userPrefConfig", value: userPrefConfigStr}]
       qry = Query.createUserMetaMtn(localStorage.getItem("userId"), userMetaData)
     }
 
     riques(qry, 
       function(error, response, body){
         if(!error && !body.errors) {
-          debugger;
           var cfg = _.find(body.data, {changedUserMeta: {item: "userPrefConfig"}});
           if (cfg) {
-            p.userPrefConfig = cfg.changedUserMeta.value;
-            localStorage.setItem("profile", p);
+            p["userPrefConfig"] = cfg.changedUserMeta.value;
+            localStorage.setItem("profile", JSON.stringify(p));
           }
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
+        me.disableForm(false);
         me.setState({isSaving: false});
       }
     );
@@ -175,10 +215,16 @@ const ControlSidebar = React.createClass({
   },
 
   setup: function() {
-    var me = this;
-    var tmp = this.getLSValue('skin');
-    if (tmp && $.inArray(tmp, mySkins))
-      this.changeSkin(tmp);
+    var skin = this.getLSValue('skin');
+
+    if (skin===null || skin==="null" ) {
+      this.setLSValue("skin", "skin-blue");
+      skin = "skin-blue";
+    }
+
+    if (skin && $.inArray(skin, mySkins))
+      this.changeSkin(skin);
+    
     //Load profile box config
     var profileBox = this.getLSValue('user-panel-box');
 
@@ -189,7 +235,7 @@ const ControlSidebar = React.createClass({
 
     var sidebarCollapse = this.getLSValue('sidebar-collapse');
     $("[data-layout='sidebar-collapse']").prop('checked', sidebarCollapse==='true');
-    if (sidebarCollapse==="true" && !$("body").hasClass("sidebar-collapse")) {
+    if (sidebarCollapse==="true") {
       $("body").addClass("sidebar-collapse")
     } else if ($("body").hasClass("sidebar-collapse")){
       $("body").removeClass("sidebar-collapse")
@@ -201,7 +247,7 @@ const ControlSidebar = React.createClass({
       $.AdminLTE.pushMenu.expandOnHover();
       if (!$('body').hasClass('sidebar-collapse')) $("body").addClass("sidebar-collapse");
     }
-    else {
+    else if (sidebarExpandHover==="false") {
       $("body").removeClass("sidebar-collapse");
     }    
   },
@@ -463,7 +509,7 @@ const ControlSidebar = React.createClass({
                 <div className="form-group">
                   <label className="control-sidebar-subheading">
                     Report panel usage
-                    <input type="checkbox" className="pull-right" onChange={this.handleCheckBox} className="setting" id="a" value="report"/>
+                    <input type="checkbox" className="pull-right setting" data-setting="report-panel-usage" onChange={this.handleSetting} />
                   </label>
 
                   <p>
@@ -474,7 +520,7 @@ const ControlSidebar = React.createClass({
                 <div className="form-group">
                   <label className="control-sidebar-subheading">
                     Allow mail redirect
-                    <input type="checkbox" className="pull-right setting" onChange={this.handleCheckBox} id="b" value="Allow"/>
+                    <input type="checkbox" className="pull-right setting" data-setting="allow-email-redirect" onChange={this.handleSetting}/>
                   </label>
 
                   <p>
@@ -485,7 +531,7 @@ const ControlSidebar = React.createClass({
                 <div className="form-group">
                   <label className="control-sidebar-subheading">
                     Expose author name in posts
-                    <input type="checkbox" className="pull-right setting" onChange={this.handleCheckBox} id="c" value="expose"/>
+                    <input type="checkbox" className="pull-right setting" data-setting="expose-author-name" onChange={this.handleSetting}/>
                   </label>
 
                   <p>
@@ -498,14 +544,14 @@ const ControlSidebar = React.createClass({
                 <div className="form-group">
                   <label className="control-sidebar-subheading">
                     Show me as online
-                    <input type="checkbox" className="pull-right setting" onChange={this.handleCheckBox} id="d" value="show"/>
+                    <input type="checkbox" className="pull-right setting" data-setting="show-as-online" onChange={this.handleSetting}/>
                   </label>
                 </div>
 
                 <div className="form-group">
                   <label className="control-sidebar-subheading">
                     Turn off notifications
-                    <input type="checkbox" className="pull-right setting" onChange={this.handleCheckBox} id="e" value="turnOff"/>
+                    <input type="checkbox" className="pull-right setting" data-setting="turn-off-notification" onChange={this.handleSetting}/>
                   </label>
                 </div>
 

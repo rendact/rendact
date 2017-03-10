@@ -1,8 +1,5 @@
 import React from 'react';
 import $ from 'jquery';
-const jQuery = $;
-window.jQuery = $;
-
 import AdminHeader from './Header';
 import ControlSidebar from './ControlSidebar';
 import Footer from './Footer';

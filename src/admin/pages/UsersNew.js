@@ -78,7 +78,7 @@ var NewUser = React.createClass({
 
 		if (v.image) this.setState({avatar: v.image});
 		if (v.meta.edges.length>0){
-			var meta = v.meta.edges;
+			meta = v.meta.edges;
 			_.forEach(meta, function(item){
 				setValue(item.node.item, item.node.value);
 			});
@@ -107,7 +107,6 @@ var NewUser = React.createClass({
 		var gender = getValue("gender");
 		var image = this.state.avatar;
 		var bio = getValue("bio");
-		var roleId = getValue("role");
 		//var birth = getValue("birth");
 		var phone = getValue("phone");
 		var country = getValue("country");
@@ -242,7 +241,6 @@ var NewUser = React.createClass({
 			document.getElementById("new-password").setAttribute("type","password")
 	},
 	handleRoleChange: function(event){
-		debugger;
 		var qry = '';
 		var roleId = event.target.value;
 		var checked = event.target.checked;

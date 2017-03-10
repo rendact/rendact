@@ -7,7 +7,7 @@ import {riques, getValue, setValue} from '../../utils';
 import _ from 'lodash';
 import DatePicker from 'react-bootstrap-date-picker';
 import TimezonePicker from 'react-bootstrap-timezone-picker';
-import CountrySelect from '../lib/CountrySelect'
+import CountrySelect from '../lib/CountrySelect';
 
 window.getBase64Image = function(img) {
   var canvas = document.createElement("canvas");
@@ -237,6 +237,7 @@ var Profile = React.createClass({
 	},
 	componentDidMount: function(){
 		require ('react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css');
+		this._notificationSystem = this.refs.notificationSystem;
 	},
 	render: function(){ 
 		let p = JSON.parse(localStorage.getItem("profile"));
