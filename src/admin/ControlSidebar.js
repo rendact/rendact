@@ -463,7 +463,7 @@ const ControlSidebar = React.createClass({
                 <div className="form-group">
                   <label className="control-sidebar-subheading">
                     Report panel usage
-                    <input type="checkbox" className="pull-right" onChange={this.handleCheckBox} className="setting" id="a" value="report"/>
+                    <input type="checkbox" className="pull-right setting" onChange={this.handleCheckBox} id="a" value="report"/>
                   </label>
 
                   <p>
