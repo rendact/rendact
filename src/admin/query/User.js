@@ -26,6 +26,7 @@ const getUserListQry = {
               gender,
               image,
               lastLogin,
+              dateOfBirth,
               posts {
                 edges {
                   node {
@@ -70,6 +71,7 @@ const getUserListByTypeQry = function(type){
               gender,
               image,
               lastLogin,
+              dateOfBirth,
               posts {
                 edges {
                   node {
@@ -94,7 +96,7 @@ const getUserListByTypeQry = function(type){
   }
 };
 
-const createUserMtn = function(username, password, email, fullname, gender) {
+const createUserMtn = function(username, password, email, fullname, gender, dateOfBirth) {
   return {
       "query": `mutation CreateUserQuery ($input: CreateUserInput!) {
         createUser(input: $input) {
@@ -106,6 +108,7 @@ const createUserMtn = function(username, password, email, fullname, gender) {
             gender
             email
             image
+            dateOfBirth
             lastLogin
             createdAt
           }
@@ -117,14 +120,15 @@ const createUserMtn = function(username, password, email, fullname, gender) {
           "fullName": fullname,
           "password": password,
           "email": email,
-          "gender": gender
+          "gender": gender,
+          "dateOfBirth" : dateOfBirth
         }
       }
 
     }
 }
 
-const saveProfileMtn = function(userId, name, username, email, gender, image, country){
+const saveProfileMtn = function(userId, name, username, email, gender, image, country, dateOfBirth){
   return {
     "query": `mutation UpdateUserQuery ($input: UpdateUserInput!) {
         updateUser(input: $input) {
@@ -136,6 +140,7 @@ const saveProfileMtn = function(userId, name, username, email, gender, image, co
             email
             image
             country 
+            dateOfBirth
             lastLogin
             createdAt
             meta {
@@ -166,7 +171,8 @@ const saveProfileMtn = function(userId, name, username, email, gender, image, co
           "email": email,
           "gender": gender,
           "image": image,
-          "country": country
+          "country": country,
+          "dateOfBirth": dateOfBirth
         }
       }
   }

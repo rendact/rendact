@@ -57,7 +57,7 @@ function AuthService(){
         lastLogin: p.lastLogin,
         createdAt: p.createdAt,
         biography: meta["bio"]?meta["bio"].node.value:"",
-        birth: p.dateOfBirth?p.dateOfBirth:"",
+        dateOfBirth: p.dateOfBirth?p.dateOfBirth:"",
         phone: meta["phone"]?meta["phone"].node.value:"",
         country: p.country?p.country:"",
         timezone: meta["timezone"]?meta["timezone"].node.value:"",

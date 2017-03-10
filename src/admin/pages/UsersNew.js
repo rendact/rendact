@@ -378,7 +378,7 @@ var NewUser = React.createClass({
 					  			<div className="form-group">
 								  	<label htmlFor="tagline" className="col-md-3">Username</label>
 								  	<div className="col-md-9">
-										<input type="text" name="username" id="username" className="form-control" required="true"/>
+										<input type="text" name="username" id="username" className="form-control" disabled/>
 										<p className="help-block">The short unique name describes you</p>
 									</div>
 								</div>
