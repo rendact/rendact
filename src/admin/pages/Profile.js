@@ -32,7 +32,9 @@ var Profile = React.createClass({
 			passwordActive: false,
 			userMetaList: Config.userMetaList,
 			timezone: "",
-			country: ""
+			country: "",
+			dateOfBirth: new Date(),
+      		dateOfBirthReset: new Date()
 		}
 	},
 	setProfile: function(p) {
@@ -50,7 +52,7 @@ var Profile = React.createClass({
 	      lastLogin: p.lastLogin,
 	      createdAt: p.createdAt,
 	      biography: meta["bio"]?meta["bio"].node.value:"",
-	      birth: p.dateOfBirth?p.dateOfBirth:"",
+	      dateOfBirth: p.dateOfBirth?p.dateOfBirth:"",
 	      phone: meta["phone"]?meta["phone"].node.value:"",
 	      country: p.country?p.country:"",
 	      timezone: meta["timezone"]?meta["timezone"].node.value:"",
@@ -61,14 +63,14 @@ var Profile = React.createClass({
 	      userPrefConfig: meta["userPrefConfig"]?meta["userPrefConfig"].node.value:""
 	  }
 	  localStorage.setItem('profile', JSON.stringify(profile));
-  },
-  setUserMeta: function(metaList){
-  	var profile = JSON.parse(localStorage.getItem("profile"));
+	},
+	setUserMeta: function(metaList){
+  		var profile = JSON.parse(localStorage.getItem("profile"));
 		_.forEach(this.state.userMetaList, function(item){
 			var i = _.find(metaList, {"item": item});
 			profile[i.item] = i?i.value:"";
 		})
-  	localStorage.setItem('profile', JSON.stringify(profile));
+  		localStorage.setItem('profile', JSON.stringify(profile));
 	},
 	handleSubmitBtn: function(event){
 		event.preventDefault();
@@ -80,7 +82,8 @@ var Profile = React.createClass({
 		var gender = getValue("gender");
 		var image = this.state.avatar;
 		var bio = getValue("bio");
-		//var birth = getValue("birth");
+		//var dateOfBirth = getValue("dateOfBirth");
+		var dateOfBirth = this.state.dateOfBirth;
 		var phone = getValue("phone");
 		var country = getValue("country");
 		//var timezone = getValue("timezone");
@@ -108,7 +111,7 @@ var Profile = React.createClass({
 	    }
 
 		this.setState({isSaving: true});
-		riques(Query.saveProfileMtn(localStorage.getItem("userId"), name, username, email, gender, image, country), 
+		riques(Query.saveProfileMtn(localStorage.getItem("userId"), name, username, email, gender, image, country, dateOfBirth), 
 			function(error, response, body){
 				if(!error && !body.errors) {
 					var p = body.data.updateUser.changedUser;
@@ -215,6 +218,9 @@ var Profile = React.createClass({
 			this.setState({passwordActive: false})
 		}
 	},
+	handleDateChange: function(date){
+	    this.setState({immediatelyStatus: false, dateOfBirth: new Date(date)});
+	},
 	handleErrorMsgClose: function(){
 	    this.setState({errorMsg: ""});
 	},
@@ -303,9 +309,9 @@ var Profile = React.createClass({
 								</div>
 
 								<div className="form-group">
-								  	<label htmlFor="birth" className="col-md-3">Date of Birth</label>
+								  	<label htmlFor="dateOfBirth" className="col-md-3">Date of Birth</label>
 								  	<div className="col-md-9">
-										<DatePicker id="datepicker" style={{width: "100%", padddingRight: 0, textAlign: "left"}} />
+										<DatePicker id="datepicker" style={{width: "100%", padddingRight: 0, textAlign: "left"}} value={this.state.dateOfBirth.toISOString()} onChange={this.handleDateChange} />
 									</div>
 								</div>
 
