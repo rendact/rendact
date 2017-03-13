@@ -5045,3 +5045,7 @@ table.text-center th {
 div.passwordTester > span.ReactPasswordStrength-strength-desc {
   right: 22px;
 } 
+
+.datetime-input {
+  width: 150px;
+}

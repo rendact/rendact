@@ -5,7 +5,8 @@ import Dropzone from 'react-dropzone';
 import Config from '../../config'
 import {riques, getValue, setValue} from '../../utils';
 import _ from 'lodash';
-import DatePicker from 'react-bootstrap-date-picker';
+import { default as swal } from 'sweetalert2';
+import DateTime from 'react-datetime';
 import TimezonePicker from 'react-bootstrap-timezone-picker';
 import CountrySelect from '../lib/CountrySelect';
 
@@ -17,6 +18,12 @@ window.getBase64Image = function(img) {
   ctx.drawImage(img, 0, 0);
   var dataURL = canvas.toDataURL("image/png");
   return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+}
+
+const errorCallback = function(msg1, msg2){
+  if (msg1) swal('Failed!', msg1, 'warning')
+  else if (msg2) swal('Failed!', msg2, 'warning')
+  else swal('Failed!', 'Unknown error','warning')
 }
 
 var Profile = React.createClass({
@@ -33,8 +40,7 @@ var Profile = React.createClass({
 			userMetaList: Config.userMetaList,
 			timezone: "",
 			country: "",
-			dateOfBirth: new Date(),
-      		dateOfBirthReset: new Date()
+			dateOfBirth: ""
 		}
 	},
 	setProfile: function(p) {
@@ -62,6 +68,7 @@ var Profile = React.createClass({
 	      linkedin: meta["linkedin"]?meta["linkedin"].node.value:"",
 	      userPrefConfig: meta["userPrefConfig"]?meta["userPrefConfig"].node.value:""
 	  }
+	  this.setState({dateOfBirth: profile.dateOfBirth, timezone: profile.timezone})
 	  localStorage.setItem('profile', JSON.stringify(profile));
 	},
 	setUserMeta: function(metaList){
@@ -111,6 +118,7 @@ var Profile = React.createClass({
 	    }
 
 		this.setState({isSaving: true});
+
 		riques(Query.saveProfileMtn(localStorage.getItem("userId"), name, username, email, gender, image, country, dateOfBirth), 
 			function(error, response, body){
 				if(!error && !body.errors) {
@@ -118,65 +126,57 @@ var Profile = React.createClass({
 					me.setState({avatar: p.image})
           me.setProfile(p);
           var here = me;
-          var userMetaData0 = {
-          	"bio": bio,
-          	"website": website,
-          	"facebook": facebook,
-          	"twitter": twitter,
-          	"linkedin": linkedin,
-          	"timezone": timezone,
-          	"phone": phone
-          };
-          var qry = '';
 
-          var userMetaData = [];
-          if (p.meta.edges.length>0) {
-          	_.forEach(p.meta.edges, function(item, index){
-          		if (_.has(userMetaData0, item.node.item))
-          			userMetaData.push({id: item.node.id, item: item.node.item, value: userMetaData0[item.node.item]});
-          	});
-          	qry = Query.saveUserMetaMtn(localStorage.getItem("userId"), userMetaData);
-          } else {
-          	_.forEach(userMetaData0, function(value, key){
-          		userMetaData.push({item: key, value: value});
-          	});
-          	qry = Query.createUserMetaMtn(userMetaData);
-          }
-          
-          riques(qry, 
-						function(error, response, body){
-							if(!error && !body.errors) {
-								var metaList = [];
-								_.forEach(body.data, function(item){
-									metaList.push(item.changedUserMeta);
-								});
-								
-								if (metaList.length>0) {
-									here.setUserMeta(metaList);
-									here.setState({noticeTxt: "Profile saved"});
-								}
-							} else {
-								if (error){
-									here.setState({errorMsg: error})
-								}
-								else if (body.errors) {
-									here.setState({errorMsg: body.errors[0].message})
+          var isMetaEmpty = (bio+website+facebook+twitter+linkedin+timezone+phone)==='';
+
+          if (isMetaEmpty) {
+          	me.setState({isSaving: false});
+          }	else {
+	          var userMetaData0 = {
+	          	"bio": bio,
+	          	"website": website,
+	          	"facebook": facebook,
+	          	"twitter": twitter,
+	          	"linkedin": linkedin,
+	          	"timezone": timezone,
+	          	"phone": phone
+	          };
+	          var qry = '';
+
+	          var userMetaData = [];
+	          if (p.meta.edges.length>0) {
+	          	_.forEach(p.meta.edges, function(item, index){
+	          		if (_.has(userMetaData0, item.node.item))
+	          			userMetaData.push({id: item.node.id, item: item.node.item, value: userMetaData0[item.node.item]});
+	          	});
+	          	qry = Query.saveUserMetaMtn(localStorage.getItem("userId"), userMetaData);
+	          } else {
+	          	_.forEach(userMetaData0, function(value, key){
+	          		userMetaData.push({item: key, value: value});
+	          	});
+	          	qry = Query.createUserMetaMtn(userMetaData);
+	          }
+	          riques(qry, 
+							function(error, response, body){
+								if(!error && !body.errors) {
+									var metaList = [];
+									_.forEach(body.data, function(item){
+										metaList.push(item.changedUserMeta);
+									});
+									
+									if (metaList.length>0) {
+										here.setUserMeta(metaList);
+										here.setState({noticeTxt: "Profile saved"});
+									}
 								} else {
-									here.setState({errorMsg: "Unknown error"})
+									errorCallback(error, body.errors?body.errors[0].message:null);
 								}
+								here.setState({isSaving: false});
 							}
-							here.setState({isSaving: false});
-						}
-					);
+						);
+	        } 
 				} else {
-					if (error){
-						me.setState({errorMsg: error})
-					}
-					else if (body.errors) {
-						me.setState({errorMsg: body.errors[0].message})
-					} else {
-						me.setState({errorMsg: "Unknown error"})
-					}
+					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
 				//me.setState({isSaving: false});
 			}
@@ -188,14 +188,7 @@ var Profile = React.createClass({
 					if(!error && !body.errors) {
 						me.setState({noticeTxt: "Password changed"});
 					} else {
-						if (error){
-							me.setState({errorMsg: error})
-						}
-						else if (body.errors) {
-							me.setState({errorMsg: body.errors[0].message})
-						} else {
-							me.setState({errorMsg: "Unknown error"})
-						}
+						errorCallback(error, body.errors?body.errors[0].message:null);
 					}
 				}
 			);
@@ -218,8 +211,8 @@ var Profile = React.createClass({
 			this.setState({passwordActive: false})
 		}
 	},
-	handleDateChange: function(date){
-	    this.setState({immediatelyStatus: false, dateOfBirth: new Date(date)});
+	handleBirthDateChange: function(date){
+	 	this.setState({dateOfBirth: date.toISOString()});
 	},
 	handleErrorMsgClose: function(){
 	    this.setState({errorMsg: ""});
@@ -243,10 +236,15 @@ var Profile = React.createClass({
 	},
 	componentDidMount: function(){
 		require ('react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css');
+		require ('react-datetime/css/react-datetime.css');
 		this._notificationSystem = this.refs.notificationSystem;
 	},
 	render: function(){ 
 		let p = JSON.parse(localStorage.getItem("profile"));
+		var dateOfBirth = null;
+		if (p.dateOfBirth) 
+			dateOfBirth = new Date(p.dateOfBirth)
+		
 		return (
 			<div className="content-wrapper">
 				<div className="container-fluid">
@@ -311,7 +309,11 @@ var Profile = React.createClass({
 								<div className="form-group">
 								  	<label htmlFor="dateOfBirth" className="col-md-3">Date of Birth</label>
 								  	<div className="col-md-9">
-										<DatePicker id="datepicker" style={{width: "100%", padddingRight: 0, textAlign: "left"}} value={this.state.dateOfBirth.toISOString()} onChange={this.handleDateChange} />
+										<DateTime 
+											timeFormat={false} 
+											className="datetime-input" 
+											defaultValue={dateOfBirth}
+											onChange={this.handleBirthDateChange}/>
 									</div>
 								</div>
 
