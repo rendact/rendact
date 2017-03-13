@@ -34,7 +34,6 @@ var Profile = React.createClass({
 			timezone: "",
 			country: "",
 			dateOfBirth: new Date(),
-      		dateOfBirthReset: new Date()
 		}
 	},
 	setProfile: function(p) {
@@ -44,7 +43,7 @@ var Profile = React.createClass({
 		})
 	  
     var profile = {
-		  	name: p.fullName?p.fullName:p.username,
+		  name: p.fullName?p.fullName:p.username,
 	      username: p.username,
 	      email: p.email,
 	      gender: p.gender,
@@ -309,8 +308,13 @@ var Profile = React.createClass({
 
 								<div className="form-group">
 								  	<label htmlFor="dateOfBirth" className="col-md-3">Date of Birth</label>
-								  	<div className="col-md-9">
-										<DatePicker id="datepicker" style={{width: "100%", padddingRight: 0, textAlign: "left"}} value={this.state.dateOfBirth.toISOString()} onChange={this.handleDateChange} />
+								  	<div className="col-md-9" >
+										<DatePicker 
+										id="datepicker" 
+										style={{width: "100%", padddingRight: 0, textAlign: "left"}} 
+										value={this.state.dateOfBirth.toISOString()} 
+										//value={p.dateOfBirth} 
+										onChange={this.handleDateChange} />				
 									</div>
 								</div>
 
@@ -348,7 +352,7 @@ var Profile = React.createClass({
 								<div className="form-group">
 								  	<label htmlFor="country" className="col-md-3">Country</label>
 								  	<div className="col-md-9">
-								  	<CountrySelect id="country" name="country" defaultValue={p.country}/>
+								  		<CountrySelect id="country" name="country" defaultValue={p.country} required="true"/>
 									</div>
 								</div>
 
