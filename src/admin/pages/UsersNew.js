@@ -313,21 +313,18 @@ var NewUser = React.createClass({
   },
   resetForm: function(){
     document.getElementById("profileForm").reset();
-    setValue("name", null);
-    setValue("username", null);
-    setValue("email", null);
-    setValue("gender", null);
-    setValue("bio", null);
-    setValue("phone", null);
-    setValue("country", null);
-    setValue("website", null);
-    setValue("facebook", null);
-    setValue("twitter", null);
-    setValue("linkedin", null);
-    setValue("old-password", null);
-    setValue("new-password", null);
-    setValue("new-password-2", null);
+    _.forEach(document.getElementsByTagName('input'), function(el){ el.value = null;})
     
+    this.setState({
+			isSaving: false,
+			errorMsg: null,
+			noticeTxt: null,
+			passwordActive: false,
+			mode: "create",
+			timezone: "",
+			country: "",
+			dateOfBirth: ""
+		});
     window.history.pushState("", "", '/admin/users/new');
   },
 	handleAddNewBtn: function(event) {
@@ -395,7 +392,8 @@ var NewUser = React.createClass({
 					  			<div className="form-group">
 								  	<label htmlFor="tagline" className="col-md-3">Username</label>
 								  	<div className="col-md-9">
-										<input type="text" name="username" id="username" className="form-control" />
+										<input type="text" name="username" id="username" 
+											className="form-control" disabled={this.state.mode==="update"?true:false}/>
 										<p className="help-block">The short unique name describes you</p>
 									</div>
 								</div>
@@ -425,7 +423,7 @@ var NewUser = React.createClass({
 					  			<div className="form-group">
 								  	<label htmlFor="keywoards" className="col-md-3">Email</label>
 								  	<div className="col-md-9">
-										<input type="text" name="email" id="email" className="form-control" />
+										<input type="text" name="email" id="email" className="form-control" disabled={this.state.mode==="update"?true:false}/>
 									</div>
 								</div>
 
@@ -491,13 +489,20 @@ var NewUser = React.createClass({
 									</div>
 								</div>
 
-								<h4 style={{marginBottom: 20}}>Role and password</h4>
-								<div className="form-group">
-								 	<label htmlFor="homeUrl" className="col-md-3">Role</label>
-								 	<div className="col-md-9">
-										{this.state.roleList}
+								{ this.state.mode==="create" &&
+								 (<h4 style={{marginBottom: 20}}>Password</h4>)
+								}
+
+								{ this.state.mode==="update" &&
+								 [<h4 style={{marginBottom: 20}}>Role and password</h4>,
+									<div className="form-group">
+									 	<label htmlFor="homeUrl" className="col-md-3">Role</label>
+									 	<div className="col-md-9">
+											{this.state.roleList}
+										</div>
 									</div>
-								</div>
+									]
+								}
 
 								<div className="form-group">
 								 	<label htmlFor="old-password" className="col-md-3">Old password</label>
