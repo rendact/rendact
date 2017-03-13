@@ -306,6 +306,28 @@ var NewUser = React.createClass({
 		if (this.state.mode==="update") {
   		this.loadData();
   	}
+  },
+  resetForm: function(){
+    document.getElementById("profileForm").reset();
+    setValue("name", null);
+    setValue("username", null);
+    setValue("email", null);
+    setValue("gender", null);
+    setValue("bio", null);
+    setValue("phone", null);
+    setValue("country", null);
+    setValue("website", null);
+    setValue("facebook", null);
+    setValue("twitter", null);
+    setValue("linkedin", null);
+    setValue("old-password", null);
+    setValue("new-password", null);
+    setValue("new-password-2", null);
+    
+    window.history.pushState("", "", '/admin/users/new');
+  },
+	handleAddNewBtn: function(event) {
+  	this.resetForm();
 	},
 	render: function(){
 		return (
