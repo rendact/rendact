@@ -30,6 +30,7 @@
     "react-dropzone": "^3.10.0",
     "react-fastclick": "^2.1.2",
     "react-fontawesome": "^1.1.0",
+    "react-notification-system": "^0.2.12",
     "react-password-strength": "^1.1.0",
     "react-router": "^4.0.0-alpha.6",
     "react-router-scroll": "^0.3.2",

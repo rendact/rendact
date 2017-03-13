@@ -3,6 +3,7 @@ import $ from 'jquery';
 window.jQuery = $;
 import _ from 'lodash';
 import Query from '../query';
+import Notification from 'react-notification-system';
 import {riques} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
@@ -28,7 +29,8 @@ const Users = React.createClass({
       statusList: ["All", "Administrator", "Editor", "Author", "Subscriber", "Guest", "No Role"],
       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
       activeStatus: "All",
-      itemSelected: false
+      itemSelected: false,
+      notification: null
     }
   },
   loadData: function(datatable, type, callback) {
@@ -96,7 +98,12 @@ const Users = React.createClass({
         el.disabled = state;
     })
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.setState({loadingMsg: state?"Processing...":null});
+    this.setState({loadingMsg: state?(this.notification.addNotification({
+      message: 'Processing...',
+      level: 'warning',
+      position: 'tc',
+      autoDismiss: 2
+    })):null});
     if (!state) {
       this.checkDynamicButtonState();
     }
@@ -149,7 +156,8 @@ const Users = React.createClass({
     this.props.handleNav('users','edit', userId);
   },
   componentDidMount: function(){
-    var datatable = $('#userListTbl').DataTable({sDom: '<"H"r>t<"F"ip>'}); 
+    var datatable = $('#userListTbl').DataTable({sDom: '<"H"r>t<"F"ip>'});
+    this.notification = this.refs.notificationSystem; 
     
     datatable.columns(1).every( function () {
         var that = this;
@@ -181,17 +189,12 @@ const Users = React.createClass({
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
               <li className="active">User List</li>
             </ol>
-          </section>  
+          </section>
+          <Notification ref="notificationSystem" />   
           { this.state.errorMsg &&
             <div className="alert alert-danger alert-dismissible">
               <button type="button" className="close" data-dismiss="alert" aria-hidden="true">×</button>
               {this.state.errorMsg}
-            </div>
-          }
-          { this.state.loadingMsg &&
-            <div className="alert alert-warning alert-dismissible">
-              <button type="button" className="close" data-dismiss="warning" aria-hidden="true">×</button>
-              {this.state.loadingMsg}
             </div>
           }
           <section className="content">
