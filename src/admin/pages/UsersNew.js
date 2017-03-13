@@ -43,11 +43,7 @@ var NewUser = React.createClass({
 			userMetaList: Config.userMetaList,
 			timezone: "",
 			country: "",
-<<<<<<< HEAD
-			dateOfBirth: new Date(),
-=======
 			dateOfBirth: ""
->>>>>>> c926593d927434e208c9657ef31a4edefc9b1243
 		}
 	},
 	loadData: function(){
@@ -407,18 +403,11 @@ var NewUser = React.createClass({
 								<div className="form-group">
 								  	<label htmlFor="dateOfBirth" className="col-md-3">Date of Birth</label>
 								  	<div className="col-md-9">
-<<<<<<< HEAD
-										<DatePicker id="datepicker" 
-										style={{width: "100%", padddingRight: 0, textAlign: "left"}} 
-										value={this.state.dateOfBirth.toISOString()} 
-										onChange={this.handleDateChange} />
-=======
 										<DateTime 
 											timeFormat={false} 
 											className="datetime-input" 
 											defaultValue={this.state.dateOfBirth}
 											onChange={this.handleBirthDateChange}/>
->>>>>>> c926593d927434e208c9657ef31a4edefc9b1243
 									</div>
 								</div>
 
