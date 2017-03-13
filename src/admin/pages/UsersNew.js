@@ -391,7 +391,7 @@ var NewUser = React.createClass({
 					  			<div className="form-group">
 								  	<label htmlFor="tagline" className="col-md-3">Username</label>
 								  	<div className="col-md-9">
-										<input type="text" name="username" id="username" className="form-control" disabled/>
+										<input type="text" name="username" id="username" className="form-control" />
 										<p className="help-block">The short unique name describes you</p>
 									</div>
 								</div>
@@ -421,7 +421,7 @@ var NewUser = React.createClass({
 					  			<div className="form-group">
 								  	<label htmlFor="keywoards" className="col-md-3">Email</label>
 								  	<div className="col-md-9">
-										<input type="text" name="email" id="email" className="form-control" disabled/>
+										<input type="text" name="email" id="email" className="form-control" />
 									</div>
 								</div>
 
