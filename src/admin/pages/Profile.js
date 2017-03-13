@@ -242,8 +242,8 @@ var Profile = React.createClass({
 	},
 	render: function(){ 
 		let p = JSON.parse(localStorage.getItem("profile"));
-		var dateOfBirth = null;
-		if (p.dateOfBirth) 
+		var dateOfBirth = "";
+		if (p.dateOfBirth && p.dateOfBirth!=="") 
 			dateOfBirth = new Date(p.dateOfBirth)
 
 		return (

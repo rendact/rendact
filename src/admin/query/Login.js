@@ -12,6 +12,7 @@ const getLoginAuth0Mtn = function(identities, token, clientId){
               country
               lastLogin
               createdAt
+              dateOfBirth
               meta { edges { node { id, item, value } }}
             }
           }
@@ -41,6 +42,7 @@ const loginUserQry = function(username, password){
             country
             lastLogin
             createdAt
+            dateOfBirth
             meta { edges { node { id, item, value } }}
           }
         }
