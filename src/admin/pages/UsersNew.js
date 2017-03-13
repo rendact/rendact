@@ -1,14 +1,15 @@
 import React from 'react';
+import _ from 'lodash';
+import ReactPasswordStrength from 'react-password-strength';
+import Dropzone from 'react-dropzone';
+import { default as swal } from 'sweetalert2';
+import DateTime from 'react-datetime';
+import TimezonePicker from 'react-bootstrap-timezone-picker';
+import CountrySelect from '../lib/CountrySelect';
+
 import Query from '../query';
 import Config from '../../config'
 import {riques, getValue, setValue} from '../../utils';
-import _ from 'lodash';
-import DatePicker from 'react-bootstrap-date-picker';
-import { default as swal } from 'sweetalert2';
-import Dropzone from 'react-dropzone';
-import TimezonePicker from 'react-bootstrap-timezone-picker';
-import CountrySelect from '../lib/CountrySelect'
-import ReactPasswordStrength from 'react-password-strength';
 
 window.getBase64Image = function(img) {
   var canvas = document.createElement("canvas");
@@ -42,7 +43,11 @@ var NewUser = React.createClass({
 			userMetaList: Config.userMetaList,
 			timezone: "",
 			country: "",
+<<<<<<< HEAD
 			dateOfBirth: new Date(),
+=======
+			dateOfBirth: ""
+>>>>>>> c926593d927434e208c9657ef31a4edefc9b1243
 		}
 	},
 	loadData: function(){
@@ -143,67 +148,60 @@ var NewUser = React.createClass({
 				if(!error && !body.errors) {
 					var p = body.data.updateUser.changedUser;
 					me.setState({avatar: p.image})
-			        me.setProfile(p);
-			        var here = me;
-			        var userMetaData0 = {
-			          	"bio": bio,
-			          	"website": website,
-			          	"facebook": facebook,
-			          	"twitter": twitter,
-			          	"linkedin": linkedin,
-			          	"timezone": timezone,
-			          	"phone": phone
-			        };
-          			var qry = '';
+	        me.setProfile(p);
+	        var here = me;
 
-          			var userMetaData = [];
-			        if (p.meta.edges.length>0) {
-			          	_.forEach(p.meta.edges, function(item, index){
-			          		if (_.has(userMetaData0, item.node.item))
-			          			userMetaData.push({id: item.node.id, item: item.node.item, value: userMetaData0[item.node.item]});
-			          	});
-			          	qry = Query.saveUserMetaMtn(localStorage.getItem("userId"), userMetaData);
-			        } else {
-			          	_.forEach(userMetaData0, function(value, key){
-			          		userMetaData.push({item: key, value: value});
-			          	});
-			          	qry = Query.createUserMetaMtn(userMetaData);
-			        }
-          
-          			riques(qry, 
-						function(error, response, body){
-							if(!error && !body.errors) {
-								var metaList = [];
-								_.forEach(body.data, function(item){
-									metaList.push(item.changedUserMeta);
-								});
-								
-								if (metaList.length>0) {
-									here.setUserMeta(metaList);
-									here.setState({noticeTxt: "Profile saved"});
-								}
-							} else {
-								if (error){
-									here.setState({errorMsg: error})
-								}
-								else if (body.errors) {
-									here.setState({errorMsg: body.errors[0].message})
+	        var isMetaEmpty = (bio+website+facebook+twitter+linkedin+timezone+phone)==='';
+
+          if (isMetaEmpty) {
+          	me.setState({isSaving: false});
+          }	else {
+		        var userMetaData0 = {
+		          	"bio": bio,
+		          	"website": website,
+		          	"facebook": facebook,
+		          	"twitter": twitter,
+		          	"linkedin": linkedin,
+		          	"timezone": timezone,
+		          	"phone": phone
+		        };
+	      			var qry = '';
+
+	      			var userMetaData = [];
+		        if (p.meta.edges.length>0) {
+		          	_.forEach(p.meta.edges, function(item, index){
+		          		if (_.has(userMetaData0, item.node.item))
+		          			userMetaData.push({id: item.node.id, item: item.node.item, value: userMetaData0[item.node.item]});
+		          	});
+		          	qry = Query.saveUserMetaMtn(localStorage.getItem("userId"), userMetaData);
+		        } else {
+		          	_.forEach(userMetaData0, function(value, key){
+		          		userMetaData.push({item: key, value: value});
+		          	});
+		          	qry = Query.createUserMetaMtn(userMetaData);
+		        }
+	          
+	          riques(qry, 
+							function(error, response, body){
+								if(!error && !body.errors) {
+									var metaList = [];
+									_.forEach(body.data, function(item){
+										metaList.push(item.changedUserMeta);
+									});
+									
+									if (metaList.length>0) {
+										here.setUserMeta(metaList);
+										here.setState({noticeTxt: "Profile saved"});
+									}
 								} else {
-									here.setState({errorMsg: "Unknown error"})
+									errorCallback(error, body.errors?body.errors[0].message:null);
 								}
+								here.setState({isSaving: false});
 							}
-							here.setState({isSaving: false});
-						}
-					);
+						);
+	        }
 				} else {
-					if (error){
-						me.setState({errorMsg: error})
-					}
-					else if (body.errors) {
-						me.setState({errorMsg: body.errors[0].message})
-					} else {
-						me.setState({errorMsg: "Unknown error"})
-					}
+					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
 				//me.setState({isSaving: false});
 			}
@@ -215,14 +213,7 @@ var NewUser = React.createClass({
 					if(!error && !body.errors) {
 						me.setState({noticeTxt: "Password changed"});
 					} else {
-						if (error){
-							me.setState({errorMsg: error})
-						}
-						else if (body.errors) {
-							me.setState({errorMsg: body.errors[0].message})
-						} else {
-							me.setState({errorMsg: "Unknown error"})
-						}
+						errorCallback(error, body.errors?body.errors[0].message:null);
 					}
 				}
 			);
@@ -287,40 +278,44 @@ var NewUser = React.createClass({
 			this.setState({passwordActive: false})
 		}
 	},
+	handleBirthDateChange: function(date){
+	 	this.setState({dateOfBirth: date.toISOString()});
+	},
 	handleErrorMsgClose: function(){
     	this.setState({errorMsg: ""});
   	},
 	handleNoticeClose: function(){
 	   	this.setState({noticeTxt: ""});
 	},
-  	componentWillMount: function(){
-  		var me = this;
-  		riques( Query.getRolesQry,
-  		function(error, response, body){
-  			if (body.data) {
-            var here = me;
-            var roleList = me.state.roleList;
-            for (var i=1;i < body.data.viewer.allRoles.edges.length; i++) {
-            	var item = body.data.viewer.allRoles.edges[i];
-            	roleList.push(
-            		<div className="form-group" key={item.node.id}>
-            			<input type="checkbox" name="roles[]" value={item.node.id} onChange={here.handleRoleChange}/> 
-            			<label style={{marginLeft: 5}}>{item.node.name}</label>
-            		</div>);
-            }
-            here.setState({roleList: roleList});
+	componentWillMount: function(){
+		var me = this;
+		riques( Query.getRolesQry,
+		function(error, response, body){
+			if (body.data) {
+          var here = me;
+          var roleList = me.state.roleList;
+          for (var i=1;i < body.data.viewer.allRoles.edges.length; i++) {
+          	var item = body.data.viewer.allRoles.edges[i];
+          	roleList.push(
+          		<div className="form-group" key={item.node.id}>
+          			<input type="checkbox" name="roles[]" value={item.node.id} onChange={here.handleRoleChange}/> 
+          			<label style={{marginLeft: 5}}>{item.node.name}</label>
+          		</div>);
           }
-  		}
-  	  );
-  	},
-  	componentDidMount: function(){
-  		if (this.state.mode==="update") {
-	  		this.loadData();
-	  	}
+          here.setState({roleList: roleList});
+        }
+		}
+	  );
+	},
+	componentDidMount: function(){
 		require ('react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css');
-  	},
+		require ('react-datetime/css/react-datetime.css');
 
-  	resetForm: function(){
+		if (this.state.mode==="update") {
+  		this.loadData();
+  	}
+  },
+  resetForm: function(){
     document.getElementById("profileForm").reset();
     setValue("name", null);
     setValue("username", null);
@@ -338,11 +333,10 @@ var NewUser = React.createClass({
     setValue("new-password-2", null);
     
     window.history.pushState("", "", '/admin/users/new');
-  	},
-
-  	handleAddNewBtn: function(event) {
-    this.resetForm();
-  	},
+  },
+	handleAddNewBtn: function(event) {
+  	this.resetForm();
+	},
 	render: function(){
 		return (
 			<div className="content-wrapper">
@@ -413,10 +407,18 @@ var NewUser = React.createClass({
 								<div className="form-group">
 								  	<label htmlFor="dateOfBirth" className="col-md-3">Date of Birth</label>
 								  	<div className="col-md-9">
+<<<<<<< HEAD
 										<DatePicker id="datepicker" 
 										style={{width: "100%", padddingRight: 0, textAlign: "left"}} 
 										value={this.state.dateOfBirth.toISOString()} 
 										onChange={this.handleDateChange} />
+=======
+										<DateTime 
+											timeFormat={false} 
+											className="datetime-input" 
+											defaultValue={this.state.dateOfBirth}
+											onChange={this.handleBirthDateChange}/>
+>>>>>>> c926593d927434e208c9657ef31a4edefc9b1243
 									</div>
 								</div>
 
