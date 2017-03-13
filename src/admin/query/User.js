@@ -25,6 +25,7 @@ const getUserListQry = {
               fullName,
               gender,
               image,
+              country,
               lastLogin,
               dateOfBirth,
               posts {
@@ -70,6 +71,7 @@ const getUserListByTypeQry = function(type){
               fullName,
               gender,
               image,
+              country,
               lastLogin,
               dateOfBirth,
               posts {
@@ -96,7 +98,7 @@ const getUserListByTypeQry = function(type){
   }
 };
 
-const createUserMtn = function(username, password, email, fullname, gender, dateOfBirth) {
+const createUserMtn = function(username, password, email, fullname, gender, country, dateOfBirth) {
   return {
       "query": `mutation CreateUserQuery ($input: CreateUserInput!) {
         createUser(input: $input) {
@@ -108,6 +110,7 @@ const createUserMtn = function(username, password, email, fullname, gender, date
             gender
             email
             image
+            country
             dateOfBirth
             lastLogin
             createdAt
@@ -121,6 +124,7 @@ const createUserMtn = function(username, password, email, fullname, gender, date
           "password": password,
           "email": email,
           "gender": gender,
+          "country": country,
           "dateOfBirth" : dateOfBirth
         }
       }

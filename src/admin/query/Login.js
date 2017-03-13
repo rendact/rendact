@@ -9,6 +9,7 @@ const getLoginAuth0Mtn = function(identities, token, clientId){
               gender
               email
               image
+              country
               lastLogin
               createdAt
               meta { edges { node { id, item, value } }}
@@ -37,6 +38,7 @@ const loginUserQry = function(username, password){
             gender
             email
             image
+            country
             lastLogin
             createdAt
             meta { edges { node { id, item, value } }}

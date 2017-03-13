@@ -69,7 +69,7 @@ var NewUser = React.createClass({
 		setValue("email", v.email);
 		setValue("gender", v.gender);
 		setValue("bio", meta["bio"].node.value);
-		setValue("birth", v.dateOfBirth);
+		setValue("dateOfBirth", v.dateOfBirth);
 		setValue("phone", meta["phone"].node.value);
 		setValue("country", v.country);
 		setValue("timezone", meta["timezone"].node.value);
@@ -110,6 +110,7 @@ var NewUser = React.createClass({
 		var image = this.state.avatar;
 		var bio = getValue("bio");
 		//var birth = getValue("birth");
+		var dateOfBirth = this.state.dateOfBirth;
 		var phone = getValue("phone");
 		var country = getValue("country");
 		//var timezone = getValue("timezone");
@@ -138,7 +139,7 @@ var NewUser = React.createClass({
 	    }
 
 		this.setState({isSaving: true});
-		riques(Query.saveProfileMtn(localStorage.getItem("userId"), name, username, email, gender, image, country), 
+		riques(Query.saveProfileMtn(localStorage.getItem("userId"), name, username, email, gender, image, country, dateOfBirth), 
 			function(error, response, body){
 				if(!error && !body.errors) {
 					var p = body.data.updateUser.changedUser;
@@ -227,6 +228,9 @@ var NewUser = React.createClass({
 			document.getElementById("new-password").setAttribute("type","text")
 		else
 			document.getElementById("new-password").setAttribute("type","password")
+	},
+	handleDateChange: function(date){
+	    this.setState({immediatelyStatus: false, dateOfBirth: new Date(date)});
 	},
 	handleRoleChange: function(event){
 		var qry = '';
@@ -397,7 +401,7 @@ var NewUser = React.createClass({
 								</div>
 
 								<div className="form-group">
-								  	<label htmlFor="birth" className="col-md-3">Date of Birth</label>
+								  	<label htmlFor="dateOfBirth" className="col-md-3">Date of Birth</label>
 								  	<div className="col-md-9">
 										<DateTime 
 											timeFormat={false} 

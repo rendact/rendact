@@ -51,7 +51,7 @@ var Profile = React.createClass({
 		})
 	  
     var profile = {
-		  	name: p.fullName?p.fullName:p.username,
+		  name: p.fullName?p.fullName:p.username,
 	      username: p.username,
 	      email: p.email,
 	      gender: p.gender,
@@ -352,7 +352,7 @@ var Profile = React.createClass({
 								<div className="form-group">
 								  	<label htmlFor="country" className="col-md-3">Country</label>
 								  	<div className="col-md-9">
-								  	<CountrySelect id="country" name="country" defaultValue={p.country}/>
+								  		<CountrySelect id="country" name="country" defaultValue={p.country} required="true"/>
 									</div>
 								</div>
 

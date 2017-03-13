@@ -82,9 +82,7 @@ const ControlSidebar = React.createClass({
 
   handleCheckBox: function(){
     var checked = $("input.setting:checked");
-    if (checked){
-      alert("a");
-    }
+    
   },
 
   handleDataSkin: function(e){
@@ -510,6 +508,7 @@ const ControlSidebar = React.createClass({
                   <label className="control-sidebar-subheading">
                     Report panel usage
                     <input type="checkbox" className="pull-right setting" data-setting="report-panel-usage" onChange={this.handleSetting} />
+
                   </label>
 
                   <p>
