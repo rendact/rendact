@@ -79,7 +79,7 @@ var NewUser = React.createClass({
 
 		if (v.image) this.setState({avatar: v.image});
 		if (v.meta.edges.length>0){
-			var meta = v.meta.edges;
+			meta = v.meta.edges;
 			_.forEach(meta, function(item){
 				setValue(item.node.item, item.node.value);
 			});
@@ -108,7 +108,6 @@ var NewUser = React.createClass({
 		var gender = getValue("gender");
 		var image = this.state.avatar;
 		var bio = getValue("bio");
-		var roleId = getValue("role");
 		//var birth = getValue("birth");
 		var dateOfBirth = this.state.dateOfBirth;
 		var phone = getValue("phone");
@@ -247,7 +246,6 @@ var NewUser = React.createClass({
 	    this.setState({immediatelyStatus: false, dateOfBirth: new Date(date)});
 	},
 	handleRoleChange: function(event){
-		debugger;
 		var qry = '';
 		var roleId = event.target.value;
 		var checked = event.target.checked;
@@ -320,6 +318,30 @@ var NewUser = React.createClass({
 	  		this.loadData();
 	  	}
 		require ('react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css');
+  	},
+
+  	resetForm: function(){
+    document.getElementById("profileForm").reset();
+    setValue("name", null);
+    setValue("username", null);
+    setValue("email", null);
+    setValue("gender", null);
+    setValue("bio", null);
+    setValue("phone", null);
+    setValue("country", null);
+    setValue("website", null);
+    setValue("facebook", null);
+    setValue("twitter", null);
+    setValue("linkedin", null);
+    setValue("old-password", null);
+    setValue("new-password", null);
+    setValue("new-password-2", null);
+    
+    window.history.pushState("", "", '/admin/users/new');
+  	},
+
+  	handleAddNewBtn: function(event) {
+    this.resetForm();
   	},
 	render: function(){
 		return (

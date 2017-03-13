@@ -5,7 +5,7 @@ var CountrySelect = React.createClass({
 	render: function(){
 		return (
 			<select id={this.props.id} name={this.props.name} defaultValue={this.props.defaultValue}>
-				
+				<option value="">Choose country... </option>
 				<option value="Afghanistan">Afghanistan</option>
 				<option value="Åland Islands">Åland Islands</option>
 				<option value="Albania">Albania</option>

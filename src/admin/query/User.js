@@ -6,7 +6,7 @@ const getUserQry  = function(userId){
       "query": `{
         getUser(id: "`+userId+`"){
         id, username, fullName, gender, image, email, lastLogin, createdAt, country, dateOfBirth,
-        meta { edges { node { item, value } }} roles { edges { node { id, name } }}
+        meta { edges { node { id, item, value } }} roles { edges { node { id, name } }}
         }                                       
       }`
 

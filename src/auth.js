@@ -44,8 +44,10 @@ function AuthService(){
   var _setProfile = function(p) { 
     var meta = {}
     var metaList = Config.userMetaList;
+    var metaIdList = {};
     _.forEach(metaList, function(item){
       meta[item] = _.find(p.meta.edges, {"node": {"item": item}});
+      metaIdList[item] = meta[item]?meta[item].node.id:null;
     })
     
     var profile = {
@@ -69,7 +71,14 @@ function AuthService(){
     }
     localStorage.setItem("userId", p.id);
     localStorage.setItem('profile', JSON.stringify(profile));
+    localStorage.setItem('metaIdList', JSON.stringify(metaIdList));
     //console.log("set profile: "+JSON.stringify(profile));
+
+    if (meta["userPrefConfig"]){
+      _.forEach(JSON.parse(meta["userPrefConfig"].node.value), function(value, key){
+        localStorage.setItem(key, value);
+      });
+    }
   }
 
   this.checkAuth = function(cb){
