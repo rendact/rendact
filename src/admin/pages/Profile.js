@@ -1,14 +1,15 @@
 import React from 'react';
-import ReactPasswordStrength from 'react-password-strength';
-import Query from '../query';
-import Dropzone from 'react-dropzone';
-import Config from '../../config'
-import {riques, getValue, setValue} from '../../utils';
 import _ from 'lodash';
+import ReactPasswordStrength from 'react-password-strength';
+import Dropzone from 'react-dropzone';
 import { default as swal } from 'sweetalert2';
 import DateTime from 'react-datetime';
 import TimezonePicker from 'react-bootstrap-timezone-picker';
 import CountrySelect from '../lib/CountrySelect';
+
+import Query from '../query';
+import Config from '../../config'
+import {riques, getValue, setValue} from '../../utils';
 
 window.getBase64Image = function(img) {
   var canvas = document.createElement("canvas");
@@ -244,7 +245,7 @@ var Profile = React.createClass({
 		var dateOfBirth = null;
 		if (p.dateOfBirth) 
 			dateOfBirth = new Date(p.dateOfBirth)
-		
+
 		return (
 			<div className="content-wrapper">
 				<div className="container-fluid">
