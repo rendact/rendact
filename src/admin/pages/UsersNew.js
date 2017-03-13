@@ -314,6 +314,30 @@ var NewUser = React.createClass({
 	  	}
 		require ('react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css');
   	},
+
+  	resetForm: function(){
+    document.getElementById("profileForm").reset();
+    setValue("name", null);
+    setValue("username", null);
+    setValue("email", null);
+    setValue("gender", null);
+    setValue("bio", null);
+    setValue("phone", null);
+    setValue("country", null);
+    setValue("website", null);
+    setValue("facebook", null);
+    setValue("twitter", null);
+    setValue("linkedin", null);
+    setValue("old-password", null);
+    setValue("new-password", null);
+    setValue("new-password-2", null);
+    
+    window.history.pushState("", "", '/admin/users/new');
+  	},
+
+  	handleAddNewBtn: function(event) {
+    this.resetForm();
+  	},
 	render: function(){
 		return (
 			<div className="content-wrapper">
