@@ -61,22 +61,17 @@ var NewUser = React.createClass({
 	},
 	setFormValues: function(v){
 		var meta = {}
-		_.forEach(this.state.userMetaList, function(item){
-			meta[item] = _.find(v.meta.edges, {"node": {"item": item}});
-		})
 		setValue("name", v.fullName);
 		setValue("username", v.username);
 		setValue("email", v.email);
 		setValue("gender", v.gender);
-		setValue("bio", meta["bio"].node.value);
-		setValue("dateOfBirth", v.dateOfBirth);
-		setValue("phone", meta["phone"].node.value);
+		//setValue("dateOfBirth", v.dateOfBirth);
+		this.setState({dateOfBirth: v.dateOfBirth});
 		setValue("country", v.country);
-		setValue("timezone", meta["timezone"].node.value);
-		setValue("website", meta["website"].node.value);
-		setValue("facebook", meta["facebook"].node.value);
-		setValue("twitter", meta["twitter"].node.value);
-		setValue("linkedin", meta["linkedin"].node.value);
+		debugger;
+		_.forEach(this.state.userMetaList, function(item){
+			meta[item] = _.find(v.meta.edges, {"node": {"item": item}});
+		})
 
 		if (v.image) this.setState({avatar: v.image});
 		if (v.meta.edges.length>0){
@@ -168,12 +163,12 @@ var NewUser = React.createClass({
 		          		if (_.has(userMetaData0, item.node.item))
 		          			userMetaData.push({id: item.node.id, item: item.node.item, value: userMetaData0[item.node.item]});
 		          	});
-		          	qry = Query.saveUserMetaMtn(localStorage.getItem("userId"), userMetaData);
+		          	qry = Query.saveUserMetaMtn(p.id, userMetaData);
 		        } else {
 		          	_.forEach(userMetaData0, function(value, key){
 		          		userMetaData.push({item: key, value: value});
 		          	});
-		          	qry = Query.createUserMetaMtn(userMetaData);
+		          	qry = Query.createUserMetaMtn(p.id, userMetaData);
 		        }
 	          
 	          riques(qry, 
@@ -204,7 +199,7 @@ var NewUser = React.createClass({
 				//me.setState({isSaving: false});
 			}
 		);
-		
+		/*
 		// Change password
 		if (changePassword) {
 			var oldPassword = getValue("old-password");
@@ -234,6 +229,7 @@ var NewUser = React.createClass({
 				}
 			);
 		}
+		*/
 	},
 	handleGeneratePassword: function(event){
 		event.preventDefault();
