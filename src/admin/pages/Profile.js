@@ -73,10 +73,17 @@ var Profile = React.createClass({
 	  localStorage.setItem('profile', JSON.stringify(profile));
 	},
 	setUserMeta: function(metaList){
+		var me = this;
   		var profile = JSON.parse(localStorage.getItem("profile"));
 		_.forEach(this.state.userMetaList, function(item){
 			var i = _.find(metaList, {"item": item});
-			profile[i.item] = i?i.value:"";
+			if (i){
+				if (item==="timezone"){
+					me.setState({timezone: i.value});
+				} else {
+					profile[i.item] = i.value;
+				}
+			}
 		})
   		localStorage.setItem('profile', JSON.stringify(profile));
 	},
@@ -103,24 +110,24 @@ var Profile = React.createClass({
 		// Change password
 		var oldPassword = getValue("old-password");
 		var password = getValue("new-password");
-	    var repassword = getValue("new-password-2");
-	    var changePassword = false;
+    var repassword = getValue("new-password-2");
+    var changePassword = false;
 
-	    if (password) {
-	    	if (!oldPassword) {
-	    		this.setState({errorMsg: "Please fill your old password"});
-		    	return;
-	    	}
-	    	if (password!==repassword) {
-		    	this.setState({errorMsg: "Password is not match"});
-		    	return;
-		    }
-		    changePassword = true;
+    if (password) {
+    	if (!oldPassword) {
+    		this.setState({errorMsg: "Please fill your old password"});
+	    	return;
+    	}
+    	if (password!==repassword) {
+	    	this.setState({errorMsg: "Password is not match"});
+	    	return;
 	    }
+	    changePassword = true;
+    }
 
 		this.setState({isSaving: true});
 
-		riques(Query.saveProfileMtn(localStorage.getItem("userId"), name, username, email, gender, image, country, dateOfBirth), 
+		riques(Query.saveProfileMtn(localStorage.getItem("userId"), name, gender, image, country, dateOfBirth), 
 			function(error, response, body){
 				if(!error && !body.errors) {
 					var p = body.data.updateUser.changedUser;
