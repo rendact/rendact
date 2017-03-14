@@ -49,6 +49,11 @@ function AuthService(){
       meta[item] = _.find(p.meta.edges, {"node": {"item": item}});
       metaIdList[item] = meta[item]?meta[item].node.id:null;
     })
+
+    var roleList = [];
+    _.forEach(p.roles.edges, function(item){
+      roleList.push(item.name)
+    })
     
     var profile = {
         name: p.fullName?p.fullName:p.username,
@@ -67,8 +72,10 @@ function AuthService(){
         facebook: meta["facebook"]?meta["facebook"].node.value:"",
         twitter: meta["twitter"]?meta["twitter"].node.value:"",
         linkedin: meta["linkedin"]?meta["linkedin"].node.value:"",
-        userPrefConfig: meta["userPrefConfig"]?meta["userPrefConfig"].node.value:""
+        userPrefConfig: meta["userPrefConfig"]?meta["userPrefConfig"].node.value:"",
+        roles: roleList
     }
+    
     localStorage.setItem("userId", p.id);
     localStorage.setItem('profile', JSON.stringify(profile));
     localStorage.setItem('metaIdList', JSON.stringify(metaIdList));
