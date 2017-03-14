@@ -100,7 +100,7 @@ const Pages = React.createClass({
     this.setState({loadingMsg: state?(this.notification.addNotification({
       message: 'Processing...',
       level: 'warning',
-      position: 'tc',
+      position: 'tl',
       autoDismiss: 2
     })):null});
     if (!state) {
