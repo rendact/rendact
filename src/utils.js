@@ -16,11 +16,15 @@ const riques = function(query, callback){
 }
 
 const setValue = function(element, value) {
-	document.getElementById(element).value = value;
+  if (document.getElementById(element))
+	 document.getElementById(element).value = value;
 }
 
 let getValue = function(element) {
-	return document.getElementById(element).value;
+  if (document.getElementById(element))
+	  return document.getElementById(element).value;
+  else 
+    return null;
 }
 
 let getValueName = function(element){

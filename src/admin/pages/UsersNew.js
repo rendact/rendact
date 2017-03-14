@@ -61,6 +61,7 @@ var NewUser = React.createClass({
 	},
 	setFormValues: function(v){
 		var meta = {}
+		var me = this;
 		setValue("name", v.fullName);
 		setValue("username", v.username);
 		setValue("email", v.email);
@@ -68,7 +69,7 @@ var NewUser = React.createClass({
 		//setValue("dateOfBirth", v.dateOfBirth);
 		this.setState({dateOfBirth: v.dateOfBirth});
 		setValue("country", v.country);
-		debugger;
+
 		_.forEach(this.state.userMetaList, function(item){
 			meta[item] = _.find(v.meta.edges, {"node": {"item": item}});
 		})
@@ -77,7 +78,11 @@ var NewUser = React.createClass({
 		if (v.meta.edges.length>0){
 			meta = v.meta.edges;
 			_.forEach(meta, function(item){
-				setValue(item.node.item, item.node.value);
+				if (item.node.item==="timezone")
+					me.setState({timezone: item.node.value})
+				else {
+					setValue(item.node.item, item.node.value);
+				}
 			});
 		}
 		
@@ -115,6 +120,21 @@ var NewUser = React.createClass({
 		var twitter = getValue("twitter");
 		var linkedin = getValue("linkedin");
 		var password = getValue("new-password");
+		var oldPassword = getValue("old-password");
+    var repassword = getValue("new-password-2");
+    var changePassword = false;
+
+  	if (password) {
+    	if (!oldPassword) {
+    		this.setState({errorMsg: "Please fill your old password"});
+	    	return;
+    	}
+    	if (password!==repassword) {
+	    	this.setState({errorMsg: "Password is not match"});
+	    	return;
+	    }
+	    changePassword = true;
+    }
 
 		this.setState({isSaving: true});
 
@@ -122,6 +142,10 @@ var NewUser = React.createClass({
 		if (this.state.mode==="update"){
 			qry = Query.saveProfileMtn(localStorage.getItem("userId"), name, username, email, gender, image, country, dateOfBirth);
 		} else {
+			if (!password) {
+    		this.setState({errorMsg: "Please fill your old password"});
+	    	return;
+    	}
 			qry = Query.createUserMtn(username, password, email, name, gender, country, dateOfBirth)
 		}
 		
@@ -199,26 +223,9 @@ var NewUser = React.createClass({
 				//me.setState({isSaving: false});
 			}
 		);
-		/*
+		
 		// Change password
 		if (changePassword) {
-			var oldPassword = getValue("old-password");
-	    var repassword = getValue("new-password-2");
-	    var changePassword = false;
-
-	  	if (password) {
-	    	if (!oldPassword) {
-	    		this.setState({errorMsg: "Please fill your old password"});
-		    	return;
-	    	}
-	    	if (password!==repassword) {
-		    	this.setState({errorMsg: "Password is not match"});
-		    	return;
-		    }
-		    changePassword = true;
-	    }
-
-
 			riques(Query.changePasswordMtn(oldPassword, password), 
 				function(error, response, body){
 					if(!error && !body.errors) {
@@ -229,7 +236,6 @@ var NewUser = React.createClass({
 				}
 			);
 		}
-		*/
 	},
 	handleGeneratePassword: function(event){
 		event.preventDefault();
@@ -294,10 +300,10 @@ var NewUser = React.createClass({
 	 	this.setState({dateOfBirth: date.toISOString()});
 	},
 	handleErrorMsgClose: function(){
-    	this.setState({errorMsg: ""});
+    	this.setState({errorMsg: "", isSaving: false});
   	},
 	handleNoticeClose: function(){
-	   	this.setState({noticeTxt: ""});
+	   	this.setState({noticeTxt: "", isSaving: false});
 	},
 	componentWillMount: function(){
 		var me = this;
@@ -512,14 +518,14 @@ var NewUser = React.createClass({
 								}
 
 								{ this.state.mode==="update" &&
-								 [<h4 style={{marginBottom: 20}}>Role and password</h4>,
-									<div className="form-group">
+								 [<h4 key="1" style={{marginBottom: 20}}>Role and password</h4>,
+									<div key="2" className="form-group">
 									 	<label htmlFor="homeUrl" className="col-md-3">Role</label>
 									 	<div className="col-md-9">
 											{this.state.roleList}
 										</div>
 									</div>,
-									<div className="form-group">
+									<div key="3" className="form-group">
 									 	<label htmlFor="old-password" className="col-md-3">Old password</label>
 									 	<div className="col-md-9">
 											<input type="password" name="old-password" id="old-password" className="form-control" style={{width:200}}/>
@@ -558,7 +564,7 @@ var NewUser = React.createClass({
 								<div className="form-group">
 									<div className="col-md-9">
 										<div className="btn-group">
-											<input type="submit" value={this.state.mode==="update"?"Save":"Add"} className="btn btn-primary btn-sm" />
+											<input type="submit" value={this.state.mode==="update"?"Update User":"Add User"} className="btn btn-primary btn-sm" />
 										</div>
 										{ this.state.isSaving &&
 											<p>Saving...</p>
