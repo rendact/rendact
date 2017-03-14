@@ -114,6 +114,23 @@ const createUserMtn = function(username, password, email, fullname, gender, coun
             dateOfBirth
             lastLogin
             createdAt
+            meta {
+              edges {
+                node {
+                  id
+                  item 
+                  value
+                }
+              }
+            }
+            roles {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
           }
         }
       }`,
@@ -132,7 +149,7 @@ const createUserMtn = function(username, password, email, fullname, gender, coun
     }
 }
 
-const saveProfileMtn = function(userId, name, username, email, gender, image, country, dateOfBirth){
+const saveProfileMtn = function(userId, name, gender, image, country, dateOfBirth){
   return {
     "query": `mutation UpdateUserQuery ($input: UpdateUserInput!) {
         updateUser(input: $input) {
@@ -170,9 +187,7 @@ const saveProfileMtn = function(userId, name, username, email, gender, image, co
       "variables": {
         "input": {
           "id": userId,
-          "username": username,
           "fullName": name,
-          "email": email,
           "gender": gender,
           "image": image,
           "country": country,

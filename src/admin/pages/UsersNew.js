@@ -61,28 +61,28 @@ var NewUser = React.createClass({
 	},
 	setFormValues: function(v){
 		var meta = {}
-		_.forEach(this.state.userMetaList, function(item){
-			meta[item] = _.find(v.meta.edges, {"node": {"item": item}});
-		})
+		var me = this;
 		setValue("name", v.fullName);
 		setValue("username", v.username);
 		setValue("email", v.email);
 		setValue("gender", v.gender);
-		setValue("bio", meta["bio"].node.value);
-		setValue("dateOfBirth", v.dateOfBirth);
-		setValue("phone", meta["phone"].node.value);
+		//setValue("dateOfBirth", v.dateOfBirth);
+		this.setState({dateOfBirth: v.dateOfBirth});
 		setValue("country", v.country);
-		setValue("timezone", meta["timezone"].node.value);
-		setValue("website", meta["website"].node.value);
-		setValue("facebook", meta["facebook"].node.value);
-		setValue("twitter", meta["twitter"].node.value);
-		setValue("linkedin", meta["linkedin"].node.value);
+
+		_.forEach(this.state.userMetaList, function(item){
+			meta[item] = _.find(v.meta.edges, {"node": {"item": item}});
+		})
 
 		if (v.image) this.setState({avatar: v.image});
 		if (v.meta.edges.length>0){
 			meta = v.meta.edges;
 			_.forEach(meta, function(item){
-				setValue(item.node.item, item.node.value);
+				if (item.node.item==="timezone")
+					me.setState({timezone: item.node.value})
+				else {
+					setValue(item.node.item, item.node.value);
+				}
 			});
 		}
 		
@@ -119,38 +119,56 @@ var NewUser = React.createClass({
 		var facebook = getValue("facebook");
 		var twitter = getValue("twitter");
 		var linkedin = getValue("linkedin");
-
-		// Change password
-		var oldPassword = getValue("old-password");
 		var password = getValue("new-password");
-	    var repassword = getValue("new-password-2");
-	    var changePassword = false;
+		var oldPassword = getValue("old-password");
+    var repassword = getValue("new-password-2");
+    var changePassword = false;
 
-    	if (password) {
-	    	if (!oldPassword) {
-	    		this.setState({errorMsg: "Please fill your old password"});
-		    	return;
-	    	}
-	    	if (password!==repassword) {
-		    	this.setState({errorMsg: "Password is not match"});
-		    	return;
-		    }
-		    changePassword = true;
+  	if (password) {
+    	if (!oldPassword) {
+    		this.setState({errorMsg: "Please fill your old password"});
+	    	return;
+    	}
+    	if (password!==repassword) {
+	    	this.setState({errorMsg: "Password is not match"});
+	    	return;
 	    }
+	    changePassword = true;
+    }
 
 		this.setState({isSaving: true});
-		riques(Query.saveProfileMtn(localStorage.getItem("userId"), name, username, email, gender, image, country, dateOfBirth), 
+
+		var qry = '';
+		if (this.state.mode==="update"){
+			qry = Query.saveProfileMtn(this.props.userId, name, gender, image, country, dateOfBirth);
+		} else {
+			if (!password) {
+    		this.setState({errorMsg: "Please fill your old password"});
+	    	return;
+    	}
+			qry = Query.createUserMtn(username, password, email, name, gender, country, dateOfBirth)
+		}
+		
+		riques(qry, 
 			function(error, response, body){
 				if(!error && !body.errors) {
-					var p = body.data.updateUser.changedUser;
-					me.setState({avatar: p.image})
-	        me.setProfile(p);
+					var p;
+
+					if (me.state.mode==="update")
+						p = body.data.updateUser.changedUser;
+					else
+						p =body.data.createUser.changedUser;
+					//me.setState({avatar: p.image})
+	        //me.setProfile(p);
 	        var here = me;
 
 	        var isMetaEmpty = (bio+website+facebook+twitter+linkedin+timezone+phone)==='';
 
           if (isMetaEmpty) {
-          	me.setState({isSaving: false});
+          	if (me.state.mode==="create")
+          		me.resetForm();
+          	else
+          		me.setState({isSaving: false})
           }	else {
 		        var userMetaData0 = {
 		          	"bio": bio,
@@ -169,12 +187,12 @@ var NewUser = React.createClass({
 		          		if (_.has(userMetaData0, item.node.item))
 		          			userMetaData.push({id: item.node.id, item: item.node.item, value: userMetaData0[item.node.item]});
 		          	});
-		          	qry = Query.saveUserMetaMtn(localStorage.getItem("userId"), userMetaData);
+		          	qry = Query.saveUserMetaMtn(p.id, userMetaData);
 		        } else {
 		          	_.forEach(userMetaData0, function(value, key){
 		          		userMetaData.push({item: key, value: value});
 		          	});
-		          	qry = Query.createUserMetaMtn(userMetaData);
+		          	qry = Query.createUserMetaMtn(p.id, userMetaData);
 		        }
 	          
 	          riques(qry, 
@@ -186,13 +204,16 @@ var NewUser = React.createClass({
 									});
 									
 									if (metaList.length>0) {
-										here.setUserMeta(metaList);
+										//here.setUserMeta(metaList);
 										here.setState({noticeTxt: "Profile saved"});
 									}
 								} else {
 									errorCallback(error, body.errors?body.errors[0].message:null);
 								}
-								here.setState({isSaving: false});
+								if (here.state.mode==="create")
+		          		here.resetForm();
+		          	else
+		          		here.setState({isSaving: false})
 							}
 						);
 	        }
@@ -203,6 +224,7 @@ var NewUser = React.createClass({
 			}
 		);
 		
+		// Change password
 		if (changePassword) {
 			riques(Query.changePasswordMtn(oldPassword, password), 
 				function(error, response, body){
@@ -278,10 +300,10 @@ var NewUser = React.createClass({
 	 	this.setState({dateOfBirth: date.toISOString()});
 	},
 	handleErrorMsgClose: function(){
-    	this.setState({errorMsg: ""});
+    	this.setState({errorMsg: "", isSaving: false});
   	},
 	handleNoticeClose: function(){
-	   	this.setState({noticeTxt: ""});
+	   	this.setState({noticeTxt: "", isSaving: false});
 	},
 	componentWillMount: function(){
 		var me = this;
@@ -423,14 +445,15 @@ var NewUser = React.createClass({
 					  			<div className="form-group">
 								  	<label htmlFor="keywoards" className="col-md-3">Email</label>
 								  	<div className="col-md-9">
-										<input type="text" name="email" id="email" className="form-control" disabled={this.state.mode==="update"?true:false}/>
+										<input type="text" name="email" id="email" className="form-control" 
+											disabled={this.state.mode==="update"?true:false} required="true"/>
 									</div>
 								</div>
 
 								<div className="form-group">
 								  	<label htmlFor="phone" className="col-md-3">Phone</label>
 								  	<div className="col-md-9">
-										<input type="text" name="phone" id="phone" className="form-control" required="true" />
+										<input type="text" name="phone" id="phone" className="form-control" />
 									</div>
 								</div>
 
@@ -444,7 +467,7 @@ var NewUser = React.createClass({
 								<div className="form-group">
 								  	<label htmlFor="country" className="col-md-3">Country</label>
 								  	<div className="col-md-9">
-								  	<CountrySelect id="country" name="country" required="true"/>
+								  	<CountrySelect id="country" name="country" />
 									</div>
 								</div>
 
@@ -464,55 +487,55 @@ var NewUser = React.createClass({
 								<div className="form-group">
 								  	<label htmlFor="website" className="col-md-3">Website</label>
 								  	<div className="col-md-9">
-										<input type="text" name="website" id="website" className="form-control" required="true" />
+										<input type="text" name="website" id="website" className="form-control" />
 									</div>
 								</div>
 
 								<div className="form-group">
 								  	<label htmlFor="facebook" className="col-md-3">Facebook Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="facebook" id="facebook" className="form-control" required="true" />
+										<input type="text" name="facebook" id="facebook" className="form-control" />
 									</div>
 								</div>
 
 								<div className="form-group">
 								  	<label htmlFor="twitter" className="col-md-3">Twitter Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="twitter" id="twitter" className="form-control" required="true" />
+										<input type="text" name="twitter" id="twitter" className="form-control" />
 									</div>
 								</div>
 
 								<div className="form-group">
 								  	<label htmlFor="linkedin" className="col-md-3">Linkedin Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="linkedin" id="linkedin" className="form-control" required="true" />
+										<input type="text" name="linkedin" id="linkedin" className="form-control" />
 									</div>
 								</div>
 
 								{ this.state.mode==="create" &&
-								 (<h4 style={{marginBottom: 20}}>Password</h4>)
+								 ( <h4 style={{marginBottom: 20}}>Password</h4>
+								 )
 								}
 
 								{ this.state.mode==="update" &&
-								 [<h4 style={{marginBottom: 20}}>Role and password</h4>,
-									<div className="form-group">
+								 [<h4 key="1" style={{marginBottom: 20}}>Role and password</h4>,
+									<div key="2" className="form-group">
 									 	<label htmlFor="homeUrl" className="col-md-3">Role</label>
 									 	<div className="col-md-9">
 											{this.state.roleList}
+										</div>
+									</div>,
+									<div key="3" className="form-group">
+									 	<label htmlFor="old-password" className="col-md-3">Old password</label>
+									 	<div className="col-md-9">
+											<input type="password" name="old-password" id="old-password" className="form-control" style={{width:200}}/>
 										</div>
 									</div>
 									]
 								}
 
 								<div className="form-group">
-								 	<label htmlFor="old-password" className="col-md-3">Old password</label>
-								 	<div className="col-md-9">
-										<input type="password" name="old-password" id="old-password" className="form-control" style={{width:200}}/>
-									</div>
-								</div>
-
-								<div className="form-group">
-								 	<label htmlFor="new-password" className="col-md-3">New password</label>
+								 	<label htmlFor="new-password" className="col-md-3">Password</label>
 								 	<div className="col-md-9">
 								 			<ReactPasswordStrength
 											  className="passwordTester"
@@ -532,7 +555,7 @@ var NewUser = React.createClass({
 								</div>
 
 								<div className="form-group">
-								 	<label htmlFor="new-password-2" className="col-md-3">Re-type new password</label>
+								 	<label htmlFor="new-password-2" className="col-md-3">Re-type password</label>
 								 	<div className="col-md-9">
 										<input type="password" name="new-password-2" id="new-password-2" className="form-control" style={{width:200}} disabled={!this.state.passwordActive}/>
 									</div>
@@ -541,7 +564,7 @@ var NewUser = React.createClass({
 								<div className="form-group">
 									<div className="col-md-9">
 										<div className="btn-group">
-											<input type="submit" value={this.state.mode==="update"?"Save":"Add"} className="btn btn-primary btn-sm" />
+											<input type="submit" value={this.state.mode==="update"?"Update User":"Add User"} className="btn btn-primary btn-sm" />
 										</div>
 										{ this.state.isSaving &&
 											<p>Saving...</p>
