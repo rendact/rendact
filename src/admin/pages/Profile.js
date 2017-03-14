@@ -29,6 +29,11 @@ const errorCallback = function(msg1, msg2){
 
 var Profile = React.createClass({
 	getInitialState: function(){
+		var p = JSON.parse(localStorage.getItem("profile"));
+		var dateOfBirth = "";
+		if (p.dateOfBirth && p.dateOfBirth!=="") 
+			dateOfBirth = new Date(p.dateOfBirth)
+
 		var image = Config.rootUrl+"/images/avatar-default.png";
 		if (JSON.parse(localStorage.getItem("profile")).image)
 			image = JSON.parse(localStorage.getItem("profile")).image;
@@ -39,9 +44,9 @@ var Profile = React.createClass({
 			avatar: image,
 			passwordActive: false,
 			userMetaList: Config.userMetaList,
-			timezone: "",
+			timezone: p.timezone,
 			country: "",
-			dateOfBirth: ""
+			dateOfBirth: dateOfBirth
 		}
 	},
 	setProfile: function(p) {
@@ -223,7 +228,10 @@ var Profile = React.createClass({
 	 	this.setState({dateOfBirth: date.toISOString()});
 	},
 	handleErrorMsgClose: function(){
-	    this.setState({errorMsg: ""});
+    	this.setState({errorMsg: "", isSaving: false});
+  	},
+	handleNoticeClose: function(){
+	   	this.setState({noticeTxt: "", isSaving: false});
 	},
 	handleGeneratePassword: function(event){
 		event.preventDefault();
@@ -266,7 +274,7 @@ var Profile = React.createClass({
 			      </ol>
 			    </section>
 
-		  { this.state.errorMsg &&
+		  		{ this.state.errorMsg &&
             <div className="alert alert-danger alert-dismissible">
               <button type="button" className="close" onClick={this.handleErrorMsgClose}>×</button>
               {this.state.errorMsg}

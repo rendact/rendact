@@ -67,24 +67,37 @@ var NewUser = React.createClass({
 		setValue("email", v.email);
 		setValue("gender", v.gender);
 		//setValue("dateOfBirth", v.dateOfBirth);
-		this.setState({dateOfBirth: v.dateOfBirth});
+		var dateOfBirth = "";
+		if (v.dateOfBirth && v.dateOfBirth!=="") 
+			dateOfBirth = new Date(v.dateOfBirth)
+		
+		this.setState({dateOfBirth: dateOfBirth});
 		setValue("country", v.country);
 
 		_.forEach(this.state.userMetaList, function(item){
-			meta[item] = _.find(v.meta.edges, {"node": {"item": item}});
+			var i = _.find(v.meta.edges, {"node": {"item": item}});
+			if (i){
+				if (item==="timezone"){
+					me.setState({timezone: i.node.value});
+				} else {
+					setValue(i.node.item, i.node.value);
+				}
+			}
 		})
 
 		if (v.image) this.setState({avatar: v.image});
+		/*
 		if (v.meta.edges.length>0){
 			meta = v.meta.edges;
 			_.forEach(meta, function(item){
-				if (item.node.item==="timezone")
+				if (item.node.item==="timezone"){
 					me.setState({timezone: item.node.value})
-				else {
+				} else {
 					setValue(item.node.item, item.node.value);
 				}
 			});
 		}
+		*/
 		
 		if (v.roles.edges.length>0){
 			var roles = _.map(v.roles.edges, function(item){
@@ -252,7 +265,7 @@ var NewUser = React.createClass({
 			document.getElementById("new-password").setAttribute("type","password")
 	},
 	handleDateChange: function(date){
-	    this.setState({immediatelyStatus: false, dateOfBirth: new Date(date)});
+	    this.setState({dateOfBirth: new Date(date)});
 	},
 	handleRoleChange: function(event){
 		var qry = '';
@@ -297,7 +310,7 @@ var NewUser = React.createClass({
 		}
 	},
 	handleBirthDateChange: function(date){
-	 	this.setState({dateOfBirth: date.toISOString()});
+	 	this.setState({dateOfBirth: date});
 	},
 	handleErrorMsgClose: function(){
     	this.setState({errorMsg: "", isSaving: false});
@@ -403,7 +416,7 @@ var NewUser = React.createClass({
 							  	<div className="col-md-9">
 									<Dropzone onDrop={this.handleImageDrop}>
 										<div className="avatar-container">
-				              			  <img src={this.state.avatar} alt='' id="avatar"/> 
+				             	<img src={this.state.avatar} alt='' id="avatar"/> 
 										  <div className="avatar-overlay"></div>
 										  <div className="avatar-button"><a href="#"> Change </a></div>
 										</div>
@@ -426,7 +439,7 @@ var NewUser = React.createClass({
 										<DateTime 
 											timeFormat={false} 
 											className="datetime-input" 
-											defaultValue={this.state.dateOfBirth}
+											value={this.state.dateOfBirth}
 											onChange={this.handleBirthDateChange}/>
 									</div>
 								</div>
@@ -478,6 +491,7 @@ var NewUser = React.createClass({
 										  absolute={true}
 										  style={{width: 300}}
 										  placeholder="Select timezone..."
+										  value={this.state.timezone}
 										  onChange={this.handleTimezoneChange}
 										/>
 									</div>
