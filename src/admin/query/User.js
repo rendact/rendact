@@ -114,6 +114,23 @@ const createUserMtn = function(username, password, email, fullname, gender, coun
             dateOfBirth
             lastLogin
             createdAt
+            meta {
+              edges {
+                node {
+                  id
+                  item 
+                  value
+                }
+              }
+            }
+            roles {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
           }
         }
       }`,
