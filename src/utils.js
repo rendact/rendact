@@ -1,15 +1,19 @@
 import request from 'request';
 import Config from './config';
 
-const riques = function(query, callback){
+const riques = function(query, callback, isadmin){
+  var token = localStorage.getItem("token");
+  if (isadmin){
+    token = Config.adminToken
+  }
+  
 	request({
       url: Config.scapholdUrl,
       method: "POST",
       json: true,
       headers: {
         "content-type": "application/json",
-        "Authorization": "Bearer " + localStorage.token
-        //"Authorization": "Bearer " + Config.adminToken
+        "Authorization": "Bearer " + token
       },
       body: query
     }, callback);

@@ -43,7 +43,8 @@ var NewUser = React.createClass({
 			userMetaList: Config.userMetaList,
 			timezone: "",
 			country: "",
-			dateOfBirth: ""
+			dateOfBirth: "",
+			isAdmin: false
 		}
 	},
 	loadData: function(){
@@ -86,18 +87,6 @@ var NewUser = React.createClass({
 		})
 
 		if (v.image) this.setState({avatar: v.image});
-		/*
-		if (v.meta.edges.length>0){
-			meta = v.meta.edges;
-			_.forEach(meta, function(item){
-				if (item.node.item==="timezone"){
-					me.setState({timezone: item.node.value})
-				} else {
-					setValue(item.node.item, item.node.value);
-				}
-			});
-		}
-		*/
 		
 		if (v.roles.edges.length>0){
 			var roles = _.map(v.roles.edges, function(item){
@@ -111,6 +100,12 @@ var NewUser = React.createClass({
 				}
 			});
 		}
+
+		var p = JSON.parse(localStorage.getItem("profile"));
+
+		var isAdmin = (_.indexOf(p.roles, "Administrator") > -1);
+		this.setState({isAdmin: isAdmin});
+		_.forEach(document.getElementsByTagName('roles[]'), function(el){ el.disabled = !isAdmin;})
 	},
 	handleSubmitBtn: function(event){
 		event.preventDefault();
@@ -278,6 +273,7 @@ var NewUser = React.createClass({
 			qry = Query.deleteRoleUser(this.props.userId, roleId);	
 		}
 		var me = this;
+		
     riques(qry, 
 			function(error, response, body){
 				if(!error && !body.errors) {
@@ -286,7 +282,7 @@ var NewUser = React.createClass({
 					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
 				me.setState({isSaving: false});
-			}
+			}, this.state.isAdmin
 		);
 	},
 	handleImageDrop: function(accepted){

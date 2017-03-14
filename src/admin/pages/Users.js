@@ -50,7 +50,7 @@ const Users = React.createClass({
                 roles = _.join(
                   _.map(item.node.roles.edges, function(item){
                     return item.node.name;
-                  }), " ,");
+                  }), "<br/>");
               }
               if (type==="No Role"){
                 if (rolesLen>0) return;
