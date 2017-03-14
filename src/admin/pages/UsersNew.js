@@ -140,7 +140,7 @@ var NewUser = React.createClass({
 
 		var qry = '';
 		if (this.state.mode==="update"){
-			qry = Query.saveProfileMtn(localStorage.getItem("userId"), name, username, email, gender, image, country, dateOfBirth);
+			qry = Query.saveProfileMtn(this.props.userId, name, gender, image, country, dateOfBirth);
 		} else {
 			if (!password) {
     		this.setState({errorMsg: "Please fill your old password"});
