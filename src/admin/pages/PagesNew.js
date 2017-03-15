@@ -8,6 +8,7 @@ import {riques, setValue, getValue} from '../../utils';
 import {getTemplates} from '../theme';
 import { default as swal } from 'sweetalert2';
 import DatePicker from 'react-bootstrap-date-picker';
+import Notification from 'react-notification-system';
 
 const errorCallback = function(msg1, msg2){
   if (msg1) swal('Failed!', msg1, 'warning')
@@ -20,7 +21,6 @@ const NewPage = React.createClass({
     return {
       noticeTxt: null,
       loadingMsg: null,
-      errorMsg:null,
       title:"",
       slug:"",
       content:"",
@@ -57,6 +57,8 @@ const NewPage = React.createClass({
     if (this.state.visibilityTxt==="Public") {
       $("#public").attr("checked", true);
     }else $("#private").attr("checked", true);
+
+    this.notification = this.refs.notificationSystem;
 
   },
   checkSlug: function(slug){
@@ -98,12 +100,22 @@ const NewPage = React.createClass({
     var v = this.getFormValues();
 
     if (v.title.length<=3) {
-      this.setState({errorMsg: "Title is to short!"});
+      this.notification.addNotification({
+      title: 'Error',
+      message: 'Title is too short',
+      level: 'error',
+      position: 'tc'
+    });
       return;
     }
 
     if (!v.content) {
-      this.setState({errorMsg: "Content can't be empty"});
+      this.notification.addNotification({
+      title: 'Error',
+      message: "Content can't be empty",
+      level: 'error',
+      position: 'tc'
+    });
       return;
     }
     
@@ -111,11 +123,21 @@ const NewPage = React.createClass({
     if (this.state.mode==="create"){
       qry = Query.getCreatePageQry(v.title, v.content, "Draft", v.visibility, v.passwordPage, v.publishDate, 
         localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder, v.type);
-      noticeTxt = "Page Published!";
+      noticeTxt = this.notification.addNotification({
+      title: 'Notice',
+      message: 'Page Published!',
+      level: 'success',
+      position: 'tc'
+    });
     }else{
       qry = Query.getUpdatePageQry(this.props.postId, v.title, v.content, "Draft", v.visibility, v.passwordPage, 
         v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder);
-      noticeTxt = "Page Updated!";
+      noticeTxt = this.notification.addNotification({
+      title: 'Notice',
+      message: 'Page Updated!',
+      level: 'success',
+      position: 'tc'
+    });
     }
 
     riques(qry, 
@@ -165,13 +187,19 @@ const NewPage = React.createClass({
     _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
     _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;})
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.setState({loadingMsg: state?"Processing...":null});
+    this.setState({loadingMsg: state?(
+      this.notification.addNotification({
+      message: 'Processing...',
+      level: 'warning',
+      position: 'tl',
+      autoDismiss: 1
+    }))
+    :null});
   },
   resetForm: function(){
     document.getElementById("pageForm").reset();
     window.CKEDITOR.instances['content'].setData(null);
     this.setState({
-      noticeTxt: null, loadingMsg: null, errorMsg:null,
       title:"", slug:"", content:"", summary:"", parent:"",
       status:"Draft", immediately:"", immediatelyStatus:true, visibilityTxt:"Public", publishDate: new Date(),
       permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160});
@@ -279,12 +307,7 @@ const NewPage = React.createClass({
     var metaDescription = $("#metaDescription").val();
     this.setState({metaDescriptionLeftCharacter: 160-(metaDescription.length)});
   },
-  handleErrorMsgClose: function(){
-    this.setState({errorMsg: ""});
-  },
-  handleNoticeClose: function(){
-    this.setState({noticeTxt: ""});
-  },
+
   handleDateChange: function(date){
     this.setState({immediatelyStatus: false, publishDate: new Date(date)});
   },
@@ -306,12 +329,22 @@ const NewPage = React.createClass({
     var v = this.getFormValues();
 
     if (v.title.length<=3) {
-      this.setState({errorMsg: "Title is to short!"});
+      this.notification.addNotification({
+      title: 'Error',
+      message: 'Title is too short',
+      level: 'error',
+      position: 'tc'
+    });
       return;
     }
 
     if (!v.content) {
-      this.setState({errorMsg: "Content can't be empty"});
+      this.notification.addNotification({
+      title: 'Error',
+      message: "Content can't be empty",
+      level: 'error',
+      position: 'tc'
+    });
       return;
     }
 
@@ -320,11 +353,21 @@ const NewPage = React.createClass({
     if (this.state.mode==="create"){
       qry = Query.getCreatePageQry(v.title, v.content, v.status, v.visibility, v.passwordPage, v.publishDate, 
         localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder, v.type);
-      noticeTxt = "Page Published!";
+      noticeTxt = this.notification.addNotification({
+      title: 'Notice',
+      message: 'Page Published!',
+      level: 'success',
+      position: 'tc'
+    });
     }else{
       qry = Query.getUpdatePageQry(this.props.postId, v.title, v.content, v.status, v.visibility, v.passwordPage, 
         v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder);
-      noticeTxt = "Page Updated!";
+      noticeTxt = this.notification.addNotification({
+      title: 'Notice',
+      message: 'Page Updated!',
+      level: 'success',
+      position: 'tc'
+    });
     }
 
     riques(qry, 
@@ -422,18 +465,8 @@ const NewPage = React.createClass({
                 </ol>
                
           </section>
-          { this.state.errorMsg &&
-            <div className="alert alert-danger alert-dismissible">
-              <button type="button" className="close" onClick={this.handleErrorMsgClose}>×</button>
-              {this.state.errorMsg}
-            </div>
-          }
-          { this.state.noticeTxt &&
-            <div className="alert alert-info alert-dismissible" id="publishedNotice">
-              <button type="button" className="close" onClick={this.handleNoticeClose}>×</button>
-              {this.state.noticeTxt}
-            </div>
-          }
+          <Notification ref="notificationSystem" />
+
           <form onSubmit={this.handleSubmit} id="pageForm" method="get">
           <div className="col-md-8">
             <div className="form-group"  style={{marginBottom:30}}>
@@ -627,7 +660,6 @@ const NewPage = React.createClass({
                               <li><button onClick={this.saveDraftBtn} className="btn btn-default btn-flat">{this.state.status==="Draft"?"Save As Draft":""}</button></li>
                             </ul>
                           </div>
-                          <p>{this.state.loadingMsg}</p>
                       </div>        
                     </div>
                   </div>
