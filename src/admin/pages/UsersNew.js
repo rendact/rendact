@@ -6,6 +6,7 @@ import { default as swal } from 'sweetalert2';
 import DateTime from 'react-datetime';
 import TimezonePicker from 'react-bootstrap-timezone-picker';
 import CountrySelect from '../lib/CountrySelect';
+import Notification from 'react-notification-system';
 
 import Query from '../query';
 import Config from '../../config'
@@ -136,11 +137,23 @@ var NewUser = React.createClass({
 		if (this.state.mode==="update"){
 			if (password) {
 	    	if (!oldPassword) {
-	    		this.setState({errorMsg: "Please fill your old password"});
+	    		this.setState({errorMsg: (this.notification.addNotification({
+      		message: 'Please fill your old password',
+      		level: 'error',
+      		position: 'tl',
+      		autoDismiss: 5
+    		}))
+    		});
 		    	return;
 	    	}
 	    	if (password!==repassword) {
-		    	this.setState({errorMsg: "Password is not match"});
+		    	this.setState({errorMsg: (this.notification.addNotification({
+      		message: 'Password is not match',
+      		level: 'error',
+      		position: 'tl',
+      		autoDismiss: 5
+    		}))
+    		});
 		    	return;
 		    }
 		    changePassword = true;
@@ -149,7 +162,13 @@ var NewUser = React.createClass({
 			qry = Query.saveProfileMtn(this.props.userId, name, gender, image, country, dateOfBirth);
 		} else {
 			if (!password) {
-    		this.setState({errorMsg: "Please fill your password"});
+    		this.setState({errorMsg: (this.notification.addNotification({
+      		message: 'Please fill your old password',
+      		level: 'error',
+      		position: 'tl',
+      		autoDismiss: 5
+    		}))
+    	});
 	    	return;
     	}
 			qry = Query.createUserMtn(username, password, email, name, gender, country, dateOfBirth)
@@ -201,7 +220,13 @@ var NewUser = React.createClass({
 									
 									if (metaList.length>0) {
 										//here.setUserMeta(metaList);
-										here.setState({noticeTxt: "Profile saved"});
+										here.setState({noticeTxt: (this.notification.addNotification({
+      									message: 'Profile saved',
+      									level: 'success',
+      									position: 'tl',
+      									autoDismiss: 5
+    									}))
+									});
 									}
 								} else {
 									errorCallback(error, body.errors?body.errors[0].message:null);
@@ -225,7 +250,13 @@ var NewUser = React.createClass({
 			riques(Query.changePasswordMtn(oldPassword, password), 
 				function(error, response, body){
 					if(!error && !body.errors) {
-						me.setState({noticeTxt: "Password changed"});
+						me.setState({noticeTxt: (this.notification.addNotification({
+      									message: 'Password changed',
+      									level: 'success',
+      									position: 'tl',
+      									autoDismiss: 5
+    									}))
+					});
 					} else {
 						errorCallback(error, body.errors?body.errors[0].message:null);
 					}
@@ -265,7 +296,13 @@ var NewUser = React.createClass({
     riques(qry, 
 			function(error, response, body){
 				if(!error && !body.errors) {
-					me.setState({noticeTxt: "Role saved"});
+					me.setState({noticeTxt: (this.notification.addNotification({
+      									message: 'Role saved',
+      									level: 'success',
+      									position: 'tl',
+      									autoDismiss: 5
+    									}))
+				});
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
@@ -325,6 +362,7 @@ var NewUser = React.createClass({
 	componentDidMount: function(){
 		require ('react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css');
 		require ('react-datetime/css/react-datetime.css');
+		this.notification = this.refs.notificationSystem;
 
 		if (this.state.mode==="update") {
   		this.loadData();
@@ -367,19 +405,7 @@ var NewUser = React.createClass({
 			        <li className="active">Profile</li>
 			      </ol>
 			    </section>
-
-			    { this.state.errorMsg &&
-            <div className="alert alert-danger alert-dismissible">
-              <button type="button" className="close" onClick={this.handleErrorMsgClose}>×</button>
-              {this.state.errorMsg}
-            </div>
-          }
-          { this.state.noticeTxt &&
-            <div className="alert alert-info alert-dismissible">
-              <button type="button" className="close" onClick={this.handleNoticeClose}>×</button>
-              {this.state.noticeTxt}
-            </div>
-          }
+			    <Notification ref="notificationSystem" />
 
 			    <section className="content">
 			    	<div className="row">
