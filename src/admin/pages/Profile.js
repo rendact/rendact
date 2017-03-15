@@ -39,7 +39,6 @@ var Profile = React.createClass({
 		if (JSON.parse(localStorage.getItem("profile")).image)
 			image = JSON.parse(localStorage.getItem("profile")).image;
 		return {
-			isSaving: false,
 			avatar: image,
 			passwordActive: false,
 			userMetaList: Config.userMetaList,
@@ -119,33 +118,22 @@ var Profile = React.createClass({
 
     if (password) {
     	if (!oldPassword) {
-    		this.notification.addNotification({
-      		message: 'Please fill your old password',
-      		level: 'error',
-      		position: 'tl',
-      		autoDismiss: 5
-    		});
+    		swal('Failed!', 'Please fill your old password', 'warning')
 	    	return;
     	}
     	if (password!==repassword) {
-	    	this.notification.addNotification({
-      		message: 'Password is not match',
-      		level: 'error',
-      		position: 'tl',
-      		autoDismiss: 5
-    		});
+    		swal('Failed!', 'Password is not match', 'warning')
 	    	return;
 	    }
 	    changePassword = true;
     }
 
-		this.setState({isSaving: true && (this.notification.addNotification({
-      		message: 'Updating...',
-      		level: 'warning',
-      		position: 'tl',
-      		autoDismiss: 2
-    		}))
-		});
+		this.notification.addNotification({
+			id: 'saving',
+  		message: 'Updating...',
+  		level: 'warning',
+  		position: 'tr'
+    });
 
 		riques(Query.saveProfileMtn(localStorage.getItem("userId"), name, gender, image, country, dateOfBirth), 
 			function(error, response, body){
@@ -158,7 +146,7 @@ var Profile = React.createClass({
           var isMetaEmpty = (bio+website+facebook+twitter+linkedin+timezone+phone)==='';
 
           if (isMetaEmpty) {
-          	me.setState({isSaving: false});
+          	me.notification.removeNotification('saving');
           }	else {
 	          var userMetaData0 = {
 	          	"bio": bio,
@@ -183,24 +171,23 @@ var Profile = React.createClass({
 									
 									if (metaList.length>0) {
 										here.setUserMeta(metaList);
-										this.notification.addNotification({
-      									message: 'Profile saved',
-      									level: 'success',
-      									position: 'tl',
-      									autoDismiss: 5
-    									});
+										here.notification.addNotification({
+    									message: 'Profile saved',
+    									level: 'success',
+    									position: 'tr',
+    									autoDismiss: 5
+										});
 									}
 								} else {
 									errorCallback(error, body.errors?body.errors[0].message:null);
 								}
-								here.setState({isSaving: false});
+								here.notification.removeNotification('saving');
 							}
 						);
 	        } 
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
-				//me.setState({isSaving: false});
 			}
 		);
 		
@@ -209,11 +196,11 @@ var Profile = React.createClass({
 				function(error, response, body){
 					if(!error && !body.errors) {
 						this.notification.addNotification({
-      									message: 'Password changed',
-      									level: 'success',
-      									position: 'tl',
-      									autoDismiss: 5
-    									});
+							message: 'Password changed',
+							level: 'success',
+							position: 'tr',
+							autoDismiss: 5
+						});
 					} else {
 						errorCallback(error, body.errors?body.errors[0].message:null);
 					}

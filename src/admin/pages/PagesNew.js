@@ -19,8 +19,6 @@ const errorCallback = function(msg1, msg2){
 const NewPage = React.createClass({
   getInitialState: function(){
     return {
-      noticeTxt: null,
-      loadingMsg: null,
       title:"",
       slug:"",
       content:"",
@@ -42,6 +40,7 @@ const NewPage = React.createClass({
   },
   componentDidMount: function(){
     var me = this;
+    this.notification = this.refs.notificationSystem;
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard-all/ckeditor.js", function(data, status, xhr){
       window.CKEDITOR.replace('content', {
         extraPlugins: 'justify',
@@ -100,22 +99,12 @@ const NewPage = React.createClass({
     var v = this.getFormValues();
 
     if (v.title.length<=3) {
-      this.notification.addNotification({
-      title: 'Error',
-      message: 'Title is too short',
-      level: 'error',
-      position: 'tc'
-    });
+      swal('Invalid content', "Title is to short!", 'warning');
       return;
     }
 
     if (!v.content) {
-      this.notification.addNotification({
-      title: 'Error',
-      message: "Content can't be empty",
-      level: 'error',
-      position: 'tc'
-    });
+      swal('Invalid content', "Content can't be empty", 'warning');
       return;
     }
     
@@ -164,7 +153,12 @@ const NewPage = React.createClass({
           riques(pmQry, 
             function(error, response, body) {
               if (!error && !body.errors && response.statusCode === 200) {
-                here.setState({noticeTxt: noticeTxt}); 
+                here.notification.addNotification({
+                  message: noticeTxt,
+                  level: 'success',
+                  position: 'tr',
+                  autoDismiss: 2
+                });
               } else {
                 errorCallback(error, body.errors?body.errors[0].message:null);
               }
@@ -307,7 +301,6 @@ const NewPage = React.createClass({
     var metaDescription = $("#metaDescription").val();
     this.setState({metaDescriptionLeftCharacter: 160-(metaDescription.length)});
   },
-
   handleDateChange: function(date){
     this.setState({immediatelyStatus: false, publishDate: new Date(date)});
   },
@@ -329,22 +322,12 @@ const NewPage = React.createClass({
     var v = this.getFormValues();
 
     if (v.title.length<=3) {
-      this.notification.addNotification({
-      title: 'Error',
-      message: 'Title is too short',
-      level: 'error',
-      position: 'tc'
-    });
+      swal('Invalid content', "Title is to short!", 'warning');
       return;
     }
 
     if (!v.content) {
-      this.notification.addNotification({
-      title: 'Error',
-      message: "Content can't be empty",
-      level: 'error',
-      position: 'tc'
-    });
+      swal('Invalid content', "Content can't be empty", 'warning');
       return;
     }
 
@@ -400,7 +383,12 @@ const NewPage = React.createClass({
           riques(pmQry, 
             function(error, response, body) {
               if (!error && !body.errors && response.statusCode === 200) {
-                here.setState({noticeTxt: noticeTxt}); 
+                here.notification.addNotification({
+                  message: noticeTxt,
+                  level: 'success',
+                  position: 'tr',
+                  autoDismiss: 2
+                });
               } else {
                 errorCallback(error, body.errors?body.errors[0].message:null);
               }
@@ -465,8 +453,7 @@ const NewPage = React.createClass({
                 </ol>
                
           </section>
-          <Notification ref="notificationSystem" />
-
+          <Notification ref="notificationSystem" /> 
           <form onSubmit={this.handleSubmit} id="pageForm" method="get">
           <div className="col-md-8">
             <div className="form-group"  style={{marginBottom:30}}>

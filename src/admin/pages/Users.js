@@ -22,8 +22,6 @@ const Users = React.createClass({
 
     return {
       dt: null,
-      errorMsg: null,
-      loadingMsg: null,
       monthList: [],
       deleteMode: false,
       statusList: ["All", "Administrator", "Editor", "Author", "Subscriber", "Guest", "No Role"],
@@ -98,12 +96,12 @@ const Users = React.createClass({
         el.disabled = state;
     })
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.setState({loadingMsg: state?(this.notification.addNotification({
+    this.notification.addNotification({
       message: 'Processing...',
       level: 'warning',
-      position: 'tl',
+      position: 'tr',
       autoDismiss: 2
-    })):null});
+    });
     if (!state) {
       this.checkDynamicButtonState();
     }
@@ -191,12 +189,6 @@ const Users = React.createClass({
             </ol>
           </section>
           <Notification ref="notificationSystem" />   
-          { this.state.errorMsg &&
-            <div className="alert alert-danger alert-dismissible">
-              <button type="button" className="close" data-dismiss="alert" aria-hidden="true">×</button>
-              {this.state.errorMsg}
-            </div>
-          }
           <section className="content">
             <div className="box box-default">
               <div className="box-body">

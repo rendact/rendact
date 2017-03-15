@@ -4,6 +4,7 @@ import Query from './query';
 import _ from 'lodash';
 import {riques} from '../utils';
 import { default as swal } from 'sweetalert2';
+import Notification from 'react-notification-system';
 
 window.$ = $;
 
@@ -31,13 +32,12 @@ const mySkins = [
 const ControlSidebar = React.createClass({
   getInitialState: function(){
     return {
-      isSaving: false,
-      errorMsg: null,
-      noticeTxt: null
+      
     }
   },
   componentDidMount: function(){
     require('./lib/app.js');
+    this.notification = this.refs.notificationSystem;
     
     this.changeLayout('fixed');
     this.setup();
@@ -201,7 +201,12 @@ const ControlSidebar = React.createClass({
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
         me.disableForm(false);
-        me.setState({isSaving: false});
+        me.notification.addNotification({
+          message: "Saved",
+          level: 'succes',
+          position: 'tr',
+          autoDismiss: 5
+        });
       }
     );
   },
