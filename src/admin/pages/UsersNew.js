@@ -33,7 +33,6 @@ var NewUser = React.createClass({
 		var image = Config.rootUrl+"/images/avatar-default.png";
 		
 		return {
-			isSaving: false,
 			avatar: image,
 			passwordActive: false,
 			mode: this.props.userId?"update":"create",
@@ -158,12 +157,11 @@ var NewUser = React.createClass({
 			qry = Query.createUserMtn(username, password, email, name, gender, country, dateOfBirth)
 		}
 
-		this.setState({isSaving: true });
 		this.notification.addNotification({
+			id: 'saving',
   		message: 'Saving...',
   		level: 'warning',
-  		position: 'tr',
-  		autoDismiss: 2
+  		position: 'tr'
 		});
 		
 		riques(qry, 
@@ -185,7 +183,7 @@ var NewUser = React.createClass({
           	if (me.state.mode==="create")
           		me.resetForm();
           	else
-          		me.setState({isSaving: false})
+          		me.notification.removeNotification('saving');
           }	else {
 		        var userMetaData0 = {
 		          	"bio": bio,
@@ -223,14 +221,13 @@ var NewUser = React.createClass({
 								if (here.state.mode==="create")
 		          		here.resetForm();
 		          	else
-		          		here.setState({isSaving: false})
+		          		here.notification.removeNotification('saving');
 							}
 						);
 	        }
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
-				//me.setState({isSaving: false});
 			}
 		);
 		
@@ -280,6 +277,13 @@ var NewUser = React.createClass({
 			qry = Query.deleteRoleUser(this.props.userId, roleId);	
 		}
 		var me = this;
+
+		this.notification.addNotification({
+			id: 'saving',
+			message: 'Saving..',
+			level: 'info',
+			position: 'tr'
+		});
 		
     riques(qry, 
 			function(error, response, body){
@@ -293,7 +297,7 @@ var NewUser = React.createClass({
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
-				me.setState({isSaving: false});
+				me.notification.removeNotification('saving');
 			}, this.state.isAdmin
 		);
 	},
@@ -355,7 +359,6 @@ var NewUser = React.createClass({
     _.forEach(document.getElementsByTagName('input'), function(el){ el.value = null;})
     
     this.setState({
-			isSaving: false,
 			passwordActive: false,
 			mode: "create",
 			timezone: "",

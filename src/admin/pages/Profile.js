@@ -39,7 +39,6 @@ var Profile = React.createClass({
 		if (JSON.parse(localStorage.getItem("profile")).image)
 			image = JSON.parse(localStorage.getItem("profile")).image;
 		return {
-			isSaving: false,
 			avatar: image,
 			passwordActive: false,
 			userMetaList: Config.userMetaList,
@@ -130,10 +129,10 @@ var Profile = React.createClass({
     }
 
 		this.notification.addNotification({
+			id: 'saving',
   		message: 'Updating...',
   		level: 'warning',
-  		position: 'tr',
-  		autoDismiss: 2
+  		position: 'tr'
     });
 
 		riques(Query.saveProfileMtn(localStorage.getItem("userId"), name, gender, image, country, dateOfBirth), 
@@ -147,7 +146,7 @@ var Profile = React.createClass({
           var isMetaEmpty = (bio+website+facebook+twitter+linkedin+timezone+phone)==='';
 
           if (isMetaEmpty) {
-          	me.setState({isSaving: false});
+          	me.notification.removeNotification('saving');
           }	else {
 	          var userMetaData0 = {
 	          	"bio": bio,
@@ -182,14 +181,13 @@ var Profile = React.createClass({
 								} else {
 									errorCallback(error, body.errors?body.errors[0].message:null);
 								}
-								here.setState({isSaving: false});
+								here.notification.removeNotification('saving');
 							}
 						);
 	        } 
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
-				//me.setState({isSaving: false});
 			}
 		);
 		
