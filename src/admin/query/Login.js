@@ -14,6 +14,7 @@ const getLoginAuth0Mtn = function(identities, token, clientId){
               createdAt
               dateOfBirth
               meta { edges { node { id, item, value } }}
+              roles { edges { node { id, name } }}
             }
           }
         }`,
@@ -44,6 +45,7 @@ const loginUserQry = function(username, password){
             createdAt
             dateOfBirth
             meta { edges { node { id, item, value } }}
+            roles { edges { node { id, name } }}
           }
         }
       }`,

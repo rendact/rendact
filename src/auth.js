@@ -49,10 +49,10 @@ function AuthService(){
       meta[item] = _.find(p.meta.edges, {"node": {"item": item}});
       metaIdList[item] = meta[item]?meta[item].node.id:null;
     })
-
+    
     var roleList = [];
     _.forEach(p.roles.edges, function(item){
-      roleList.push(item.name)
+      roleList.push(item.node.name)
     })
     
     var profile = {
