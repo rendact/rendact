@@ -187,21 +187,9 @@ var NewUser = React.createClass({
 		          	"timezone": timezone,
 		          	"phone": phone
 		        };
-	      			var qry = '';
 
-	      			var userMetaData = [];
-		        if (p.meta.edges.length>0) {
-		          	_.forEach(p.meta.edges, function(item, index){
-		          		if (_.has(userMetaData0, item.node.item))
-		          			userMetaData.push({id: item.node.id, item: item.node.item, value: userMetaData0[item.node.item]});
-		          	});
-		          	qry = Query.saveUserMetaMtn(p.id, userMetaData);
-		        } else {
-		          	_.forEach(userMetaData0, function(value, key){
-		          		userMetaData.push({item: key, value: value});
-		          	});
-		          	qry = Query.createUserMetaMtn(p.id, userMetaData);
-		        }
+	      		var existMetaList = _.map(p.meta.edges, function(item){ return item.node.item });
+	          var qry = Query.createUpdateUserMetaMtn(p.id, existMetaList,userMetaData0);
 	          
 	          riques(qry, 
 							function(error, response, body){
