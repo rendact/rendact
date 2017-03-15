@@ -132,30 +132,30 @@ var NewUser = React.createClass({
     var repassword = getValue("new-password-2");
     var changePassword = false;
 
-  	if (password) {
-    	if (!oldPassword) {
-    		this.setState({errorMsg: "Please fill your old password"});
-	    	return;
-    	}
-    	if (password!==repassword) {
-	    	this.setState({errorMsg: "Password is not match"});
-	    	return;
-	    }
-	    changePassword = true;
-    }
-
-		this.setState({isSaving: true});
-
 		var qry = '';
 		if (this.state.mode==="update"){
+			if (password) {
+	    	if (!oldPassword) {
+	    		this.setState({errorMsg: "Please fill your old password"});
+		    	return;
+	    	}
+	    	if (password!==repassword) {
+		    	this.setState({errorMsg: "Password is not match"});
+		    	return;
+		    }
+		    changePassword = true;
+	    }
+
 			qry = Query.saveProfileMtn(this.props.userId, name, gender, image, country, dateOfBirth);
 		} else {
 			if (!password) {
-    		this.setState({errorMsg: "Please fill your old password"});
+    		this.setState({errorMsg: "Please fill your password"});
 	    	return;
     	}
 			qry = Query.createUserMtn(username, password, email, name, gender, country, dateOfBirth)
 		}
+
+		this.setState({isSaving: true});
 		
 		riques(qry, 
 			function(error, response, body){
