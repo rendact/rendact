@@ -252,6 +252,46 @@ const createUserMetaMtn = function(userId, arr){
   }
 }
 
+const createUpdateUserMetaMtn = function(userId, arrItem, arrData){
+  var variables = {};
+  var query = "mutation (";
+  
+  var keysArr = _.keys(arrData);
+
+  _.forEach(keysArr, function(item, index){
+    if (_.indexOf()>=0) {
+      query += "$input"+index+": UpdateUserMetaInput!";
+    } else {
+      query += "$input"+index+": CreateUserMetaInput!";
+    }
+    if (index!==keysArr.length-1) query += ", "
+  });
+  query += ") {";
+
+  var index = 0;
+  _.forEach(arrData, function(val, key){
+    if (_.indexOf()>=0) {
+      query += ' UpdateUserMeta'+index+' : updateUserMeta(input: $input'+index+'){ changedUserMeta{ id item value } }'; 
+    } else {
+      query += ' CreateUserMeta'+index+' : createUserMeta(input: $input'+index+'){ changedUserMeta{ id item value } }'; 
+    }
+
+    variables["input"+index] = {
+      userId: userId,
+      item: key,
+      value: val
+    }
+
+    index++;
+  });
+  
+  query += "}";
+  return {
+    "query": query,
+    "variables": variables
+  }
+}
+
 const changePasswordMtn = function(oldPass, newPass){
   return {
     "query": `mutation ChangePassword($input: ChangeUserPasswordInput!)
@@ -340,6 +380,7 @@ const queries = {
   saveProfileMtn: saveProfileMtn,
   saveUserMetaMtn: saveUserMetaMtn,
   createUserMetaMtn: createUserMetaMtn,
+  createUpdateUserMetaMtn: createUpdateUserMetaMtn,
   changePasswordMtn: changePasswordMtn,
   addRoleToUser: addRoleToUser,
   deleteRoleUser: deleteRoleUser,
