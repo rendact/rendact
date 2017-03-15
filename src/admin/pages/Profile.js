@@ -143,7 +143,13 @@ var Profile = React.createClass({
 	    changePassword = true;
     }
 
-		this.setState({isSaving: true});
+		this.setState({isSaving: true && (this.notification.addNotification({
+      		message: 'Updating...',
+      		level: 'warning',
+      		position: 'tl',
+      		autoDismiss: 2
+    		}))
+		});
 
 		riques(Query.saveProfileMtn(localStorage.getItem("userId"), name, gender, image, country, dateOfBirth), 
 			function(error, response, body){
@@ -474,9 +480,7 @@ var Profile = React.createClass({
 										<div className="btn-group">
 											<input type="submit" value="Update Profile" className="btn btn-primary btn-sm" />
 										</div>
-										{ this.state.isSaving &&
-											<p>Updating...</p>
-										}
+										{ this.state.isSaving }
 									</div>
 								</div>
 							</form>

@@ -174,7 +174,13 @@ var NewUser = React.createClass({
 			qry = Query.createUserMtn(username, password, email, name, gender, country, dateOfBirth)
 		}
 
-		this.setState({isSaving: true});
+		this.setState({isSaving: true && (this.notification.addNotification({
+      		message: 'Saving...',
+      		level: 'warning',
+      		position: 'tl',
+      		autoDismiss: 2
+    		}))
+	});
 		
 		riques(qry, 
 			function(error, response, body){
@@ -594,9 +600,7 @@ var NewUser = React.createClass({
 										<div className="btn-group">
 											<input type="submit" value={this.state.mode==="update"?"Update User":"Add User"} className="btn btn-primary btn-sm" />
 										</div>
-										{ this.state.isSaving &&
-											<p>Saving...</p>
-										}
+										{ this.state.isSaving }
 									</div>
 								</div>
 							</form>
