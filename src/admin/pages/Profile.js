@@ -40,8 +40,6 @@ var Profile = React.createClass({
 			image = JSON.parse(localStorage.getItem("profile")).image;
 		return {
 			isSaving: false,
-			errorMsg: null,
-			noticeTxt: null,
 			avatar: image,
 			passwordActive: false,
 			userMetaList: Config.userMetaList,
@@ -121,23 +119,21 @@ var Profile = React.createClass({
 
     if (password) {
     	if (!oldPassword) {
-    		this.setState({errorMsg: (this.notification.addNotification({
+    		this.notification.addNotification({
       		message: 'Please fill your old password',
       		level: 'error',
       		position: 'tl',
       		autoDismiss: 5
-    		}))
-    	});
+    		});
 	    	return;
     	}
     	if (password!==repassword) {
-	    	this.setState({errorMsg: (this.notification.addNotification({
+	    	this.notification.addNotification({
       		message: 'Password is not match',
       		level: 'error',
       		position: 'tl',
       		autoDismiss: 5
-    		}))
-	    });
+    		});
 	    	return;
 	    }
 	    changePassword = true;
@@ -187,13 +183,12 @@ var Profile = React.createClass({
 									
 									if (metaList.length>0) {
 										here.setUserMeta(metaList);
-										here.setState({noticeTxt: (this.notification.addNotification({
+										this.notification.addNotification({
       									message: 'Profile saved',
       									level: 'success',
       									position: 'tl',
       									autoDismiss: 5
-    									}))
-									});
+    									});
 									}
 								} else {
 									errorCallback(error, body.errors?body.errors[0].message:null);
@@ -213,13 +208,12 @@ var Profile = React.createClass({
 			riques(Query.changePasswordMtn(oldPassword, password), 
 				function(error, response, body){
 					if(!error && !body.errors) {
-						me.setState({noticeTxt: (this.notification.addNotification({
+						this.notification.addNotification({
       									message: 'Password changed',
       									level: 'success',
       									position: 'tl',
       									autoDismiss: 5
-    									}))
-					});
+    									});
 					} else {
 						errorCallback(error, body.errors?body.errors[0].message:null);
 					}
@@ -246,12 +240,6 @@ var Profile = React.createClass({
 	},
 	handleBirthDateChange: function(date){
 	 	this.setState({dateOfBirth: date.toISOString()});
-	},
-	handleErrorMsgClose: function(){
-    	this.setState({errorMsg: "", isSaving: false});
-  	},
-	handleNoticeClose: function(){
-	   	this.setState({noticeTxt: "", isSaving: false});
 	},
 	handleGeneratePassword: function(event){
 		event.preventDefault();
@@ -480,7 +468,6 @@ var Profile = React.createClass({
 										<div className="btn-group">
 											<input type="submit" value="Update Profile" className="btn btn-primary btn-sm" />
 										</div>
-										{ this.state.isSaving }
 									</div>
 								</div>
 							</form>
