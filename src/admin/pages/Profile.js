@@ -457,7 +457,6 @@ var Profile = React.createClass({
 										<div className="btn-group">
 											<input type="submit" value="Update Profile" className="btn btn-primary btn-sm" />
 										</div>
-										{ this.state.isSaving }
 									</div>
 								</div>
 							</form>

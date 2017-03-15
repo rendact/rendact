@@ -57,6 +57,8 @@ const NewPage = React.createClass({
       $("#public").attr("checked", true);
     }else $("#private").attr("checked", true);
 
+    this.notification = this.refs.notificationSystem;
+
   },
   checkSlug: function(slug){
     var me = this;
@@ -110,11 +112,21 @@ const NewPage = React.createClass({
     if (this.state.mode==="create"){
       qry = Query.getCreatePageQry(v.title, v.content, "Draft", v.visibility, v.passwordPage, v.publishDate, 
         localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder, v.type);
-      noticeTxt = "Page Published!";
+      noticeTxt = this.notification.addNotification({
+      title: 'Notice',
+      message: 'Page Published!',
+      level: 'success',
+      position: 'tc'
+    });
     }else{
       qry = Query.getUpdatePageQry(this.props.postId, v.title, v.content, "Draft", v.visibility, v.passwordPage, 
         v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder);
-      noticeTxt = "Page Updated!";
+      noticeTxt = this.notification.addNotification({
+      title: 'Notice',
+      message: 'Page Updated!',
+      level: 'success',
+      position: 'tc'
+    });
     }
 
     riques(qry, 
@@ -169,7 +181,14 @@ const NewPage = React.createClass({
     _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
     _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;})
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.setState({loadingMsg: state?"Processing...":null});
+    this.setState({loadingMsg: state?(
+      this.notification.addNotification({
+      message: 'Processing...',
+      level: 'warning',
+      position: 'tl',
+      autoDismiss: 1
+    }))
+    :null});
   },
   resetForm: function(){
     document.getElementById("pageForm").reset();
@@ -317,11 +336,21 @@ const NewPage = React.createClass({
     if (this.state.mode==="create"){
       qry = Query.getCreatePageQry(v.title, v.content, v.status, v.visibility, v.passwordPage, v.publishDate, 
         localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder, v.type);
-      noticeTxt = "Page Published!";
+      noticeTxt = this.notification.addNotification({
+      title: 'Notice',
+      message: 'Page Published!',
+      level: 'success',
+      position: 'tc'
+    });
     }else{
       qry = Query.getUpdatePageQry(this.props.postId, v.title, v.content, v.status, v.visibility, v.passwordPage, 
         v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder);
-      noticeTxt = "Page Updated!";
+      noticeTxt = this.notification.addNotification({
+      title: 'Notice',
+      message: 'Page Updated!',
+      level: 'success',
+      position: 'tc'
+    });
     }
 
     riques(qry, 

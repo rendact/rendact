@@ -574,7 +574,6 @@ var NewUser = React.createClass({
 										<div className="btn-group">
 											<input type="submit" value={this.state.mode==="update"?"Update User":"Add User"} className="btn btn-primary btn-sm" />
 										</div>
-										{ this.state.isSaving }
 									</div>
 								</div>
 							</form>
