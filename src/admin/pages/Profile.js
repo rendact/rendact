@@ -402,28 +402,32 @@ var Profile = React.createClass({
 								<div className="form-group">
 								  	<label htmlFor="website" className="col-md-3">Website</label>
 								  	<div className="col-md-9">
-										<input type="text" name="website" id="website" className="form-control" defaultValue={p.website} />
+										<input type="text" name="website" id="website" placeholder="example: www.ussunnah.com" className="form-control" defaultValue={p.website} />
+										<p className="help-block">Your website name</p>
 									</div>
 								</div>
 
 								<div className="form-group">
 								  	<label htmlFor="facebook" className="col-md-3">Facebook Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="facebook" id="facebook" className="form-control" defaultValue={p.facebook} />
+										<input type="text" name="facebook" id="facebook" placeholder="example: www.facebook.com/ussunnah" className="form-control" defaultValue={p.facebook} />
+										<p className="help-block">URL to your Facebook Page</p>
 									</div>
 								</div>
 
 								<div className="form-group">
 								  	<label htmlFor="twitter" className="col-md-3">Twitter Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="twitter" id="twitter" className="form-control" defaultValue={p.twitter} />
+										<input type="text" name="twitter" id="twitter" placeholder="example: www.twitter.com/ussunnah" className="form-control" defaultValue={p.twitter} />
+										<p className="help-block">URL to your Twitter Page</p>
 									</div>
 								</div>
 
 								<div className="form-group">
 								  	<label htmlFor="linkedin" className="col-md-3">Linkedin Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="linkedin" id="linkedin" className="form-control" defaultValue={p.linkedin} />
+										<input type="text" name="linkedin" id="linkedin" placeholder="example: www.linkedin.com/in/ussunnah" className="form-control" defaultValue={p.linkedin} />
+										<p className="help-block">URL to your LinkedIn Page</p>
 									</div>
 								</div>
 

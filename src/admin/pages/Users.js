@@ -35,13 +35,13 @@ const Users = React.createClass({
   },
   loadData: function(datatable, type, callback) {
     var me = this;
+    var qry = Query.getUserListByTypeQry(type);
 
-    riques(Query.getUserListByTypeQry(type), 
+    riques(qry, 
       function(error, response, body) {
-        if (!error && !body.error) {
           if (body.data) {
-            var here = me;
             datatable.clear();
+            var here = me;
             _.forEach(body.data.viewer.allUsers.edges, function(item){
               var roles = "No Role";
               var img = item.node.image?item.node.image:Config.rootUrl+"/images/avatar-default.png";
@@ -84,10 +84,10 @@ const Users = React.createClass({
             });
 
             if (callback) callback.call();
-            datatable.draw();
-          }else{ errorCallback(error, body.errors?body.errors[0].message:null); }
+          }else{ 
+            errorCallback(error, body.errors?body.errors[0].message:null); 
+          }
         }
-      }
     );
   },
   disableForm: function(state){
@@ -101,7 +101,7 @@ const Users = React.createClass({
     this.setState({loadingMsg: state?(this.notification.addNotification({
       message: 'Processing...',
       level: 'warning',
-      position: 'tc',
+      position: 'tl',
       autoDismiss: 2
     })):null});
     if (!state) {
@@ -156,9 +156,9 @@ const Users = React.createClass({
     this.props.handleNav('users','edit', userId);
   },
   componentDidMount: function(){
-    var datatable = $('#userListTbl').DataTable({sDom: '<"H"r>t<"F"ip>'});
-    this.notification = this.refs.notificationSystem; 
-    
+    var datatable = $('#userListTbl').DataTable({sDom: '<"H"r>t<"F"ip>'}); 
+    this.notification = this.refs.notificationSystem;
+
     datatable.columns(1).every( function () {
         var that = this;
         $('#searchBox', this.footer() ).on( 'keyup change', function () {

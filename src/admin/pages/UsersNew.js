@@ -497,28 +497,32 @@ var NewUser = React.createClass({
 								<div className="form-group">
 								  	<label htmlFor="website" className="col-md-3">Website</label>
 								  	<div className="col-md-9">
-										<input type="text" name="website" id="website" className="form-control" />
+										<input type="text" name="website" id="website" placeholder="example: www.ussunnah.com" className="form-control" />
+										<p className="help-block">Your website name</p>
 									</div>
 								</div>
 
 								<div className="form-group">
 								  	<label htmlFor="facebook" className="col-md-3">Facebook Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="facebook" id="facebook" className="form-control" />
+										<input type="text" name="facebook" id="facebook" placeholder="example: www.facebook.com/ussunnah" className="form-control" />
+										<p className="help-block">URL to your Facebook Page</p>
 									</div>
 								</div>
 
 								<div className="form-group">
 								  	<label htmlFor="twitter" className="col-md-3">Twitter Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="twitter" id="twitter" className="form-control" />
+										<input type="text" name="twitter" id="twitter" placeholder="example: www.twitter.com/ussunnah" className="form-control" />
+										<p className="help-block">URL to your Twitter Page</p>
 									</div>
 								</div>
 
 								<div className="form-group">
 								  	<label htmlFor="linkedin" className="col-md-3">Linkedin Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="linkedin" id="linkedin" className="form-control" />
+										<input type="text" name="linkedin" id="linkedin" placeholder="example: www.linkedin.com/in/ussunnah" className="form-control" />
+										<p className="help-block">URL to your LinkedIn Page</p>
 									</div>
 								</div>
 
