@@ -40,8 +40,6 @@ var Profile = React.createClass({
 			image = JSON.parse(localStorage.getItem("profile")).image;
 		return {
 			isSaving: false,
-			errorMsg: null,
-			noticeTxt: null,
 			avatar: image,
 			passwordActive: false,
 			userMetaList: Config.userMetaList,
@@ -121,35 +119,22 @@ var Profile = React.createClass({
 
     if (password) {
     	if (!oldPassword) {
-    		this.setState({errorMsg: (this.notification.addNotification({
-      		message: 'Please fill your old password',
-      		level: 'error',
-      		position: 'tl',
-      		autoDismiss: 5
-    		}))
-    	});
+    		swal('Failed!', 'Please fill your old password', 'warning')
 	    	return;
     	}
     	if (password!==repassword) {
-	    	this.setState({errorMsg: (this.notification.addNotification({
-      		message: 'Password is not match',
-      		level: 'error',
-      		position: 'tl',
-      		autoDismiss: 5
-    		}))
-	    });
+    		swal('Failed!', 'Password is not match', 'warning')
 	    	return;
 	    }
 	    changePassword = true;
     }
 
-		this.setState({isSaving: true && (this.notification.addNotification({
-      		message: 'Updating...',
-      		level: 'warning',
-      		position: 'tl',
-      		autoDismiss: 2
-    		}))
-		});
+		this.notification.addNotification({
+  		message: 'Updating...',
+  		level: 'warning',
+  		position: 'tr',
+  		autoDismiss: 2
+    });
 
 		riques(Query.saveProfileMtn(localStorage.getItem("userId"), name, gender, image, country, dateOfBirth), 
 			function(error, response, body){
@@ -187,13 +172,12 @@ var Profile = React.createClass({
 									
 									if (metaList.length>0) {
 										here.setUserMeta(metaList);
-										here.setState({noticeTxt: (this.notification.addNotification({
-      									message: 'Profile saved',
-      									level: 'success',
-      									position: 'tl',
-      									autoDismiss: 5
-    									}))
-									});
+										here.notification.addNotification({
+    									message: 'Profile saved',
+    									level: 'success',
+    									position: 'tr',
+    									autoDismiss: 5
+										});
 									}
 								} else {
 									errorCallback(error, body.errors?body.errors[0].message:null);
@@ -213,13 +197,12 @@ var Profile = React.createClass({
 			riques(Query.changePasswordMtn(oldPassword, password), 
 				function(error, response, body){
 					if(!error && !body.errors) {
-						me.setState({noticeTxt: (this.notification.addNotification({
-      									message: 'Password changed',
-      									level: 'success',
-      									position: 'tl',
-      									autoDismiss: 5
-    									}))
-					});
+						this.notification.addNotification({
+							message: 'Password changed',
+							level: 'success',
+							position: 'tr',
+							autoDismiss: 5
+						});
 					} else {
 						errorCallback(error, body.errors?body.errors[0].message:null);
 					}
@@ -246,12 +229,6 @@ var Profile = React.createClass({
 	},
 	handleBirthDateChange: function(date){
 	 	this.setState({dateOfBirth: date.toISOString()});
-	},
-	handleErrorMsgClose: function(){
-    	this.setState({errorMsg: "", isSaving: false});
-  	},
-	handleNoticeClose: function(){
-	   	this.setState({noticeTxt: "", isSaving: false});
 	},
 	handleGeneratePassword: function(event){
 		event.preventDefault();

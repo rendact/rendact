@@ -24,8 +24,6 @@ const Pages = React.createClass({
 
     return {
       dt: null,
-      errorMsg: null,
-      loadingMsg: null,
       monthList: [],
       deleteMode: false,
       statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
@@ -97,12 +95,12 @@ const Pages = React.createClass({
         el.disabled = state;
     })
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.setState({loadingMsg: state?(this.notification.addNotification({
+    this.notification.addNotification({
       message: 'Processing...',
       level: 'warning',
-      position: 'tl',
+      position: 'tr',
       autoDismiss: 2
-    })):null});
+    });
     if (!state) {
       this.checkDynamicButtonState();
     }

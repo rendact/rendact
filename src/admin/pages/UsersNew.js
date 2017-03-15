@@ -34,8 +34,6 @@ var NewUser = React.createClass({
 		
 		return {
 			isSaving: false,
-			errorMsg: null,
-			noticeTxt: null,
 			avatar: image,
 			passwordActive: false,
 			mode: this.props.userId?"update":"create",
@@ -137,23 +135,11 @@ var NewUser = React.createClass({
 		if (this.state.mode==="update"){
 			if (password) {
 	    	if (!oldPassword) {
-	    		this.setState({errorMsg: (this.notification.addNotification({
-      		message: 'Please fill your old password',
-      		level: 'error',
-      		position: 'tl',
-      		autoDismiss: 5
-    		}))
-    		});
+	    		swal('Failed!', 'Please fill your old password', 'warning')
 		    	return;
 	    	}
 	    	if (password!==repassword) {
-		    	this.setState({errorMsg: (this.notification.addNotification({
-      		message: 'Password is not match',
-      		level: 'error',
-      		position: 'tl',
-      		autoDismiss: 5
-    		}))
-    		});
+		    	swal('Failed!', 'Password is not match', 'warning')
 		    	return;
 		    }
 		    changePassword = true;
@@ -162,25 +148,23 @@ var NewUser = React.createClass({
 			qry = Query.saveProfileMtn(this.props.userId, name, gender, image, country, dateOfBirth);
 		} else {
 			if (!password) {
-    		this.setState({errorMsg: (this.notification.addNotification({
-      		message: 'Please fill your old password',
-      		level: 'error',
-      		position: 'tl',
-      		autoDismiss: 5
-    		}))
-    	});
+    		swal('Failed!', 'Please fill your password', 'warning')
 	    	return;
     	}
+    	if (password!==repassword) {
+	    	swal('Failed!', 'Password is not match', 'warning')
+	    	return;
+	    }
 			qry = Query.createUserMtn(username, password, email, name, gender, country, dateOfBirth)
 		}
 
-		this.setState({isSaving: true && (this.notification.addNotification({
-      		message: 'Saving...',
-      		level: 'warning',
-      		position: 'tl',
-      		autoDismiss: 2
-    		}))
-	});
+		this.setState({isSaving: true });
+		this.notification.addNotification({
+  		message: 'Saving...',
+  		level: 'warning',
+  		position: 'tr',
+  		autoDismiss: 2
+		});
 		
 		riques(qry, 
 			function(error, response, body){
@@ -226,13 +210,12 @@ var NewUser = React.createClass({
 									
 									if (metaList.length>0) {
 										//here.setUserMeta(metaList);
-										here.setState({noticeTxt: (this.notification.addNotification({
-      									message: 'Profile saved',
-      									level: 'success',
-      									position: 'tl',
-      									autoDismiss: 5
-    									}))
-									});
+										here.notification.addNotification({
+    									message: 'Profile saved',
+    									level: 'success',
+    									position: 'tr',
+    									autoDismiss: 5
+  									});
 									}
 								} else {
 									errorCallback(error, body.errors?body.errors[0].message:null);
@@ -256,13 +239,12 @@ var NewUser = React.createClass({
 			riques(Query.changePasswordMtn(oldPassword, password), 
 				function(error, response, body){
 					if(!error && !body.errors) {
-						me.setState({noticeTxt: (this.notification.addNotification({
-      									message: 'Password changed',
-      									level: 'success',
-      									position: 'tl',
-      									autoDismiss: 5
-    									}))
-					});
+						me.notification.addNotification({
+							message: 'Password changed',
+							level: 'success',
+							position: 'tr',
+							autoDismiss: 5
+						})
 					} else {
 						errorCallback(error, body.errors?body.errors[0].message:null);
 					}
@@ -302,13 +284,12 @@ var NewUser = React.createClass({
     riques(qry, 
 			function(error, response, body){
 				if(!error && !body.errors) {
-					me.setState({noticeTxt: (this.notification.addNotification({
-      									message: 'Role saved',
-      									level: 'success',
-      									position: 'tl',
-      									autoDismiss: 5
-    									}))
-				});
+					this.notification.addNotification({
+						message: 'Role saved',
+						level: 'success',
+						position: 'tr',
+						autoDismiss: 5
+					});
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
@@ -338,12 +319,6 @@ var NewUser = React.createClass({
 	},
 	handleBirthDateChange: function(date){
 	 	this.setState({dateOfBirth: date});
-	},
-	handleErrorMsgClose: function(){
-    	this.setState({errorMsg: "", isSaving: false});
-  	},
-	handleNoticeClose: function(){
-	   	this.setState({noticeTxt: "", isSaving: false});
 	},
 	componentWillMount: function(){
 		var me = this;
@@ -376,12 +351,11 @@ var NewUser = React.createClass({
   },
   resetForm: function(){
     document.getElementById("profileForm").reset();
+    document.getElementsByName("new-password").value = null;
     _.forEach(document.getElementsByTagName('input'), function(el){ el.value = null;})
     
     this.setState({
 			isSaving: false,
-			errorMsg: null,
-			noticeTxt: null,
 			passwordActive: false,
 			mode: "create",
 			timezone: "",
