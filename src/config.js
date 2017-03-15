@@ -7,44 +7,70 @@ const ContentTypeList = {
 const ActiveContentType = 'news';
 
 const MenuJson = [
-	{id: 'dashboard', label: 'Dashboard', icon: 'fa-dashboard', open: false, 
+	{id: 'dashboard', label: 'Dashboard', icon: 'fa-dashboard', open: false, role: 1,
 		elements: [
-			{id: 'dashboard', label: 'Dashboard', icon: 'fa-dashboard', open: true, url: '/admin/dashboard'},
-			{id: 'settings', label: 'Settings', icon: 'fa-gears', open: true, url: '/admin/settings'},
-			{id: 'content', label: 'Content', icon: 'fa-book', open: false, url: '/admin/content'}
+			{id: 'dashboard', label: 'Dashboard', icon: 'fa-dashboard', open: true, url: '/admin/dashboard', role: 1},
+			{id: 'settings', label: 'Settings', icon: 'fa-gears', open: true, url: '/admin/settings', role: 10},
+			{id: 'content', label: 'Content', icon: 'fa-book', open: false, url: '/admin/content', role: 10}
 		]
 	},
-	{id: 'themes', label: 'Themes', icon: 'fa-image', open: false,
+	{id: 'themes', label: 'Themes', icon: 'fa-image', open: false, role: 10,
 		elements: [
-			{id: 'themes', label: 'Themes', icon: 'fa-image', open: true, url: '/admin/themes'},
-			{id: 'customize-theme', label: 'Customize', icon: 'fa-gears', open: false, url: '/admin/themes/customize'}
+			{id: 'themes', label: 'Themes', icon: 'fa-image', open: true, url: '/admin/themes', role: 10},
+			{id: 'customize-theme', label: 'Customize', icon: 'fa-gears', open: false, url: '/admin/themes/customize', role: 10}
 		]
 	},
-	{id: 'plugins', label: 'Plugins', icon: 'fa-plug', open: false,
+	{id: 'plugins', label: 'Plugins', icon: 'fa-plug', open: false, role: 10,
 		elements: [
-			{id: 'plugins', label: 'Plugins', icon: 'fa-laptop', open: true, url: '/admin/plugins'}
+			{id: 'plugins', label: 'Plugins', icon: 'fa-laptop', open: true, url: '/admin/plugins', role: 10}
 		]
 	},
-	{id: 'users', label: 'Users', icon: 'fa-users', open: false, 
+	{id: 'users', label: 'Users', icon: 'fa-users', open: false, role: 1,
 		elements: [
-			{id: 'users', label: 'Users', icon: 'fa-users', open: false, url: '/admin/users'},
-			{id: 'users-new', label: 'Add New', icon: 'fa-user-plus', open: false ,url: '/admin/users/new'}
+			{id: 'users', label: 'Users', icon: 'fa-users', open: false, url: '/admin/users', role: 1},
+			{id: 'users-new', label: 'Add New', icon: 'fa-user-plus', open: false ,url: '/admin/users/new', role: 10}
 		]
 	},
 	{id: 'separator', label: 'CONTENT'},
-	{id: 'pages', label: 'Pages', icon: 'fa-drivers-license-o', open: false, 
+	{id: 'pages', label: 'Pages', icon: 'fa-drivers-license-o', open: false, role: 5,
 		elements: [
-			{id: 'pages', label: 'Pages', icon: 'fa-drivers-license-o', open: true, url: '/admin/pages'},
-			{id: 'pages-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/pages/new'}
+			{id: 'pages', label: 'Pages', icon: 'fa-drivers-license-o', open: true, url: '/admin/pages', role: 5},
+			{id: 'pages-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/pages/new', role: 5}
 		]
 	},
-	{id: ActiveContentType, label: ContentTypeList[ActiveContentType].label, icon: ContentTypeList[ActiveContentType].icon, open: false,
+	{id: ActiveContentType, label: ContentTypeList[ActiveContentType].label, icon: ContentTypeList[ActiveContentType].icon, open: false, role: 5,
 		elements: [
-			{id: 'posts', label: 'Posts', icon: ContentTypeList[ActiveContentType].icon, open: true, url: '/admin/posts'},
-			{id: 'posts-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/posts/new'}
+			{id: 'posts', label: 'Posts', icon: ContentTypeList[ActiveContentType].icon, open: true, url: '/admin/posts', role: 5},
+			{id: 'posts-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/posts/new', role: 5}
 		]
 	},
 ];
+
+const menuRoleValue = {
+	'dashboard' : 1,
+	'settings' : 1,
+	'profile' : 1,
+	'posts' : 5,
+	'pages' : 5,
+	'themes' : 10,
+	'plugins' : 10,
+	'users' : 1,
+	'posts-new' : 5,
+	'pages-new' : 5,
+	'theme-new' : 5,
+	'users-new' : 10,
+	'posts-edit' : 5,
+	'pages-edit' : 5,
+	'users-edit' : 10
+}
+
+const roleValue = {
+	"Administrator": 10,
+	"Editor": 6,
+	"Author": 5,
+	"Subscriber": 2,
+	"Guest": 1
+}
 
 const ActiveThemeConfig = {
 	id: 'default',
@@ -93,7 +119,10 @@ const config = {
 	defaultSwalStyling: defaultSwalStyling,
 	guestRoleId: "Um9sZTo1",
 	userMetaList: userMetaList,
-	adminToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoic2NhcGhvbGQuc3VwZXJ1c2VyIiwiZXhwIjo4NjQwMDAwMDAwMDAwMDAwLCJpYXQiOjE0ODg4NzMyODUsImF1ZCI6Ikp0Z2Z5WklRMnBKajlySThFOWU2MTdoUWNrMFJueEFuIiwiaXNzIjoiaHR0cHM6Ly9zY2FwaG9sZC5hdXRoMC5jb20vIiwic3ViIjoiMWY1ZDY3ZGYtZDQ2My00ZTliLWI0NDctOWUyMGEyNjhjYjUxIn0.GgTXH8Vie2PoZToBiMhz2CqQyB-dHqgi9VQeMJJThlM"
+	adminToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoic2NhcGhvbGQuc3VwZXJ1c2VyIiwiZXhwIjo4NjQwMDAwMDAwMDAwMDAwLCJpYXQiOjE0ODg4NzMyODUsImF1ZCI6Ikp0Z2Z5WklRMnBKajlySThFOWU2MTdoUWNrMFJueEFuIiwiaXNzIjoiaHR0cHM6Ly9zY2FwaG9sZC5hdXRoMC5jb20vIiwic3ViIjoiMWY1ZDY3ZGYtZDQ2My00ZTliLWI0NDctOWUyMGEyNjhjYjUxIn0.GgTXH8Vie2PoZToBiMhz2CqQyB-dHqgi9VQeMJJThlM",
+	roleValue: roleValue,
+	menuRoleValue: menuRoleValue,
+	adminMode: true
 }
 
 module.exports = config;

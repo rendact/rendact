@@ -1,5 +1,6 @@
 import request from 'request';
 import Config from './config';
+import _ from 'lodash';
 
 const riques = function(query, callback, isadmin){
   var token = localStorage.getItem("token");
@@ -35,9 +36,20 @@ let getValueName = function(element){
   return document.getElementsByName(element);
 }
 
+let getMaxRole = function(){
+  var p = JSON.parse(localStorage.getItem("profile"));
+  var roleValueList = _.map(p.roles, function(item){ return Config.roleValue[item] });
+  var maxRole = _.max(roleValueList);
+  if (!maxRole) maxRole=1;
+  if (Config.adminMode) return 1000;
+  return maxRole;
+}
+
+
 module.exports = {
 	riques: riques,
 	setValue: setValue,
 	getValue: getValue,
-  getValueName: getValueName
+  getValueName: getValueName,
+  getMaxRole: getMaxRole
 };
