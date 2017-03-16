@@ -6,11 +6,13 @@ import ControlSidebar from './ControlSidebar';
 import Footer from './Footer';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
+import Content from './pages/Content';
 import Posts from './pages/Posts';
 import Pages from './pages/Pages';
 import Themes from './pages/Themes';
 import Plugins from './pages/Plugins';
 import Users from './pages/Users';
+import Permission from './pages/Permission';
 import NewPost from './pages/PostsNew';
 import NewPage from './pages/PagesNew';
 import NewTheme from './pages/ThemesNew';
@@ -131,10 +133,12 @@ const PageLoader = React.createClass({
 		var map = {
 			'dashboard' : <Dashboard />,
 			'settings' : <Settings />,
+			'content' : <Content />,
 			'profile' : <Profile />,
 			'posts' : <Posts handleNav={this.props.handleNav}/>,
 			'pages' : <Pages handleNav={this.props.handleNav}/>,
 			'themes' : <Themes />,
+			'permission' : <Permission />,
 			'plugins' : <Plugins />,
 			'users' : <Users handleNav={this.props.handleNav}/>,
 			'posts-new' : <NewPost />,
