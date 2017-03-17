@@ -1,32 +1,16 @@
-const getPostListQry = {"query": `
-  query getPosts{
-  viewer {
-    allPosts(where: {type: {eq: "post"}}) {
-      edges {
-        node{
-        id
-        title,
-        author{
-          username
-        },
-        status,
-        category{
-          edges{
-            node{
-              category {
-                id
-                name
-              }
-            }
-          }
-        },
-        createdAt
-      }
-      }
-    }
-  }
-  } 
-`};
+import _ from 'lodash';
+
+const getPostListQry = function(s) {
+  var status = '{ne: "Deleted"}';
+  if (s==="Deleted" || s==="Draft" || s==="Pending Review")
+    status = '{eq: "'+s+'"}';
+
+  return {
+    "query": 
+      'query getPosts{viewer {allPosts(where: {type: {eq: "post"}, status: '+status+'}) { edges { node { '
+     +'id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},createdAt}}}}}'
+  };
+}
 
 const getAllCategoryQry = {
   "query": `query getCategories{
@@ -189,6 +173,42 @@ const getPostQry = function(postId){
     }
   };
 
+const deletePostQry = function(idList){
+  var query = "mutation { ";
+  _.forEach(idList, function(val, index){
+    query += ' DeletePost'+index+' : updatePost(input: {id: "'+val+'", status: "Deleted", deleteDate: "'+new Date()+'"}){ changedPost{ id } }'; 
+  });
+  query += "}";
+
+  return {
+    "query": query
+  }
+};
+
+const deletePostPermanentQry = function(idList){
+  var query = "mutation { ";
+  _.forEach(idList, function(val, index){
+    query += ' DeletePost'+index+' : deletePost(input: {id: "'+val+'"}){ changedPost{ id } }'; 
+  });
+  query += "}";
+
+  return {
+    "query": query
+  }
+};
+
+const recoverPostQry = function(idList){
+  var query = "mutation { ";
+  _.forEach(idList, function(val, index){
+    query += ' RecoverPost'+index+' : updatePost(input: {id: "'+val+'", status: "Published", deleteDate: ""}){ changedPost{ id } }'; 
+  });
+  query += "}";
+
+  return {
+    "query": query
+  }
+};
+
 
 
 const queries = {
@@ -198,7 +218,10 @@ const queries = {
   getCreatePostQry: getCreatePostQry,
   getUpdatePostQry: getUpdatePostQry,
   getCreateCategoryOfPostQry: getCreateCategoryOfPostQry,
-  getUpdateCategoryOfPostQry: getUpdateCategoryOfPostQry
+  getUpdateCategoryOfPostQry: getUpdateCategoryOfPostQry,
+  deletePostQry: deletePostQry,
+  deletePostPermanentQry: deletePostPermanentQry,
+  recoverPostQry: recoverPostQry
 }
 
 module.exports = queries;
