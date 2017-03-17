@@ -4,7 +4,7 @@ const ContentTypeList = {
 	'articles': {id: 'articles', label: "Articles", icon: "fa-sticky-note-o"}
 };
 
-const ActiveContentType = 'news';
+const ActiveContentType = 'posts';
 
 const MenuJson = [
 	{id: 'dashboard', label: 'Dashboard', icon: 'fa-dashboard', open: false, role: 1,
@@ -28,6 +28,7 @@ const MenuJson = [
 	{id: 'users', label: 'Users', icon: 'fa-users', open: false, role: 1,
 		elements: [
 			{id: 'users', label: 'Users', icon: 'fa-users', open: false, url: '/admin/users', role: 1},
+			{id: 'permission', label: 'Permission', icon: 'fa-users', open: false, url: '/admin/users/permission', role: 10},
 			{id: 'users-new', label: 'Add New', icon: 'fa-user-plus', open: false ,url: '/admin/users/new', role: 10}
 		]
 	},
