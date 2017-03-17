@@ -24,7 +24,7 @@ const Users = React.createClass({
       dt: null,
       monthList: [],
       deleteMode: false,
-      statusList: ["All", "Administrator", "Editor", "Author", "Subscriber", "Guest", "No Role"],
+      statusList: Config.roleList,
       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
       activeStatus: "All",
       itemSelected: false,

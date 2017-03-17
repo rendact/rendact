@@ -95,8 +95,6 @@ var Profile = React.createClass({
 		
 		var me = this;
 		var name = getValue("name");
-		var username = getValue("username");
-		var email = getValue("email");
 		var gender = getValue("gender");
 		var image = this.state.avatar;
 		var bio = getValue("bio");

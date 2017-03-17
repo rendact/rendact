@@ -18,6 +18,9 @@ const errorCallback = function(msg1, msg2){
 
 const Permission = React.createClass({
   getInitialState: function(){
+    require ('datatables');
+    require ('datatables/media/css/jquery.dataTables.min.css');
+
     return {
       dt: null,
       itemSelected: false,
@@ -43,6 +46,12 @@ const Permission = React.createClass({
     });
   },
   componentDidMount: function(){
+    var datatable = $('#pageListTbl').DataTable({
+        "paging"  : false,
+        "searching": false,
+        "ordering": false,
+        "info"    : false
+      }); 
     this.notification = this.refs.notificationSystem;
   },
   render: function(){
@@ -73,10 +82,46 @@ const Permission = React.createClass({
                       </div>                   
                       <table id="pageListTbl" className="display">
                         <thead>
-                        
+                          <tr>
+                            <th style={{width: 500, color: 'blue'}}>Functionality</th>
+                            {
+                              Config.roleList.map(function(item){
+                                return <th style={{width: 80, textAlign: 'center'}}>{item}</th>    
+                              })
+                            }
+                          </tr>
                         </thead>
                         <tbody>
-                          
+                          <tr>
+                            <td>Can modify permission</td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" checked/></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                          </tr>
+                          <tr>
+                            <td>Can add / modify user</td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" checked/></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                          </tr>
+                          <tr>
+                            <td>Can add / modify page</td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" checked/></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                          </tr>
                         </tbody>
                     </table>
                   </div>
