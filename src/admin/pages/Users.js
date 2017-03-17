@@ -154,7 +154,7 @@ const Users = React.createClass({
     this.props.handleNav('users','edit', userId);
   },
   componentDidMount: function(){
-    var datatable = $('#userListTbl').DataTable({sDom: '<"H"r>t<"F"ip>'}); 
+    var datatable = $('#userListTbl').DataTable({"dom": '<"H"r>t<"F"ip>'}); 
     this.notification = this.refs.notificationSystem;
 
     datatable.columns(1).every( function () {

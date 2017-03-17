@@ -240,7 +240,7 @@ var Profile = React.createClass({
 		else
 			document.getElementById("new-password").setAttribute("type","password")
 	},
-	handleTimezoneChange: function(tz){
+	handleTimezoneChange: function(tz){debugger;
 		this.setState({timezone: tz});
 	},
 	componentDidMount: function(){

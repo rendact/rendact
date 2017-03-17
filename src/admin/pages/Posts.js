@@ -1,11 +1,19 @@
 import React from 'react';
-import request from 'request';
 import $ from 'jquery';
 window.jQuery = $;
 import Config from '../../config';
 import Query from '../query';
 import Fn from '../lib/functions';
 import { default as swal } from 'sweetalert2';
+import _ from 'lodash';
+import Notification from 'react-notification-system';
+import {riques} from '../../utils';
+
+const errorCallback = function(msg1, msg2){
+  if (msg1) swal('Failed!', msg1, 'warning')
+  else if (msg2) swal('Failed!', msg2, 'warning')
+  else swal('Failed!', 'Unknown error','warning')
+}
 
 const Posts = React.createClass({
 	getInitialState: function(){
@@ -19,201 +27,273 @@ const Posts = React.createClass({
 	      dt: null,
 	      errorMsg: null,
 	      loadingMsg: null,
-	      monthList: []
+	      monthList: [],
+        deleteMode: false,
+        statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
+        dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
+        activeStatus: "All",
+        itemSelected: false,
+        notification: null,
 	    }
-	  },
-	loadData: function(datatable, callback) {
-		var me = this;
-	    request({
-	        url: Config.scapholdUrl,
-	        method: "POST",
-	        json: true,
-	        headers: {
-	          "content-type": "application/json",
-	          "Authorization": "Bearer " + localStorage.token
-	        },
-	        body: Query.getPostListQry
-	      }, (error, response, body) => {
-	        if (!error && !body.error) {
-	       	 
-	          if (body.data) {
-	            datatable.clear();
-	            var monthList = ["all"];
-	            $.each(body.data.viewer.allPosts.edges, function(key, item){
-	              var dt = new Date(item.node.createdAt);
-	              var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
-	              var author = item.node.author?item.node.author.username:"";
-	              var status = item.node.status;
-	              //var categories = item.node.categories?item.node.categories.edges.node.name:"";
-	              var categories = "";
-	              var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
-	              if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
-	              var img = "<img src='/images/photo1.png' width='100' />";
-	              var tag = "";
-	              var like = 20;
+	},
 
-	              datatable.row.add([
-	                '<input class="postListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
-	                '<center>'+img+'</center>',
-	                '<a href="/admin/posts/edit/'+item.node.id+'" >'+item.node.title+'</a>',
-	                '<a href="">'+author+'</a>',
-	                '<center>'+categories+'</center>',
-	                '<center>'+tag+'</center>',
-	                '<center>'+like+'</center>',
-	                '<center>'+status+'</center>',
-	                '<center>'+date+'</center>'
-	              ])
-	            });
-
-              if (callback) callback.call();
-
-	            me.setState({monthList: monthList});
-	            datatable.draw();
-	          }else{
-	            if (error)
-	              swal(
-	                'Failed!',
-	                error,
-	                'warning'
-	              )
-	            else if (body.error)
-	              swal(
-	                'Failed!',
-	                body.errors[0].message,
-	                'warning'
-	              )
-	            else 
-	              swal(
-	                'Failed!',
-	                'Unknown error',
-	                'warning'
-	              )
-	          }
-	        }
-	      } 
-	    );
-	  },
-
-	handleDeleteBtn: function(event){
-    var checkedRow = $("input.postListCb:checked");
-    if (checkedRow.length === 0) {
-      //this.setState({errorMsg: "Please choose item to be deleted"});
-      swal({
-        title: 'Warning!',
-        text: 'Please choose item to be deleted',
-        timer: 5000
-      }).then(
-        function () {},
-        // handling the promise rejection
-        function (dismiss) {
-          if (dismiss === 'timer') {
-            console.log('I was closed by the timer')
-          }
-        }
-      );
-      return;
-    }
+  loadData: function(datatable, type, callback) {
     var me = this;
+    var qry = Query.getPostListQry(type);
+    riques(qry, 
+      function(error, response, body) { debugger;
+        if (body.data) { 
+          datatable.clear();
+          var monthList = ["all"];
+          var here = me;
+          _.forEach(body.data.viewer.allPosts.edges, function(item){
+            var dt = new Date(item.node.createdAt);
+            var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+            var author = item.node.author?item.node.author.username:"";
+            var status = item.node.status?item.node.status:"";
+            //var categories = item.node.category?item.node.category.edges.node.category.name:"";
+            var categories = "Category";
+            var img = "<img src='/images/photo1.png' width='100' />";
+            //var tag = item.node.tag?item.node.tag.edges.node.tag.name:"";
+            var tag = "Tag";
+            var like = _.find(item.node.meta.edges,{"node": {"item": "like"}})?_.find(item.node.meta.edges,{"node": {"item": "like"}}).node.value:"";
+            //var like = 20;
+            var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
+            if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
+
+            datatable.row.add([
+              '<input class="postListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
+              '<center>'+img+'</center>',
+              '<a href="/admin/posts/edit/'+item.node.id+'" >'+item.node.title+'</a>',
+              '<a href="">'+author+'</a>',
+              '<center>'+categories+'</center>',
+              '<center>'+tag+'</center>',
+              '<center>'+like+'</center>',
+              '<center>'+status+'</center>',
+              '<center>'+date+'</center>'
+            ])
+          });
+
+          me.setState({monthList: monthList});
+          datatable.draw();
+
+          $(".tableItem").click(function(event){
+            event.preventDefault();
+            var postId = this.id.split("-")[1];
+            here.handleViewPost(postId);
+          });
+          $(".postListCb").click( function(){
+            here.checkDynamicButtonState();
+          });
+          $('#selectAll').click(function () {
+            $(':checkbox', datatable.rows().nodes()).prop('checked', this.checked);
+            here.checkDynamicButtonState();
+          });
+
+          if (callback) callback.call();
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+      }
+    );
+  },
+
+  handleDeleteBtn: function(event){
+    var me = this;
+    var checkedRow = $("input.postListCb:checked");
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
-    swal({
+    swal(_.merge({
       title: 'Sure want to delete?',
       text: "You might lost some data!",
       type: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, cancel!',
-      confirmButtonClass: 'btn btn-success',
-      cancelButtonClass: 'btn btn-danger',
-      buttonsStyling: true
-    }).then(function () {
-    	me.disableForm(true);
-      request({
-        url: Config.scapholdUrl,
-        method: "POST",
-        json: true,
-        headers: {
-          "content-type": "application/json",
-          "Authorization": "Bearer " + localStorage.token
-        },
-        body: Query.deletePostQry(idList)
-      }, (error, response, body) => {
-        if (!error && !body.errors && response.statusCode === 200) {
-          console.log(JSON.stringify(body, null, 2));
-          var here = me;
-          var cb = function(){here.disableForm(false)}
-          me.loadData(me.state.dt, cb);
-        } else {
-          if (error)
-            swal(
-              'Failed!',
-              error,
-              'warning'
-            )
-          else if (body.error)
-            swal(
-              'Failed!',
-              body.error,
-              'warning'
-            )
-          else 
-            swal(
-              'Failed!',
-              'Unknown error',
-              'warning'
-            )
-          me.disableForm(false);
+    },Config.defaultSwalStyling)).then(function () {
+      me.disableForm(true);
+      riques(Query.deletePostQry(idList), 
+        function(error, response, body) {
+          if (!error && !body.errors && response.statusCode === 200) {
+            var here = me;
+            var cb = function(){here.disableForm(false)}
+            me.loadData(me.state.dt, "All", cb);
+          } else {
+            errorCallback(error, body.errors?body.errors[0].message:null);
+            me.disableForm(false);
+          }
         }
-      });  
-   })},
+      );
+    })},
+
+  handleDeletePermanent: function(event){
+    var checkedRow = $("input.postListCb:checked");
+    var me = this;
+    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
+    swal(_.merge({
+      title: 'Sure want to delete permanently?',
+      text: "You might lost some data forever!",
+      type: 'warning',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel!',
+    },Config.defaultSwalStyling)).then(function () {
+      me.disableForm(true);
+      riques(Query.deletePostPermanentQry(idList), 
+        function(error, response, body) {
+          if (!error && !body.errors && response.statusCode === 200) {
+            var here = me;
+            var cb = function(){here.disableForm(false)}
+            me.loadData(me.state.dt, "Deleted", cb);
+          } else {
+            errorCallback(error, body.errors?body.errors[0].message:null);
+            me.disableForm(false);
+          }
+        }
+      );
+    })
+  },
+
+  handleEmptyTrash: function(event){
+    var checkedRow = $("input.postListCb");
+    var me = this;
+    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
+    swal(_.merge({
+      title: 'Sure want to empty trash?',
+      text: "You might lost some data forever!",
+      type: 'warning',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel!'
+    }, Config.defaultSwalStyling)).then(function () {
+      me.disableForm(true);
+      riques(Query.deletePostPermanentQry(idList), 
+        function(error, response, body) {
+          if (!error && !body.errors && response.statusCode === 200) {
+            var here = me;
+            var cb = function(){here.disableForm(false)}
+            me.loadData(me.state.dt, "Deleted", cb);
+          } else {
+            errorCallback(error, body.errors?body.errors[0].message:null);
+            me.disableForm(false);
+          }
+        }
+      );
+    })
+  },
+
+  handleRecover: function(event){
+    var checkedRow = $("input.postListCb:checked");
+    var me = this;
+    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
+    swal(_.merge({
+      title: 'Sure want to recover?',
+      text: "Please look carefully!",
+      type: 'warning',
+      confirmButtonText: 'Yes, recover it!',
+      cancelButtonText: 'No, cancel!',
+    },Config.defaultSwalStyling)).then(function () {
+      me.disableForm(true);
+      riques(Query.recoverPostQry(idList), 
+        function(error, response, body) {
+          if (!error && !body.errors && response.statusCode === 200) {
+            console.log(JSON.stringify(body, null, 2));
+            var here = me;
+            var cb = function(){here.disableForm(false)}
+            me.loadData(me.state.dt, "Deleted", cb);
+          } else {
+            errorCallback(error, body.errors?body.errors[0].message:null);
+            me.disableForm(false);
+          }
+        }
+      );
+    })},
+
+  handleStatusFilter: function(event){
+    this.disableForm(true);
+    var status = event.target.text;
+    this.setState({activeStatus: status});
+    if (status==='Deleted'){
+      var me = this;
+      this.loadData(this.state.dt, "Deleted", function(){
+        me.setState({deleteMode: true});
+        me.disableForm(false);
+      });
+    }else{
+      var re = this;
+      this.loadData(this.state.dt, status, function(){
+        re.setState({deleteMode: false});
+        re.disableForm(false);
+      })
+    } ;
+  },
+
+  handleDateFilter: function(event){
+    this.disableForm(true);
+    var status = this.state.activeStatus;
+    if (status==='Deleted'){
+      var me = this;
+      this.loadData(this.state.dt, "Deleted", function(){
+        me.setState({deleteMode: true});
+        me.disableForm(false);
+      });
+    }else{
+      var date = $("#dateFilter").val();
+      var searchValue = { 6: date };
+      var te = this;
+      this.loadData(this.state.dt, status, function(){
+        te.setState({deleteMode: false});
+        te.state.dt.columns([6]).every( function () {
+          this.search( searchValue[this.index()] ).draw();
+          return null;
+        })
+        te.disableForm(false);
+      })
+    } ;
+  },
 
   disableForm: function(state){
-    $("#filterBtn").attr('disabled',state);
-    $("#deleteBtn").attr('disabled',state);
-    $("#dateFilter").attr('disabled',state);
-    $("#statusFilter").attr('disabled',state);
-    this.setState({loadingMsg: state?"Processing...":null});
-  },
-	
-	componentDidMount: function(){
-	    var datatable = $('#postListTbl').DataTable({
-	      sDom: '<"H"r>t<"F"ip>',
-	    });
-	    $('#selectAll').click(function () {
-	        $(':checkbox', datatable.rows().nodes()).prop('checked', this.checked);
-	    });
-	    datatable.columns(2).every( function () {
-	        var that = this;
-	 
-	        $('#searchBox', this.footer() ).on( 'keyup change', function () {
-	            if ( that.search() !== this.value ) {
-	                that
-	                    .search( this.value )
-	                    .draw();
-	            }
-	            return null;
-	        });
-	        return null;
-	    } );
-	    
-	    this.setState({dt: datatable});
-	    this.loadData(datatable);
-	 },
-
-	handleFilterBtn: function(){
-    var status = $("#statusFilter").val();
-    var date = $("#dateFilter").val();
-
-    var searchValue = {
-      7: status,
-      8: date
+    var me = this;
+    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
+    _.forEach(document.getElementsByTagName('button'), function(el){ 
+      if (_.indexOf(me.state.dynamicStateBtnList, el.id) < 0)
+        el.disabled = state;
+    })
+    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
+    this.notification.addNotification({
+      message: 'Processing...',
+      level: 'warning',
+      position: 'tr',
+      autoDismiss: 2
+    });
+    if (!state) {
+      this.checkDynamicButtonState();
     }
+  },
 
-    this.state.dt.columns([7,8]).every( function () {
-        this.search( searchValue[this.index()] ).draw();
+  checkDynamicButtonState: function(){
+    var checkedRow = $("input.postListCb:checked");
+    this.setState({itemSelected: checkedRow.length>0})
+  },
+
+  handleViewPost: function(postId){
+    this.props.handleNav('posts','edit', postId);
+  },
+
+  componentDidMount: function(){
+    var datatable = $('#postListTbl').DataTable({sDom: '<"H"r>t<"F"ip>'}); 
+    this.notification = this.refs.notificationSystem;
+
+    datatable.columns(1).every( function () {
+        var that = this;
+        $('#searchBox', this.footer() ).on( 'keyup change', function () {
+            if ( that.search() !== this.value ) {
+                that.search( this.value )
+                    .draw();
+            }
+            return null;
+        });
         return null;
     } );
+    
+    this.setState({dt: datatable});
+    this.loadData(datatable, "All");
   },
 
 	render: function(){
@@ -229,18 +309,7 @@ const Posts = React.createClass({
               <li className="active">Post List</li>
             </ol>
           </section>  
-          { this.state.errorMsg &&
-            <div className="alert alert-danger alert-dismissible">
-              <button type="button" className="close" data-dismiss="alert" aria-hidden="true">×</button>
-              {this.state.errorMsg}
-            </div>
-          }
-          { this.state.loadingMsg &&
-            <div className="alert alert-warning alert-dismissible">
-              <button type="button" className="close" data-dismiss="warning" aria-hidden="true">×</button>
-              {this.state.loadingMsg}
-            </div>
-          }
+          <Notification ref="notificationSystem" /> 
           <section className="content">
             <div className="box box-default">
               <div className="box-body">
@@ -248,25 +317,54 @@ const Posts = React.createClass({
                   <div className="row">
                     <div className="col-xs-12">
                       <div style={{marginTop: 10, marginBottom: 20}}>
-                          <button className="btn btn-default btn-flat" id="deleteBtn" style={{marginRight:10}} onClick={this.handleDeleteBtn}>Delete</button>
-                          <select className="btn select" id="dateFilter" style={{marginRight:5,height:35}}>
+                          <select className="btn select" id="dateFilter" onChange={this.handleDateFilter} style={{marginRight:10,height:35}}>
                             {this.state.monthList.map(function(item){
                               if (item==="all")
-                                return <option key="0" value="">All</option>
+                                return (<option key="0" value="">Show all months</option>);
                               var s = item.split("/");
                               var monthList = Fn.getMonthList();
                               var month = monthList[parseInt(s[1],10)-1];
                               var year = s[0];
                               return <option key={item} value={item}>{month+" "+year}</option>
                             })}
-                          </select>
+                          </select>     
                           <select className="btn select" id="statusFilter" style={{marginRight:5,height:35}}>
-                            <option value="">All</option>
-                            <option value="published">Published</option>
-                            <option value="draft">Draft</option>
-                          </select>
-                          <button className="btn btn-default btn-flat" id="filterBtn" onClick={this.handleFilterBtn}>Filter</button>
-                        <input className="pull-right" placeholder="Search..." id="searchBox" />
+                            <option value="">All Categories</option>
+                            <option value="category1">category1</option>
+                            <option value="category2">category2</option>
+                            <option value="category3">category3</option>
+                            <option value="category4">category4</option>
+                          </select> 
+                          { !this.state.deleteMode &&    
+                            [<button className="btn btn-default btn-flat" id="deleteBtn" onClick={this.handleDeleteBtn} style={{marginRight:10}} 
+                            disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete</button>]
+                          }   
+                          { this.state.deleteMode && 
+                            [<button key="recoverBtn" className="btn btn-default btn-flat" id="recoverBtn" style={{marginRight:10}} onClick={this.handleRecover}
+                             disabled={!this.state.itemSelected} ><span className="fa fa-support" ></span> Recover</button>,
+                             <button key="deletePermanentBtn" className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}
+                             disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete Permanently</button>,
+                             <button key="emptyTrashBtn" className="btn btn-default btn-flat" id="emptyTrashBtn" onClick={this.handleEmptyTrash}><span className="fa fa-trash" ></span> Empty Trash</button>]
+                          }                        
+                        <div className="box-tools pull-right">
+                          <div className="input-group" style={{width: 200}}>
+                            <input type="text" id="searchBox" className="form-control" placeholder="Search"/>
+
+                            <div className="input-group-btn">
+                              <button className="btn btn-default"><i className="fa fa-search"></i></button>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="box-tools" style={{marginTop: 10}}>
+                          <b>Status:</b> {this.state.statusList.map(function(item, index, array){
+                            var last = (index===(array.length-1));
+                            var border = last?"":"1px solid";
+                            var color = item===this.state.activeStatus?{color: "black", fontWeight: "bold"}:{};
+                            return <span key={index} style={{paddingRight: 7, paddingLeft: 7, borderRight: border}}>
+                                    <a href="#" onClick={this.handleStatusFilter} style={color}>{item}</a>
+                                   </span>
+                          }.bind(this))}
+                        </div>
                       </div>                   
                       <table id="postListTbl" className="display">
                         <thead>
