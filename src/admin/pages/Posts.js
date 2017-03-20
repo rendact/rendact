@@ -51,11 +51,11 @@ const Posts = React.createClass({
             var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
             var author = item.node.author?item.node.author.username:"";
             var status = item.node.status?item.node.status:"";
-            //var categories = item.node.category?item.node.category.edges.node.category.name:"";
-            var categories = "Category";
+            var categories = _.find(item.node.category.edges.length>0)?"p":"";
+            //var categories = "Category";
             var img = "<img src='/images/photo1.png' width='100' />";
             //var tag = item.node.tag?item.node.tag.edges.node.tag.name:"";
-            var tag = "Tag";
+            var tag = "";
             var like = _.find(item.node.meta.edges,{"node": {"item": "like"}})?_.find(item.node.meta.edges,{"node": {"item": "like"}}).node.value:"";
             //var like = 20;
             var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);

@@ -5,6 +5,7 @@ window.jQuery = $;
 import Config from '../../config';
 import Query from '../query';
 import {riques, setValue, getValue} from '../../utils';
+import {getTemplates} from '../theme';
 import { default as swal } from 'sweetalert2';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
@@ -16,34 +17,12 @@ const errorCallback = function(msg1, msg2){
 }
 
 const NewPost = React.createClass({
-  componentDidMount: function(){
-    require('../lib/bootstrap-tagsinput.js');
-    require('../lib/bootstrap-tagsinput.css');
-    var me = this;
-
-    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
-      window.CKEDITOR.replace('content', {
-        height: 400,
-        title: false
-      });
-      for (var i in window.CKEDITOR.instances) {
-        if (window.CKEDITOR.instances.hasOwnProperty(i))
-          window.CKEDITOR.instances[i].on('change', me.handleContentChange);
-      }
-    });
-
-    if (this.state.visibilityTxt==="Public") {
-      $("#public").attr("checked", true);
-    }else $("#private").attr("checked", true);
-
-    this.notification = this.refs.notificationSystem;
-  },
 
   getInitialState: function(){
     return {
-      noticeTxt: null,
-      loadingMsg: null,
-      errorMsg:null,
+      //noticeTxt: null,
+      //loadingMsg: null,
+      //errorMsg:null,
       title:"",
       slug:"",
       content:"",
@@ -61,6 +40,25 @@ const NewPost = React.createClass({
       publishDate: new Date(),
       publishDateReset: new Date()
     }
+  },
+  componentDidMount: function(){
+    var me = this;
+    this.notification = this.refs.notificationSystem;
+    $.getScript("https://cdn.ckeditor.com/4.6.2/standard-all/ckeditor.js", function(data, status, xhr){
+      window.CKEDITOR.replace('content', {
+        extraPlugins: 'justify',
+        height: 400,
+        title: false
+      });
+      for (var i in window.CKEDITOR.instances) {
+        if (window.CKEDITOR.instances.hasOwnProperty(i))
+          window.CKEDITOR.instances[i].on('change', me.handleContentChange);
+      }
+    });
+    if (this.state.visibilityTxt==="Public") {
+      $("#public").attr("checked", true);
+    }else $("#private").attr("checked", true);
+    this.notification = this.refs.notificationSystem;
   },
   checkSlug: function(slug){
     var me = this;
@@ -93,6 +91,92 @@ const NewPost = React.createClass({
   saveDraft: function(event){
     this.setState({status: $("#statusSelect option:selected").text()});
   },
+  saveDraftBtn: function(event) {
+    event.preventDefault();
+    this.disableForm(true);
+
+    var me = this;
+    var v = this.getFormValues();
+
+    if (v.title.length<=3) {
+      swal('Invalid content', "Title is to short!", 'warning');
+      return;
+    }
+
+    if (!v.content) {
+      swal('Invalid content', "Content can't be empty", 'warning');
+      return;
+    }
+
+    this.disableForm(true);
+    var qry = "", noticeTxt = "";
+    if (this.state.mode==="create"){
+      qry = Query.getCreatePostQry(v.title, v.content, "Draft", v.visibility, v.publishDate, 
+        localStorage.getItem('userId'), this.state.slug, v.summary, v.type);
+      noticeTxt = this.notification.addNotification({
+      title: 'Notice',
+      message: 'Post Published!',
+      level: 'success',
+      position: 'tc'
+    });
+    }else{
+      qry = Query.getUpdatePostQry(this.props.postId, v.title, v.content, "Draft", v.visibility, 
+        v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary);
+      noticeTxt = this.notification.addNotification({
+      title: 'Notice',
+      message: 'Post Updated!',
+      level: 'success',
+      position: 'tc'
+    });
+    }
+
+    riques(qry, 
+      function(error, response, body) {
+        if (!error && !body.errors && response.statusCode === 200) {
+          var here = me;
+          var postMetaId = "";
+          var postId = "";
+          var pmQry = "";
+          var categoryOfPostId = "";
+
+          if (me.state.mode==="create"){
+            postId = body.data.createPost.changedPost.id;
+            pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, null);
+          } else {
+            postId = body.data.updatePost.changedPost.id;
+            if (body.data.updatePost.changedPost.meta.edges.length===0) {
+              pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, null);
+            } else {
+              var data = [];
+              _.forEach(body.data.updatePost.changedPost.meta.edges, function(item){
+                data.push({
+                  postMetaId: item.node.id,
+                  item: item.node.item,
+                  value: _.has(v, item.node.item)?v[item.node.item]:null
+                });
+              });
+              pmQry = Query.updatePostMetaMtn(postId, data);
+            }
+          }
+
+          riques(pmQry, 
+            function(error, response, body) {
+              if (!error && !body.errors && response.statusCode === 200) {
+                here.setState({noticeTxt: noticeTxt}); 
+              } else {
+                errorCallback(error, body.errors?body.errors[0].message:null);
+              }
+              here.disableForm(false);
+            }
+          );
+
+          me.setState({mode: "update"});
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+      }
+    );  
+  },
   saveVisibility: function(event){
     this.setState({visibilityTxt: $("input[name=visibilityRadio]:checked").val()});
   },
@@ -112,13 +196,18 @@ const NewPost = React.createClass({
   resetForm: function(){
     document.getElementById("postForm").reset();
     window.CKEDITOR.instances['content'].setData(null);
-    this.setState({title:"", slug:"", content:"", summary:"",
+    this.setState({
+      title:"", slug:"", content:"", summary:"",
       status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
       permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160});
     this.handleTitleChange();
     window.history.pushState("", "", '/admin/posts/new');
   },
   getFormValues: function(){
+    var postOrder = $("#postOrder").val();
+    var postOrderInt = 0;
+    try  {postOrderInt=parseInt(postOrder,10)} catch(e) {}
+
     return {
       title: getValue("titlePost"),
       content: window.CKEDITOR.instances['content'].getData(),
@@ -129,6 +218,7 @@ const NewPost = React.createClass({
       summary: getValue("summary"),
       visibility: $("input[name=visibilityRadio]:checked").val(),
       publishDate: this.state.publishDate,
+      //passwordPost: "",
       type: "post"
     }
   },
@@ -220,122 +310,18 @@ const NewPost = React.createClass({
     var resetDate = this.state.publishDateReset;
     this.setState({publishDate: resetDate});
   },
-  saveDraftBtn: function(event) {
-    event.preventDefault();
-    var me = this;
-    var v = this.getFormValues();
-
-    if (v.title.length<=3) {
-      this.notification.addNotification({
-      title: 'Error',
-      message: 'Title is too short',
-      level: 'error',
-      position: 'tc'
-    });
-      return;
-    }
-
-    if (!v.content) {
-      this.notification.addNotification({
-      title: 'Error',
-      message: "Content can't be empty",
-      level: 'error',
-      position: 'tc'
-    });
-      return;
-    }
-
-    this.disableForm(true);
-    var qry = "", noticeTxt = "";
-    if (this.state.mode==="create"){
-      qry = Query.getCreatePostQry(v.title, v.content, "Draft", v.visibility, v.publishDate, 
-        localStorage.getItem('userId'), this.state.slug, v.summary, v.type);
-      noticeTxt = this.notification.addNotification({
-      title: 'Notice',
-      message: 'Page Published!',
-      level: 'success',
-      position: 'tc'
-    });
-    }else{
-      qry = Query.getUpdatePostQry(this.props.postId, v.title, v.content, "Draft", v.visibility, 
-        v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary);
-      noticeTxt = this.notification.addNotification({
-      title: 'Notice',
-      message: 'Page Updated!',
-      level: 'success',
-      position: 'tc'
-    });
-    }
-
-    riques(qry, 
-      function(error, response, body) {
-        if (!error && !body.errors && response.statusCode === 200) {
-          var here = me;
-          var postMetaId = "";
-          var postId = "";
-          var pmQry = "";
-          var categoryOfPostId = "";
-
-          if (me.state.mode==="create"){
-            postId = body.data.createPost.changedPost.id;
-            pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, null);
-          } else {
-            postId = body.data.updatePost.changedPost.id;
-            if (body.data.updatePost.changedPost.meta.edges.length===0) {
-              pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, null);
-            } else {
-              var data = [];
-              _.forEach(body.data.updatePost.changedPost.meta.edges, function(item){
-                data.push({
-                  postMetaId: item.node.id,
-                  item: item.node.item,
-                  value: _.has(v, item.node.item)?v[item.node.item]:null
-                });
-              });
-              pmQry = Query.updatePostMetaMtn(postId, data);
-            }
-          }
-
-          riques(pmQry, 
-            function(error, response, body) {
-              if (!error && !body.errors && response.statusCode === 200) {
-                here.setState({noticeTxt: noticeTxt}); 
-              } else {
-                errorCallback(error, body.errors?body.errors[0].message:null);
-              }
-              here.disableForm(false);
-            }
-          );
-
-          me.setState({mode: "update"});
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-      }
-    );  
-  },
   handleSubmit: function(event) {
     event.preventDefault();
     var me = this;
     var v = this.getFormValues();
 
     if (v.title.length<=3) {
-      this.notification.addNotification({
-      title: 'Error',
-      message: 'Title is too short',
-      level: 'error',
-      position: 'tc'
-    });
+      swal('Invalid content', "Title is to short!", 'warning');
       return;
     }
 
     if (!v.content) {
-      this.notification.addNotification({
-      title: 'Error',
-      message: "Content can't be empty",
-      level: 'error',
-      position: 'tc'
-    });
+      swal('Invalid content', "Content can't be empty", 'warning');
       return;
     }
 
@@ -346,7 +332,7 @@ const NewPost = React.createClass({
         localStorage.getItem('userId'), this.state.slug, v.summary, v.type);
       noticeTxt = this.notification.addNotification({
       title: 'Notice',
-      message: 'Page Published!',
+      message: 'Post Published!',
       level: 'success',
       position: 'tc'
     });
@@ -355,7 +341,7 @@ const NewPost = React.createClass({
         v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary);
       noticeTxt = this.notification.addNotification({
       title: 'Notice',
-      message: 'Page Updated!',
+      message: 'Post Updated!',
       level: 'success',
       position: 'tc'
     });
@@ -619,7 +605,7 @@ const NewPost = React.createClass({
 
                         <div className="form-group">
                           <p><span className="glyphicon glyphicon-calendar" style={{marginRight: 10}}></span>{this.state.immediatelyStatus===true?
-                            (<span>Publish <b>Immediately</b></span>):<span>Published at <b>{this.formatDate(this.state.publishDate)}</b></span>} 
+                            (<span>Publish <b>Immediately </b></span>):<span>Published at <b>{this.formatDate(this.state.publishDate)}</b></span>} 
                           <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#scheduleOption"> Edit </button></p>
 
                           <div id="scheduleOption" className="collapse">

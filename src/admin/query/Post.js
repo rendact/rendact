@@ -27,8 +27,8 @@ const getAllCategoryQry = {
   }`
 }
 
-const getCreatePostQry = function(title, content, draft, visibility, passwordPage, 
-  publishDate, userId, slug, summary){
+const getCreatePostQry = function(title, content, draft, visibility, 
+  publishDate, userId, slug, summary, category){
   return {
       "query": `
     mutation createPost($input: CreatePostInput!) {
@@ -45,13 +45,7 @@ const getCreatePostQry = function(title, content, draft, visibility, passwordPag
                 }
               }
             }
-            category {
-              edges {
-                node {
-                  id
-                }
-              }
-            }
+            
         }
       }
     }
@@ -62,19 +56,19 @@ const getCreatePostQry = function(title, content, draft, visibility, passwordPag
           "content": content,
           "status": draft,
           "visibility": visibility,
-          "passwordPage": passwordPage,
+        
           "publishDate": publishDate,
-          "type": "page",
+          "type": "post",
           "authorId": userId,
           "slug": slug,
-          "summary": summary
+          "summary": summary,
         }
       }
     }
   };
 
-const getUpdatePostQry = function(id, title, content, draft, visibility, passwordPage, 
-  publishDate, userId, slug, summary){
+const getUpdatePostQry = function(id, title, content, draft, visibility, 
+  publishDate, userId, slug, summary, category){
   return {
       "query": `
     mutation updatePost($input: UpdatePostInput!) {
@@ -88,16 +82,11 @@ const getUpdatePostQry = function(id, title, content, draft, visibility, passwor
               edges {
                 node {
                   id
+                  item
                 }
               }
             }
-            category {
-              edges {
-                node {
-                  id
-                }
-              }
-            }
+            
         }
       }
     }
@@ -109,12 +98,12 @@ const getUpdatePostQry = function(id, title, content, draft, visibility, passwor
           "content": content,
           "status": draft,
           "visibility": visibility,
-          "passwordPage": passwordPage,
+         
           "publishDate": publishDate,
-          "type": "page",
+          "type": "post",
           "authorId": userId,
           "slug": slug,
-          "summary": summary
+          "summary": summary,
         }
       }
     }
