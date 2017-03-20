@@ -24,11 +24,29 @@ const Permission = React.createClass({
     return {
       dt: null,
       itemSelected: false,
-      notification: null
+      notification: null,
+      itemList: []
     }
   },
-  loadData: function(datatable, type, callback) {
-    
+  loadData: function(datatable) {
+    datatable.clear();
+    var permissionConfig = Config.permissionConfig;
+    var roleList = Config.roleList;
+
+    _.forEach(Config.permissionList, function(item){
+      var row = ['<td>'+item.label+'</td>']
+      var roleId = item.id;
+
+      _.forEach(roleList, function(item){
+        var checked = "";
+        if (_.indexOf(permissionConfig[item], roleId)>-1)
+          checked = "checked";
+        row.push('<td style="textAlign: center"><input type="checkbox" '+checked+'/></td>');
+      });
+
+      datatable.row.add(row);
+    });
+    datatable.draw();
   },
   disableForm: function(state){
     var me = this;
@@ -53,6 +71,7 @@ const Permission = React.createClass({
         "info"    : false
       }); 
     this.notification = this.refs.notificationSystem;
+    this.loadData(datatable);
   },
   render: function(){
     return (
@@ -93,34 +112,12 @@ const Permission = React.createClass({
                         </thead>
                         <tbody>
                           <tr>
-                            <td>Can modify permission</td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" checked/></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
-                          </tr>
-                          <tr>
-                            <td>Can add / modify user</td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" checked/></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
-                          </tr>
-                          <tr>
-                            <td>Can add / modify page</td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" checked/></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
-                            <td style={{textAlign: 'center'}}><input type="checkbox" /></td>
+                            <td>Loading data...</td>
+                            {
+                              Config.roleList.map(function(item, index){
+                                return (<td></td>)
+                              })
+                            }
                           </tr>
                         </tbody>
                     </table>
