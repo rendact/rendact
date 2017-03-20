@@ -7,42 +7,42 @@ const ContentTypeList = {
 const ActiveContentType = 'posts';
 
 const MenuJson = [
-	{id: 'dashboard', label: 'Dashboard', icon: 'fa-dashboard', open: false, role: 1,
+	{id: 'dashboard', label: 'Dashboard', icon: 'fa-dashboard', open: false, role: 1, 
 		elements: [
 			{id: 'dashboard', label: 'Dashboard', icon: 'fa-dashboard', open: true, url: '/admin/dashboard', role: 1},
-			{id: 'settings', label: 'Settings', icon: 'fa-gears', open: true, url: '/admin/settings', role: 10},
-			{id: 'content', label: 'Content', icon: 'fa-book', open: false, url: '/admin/content', role: 10}
+			{id: 'settings', label: 'Settings', icon: 'fa-gears', open: true, url: '/admin/settings', role: 10, roleId: 'modify-settings'},
+			{id: 'content', label: 'Content', icon: 'fa-book', open: false, url: '/admin/content', role: 10, roleId: 'modify-content'}
 		]
 	},
-	{id: 'themes', label: 'Themes', icon: 'fa-image', open: false, role: 10,
+	{id: 'themes', label: 'Themes', icon: 'fa-image', open: false, role: 10, roleId: 'view-themes',
 		elements: [
-			{id: 'themes', label: 'Themes', icon: 'fa-image', open: true, url: '/admin/themes', role: 10},
-			{id: 'customize-theme', label: 'Customize', icon: 'fa-gears', open: false, url: '/admin/themes/customize', role: 10}
+			{id: 'themes', label: 'Themes', icon: 'fa-image', open: true, url: '/admin/themes', role: 10, roleId: 'view-themes'},
+			{id: 'customize-theme', label: 'Customize', icon: 'fa-gears', open: false, url: '/admin/themes/customize', role: 10, roleId: 'view-themes'}
 		]
 	},
-	{id: 'plugins', label: 'Plugins', icon: 'fa-plug', open: false, role: 10,
+	{id: 'plugins', label: 'Plugins', icon: 'fa-plug', open: false, role: 10, roleId: 'view-plugins',
 		elements: [
-			{id: 'plugins', label: 'Plugins', icon: 'fa-laptop', open: true, url: '/admin/plugins', role: 10}
+			{id: 'plugins', label: 'Plugins', icon: 'fa-laptop', open: true, url: '/admin/plugins', role: 10, roleId: 'view-plugins'}
 		]
 	},
-	{id: 'users', label: 'Users', icon: 'fa-users', open: false, role: 1,
+	{id: 'users', label: 'Users', icon: 'fa-users', open: false, role: 1, roleId: 'view-users',
 		elements: [
-			{id: 'users', label: 'Users', icon: 'fa-users', open: false, url: '/admin/users', role: 1},
-			{id: 'permission', label: 'Permission', icon: 'fa-users', open: false, url: '/admin/users/permission', role: 10},
-			{id: 'users-new', label: 'Add New', icon: 'fa-user-plus', open: false ,url: '/admin/users/new', role: 10}
+			{id: 'users', label: 'Users', icon: 'fa-users', open: false, url: '/admin/users', role: 1, roleId: 'view-users'},
+			{id: 'permission', label: 'Permission', icon: 'fa-users', open: false, url: '/admin/users/permission', role: 10, roleId: 'modify-permission'},
+			{id: 'users-new', label: 'Add New', icon: 'fa-user-plus', open: false ,url: '/admin/users/new', role: 10, roleId: 'modify-users'}
 		]
 	},
 	{id: 'separator', label: 'CONTENT'},
-	{id: 'pages', label: 'Pages', icon: 'fa-drivers-license-o', open: false, role: 5,
+	{id: 'pages', label: 'Pages', icon: 'fa-drivers-license-o', open: false, role: 5, roleId: 'view-pages]',
 		elements: [
-			{id: 'pages', label: 'Pages', icon: 'fa-drivers-license-o', open: true, url: '/admin/pages', role: 5},
-			{id: 'pages-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/pages/new', role: 5}
+			{id: 'pages', label: 'Pages', icon: 'fa-drivers-license-o', open: true, url: '/admin/pages', role: 5, roleId: 'view-page'},
+			{id: 'pages-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/pages/new', role: 5, roleId: 'modify-page'}
 		]
 	},
-	{id: ActiveContentType, label: ContentTypeList[ActiveContentType].label, icon: ContentTypeList[ActiveContentType].icon, open: false, role: 5,
+	{id: ActiveContentType, label: ContentTypeList[ActiveContentType].label, icon: ContentTypeList[ActiveContentType].icon, open: false, role: 5, roleId: 'view-post',
 		elements: [
-			{id: 'posts', label: 'Posts', icon: ContentTypeList[ActiveContentType].icon, open: true, url: '/admin/posts', role: 5},
-			{id: 'posts-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/posts/new', role: 5}
+			{id: 'posts', label: 'Posts', icon: ContentTypeList[ActiveContentType].icon, open: true, url: '/admin/posts', role: 5, roleId: 'view-post'},
+			{id: 'posts-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/posts/new', role: 5, roleId: 'modify-post'}
 		]
 	},
 ];
@@ -106,7 +106,35 @@ const defaultSwalStyling = {
 
 const userMetaList = ["bio","website","facebook","twitter","linkedin","phone","timezone", "userPrefConfig"];
 
-const roleList = ["All", "Administrator", "Editor", "Author", "Subscriber", "Guest", "No Role"]
+const roleList = ["Administrator", "Editor", "Author", "Subscriber", "No Role"]
+
+const permissionList = [
+	{id: "view-page", label: "View page list"},
+	{id: "modify-page", label: "Add / modify page"},
+	{id: "view-post", label: "View post list"},
+	{id: "modify-post", label:"Add / modify post"},
+	{id: "view-user", label: "View user list"},
+	{id: "modify-user", label: "Add / modify user"},
+	{id: "modify-settings", label: "Modify settings"},
+	{id: "view-stats", label: "View statistics"},
+	{id: "upload-media", label: "Upload media"},
+	{id: "modify-permission", label: "Modify permission"},
+	{id: "view-plugins", label: "View plugins list"},
+	{id: "modify-plugins", label: "Add / modify plugins"},
+	{id: "view-themes", label: "View themes list"},
+	{id: "modify-themes", label: "Add / modify themes"}
+];
+
+const permissionConfig = {
+	"No Role"				: ["view-post","view-page"],
+	"Subscriber"		: ["view-post","view-page", "view-stats"],
+	"Author"				: ["modify-post", "upload-media"],
+	"Editor"				: ["modify-post", "upload-media", "modify-page"],
+	"Administrator"	: ["view-post","view-page", "view-stats", "modify-post", "upload-media", "modify-page", 
+										 "view-user", "modify-user", "modify-permission", "view-plugins", "modify-plugins", 
+										 "view-themes", "modify-themes", "modify-settings"]
+}
+
 
 const config = {
 	rootUrl: 'http://localhost:3000',
@@ -126,7 +154,9 @@ const config = {
 	roleValue: roleValue,
 	menuRoleValue: menuRoleValue,
 	adminMode: false,
-	roleList: roleList
+	roleList: roleList,
+	permissionList: permissionList,
+	permissionConfig: permissionConfig
 }
 
 module.exports = config;

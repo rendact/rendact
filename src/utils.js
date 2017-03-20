@@ -45,11 +45,22 @@ let getMaxRole = function(){
   return maxRole;
 }
 
+let hasRole = function(roleId){
+  var p = JSON.parse(localStorage.getItem("profile"));
+  
+  var roleIdList = [];
+  _.forEach(p.roles, function(item){
+    roleIdList = _.concat(roleIdList, Config.permissionConfig[item])
+  })
+
+  return (_.indexOf(roleIdList, roleId)>-1)
+}
 
 module.exports = {
 	riques: riques,
 	setValue: setValue,
 	getValue: getValue,
   getValueName: getValueName,
-  getMaxRole: getMaxRole
+  getMaxRole: getMaxRole,
+  hasRole: hasRole
 };

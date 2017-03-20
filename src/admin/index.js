@@ -23,7 +23,7 @@ import NotPermissible from './NotPermissible';
 
 import Config from '../config';
 import AdminLTEinit from './lib/app.js';
-import {getMaxRole} from '../utils';
+import {getMaxRole, hasRole} from '../utils';
 
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -78,19 +78,26 @@ const SideMenu = React.createClass({
 			      </form>
 			      <ul className="sidebar-menu">
 			      	{ Config.menuList.map(function(item) {
-			      		var maxRole = getMaxRole();
-			      		if (item.role > maxRole) return null;
-
+			      		if (item.roleId) {
+			      			if (!hasRole(item.roleId)) {
+			      				return null
+			      			}
+			      		}
 			      		if (item.id === 'separator') {
 			      			return <li className="header" key={item.id}>{item.label}</li>
 			      		}
+
 			      		var childItems = "";
 			      		if (item.elements) {
 				      		childItems = (
 				      			<ul className="treeview-menu">
 				      			{
 				      				item.elements.map(function(item) {
-				      					if (item.role > maxRole) return null;
+				      					if (item.roleId) {
+							      			if (!hasRole(item.roleId)) {
+							      				return null
+							      			}
+							      		}
 
 				      					var iconClass = "fa "+item.icon;
 				      					return <li key={item.id} id={"menu-"+item.id} className="menu-item" onClick={this.onClick.bind(this, item.id)}><a href={item.url}><i className={iconClass}></i> {item.label}</a></li>
