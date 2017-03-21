@@ -48,21 +48,21 @@ const MenuJson = [
 ];
 
 const menuRoleValue = {
-	'dashboard' : 1,
-	'settings' : 1,
-	'profile' : 1,
-	'posts' : 5,
-	'pages' : 5,
-	'themes' : 10,
-	'plugins' : 10,
-	'users' : 1,
-	'posts-new' : 5,
-	'pages-new' : 5,
-	'theme-new' : 5,
-	'users-new' : 10,
-	'posts-edit' : 5,
-	'pages-edit' : 5,
-	'users-edit' : 10
+	'dashboard' : 'all',
+	'settings' : 'view-settings',
+	'profile' : 'all',
+	'posts' : 'view-post',
+	'pages' : 'view-page',
+	'themes' : 'view-page',
+	'plugins' : 'view-plugins',
+	'users' : 'view-user',
+	'posts-new' : 'modify-post',
+	'pages-new' : 'modify-page',
+	'theme-new' : 'modify-themes',
+	'users-new' : 'modify-user',
+	'posts-edit' : 'modify-post',
+	'pages-edit' : 'modify-page',
+	'users-edit' : 'modify-user'
 }
 
 const roleValue = {
