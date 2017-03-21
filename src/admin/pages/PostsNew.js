@@ -42,8 +42,6 @@ const NewPost = React.createClass({
   getInitialState: function(){
     return {
       noticeTxt: null,
-      loadingMsg: null,
-      errorMsg:null,
       title:"",
       slug:"",
       content:"",
@@ -101,14 +99,13 @@ const NewPost = React.createClass({
     _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
     _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;})
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.setState({loadingMsg: state?(
-      this.notification.addNotification({
+    
+    this.notification.addNotification({
       message: 'Processing...',
       level: 'warning',
       position: 'tr',
       autoDismiss: 1
-    }))
-    :null});
+    });
   },
   resetForm: function(){
     document.getElementById("postForm").reset();
@@ -267,21 +264,11 @@ const NewPost = React.createClass({
     if (this.state.mode==="create"){
       qry = Query.getCreatePostQry(v.title, v.content, "Draft", v.visibility, v.publishDate, 
         localStorage.getItem('userId'), this.state.slug, v.summary, v.type);
-      noticeTxt = this.notification.addNotification({
-      title: 'Notice',
-      message: 'Post Published!',
-      level: 'success',
-      position: 'tr'
-    });
+      noticeTxt = 'Post Published!';
     }else{
       qry = Query.getUpdatePostQry(this.props.postId, v.title, v.content, "Draft", v.visibility, 
         v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary);
-      noticeTxt = this.notification.addNotification({
-      title: 'Notice',
-      message: 'Post Updated!',
-      level: 'success',
-      position: 'tr'
-    });
+      noticeTxt = 'Post Updated!';
     }
 
     riques(qry, 
@@ -316,7 +303,12 @@ const NewPost = React.createClass({
           riques(pmQry, 
             function(error, response, body) {
               if (!error && !body.errors && response.statusCode === 200) {
-                here.setState({noticeTxt: noticeTxt}); 
+                here.notification.addNotification({
+                  title: 'Notice',
+                  message: noticeTxt,
+                  level: 'success',
+                  position: 'tr'
+                });
               } else {
                 errorCallback(error, body.errors?body.errors[0].message:null);
               }
@@ -338,21 +330,21 @@ const NewPost = React.createClass({
 
     if (v.title.length<=3) {
       this.notification.addNotification({
-      title: 'Error',
-      message: 'Title is too short',
-      level: 'error',
-      position: 'tr'
-    });
+        title: 'Error',
+        message: 'Title is too short',
+        level: 'error',
+        position: 'tr'
+      });
       return;
     }
 
     if (!v.content) {
       this.notification.addNotification({
-      title: 'Error',
-      message: "Content can't be empty",
-      level: 'error',
-      position: 'tr'
-    });
+        title: 'Error',
+        message: "Content can't be empty",
+        level: 'error',
+        position: 'tr'
+      });
       return;
     }
 
@@ -361,21 +353,11 @@ const NewPost = React.createClass({
     if (this.state.mode==="create"){
       qry = Query.getCreatePostQry(v.title, v.content, v.status, v.visibility, v.passwordPage, v.publishDate, 
         localStorage.getItem('userId'), this.state.slug, v.summary);
-      noticeTxt = this.notification.addNotification({
-      title: 'Notice',
-      message: 'Page Published!',
-      level: 'success',
-      position: 'tr'
-    });
+      noticeTxt = 'Post Published!';
     }else{
       qry = Query.getUpdatePostQry(this.props.postId, v.title, v.content, v.status, v.visibility, v.passwordPage, 
         v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary);
-      noticeTxt = this.notification.addNotification({
-      title: 'Notice',
-      message: 'Page Updated!',
-      level: 'success',
-      position: 'tr'
-    });
+      noticeTxt = 'Post Updated!';
     }
 
     riques(qry, 
@@ -410,7 +392,12 @@ const NewPost = React.createClass({
           riques(pmQry, 
             function(error, response, body) {
               if (!error && !body.errors && response.statusCode === 200) {
-                here.setState({noticeTxt: noticeTxt}); 
+                here.notification.addNotification({
+                  message: noticeTxt,
+                  level: 'success',
+                  position: 'tr',
+                  autoDismiss: 2
+                });
               } else {
                 errorCallback(error, body.errors?body.errors[0].message:null);
               }
@@ -421,7 +408,7 @@ const NewPost = React.createClass({
           riques(Config.createUpdateCategoryOfPostMtn(postId, me.state.postCategoryList, v.categories),
             function(error, response, body) {
               if (!error && !body.errors && response.statusCode === 200) {
-                here.setState({noticeTxt: noticeTxt}); 
+                
               } else {
                 errorCallback(error, body.errors?body.errors[0].message:null);
               }

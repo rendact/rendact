@@ -112,21 +112,11 @@ const NewPage = React.createClass({
     if (this.state.mode==="create"){
       qry = Query.getCreatePageQry(v.title, v.content, "Draft", v.visibility, v.passwordPage, v.publishDate, 
         localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder, v.type);
-      noticeTxt = this.notification.addNotification({
-      title: 'Notice',
-      message: 'Page Published!',
-      level: 'success',
-      position: 'tc'
-    });
+      noticeTxt = 'Page Published!';
     }else{
       qry = Query.getUpdatePageQry(this.props.postId, v.title, v.content, "Draft", v.visibility, v.passwordPage, 
         v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder);
-      noticeTxt = this.notification.addNotification({
-      title: 'Notice',
-      message: 'Page Updated!',
-      level: 'success',
-      position: 'tc'
-    });
+      noticeTxt = 'Page Updated!';
     }
 
     riques(qry, 
