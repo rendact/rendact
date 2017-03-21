@@ -64,7 +64,7 @@ const getCreatePostQry = function(title, content, draft, visibility, passwordPag
           "visibility": visibility,
           "passwordPage": passwordPage,
           "publishDate": publishDate,
-          "type": "page",
+          "type": "post",
           "authorId": userId,
           "slug": slug,
           "summary": summary
@@ -111,7 +111,7 @@ const getUpdatePostQry = function(id, title, content, draft, visibility, passwor
           "visibility": visibility,
           "passwordPage": passwordPage,
           "publishDate": publishDate,
-          "type": "page",
+          "type": "post",
           "authorId": userId,
           "slug": slug,
           "summary": summary

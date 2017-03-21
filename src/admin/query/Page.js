@@ -13,7 +13,6 @@ const getPageListQry = function(s) {
 }
 
 const getCreatePageQry = function(title, content, draft, visibility, passwordPage, 
-
   publishDate, userId, slug, summary, parentPage, pageOrder){
   return {
       "query": `

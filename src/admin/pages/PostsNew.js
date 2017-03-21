@@ -105,7 +105,7 @@ const NewPost = React.createClass({
       this.notification.addNotification({
       message: 'Processing...',
       level: 'warning',
-      position: 'tl',
+      position: 'tr',
       autoDismiss: 1
     }))
     :null});
@@ -127,6 +127,7 @@ const NewPost = React.createClass({
       titleTag: getValue("titleTag"),
       metaKeyword: getValue("metaKeyword"),
       metaDescription: getValue("metaDescription"),
+      passwordPage: "",
       summary: getValue("summary"),
       visibility: $("input[name=visibilityRadio]:checked").val(),
       publishDate: this.state.publishDate,
@@ -246,7 +247,7 @@ const NewPost = React.createClass({
       title: 'Error',
       message: 'Title is too short',
       level: 'error',
-      position: 'tc'
+      position: 'tr'
     });
       return;
     }
@@ -256,7 +257,7 @@ const NewPost = React.createClass({
       title: 'Error',
       message: "Content can't be empty",
       level: 'error',
-      position: 'tc'
+      position: 'tr'
     });
       return;
     }
@@ -268,18 +269,18 @@ const NewPost = React.createClass({
         localStorage.getItem('userId'), this.state.slug, v.summary, v.type);
       noticeTxt = this.notification.addNotification({
       title: 'Notice',
-      message: 'Page Published!',
+      message: 'Post Published!',
       level: 'success',
-      position: 'tc'
+      position: 'tr'
     });
     }else{
       qry = Query.getUpdatePostQry(this.props.postId, v.title, v.content, "Draft", v.visibility, 
         v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary);
       noticeTxt = this.notification.addNotification({
       title: 'Notice',
-      message: 'Page Updated!',
+      message: 'Post Updated!',
       level: 'success',
-      position: 'tc'
+      position: 'tr'
     });
     }
 
@@ -340,7 +341,7 @@ const NewPost = React.createClass({
       title: 'Error',
       message: 'Title is too short',
       level: 'error',
-      position: 'tc'
+      position: 'tr'
     });
       return;
     }
@@ -350,7 +351,7 @@ const NewPost = React.createClass({
       title: 'Error',
       message: "Content can't be empty",
       level: 'error',
-      position: 'tc'
+      position: 'tr'
     });
       return;
     }
@@ -358,22 +359,22 @@ const NewPost = React.createClass({
     this.disableForm(true);
     var qry = "", noticeTxt = "";
     if (this.state.mode==="create"){
-      qry = Query.getCreatePostQry(v.title, v.content, v.status, v.visibility, v.publishDate, 
-        localStorage.getItem('userId'), this.state.slug, v.summary, v.type);
+      qry = Query.getCreatePostQry(v.title, v.content, v.status, v.visibility, v.passwordPage, v.publishDate, 
+        localStorage.getItem('userId'), this.state.slug, v.summary);
       noticeTxt = this.notification.addNotification({
       title: 'Notice',
       message: 'Page Published!',
       level: 'success',
-      position: 'tc'
+      position: 'tr'
     });
     }else{
-      qry = Query.getUpdatePostQry(this.props.postId, v.title, v.content, v.status, v.visibility, 
+      qry = Query.getUpdatePostQry(this.props.postId, v.title, v.content, v.status, v.visibility, v.passwordPage, 
         v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary);
       noticeTxt = this.notification.addNotification({
       title: 'Notice',
       message: 'Page Updated!',
       level: 'success',
-      position: 'tc'
+      position: 'tr'
     });
     }
 
