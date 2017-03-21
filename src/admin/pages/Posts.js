@@ -51,12 +51,12 @@ const Posts = React.createClass({
             var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
             var author = item.node.author?item.node.author.username:"";
             var status = item.node.status?item.node.status:"";
-            var categories = _.find(item.node.category.edges.length>0)?"p":"";
+            var categories = item.node.category.edges.length>0?item.node.category.edges.node:"";
             //var categories = "Category";
             var img = "<img src='/images/photo1.png' width='100' />";
             //var tag = item.node.tag?item.node.tag.edges.node.tag.name:"";
             var tag = "";
-            var like = _.find(item.node.meta.edges,{"node": {"item": "like"}})?_.find(item.node.meta.edges,{"node": {"item": "like"}}).node.value:"";
+            var like = _.find(item.node.meta.edges,{"node": {"item": "like"}})?_.find(item.node.meta.edges,{"node": {"item": "like"}}).node.value:"0";
             //var like = 20;
             var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
             if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
@@ -328,13 +328,7 @@ const Posts = React.createClass({
                               return <option key={item} value={item}>{month+" "+year}</option>
                             })}
                           </select>     
-                          <select className="btn select" id="statusFilter" style={{marginRight:5,height:35}}>
-                            <option value="">All Categories</option>
-                            <option value="category1">category1</option>
-                            <option value="category2">category2</option>
-                            <option value="category3">category3</option>
-                            <option value="category4">category4</option>
-                          </select> 
+                          
                           { !this.state.deleteMode &&    
                             [<button className="btn btn-default btn-flat" id="deleteBtn" onClick={this.handleDeleteBtn} style={{marginRight:10}} 
                             disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete</button>]

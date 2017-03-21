@@ -27,7 +27,7 @@ const getAllCategoryQry = {
   }`
 }
 
-const getCreatePostQry = function(title, content, draft, visibility, 
+const getCreatePostQry = function(title, content, draft, visibility, passwordPage,
   publishDate, userId, slug, summary, category){
   return {
       "query": `
@@ -56,7 +56,7 @@ const getCreatePostQry = function(title, content, draft, visibility,
           "content": content,
           "status": draft,
           "visibility": visibility,
-        
+          "passwordPage": passwordPage,
           "publishDate": publishDate,
           "type": "post",
           "authorId": userId,
@@ -67,7 +67,7 @@ const getCreatePostQry = function(title, content, draft, visibility,
     }
   };
 
-const getUpdatePostQry = function(id, title, content, draft, visibility, 
+const getUpdatePostQry = function(id, title, content, draft, visibility, passwordPage,
   publishDate, userId, slug, summary, category){
   return {
       "query": `
@@ -98,7 +98,7 @@ const getUpdatePostQry = function(id, title, content, draft, visibility,
           "content": content,
           "status": draft,
           "visibility": visibility,
-         
+          "passwordPage": passwordPage,
           "publishDate": publishDate,
           "type": "post",
           "authorId": userId,

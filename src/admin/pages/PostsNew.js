@@ -111,7 +111,7 @@ const NewPost = React.createClass({
     this.disableForm(true);
     var qry = "", noticeTxt = "";
     if (this.state.mode==="create"){
-      qry = Query.getCreatePostQry(v.title, v.content, "Draft", v.visibility, v.publishDate, 
+      qry = Query.getCreatePostQry(v.title, v.content, "Draft", v.visibility, v.publishDate, v.passwordPage,
         localStorage.getItem('userId'), this.state.slug, v.summary, v.type);
       noticeTxt = this.notification.addNotification({
       title: 'Notice',
@@ -120,7 +120,7 @@ const NewPost = React.createClass({
       position: 'tc'
     });
     }else{
-      qry = Query.getUpdatePostQry(this.props.postId, v.title, v.content, "Draft", v.visibility, 
+      qry = Query.getUpdatePostQry(this.props.postId, v.title, v.content, "Draft", v.visibility, v.passwordPage,
         v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary);
       noticeTxt = this.notification.addNotification({
       title: 'Notice',
@@ -130,7 +130,7 @@ const NewPost = React.createClass({
     });
     }
 
-    riques(qry, 
+    /*riques(qry, 
       function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
           var here = me;
@@ -157,12 +157,47 @@ const NewPost = React.createClass({
               });
               pmQry = Query.updatePostMetaMtn(postId, data);
             }
+          }*/
+    riques(qry, 
+      function(error, response, body){
+        if (!error && !body.errors && response.statusCode === 200) {
+          var here = me;
+          var postMetaId = "";
+          var postId = "";
+          var pmQry = "";
+          
+          if (me.state.mode==="create"){
+            postId = body.data.createPost.changedPost.id;
+            pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
+          } else {
+            postId = body.data.updatePost.changedPost.id;
+            if (body.data.updatePost.changedPost.meta.edges.length===0) {
+              pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
+            } else {
+              postMetaId = body.data.updatePost.changedPost.meta.edges[0].node.id;
+              pmQry = Query.updatePostMetaMtn(postMetaId, postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
+            }
           }
 
-          riques(pmQry, 
+          /*riques(pmQry, 
             function(error, response, body) {
               if (!error && !body.errors && response.statusCode === 200) {
                 here.setState({noticeTxt: noticeTxt}); 
+              } else {
+                errorCallback(error, body.errors?body.errors[0].message:null);
+              }
+              here.disableForm(false);
+            }
+          );*/
+          riques(pmQry, 
+            function(error, response, body) {
+              if (!error && !body.errors && response.statusCode === 200) {
+                here.notification.addNotification({
+                  message: noticeTxt,
+                  level: 'success',
+                  position: 'tr',
+                  autoDismiss: 2
+                });
               } else {
                 errorCallback(error, body.errors?body.errors[0].message:null);
               }
@@ -218,7 +253,7 @@ const NewPost = React.createClass({
       summary: getValue("summary"),
       visibility: $("input[name=visibilityRadio]:checked").val(),
       publishDate: this.state.publishDate,
-      //passwordPost: "",
+      passwordPage: "",
       type: "post"
     }
   },
@@ -328,7 +363,7 @@ const NewPost = React.createClass({
     this.disableForm(true);
     var qry = "", noticeTxt = "";
     if (this.state.mode==="create"){
-      qry = Query.getCreatePostQry(v.title, v.content, v.status, v.visibility, v.publishDate, 
+      qry = Query.getCreatePostQry(v.title, v.content, v.status, v.visibility, v.publishDate, v.passwordPage,
         localStorage.getItem('userId'), this.state.slug, v.summary, v.type);
       noticeTxt = this.notification.addNotification({
       title: 'Notice',
@@ -337,7 +372,7 @@ const NewPost = React.createClass({
       position: 'tc'
     });
     }else{
-      qry = Query.getUpdatePostQry(this.props.postId, v.title, v.content, v.status, v.visibility, 
+      qry = Query.getUpdatePostQry(this.props.postId, v.title, v.content, v.status, v.visibility, v.passwordPage,
         v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary);
       noticeTxt = this.notification.addNotification({
       title: 'Notice',
@@ -376,10 +411,25 @@ const NewPost = React.createClass({
             }
           }
 
-          riques(pmQry, 
+          /*riques(pmQry, 
             function(error, response, body) {
               if (!error && !body.errors && response.statusCode === 200) {
                 here.setState({noticeTxt: noticeTxt}); 
+              } else {
+                errorCallback(error, body.errors?body.errors[0].message:null);
+              }
+              here.disableForm(false);
+            }
+          );*/
+          riques(pmQry, 
+            function(error, response, body) {
+              if (!error && !body.errors && response.statusCode === 200) {
+                here.notification.addNotification({
+                  message: noticeTxt,
+                  level: 'success',
+                  position: 'tr',
+                  autoDismiss: 2
+                });
               } else {
                 errorCallback(error, body.errors?body.errors[0].message:null);
               }
