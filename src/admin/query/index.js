@@ -34,7 +34,8 @@ const queries = {
   recoverPostQry: Page.recoverPostQry,
   addRoleToUser: User.addRoleToUser,
   deleteRoleUser: User.deleteRoleUser,
-  getRolesQry: User.getRolesQry
+  getRolesQry: User.getRolesQry,
+  createUpdateCategoryOfPostMtn: Post.createUpdateCategoryOfPostMtn
 }
 
 module.exports = queries;

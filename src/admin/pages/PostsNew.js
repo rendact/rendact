@@ -56,6 +56,7 @@ const NewPost = React.createClass({
       permalinkEditing: false,
       mode: this.props.postId?"update":"create",
       categoryList: null,
+      postCategoryList: [],
       titleTagLeftCharacter: 65,
       metaDescriptionLeftCharacter: 160,
       publishDate: new Date(),
@@ -129,7 +130,11 @@ const NewPost = React.createClass({
       summary: getValue("summary"),
       visibility: $("input[name=visibilityRadio]:checked").val(),
       publishDate: this.state.publishDate,
-      type: "post"
+      type: "post",
+      categories: _.map(document.getElementsByName("categoryCheckbox[]"), function(item){
+        if (item.checked)
+          return item.value
+      })
     }
   },
   setFormValues: function(v){
@@ -139,6 +144,17 @@ const NewPost = React.createClass({
         meta[i.node.item] = i.node.value;
       });
     }
+
+    var _postCategoryList = [];
+    if (v.category.edges.length>0) {
+      _.forEach(v.category.edges, function(i){
+        _postCategoryList.push(i.node.id);
+        if (document.getElementById(i.node.id))
+          document.getElementById(i.node.id).checked = true;
+      });
+      this.setState({postCategoryList: _postCategoryList});
+    }
+
     var pubDate = v.publishDate? new Date(v.publishDate) : new Date();
     setValue("titlePost", v.title);
     setValue("content", v.content);
@@ -401,6 +417,17 @@ const NewPost = React.createClass({
             }
           );
 
+          riques(Config.createUpdateCategoryOfPostMtn(postId, me.state.postCategoryList, v.categories),
+            function(error, response, body) {
+              if (!error && !body.errors && response.statusCode === 200) {
+                here.setState({noticeTxt: noticeTxt}); 
+              } else {
+                errorCallback(error, body.errors?body.errors[0].message:null);
+              }
+              here.disableForm(false);
+            }
+          );
+
           me.setState({mode: "update"});
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
@@ -419,7 +446,7 @@ const NewPost = React.createClass({
         if (!error) {
           var categoryList = [];
           $.each(body.data.viewer.allCategories.edges, function(key, item){
-            categoryList.push((<div><input key={item.node.id} id="categoryCheckbox" name="categoryCheckbox" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
+            categoryList.push((<div><input key={item.node.id} id={item.node.id} name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
           })
           me.setState({categoryList: categoryList});
         }
