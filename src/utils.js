@@ -46,6 +46,7 @@ let getMaxRole = function(){
 }
 
 let hasRole = function(roleId){
+  if (roleId==="all") return true;
   var p = JSON.parse(localStorage.getItem("profile"));
   
   var roleIdList = [];

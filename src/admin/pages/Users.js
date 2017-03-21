@@ -4,7 +4,7 @@ window.jQuery = $;
 import _ from 'lodash';
 import Query from '../query';
 import Notification from 'react-notification-system';
-import {riques} from '../../utils';
+import {riques, hasRole} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
 
@@ -40,6 +40,8 @@ const Users = React.createClass({
           if (body.data) {
             datatable.clear();
             var here = me;
+            var bEdit = hasRole('modify-user');
+
             _.forEach(body.data.viewer.allUsers.edges, function(item){
               var roles = "No Role";
               var img = item.node.image?item.node.image:Config.rootUrl+"/images/avatar-default.png";
@@ -57,7 +59,9 @@ const Users = React.createClass({
               datatable.row.add([
                 '<input class="userListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
                 '<center><img src='+img+' width="50" /></center>',
-                '<a class="tableItem" href="#" id="tableItem-'+item.node.id+'" >'+item.node.username+'</a>',
+                bEdit ?
+                '<a class="tableItem" href="#" id="tableItem-'+item.node.id+'" >'+item.node.username+'</a>' :
+                item.node.username,
                 '<center>'+item.node.email+'</center>',
                 '<center>'+item.node.fullName+'</center>',
                 '<center>'+item.node.gender+'</center>',
@@ -179,9 +183,11 @@ const Users = React.createClass({
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
               User List
-              <small style={{marginLeft: 5}}>
+              { hasRole('modify-user') &&
+              (<small style={{marginLeft: 5}}>
                 <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
-              </small>
+              </small>)
+              }
             </h1>
             <ol className="breadcrumb">
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>

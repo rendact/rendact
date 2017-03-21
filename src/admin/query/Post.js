@@ -109,27 +109,27 @@ const getUpdatePostQry = function(id, title, content, draft, visibility, passwor
     }
   };
 
-  const getCreateCategoryOfPostQry = function(postId, categoryId){
-  return {
-      "query": `
-    mutation createCategoryOfPost($input: CreateCategoryOfPostInput!) {
-        createCategoryOfPost(input: $input) {
-          changedCategoryOfPost {
-            id,
-            post,
-            category
-        }
+const getCreateCategoryOfPostQry = function(postId, categoryId){
+return {
+    "query": `
+  mutation createCategoryOfPost($input: CreateCategoryOfPostInput!) {
+      createCategoryOfPost(input: $input) {
+        changedCategoryOfPost {
+          id,
+          post,
+          category
       }
     }
-    `,
-      "variables": {
-        "input": {
-          "post": postId,
-          "category": categoryId
-        }
+  }
+  `,
+    "variables": {
+      "input": {
+        "post": postId,
+        "category": categoryId
       }
     }
-  };
+  }
+};
 
 const getUpdateCategoryOfPostQry = function(id, postId, categoryId){
   return {
@@ -153,6 +153,54 @@ const getUpdateCategoryOfPostQry = function(id, postId, categoryId){
       }
     }
   };
+
+const createUpdateCategoryOfPostMtn = function(postId, currentCat, newCat){
+  var variables = {};
+  var deleteList = _.difference(currentCat, newCat);
+  var addList = _.difference(newCat, currentCat);
+
+  var query = "mutation (";
+  
+  var _tempArr = [];
+  var index = 0;
+  _.forEach(deleteList, function(item){
+    _tempArr.push("$input"+index+": DeleteCategoryOfPostInput!")
+    index++;
+  });
+  _.forEach(addList, function(item){
+    _tempArr.push("$input"+index+": CreateCategoryOfPostInput!")
+    index++;
+  });
+  query += _.join(_tempArr, ",");
+  query += ") {";
+
+  index = 0;
+  _.forEach(deleteList, function(item){
+    query += ' DeleteCategoryOfPost'+index+' : deleteCategoryOfPost(input: $input'+index+'){ changedCategoryOfPost{ id } }'; 
+    variables["input"+index] = {
+      postId: postId,
+      categoryId: item
+    }
+
+    index++;
+  });
+
+  _.forEach(addList, function(item){
+    query += ' CreateCategoryOfPost'+index+' : createCategoryOfPost(input: $input'+index+'){ changedCategoryOfPost{ id } }'; 
+    variables["input"+index] = {
+      postId: postId,
+      categoryId: item
+    }
+
+    index++;
+  });
+  
+  query += "}";
+  return {
+    "query": query,
+    "variables": variables
+  }
+}
 
 const getPostQry = function(postId){
   return {"query": 
@@ -210,7 +258,8 @@ const queries = {
   getUpdateCategoryOfPostQry: getUpdateCategoryOfPostQry,
   deletePostQry: deletePostQry,
   deletePostPermanentQry: deletePostPermanentQry,
-  recoverPostQry: recoverPostQry
+  recoverPostQry: recoverPostQry,
+  createUpdateCategoryOfPostMtn: createUpdateCategoryOfPostMtn
 }
 
 module.exports = queries;

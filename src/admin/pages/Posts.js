@@ -7,7 +7,7 @@ import Fn from '../lib/functions';
 import { default as swal } from 'sweetalert2';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
-import {riques} from '../../utils';
+import {riques, hasRole} from '../../utils';
 
 const errorCallback = function(msg1, msg2){
   if (msg1) swal('Failed!', msg1, 'warning')
@@ -46,6 +46,8 @@ const Posts = React.createClass({
           datatable.clear();
           var monthList = ["all"];
           var here = me;
+          var bEdit = hasRole('modify-post');
+
           _.forEach(body.data.viewer.allPosts.edges, function(item){
             var dt = new Date(item.node.createdAt);
             var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
@@ -64,7 +66,9 @@ const Posts = React.createClass({
             datatable.row.add([
               '<input class="postListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
               '<center>'+img+'</center>',
-              '<a href="/admin/posts/edit/'+item.node.id+'" >'+item.node.title+'</a>',
+              bEdit ?
+              '<a href="/admin/posts/edit/'+item.node.id+'" >'+item.node.title+'</a>':
+              item.node.title,
               '<a href="">'+author+'</a>',
               '<center>'+categories+'</center>',
               '<center>'+tag+'</center>',
@@ -328,12 +332,20 @@ const Posts = React.createClass({
                               return <option key={item} value={item}>{month+" "+year}</option>
                             })}
                           </select>     
-                          
-                          { !this.state.deleteMode &&    
+
+                          <select className="btn select" id="statusFilter" style={{marginRight:5,height:35}}>
+                            <option value="">All Categories</option>
+                            <option value="category1">category1</option>
+                            <option value="category2">category2</option>
+                            <option value="category3">category3</option>
+                            <option value="category4">category4</option>
+                          </select> 
+                          { (!this.state.deleteMode && hasRole('modify-post')) &&    
+
                             [<button className="btn btn-default btn-flat" id="deleteBtn" onClick={this.handleDeleteBtn} style={{marginRight:10}} 
                             disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete</button>]
                           }   
-                          { this.state.deleteMode && 
+                          { (this.state.deleteMode && hasRole('modify-post')) && 
                             [<button key="recoverBtn" className="btn btn-default btn-flat" id="recoverBtn" style={{marginRight:10}} onClick={this.handleRecover}
                              disabled={!this.state.itemSelected} ><span className="fa fa-support" ></span> Recover</button>,
                              <button key="deletePermanentBtn" className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}

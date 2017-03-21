@@ -157,7 +157,9 @@ const PageLoader = React.createClass({
 			'users-edit' : <NewUser userId={this.props.postId}/>,
 		}
 		
-		if (Config.menuRoleValue[page+action]>maxRole){
+		var requiredRole = Config.menuRoleValue[page+action];
+
+		if (!hasRole(requiredRole)){
 			return <NotPermissible/>
 		}
 		if (map[page+action]) {
