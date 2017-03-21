@@ -5,7 +5,7 @@ import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Query from '../query';
 import Fn from '../lib/functions';
-import {riques} from '../../utils';
+import {riques, hasRole} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
 
@@ -43,6 +43,8 @@ const Pages = React.createClass({
           datatable.clear();
           var monthList = ["all"];
           var here = me;
+          var bEdit = hasRole('modify-page');
+
           _.forEach(body.data.viewer.allPosts.edges, function(item){
             var dt = new Date(item.node.createdAt);
             var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
@@ -55,7 +57,9 @@ const Pages = React.createClass({
 
             datatable.row.add([
               '<input class="pageListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
-              '<a class="tableItem" href="#" id="tableItem-'+item.node.id+'" >'+item.node.title+'</a>',
+              bEdit ?
+              '<a class="tableItem" href="#" id="tableItem-'+item.node.id+'" >'+item.node.title+'</a>' :
+              item.node.title,
               slug,
               '<a href="">'+author+'</a>',
               '<center>'+status+'</center>',
@@ -285,9 +289,11 @@ const Pages = React.createClass({
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
               Page List
-              <small style={{marginLeft: 5}}>
+              { hasRole('modify-page') &&
+              (<small style={{marginLeft: 5}}>
                 <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
-              </small>
+              </small>)
+              }
             </h1>
             <ol className="breadcrumb">
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
@@ -313,11 +319,11 @@ const Pages = React.createClass({
                               return <option key={item} value={item}>{month+" "+year}</option>
                             })}
                           </select>      
-                          { !this.state.deleteMode &&    
+                          { (!this.state.deleteMode && hasRole('modify-page')) &&    
                             [<button className="btn btn-default btn-flat" id="deleteBtn" onClick={this.handleDeleteBtn} style={{marginRight:10}} 
                             disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete</button>]
                           }   
-                          { this.state.deleteMode && 
+                          { (this.state.deleteMode && hasRole('modify-page')) && 
                             [<button key="recoverBtn" className="btn btn-default btn-flat" id="recoverBtn" style={{marginRight:10}} onClick={this.handleRecover}
                              disabled={!this.state.itemSelected} ><span className="fa fa-support" ></span> Recover</button>,
                              <button key="deletePermanentBtn" className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}

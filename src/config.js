@@ -49,13 +49,14 @@ const MenuJson = [
 
 const menuRoleValue = {
 	'dashboard' : 'all',
-	'settings' : 'view-settings',
+	'settings' : 'modify-settings',
 	'profile' : 'all',
 	'posts' : 'view-post',
 	'pages' : 'view-page',
 	'themes' : 'view-page',
 	'plugins' : 'view-plugins',
 	'users' : 'view-user',
+	'permission': 'modify-permission',
 	'posts-new' : 'modify-post',
 	'pages-new' : 'modify-page',
 	'theme-new' : 'modify-themes',
