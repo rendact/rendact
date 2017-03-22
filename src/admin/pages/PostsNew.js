@@ -21,6 +21,16 @@ const NewPost = React.createClass({
     require('../lib/bootstrap-tagsinput.css');
     var me = this;
 
+    $('#tags-input').tagsinput({
+      confirmKeys: [13, 188]
+    });
+    $('#tags-input').on('keypress', function(e){
+      if (e.keyCode == 13){
+        e.keyCode = 188;
+        e.preventDefault();
+      };
+    });
+
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
       window.CKEDITOR.replace('content', {
         height: 400,
@@ -612,7 +622,7 @@ const NewPost = React.createClass({
                     </div>
                     <div className="box-body pad">
                       <div className="form-group" style={{width: '100%'}}>
-                          <input id="tags" type="text" data-role="tagsinput"/>
+                          <input id="tags-input" type="text"/>
                           <p><span className="help-block">Press enter after inputting tag</span></p>
                       </div>
                     </div>

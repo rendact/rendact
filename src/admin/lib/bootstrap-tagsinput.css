@@ -1,3 +1,8 @@
+/*
+ * bootstrap-tagsinput v0.8.0
+ * 
+ */
+
 .bootstrap-tagsinput {
   background-color: #fff;
   border: 1px solid #ccc;
@@ -10,7 +15,6 @@
   max-width: 100%;
   line-height: 22px;
   cursor: text;
-  width: 100%;
 }
 .bootstrap-tagsinput input {
   border: none;
@@ -19,7 +23,7 @@
   background-color: transparent;
   padding: 0 6px;
   margin: 0;
-  width: 100%;
+  width: auto;
   max-width: inherit;
 }
 .bootstrap-tagsinput.form-control input::-moz-placeholder {
