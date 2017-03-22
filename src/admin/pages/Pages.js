@@ -8,7 +8,7 @@ import Fn from '../lib/functions';
 import {riques, hasRole} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
-
+//import RendactTable from '../lib/Table';
 
 const errorCallback = function(msg1, msg2){
   if (msg1) swal('Failed!', msg1, 'warning')
