@@ -5,7 +5,6 @@ window.jQuery = $;
 import Config from '../../config';
 import Query from '../query';
 import {riques, setValue, getValue} from '../../utils';
-import {getTemplates} from '../theme';
 import { default as swal } from 'sweetalert2';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
@@ -17,6 +16,28 @@ const errorCallback = function(msg1, msg2){
 }
 
 const NewPost = React.createClass({
+  componentDidMount: function(){
+    require('../lib/bootstrap-tagsinput.js');
+    require('../lib/bootstrap-tagsinput.css');
+    var me = this;
+
+    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
+      window.CKEDITOR.replace('content', {
+        height: 400,
+        title: false
+      });
+      for (var i in window.CKEDITOR.instances) {
+        if (window.CKEDITOR.instances.hasOwnProperty(i))
+          window.CKEDITOR.instances[i].on('change', me.handleContentChange);
+      }
+    });
+
+    if (this.state.visibilityTxt==="Public") {
+      $("#public").attr("checked", true);
+    }else $("#private").attr("checked", true);
+
+    this.notification = this.refs.notificationSystem;
+  },
 
   getInitialState: function(){
     return {
@@ -38,25 +59,6 @@ const NewPost = React.createClass({
       publishDate: new Date(),
       publishDateReset: new Date()
     }
-  },
-  componentDidMount: function(){
-    var me = this;
-    this.notification = this.refs.notificationSystem;
-    $.getScript("https://cdn.ckeditor.com/4.6.2/standard-all/ckeditor.js", function(data, status, xhr){
-      window.CKEDITOR.replace('content', {
-        extraPlugins: 'justify',
-        height: 400,
-        title: false
-      });
-      for (var i in window.CKEDITOR.instances) {
-        if (window.CKEDITOR.instances.hasOwnProperty(i))
-          window.CKEDITOR.instances[i].on('change', me.handleContentChange);
-      }
-    });
-    if (this.state.visibilityTxt==="Public") {
-      $("#public").attr("checked", true);
-    }else $("#private").attr("checked", true);
-    this.notification = this.refs.notificationSystem;
   },
   checkSlug: function(slug){
     var me = this;
@@ -87,7 +89,7 @@ const NewPost = React.createClass({
     this.setState({immediately: time});
   },
   saveDraft: function(event){
-    
+    this.setState({status: $("#statusSelect option:selected").text()});
   },
   saveVisibility: function(event){
     this.setState({visibilityTxt: $("input[name=visibilityRadio]:checked").val()});
@@ -110,18 +112,13 @@ const NewPost = React.createClass({
   resetForm: function(){
     document.getElementById("postForm").reset();
     window.CKEDITOR.instances['content'].setData(null);
-    this.setState({
-      title:"", slug:"", content:"", summary:"",
+    this.setState({title:"", slug:"", content:"", summary:"",
       status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
       permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160});
     this.handleTitleChange();
     window.history.pushState("", "", '/admin/posts/new');
   },
   getFormValues: function(){
-    var postOrder = $("#postOrder").val();
-    var postOrderInt = 0;
-    try  {postOrderInt=parseInt(postOrder,10)} catch(e) {}
-
     return {
       title: getValue("titlePost"),
       content: window.CKEDITOR.instances['content'].getData(),
@@ -138,7 +135,6 @@ const NewPost = React.createClass({
         if (item.checked)
           return item.value
       })
-
     }
   },
   setFormValues: function(v){
@@ -307,11 +303,10 @@ const NewPost = React.createClass({
             }
           }
 
-
           riques(pmQry, 
             function(error, response, body) {
               if (!error && !body.errors && response.statusCode === 200) {
-
+                var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.state.postCategoryList, v.categories);
                 riques(catQry,
                   function(error, response, body) {
                     if (!error && !body.errors && response.statusCode === 200) {
@@ -321,23 +316,19 @@ const NewPost = React.createClass({
                         position: 'tr',
                         autoDismiss: 2
                       });
-
+                      here.setState({mode: "update"});
                     } else {
                       errorCallback(error, body.errors?body.errors[0].message:null);
                     }
                     here.disableForm(false);
                   }
                 );
-
               } else {
                 errorCallback(error, body.errors?body.errors[0].message:null);
               }
+              here.disableForm(false);
             }
           );
-          
-          var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.state.postCategoryList, v.categories);
-
-          me.setState({mode: "update"});
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
@@ -556,7 +547,7 @@ const NewPost = React.createClass({
 
                         <div className="form-group">
                           <p><span className="glyphicon glyphicon-calendar" style={{marginRight: 10}}></span>{this.state.immediatelyStatus===true?
-                            (<span>Publish <b>Immediately </b></span>):<span>Published at <b>{this.formatDate(this.state.publishDate)}</b></span>} 
+                            (<span>Publish <b>Immediately</b></span>):<span>Published at <b>{this.formatDate(this.state.publishDate)}</b></span>} 
                           <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#scheduleOption"> Edit </button></p>
 
                           <div id="scheduleOption" className="collapse">
