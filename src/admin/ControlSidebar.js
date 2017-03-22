@@ -76,13 +76,18 @@ const ControlSidebar = React.createClass({
   },
 
   disableForm: function(state){
-    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
-    _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;})
-  },
+    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;});
+    _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;});
 
-  handleCheckBox: function(){
-    var checked = $("input.setting:checked");
-    
+    if (state)
+      this.notification.addNotification({
+        id: 'loading',
+        message: 'Processing...',
+        level: 'warning',
+        position: 'tr'
+      });
+    else 
+      this.notification.removeNotification('loading');
   },
 
   handleDataSkin: function(e){
@@ -200,13 +205,13 @@ const ControlSidebar = React.createClass({
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
-        me.disableForm(false);
         me.notification.addNotification({
           message: "Saved",
-          level: 'succes',
+          level: 'success',
           position: 'tr',
           autoDismiss: 5
         });
+        me.disableForm(false);
       }
     );
   },
@@ -272,6 +277,7 @@ const ControlSidebar = React.createClass({
             {/* <li><a href="#control-sidebar-home-tab" data-toggle="tab"><i className="fa fa-home"></i></a></li> */}
             <li><a href="#control-sidebar-settings-tab" data-toggle="tab"><i className="fa fa-gears"></i></a></li>
           </ul>
+          <Notification ref="notificationSystem" />
           <div className="tab-content">
             <div className="tab-pane active" id="control-sidebar-theme-demo-options-tab">
                 <h4 className="control-sidebar-heading">Layout Options</h4>

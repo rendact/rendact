@@ -59,7 +59,6 @@ var NewUser = React.createClass({
 		);
 	},
 	setFormValues: function(v){
-		var meta = {}
 		var me = this;
 		setValue("name", v.fullName);
 		setValue("username", v.username);

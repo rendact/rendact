@@ -25,7 +25,7 @@ const NewPost = React.createClass({
       confirmKeys: [13, 188]
     });
     $('#tags-input').on('keypress', function(e){
-      if (e.keyCode == 13){
+      if (e.keyCode === 13){
         e.keyCode = 188;
         e.preventDefault();
       };
@@ -288,11 +288,9 @@ const NewPost = React.createClass({
       function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
           var here = me;
-          var postMetaId = "";
           var postId = "";
           var pmQry = "";
-          var categoryOfPostId = "";
-
+          
           if (me.state.mode==="create"){
             postId = body.data.createPost.changedPost.id;
             pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, null);
@@ -622,7 +620,7 @@ const NewPost = React.createClass({
                     </div>
                     <div className="box-body pad">
                       <div className="form-group" style={{width: '100%'}}>
-                          <input id="tags-input" type="text"/>
+                          <input id="tags-input" type="text" style={{width: '100%'}}/>
                           <p><span className="help-block">Press enter after inputting tag</span></p>
                       </div>
                     </div>

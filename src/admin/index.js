@@ -23,7 +23,7 @@ import NotPermissible from './NotPermissible';
 
 import Config from '../config';
 import AdminLTEinit from './lib/app.js';
-import {getMaxRole, hasRole} from '../utils';
+import {hasRole} from '../utils';
 
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -132,7 +132,6 @@ const PageLoader = React.createClass({
 	},
 	render: function() {
 		var page = this.props.pageId;
-		var maxRole = getMaxRole();
 		var action = "";
 		if (this.props.actionId) {
 			action = "-"+this.props.actionId;

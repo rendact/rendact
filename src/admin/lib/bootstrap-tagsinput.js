@@ -83,7 +83,7 @@
 
       // Throw an error when trying to add an object while the itemValue option was not set
       if (typeof item === "object" && !self.objectItems)
-        throw("Can't add objects when itemValue option is not set");
+        return "Can't add objects when itemValue option is not set";
 
       // Ignore strings only containg whitespace
       if (item.toString().match(/^\s*$/))
@@ -185,9 +185,9 @@
 
       if (self.objectItems) {
         if (typeof item === "object")
-          item = $.grep(self.itemsArray, function(other) { return self.options.itemValue(other) ==  self.options.itemValue(item); } );
+          item = $.grep(self.itemsArray, function(other) { return self.options.itemValue(other) ===  self.options.itemValue(item); } );
         else
-          item = $.grep(self.itemsArray, function(other) { return self.options.itemValue(other) ==  item; } );
+          item = $.grep(self.itemsArray, function(other) { return self.options.itemValue(other) ===  item; } );
 
         item = item[item.length-1];
       }
@@ -246,7 +246,7 @@
           $tag.attr('class', null);
           $tag.addClass('tag ' + htmlEncode(tagClass));
           $tag.contents().filter(function() {
-            return this.nodeType == 3;
+            return this.nodeType === 3;
           })[0].nodeValue = htmlEncode(itemText);
 
           if (self.isSelect) {
@@ -302,6 +302,9 @@
 
         self.$input.typeahead($.extend({}, typeahead, {
           source: function (query, process) {
+            var map = this.map,
+                data = typeahead.source(query);
+
             function processItems(items) {
               var texts = [];
 
@@ -314,8 +317,6 @@
             }
 
             this.map = {};
-            var map = this.map,
-                data = typeahead.source(query);
 
             if ($.isFunction(data.success)) {
               // support for Angular callbacks
@@ -445,9 +446,6 @@
          }
 
         // Reset internal input's size
-        var textLength = $input.val().length,
-            wordSpace = Math.ceil(textLength / 5),
-            size = textLength + wordSpace + 1;
         $input.attr('size', Math.max(this.inputSize, $input.val().length));
       }, self));
 
@@ -475,9 +473,6 @@
          }
 
          // Reset internal input's size
-         var textLength = $input.val().length,
-            wordSpace = Math.ceil(textLength / 5),
-            size = textLength + wordSpace + 1;
          $input.attr('size', Math.max(this.inputSize, $input.val().length));
       }, self));
 
@@ -552,6 +547,7 @@
 
     this.each(function() {
       var tagsinput = $(this).data('tagsinput');
+      var retVal;
       // Initialize a new tags input
       if (!tagsinput) {
           tagsinput = new TagsInput(this, arg1);
@@ -571,16 +567,16 @@
       } else if(tagsinput[arg1] !== undefined) {
           // Invoke function on existing tags input
             if(tagsinput[arg1].length === 3 && arg3 !== undefined){
-               var retVal = tagsinput[arg1](arg2, null, arg3);
+               retVal = tagsinput[arg1](arg2, null, arg3);
             }else{
-               var retVal = tagsinput[arg1](arg2);
+               retVal = tagsinput[arg1](arg2);
             }
           if (retVal !== undefined)
               results.push(retVal);
       }
     });
 
-    if ( typeof arg1 == 'string') {
+    if ( typeof arg1 === 'string') {
       // Return the results from the invoked function calls
       return results.length > 1 ? results : results[0];
     } else {
@@ -630,7 +626,7 @@
       var oSel = document.selection.createRange();
       oSel.moveStart ('character', -oField.value.length);
       iCaretPos = oSel.text.length;
-    } else if (oField.selectionStart || oField.selectionStart == '0') {
+    } else if (oField.selectionStart || oField.selectionStart === '0') {
       iCaretPos = oField.selectionStart;
     }
     return (iCaretPos);
