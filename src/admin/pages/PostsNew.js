@@ -20,9 +20,6 @@ const NewPost = React.createClass({
 
   getInitialState: function(){
     return {
-
-      noticeTxt: null,
-
       title:"",
       slug:"",
       content:"",
@@ -90,128 +87,7 @@ const NewPost = React.createClass({
     this.setState({immediately: time});
   },
   saveDraft: function(event){
-    this.setState({status: $("#statusSelect option:selected").text()});
-  },
-  saveDraftBtn: function(event) {
-    event.preventDefault();
-    this.disableForm(true);
-
-    var me = this;
-    var v = this.getFormValues();
-
-    if (v.title.length<=3) {
-      swal('Invalid content', "Title is to short!", 'warning');
-      return;
-    }
-
-    if (!v.content) {
-      swal('Invalid content', "Content can't be empty", 'warning');
-      return;
-    }
-
-    this.disableForm(true);
-    var qry = "", noticeTxt = "";
-    if (this.state.mode==="create"){
-      qry = Query.getCreatePostQry(v.title, v.content, "Draft", v.visibility, v.publishDate, v.passwordPage,
-        localStorage.getItem('userId'), this.state.slug, v.summary, v.type);
-      noticeTxt = this.notification.addNotification({
-      title: 'Notice',
-      message: 'Post Published!',
-      level: 'success',
-      position: 'tc'
-    });
-    }else{
-      qry = Query.getUpdatePostQry(this.props.postId, v.title, v.content, "Draft", v.visibility, v.passwordPage,
-        v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary);
-      noticeTxt = this.notification.addNotification({
-      title: 'Notice',
-      message: 'Post Updated!',
-      level: 'success',
-      position: 'tc'
-    });
-    }
-
-    /*riques(qry, 
-      function(error, response, body) {
-        if (!error && !body.errors && response.statusCode === 200) {
-          var here = me;
-          var postMetaId = "";
-          var postId = "";
-          var pmQry = "";
-          var categoryOfPostId = "";
-
-          if (me.state.mode==="create"){
-            postId = body.data.createPost.changedPost.id;
-            pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, null);
-          } else {
-            postId = body.data.updatePost.changedPost.id;
-            if (body.data.updatePost.changedPost.meta.edges.length===0) {
-              pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, null);
-            } else {
-              var data = [];
-              _.forEach(body.data.updatePost.changedPost.meta.edges, function(item){
-                data.push({
-                  postMetaId: item.node.id,
-                  item: item.node.item,
-                  value: _.has(v, item.node.item)?v[item.node.item]:null
-                });
-              });
-              pmQry = Query.updatePostMetaMtn(postId, data);
-            }
-          }*/
-    riques(qry, 
-      function(error, response, body){
-        if (!error && !body.errors && response.statusCode === 200) {
-          var here = me;
-          var postMetaId = "";
-          var postId = "";
-          var pmQry = "";
-          
-          if (me.state.mode==="create"){
-            postId = body.data.createPost.changedPost.id;
-            pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
-          } else {
-            postId = body.data.updatePost.changedPost.id;
-            if (body.data.updatePost.changedPost.meta.edges.length===0) {
-              pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
-            } else {
-              postMetaId = body.data.updatePost.changedPost.meta.edges[0].node.id;
-              pmQry = Query.updatePostMetaMtn(postMetaId, postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
-            }
-          }
-
-          /*riques(pmQry, 
-            function(error, response, body) {
-              if (!error && !body.errors && response.statusCode === 200) {
-                here.setState({noticeTxt: noticeTxt}); 
-              } else {
-                errorCallback(error, body.errors?body.errors[0].message:null);
-              }
-              here.disableForm(false);
-            }
-          );*/
-          riques(pmQry, 
-            function(error, response, body) {
-              if (!error && !body.errors && response.statusCode === 200) {
-                here.notification.addNotification({
-                  message: noticeTxt,
-                  level: 'success',
-                  position: 'tr',
-                  autoDismiss: 2
-                });
-              } else {
-                errorCallback(error, body.errors?body.errors[0].message:null);
-              }
-              here.disableForm(false);
-            }
-          );
-
-          me.setState({mode: "update"});
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-      }
-    );  
+    
   },
   saveVisibility: function(event){
     this.setState({visibilityTxt: $("input[name=visibilityRadio]:checked").val()});
@@ -221,12 +97,15 @@ const NewPost = React.createClass({
     _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;})
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
     
-    this.notification.addNotification({
-      message: 'Processing...',
-      level: 'warning',
-      position: 'tr',
-      autoDismiss: 1
-    });
+    if (state)
+      this.notification.addNotification({
+        id: 'loading',
+        message: 'Processing...',
+        level: 'warning',
+        position: 'tr'
+      });
+    else 
+      this.notification.removeNotification('loading');
   },
   resetForm: function(){
     document.getElementById("postForm").reset();
@@ -254,7 +133,6 @@ const NewPost = React.createClass({
       summary: getValue("summary"),
       visibility: $("input[name=visibilityRadio]:checked").val(),
       publishDate: this.state.publishDate,
-
       type: "post",
       categories: _.map(document.getElementsByName("categoryCheckbox[]"), function(item){
         if (item.checked)
@@ -270,13 +148,14 @@ const NewPost = React.createClass({
         meta[i.node.item] = i.node.value;
       });
     }
-
+    
     var _postCategoryList = [];
     if (v.category.edges.length>0) {
       _.forEach(v.category.edges, function(i){
         _postCategoryList.push(i.node.id);
-        if (document.getElementById(i.node.id))
-          document.getElementById(i.node.id).checked = true;
+        if (document.getElementById(i.node.category.id)){
+          document.getElementById(i.node.category.id).checked = true;
+        }
       });
       this.setState({postCategoryList: _postCategoryList});
     }
@@ -368,106 +247,6 @@ const NewPost = React.createClass({
     var v = this.getFormValues();
 
     if (v.title.length<=3) {
-
-      this.notification.addNotification({
-      title: 'Error',
-      message: 'Title is too short',
-      level: 'error',
-      position: 'tr'
-    });
-
-      return;
-    }
-
-    if (!v.content) {
-
-      this.notification.addNotification({
-      title: 'Error',
-      message: "Content can't be empty",
-      level: 'error',
-      position: 'tr'
-    });
-
-      return;
-    }
-
-    this.disableForm(true);
-    var qry = "", noticeTxt = "";
-    if (this.state.mode==="create"){
-      qry = Query.getCreatePostQry(v.title, v.content, v.status, v.visibility, v.publishDate, v.passwordPage,
-        localStorage.getItem('userId'), this.state.slug, v.summary, v.type);
-
-      noticeTxt = 'Post Published!';
-
-    }else{
-      qry = Query.getUpdatePostQry(this.props.postId, v.title, v.content, v.status, v.visibility, v.passwordPage,
-        v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary);
-
-      noticeTxt = 'Post Updated!';
-
-    }
-
-    riques(qry, 
-      function(error, response, body) {
-        if (!error && !body.errors && response.statusCode === 200) {
-          var here = me;
-          var postMetaId = "";
-          var postId = "";
-          var pmQry = "";
-          var categoryOfPostId = "";
-
-          if (me.state.mode==="create"){
-            postId = body.data.createPost.changedPost.id;
-            pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, null);
-          } else {
-            postId = body.data.updatePost.changedPost.id;
-            if (body.data.updatePost.changedPost.meta.edges.length===0) {
-              pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, null);
-            } else {
-              var data = [];
-              _.forEach(body.data.updatePost.changedPost.meta.edges, function(item){
-                data.push({
-                  postMetaId: item.node.id,
-                  item: item.node.item,
-                  value: _.has(v, item.node.item)?v[item.node.item]:null
-                });
-              });
-              pmQry = Query.updatePostMetaMtn(postId, data);
-            }
-          }
-
-          /*riques(pmQry, 
-            function(error, response, body) {
-              if (!error && !body.errors && response.statusCode === 200) {
-                here.notification.addNotification({
-                  title: 'Notice',
-                  message: noticeTxt,
-                  level: 'success',
-                  position: 'tr'
-                });
-              } else {
-                errorCallback(error, body.errors?body.errors[0].message:null);
-              }
-              here.disableForm(false);
-            }
-
-          );*/
-
-        
-
-          me.setState({mode: "update"});
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-      }
-    );  
-  },
-  handleSubmit: function(event) {
-    event.preventDefault();
-    var me = this;
-    var v = this.getFormValues();
-
-    if (v.title.length<=3) {
       this.notification.addNotification({
         title: 'Error',
         message: 'Title is too short',
@@ -532,31 +311,31 @@ const NewPost = React.createClass({
           riques(pmQry, 
             function(error, response, body) {
               if (!error && !body.errors && response.statusCode === 200) {
-                here.notification.addNotification({
-                  message: noticeTxt,
-                  level: 'success',
-                  position: 'tr',
-                  autoDismiss: 2
-                });
+
+                riques(catQry,
+                  function(error, response, body) {
+                    if (!error && !body.errors && response.statusCode === 200) {
+                      here.notification.addNotification({
+                        message: noticeTxt,
+                        level: 'success',
+                        position: 'tr',
+                        autoDismiss: 2
+                      });
+
+                    } else {
+                      errorCallback(error, body.errors?body.errors[0].message:null);
+                    }
+                    here.disableForm(false);
+                  }
+                );
 
               } else {
                 errorCallback(error, body.errors?body.errors[0].message:null);
               }
-              here.disableForm(false);
             }
           );
-
-          riques(Config.createUpdateCategoryOfPostMtn(postId, me.state.postCategoryList, v.categories),
-            function(error, response, body) {
-              if (!error && !body.errors && response.statusCode === 200) {
-                
-
-              } else {
-                errorCallback(error, body.errors?body.errors[0].message:null);
-              }
-              here.disableForm(false);
-            }
-          );
+          
+          var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.state.postCategoryList, v.categories);
 
           me.setState({mode: "update"});
         } else {
@@ -579,17 +358,18 @@ const NewPost = React.createClass({
             categoryList.push((<div><input key={item.node.id} id={item.node.id} name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
           })
           me.setState({categoryList: categoryList});
-        }
-      }
-    );
 
-    if (!this.props.postId) return;
+          if (!me.props.postId) return;
 
-    riques(Query.getPostQry(this.props.postId), 
-      function(error, response, body) {
-        if (!error) {
-          var values = body.data.getPost;
-          me.setFormValues(values);
+          riques(Query.getPostQry(me.props.postId), 
+            function(error, response, body) {
+              if (!error) {
+                var values = body.data.getPost;
+                me.setFormValues(values);
+              }
+            }
+          );
+
         }
       }
     );
@@ -809,7 +589,7 @@ const NewPost = React.createClass({
                               <span className="sr-only">Toggle Dropdown</span>
                             </button>
                             <ul className="dropdown-menu" role="menu">
-                              <li><button onClick={this.saveDraftBtn} className="btn btn-default btn-flat">{this.state.status==="Draft"?"Save As Draft":""}</button></li>
+                              <li><button onClick={this.saveDraft} className="btn btn-default btn-flat">{this.state.status==="Draft"?"Save As Draft":""}</button></li>
                             </ul>
                           </div>
                       </div>        

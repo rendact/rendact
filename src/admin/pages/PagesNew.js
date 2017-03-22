@@ -171,14 +171,19 @@ const NewPage = React.createClass({
     _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
     _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;})
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.setState({loadingMsg: state?(
+    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
+    _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;})
+    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
+    
+    if (state)
       this.notification.addNotification({
-      message: 'Processing...',
-      level: 'warning',
-      position: 'tl',
-      autoDismiss: 1
-    }))
-    :null});
+        id: 'loading',
+        message: 'Processing...',
+        level: 'warning',
+        position: 'tr'
+      });
+    else 
+      this.notification.removeNotification('loading');
   },
   resetForm: function(){
     document.getElementById("pageForm").reset();
