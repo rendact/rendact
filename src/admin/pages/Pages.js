@@ -42,27 +42,22 @@ const Pages = React.createClass({
         if (body.data) {
           var monthList = ["all"];
           var here = me;
-          var bEdit = hasRole('modify-page');
-
           var _dataArr = [];
           _.forEach(body.data.viewer.allPosts.edges, function(item){
             var dt = new Date(item.node.createdAt);
-            var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
-            var author = item.node.author?item.node.author.username:"";
-            var slug = item.node.slug?item.node.slug:"";
-            var status = item.node.status?item.node.status:"";
 
-            var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
             _dataArr.push({
               "checkbox": null,
               "postId": item.node.id,
               "title": item.node.title,
-              "slug": slug,
-              "author": author,
-              "status": status,
-              "comment": 10,
-              "published": date
+              "slug": item.node.slug?item.node.slug:"",
+              "author": item.node.author?item.node.author.username:"",
+              "status": item.node.status?item.node.status:"",
+              "comments": item.node.comments.edges.length,
+              "published": dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate()
             })
+
+            var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
             if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
           });
 
@@ -73,7 +68,7 @@ const Pages = React.createClass({
             var postId = this.id.split("-")[1];
             me.handleViewPage(postId);
           });
-          $(".pageCb").click( function(){
+          $(".pageListCb").click( function(){
             me.checkDynamicButtonState();
           });
           $('#selectAll').click(function () {
@@ -352,7 +347,7 @@ const Pages = React.createClass({
                       <RendactTable 
                         id="pageList"
                         columns={[
-                          {id: 'checkbox', type: "checkbox", width: 7, cssClass:"pageCb"},
+                          {id: 'checkbox', type: "checkbox", width: 7, cssClass:"pageListCb"},
                           {id: 'title', label: "Title", width: 400, type: "link", target: "", cssClass:"titleText"},
                           {id: 'slug', label: "Slug", textAlign:"center"},
                           {id: 'author', label: "Author", textAlign:"center"},

@@ -2,7 +2,7 @@ import React from 'react';
 import $ from 'jquery';
 window.jQuery = $;
 import _ from 'lodash';
-
+import {riques, hasRole} from '../../utils';
 
 const Table = React.createClass({
 	getInitialState: function(){
@@ -37,6 +37,7 @@ const Table = React.createClass({
   },
   loadData: function(dataArr){
   	var me = this;
+  	var bEdit = hasRole('modify-page');
   	this.datatable.clear();
   	_.forEach(dataArr, function(item){
       var dt = new Date(item.createdAt);
@@ -55,7 +56,7 @@ const Table = React.createClass({
 
       	if (col.type && col.type==="checkbox") 
       		_cols.push('<input class="'+cssClass+'" type="checkbox" ></input>');
-      	else if (col.type && col.type==="link") {
+      	else if (col.type && col.type==="link" && bEdit) {
       		_cols.push('<span id="'+item.id+'-'+item.postId+'" class="'+cssClass+'" style="text-align: '+textAlign+'; width:100%; display: block">'+
       			'<a href="'+target+'">'+item[col.id]+'</a>'+
       			'</span>')
