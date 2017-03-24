@@ -67,7 +67,10 @@ const NewPost = React.createClass({
       titleTagLeftCharacter: 65,
       metaDescriptionLeftCharacter: 160,
       publishDate: new Date(),
-      publishDateReset: new Date()
+      publishDateReset: new Date(),
+      titleTag: "",
+      metaKeyword: "",
+      metaDescription: ""
     }
   },
   checkSlug: function(slug){
@@ -156,13 +159,17 @@ const NewPost = React.createClass({
     }
     
     var _postCategoryList = [];
-    if (v.category.edges.length>0) {
+    if (v.category.edges.length>0) {debugger;
       _.forEach(v.category.edges, function(i){
+        if ((i.node.category.null)){
+          _postCategoryList.push(i.node.id);
+          document.getElementById(i.node.category.id).checked = false;
+        }else{
         _postCategoryList.push(i.node.id);
         if (document.getElementById(i.node.category.id)){
           document.getElementById(i.node.category.id).checked = true;
         }
-      });
+      }});
       this.setState({postCategoryList: _postCategoryList});
     }
 
@@ -310,7 +317,7 @@ const NewPost = React.createClass({
               pmQry = Query.updatePostMetaMtn(postId, data);
             }
           }
-
+          
           riques(pmQry, 
             function(error, response, body) {
               if (!error && !body.errors && response.statusCode === 200) {
@@ -354,7 +361,8 @@ const NewPost = React.createClass({
         if (!error) {
           var categoryList = [];
           $.each(body.data.viewer.allCategories.edges, function(key, item){
-            categoryList.push((<div><input key={item.node.id} id={item.node.id} name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
+            categoryList.push((<div><input key={item.node.id} id={item.node.id}
+            name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
           })
           me.setState({categoryList: categoryList});
 
@@ -362,7 +370,7 @@ const NewPost = React.createClass({
 
           riques(Query.getPostQry(me.props.postId), 
             function(error, response, body) {
-              if (!error) {
+              if (!error ) {
                 var values = body.data.getPost;
                 me.setFormValues(values);
               }
@@ -555,7 +563,7 @@ const NewPost = React.createClass({
 
                         <div className="form-group">
                           <p><span className="glyphicon glyphicon-calendar" style={{marginRight: 10}}></span>{this.state.immediatelyStatus===true?
-                            (<span>Publish <b>Immediately</b></span>):<span>Published at <b>{this.formatDate(this.state.publishDate)}</b></span>} 
+                            (<span>Publish <b>Immediately </b></span>):<span>Published at <b>{this.formatDate(this.state.publishDate)}</b> </span>} 
                           <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#scheduleOption"> Edit </button></p>
 
                           <div id="scheduleOption" className="collapse">

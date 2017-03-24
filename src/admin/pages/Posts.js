@@ -53,7 +53,7 @@ const Posts = React.createClass({
             var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
             var author = item.node.author?item.node.author.username:"";
             var status = item.node.status?item.node.status:"";
-            var categories = item.node.category.edges.length>0?item.node.category.edges.node:"";
+            var categories = item.node.category.edges.length>0?"ada kategory":"";
             //var categories = "Category";
             var img = "<img src='/images/photo1.png' width='100' />";
             //var tag = item.node.tag?item.node.tag.edges.node.tag.name:"";
@@ -287,8 +287,8 @@ const Posts = React.createClass({
     datatable.columns(1).every( function () {
         var that = this;
         $('#searchBox', this.footer() ).on( 'keyup change', function () {
-            if ( that.search() !== this.value ) {
-                that.search( this.value )
+            if ( that.search() !== that.value ) {
+                that.search( that.value )
                     .draw();
             }
             return null;
