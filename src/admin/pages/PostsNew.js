@@ -159,17 +159,15 @@ const NewPost = React.createClass({
     }
     
     var _postCategoryList = [];
-    if (v.category.edges.length>0) {debugger;
+    if (v.category.edges.length>0) {
       _.forEach(v.category.edges, function(i){
-        if ((i.node.category.null)){
-          _postCategoryList.push(i.node.id);
-          document.getElementById(i.node.category.id).checked = false;
-        }else{
-        _postCategoryList.push(i.node.id);
-        if (document.getElementById(i.node.category.id)){
-          document.getElementById(i.node.category.id).checked = true;
+        if (i.node.category){
+          _postCategoryList.push(i.node.category.id);
+          if (document.getElementById(i.node.category.id)){
+            document.getElementById(i.node.category.id).checked = true;
+          }
         }
-      }});
+      });
       this.setState({postCategoryList: _postCategoryList});
     }
 
@@ -361,7 +359,7 @@ const NewPost = React.createClass({
         if (!error) {
           var categoryList = [];
           $.each(body.data.viewer.allCategories.edges, function(key, item){
-            categoryList.push((<div><input key={item.node.id} id={item.node.id}
+            categoryList.push((<div key={item.node.id}><input id={item.node.id}
             name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
           })
           me.setState({categoryList: categoryList});
