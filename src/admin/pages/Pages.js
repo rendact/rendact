@@ -5,16 +5,10 @@ import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Query from '../query';
 import Fn from '../lib/functions';
-import {riques, hasRole} from '../../utils';
+import {riques, hasRole, errorCallback} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
-import RendactTable from '../lib/Table';
-
-const errorCallback = function(msg1, msg2){
-  if (msg1) swal('Failed!', msg1, 'warning')
-  else if (msg2) swal('Failed!', msg2, 'warning')
-  else swal('Failed!', 'Unknown error','warning')
-}
+import {Table, SearchBox, DeleteButtons} from '../lib/Table';
 
 const Pages = React.createClass({
   getInitialState: function(){
@@ -29,11 +23,10 @@ const Pages = React.createClass({
       statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
       activeStatus: "All",
-      itemSelected: false,
-      notification: null
+      itemSelected: false
     }
   },
-  loadData: function(datatable, type, callback) {
+  loadData: function(type, callback) {
     var me = this;
     var qry = Query.getPageListQry(type);
     
@@ -41,7 +34,6 @@ const Pages = React.createClass({
       function(error, response, body) {
         if (body.data) {
           var monthList = ["all"];
-          var here = me;
           var _dataArr = [];
           _.forEach(body.data.viewer.allPosts.edges, function(item){
             var dt = new Date(item.node.createdAt);
@@ -62,19 +54,6 @@ const Pages = React.createClass({
           });
 
           me.table.loadData(_dataArr);
-
-          $(".titleText").click(function(event){
-            event.preventDefault();
-            var postId = this.id.split("-")[1];
-            me.handleViewPage(postId);
-          });
-          $(".pageListCb").click( function(){
-            me.checkDynamicButtonState();
-          });
-          $('#selectAll').click(function () {
-            $(':checkbox').prop('checked', this.checked);
-            me.checkDynamicButtonState();
-          });
           me.setState({monthList: monthList});
           
           if (callback) callback.call();
@@ -92,12 +71,7 @@ const Pages = React.createClass({
         el.disabled = state;
     })
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.notification.addNotification({
-      message: 'Processing...',
-      level: 'warning',
-      position: 'tr',
-      autoDismiss: 2
-    });
+    this.notif.addNotification({message: 'Processing...', level: 'warning',position: 'tr'});
     if (!state) {
       this.checkDynamicButtonState();
     }
@@ -123,7 +97,7 @@ const Pages = React.createClass({
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, "All", cb);
+            me.loadData("All", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -148,7 +122,7 @@ const Pages = React.createClass({
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, "Deleted", cb);
+            me.loadData("Deleted", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -174,7 +148,7 @@ const Pages = React.createClass({
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, "Deleted", cb);
+            me.loadData("Deleted", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -201,7 +175,7 @@ const Pages = React.createClass({
             console.log(JSON.stringify(body, null, 2));
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, "Deleted", cb);
+            me.loadData("Deleted", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -218,13 +192,13 @@ const Pages = React.createClass({
     this.setState({activeStatus: status});
     if (status==='Deleted'){
       var me = this;
-      this.loadData(this.state.dt, "Deleted", function(){
+      this.loadData("Deleted", function(){
         me.setState({deleteMode: true});
         me.disableForm(false);
       });
     }else{
       var re = this;
-      this.loadData(this.state.dt, status, function(){
+      this.loadData(status, function(){
         re.setState({deleteMode: false});
         re.disableForm(false);
       })
@@ -235,7 +209,7 @@ const Pages = React.createClass({
     var status = this.state.activeStatus;
     if (status==='Deleted'){
       var me = this;
-      this.loadData(this.state.dt, "Deleted", function(){
+      this.loadData("Deleted", function(){
         me.setState({deleteMode: true});
         me.disableForm(false);
       });
@@ -243,7 +217,7 @@ const Pages = React.createClass({
       var date = $("#dateFilter").val();
       var searchValue = { 6: date };
       var te = this;
-      this.loadData(this.state.dt, status, function(){
+      this.loadData(status, function(){
         te.setState({deleteMode: false});
         te.state.dt.columns([6]).every( function () {
           this.search( searchValue[this.index()] ).draw();
@@ -256,25 +230,21 @@ const Pages = React.createClass({
   handleViewPage: function(postId){
     this.props.handleNav('pages','edit', postId);
   },
+  onAfterTableLoad: function(){
+    var me = this;
+    $(".titleText").click(function(event){
+      event.preventDefault();
+      var postId = this.id.split("-")[1];
+      me.handleViewPage(postId);
+    });
+  },
   componentDidMount: function(){
-    var datatable = $('#pageListTbl').DataTable({sDom: '<"H"r>t<"F"ip>'}); 
-    this.notification = this.refs.notificationSystem;
+    this.notif = this.refs.notificationSystem;
     this.table = this.refs.rendactTable;
-
-    datatable.columns(1).every( function () {
-        var that = this;
-        $('#searchBox', this.footer() ).on( 'keyup change', function () {
-            if ( that.search() !== this.value ) {
-                that.search( this.value )
-                    .draw();
-            }
-            return null;
-        });
-        return null;
-    } );
-    
+    var datatable = this.table.datatable;
+    this.refs.rendactSearchBox.bindToTable(datatable);
     this.setState({dt: datatable});
-    this.loadData(datatable, "All");
+    this.loadData("All");
   },
   render: function(){
     return (
@@ -313,25 +283,16 @@ const Pages = React.createClass({
                               return <option key={item} value={item}>{month+" "+year}</option>
                             })}
                           </select>      
-                          { (!this.state.deleteMode && hasRole('modify-page')) &&    
-                            [<button className="btn btn-default btn-flat" id="deleteBtn" onClick={this.handleDeleteBtn} style={{marginRight:10}} 
-                            disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete</button>]
-                          }   
-                          { (this.state.deleteMode && hasRole('modify-page')) && 
-                            [<button key="recoverBtn" className="btn btn-default btn-flat" id="recoverBtn" style={{marginRight:10}} onClick={this.handleRecover}
-                             disabled={!this.state.itemSelected} ><span className="fa fa-support" ></span> Recover</button>,
-                             <button key="deletePermanentBtn" className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}
-                             disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete Permanently</button>,
-                             <button key="emptyTrashBtn" className="btn btn-default btn-flat" id="emptyTrashBtn" onClick={this.handleEmptyTrash}><span className="fa fa-trash" ></span> Empty Trash</button>]
-                          }                        
+                          <DeleteButtons 
+                            deleteMode={this.state.deleteMode}
+                            itemSelected={this.state.itemSelected}
+                            onDelete={this.handleDeleteBtn}
+                            onRecover={this.handleRecover}
+                            onDeletePermanent={this.handleDeletePermanent}
+                            onEmptyTrash={this.handleEmptyTrash}
+                          />
                         <div className="box-tools pull-right">
-                          <div className="input-group" style={{width: 200}}>
-                            <input type="text" id="searchBox" className="form-control" placeholder="Search"/>
-
-                            <div className="input-group-btn">
-                              <button className="btn btn-default"><i className="fa fa-search"></i></button>
-                            </div>
-                          </div>
+                          <SearchBox datatable={this.table} ref="rendactSearchBox"/>
                         </div>
                         <div className="box-tools" style={{marginTop: 10}}>
                           <b>Status:</b> {this.state.statusList.map(function(item, index, array){
@@ -344,10 +305,9 @@ const Pages = React.createClass({
                           }.bind(this))}
                         </div>
                       </div>
-                      <RendactTable 
+                      <Table 
                         id="pageList"
                         columns={[
-                          {id: 'checkbox', type: "checkbox", width: 7, cssClass:"pageListCb"},
                           {id: 'title', label: "Title", width: 400, type: "link", target: "", cssClass:"titleText"},
                           {id: 'slug', label: "Slug", textAlign:"center"},
                           {id: 'author', label: "Author", textAlign:"center"},
@@ -355,7 +315,11 @@ const Pages = React.createClass({
                           {id: 'comments', label: "Comments", width: 30, textAlign:"center"},
                           {id: 'published', label: "Published", textAlign:"center"}
                         ]}
+                        checkBoxAtFirstColumn="true"
                         ref="rendactTable"
+                        onSelectAll={this.checkDynamicButtonState}
+                        onCheckBoxClick={this.checkDynamicButtonState}
+                        onAfterLoad={this.onAfterTableLoad}
                       />
                   </div>
                 </div>

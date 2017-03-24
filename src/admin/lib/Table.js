@@ -2,7 +2,55 @@ import React from 'react';
 import $ from 'jquery';
 window.jQuery = $;
 import _ from 'lodash';
-import {riques, hasRole} from '../../utils';
+import {hasRole} from '../../utils';
+
+const SearchBox = React.createClass({
+	bindToTable: function(datatable){
+    this.datatable = datatable;
+    this.datatable.columns(1).every( function () {
+        var that = this;
+        $('#searchBox', this.footer() ).on( 'keyup change', function () {
+            if ( that.search() !== this.value ) {
+                that.search( this.value )
+                    .draw();
+            }
+            return null;
+        });
+        return null;
+    } );
+  },
+	render: function(){
+		return (
+			<div className="input-group" style={{width: 200}}>
+	      <input type="text" id="searchBox" className="form-control" placeholder="Search"/>
+
+	      <div className="input-group-btn">
+	        <button className="btn btn-default"><i className="fa fa-search"></i></button>
+	      </div>
+	    </div>
+	   )
+	}
+});
+
+const DeleteButtons = React.createClass({
+	render: function(){
+		return (
+			<span>
+			{ (!this.props.deleteMode && hasRole('modify-page')) &&    
+        [<button key="deleteBtn" className="btn btn-default btn-flat" id="deleteBtn" onClick={this.props.onDelete} style={{marginRight:10}} 
+        disabled={!this.props.itemSelected}><span className="fa fa-trash-o" ></span> Delete</button>]
+      }   
+      { (this.props.deleteMode && hasRole('modify-page')) && 
+        [<button key="recoverBtn" className="btn btn-default btn-flat" id="recoverBtn" style={{marginRight:10}} onClick={this.props.onRecover}
+         disabled={!this.props.itemSelected} ><span className="fa fa-support" ></span> Recover</button>,
+         <button key="deletePermanentBtn" className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.props.onDeletePermanent}
+         disabled={!this.props.itemSelected}><span className="fa fa-trash-o" ></span> Delete Permanently</button>,
+         <button key="emptyTrashBtn" className="btn btn-default btn-flat" id="emptyTrashBtn" onClick={this.props.onEmptyTrash}><span className="fa fa-trash" ></span> Empty Trash</button>]
+      }    
+      </span>                    
+	   )
+	}
+});
 
 const Table = React.createClass({
 	getInitialState: function(){
@@ -10,16 +58,17 @@ const Table = React.createClass({
     require ('datatables/media/css/jquery.dataTables.min.css');
     
     var _tableHead = [];
+    if (this.props.checkBoxAtFirstColumn) {
+    	_tableHead.push(<th key="selectAll" style={{width: 7}}><input type="checkbox" id="selectAll"/></th>)
+    }
+
     _.forEach(this.props.columns, function(item){
     	var width = 'inherit';
     	var textAlign = 'left';
     	if (item.width) width = item.width;
     	if (item.textAlign) textAlign = item.textAlign;
 
-    	if (item.type && item.type==="checkbox") 
-    		_tableHead.push(<th style={{width: width}}><input type="checkbox" id="selectAll"/></th>)
-    	else
-  			_tableHead.push(<th style={{width: width, textAlign: textAlign}}>{item.label}</th>)
+  		_tableHead.push(<th key={item.label} style={{width: width, textAlign: textAlign}}>{item.label}</th>)
   	});
 
     return {
@@ -32,7 +81,8 @@ const Table = React.createClass({
   		columns: [
   			{label: "Column1", width: 400}, 
   			{label: "Column2", width: 400}, 
-  		]
+  		],
+  		checkBoxAtFirstColumn: false
   	}
   },
   loadData: function(dataArr){
@@ -40,23 +90,17 @@ const Table = React.createClass({
   	var bEdit = hasRole('modify-page');
   	this.datatable.clear();
   	_.forEach(dataArr, function(item){
-      var dt = new Date(item.createdAt);
-      var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
-      var author = item.username;
-      var slug = item.slug;
-      var status = status?item.node.status:"";
-
-      var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
-
       var _cols = [];
+      if (me.props.checkBoxAtFirstColumn) 
+      	_cols.push('<input class="'+me.props.id+'Cb" type="checkbox" ></input>');
+
       _.forEach(me.props.columns, function(col, index){
       	var textAlign = col.textAlign?col.textAlign:'left';
 	      var cssClass = col.cssClass?col.cssClass:'';
 	      var target = col.target?col.target:'#';
 
-      	if (col.type && col.type==="checkbox") 
-      		_cols.push('<input class="'+cssClass+'" type="checkbox" ></input>');
-      	else if (col.type && col.type==="link" && bEdit) {
+      	
+      	if (col.type && col.type==="link" && bEdit) {
       		_cols.push('<span id="'+item.id+'-'+item.postId+'" class="'+cssClass+'" style="text-align: '+textAlign+'; width:100%; display: block">'+
       			'<a href="'+target+'">'+item[col.id]+'</a>'+
       			'</span>')
@@ -69,6 +113,20 @@ const Table = React.createClass({
     });
 
     this.datatable.draw();
+
+    if (me.props.checkBoxAtFirstColumn) {
+	    $('#selectAll').click(function () {
+	      $(':checkbox').prop('checked', this.checked);
+	      me.props.onSelectAll.call();
+	    });
+	    $("."+me.props.id+"Cb").click( function(){
+	      me.props.onCheckBoxClick.call();
+	    });
+	  }
+
+	  if (me.props.onAfterTableLoad){
+	  	me.props.onAfterTableLoad.call();
+	  }
   },
   componentDidMount: function(){
   	var datatable = $('#'+this.props.id).DataTable({sDom: '<"H"r>t<"F"ip>'}); 
@@ -86,9 +144,9 @@ const Table = React.createClass({
         	<tr key="0">
 	        	{this.state.tableHead.map(function(item, index){
 	        		if (index===1)
-	        			return <td>Loading...</td>
+	        			return <td key={index}>Loading...</td>
 	        		else 
-	        			return <td></td>
+	        			return <td key={index}></td>
 	        	})}
         	</tr>
         </tbody>
@@ -98,4 +156,8 @@ const Table = React.createClass({
   }
 });
 
-export default Table;
+module.exports = {
+	Table: Table,
+	SearchBox: SearchBox,
+	DeleteButtons: DeleteButtons
+};

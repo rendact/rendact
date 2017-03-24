@@ -1,6 +1,7 @@
 import request from 'request';
 import Config from './config';
 import _ from 'lodash';
+import { default as swal } from 'sweetalert2';
 
 const riques = function(query, callback, isadmin){
   var token = localStorage.getItem("token");
@@ -57,11 +58,18 @@ let hasRole = function(roleId){
   return (_.indexOf(roleIdList, roleId)>-1)
 }
 
+let errorCallback = function(msg1, msg2){
+  if (msg1) swal('Failed!', msg1, 'warning')
+  else if (msg2) swal('Failed!', msg2, 'warning')
+  else swal('Failed!', 'Unknown error','warning')
+}
+
 module.exports = {
 	riques: riques,
 	setValue: setValue,
 	getValue: getValue,
   getValueName: getValueName,
   getMaxRole: getMaxRole,
-  hasRole: hasRole
+  hasRole: hasRole,
+  errorCallback: errorCallback
 };
