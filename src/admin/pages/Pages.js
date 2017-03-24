@@ -8,7 +8,7 @@ import Fn from '../lib/functions';
 import {riques, hasRole} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
-//import RendactTable from '../lib/Table';
+import RendactTable from '../lib/Table';
 
 const errorCallback = function(msg1, msg2){
   if (msg1) swal('Failed!', msg1, 'warning')
@@ -40,50 +40,43 @@ const Pages = React.createClass({
     riques(qry, 
       function(error, response, body) {
         if (body.data) {
-          datatable.clear();
           var monthList = ["all"];
           var here = me;
-          var bEdit = hasRole('modify-page');
-
+          var _dataArr = [];
           _.forEach(body.data.viewer.allPosts.edges, function(item){
             var dt = new Date(item.node.createdAt);
-            var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
-            var author = item.node.author?item.node.author.username:"";
-            var slug = item.node.slug?item.node.slug:"";
-            var status = item.node.status?item.node.status:"";
+
+            _dataArr.push({
+              "checkbox": null,
+              "postId": item.node.id,
+              "title": item.node.title,
+              "slug": item.node.slug?item.node.slug:"",
+              "author": item.node.author?item.node.author.username:"",
+              "status": item.node.status?item.node.status:"",
+              "comments": item.node.comments.edges.length,
+              "published": dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate()
+            })
 
             var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
             if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
-
-            datatable.row.add([
-              '<input class="pageListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
-              bEdit ?
-              '<a class="tableItem" href="#" id="tableItem-'+item.node.id+'" >'+item.node.title+'</a>' :
-              item.node.title,
-              slug,
-              '<a href="">'+author+'</a>',
-              '<center>'+status+'</center>',
-              '<center>'+item.node.comments.edges.length+'</center>',
-              '<center>'+date+'</center>'
-            ])
           });
 
-          me.setState({monthList: monthList});
-          datatable.draw();
+          me.table.loadData(_dataArr);
 
-          $(".tableItem").click(function(event){
+          $(".titleText").click(function(event){
             event.preventDefault();
             var postId = this.id.split("-")[1];
-            here.handleViewPage(postId);
+            me.handleViewPage(postId);
           });
           $(".pageListCb").click( function(){
-            here.checkDynamicButtonState();
+            me.checkDynamicButtonState();
           });
           $('#selectAll').click(function () {
-            $(':checkbox', datatable.rows().nodes()).prop('checked', this.checked);
-            here.checkDynamicButtonState();
+            $(':checkbox').prop('checked', this.checked);
+            me.checkDynamicButtonState();
           });
-
+          me.setState({monthList: monthList});
+          
           if (callback) callback.call();
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
@@ -266,6 +259,7 @@ const Pages = React.createClass({
   componentDidMount: function(){
     var datatable = $('#pageListTbl').DataTable({sDom: '<"H"r>t<"F"ip>'}); 
     this.notification = this.refs.notificationSystem;
+    this.table = this.refs.rendactTable;
 
     datatable.columns(1).every( function () {
         var that = this;
@@ -349,21 +343,20 @@ const Pages = React.createClass({
                                    </span>
                           }.bind(this))}
                         </div>
-                      </div>                   
-                      <table id="pageListTbl" className="display">
-                        <thead>
-                          <tr>
-                            <th style={{width:7}}><input type="checkbox" id="selectAll"></input></th>
-                            <th style={{width: 400, textAlign: 'center'}}>Title</th>
-                            <th style={{textAlign: 'center'}}>Slug</th>
-                            <th style={{textAlign: 'center'}}>Author</th>
-                            <th style={{textAlign: 'center'}}>Status</th>
-                            <th style={{width:30, textAlign: 'center'}}>Comments</th>                             
-                            <th style={{textAlign: 'center'}}>Published</th>
-                          </tr>
-                      </thead>
-                      <tbody><tr key="0"><td></td><td>Loading data...</td><td></td><td></td><td></td><td></td><td></td></tr></tbody>
-                    </table>
+                      </div>
+                      <RendactTable 
+                        id="pageList"
+                        columns={[
+                          {id: 'checkbox', type: "checkbox", width: 7, cssClass:"pageListCb"},
+                          {id: 'title', label: "Title", width: 400, type: "link", target: "", cssClass:"titleText"},
+                          {id: 'slug', label: "Slug", textAlign:"center"},
+                          {id: 'author', label: "Author", textAlign:"center"},
+                          {id: 'status', label: "Status", textAlign:"center"},
+                          {id: 'comments', label: "Comments", width: 30, textAlign:"center"},
+                          {id: 'published', label: "Published", textAlign:"center"}
+                        ]}
+                        ref="rendactTable"
+                      />
                   </div>
                 </div>
               </div>
