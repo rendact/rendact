@@ -35,7 +35,7 @@
     "react-password-strength": "^1.1.0",
     "react-router": "^4.0.0-alpha.6",
     "react-router-scroll": "^0.3.2",
-    "request": "^2.55.0",
+    "request": "^2.81.0",
     "sweetalert2": "^6.4.0"
   },
   "scripts": {
