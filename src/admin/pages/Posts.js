@@ -55,10 +55,13 @@ const Posts = React.createClass({
             var status = item.node.status?item.node.status:"";
 
             var cate = [];
-            _.forEach(item.node.category.edges.filter(String), function(ui){
-              cate.push (ui.node.category!==null?ui.node.category.name :"" );
-            });
-            var categories = item.node.category.edges.length>0?cate:"Uncategorized";
+              _.forEach(item.node.category.edges, function(ui){
+                if (ui.node.category!==null)
+                  cate.push(ui.node.category.name);
+              });
+            var categor = [];
+              categor = cate.length===0?"Uncategorized":cate;
+            var categories = item.node.category.edges.length>0?categor:"Uncategorized";
            
             var img = "<img src='/images/photo1.png' width='100' />";
             
