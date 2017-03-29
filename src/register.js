@@ -5,6 +5,7 @@ import Query from './admin/query';
 import AdminLTEinit from './admin/lib/app.js';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../public/css/Login.css';
+import { sendMail } from './utils'
 
 const Register = React.createClass({
 	getInitialState: function(){
@@ -44,7 +45,7 @@ const Register = React.createClass({
   },
 	handleSubmit: function(event) {
 		event.preventDefault();
-
+		
 		var fullname = document.getElementById("fullname").value;
 		var username = document.getElementById("username").value
 		var email = document.getElementById("email").value
@@ -82,6 +83,7 @@ const Register = React.createClass({
           me.setProfile(p);
         }
         console.log("register OK");
+        sendMail(email, "Welcome to Rendact", fullname+"! Welcome to Rendact");
         me.disableForm(false);
         window.location = '/admin';
       } else {
@@ -98,7 +100,7 @@ const Register = React.createClass({
     });
 	},
 	auth0LoginHandle: function(){
-		this.props.authService.showPopup()
+		//this.props.authService.showPopup()
 	},
 	render: function(){
 		const redirect = (

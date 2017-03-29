@@ -5,7 +5,7 @@ import { default as swal } from 'sweetalert2';
 
 const riques = function(query, callback, isadmin){
   var token = localStorage.getItem("token");
-  if (isadmin){
+  if (isadmin || Config.adminMode){
     token = Config.adminToken
   }
   
@@ -54,7 +54,7 @@ let hasRole = function(roleId){
   _.forEach(p.roles, function(item){
     roleIdList = _.concat(roleIdList, Config.permissionConfig[item])
   })
-
+  if (Config.adminMode) return true;
   return (_.indexOf(roleIdList, roleId)>-1)
 }
 
@@ -64,6 +64,31 @@ let errorCallback = function(msg1, msg2){
   else swal('Failed!', 'Unknown error','warning')
 }
 
+let sendMail = function(to, title, message, callback){
+  request({
+      url: Config.mailUrl,
+      method: "POST",
+      json: true,
+      headers: {
+        "Authorization": "Basic "+btoa("api:"+Config.mailApiKey)
+      },
+      form: {
+        "from": Config.mailDefaultSender,
+        "to": to,
+        "subject": title,
+        "text": message
+      }
+    }, function(error, response, body){
+      if (error){
+        console.log(error)
+      } else {
+        console.log(response)
+        if (callback)
+          callback.call();
+      }
+    });
+}
+
 module.exports = {
 	riques: riques,
 	setValue: setValue,
@@ -71,5 +96,6 @@ module.exports = {
   getValueName: getValueName,
   getMaxRole: getMaxRole,
   hasRole: hasRole,
-  errorCallback: errorCallback
+  errorCallback: errorCallback,
+  sendMail: sendMail
 };

@@ -127,7 +127,7 @@ const permissionList = [
 ];
 
 const permissionConfig = {
-	"No Role"				: ["view-post","view-page"],
+	"No Role"				: ["view-post","view-page","view-user","modify-user"],
 	"Subscriber"		: ["view-post","view-page", "view-stats"],
 	"Author"				: ["modify-post", "upload-media"],
 	"Editor"				: ["modify-post", "upload-media", "modify-page"],
@@ -139,7 +139,8 @@ const permissionConfig = {
 
 const config = {
 	rootUrl: 'http://localhost:3000',
-	scapholdUrl: 'https://us-west-2.api.scaphold.io/graphql/rendact',
+	//scapholdUrl: 'https://us-west-2.api.scaphold.io/graphql/rendact',
+	scapholdUrl: 'https://us-west-2.api.scaphold.io/graphql/rendact-fork',
 	auth0ClientId: 'ppT7SigAoZtxsMkivihT2O1PLS7TYBFf',
 	auth0Domain: 'rendact.auth0.com',
 	activeContentType: ActiveContentType,
@@ -151,13 +152,17 @@ const config = {
 	defaultSwalStyling: defaultSwalStyling,
 	guestRoleId: "Um9sZTo1",
 	userMetaList: userMetaList,
-	adminToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoic2NhcGhvbGQuc3VwZXJ1c2VyIiwiZXhwIjo4NjQwMDAwMDAwMDAwMDAwLCJpYXQiOjE0ODg4NzMyODUsImF1ZCI6Ikp0Z2Z5WklRMnBKajlySThFOWU2MTdoUWNrMFJueEFuIiwiaXNzIjoiaHR0cHM6Ly9zY2FwaG9sZC5hdXRoMC5jb20vIiwic3ViIjoiMWY1ZDY3ZGYtZDQ2My00ZTliLWI0NDctOWUyMGEyNjhjYjUxIn0.GgTXH8Vie2PoZToBiMhz2CqQyB-dHqgi9VQeMJJThlM",
+	adminToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoic2NhcGhvbGQuc3VwZXJ1c2VyIiwiZXhwIjo4NjQwMDAwMDAwMDAwMDAwLCJpYXQiOjE0OTA3NTczOTEsImF1ZCI6Ikp0Z2Z5WklRMnBKajlySThFOWU2MTdoUWNrMFJueEFuIiwiaXNzIjoiaHR0cHM6Ly9zY2FwaG9sZC5hdXRoMC5jb20vIiwic3ViIjoiMWY1ZDY3ZGYtZDQ2My00ZTliLWI0NDctOWUyMGEyNjhjYjUxIn0.iPcAUCUVbYpVGCS3bqqNXAQP5bWXJJOE7LW85AvH8Q0",
+	//adminToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoic2NhcGhvbGQuc3VwZXJ1c2VyIiwiZXhwIjo4NjQwMDAwMDAwMDAwMDAwLCJpYXQiOjE0ODg4NzMyODUsImF1ZCI6Ikp0Z2Z5WklRMnBKajlySThFOWU2MTdoUWNrMFJueEFuIiwiaXNzIjoiaHR0cHM6Ly9zY2FwaG9sZC5hdXRoMC5jb20vIiwic3ViIjoiMWY1ZDY3ZGYtZDQ2My00ZTliLWI0NDctOWUyMGEyNjhjYjUxIn0.GgTXH8Vie2PoZToBiMhz2CqQyB-dHqgi9VQeMJJThlM",
 	roleValue: roleValue,
 	menuRoleValue: menuRoleValue,
 	adminMode: false,
 	roleList: roleList,
 	permissionList: permissionList,
-	permissionConfig: permissionConfig
+	permissionConfig: permissionConfig,
+	mailUrl: "https://api.mailgun.net/v3/sandboxfe2bb2acf7e146149e8eca858e5a7213.mailgun.org/messages",
+	mailApiKey: "key-4c6459641d3cce5c6220eb61d7f26c69",
+	mailDefaultSender: "sender@example.com"
 }
 
 module.exports = config;
