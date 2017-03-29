@@ -53,13 +53,18 @@ const Posts = React.createClass({
             var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
             var author = item.node.author?item.node.author.username:"";
             var status = item.node.status?item.node.status:"";
-            var categories = item.node.category.edges.length>0?"ada kategory":"";
-            //var categories = "Category";
+
+            var cate = [];
+            _.forEach(item.node.category.edges.filter(String), function(ui){
+              cate.push (ui.node.category!==null?ui.node.category.name :"" );
+            });
+            var categories = item.node.category.edges.length>0?cate:"Uncategorized";
+           
             var img = "<img src='/images/photo1.png' width='100' />";
-            //var tag = item.node.tag?item.node.tag.edges.node.tag.name:"";
+            
             var tag = "";
             var like = _.find(item.node.meta.edges,{"node": {"item": "like"}})?_.find(item.node.meta.edges,{"node": {"item": "like"}}).node.value:"0";
-            //var like = 20;
+            
             var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
             if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
 
@@ -287,8 +292,8 @@ const Posts = React.createClass({
     datatable.columns(1).every( function () {
         var that = this;
         $('#searchBox', this.footer() ).on( 'keyup change', function () {
-            if ( that.search() !== that.value ) {
-                that.search( that.value )
+            if ( that.search() !== this.value ) {
+                that.search( this.value )
                     .draw();
             }
             return null;
