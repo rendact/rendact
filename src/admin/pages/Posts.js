@@ -1,27 +1,17 @@
 import React from 'react';
 import $ from 'jquery';
-window.jQuery = $;
-import Config from '../../config';
 import Query from '../query';
 import Fn from '../lib/functions';
-import { default as swal } from 'sweetalert2';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
-import {riques, hasRole} from '../../utils';
-
-const errorCallback = function(msg1, msg2){
-  if (msg1) swal('Failed!', msg1, 'warning')
-  else if (msg2) swal('Failed!', msg2, 'warning')
-  else swal('Failed!', 'Unknown error','warning')
-}
+import {riques, hasRole, errorCallback} from '../../utils';
+import { default as swal } from 'sweetalert2';
+import Config from '../../config';
+import {Table, SearchBox, DeleteButtons} from '../lib/Table';
 
 const Posts = React.createClass({
 	getInitialState: function(){
-	    require ('datatables');
-	    require ('datatables/media/css/jquery.dataTables.min.css');
 	    require ('./Posts.css');
-	    require ('jquery-ui/themes/base/dialog.css');
-	    require ('jquery-ui/ui/widgets/dialog');
 
 	    return {
 	      dt: null,
@@ -32,71 +22,49 @@ const Posts = React.createClass({
         statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
         dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
         activeStatus: "All",
-        itemSelected: false,
-        notification: null,
+        itemSelected: false
 	    }
 	},
-
-  loadData: function(datatable, type, callback) {
+  loadData: function(type, callback) {
     var me = this;
     var qry = Query.getPostListQry(type);
     riques(qry, 
-      function(error, response, body) { debugger;
+      function(error, response, body) { 
         if (body.data) { 
-          datatable.clear();
           var monthList = ["all"];
-          var here = me;
-          var bEdit = hasRole('modify-post');
+          var _dataArr = [];
 
           _.forEach(body.data.viewer.allPosts.edges, function(item){
             var dt = new Date(item.node.createdAt);
-            var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
-            var author = item.node.author?item.node.author.username:"";
-            var status = item.node.status?item.node.status:"";
-            var cate = [];
-              _.forEach(item.node.category.edges, function(ui){
-                if (ui.node.category!==null)
-                  cate.push(ui.node.category.name);
-              });
-            var categor = [];
-              categor = cate.length===0?"Uncategorized":cate;
-            var categories = item.node.category.edges.length>0?categor:"Uncategorized";          
-            var img = "<img src='/images/photo1.png' width='100' />";     
+            var categories = item.node.category.edges.map(function(item){ return item.node.category.name});
+            if (categories.length===0)
+              categories = "Uncategorized";
+            
+            var img = "/images/photo1.png";     
             var tag = "";
-            var like = _.find(item.node.meta.edges,{"node": {"item": "like"}})?_.find(item.node.meta.edges,{"node": {"item": "like"}}).node.value:"0";            
+            var like = _.find(item.node.meta.edges,{"node": {"item": "like"}})?_.find(item.node.meta.edges,{"node": {"item": "like"}}).node.value:"0";
+
+            _dataArr.push({
+              "postId": item.node.id,
+              "image": img,
+              "title": item.node.title,
+              "slug": item.node.slug?item.node.slug:"",
+              "author": item.node.author?item.node.author.username:"",
+              "category": categories,
+              "tags": tag,
+              "likes": like,
+              "status": item.node.status?item.node.status:"",
+              "comments": item.node.comments.edges.length,
+              "published": dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate()
+            });
+
             var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
             if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
-
-            datatable.row.add([
-              '<input class="postListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
-              '<center>'+img+'</center>',
-              bEdit ?
-              '<a href="/admin/posts/edit/'+item.node.id+'" >'+item.node.title+'</a>':
-              item.node.title,
-              '<a href="">'+author+'</a>',
-              '<center>'+categories+'</center>',
-              '<center>'+tag+'</center>',
-              '<center>'+like+'</center>',
-              '<center>'+status+'</center>',
-              '<center>'+date+'</center>'
-            ])
           });
 
+          var bEdit = hasRole('modify-post');
+          me.table.loadData(_dataArr, bEdit);
           me.setState({monthList: monthList});
-          datatable.draw();
-
-          $(".tableItem").click(function(event){
-            event.preventDefault();
-            var postId = this.id.split("-")[1];
-            here.handleViewPost(postId);
-          });
-          $(".postListCb").click( function(){
-            here.checkDynamicButtonState();
-          });
-          $('#selectAll').click(function () {
-            $(':checkbox', datatable.rows().nodes()).prop('checked', this.checked);
-            here.checkDynamicButtonState();
-          });
 
           if (callback) callback.call();
         } else {
@@ -105,7 +73,6 @@ const Posts = React.createClass({
       }
     );
   },
-
   handleDeleteBtn: function(event){
     var me = this;
     var checkedRow = $("input.postListCb:checked");
@@ -130,8 +97,7 @@ const Posts = React.createClass({
           }
         }
       );
-    })},
-
+  })},
   handleDeletePermanent: function(event){
     var checkedRow = $("input.postListCb:checked");
     var me = this;
@@ -158,7 +124,6 @@ const Posts = React.createClass({
       );
     })
   },
-
   handleEmptyTrash: function(event){
     var checkedRow = $("input.postListCb");
     var me = this;
@@ -185,7 +150,6 @@ const Posts = React.createClass({
       );
     })
   },
-
   handleRecover: function(event){
     var checkedRow = $("input.postListCb:checked");
     var me = this;
@@ -211,8 +175,7 @@ const Posts = React.createClass({
           }
         }
       );
-    })},
-
+  })},
   handleStatusFilter: function(event){
     this.disableForm(true);
     var status = event.target.text;
@@ -231,7 +194,6 @@ const Posts = React.createClass({
       })
     } ;
   },
-
   handleDateFilter: function(event){
     this.disableForm(true);
     var status = this.state.activeStatus;
@@ -255,7 +217,6 @@ const Posts = React.createClass({
       })
     } ;
   },
-
   disableForm: function(state){
     var me = this;
     _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
@@ -274,36 +235,29 @@ const Posts = React.createClass({
       this.checkDynamicButtonState();
     }
   },
-
   checkDynamicButtonState: function(){
     var checkedRow = $("input.postListCb:checked");
     this.setState({itemSelected: checkedRow.length>0})
   },
-
   handleViewPost: function(postId){
     this.props.handleNav('posts','edit', postId);
   },
-
-  componentDidMount: function(){
-    var datatable = $('#postListTbl').DataTable({sDom: '<"H"r>t<"F"ip>'}); 
-    this.notification = this.refs.notificationSystem;
-
-    datatable.columns(1).every( function () {
-        var that = this;
-        $('#searchBox', this.footer() ).on( 'keyup change', function () {
-            if ( that.search() !== this.value ) {
-                that.search( this.value )
-                    .draw();
-            }
-            return null;
-        });
-        return null;
-    } );
-    
-    this.setState({dt: datatable});
-    this.loadData(datatable, "All");
+  onAfterTableLoad: function(){
+    var me = this;
+    $(".titleText").click(function(event){
+      event.preventDefault();
+      var postId = this.id.split("-")[1];
+      me.handleViewPage(postId);
+    });
   },
-
+  componentDidMount: function(){
+    this.notif = this.refs.notificationSystem;
+    this.table = this.refs.rendactTable;
+    var datatable = this.table.datatable;
+    this.refs.rendactSearchBox.bindToTable(datatable);
+    this.setState({dt: datatable});
+    this.loadData("All");
+  },
 	render: function(){
 		return (
 			<div className="content-wrapper">
@@ -336,7 +290,6 @@ const Posts = React.createClass({
                               return <option key={item} value={item}>{month+" "+year}</option>
                             })}
                           </select>     
-
                           <select className="btn select" id="statusFilter" style={{marginRight:5,height:35}}>
                             <option value="">All Categories</option>
                             <option value="category1">category1</option>
@@ -344,26 +297,16 @@ const Posts = React.createClass({
                             <option value="category3">category3</option>
                             <option value="category4">category4</option>
                           </select> 
-                          { (!this.state.deleteMode && hasRole('modify-post')) &&    
-
-                            [<button className="btn btn-default btn-flat" id="deleteBtn" onClick={this.handleDeleteBtn} style={{marginRight:10}} 
-                            disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete</button>]
-                          }   
-                          { (this.state.deleteMode && hasRole('modify-post')) && 
-                            [<button key="recoverBtn" className="btn btn-default btn-flat" id="recoverBtn" style={{marginRight:10}} onClick={this.handleRecover}
-                             disabled={!this.state.itemSelected} ><span className="fa fa-support" ></span> Recover</button>,
-                             <button key="deletePermanentBtn" className="btn btn-default btn-flat" id="deletePermanentBtn" style={{marginRight:10}} onClick={this.handleDeletePermanent}
-                             disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete Permanently</button>,
-                             <button key="emptyTrashBtn" className="btn btn-default btn-flat" id="emptyTrashBtn" onClick={this.handleEmptyTrash}><span className="fa fa-trash" ></span> Empty Trash</button>]
-                          }                        
+                          <DeleteButtons 
+                            deleteMode={this.state.deleteMode}
+                            itemSelected={this.state.itemSelected}
+                            onDelete={this.handleDeleteBtn}
+                            onRecover={this.handleRecover}
+                            onDeletePermanent={this.handleDeletePermanent}
+                            onEmptyTrash={this.handleEmptyTrash}
+                          />                  
                         <div className="box-tools pull-right">
-                          <div className="input-group" style={{width: 200}}>
-                            <input type="text" id="searchBox" className="form-control" placeholder="Search"/>
-
-                            <div className="input-group-btn">
-                              <button className="btn btn-default"><i className="fa fa-search"></i></button>
-                            </div>
-                          </div>
+                          <SearchBox datatable={this.table} ref="rendactSearchBox"/>
                         </div>
                         <div className="box-tools" style={{marginTop: 10}}>
                           <b>Status:</b> {this.state.statusList.map(function(item, index, array){
@@ -376,22 +319,25 @@ const Posts = React.createClass({
                           }.bind(this))}
                         </div>
                       </div>                   
-                      <table id="postListTbl" className="display">
-                        <thead>
-                          <tr>
-                            <th style={{width:7}}><input type="checkbox" id="selectAll"></input></th>
-                            <th style={{width: 400, textAlign: 'center'}}></th>
-                            <th style={{width: 400, textAlign: 'center'}}>Title</th>
-                            <th style={{width: 400, textAlign: 'center'}}>Author</th>
-                            <th style={{width: 400, textAlign: 'center'}}>Categories</th>
-                            <th style={{width: 400, textAlign: 'center'}}>Tags</th>
-                            <th style={{width: 400, textAlign: 'center'}}>Likes</th>
-                            <th style={{width: 400, textAlign: 'center'}}>Status</th>
-                            <th style={{width: 400, textAlign: 'center'}}>Publish Date</th>
-                          </tr>
-                      </thead>
-                      <tbody><tr key="0"><td></td><td>Loading data...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody>
-                    </table>
+                      <Table 
+                          id="postList"
+                          columns={[
+                            {id: 'image', label: "Image", type: "image", width: 10},
+                            {id: 'title', label: "Title", width: 400, type: "link", target: "", cssClass:"titleText"},
+                            {id: 'slug', label: "Slug", textAlign:"center"},
+                            {id: 'author', label: "Author", textAlign:"center"},
+                            {id: 'category', label: "Category", textAlign:"center"},
+                            {id: 'tags', label: "Tags", textAlign:"center"},
+                            {id: 'likes', label: "Likes", textAlign:"center"},
+                            {id: 'comments', label: "Comments", width: 30, textAlign:"center"},
+                            {id: 'published', label: "Publish Date", textAlign:"center"}
+                          ]}
+                          checkBoxAtFirstColumn="true"
+                          ref="rendactTable"
+                          onSelectAll={this.checkDynamicButtonState}
+                          onCheckBoxClick={this.checkDynamicButtonState}
+                          onAfterLoad={this.onAfterTableLoad}
+                        />
                   </div>
                 </div>
               </div>

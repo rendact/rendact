@@ -37,7 +37,6 @@ const Pages = React.createClass({
             var dt = new Date(item.node.createdAt);
 
             _dataArr.push({
-              "checkbox": null,
               "postId": item.node.id,
               "title": item.node.title,
               "slug": item.node.slug?item.node.slug:"",
