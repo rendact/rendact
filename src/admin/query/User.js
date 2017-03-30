@@ -270,7 +270,7 @@ const createUpdateUserMetaMtn = function(userId, arrItem, arrData){
 
   var index = 0;
   _.forEach(arrData, function(val, key){
-    if (_.indexOf()>=0) {
+    if (_.indexOf(arrItem, key)>=0) {
       query += ' UpdateUserMeta'+index+' : updateUserMeta(input: $input'+index+'){ changedUserMeta{ id item value } }'; 
     } else {
       query += ' CreateUserMeta'+index+' : createUserMeta(input: $input'+index+'){ changedUserMeta{ id item value } }'; 

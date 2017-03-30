@@ -1,6 +1,64 @@
 import React from 'react';
+import _ from 'lodash';
+import { default as swal } from 'sweetalert2';
+import TimezonePicker from 'react-bootstrap-timezone-picker';
+import Notification from 'react-notification-system';
+
+import Query from '../query';
+import Config from '../../config'
+import {riques, getValue, setValue, errorCallback} from '../../utils';
 
 var Settings = React.createClass({
+	getInitialState: function(){
+		var p = JSON.parse(localStorage.getItem("profile"));
+		var dateOfBirth = "";
+		if (p.dateOfBirth && p.dateOfBirth!=="") 
+			dateOfBirth = new Date(p.dateOfBirth)
+
+		return {
+		}
+	},
+	handleSubmitBtn: function(event){
+		event.preventDefault();
+		
+		var me = this;
+		var name = getValue("name");
+		var tagline = getValue("tagline");
+		var keywords = getValue("keywords");
+		var homeUrl = getValue("homeUrl");
+		var adminEmail = getValue("adminEmail");
+		var timezone = getValue("timezone");
+
+		this.notification.addNotification({
+			id: 'saving',
+  		message: 'Updating...',
+  		level: 'warning',
+  		position: 'tr'
+    });
+
+		riques(Query.saveSettingsMtn(name, tagline, keywords, homeUrl, adminEmail, timezone), 
+			function(error, response, body){
+				if(!error && !body.errors) {
+					var p = body.data.updateUser.changedUser;
+					me.notification.removeNotification('saving');
+					me.notification.addNotification({
+						message: 'Updated',
+						level: 'success',
+						position: 'tr',
+						autoDismiss: 5
+					});
+				} else {
+					errorCallback(error, body.errors?body.errors[0].message:null);
+				}
+			}
+		);
+	}, 
+	componentDidMount: function(){
+		require ('react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css');
+		require ('react-datetime/css/react-datetime.css');
+		this.notification = this.refs.notificationSystem;
+
+	},
 	render: function(){
 		return (
 			<div className="content-wrapper" style={{height: '100%'}}>
@@ -19,13 +77,13 @@ var Settings = React.createClass({
 			    	<div className="row">
 					  	<div className="col-md-8">
 					  	<section className="content">
-			    			<form className="form-horizontal">
+			    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal">
 			    			
 					  			<div className="form-group">
-								  	<label htmlFor="name" className="col-md-3">Name</label>
+								  	<label htmlFor="name" className="col-md-3">Webiste name</label>
 								  	<div className="col-md-9">
 										<input type="text" name="name" className="form-control" />
-										<p className="help-block">Your great full name</p>
+										<p className="help-block">Website name, will shows up in <code>title</code> tag</p>
 									</div>
 								</div>
 
@@ -40,7 +98,7 @@ var Settings = React.createClass({
 					  			<div className="form-group">
 								  	<label htmlFor="keywoards" className="col-md-3">Keywords</label>
 								  	<div className="col-md-9">
-										<input type="text" name="keywoards" className="form-control" />
+										<input type="text" name="keywords" className="form-control" />
 										<p className="help-block">Some words represents your web</p>
 									</div>
 								</div>

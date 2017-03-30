@@ -399,7 +399,7 @@ var NewUser = React.createClass({
 								  	<label htmlFor="name" className="col-md-3">Name</label>
 								  	<div className="col-md-9">
 										<input type="text" name="name" id="name" className="form-control" required="true"/>
-										<p className="help-block">Your great full name</p>
+										<p className="help-block">Your full name</p>
 									</div>
 								</div>
 

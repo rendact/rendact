@@ -2,6 +2,7 @@ import User from './User.js'
 import Page from './Page.js'
 import Login from './Login.js'
 import Post from './Post.js'
+import Settings from './Settings.js'
 
 const queries = {
   getUserQry: User.getUserQry,
@@ -35,7 +36,8 @@ const queries = {
   addRoleToUser: User.addRoleToUser,
   deleteRoleUser: User.deleteRoleUser,
   getRolesQry: User.getRolesQry,
-  createUpdateCategoryOfPostMtn: Post.createUpdateCategoryOfPostMtn
+  createUpdateCategoryOfPostMtn: Post.createUpdateCategoryOfPostMtn,
+  saveSettingsMtn: Settings.saveSettingsMtn
 }
 
 module.exports = queries;

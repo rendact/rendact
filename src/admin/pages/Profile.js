@@ -10,7 +10,7 @@ import Notification from 'react-notification-system';
 
 import Query from '../query';
 import Config from '../../config'
-import {riques, getValue, setValue} from '../../utils';
+import {riques, getValue, setValue, errorCallback} from '../../utils';
 
 window.getBase64Image = function(img) {
   var canvas = document.createElement("canvas");
@@ -20,12 +20,6 @@ window.getBase64Image = function(img) {
   ctx.drawImage(img, 0, 0);
   var dataURL = canvas.toDataURL("image/png");
   return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
-}
-
-const errorCallback = function(msg1, msg2){
-  if (msg1) swal('Failed!', msg1, 'warning')
-  else if (msg2) swal('Failed!', msg2, 'warning')
-  else swal('Failed!', 'Unknown error','warning')
 }
 
 var Profile = React.createClass({
@@ -279,7 +273,7 @@ var Profile = React.createClass({
 								  	<label htmlFor="name" className="col-md-3">Name</label>
 								  	<div className="col-md-9">
 										<input type="text" name="name" id="name" className="form-control" defaultValue={p.name} required="true"/>
-										<p className="help-block">Your great full name</p>
+										<p className="help-block">Your full name</p>
 									</div>
 								</div>
 
