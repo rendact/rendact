@@ -32,6 +32,34 @@ const SearchBox = React.createClass({
 	}
 });
 
+const SearchBoxPost = React.createClass({
+  bindToTable: function(datatable){
+    this.datatable = datatable;
+    this.datatable.columns(2).every( function () {
+        var that = this;
+        $('#searchBox', this.footer() ).on( 'keyup change', function () {
+            if ( that.search() !== this.value ) {
+                that.search( this.value )
+                    .draw();
+            }
+            return null;
+        });
+        return null;
+    } );
+  },
+  render: function(){
+    return (
+      <div className="input-group" style={{width: 200}}>
+        <input type="text" id="searchBox" className="form-control" placeholder="Search"/>
+
+        <div className="input-group-btn">
+          <button className="btn btn-default"><i className="fa fa-search"></i></button>
+        </div>
+      </div>
+     )
+  }
+});
+
 const DeleteButtons = React.createClass({
 	render: function(){
 		return (
@@ -159,5 +187,6 @@ const Table = React.createClass({
 module.exports = {
 	Table: Table,
 	SearchBox: SearchBox,
+  SearchBoxPost: SearchBoxPost,
 	DeleteButtons: DeleteButtons
 };
