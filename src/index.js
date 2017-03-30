@@ -14,10 +14,15 @@ const Main = React.createClass({
 	getInitialState: function(){
 		this.AuthService = new AuthService(this);
 		this.AuthService.checkAuth(this.onlogin);
-		return {logged: localStorage.getItem("token")?true:false};
+		return {
+			logged: localStorage.getItem("token")?true:false,
+			pathname: 'admin'
+		};
 	},
-	setLogged: function(state){
-		this.setState({logged: state});
+	setLogged: function(state, pathname){
+		var _obj = {logged: state};
+		if (pathname) _obj['pathname'] = pathname;
+		this.setState(_obj);
 	},
 	render: function(){
 		return (
@@ -36,7 +41,7 @@ const Main = React.createClass({
 						<Match pattern="/login/:param1?" render={props => (
 					    this.state.logged ? (
 					      <Redirect to={{
-					        pathname: '/admin',
+					        pathname: this.state.pathname,
 					        state: { from: props.location }
 					      }}/>
 					    ) : (

@@ -20,7 +20,7 @@ const Login = React.createClass({
 		require ('font-awesome/css/font-awesome.css');
 		require ('../public/css/ionicons.min.css');
 		require ('../public/css/AdminLTE.css');
-
+		
 		AdminLTEinit();
 	},
 	handleSubmit: function(event) {
@@ -31,9 +31,14 @@ const Login = React.createClass({
     var password = document.getElementById("password").value;
 
 		var me = this;
+		var pathname = null;
+		try {
+			pathname = this.props.location.state.from.pathname;
+		} catch(e) {}
+
 		function successFn(){
 			me.disableForm(false);
-			me.props.onlogin(true);
+			me.props.onlogin(true, pathname);
 		}
 		function failedFn(msg){
 			me.setState({errorMsg: msg});
