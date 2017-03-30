@@ -53,7 +53,6 @@ const Posts = React.createClass({
             var date = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
             var author = item.node.author?item.node.author.username:"";
             var status = item.node.status?item.node.status:"";
-
             var cate = [];
               _.forEach(item.node.category.edges, function(ui){
                 if (ui.node.category!==null)
@@ -61,13 +60,10 @@ const Posts = React.createClass({
               });
             var categor = [];
               categor = cate.length===0?"Uncategorized":cate;
-            var categories = item.node.category.edges.length>0?categor:"Uncategorized";
-           
-            var img = "<img src='/images/photo1.png' width='100' />";
-            
+            var categories = item.node.category.edges.length>0?categor:"Uncategorized";          
+            var img = "<img src='/images/photo1.png' width='100' />";     
             var tag = "";
-            var like = _.find(item.node.meta.edges,{"node": {"item": "like"}})?_.find(item.node.meta.edges,{"node": {"item": "like"}}).node.value:"0";
-            
+            var like = _.find(item.node.meta.edges,{"node": {"item": "like"}})?_.find(item.node.meta.edges,{"node": {"item": "like"}}).node.value:"0";            
             var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
             if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
 
