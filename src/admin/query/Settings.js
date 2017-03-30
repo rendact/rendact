@@ -39,8 +39,19 @@ const createUpdateSettingsMtn = function(arrData){
   }
 }
 
+const createUpdatePermissionMtn = function(arrData){
+  var variables = {};
+  var query = "mutation ()";
+
+  return {
+    "query": query,
+    "variables": variables
+  }
+}
+
 const queries = {
   createUpdateSettingsMtn: createUpdateSettingsMtn,
+  createUpdatePermissionMtn: createUpdatePermissionMtn
 }
 
 module.exports = queries;

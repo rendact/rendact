@@ -37,7 +37,8 @@ const queries = {
   deleteRoleUser: User.deleteRoleUser,
   getRolesQry: User.getRolesQry,
   createUpdateCategoryOfPostMtn: Post.createUpdateCategoryOfPostMtn,
-  saveSettingsMtn: Settings.saveSettingsMtn
+  saveSettingsMtn: Settings.saveSettingsMtn,
+  createUpdatePermissionMtn: Settings.createUpdatePermissionMtn
 }
 
 module.exports = queries;

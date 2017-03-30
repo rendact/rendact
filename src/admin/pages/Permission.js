@@ -38,10 +38,10 @@ const Permission = React.createClass({
 
       _.forEach(roleList, function(item){
         var checked = "";
-        var val = roleList + ":" + roleId;
+        var val = item + "~" + roleId;
         if (_.indexOf(permissionConfig[item], roleId)>-1)
           checked = "checked";
-        row.push('<td style="textAlign: center"><input type="checkbox" name="permissionCheckbox" value="'+val+'" '+checked+'/></td>');
+          row.push('<td style="textAlign: center"><input type="checkbox" name="permissionCheckbox" value="'+val+'" '+checked+'/></td>');
       });
 
       datatable.row.add(row);
@@ -51,24 +51,37 @@ const Permission = React.createClass({
   handleSubmit: function(event) {
     event.preventDefault();
     var here = this;
-    var checkboxVal = $('input[name="locationthemes"]:checked');
-    var qry = '';
-    qry = Query.createUserMetaMtn(null, checkboxVal);
+    var checkboxList = $('input[name="permissionCheckbox"]:checked');
+
+    var _config = {}
+    _.forEach(checkboxList, function(item){
+      var chkValue = item.value;
+      var roleName = chkValue.split("~")[0];
+      var permissionName = chkValue.split("~")[1]
+
+      if (_.has(_config, roleName)) {
+        _config[roleName].push(permissionName);  
+      } else {
+        _config[roleName] = [permissionName]; 
+      }
+    });
+    
+    var qry = Query.createUpdatePermissionMtn(null, _config);
 
     riques(qry, 
-            function(error, response, body) {
-              if (!error && !body.errors && response.statusCode === 200) {
-                here.notification.addNotification({
-                  level: 'success',
-                  position: 'tr',
-                  autoDismiss: 2
-                });
-              } else {
-                errorCallback(error, body.errors?body.errors[0].message:null);
-              }
-              here.disableForm(false);
-            }
-          );
+      function(error, response, body) {
+        if (!error && !body.errors && response.statusCode === 200) {
+          here.notification.addNotification({
+            level: 'success',
+            position: 'tr',
+            autoDismiss: 2
+          });
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+        here.disableForm(false);
+      }
+    );
     
   },
   disableForm: function(state){
