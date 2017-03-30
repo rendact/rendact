@@ -31,21 +31,45 @@ const Permission = React.createClass({
     datatable.clear();
     var permissionConfig = Config.permissionConfig;
     var roleList = Config.roleList;
-
+    
     _.forEach(Config.permissionList, function(item){
       var row = ['<td>'+item.label+'</td>']
       var roleId = item.id;
 
       _.forEach(roleList, function(item){
         var checked = "";
+        var val = roleList + ":" + roleId;
         if (_.indexOf(permissionConfig[item], roleId)>-1)
           checked = "checked";
-        row.push('<td style="textAlign: center"><input type="checkbox" '+checked+'/></td>');
+        row.push('<td style="textAlign: center"><input type="checkbox" name="permissionCheckbox" value="'+val+'" '+checked+'/></td>');
       });
 
       datatable.row.add(row);
     });
     datatable.draw();
+  },
+  handleSubmit: function(event) {
+    event.preventDefault();
+    var here = this;
+    var checkboxVal = $('input[name="locationthemes"]:checked');
+    var qry = '';
+    qry = Query.createUserMetaMtn(null, checkboxVal);
+
+    riques(qry, 
+            function(error, response, body) {
+              if (!error && !body.errors && response.statusCode === 200) {
+                here.notification.addNotification({
+                  level: 'success',
+                  position: 'tr',
+                  autoDismiss: 2
+                });
+              } else {
+                errorCallback(error, body.errors?body.errors[0].message:null);
+              }
+              here.disableForm(false);
+            }
+          );
+    
   },
   disableForm: function(state){
     var me = this;
@@ -85,7 +109,8 @@ const Permission = React.createClass({
               <li className="active">Permission Settings</li>
             </ol>
           </section>
-          <Notification ref="notificationSystem" /> 
+          <Notification ref="notificationSystem" />
+          <form onSubmit={this.handleSubmit} id="permissionForm" method="get"> 
           <section className="content">
             <div className="box box-default">
               <div className="box-body">
@@ -120,12 +145,15 @@ const Permission = React.createClass({
                           </tr>
                         </tbody>
                     </table>
+                    <br/>
+                    <button type="submit" id="saveBtn" className="btn btn-primary btn-flat pull-right">Save</button>
                   </div>
                 </div>
               </div>
              </div>
             </div>
           </section>
+          </form>
         </div>
       </div>
     )},
