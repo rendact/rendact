@@ -12,8 +12,6 @@ import {Table, SearchBox, DeleteButtons} from '../lib/Table';
 
 const Pages = React.createClass({
   getInitialState: function(){
-    require ('datatables');
-    require ('datatables/media/css/jquery.dataTables.min.css');
     require ('./Pages.css');
 
     return {
@@ -53,7 +51,8 @@ const Pages = React.createClass({
             if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
           });
 
-          me.table.loadData(_dataArr);
+          var bEdit = hasRole('modify-page');
+          me.table.loadData(_dataArr, bEdit);
           me.setState({monthList: monthList});
           
           if (callback) callback.call();

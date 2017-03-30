@@ -4,20 +4,13 @@ window.jQuery = $;
 import _ from 'lodash';
 import Query from '../query';
 import Notification from 'react-notification-system';
-import {riques, hasRole} from '../../utils';
+import {riques, hasRole, errorCallback} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
-
-const errorCallback = function(msg1, msg2){
-  if (msg1) swal('Failed!', msg1, 'warning')
-  else if (msg2) swal('Failed!', msg2, 'warning')
-  else swal('Failed!', 'Unknown error','warning')
-}
+import {Table, SearchBox, DeleteButtons} from '../lib/Table';
 
 const Users = React.createClass({
   getInitialState: function(){
-    require ('datatables');
-    require ('datatables/media/css/jquery.dataTables.min.css');
     require ('./Pages.css');
 
     return {
@@ -27,21 +20,17 @@ const Users = React.createClass({
       statusList: Config.roleList,
       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
       activeStatus: "All",
-      itemSelected: false,
-      notification: null
+      itemSelected: false
     }
   },
-  loadData: function(datatable, type, callback) {
+  loadData: function(type, callback) {
     var me = this;
     var qry = Query.getUserListByTypeQry(type);
 
     riques(qry, 
       function(error, response, body) {
           if (body.data) {
-            datatable.clear();
-            var here = me;
-            var bEdit = hasRole('modify-user');
-
+            var _dataArr = [];
             _.forEach(body.data.viewer.allUsers.edges, function(item){
               var roles = "No Role";
               var img = item.node.image?item.node.image:Config.rootUrl+"/images/avatar-default.png";
@@ -56,35 +45,19 @@ const Users = React.createClass({
                 if (rolesLen>0) return;
               }
 
-              datatable.row.add([
-                '<input class="userListCb" type="checkbox" id="cb-'+item.node.id+'" ></input>',
-                '<center><img src='+img+' width="50" /></center>',
-                bEdit ?
-                '<a class="tableItem" href="#" id="tableItem-'+item.node.id+'" >'+item.node.username+'</a>' :
-                item.node.username,
-                '<center>'+item.node.email+'</center>',
-                '<center>'+item.node.fullName+'</center>',
-                '<center>'+item.node.gender+'</center>',
-                '<center>'+roles+'</center>',
-                '<center>'+item.node.posts.edges.length+'</center>'
-              ])
+              _dataArr.push({
+                image: item.node.image?item.node.image:Config.rootUrl+"/images/avatar-default.png",
+                username: item.node.username,
+                email: item.node.email,
+                fullName: item.node.fullName,
+                gender: item.node.gender,
+                role: roles,
+                posts: item.node.posts.edges.length
+              })
             });
 
-            datatable.draw();
-
-            $(".tableItem").click(function(event){
-              event.preventDefault();
-              var userId = this.id.split("-")[1];
-              here.handleViewUser(userId);
-            });
-            $(".userListCb").click( function(){
-              here.checkDynamicButtonState();
-            });
-            $('#selectAll').click(function () {
-              $(':checkbox', datatable.rows().nodes()).prop('checked', this.checked);
-              here.checkDynamicButtonState();
-            });
-
+            var bEdit = hasRole('modify-user');
+            me.table.loadData(_dataArr, bEdit);
             if (callback) callback.call();
           }else{ 
             errorCallback(error, body.errors?body.errors[0].message:null); 
@@ -157,24 +130,21 @@ const Users = React.createClass({
   handleViewUser: function(userId){
     this.props.handleNav('users','edit', userId);
   },
+  onAfterTableLoad: function(){
+    var me = this;
+    $(".titleText").click(function(event){
+      event.preventDefault();
+      var userId = this.id.split("-")[1];
+      me.handleViewPage(userId);
+    });
+  },
   componentDidMount: function(){
-    var datatable = $('#userListTbl').DataTable({"dom": '<"H"r>t<"F"ip>'}); 
-    this.notification = this.refs.notificationSystem;
-
-    datatable.columns(1).every( function () {
-        var that = this;
-        $('#searchBox', this.footer() ).on( 'keyup change', function () {
-            if ( that.search() !== this.value ) {
-                that.search( this.value )
-                    .draw();
-            }
-            return null;
-        });
-        return null;
-    } );
-    
+    this.notif = this.refs.notificationSystem;
+    this.table = this.refs.rendactTable;
+    var datatable = this.table.datatable;
+    this.refs.rendactSearchBox.bindToTable(datatable);
     this.setState({dt: datatable});
-    this.loadData(datatable, "All");
+    this.loadData("All");
   },
   render: function(){
     return (
@@ -202,18 +172,13 @@ const Users = React.createClass({
                   <div className="row">
                     <div className="col-xs-12">
                       <div style={{marginTop: 10, marginBottom: 20}}>
-                          { !this.state.deleteMode &&    
-                            [<button className="btn btn-default btn-flat" id="deleteBtn" onClick={this.handleDeleteBtn} style={{marginRight:10}} 
-                            disabled={!this.state.itemSelected}><span className="fa fa-trash-o" ></span> Delete</button>]
-                          }   
+                          <DeleteButtons 
+                            deleteMode={this.state.deleteMode}
+                            itemSelected={this.state.itemSelected}
+                            onDelete={this.handleDeleteBtn}
+                          />   
                         <div className="box-tools pull-right">
-                          <div className="input-group" style={{width: 200}}>
-                            <input type="text" id="searchBox" className="form-control" placeholder="Search"/>
-
-                            <div className="input-group-btn">
-                              <button className="btn btn-default"><i className="fa fa-search"></i></button>
-                            </div>
-                          </div>
+                          <SearchBox datatable={this.table} ref="rendactSearchBox"/>
                         </div>
                         <div className="box-tools" style={{marginTop: 10}}>
                           <b>Status:</b> {this.state.statusList.map(function(item, index, array){
@@ -225,22 +190,24 @@ const Users = React.createClass({
                                    </span>
                           }.bind(this))}
                         </div>
-                      </div>                   
-                      <table id="userListTbl" className="display">
-                        <thead>
-                          <tr>
-                            <th style={{width:7}}><input type="checkbox" id="selectAll"></input></th>
-                            <th style={{width: 10, textAlign: 'center'}}>Avatar</th>
-                            <th style={{textAlign: 'center'}}>Username</th>
-                            <th style={{textAlign: 'center'}}>Email</th>
-                            <th style={{textAlign: 'center'}}>Full Name</th>
-                            <th style={{textAlign: 'center'}}>Gender</th>
-                            <th style={{textAlign: 'center'}}>Role</th>
-                            <th style={{width:30, textAlign: 'center'}}>Posts</th>                             
-                          </tr>
-                      </thead>
-                      <tbody><tr key="0"><td></td><td>Loading data...</td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody>
-                    </table>
+                      </div>  
+                      <Table 
+                          id="userListTbl"
+                          columns={[
+                            {id: 'image', label: "Image", type: "image", width: 10},
+                            {id: 'username', label: "Username", width: 400, type: "link", target: "", cssClass:"titleText"},
+                            {id: 'email', label: "Email"},
+                            {id: 'fullName', label: "Full name"},
+                            {id: 'gender', label: "Gender", textAlign:"center"},
+                            {id: 'role', label: "Role", textAlign:"center"},
+                            {id: 'posts', label: "Posts", width: 30, textAlign:"center"}
+                          ]}
+                          checkBoxAtFirstColumn="true"
+                          ref="rendactTable"
+                          onSelectAll={this.checkDynamicButtonState}
+                          onCheckBoxClick={this.checkDynamicButtonState}
+                          onAfterLoad={this.onAfterTableLoad}
+                        />
                   </div>
                 </div>
               </div>

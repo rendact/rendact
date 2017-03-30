@@ -85,9 +85,8 @@ const Table = React.createClass({
   		checkBoxAtFirstColumn: false
   	}
   },
-  loadData: function(dataArr){
+  loadData: function(dataArr, canEdit){
   	var me = this;
-  	var bEdit = hasRole('modify-page');
   	this.datatable.clear();
   	_.forEach(dataArr, function(item){
       var _cols = [];
@@ -100,12 +99,13 @@ const Table = React.createClass({
 	      var target = col.target?col.target:'#';
 
       	
-      	if (col.type && col.type==="link" && bEdit) {
+      	if (col.type && col.type==="link" && canEdit) {
       		_cols.push('<span id="'+item.id+'-'+item.postId+'" class="'+cssClass+'" style="text-align: '+textAlign+'; width:100%; display: block">'+
       			'<a href="'+target+'">'+item[col.id]+'</a>'+
       			'</span>')
-      	}
-      	else {
+      	} else if (col.type && col.type==="image" && canEdit) {
+          _cols.push('<center><img src='+item[col.id]+' width="50" /></center>')
+      	} else {
       		_cols.push('<span id="'+item.id+'-'+item.postId+'" class="'+cssClass+'" style="text-align: '+textAlign+'; width:100%; display: block">'+item[col.id]+'</span>',)
       	}
       });
