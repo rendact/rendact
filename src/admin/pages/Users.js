@@ -7,7 +7,7 @@ import Notification from 'react-notification-system';
 import {riques, hasRole, errorCallback} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
-import {Table, SearchBox, DeleteButtons} from '../lib/Table';
+import {Table, SearchBoxPost, DeleteButtons} from '../lib/Table';
 
 const Users = React.createClass({
   getInitialState: function(){
@@ -142,7 +142,7 @@ const Users = React.createClass({
     this.notif = this.refs.notificationSystem;
     this.table = this.refs.rendactTable;
     var datatable = this.table.datatable;
-    this.refs.rendactSearchBox.bindToTable(datatable);
+    this.refs.rendactSearchBoxPost.bindToTable(datatable);
     this.setState({dt: datatable});
     this.loadData("All");
   },
@@ -178,7 +178,7 @@ const Users = React.createClass({
                             onDelete={this.handleDeleteBtn}
                           />   
                         <div className="box-tools pull-right">
-                          <SearchBox datatable={this.table} ref="rendactSearchBox"/>
+                          <SearchBoxPost datatable={this.table} ref="rendactSearchBoxPost"/>
                         </div>
                         <div className="box-tools" style={{marginTop: 10}}>
                           <b>Status:</b> {this.state.statusList.map(function(item, index, array){
