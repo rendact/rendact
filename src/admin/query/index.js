@@ -37,7 +37,8 @@ const queries = {
   deleteRoleUser: User.deleteRoleUser,
   getRolesQry: User.getRolesQry,
   createUpdateCategoryOfPostMtn: Post.createUpdateCategoryOfPostMtn,
-  saveSettingsMtn: Settings.saveSettingsMtn,
+  loadSettingsQry: Settings.loadSettingsQry,
+  createUpdateSettingsMtn: Settings.createUpdateSettingsMtn,
   createUpdatePermissionMtn: Settings.createUpdatePermissionMtn
 }
 

@@ -89,6 +89,45 @@ let sendMail = function(to, title, message, callback){
     });
 }
 
+let getFormData = function(className){
+  var _objData = [];
+  _.forEach(document.getElementsByClassName(className), function(item){
+    var _obj = {
+      value: item.value,
+      item: item.name
+    }
+    if (item.id)
+      _obj['id'] = item.id
+    _objData.push(_obj);
+  });
+  return _objData;
+}
+
+let disableForm = function(state, notif){
+  var me = this;
+  _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;});
+  _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;});
+  _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;});
+  if (notif) {
+    if (state)
+      notif.addNotification({
+        id: 'saving',
+        message: 'Processing...',
+        level: 'warning',
+        position: 'tr'
+      });
+    else {
+      notif.addNotification({
+        message: 'Done!',
+        level: 'success',
+        position: 'tr',
+        autoDismiss: 1
+      });
+      notif.removeNotification('saving');
+    }
+  }
+}
+
 module.exports = {
 	riques: riques,
 	setValue: setValue,
@@ -97,5 +136,7 @@ module.exports = {
   getMaxRole: getMaxRole,
   hasRole: hasRole,
   errorCallback: errorCallback,
-  sendMail: sendMail
+  sendMail: sendMail,
+  getFormData: getFormData,
+  disableForm: disableForm
 };

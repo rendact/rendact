@@ -252,10 +252,8 @@ var Profile = React.createClass({
 		return (
 			<div className="content-wrapper">
 				<div className="container-fluid">
-				<section className="content-header" style={{marginBottom:20}}>
-			      <h1>
-			        My Profile
-			      </h1>
+					<section className="content-header" style={{marginBottom:20}}>
+			      <h1>My Profile</h1>
 			      <ol className="breadcrumb">
 			        <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
 			        <li className="active">Profile</li>
@@ -266,193 +264,193 @@ var Profile = React.createClass({
 			    <section className="content">
 			    	<div className="row">
 					  	<div className="col-md-8">
-					  	<section className="content">
-			    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" id="profileForm">
-			    			
-					  			<div className="form-group">
-								  	<label htmlFor="name" className="col-md-3">Name</label>
-								  	<div className="col-md-9">
-										<input type="text" name="name" id="name" className="form-control" defaultValue={p.name} required="true"/>
-										<p className="help-block">Your full name</p>
-									</div>
-								</div>
-
-								<div className="form-group">
-							  	<label htmlFor="name" className="col-md-3">Picture</label>
-							  	<div className="col-md-9">
-									<Dropzone onDrop={this.handleImageDrop}>
-										<div className="avatar-container">
-				              			  <img src={this.state.avatar} alt='' id="avatar"/> 
-										  <div className="avatar-overlay"></div>
-										  <div className="avatar-button"><a href="#"> Change </a></div>
-										</div>
-			            			</Dropzone>
-								</div>
-								</div>
-
-					  			<div className="form-group">
-								  	<label htmlFor="tagline" className="col-md-3">Username</label>
-								  	<div className="col-md-9">
-										<input type="text" name="username" id="username" className="form-control" defaultValue={p.username} disabled/>
-										<p className="help-block">The short unique name describes you</p>
-									</div>
-								</div>
-
-								<div className="form-group">
-								  	<label htmlFor="dateOfBirth" className="col-md-3">Date of Birth</label>
-								  	<div className="col-md-9">
-										<DateTime 
-											timeFormat={false} 
-											className="datetime-input" 
-											defaultValue={dateOfBirth}
-											onChange={this.handleBirthDateChange}/>
-									</div>
-								</div>
-
-								<div className="form-group">
-								 	<label htmlFor="homeUrl" className="col-md-3">Gender</label>
-								 	<div className="col-md-9">
-										<select id="gender" name="gender" defaultValue={p.gender} style={{width: 150}}>
-											<option key="male" value="male" >Male</option>
-											<option key="female" value="female" >Female</option>
-										</select> 
-									</div>
-								</div>
-
-					  			<div className="form-group">
-								  	<label htmlFor="keywoards" className="col-md-3">Email</label>
-								  	<div className="col-md-9">
-										<input type="text" name="email" id="email" className="form-control" defaultValue={p.email} disabled/>
-									</div>
-								</div>
-
-								<div className="form-group">
-								  	<label htmlFor="phone" className="col-md-3">Phone</label>
-								  	<div className="col-md-9">
-										<input type="text" name="phone" id="phone" className="form-control" defaultValue={p.phone} />
-									</div>
-								</div>
-
-					  			<div className="form-group">
-								 	<label htmlFor="homeUrl" className="col-md-3">Biography</label>
-								 	<div className="col-md-9">
-										<textarea name="bio" id="bio" className="form-control">{p.biography}</textarea>
-									</div>
-								</div>
-
-								<div className="form-group">
-								  	<label htmlFor="country" className="col-md-3">Country</label>
-								  	<div className="col-md-9">
-								  		<CountrySelect id="country" name="country" defaultValue={p.country} required="true"/>
-									</div>
-								</div>
-
-								<div className="form-group">
-								  	<label htmlFor="timezone" className="col-md-3">Timezone</label>
-								  	<div className="col-md-9">
-										<TimezonePicker
-										  absolute={true}
-										  defaultValue={p.timezone}
-										  style={{width: 300}}
-										  placeholder="Select timezone..."
-										  onChange={this.handleTimezoneChange}
-										/>
-									</div>
-								</div>
-
-								<div className="form-group">
-								 	<label htmlFor="homeUrl" className="col-md-3">Member since</label>
-								 	<div className="col-md-9">
-										<input type="text" name="gender" className="form-control" defaultValue={p.createdAt} disabled/>
-									</div>
-								</div>
-
-								<div className="form-group">
-								 	<label htmlFor="homeUrl" className="col-md-3">Last login</label>
-								 	<div className="col-md-9">
-										<input type="text" name="gender" className="form-control" defaultValue={p.lastLogin} disabled/>
-									</div>
-								</div>
-
-								<h4 style={{marginBottom: 20}}>Social Media Accounts</h4>
-								<div className="form-group">
-								  	<label htmlFor="website" className="col-md-3">Website</label>
-								  	<div className="col-md-9">
-										<input type="text" name="website" id="website" placeholder="example: www.ussunnah.com" className="form-control" defaultValue={p.website} />
-										<p className="help-block">Your website name</p>
-									</div>
-								</div>
-
-								<div className="form-group">
-								  	<label htmlFor="facebook" className="col-md-3">Facebook Account</label>
-								  	<div className="col-md-9">
-										<input type="text" name="facebook" id="facebook" placeholder="example: www.facebook.com/ussunnah" className="form-control" defaultValue={p.facebook} />
-										<p className="help-block">URL to your Facebook Page</p>
-									</div>
-								</div>
-
-								<div className="form-group">
-								  	<label htmlFor="twitter" className="col-md-3">Twitter Account</label>
-								  	<div className="col-md-9">
-										<input type="text" name="twitter" id="twitter" placeholder="example: www.twitter.com/ussunnah" className="form-control" defaultValue={p.twitter} />
-										<p className="help-block">URL to your Twitter Page</p>
-									</div>
-								</div>
-
-								<div className="form-group">
-								  	<label htmlFor="linkedin" className="col-md-3">Linkedin Account</label>
-								  	<div className="col-md-9">
-										<input type="text" name="linkedin" id="linkedin" placeholder="example: www.linkedin.com/in/ussunnah" className="form-control" defaultValue={p.linkedin} />
-										<p className="help-block">URL to your LinkedIn Page</p>
-									</div>
-								</div>
-
-								<h4 style={{marginBottom: 20}}>Change Password</h4>
-								<div className="form-group">
-								 	<label htmlFor="old-password" className="col-md-3">Old password</label>
-								 	<div className="col-md-9">
-										<input type="password" name="old-password" id="old-password" className="form-control" style={{width:300}}/>
-									</div>
-								</div>
-
-								<div className="form-group">
-								 	<label htmlFor="new-password" className="col-md-3">New password</label>
-								 	<div className="col-md-9">
-								 			<ReactPasswordStrength
-											  className="passwordTester"
-											  style={{ width: 300, display: "inline-block" }}
-											  minLength={5}
-											  minScore={2}
-											  changeCallback={this.handlePasswordChange}
-											  scoreWords={['weak', 'okay', 'good', 'strong', 'stronger']}
-											  inputProps={{ name: "new-password", id:"new-password", value: "OK" }}
-											  value="OK"
-											/>
-											<button className="btn" onClick={this.handleGeneratePassword} style={{height: 52, marginLeft: 5, marginBottom: 5}}>Generate</button>
-											<div>
-												<input type="checkbox" id="togglePassword" onChange={this.handleShowPassword}/> Show password
+						  	<section className="content">
+				    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" id="profileForm">
+				    			
+						  			<div className="form-group">
+									  	<label htmlFor="name" className="col-md-3">Name</label>
+									  	<div className="col-md-9">
+												<input type="text" name="name" id="name" className="form-control" defaultValue={p.name} required="true"/>
+												<p className="help-block">Your full name</p>
 											</div>
-									</div>
-								</div>
+										</div>
 
-								<div className="form-group">
-								 	<label htmlFor="new-password-2" className="col-md-3">Re-type new password</label>
-								 	<div className="col-md-9">
-										<input type="password" name="new-password-2" id="new-password-2" className="form-control" style={{width:300}} disabled={!this.state.passwordActive}/>
+									<div className="form-group">
+								  	<label htmlFor="name" className="col-md-3">Picture</label>
+								  	<div className="col-md-9">
+										<Dropzone onDrop={this.handleImageDrop}>
+											<div className="avatar-container">
+					              			  <img src={this.state.avatar} alt='' id="avatar"/> 
+											  <div className="avatar-overlay"></div>
+											  <div className="avatar-button"><a href="#"> Change </a></div>
+											</div>
+				            			</Dropzone>
 									</div>
-								</div>
-															
-								<div className="form-group">
-									<div className="col-md-9">
-										<div className="btn-group">
-											<input type="submit" value="Update Profile" className="btn btn-primary btn-sm" />
+									</div>
+
+						  			<div className="form-group">
+									  	<label htmlFor="tagline" className="col-md-3">Username</label>
+									  	<div className="col-md-9">
+											<input type="text" name="username" id="username" className="form-control" defaultValue={p.username} disabled/>
+											<p className="help-block">The short unique name describes you</p>
 										</div>
 									</div>
-								</div>
-							</form>
-						</section>
+
+									<div className="form-group">
+									  	<label htmlFor="dateOfBirth" className="col-md-3">Date of Birth</label>
+									  	<div className="col-md-9">
+											<DateTime 
+												timeFormat={false} 
+												className="datetime-input" 
+												defaultValue={dateOfBirth}
+												onChange={this.handleBirthDateChange}/>
+										</div>
+									</div>
+
+									<div className="form-group">
+									 	<label htmlFor="homeUrl" className="col-md-3">Gender</label>
+									 	<div className="col-md-9">
+											<select id="gender" name="gender" defaultValue={p.gender} style={{width: 150}}>
+												<option key="male" value="male" >Male</option>
+												<option key="female" value="female" >Female</option>
+											</select> 
+										</div>
+									</div>
+
+						  			<div className="form-group">
+									  	<label htmlFor="keywoards" className="col-md-3">Email</label>
+									  	<div className="col-md-9">
+											<input type="text" name="email" id="email" className="form-control" defaultValue={p.email} disabled/>
+										</div>
+									</div>
+
+									<div className="form-group">
+									  	<label htmlFor="phone" className="col-md-3">Phone</label>
+									  	<div className="col-md-9">
+											<input type="text" name="phone" id="phone" className="form-control" defaultValue={p.phone} />
+										</div>
+									</div>
+
+						  			<div className="form-group">
+									 	<label htmlFor="homeUrl" className="col-md-3">Biography</label>
+									 	<div className="col-md-9">
+											<textarea name="bio" id="bio" className="form-control">{p.biography}</textarea>
+										</div>
+									</div>
+
+									<div className="form-group">
+									  	<label htmlFor="country" className="col-md-3">Country</label>
+									  	<div className="col-md-9">
+									  		<CountrySelect id="country" name="country" defaultValue={p.country} required="true"/>
+										</div>
+									</div>
+
+									<div className="form-group">
+									  	<label htmlFor="timezone" className="col-md-3">Timezone</label>
+									  	<div className="col-md-9">
+											<TimezonePicker
+											  absolute={true}
+											  defaultValue={p.timezone}
+											  style={{width: 300}}
+											  placeholder="Select timezone..."
+											  onChange={this.handleTimezoneChange}
+											/>
+										</div>
+									</div>
+
+									<div className="form-group">
+									 	<label htmlFor="homeUrl" className="col-md-3">Member since</label>
+									 	<div className="col-md-9">
+											<input type="text" name="gender" className="form-control" defaultValue={p.createdAt} disabled/>
+										</div>
+									</div>
+
+									<div className="form-group">
+									 	<label htmlFor="homeUrl" className="col-md-3">Last login</label>
+									 	<div className="col-md-9">
+											<input type="text" name="gender" className="form-control" defaultValue={p.lastLogin} disabled/>
+										</div>
+									</div>
+
+									<h4 style={{marginBottom: 20}}>Social Media Accounts</h4>
+									<div className="form-group">
+									  	<label htmlFor="website" className="col-md-3">Website</label>
+									  	<div className="col-md-9">
+											<input type="text" name="website" id="website" placeholder="example: www.ussunnah.com" className="form-control" defaultValue={p.website} />
+											<p className="help-block">Your website name</p>
+										</div>
+									</div>
+
+									<div className="form-group">
+									  	<label htmlFor="facebook" className="col-md-3">Facebook Account</label>
+									  	<div className="col-md-9">
+											<input type="text" name="facebook" id="facebook" placeholder="example: www.facebook.com/ussunnah" className="form-control" defaultValue={p.facebook} />
+											<p className="help-block">URL to your Facebook Page</p>
+										</div>
+									</div>
+
+									<div className="form-group">
+									  	<label htmlFor="twitter" className="col-md-3">Twitter Account</label>
+									  	<div className="col-md-9">
+											<input type="text" name="twitter" id="twitter" placeholder="example: www.twitter.com/ussunnah" className="form-control" defaultValue={p.twitter} />
+											<p className="help-block">URL to your Twitter Page</p>
+										</div>
+									</div>
+
+									<div className="form-group">
+									  	<label htmlFor="linkedin" className="col-md-3">Linkedin Account</label>
+									  	<div className="col-md-9">
+											<input type="text" name="linkedin" id="linkedin" placeholder="example: www.linkedin.com/in/ussunnah" className="form-control" defaultValue={p.linkedin} />
+											<p className="help-block">URL to your LinkedIn Page</p>
+										</div>
+									</div>
+
+									<h4 style={{marginBottom: 20}}>Change Password</h4>
+									<div className="form-group">
+									 	<label htmlFor="old-password" className="col-md-3">Old password</label>
+									 	<div className="col-md-9">
+											<input type="password" name="old-password" id="old-password" className="form-control" style={{width:300}}/>
+										</div>
+									</div>
+
+									<div className="form-group">
+									 	<label htmlFor="new-password" className="col-md-3">New password</label>
+									 	<div className="col-md-9">
+									 			<ReactPasswordStrength
+												  className="passwordTester"
+												  style={{ width: 300, display: "inline-block" }}
+												  minLength={5}
+												  minScore={2}
+												  changeCallback={this.handlePasswordChange}
+												  scoreWords={['weak', 'okay', 'good', 'strong', 'stronger']}
+												  inputProps={{ name: "new-password", id:"new-password", value: "OK" }}
+												  value="OK"
+												/>
+												<button className="btn" onClick={this.handleGeneratePassword} style={{height: 52, marginLeft: 5, marginBottom: 5}}>Generate</button>
+												<div>
+													<input type="checkbox" id="togglePassword" onChange={this.handleShowPassword}/> Show password
+												</div>
+										</div>
+									</div>
+
+									<div className="form-group">
+									 	<label htmlFor="new-password-2" className="col-md-3">Re-type new password</label>
+									 	<div className="col-md-9">
+											<input type="password" name="new-password-2" id="new-password-2" className="form-control" style={{width:300}} disabled={!this.state.passwordActive}/>
+										</div>
+									</div>
+																
+									<div className="form-group">
+										<div className="col-md-9">
+											<div className="btn-group">
+												<input type="submit" value="Update Profile" className="btn btn-primary btn-sm" />
+											</div>
+										</div>
+									</div>
+									</form>
+								</section>
 					  	</div>
-					</div>
+						</div>
 					
 			    </section>
 

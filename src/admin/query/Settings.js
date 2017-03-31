@@ -1,35 +1,47 @@
 import _ from 'lodash';
 
+const loadSettingsQry = {
+  query: `query getOptions{
+        viewer {
+        allOptions {
+          edges {
+            node {
+              id,
+              item,
+              value
+            }
+          }
+        }
+      }
+    }`
+}
+
 const createUpdateSettingsMtn = function(arrData){
   var variables = {};
   var query = "mutation (";
   
-  var keysArr = _.keys(arrData);
-
-  _.forEach(keysArr, function(item, index){
-    if (_.indexOf()>=0) {
+  _.forEach(arrData, function(item, index){
+    if (_.has(item, "id")) {
       query += "$input"+index+": UpdateOptionsInput!";
     } else {
       query += "$input"+index+": CreateOptionsInput!";
     }
-    if (index!==keysArr.length-1) query += ", "
+    if (index!==arrData.length-1) query += ", "
   });
   query += ") {";
 
-  var index = 0;
-  _.forEach(arrData, function(val, key){
-    if (_.indexOf()>=0) {
+  _.forEach(arrData, function(item, index){
+    variables["input"+index] = {
+      item: item.item,
+      value: item.value
+    }
+
+    if (_.has(item, "id")) {
+      variables["input"+index]['id'] = item.id;
       query += ' UpdateOptions'+index+' : updateOptions(input: $input'+index+'){ changedOptions{ id item value } }'; 
     } else {
       query += ' CreateOptions'+index+' : createOptions(input: $input'+index+'){ changedOptions{ id item value } }'; 
     }
-
-    variables["input"+index] = {
-      item: key,
-      value: val
-    }
-
-    index++;
   });
   
   query += "}";
@@ -50,6 +62,7 @@ const createUpdatePermissionMtn = function(arrData){
 }
 
 const queries = {
+  loadSettingsQry: loadSettingsQry,
   createUpdateSettingsMtn: createUpdateSettingsMtn,
   createUpdatePermissionMtn: createUpdatePermissionMtn
 }
