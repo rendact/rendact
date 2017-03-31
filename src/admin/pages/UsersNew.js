@@ -10,7 +10,7 @@ import Notification from 'react-notification-system';
 
 import Query from '../query';
 import Config from '../../config'
-import {riques, getValue, setValue} from '../../utils';
+import {riques, getValue, setValue, errorCallback, disableForm} from '../../utils';
 
 window.getBase64Image = function(img) {
   var canvas = document.createElement("canvas");
@@ -20,12 +20,6 @@ window.getBase64Image = function(img) {
   ctx.drawImage(img, 0, 0);
   var dataURL = canvas.toDataURL("image/png");
   return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
-}
-
-const errorCallback = function(msg1, msg2){
-  if (msg1) swal('Failed!', msg1, 'warning')
-  else if (msg2) swal('Failed!', msg2, 'warning')
-  else swal('Failed!', 'Unknown error','warning')
 }
 
 var NewUser = React.createClass({
@@ -104,6 +98,9 @@ var NewUser = React.createClass({
 		this.setState({isAdmin: isAdmin});
 		_.forEach(document.getElementsByTagName('roles[]'), function(el){ el.disabled = !isAdmin;})
 	},
+	disableForm: function(state){
+		disableForm(state, this.notification)
+	},
 	handleSubmitBtn: function(event){
 		event.preventDefault();
 		
@@ -156,12 +153,7 @@ var NewUser = React.createClass({
 			qry = Query.createUserMtn(username, password, email, name, gender, country, dateOfBirth)
 		}
 
-		this.notification.addNotification({
-			id: 'saving',
-  		message: 'Saving...',
-  		level: 'warning',
-  		position: 'tr'
-		});
+		this.disableForm(true);
 		
 		riques(qry, 
 			function(error, response, body){
@@ -206,21 +198,15 @@ var NewUser = React.createClass({
 									});
 									
 									if (metaList.length>0) {
-										//here.setUserMeta(metaList);
-										here.notification.addNotification({
-    									message: 'Profile saved',
-    									level: 'success',
-    									position: 'tr',
-    									autoDismiss: 5
-  									});
+										
 									}
 								} else {
 									errorCallback(error, body.errors?body.errors[0].message:null);
 								}
 								if (here.state.mode==="create")
 		          		here.resetForm();
-		          	else
-		          		here.notification.removeNotification('saving');
+		          	else 
+		          		here.disableForm(false);
 							}
 						);
 	        }
@@ -277,22 +263,12 @@ var NewUser = React.createClass({
 		}
 		var me = this;
 
-		this.notification.addNotification({
-			id: 'saving',
-			message: 'Saving..',
-			level: 'info',
-			position: 'tr'
-		});
+		this.disableForm(true);
 		
     riques(qry, 
 			function(error, response, body){
 				if(!error && !body.errors) {
-					this.notification.addNotification({
-						message: 'Role saved',
-						level: 'success',
-						position: 'tr',
-						autoDismiss: 5
-					});
+					this.disableForm(false);
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
 				}

@@ -2,7 +2,7 @@ import React from 'react';
 import $ from 'jquery';
 import Query from './query';
 import _ from 'lodash';
-import {riques} from '../utils';
+import {riques, disableForm} from '../utils';
 import { default as swal } from 'sweetalert2';
 import Notification from 'react-notification-system';
 
@@ -76,18 +76,7 @@ const ControlSidebar = React.createClass({
   },
 
   disableForm: function(state){
-    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;});
-    _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;});
-
-    if (state)
-      this.notification.addNotification({
-        id: 'loading',
-        message: 'Processing...',
-        level: 'warning',
-        position: 'tr'
-      });
-    else 
-      this.notification.removeNotification('loading');
+    disableForm(state, this.notification)
   },
 
   handleDataSkin: function(e){
@@ -201,17 +190,11 @@ const ControlSidebar = React.createClass({
           if (cfg) {
             p["userPrefConfig"] = cfg.changedUserMeta.value;
             localStorage.setItem("profile", JSON.stringify(p));
+            me.disableForm(false);
           }
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
-        me.notification.addNotification({
-          message: "Saved",
-          level: 'success',
-          position: 'tr',
-          autoDismiss: 5
-        });
-        me.disableForm(false);
       }
     );
   },

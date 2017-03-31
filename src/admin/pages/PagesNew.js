@@ -4,7 +4,7 @@ import $ from 'jquery';
 window.jQuery = $;
 import Config from '../../config';
 import Query from '../query';
-import {riques, setValue, getValue} from '../../utils';
+import {riques, setValue, getValue, disableForm} from '../../utils';
 import {getTemplates} from '../theme';
 import { default as swal } from 'sweetalert2';
 import DatePicker from 'react-bootstrap-date-picker';
@@ -143,16 +143,10 @@ const NewPage = React.createClass({
           riques(pmQry, 
             function(error, response, body) {
               if (!error && !body.errors && response.statusCode === 200) {
-                here.notification.addNotification({
-                  message: noticeTxt,
-                  level: 'success',
-                  position: 'tr',
-                  autoDismiss: 2
-                });
+                here.disableForm(false); 
               } else {
                 errorCallback(error, body.errors?body.errors[0].message:null);
               }
-              here.disableForm(false);
             }
           );
 
@@ -168,22 +162,7 @@ const NewPage = React.createClass({
     this.setState({visibilityTxt: $("input[name=visibilityRadio]:checked").val()});
   },
   disableForm: function(state){
-    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
-    _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;})
-    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
-    _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;})
-    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    
-    if (state)
-      this.notification.addNotification({
-        id: 'loading',
-        message: 'Processing...',
-        level: 'warning',
-        position: 'tr'
-      });
-    else 
-      this.notification.removeNotification('loading');
+    disableForm(state, this.notification)
   },
   resetForm: function(){
     document.getElementById("pageForm").reset();

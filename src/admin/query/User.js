@@ -149,7 +149,7 @@ const createUserMtn = function(username, password, email, fullname, gender, coun
     }
 }
 
-const saveProfileMtn = function(userId, name, gender, image, country, dateOfBirth){
+const saveProfileMtn = function(data){
   return {
     "query": `mutation UpdateUserQuery ($input: UpdateUserInput!) {
         updateUser(input: $input) {
@@ -186,12 +186,12 @@ const saveProfileMtn = function(userId, name, gender, image, country, dateOfBirt
       }`,
       "variables": {
         "input": {
-          "id": userId,
-          "fullName": name,
-          "gender": gender,
-          "image": image,
-          "country": country,
-          "dateOfBirth": dateOfBirth
+          "id": data['userId'],
+          "fullName": data['name'],
+          "gender": data['gender'],
+          "image": data['image'],
+          "country": data['country'],
+          "dateOfBirth": data['dateOfBirth']
         }
       }
   }

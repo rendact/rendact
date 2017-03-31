@@ -4,16 +4,10 @@ import $ from 'jquery';
 window.jQuery = $;
 import Config from '../../config';
 import Query from '../query';
-import {riques, setValue, getValue} from '../../utils';
+import {riques, setValue, getValue, disableForm, errorCallback} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
-
-const errorCallback = function(msg1, msg2){
-  if (msg1) swal('Failed!', msg1, 'warning')
-  else if (msg2) swal('Failed!', msg2, 'warning')
-  else swal('Failed!', 'Unknown error','warning')
-}
 
 const NewPost = React.createClass({
   componentDidMount: function(){
@@ -108,19 +102,7 @@ const NewPost = React.createClass({
     this.setState({visibilityTxt: $("input[name=visibilityRadio]:checked").val()});
   },
   disableForm: function(state){
-    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
-    _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;})
-    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    
-    if (state)
-      this.notification.addNotification({
-        id: 'loading',
-        message: 'Processing...',
-        level: 'warning',
-        position: 'tr'
-      });
-    else 
-      this.notification.removeNotification('loading');
+    disableForm(state, this.notification);
   },
   resetForm: function(){
     document.getElementById("postForm").reset();
