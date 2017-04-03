@@ -36,7 +36,11 @@ const Posts = React.createClass({
 
           _.forEach(body.data.viewer.allPosts.edges, function(item){
             var dt = new Date(item.node.createdAt);
-            var categories = item.node.category.edges.map(function(item){ return item.node.category.name});
+            var categories = [];
+            _.forEach(item.node.category.edges, function(item){ 
+              if (item.node.category)
+                categories.push(item.node.category.name)
+            });
             if (categories.length===0)
               categories = "Uncategorized";
             
@@ -244,9 +248,10 @@ const Posts = React.createClass({
   },
   onAfterTableLoad: function(){
     var me = this;
-    $(".titleText").click(function(event){
+    $("a.titleText").click(function(event){
       event.preventDefault();
       var postId = this.id.split("-")[1];
+      console.log(postId);
       me.handleViewPost(postId);
     });
   },
