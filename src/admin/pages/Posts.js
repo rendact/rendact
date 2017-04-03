@@ -254,6 +254,21 @@ const Posts = React.createClass({
       me.handleViewPost(postId);
     });
   },
+  componentWillMount: function(){
+    var me = this;
+    riques(Query.getAllCategoryQry, 
+      function(error, response, body) {
+        if (!error) {
+          var categoryList = [];
+          $.each(body.data.viewer.allCategories.edges, function(key, item){
+            categoryList.push((<option key={item.node.id}><input id={item.node.id}
+            value={item.node.id} /> {item.node.name}</option>));
+          })
+          me.setState({categoryList: categoryList});
+        }
+      }
+    );
+  },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
     this.table = this.refs.rendactTable;
@@ -295,11 +310,7 @@ const Posts = React.createClass({
                             })}
                           </select>     
                           <select className="btn select" id="statusFilter" style={{marginRight:5,height:35}}>
-                            <option value="">All Categories</option>
-                            <option value="category1">category1</option>
-                            <option value="category2">category2</option>
-                            <option value="category3">category3</option>
-                            <option value="category4">category4</option>
+                            {this.state.categoryList}
                           </select> 
                           <DeleteButtons 
                             deleteMode={this.state.deleteMode}
