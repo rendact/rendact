@@ -11,7 +11,7 @@ const MenuJson = [
 		elements: [
 			{id: 'dashboard', label: 'Dashboard', icon: 'fa-dashboard', open: true, url: '/admin/dashboard', role: 1},
 			{id: 'settings', label: 'Settings', icon: 'fa-gears', open: true, url: '/admin/settings', role: 10, roleId: 'modify-settings'},
-			{id: 'content', label: 'Content', icon: 'fa-book', open: false, url: '/admin/content', role: 10, roleId: 'modify-content'}
+			{id: 'content', label: 'Content', icon: 'fa-book', open: false, url: '/admin/content', role: 10, roleId: 'view-content'}
 		]
 	},
 	{id: 'themes', label: 'Themes', icon: 'fa-image', open: false, role: 10, roleId: 'view-themes',
@@ -63,7 +63,8 @@ const menuRoleValue = {
 	'users-new' : 'modify-user',
 	'posts-edit' : 'modify-post',
 	'pages-edit' : 'modify-page',
-	'users-edit' : 'modify-user'
+	'users-edit' : 'modify-user',
+	'content': 'view-content'
 }
 
 const roleValue = {
@@ -123,7 +124,9 @@ const permissionList = [
 	{id: "view-plugins", label: "View plugins list"},
 	{id: "modify-plugins", label: "Add / modify plugins"},
 	{id: "view-themes", label: "View themes list"},
-	{id: "modify-themes", label: "Add / modify themes"}
+	{id: "modify-themes", label: "Add / modify themes"},
+	{id: "view-content", label: "View content type list"},
+	{id: "modify-content", label: "Add / modify content type"}
 ];
 
 const permissionConfig = {
@@ -133,7 +136,7 @@ const permissionConfig = {
 	"Editor"				: ["modify-post", "upload-media", "modify-page"],
 	"Administrator"	: ["view-post","view-page", "view-stats", "modify-post", "upload-media", "modify-page", 
 										 "view-user", "modify-user", "modify-permission", "view-plugins", "modify-plugins", 
-										 "view-themes", "modify-themes", "modify-settings"]
+										 "view-themes", "modify-themes", "modify-settings", "view-content", "modify-content"]
 }
 
 
