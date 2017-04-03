@@ -3,6 +3,7 @@ import Page from './Page.js'
 import Login from './Login.js'
 import Post from './Post.js'
 import Settings from './Settings.js'
+import Content from './Content.js'
 
 const queries = {
   getUserQry: User.getUserQry,
@@ -39,7 +40,8 @@ const queries = {
   createUpdateCategoryOfPostMtn: Post.createUpdateCategoryOfPostMtn,
   loadSettingsQry: Settings.loadSettingsQry,
   createUpdateSettingsMtn: Settings.createUpdateSettingsMtn,
-  createUpdatePermissionMtn: Settings.createUpdatePermissionMtn
+  createUpdatePermissionMtn: Settings.createUpdatePermissionMtn,
+  getContentListQry: Content.getContentListQry
 }
 
 module.exports = queries;

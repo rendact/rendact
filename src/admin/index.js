@@ -23,7 +23,8 @@ import NotPermissible from './NotPermissible';
 
 import Config from '../config';
 import AdminLTEinit from './lib/app.js';
-import {hasRole} from '../utils';
+import {riques, hasRole, errorCallback} from '../utils';
+import Query from './query';
 
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -35,7 +36,8 @@ require ('bootstrap');
 const SideMenu = React.createClass({
 	getInitialState: function() {
 		return {
-			activeMenu: this.props.activeMenu
+			activeMenu: this.props.activeMenu,
+			menuList: Config.menuList
 		}
 	},
 	onClick: function(id, e){
@@ -46,9 +48,37 @@ const SideMenu = React.createClass({
 		$("#menu-"+id).addClass("active");
 		window.history.pushState("", "", '/admin/'+id.replace('-','/'));
 	},
+	loadMenuOfContent: function(){
+		var me = this;
+    var qry = Query.getContentListQry;
+    riques(qry, 
+      function(error, response, body) { 
+        if (body.data) { 
+          var _dataArr = [];
+
+          _.forEach(body.data.viewer.allContents.edges, function(item){
+            _dataArr.push(
+            	{id: item.node.slug, label: item.node.name, icon: 'fa-drivers-license-o', open: false, role: 5, roleId: 'view-post',
+								elements: [
+									{id: item.node.slug, label: item.node.name, icon: 'fa-drivers-license-o', open: true, url: '/admin/posts', role: 5, roleId: 'view-post'},
+									{id: item.node.slug+'-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/posts/new', role: 5, roleId: 'modify-post'}
+								]
+							}
+            );
+          });
+          
+          me.setState({menuList: _.concat(me.state.menuList, _dataArr)})
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+      }
+    );
+	},
 	componentDidMount: function(){
 		$("#menu-"+this.state.activeMenu).addClass("active");
 		$("#menu-"+this.state.activeMenu).parent("ul").parent("li").addClass("active");
+
+		this.loadMenuOfContent();
 	},
 	render: function() {
 		let p = JSON.parse(localStorage.getItem("profile"));
@@ -77,7 +107,7 @@ const SideMenu = React.createClass({
 			        </div>
 			      </form>
 			      <ul className="sidebar-menu">
-			      	{ Config.menuList.map(function(item) {
+			      	{ this.state.menuList.map(function(item) {
 			      		if (item.roleId) {
 			      			if (!hasRole(item.roleId)) {
 			      				return null
