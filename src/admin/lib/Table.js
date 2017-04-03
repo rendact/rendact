@@ -128,8 +128,8 @@ const Table = React.createClass({
 
       	
       	if (col.type && col.type==="link" && canEdit) {
-      		_cols.push('<span id="'+item.id+'-'+item.postId+'" style="text-align: '+textAlign+'; width:100%; display: block">'+
-      			'<a href="'+target+'" class="'+cssClass+'">'+item[col.id]+'</a>'+
+      		_cols.push('<span id="'+item.id+'-'+item.postId+'" class="'+cssClass+'" style="text-align: '+textAlign+'; width:100%; display: block">'+
+      			'<a href="'+target+'">'+item[col.id]+'</a>'+
       			'</span>')
       	} else if (col.type && col.type==="image" && canEdit) {
           _cols.push('<center><img src='+item[col.id]+' width="50" /></center>')
@@ -151,7 +151,7 @@ const Table = React.createClass({
 	      me.props.onCheckBoxClick.call();
 	    });
 	  }
-    
+
 	  if (me.props.onAfterLoad){
 	  	me.props.onAfterLoad.call();
 	  }

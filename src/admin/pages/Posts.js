@@ -248,10 +248,9 @@ const Posts = React.createClass({
   },
   onAfterTableLoad: function(){
     var me = this;
-    $("a.titleText").click(function(event){
+    $(".titleText").click(function(event){
       event.preventDefault();
       var postId = this.id.split("-")[1];
-      console.log(postId);
       me.handleViewPost(postId);
     });
   },
