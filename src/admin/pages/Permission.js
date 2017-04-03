@@ -65,16 +65,24 @@ const Permission = React.createClass({
         _config[roleName] = [permissionName]; 
       }
     });
-    
-    var qry = Query.createUpdatePermissionMtn(null, _config);
+    var isi =""; 
+    var qry ="";
+    for(var key in _config) {
+      if(_config.hasOwnProperty(key)) {
+        isi += key + ": " +"["+ _config[key]+"]";
+        //do something with value;
+    }
+      qry = Query.createUpdatePermissionMtn(null, isi);
+    }
+      
 
     riques(qry, 
       function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
           here.notification.addNotification({
+            message: 'Config saved!',
             level: 'success',
-            position: 'tr',
-            autoDismiss: 2
+            position: 'tr'
           });
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
@@ -82,7 +90,6 @@ const Permission = React.createClass({
         here.disableForm(false);
       }
     );
-    
   },
   disableForm: function(state){
     var me = this;

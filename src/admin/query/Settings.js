@@ -51,14 +51,26 @@ const createUpdateSettingsMtn = function(arrData){
   }
 }
 
-const createUpdatePermissionMtn = function(arrData){
-  var variables = {};
-  var query = "mutation ()";
-
-  return {
-    "query": query,
-    "variables": variables
-  }
+const createUpdatePermissionMtn = function(userId, arrData){
+    return {
+      "query": `
+    mutation createUserMeta($input: CreateUserMetaInput!) {
+        createUserMeta(input: $input) {
+          changedUserMeta {
+            id
+           
+        }
+      }
+    }
+    `,
+      "variables": {
+        "input": {
+          "userId": userId,
+          "item": "permissionConfig",
+          "value": arrData
+        }
+      }
+    }
 }
 
 const queries = {
