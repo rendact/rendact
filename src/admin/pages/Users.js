@@ -65,7 +65,7 @@ const Users = React.createClass({
         }
     );
   },
-  disableForm: function(state){
+  /*disableForm: function(state){
     var me = this;
     _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
     _.forEach(document.getElementsByTagName('button'), function(el){ 
@@ -82,13 +82,26 @@ const Users = React.createClass({
     if (!state) {
       this.checkDynamicButtonState();
     }
+  },*/
+  disableForm: function(state){
+    var me = this;
+    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
+    _.forEach(document.getElementsByTagName('button'), function(el){ 
+      if (_.indexOf(me.state.dynamicStateBtnList, el.id) < 0)
+        el.disabled = state;
+    })
+    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
+    this.notif.addNotification({message: 'Processing...', level: 'warning',position: 'tr'});
+    if (!state) {
+      this.checkDynamicButtonState();
+    }
   },
-  checkDynamicButtonState: function(){
-    var checkedRow = $("input.userListCb:checked");
+  checkDynamicButtonState: function(){debugger;
+    var checkedRow = $("input.userListTblCb:checked");
     this.setState({itemSelected: checkedRow.length>0})
   },
   handleDeleteBtn: function(event){
-    var checkedRow = $("input.userListCb:checked");
+    var checkedRow = $("input.userListTblCb:checked");
     var me = this;
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
     swal(_.merge({
@@ -99,13 +112,13 @@ const Users = React.createClass({
       cancelButtonText: 'No, cancel!',
     },Config.defaultSwalStyling)).then(function () {
       me.disableForm(true);
-      riques(Query.deletePostQry(idList), 
+      riques(Query.deleteUser(idList), 
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
             console.log(JSON.stringify(body, null, 2));
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, cb);
+            me.loadData("All", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
