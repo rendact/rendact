@@ -9,6 +9,7 @@ import {ThemeHome, ThemeSingle, ThemeBlog} from './admin/theme';
 import Admin from './admin';
 import Login from './login';
 import Register from './register';
+import {loadConfig} from './utils';
 
 const Main = React.createClass({
 	getInitialState: function(){
@@ -23,6 +24,9 @@ const Main = React.createClass({
 		var _obj = {logged: state};
 		if (pathname) _obj['pathname'] = pathname;
 		this.setState(_obj);
+	},
+	componentWillMount: function(){
+		loadConfig();
 	},
 	render: function(){
 		return (

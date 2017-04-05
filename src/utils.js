@@ -1,5 +1,6 @@
 import request from 'request';
 import Config from './config';
+import Query from './admin/query';
 import _ from 'lodash';
 import { default as swal } from 'sweetalert2';
 
@@ -66,14 +67,14 @@ let errorCallback = function(msg1, msg2){
 
 let sendMail = function(to, title, message, callback){
   request({
-      url: Config.mailUrl,
+      url: getConfig('mailUrl'),
       method: "POST",
       json: true,
       headers: {
-        "Authorization": "Basic "+btoa("api:"+Config.mailApiKey)
+        "Authorization": "Basic "+btoa("api:"+getConfig('mailApiKey'))
       },
       form: {
-        "from": Config.mailDefaultSender,
+        "from": getConfig('mailDefaultSender'),
         "to": to,
         "subject": title,
         "text": message
@@ -128,6 +129,68 @@ let disableForm = function(state, notif){
   }
 }
 
+const _saveConfig = function(name, value){
+  var config = JSON.parse(localStorage.getItem('config'));
+  if (config === null ){
+    config = {}
+  }
+  config[name] = value;
+  localStorage.setItem('config', JSON.stringify(config));
+}
+
+const getConfig = function(name){
+  var config = JSON.parse(localStorage.getItem('config'));
+  if (config && config[name])
+    return config[name]
+  else 
+    return null;
+}
+
+const loadConfig = function(){
+  var me = this;
+  var qry = Query.getContentListQry;
+  var config = {}
+
+  riques(qry, 
+    function(error, response, body) { 
+      if (body.data) { 
+        var _dataArr = [];
+
+        _.forEach(body.data.viewer.allContents.edges, function(item){
+          var dt = new Date(item.node.createdAt);
+          
+          _dataArr.push({
+            "postId": item.node.id,
+            "name": item.node.name,
+            "fields": _.keys(item.node.fields),
+            "slug": item.node.slug?item.node.slug:"",
+            "status": item.node.status?item.node.status:"",
+            "createdAt": dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate()
+          });
+
+        });
+        _saveConfig("contentList", _dataArr);
+
+      } else {
+        errorCallback(error, body.errors?body.errors[0].message:null);
+      }
+    }
+  );
+
+  qry = Query.loadSettingsQry;
+  riques(qry, 
+    function(error, response, body) { 
+      if (body.data) { 
+        _.forEach(body.data.viewer.allOptions.edges, function(item){
+          _saveConfig(item.node.item, item.node.value);
+        });
+      } else {
+        errorCallback(error, body.errors?body.errors[0].message:null);
+      }
+    }
+  );
+}
+
 module.exports = {
 	riques: riques,
 	setValue: setValue,
@@ -138,5 +201,7 @@ module.exports = {
   errorCallback: errorCallback,
   sendMail: sendMail,
   getFormData: getFormData,
-  disableForm: disableForm
+  disableForm: disableForm,
+  loadConfig: loadConfig,
+  getConfig: getConfig
 };

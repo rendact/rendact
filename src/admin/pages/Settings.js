@@ -107,9 +107,9 @@ var Settings = React.createClass({
 								</div>
 
 					  		<div className="form-group">
-								 	<label htmlFor="homeUrl" className="col-md-3">Home URL</label>
+								 	<label htmlFor="rootUrl" className="col-md-3">Home URL</label>
 							  	<div className="col-md-9">
-										<input type="text" name="homeUrl" className="form-control rdt-input-form" />
+										<input type="text" name="rootUrl" className="form-control rdt-input-form" />
 									</div>
 								</div>
 

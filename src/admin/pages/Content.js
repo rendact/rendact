@@ -19,8 +19,9 @@ const Content = React.createClass({
       itemSelected: false,
       fixedContent: {
         "postId": "fixed",
-        "name": "Post",
+        "name": "Posts",
         "slug": "post",
+        "fields": null,
         "status": "active",
         "createdAt": null
       }
@@ -40,6 +41,7 @@ const Content = React.createClass({
             _dataArr.push({
               "postId": item.node.id,
               "name": item.node.name,
+              "fields": _.keys(item.node.fields),
               "slug": item.node.slug?item.node.slug:"",
               "status": item.node.status?item.node.status:"",
               "createdAt": dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate()

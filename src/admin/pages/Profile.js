@@ -10,7 +10,7 @@ import Notification from 'react-notification-system';
 
 import Query from '../query';
 import Config from '../../config'
-import {riques, getValue, setValue, errorCallback, getFormData, disableForm} from '../../utils';
+import {riques, getValue, setValue, errorCallback, getFormData, disableForm, getConfig} from '../../utils';
 
 window.getBase64Image = function(img) {
   var canvas = document.createElement("canvas");
@@ -29,7 +29,7 @@ var Profile = React.createClass({
 		if (p.dateOfBirth && p.dateOfBirth!=="") 
 			dateOfBirth = new Date(p.dateOfBirth)
 
-		var image = Config.rootUrl+"/images/avatar-default.png";
+		var image = getConfig('rootUrl')+"/images/avatar-default.png";
 		if (JSON.parse(localStorage.getItem("profile")).image)
 			image = JSON.parse(localStorage.getItem("profile")).image;
 		return {

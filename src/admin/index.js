@@ -23,7 +23,7 @@ import NotPermissible from './NotPermissible';
 
 import Config from '../config';
 import AdminLTEinit from './lib/app.js';
-import {riques, hasRole, errorCallback} from '../utils';
+import {riques, hasRole, errorCallback, getConfig} from '../utils';
 import Query from './query';
 
 import 'jquery-ui/ui/core';
@@ -40,13 +40,13 @@ const SideMenu = React.createClass({
 			menuList: Config.menuList
 		}
 	},
-	onClick: function(id, e){
+	onClick: function(id, url, e){
 		e.preventDefault();
 		this.props.onClick(id);
 		this.setState({activeMenu: id});
 		$(".menu-item").removeClass("active");
 		$("#menu-"+id).addClass("active");
-		window.history.pushState("", "", '/admin/'+id.replace('-','/'));
+		window.history.pushState("", "", url);
 	},
 	loadMenuOfContent: function(){
 		var me = this;
@@ -60,8 +60,8 @@ const SideMenu = React.createClass({
             _dataArr.push(
             	{id: item.node.slug, label: item.node.name, icon: 'fa-drivers-license-o', open: false, role: 5, roleId: 'view-post',
 								elements: [
-									{id: item.node.slug, label: item.node.name, icon: 'fa-drivers-license-o', open: true, url: '/admin/posts', role: 5, roleId: 'view-post'},
-									{id: item.node.slug+'-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/posts/new', role: 5, roleId: 'modify-post'}
+									{id: item.node.slug, label: item.node.name, icon: 'fa-drivers-license-o', open: true, url: '/admin/content/'+item.node.slug, role: 5, roleId: 'view-post'},
+									{id: item.node.slug+'-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/content/'+item.node.slug+'/new', role: 5, roleId: 'modify-post'}
 								]
 							}
             );
@@ -82,7 +82,7 @@ const SideMenu = React.createClass({
 	},
 	render: function() {
 		let p = JSON.parse(localStorage.getItem("profile"));
-		var image = Config.rootUrl+"/images/avatar-default.png";
+		var image = getConfig('rootUrl')+"/images/avatar-default.png";
     if (p.image)
       image = p.image;
 		return (
@@ -130,7 +130,7 @@ const SideMenu = React.createClass({
 							      		}
 
 				      					var iconClass = "fa "+item.icon;
-				      					return <li key={item.id} id={"menu-"+item.id} className="menu-item" onClick={this.onClick.bind(this, item.id)}><a href={item.url}><i className={iconClass}></i> {item.label}</a></li>
+				      					return <li key={item.id} id={"menu-"+item.id} className="menu-item" onClick={this.onClick.bind(this, item.id, item.url)}><a href={item.url}><i className={iconClass}></i> {item.label}</a></li>
 				      				}, this)
 				      			}
 				      			</ul>

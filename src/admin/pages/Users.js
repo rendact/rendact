@@ -4,7 +4,7 @@ window.jQuery = $;
 import _ from 'lodash';
 import Query from '../query';
 import Notification from 'react-notification-system';
-import {riques, hasRole, errorCallback} from '../../utils';
+import {riques, hasRole, errorCallback, getConfig} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
 import {Table, SearchBoxPost, DeleteButtons} from '../lib/Table';
@@ -33,7 +33,7 @@ const Users = React.createClass({
             var _dataArr = [];
             _.forEach(body.data.viewer.allUsers.edges, function(item){
               var roles = "No Role";
-              var img = item.node.image?item.node.image:Config.rootUrl+"/images/avatar-default.png";
+              var img = item.node.image?item.node.image:getConfig('rootUrl')+"/images/avatar-default.png";
               var rolesLen = item.node.roles.edges.length;
               if (rolesLen>0) {
                 roles = _.join(
@@ -46,7 +46,7 @@ const Users = React.createClass({
               }
 
               _dataArr.push({
-                image: item.node.image?item.node.image:Config.rootUrl+"/images/avatar-default.png",
+                image: item.node.image?item.node.image:getConfig('rootUrl')+"/images/avatar-default.png",
                 username: item.node.username,
                 email: item.node.email,
                 fullName: item.node.fullName,

@@ -1,5 +1,6 @@
 import React from 'react';
-import Config from '../config'
+import Config from '../config';
+import { getConfig } from '../utils';
 
 const AdminHeader = React.createClass({
   getInitialState: function(){
@@ -15,11 +16,12 @@ const AdminHeader = React.createClass({
     }
   },
   render: function() {
+    var rootUrl = getConfig('rootUrl');
     var profile = this.props.profile;
     if (this.props.authService.getProfile())
       profile = this.props.authService.getProfile()
 
-    var image = Config.rootUrl+"/images/avatar-default.png";
+    var image = rootUrl+"/images/avatar-default.png";
     if (JSON.parse(localStorage.getItem("profile")).image)
       image = JSON.parse(localStorage.getItem("profile")).image;
 
@@ -28,10 +30,10 @@ const AdminHeader = React.createClass({
       <nav className="navbar navbar-static-top">
         <a href="#" className="logo dropdown-toggle" data-toggle="dropdown">
           <span className="logo-mini">
-            <img src={Config.rootUrl+"/images/icon-32.png"} className="img-circle" alt="Rendact Logo"/> 
+            <img src={rootUrl+"/images/icon-32.png"} className="img-circle" alt="Rendact Logo"/> 
           </span>
           <span className="logo-lg" style={{paddingRight:10}}>
-            <img src={Config.rootUrl+"/images/icon-32.png"} className="img-circle" alt="Rendact Logo"/> 
+            <img src={rootUrl+"/images/icon-32.png"} className="img-circle" alt="Rendact Logo"/> 
           </span>
         </a>
         <ul className="dropdown-menu logo-menu">
