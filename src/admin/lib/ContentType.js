@@ -1,17 +1,17 @@
 import React from 'react';
 import $ from 'jquery';
 import Query from '../query';
-import Fn from '../lib/functions';
+import Fn from './functions';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
-import {riques, hasRole, errorCallback} from '../../utils';
+import {riques, hasRole, errorCallback, getConfig} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
-import {Table, SearchBoxPost, DeleteButtons} from '../lib/Table';
+import {Table, SearchBoxPost, DeleteButtons} from './Table';
 
-const Posts = React.createClass({
+const ContentType = React.createClass({
 	getInitialState: function(){
-	    require ('./Posts.css');
+	    require ('../pages/Posts.css');
 
 	    return {
 	      dt: null,
@@ -279,12 +279,15 @@ const Posts = React.createClass({
     this.loadData("All");
   },
 	render: function(){
+    var contentList = getConfig("contentList");
+    var contentData = _.find(contentList, {slug: this.props.name});
+
 		return (
 			<div className="content-wrapper">
         <div className="container-fluid">
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
-              Post List
+              {this.props.name}
             </h1>
             <ol className="breadcrumb">
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
@@ -365,4 +368,4 @@ const Posts = React.createClass({
 		)},
 });
 
-export default Posts;
+export default ContentType;

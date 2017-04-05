@@ -20,6 +20,7 @@ import NewUser from './pages/UsersNew';
 import Profile from './pages/Profile';
 import NotFound from './NotFound';
 import NotPermissible from './NotPermissible';
+import ContentType from './lib/ContentType';
 
 import Config from '../config';
 import AdminLTEinit from './lib/app.js';
@@ -60,8 +61,8 @@ const SideMenu = React.createClass({
             _dataArr.push(
             	{id: item.node.slug, label: item.node.name, icon: 'fa-drivers-license-o', open: false, role: 5, roleId: 'view-post',
 								elements: [
-									{id: item.node.slug, label: item.node.name, icon: 'fa-drivers-license-o', open: true, url: '/admin/content/'+item.node.slug, role: 5, roleId: 'view-post'},
-									{id: item.node.slug+'-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/content/'+item.node.slug+'/new', role: 5, roleId: 'modify-post'}
+									{id: item.node.slug, label: item.node.name, icon: 'fa-drivers-license-o', open: true, url: '/admin/'+item.node.slug, role: 5, roleId: 'view-post'},
+									{id: item.node.slug+'-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/'+item.node.slug+'/new', role: 5, roleId: 'modify-post'}
 								]
 							}
             );
@@ -160,6 +161,12 @@ const PageLoader = React.createClass({
 	getDefaultProps: function() {
 		return {pageId: "dashboard", actionId: ''}
 	},
+	isContentType: function(page){
+		var contentList = getConfig("contentList");
+		var contentListIds = _.map(contentList, function(item){ return item.slug })
+		debugger;
+		return (_.indexOf(contentListIds, page) !== -1);
+	},
 	render: function() {
 		var page = this.props.pageId;
 		var action = "";
@@ -188,11 +195,16 @@ const PageLoader = React.createClass({
 		
 		var requiredRole = Config.menuRoleValue[page+action];
 
-		if (!hasRole(requiredRole)){
+		if (!hasRole(requiredRole) && !this.isContentType(page)){
+			return <NotPermissible/>
+		} else if (this.isContentType(page) && !hasRole("view-content")){
 			return <NotPermissible/>
 		}
+
 		if (map[page+action]) {
 			return map[page+action]
+		} else if (this.isContentType(page)) {
+			return <ContentType name={page} action={action} />
 		} else {
 			return <NotFound/>
 		}
