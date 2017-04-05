@@ -41,7 +41,8 @@ const queries = {
   loadSettingsQry: Settings.loadSettingsQry,
   createUpdateSettingsMtn: Settings.createUpdateSettingsMtn,
   createUpdatePermissionMtn: Settings.createUpdatePermissionMtn,
-  getContentListQry: Content.getContentListQry
+  getContentListQry: Content.getContentListQry,
+  deleteUserQry: User.deleteUserQry
 }
 
 module.exports = queries;

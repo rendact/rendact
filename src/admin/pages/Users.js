@@ -7,7 +7,7 @@ import Notification from 'react-notification-system';
 import {riques, hasRole, errorCallback} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
-import {Table, SearchBoxPost, DeleteButtons} from '../lib/Table';
+import {TableUser, SearchBoxPost, DeleteButtons} from '../lib/Table';
 
 const Users = React.createClass({
   getInitialState: function(){
@@ -46,6 +46,7 @@ const Users = React.createClass({
               }
 
               _dataArr.push({
+                userId: item.node.id,
                 image: item.node.image?item.node.image:Config.rootUrl+"/images/avatar-default.png",
                 username: item.node.username,
                 email: item.node.email,
@@ -96,7 +97,7 @@ const Users = React.createClass({
       this.checkDynamicButtonState();
     }
   },
-  checkDynamicButtonState: function(){debugger;
+  checkDynamicButtonState: function(){
     var checkedRow = $("input.userListTblCb:checked");
     this.setState({itemSelected: checkedRow.length>0})
   },
@@ -112,8 +113,9 @@ const Users = React.createClass({
       cancelButtonText: 'No, cancel!',
     },Config.defaultSwalStyling)).then(function () {
       me.disableForm(true);
-      riques(Query.deleteUser(idList), 
+      riques(Query.deleteUserQry(idList), 
         function(error, response, body) {
+          debugger;
           if (!error && !body.errors && response.statusCode === 200) {
             console.log(JSON.stringify(body, null, 2));
             var here = me;
@@ -148,7 +150,7 @@ const Users = React.createClass({
     $(".titleText").click(function(event){
       event.preventDefault();
       var userId = this.id.split("-")[1];
-      me.handleViewPage(userId);
+      me.handleViewUser(userId);
     });
   },
   componentDidMount: function(){
@@ -204,7 +206,7 @@ const Users = React.createClass({
                           }.bind(this))}
                         </div>
                       </div>  
-                      <Table 
+                      <TableUser 
                           id="userListTbl"
                           columns={[
                             {id: 'image', label: "Image", type: "image", width: 10},

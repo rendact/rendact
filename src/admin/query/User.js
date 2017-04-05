@@ -372,7 +372,7 @@ const getRolesQry = {
   `
 }
 
-const deleteUser = function(idList){
+const deleteUserQry = function(idList){
   var query = "mutation { ";
   _.forEach(idList, function(val, index){
     query += ' DeleteUser'+index+' : deleteUser(input: {id: "'+val+'"}){ changedUser{ id } }'; 
@@ -397,7 +397,7 @@ const queries = {
   addRoleToUser: addRoleToUser,
   deleteRoleUser: deleteRoleUser,
   getRolesQry: getRolesQry,
-  deleteUser: deleteUser
+  deleteUserQry: deleteUserQry
 }
 
 module.exports = queries;
