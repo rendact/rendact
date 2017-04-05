@@ -119,7 +119,7 @@ const Table = React.createClass({
   	_.forEach(dataArr, function(item){
       var _cols = [];
       if (me.props.checkBoxAtFirstColumn) 
-        _cols.push('<input class="'+me.props.id+'Cb" id="cb-'+item.postId+'" type="checkbox" ></input>');
+      	_cols.push('<input class="'+me.props.id+'Cb" id="cb-'+item.postId+'" type="checkbox" ></input>');
 
       _.forEach(me.props.columns, function(col, index){
       	var textAlign = col.textAlign?col.textAlign:'left';

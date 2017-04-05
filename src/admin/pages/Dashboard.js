@@ -9,7 +9,7 @@ var LatestPost = React.createClass({
 		return (
 	    	<div className="box box-primary">
 	            <div className="box-header with-border">
-	              <h3 className="box-title">Latest {config.contentTypeList[config.activeContentType].label}</h3>
+	              <h3 className="box-title">Latest Posts</h3>
 	              <div className="box-tools pull-right">
 	                <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-minus"></i>
 	                </button>
@@ -101,7 +101,7 @@ var QuickPost = React.createClass({
 		return (
         	<div className="box box-info">
 	            <div className="box-header">
-	              <h3 className="box-title">Quick {config.contentTypeList[config.activeContentType].label}</h3>
+	              <h3 className="box-title">Quick Post</h3>
 	              <div className="pull-right box-tools">
 	                <button type="button" className="btn btn-info btn-sm" data-widget="remove" data-toggle="tooltip" title="Remove">
 	                  <i className="fa fa-times"></i></button>

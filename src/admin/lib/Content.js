@@ -43,11 +43,8 @@ const Posts = React.createClass({
             });
             if (categories.length===0)
               categories = "Uncategorized";
-              /*_.forEach(item.node.category.edges, function(item){ 
-                categories.push(item.node.category,{"name": "Uncategorized"})*/
-
-            var img = "/images/photo1.png"; 
-            //var img = "";     
+            
+            var img = "/images/photo1.png";     
             var tag = "";
             var like = _.find(item.node.meta.edges,{"node": {"item": "like"}})?_.find(item.node.meta.edges,{"node": {"item": "like"}}).node.value:"0";
 
@@ -80,7 +77,7 @@ const Posts = React.createClass({
       }
     );
   },
-  handleDeleteBtn: function(event){debugger;
+  handleDeleteBtn: function(event){
     var me = this;
     var checkedRow = $("input.postListCb:checked");
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
@@ -98,7 +95,7 @@ const Posts = React.createClass({
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData("All", cb);
+            me.loadData(me.state.dt, "All", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -225,7 +222,7 @@ const Posts = React.createClass({
       })
     } ;
   },
-  /*disableForm: function(state){
+  disableForm: function(state){
     var me = this;
     _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
     _.forEach(document.getElementsByTagName('button'), function(el){ 
@@ -239,19 +236,6 @@ const Posts = React.createClass({
       position: 'tr',
       autoDismiss: 2
     });
-    if (!state) {
-      this.checkDynamicButtonState();
-    }
-  },*/
-  disableForm: function(state){
-    var me = this;
-    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
-    _.forEach(document.getElementsByTagName('button'), function(el){ 
-      if (_.indexOf(me.state.dynamicStateBtnList, el.id) < 0)
-        el.disabled = state;
-    })
-    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.notif.addNotification({message: 'Processing...', level: 'warning',position: 'tr'});
     if (!state) {
       this.checkDynamicButtonState();
     }
@@ -326,7 +310,7 @@ const Posts = React.createClass({
                               return <option key={item} value={item}>{month+" "+year}</option>
                             })}
                           </select>     
-                          <select className="btn select" id="categoryFilter" style={{marginRight:5,height:35}}>
+                          <select className="btn select" id="statusFilter" style={{marginRight:5,height:35}}>
                             {this.state.categoryList}
                           </select> 
                           <DeleteButtons 

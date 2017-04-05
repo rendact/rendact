@@ -4,7 +4,7 @@ import $ from 'jquery';
 window.jQuery = $;
 import Config from '../../config';
 import Query from '../query';
-import {riques, setValue, getValue, disableForm, errorCallback} from '../../utils';
+import {riques, setValue, getValue, disableForm, errorCallback, getConfig} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
@@ -366,6 +366,7 @@ const NewPost = React.createClass({
   },
   
   render: function(){
+    var rootUrl = getConfig('rootUrl')
     const newPost=(
       <div className="content-wrapper">
         <div className="container-fluid">
@@ -396,9 +397,9 @@ const NewPost = React.createClass({
                     { !this.state.permalinkEditing ? 
                       ( <p>Permalink: &nbsp;
                         {this.state.mode==="update"?(
-                          <a id="permalink" href={Config.rootUrl+'/'+this.state.slug}>{Config.rootUrl}/{this.state.slug}</a>
+                          <a id="permalink" href={rootUrl+'/'+this.state.slug}>{rootUrl}/{this.state.slug}</a>
                           ) : (
-                          <a id="permalink" href="#">{Config.rootUrl}/{this.state.slug}</a>
+                          <a id="permalink" href="#">{rootUrl}/{this.state.slug}</a>
                           )
                         }
                         <button type="button" onClick={this.handlePermalinkBtn} id="editBtn" className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
@@ -409,7 +410,7 @@ const NewPost = React.createClass({
                       ) : (
                         <p>Permalink: 
                         <div className="form-group" id="permalinkcontent">
-                          <a id="permalink" href="#">{Config.rootUrl}/</a>
+                          <a id="permalink" href="#">{rootUrl}/</a>
                           <input id="slugcontent" defaultValue={this.state.slug}/>
                           <button type="button" className="btn btn-default" onClick={this.handleSavePermalinkBtn}>OK</button>
                         </div>
@@ -452,7 +453,7 @@ const NewPost = React.createClass({
                     <div className="col-md-8">
                       <p><a href="#">{this.state.title===""?"No Title":this.state.title.substring(0,71)}</a></p>
                       <p>{this.state.content===""?"":this.state.content.substring(0,100).replace(/(<([^>]+)>)/ig,"")}</p>
-                      <p><span className="help-block"><a style={{color: 'green'}}>{Config.rootUrl}/{this.state.slug}</a> - <a>Cache</a> - <a>Similar</a></span></p>
+                      <p><span className="help-block"><a style={{color: 'green'}}>{rootUrl}/{this.state.slug}</a> - <a>Cache</a> - <a>Similar</a></span></p>
                     </div>
                   </div>
                   <div className="form-group">

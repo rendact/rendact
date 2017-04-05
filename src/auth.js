@@ -6,12 +6,12 @@ window.browserHistory = browserHistory;
 window.Redirect = Redirect;
 import Config from './config';
 import Query from './admin/query';
-import {riques} from './utils';
+import {riques, getConfig} from './utils';
 import _ from 'lodash';
 
 function AuthService(){
   var me = this;
-  this.lock = new Auth0Lock(Config.auth0ClientId, Config.auth0Domain, {
+  this.lock = new Auth0Lock(getConfig('auth0ClientId'), getConfig('auth0Domain'), {
     auth: {
       redirectUrl: 'http://localhost:3000/login/redirect',
       responseType: 'token'
@@ -99,7 +99,7 @@ function AuthService(){
       identities.userId = identities.user_id;
       delete identities.user_id;
 
-      getUserQry = Query.getLoginAuth0Mtn(identities, localStorage.token, Config.auth0ClientId);
+      getUserQry = Query.getLoginAuth0Mtn(identities, localStorage.token, getConfig('auth0ClientId'));
       isAuth0 = true;
     } catch(e) {}
     

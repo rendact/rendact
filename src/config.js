@@ -1,11 +1,3 @@
-const ContentTypeList = {
-	'posts': 	{id: 'posts', label: "Posts", icon: "fa-pencil-square-o"},
-	'news': 	{id: 'news', label: "News", icon: "fa-newspaper-o"},
-	'articles': {id: 'articles', label: "Articles", icon: "fa-sticky-note-o"}
-};
-
-const ActiveContentType = 'posts';
-
 const MenuJson = [
 	{id: 'dashboard', label: 'Dashboard', icon: 'fa-dashboard', open: false, role: 1, 
 		elements: [
@@ -39,9 +31,9 @@ const MenuJson = [
 			{id: 'pages-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/pages/new', role: 5, roleId: 'modify-page'}
 		]
 	},
-	{id: ActiveContentType, label: ContentTypeList[ActiveContentType].label, icon: ContentTypeList[ActiveContentType].icon, open: false, role: 5, roleId: 'view-post',
+	{id: 'posts', label: 'Posts', icon: 'fa-pencil-square-o', open: false, role: 5, roleId: 'view-post',
 		elements: [
-			{id: 'posts', label: 'Posts', icon: ContentTypeList[ActiveContentType].icon, open: true, url: '/admin/posts', role: 5, roleId: 'view-post'},
+			{id: 'posts', label: 'Posts', icon: 'fa-pencil-square-o', open: true, url: '/admin/posts', role: 5, roleId: 'view-post'},
 			{id: 'posts-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/posts/new', role: 5, roleId: 'modify-post'}
 		]
 	},
@@ -139,21 +131,14 @@ const permissionConfig = {
 										 "view-themes", "modify-themes", "modify-settings", "view-content", "modify-content"]
 }
 
-
 const config = {
-	rootUrl: 'http://localhost:3000',
 	//scapholdUrl: 'https://us-west-2.api.scaphold.io/graphql/rendact',
 	scapholdUrl: 'https://us-west-2.api.scaphold.io/graphql/rendact-fork',
-	auth0ClientId: 'ppT7SigAoZtxsMkivihT2O1PLS7TYBFf',
-	auth0Domain: 'rendact.auth0.com',
-	activeContentType: ActiveContentType,
-	contentTypeList: ContentTypeList,
 	menuList: MenuJson,
 	theme: ActiveThemeConfig,
 	permalinkTypeList: PermalinkTypeList,
 	activePermalinkType: ActivePermalinkType,
 	defaultSwalStyling: defaultSwalStyling,
-	guestRoleId: "Um9sZTo1",
 	userMetaList: userMetaList,
 	adminToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoic2NhcGhvbGQuc3VwZXJ1c2VyIiwiZXhwIjo4NjQwMDAwMDAwMDAwMDAwLCJpYXQiOjE0OTA3NTczOTEsImF1ZCI6Ikp0Z2Z5WklRMnBKajlySThFOWU2MTdoUWNrMFJueEFuIiwiaXNzIjoiaHR0cHM6Ly9zY2FwaG9sZC5hdXRoMC5jb20vIiwic3ViIjoiMWY1ZDY3ZGYtZDQ2My00ZTliLWI0NDctOWUyMGEyNjhjYjUxIn0.iPcAUCUVbYpVGCS3bqqNXAQP5bWXJJOE7LW85AvH8Q0",
 	//adminToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoic2NhcGhvbGQuc3VwZXJ1c2VyIiwiZXhwIjo4NjQwMDAwMDAwMDAwMDAwLCJpYXQiOjE0ODg4NzMyODUsImF1ZCI6Ikp0Z2Z5WklRMnBKajlySThFOWU2MTdoUWNrMFJueEFuIiwiaXNzIjoiaHR0cHM6Ly9zY2FwaG9sZC5hdXRoMC5jb20vIiwic3ViIjoiMWY1ZDY3ZGYtZDQ2My00ZTliLWI0NDctOWUyMGEyNjhjYjUxIn0.GgTXH8Vie2PoZToBiMhz2CqQyB-dHqgi9VQeMJJThlM",
@@ -163,9 +148,6 @@ const config = {
 	roleList: roleList,
 	permissionList: permissionList,
 	permissionConfig: permissionConfig,
-	mailUrl: "https://api.mailgun.net/v3/sandboxfe2bb2acf7e146149e8eca858e5a7213.mailgun.org/messages",
-	mailApiKey: "key-4c6459641d3cce5c6220eb61d7f26c69",
-	mailDefaultSender: "sender@example.com"
 }
 
 module.exports = config;

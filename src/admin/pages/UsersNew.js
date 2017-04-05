@@ -10,7 +10,7 @@ import Notification from 'react-notification-system';
 
 import Query from '../query';
 import Config from '../../config'
-import {riques, getValue, setValue, errorCallback, disableForm} from '../../utils';
+import {riques, getValue, setValue, errorCallback, disableForm, getConfig} from '../../utils';
 
 window.getBase64Image = function(img) {
   var canvas = document.createElement("canvas");
@@ -24,7 +24,7 @@ window.getBase64Image = function(img) {
 
 var NewUser = React.createClass({
 	getInitialState: function(){
-		var image = Config.rootUrl+"/images/avatar-default.png";
+		var image = getConfig('rootUrl')+"/images/avatar-default.png";
 		
 		return {
 			avatar: image,
