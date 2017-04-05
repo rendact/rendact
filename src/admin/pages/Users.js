@@ -137,7 +137,7 @@ const Users = React.createClass({
     var status = event.target.text;
     this.setState({activeStatus: status});
     var re = this;
-    this.loadData(this.state.dt, status, function(){
+    this.loadData(status, function(){
       re.setState({deleteMode: false});
       re.disableForm(false);
     })  

@@ -43,8 +43,11 @@ const Posts = React.createClass({
             });
             if (categories.length===0)
               categories = "Uncategorized";
-            
-            var img = "/images/photo1.png";     
+              /*_.forEach(item.node.category.edges, function(item){ 
+                categories.push(item.node.category,{"name": "Uncategorized"})*/
+
+            var img = "/images/photo1.png"; 
+            //var img = "";     
             var tag = "";
             var like = _.find(item.node.meta.edges,{"node": {"item": "like"}})?_.find(item.node.meta.edges,{"node": {"item": "like"}}).node.value:"0";
 
