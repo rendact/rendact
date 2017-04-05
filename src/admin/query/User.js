@@ -372,6 +372,18 @@ const getRolesQry = {
   `
 }
 
+const deleteUserQry = function(idList){
+  var query = "mutation { ";
+  _.forEach(idList, function(val, index){
+    query += ' DeleteUser'+index+' : deleteUser(input: {id: "'+val+'"}){ changedUser{ id } }'; 
+  });
+  query += "}";
+
+  return {
+    "query": query
+  }
+};
+
 const queries = {
   getUserQry: getUserQry,
   getUserListQry: getUserListQry,
@@ -384,7 +396,8 @@ const queries = {
   changePasswordMtn: changePasswordMtn,
   addRoleToUser: addRoleToUser,
   deleteRoleUser: deleteRoleUser,
-  getRolesQry: getRolesQry
+  getRolesQry: getRolesQry,
+  deleteUserQry: deleteUserQry
 }
 
 module.exports = queries;

@@ -256,7 +256,7 @@ const queries = {
   getUpdatePostQry: getUpdatePostQry,
   getCreateCategoryOfPostQry: getCreateCategoryOfPostQry,
   getUpdateCategoryOfPostQry: getUpdateCategoryOfPostQry,
-  deletePostQry: deletePostQry,
+  //deletePostQry: deletePostQry,
   deletePostPermanentQry: deletePostPermanentQry,
   recoverPostQry: recoverPostQry,
   createUpdateCategoryOfPostMtn: createUpdateCategoryOfPostMtn

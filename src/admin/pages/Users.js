@@ -7,7 +7,7 @@ import Notification from 'react-notification-system';
 import {riques, hasRole, errorCallback, getConfig} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
-import {Table, SearchBoxPost, DeleteButtons} from '../lib/Table';
+import {TableUser, SearchBoxPost, DeleteButtons} from '../lib/Table';
 
 const Users = React.createClass({
   getInitialState: function(){
@@ -47,6 +47,7 @@ const Users = React.createClass({
 
               _dataArr.push({
                 image: item.node.image?item.node.image:getConfig('rootUrl')+"/images/avatar-default.png",
+                userId: item.node.id,
                 username: item.node.username,
                 email: item.node.email,
                 fullName: item.node.fullName,
@@ -65,7 +66,7 @@ const Users = React.createClass({
         }
     );
   },
-  disableForm: function(state){
+  /*disableForm: function(state){
     var me = this;
     _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
     _.forEach(document.getElementsByTagName('button'), function(el){ 
@@ -82,13 +83,26 @@ const Users = React.createClass({
     if (!state) {
       this.checkDynamicButtonState();
     }
+  },*/
+  disableForm: function(state){
+    var me = this;
+    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
+    _.forEach(document.getElementsByTagName('button'), function(el){ 
+      if (_.indexOf(me.state.dynamicStateBtnList, el.id) < 0)
+        el.disabled = state;
+    })
+    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
+    this.notif.addNotification({message: 'Processing...', level: 'warning',position: 'tr'});
+    if (!state) {
+      this.checkDynamicButtonState();
+    }
   },
   checkDynamicButtonState: function(){
-    var checkedRow = $("input.userListCb:checked");
+    var checkedRow = $("input.userListTblCb:checked");
     this.setState({itemSelected: checkedRow.length>0})
   },
   handleDeleteBtn: function(event){
-    var checkedRow = $("input.userListCb:checked");
+    var checkedRow = $("input.userListTblCb:checked");
     var me = this;
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
     swal(_.merge({
@@ -99,13 +113,14 @@ const Users = React.createClass({
       cancelButtonText: 'No, cancel!',
     },Config.defaultSwalStyling)).then(function () {
       me.disableForm(true);
-      riques(Query.deletePostQry(idList), 
+      riques(Query.deleteUserQry(idList), 
         function(error, response, body) {
+          debugger;
           if (!error && !body.errors && response.statusCode === 200) {
             console.log(JSON.stringify(body, null, 2));
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, cb);
+            me.loadData("All", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -135,7 +150,7 @@ const Users = React.createClass({
     $(".titleText").click(function(event){
       event.preventDefault();
       var userId = this.id.split("-")[1];
-      me.handleViewPage(userId);
+      me.handleViewUser(userId);
     });
   },
   componentDidMount: function(){
@@ -191,7 +206,7 @@ const Users = React.createClass({
                           }.bind(this))}
                         </div>
                       </div>  
-                      <Table 
+                      <TableUser 
                           id="userListTbl"
                           columns={[
                             {id: 'image', label: "Image", type: "image", width: 10},

@@ -74,11 +74,11 @@ const Pages = React.createClass({
       this.checkDynamicButtonState();
     }
   },
-  checkDynamicButtonState: function(){
+  checkDynamicButtonState: function(){debugger;
     var checkedRow = $("input.pageListCb:checked");
     this.setState({itemSelected: checkedRow.length>0})
   },
-  handleDeleteBtn: function(event){
+  handleDeleteBtn: function(event){debugger;
     var me = this;
     var checkedRow = $("input.pageListCb:checked");
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
