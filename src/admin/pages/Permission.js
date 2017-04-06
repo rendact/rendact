@@ -41,7 +41,7 @@ const Permission = React.createClass({
         var val = item + "~" + roleId;
         if (_.indexOf(permissionConfig.value, roleId)>-1)
           checked = "checked";
-          row.push('<td style="textAlign: center"><input type="checkbox" name="permissionCheckbox" value="'+val+'" '+checked+'/></td>');
+          row.push('<td style="textAlign: center"><center><input type="checkbox" name="permissionCheckbox" value="'+val+'" '+checked+'/></center></td>');
       });
 
       datatable.row.add(row);
