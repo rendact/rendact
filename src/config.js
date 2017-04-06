@@ -1,5 +1,5 @@
 const MenuJson = [
-	{id: 'dashboard', label: 'Dashboard', icon: 'fa-dashboard', open: false, role: 1, 
+	{id: 'dashboard', label: 'Site', icon: 'fa-dashboard', open: false, role: 1, 
 		elements: [
 			{id: 'dashboard', label: 'Dashboard', icon: 'fa-dashboard', open: true, url: '/admin/dashboard', role: 1},
 			{id: 'settings', label: 'Settings', icon: 'fa-gears', open: true, url: '/admin/settings', role: 10, roleId: 'modify-settings'},

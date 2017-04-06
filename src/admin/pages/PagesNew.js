@@ -426,7 +426,7 @@ const NewPage = React.createClass({
                   <li>Pages</li>
                   <li className="active">{this.state.mode==="update"?"Edit Page":"Add New"}</li>
                 </ol>
-              <div style={{borderBottom:"#000000" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div> 
+              <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div> 
           </section>
           <Notification ref="notificationSystem" /> 
           <form onSubmit={this.handleSubmit} id="pageForm" method="get">

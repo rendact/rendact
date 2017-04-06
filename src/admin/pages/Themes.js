@@ -124,7 +124,7 @@ var Themes = React.createClass({
             			<li className="active">Themes</li>
           			</ol>
           			<input type="search" placeholder="Search themes..." style={{marginTop: 10}}/>
-                <div style={{borderBottom:"#000000" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
+                <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
 			    </section>
 
 			    <section className="content">
