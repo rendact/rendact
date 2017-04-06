@@ -11,7 +11,7 @@ import _ from 'lodash';
 
 function AuthService(){
   var me = this;
-  this.lock = new Auth0Lock(getConfig('auth0ClientId'), getConfig('auth0Domain'), {
+  this.lock = new Auth0Lock(Config.auth0ClientId, Config.auth0Domain, {
     auth: {
       redirectUrl: 'http://localhost:3000/login/redirect',
       responseType: 'token'

@@ -115,7 +115,7 @@ const Users = React.createClass({
       me.disableForm(true);
       riques(Query.deleteUserQry(idList), 
         function(error, response, body) {
-          debugger;
+          ;
           if (!error && !body.errors && response.statusCode === 200) {
             console.log(JSON.stringify(body, null, 2));
             var here = me;
