@@ -91,8 +91,8 @@ const Content = React.createClass({
         }
       );
   })},
-  handleAddNewBtn: function(event) {
-    
+  handleAddNewBtn: function(postId){
+    this.props.handleNav('content','new');
   },
   handleViewPage: function(postId){
     this.props.handleNav('pages','edit', postId);
