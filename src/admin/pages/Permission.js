@@ -41,7 +41,7 @@ const Permission = React.createClass({
         var val = item + "~" + roleId;
         if (_.indexOf(permissionConfig.value, roleId)>-1)
           checked = "checked";
-          row.push('<td style="textAlign: center"><input type="checkbox" name="permissionCheckbox" value="'+val+'" '+checked+'/></td>');
+          row.push('<td style="textAlign: center"><center><input type="checkbox" name="permissionCheckbox" value="'+val+'" '+checked+'/></center></td>');
       });
 
       datatable.row.add(row);
@@ -120,7 +120,7 @@ const Permission = React.createClass({
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
               <li className="active">Permission Settings</li>
             </ol>
-            <div style={{borderBottom:"#000000" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
+            <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
           </section>
           <Notification ref="notificationSystem" />
           <form onSubmit={this.handleSubmit} id="permissionForm" method="get"> 
