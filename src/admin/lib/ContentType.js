@@ -171,6 +171,9 @@ const ContentType = React.createClass({
         }
       );
   })},
+  handleAddNewBtn: function(event) {
+    this.props.handleNav(this.props.name,'new');
+  },
   handleStatusFilter: function(event){
     this.disableForm(true);
     var status = event.target.text;
@@ -245,21 +248,6 @@ const ContentType = React.createClass({
       me.handleViewPost(postId);
     });
   },
-  componentWillMount: function(){
-    var me = this;
-    riques(Query.getAllCategoryQry, 
-      function(error, response, body) {
-        if (!error) {
-          var categoryList = [];
-          $.each(body.data.viewer.allCategories.edges, function(key, item){
-            categoryList.push((<option key={item.node.id}><input id={item.node.id}
-            value={item.node.id} /> {item.node.name}</option>));
-          })
-          me.setState({categoryList: categoryList});
-        }
-      }
-    );
-  },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
     this.table = this.refs.rendactTable;
@@ -275,11 +263,17 @@ const ContentType = React.createClass({
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
               {this.state.contentData.name}
+              { hasRole('modify-post') &&
+              (<small style={{marginLeft: 5}}>
+                <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
+              </small>)
+              }
             </h1>
             <ol className="breadcrumb">
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
               <li className="active">{this.state.contentData.name}</li>
             </ol>
+            <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
           </section>  
           <Notification ref="notificationSystem" /> 
           <section className="content">
@@ -300,9 +294,6 @@ const ContentType = React.createClass({
                               return <option key={item} value={item}>{month+" "+year}</option>
                             })}
                           </select>     
-                          <select className="btn select" id="statusFilter" style={{marginRight:5,height:35}}>
-                            {this.state.categoryList}
-                          </select> 
                           <DeleteButtons 
                             deleteMode={this.state.deleteMode}
                             itemSelected={this.state.itemSelected}

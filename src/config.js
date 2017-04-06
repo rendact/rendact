@@ -56,7 +56,9 @@ const menuRoleValue = {
 	'posts-edit' : 'modify-post',
 	'pages-edit' : 'modify-page',
 	'users-edit' : 'modify-user',
-	'content': 'view-content'
+	'content': 'view-content',
+	'content-new': 'modify-content',
+	'content-edit': 'modify-content'
 }
 
 const roleValue = {

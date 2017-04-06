@@ -7,6 +7,7 @@ import Footer from './Footer';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import Content from './pages/Content';
+import NewContent from './pages/ContentNew';
 import Posts from './pages/Posts';
 import Pages from './pages/Pages';
 import Themes from './pages/Themes';
@@ -21,6 +22,7 @@ import Profile from './pages/Profile';
 import NotFound from './NotFound';
 import NotPermissible from './NotPermissible';
 import ContentType from './lib/ContentType';
+import NewContentType from './lib/ContentTypeNew';
 
 import Config from '../config';
 import AdminLTEinit from './lib/app.js';
@@ -175,7 +177,9 @@ const PageLoader = React.createClass({
 		var map = {
 			'dashboard' : <Dashboard />,
 			'settings' : <Settings />,
-			'content' : <Content />,
+			'content' : <Content handleNav={this.props.handleNav}/>,
+			'content-new' : <NewContent />,
+			'content-edit' : <NewContent postId={this.props.postId}/>,
 			'profile' : <Profile />,
 			'posts' : <Posts handleNav={this.props.handleNav}/>,
 			'pages' : <Pages handleNav={this.props.handleNav}/>,
@@ -203,7 +207,10 @@ const PageLoader = React.createClass({
 		if (map[page+action]) {
 			return map[page+action]
 		} else if (this.isContentType(page)) {
-			return <ContentType name={page} action={action} />
+			if (action)
+				return <NewContentType name={page} postId={this.props.postId} handleNav={this.props.handleNav}/>
+			else
+				return <ContentType name={page} handleNav={this.props.handleNav}/>
 		} else {
 			return <NotFound/>
 		}
