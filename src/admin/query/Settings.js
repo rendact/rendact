@@ -16,6 +16,20 @@ const loadSettingsQry = {
     }`
 }
 
+const getPermissionConfigQry = {
+  query: `query getOptions{
+  viewer{
+    allOptions(where: {item:{eq: "permissionConfig"} }){
+      edges{
+        node{
+          value
+        }
+      }
+    }
+  }
+  }`
+}
+
 const createUpdateSettingsMtn = function(arrData){
   var variables = {};
   var query = "mutation (";
@@ -54,9 +68,9 @@ const createUpdateSettingsMtn = function(arrData){
 const createUpdatePermissionMtn = function(userId, arrData){
     return {
       "query": `
-    mutation createUserMeta($input: CreateUserMetaInput!) {
-        createUserMeta(input: $input) {
-          changedUserMeta {
+    mutation createOptions($input: CreateOptionsInput!) {
+        createOptions(input: $input) {
+          changedOptions {
             id
            
         }
@@ -65,7 +79,6 @@ const createUpdatePermissionMtn = function(userId, arrData){
     `,
       "variables": {
         "input": {
-          "userId": userId,
           "item": "permissionConfig",
           "value": arrData
         }
@@ -75,6 +88,7 @@ const createUpdatePermissionMtn = function(userId, arrData){
 
 const queries = {
   loadSettingsQry: loadSettingsQry,
+  getPermissionConfigQry: getPermissionConfigQry,
   createUpdateSettingsMtn: createUpdateSettingsMtn,
   createUpdatePermissionMtn: createUpdatePermissionMtn
 }

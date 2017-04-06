@@ -73,6 +73,7 @@ var Settings = React.createClass({
 			        <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
 			        <li className="active">Settings</li>
 			      </ol>
+			      <div style={{borderBottom:"#000000" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
 			    </section>
 			    <Notification ref="notificationSystem" />
 

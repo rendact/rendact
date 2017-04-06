@@ -228,7 +228,7 @@ var Dashboard = React.createClass({
 		return (
 			<div className="content-wrapper">
 				<div className="container-fluid">
-					<section className="content-header">
+					<section className="content-header" >
 			      <h1>
 			        Dashboard
 			      </h1>
@@ -236,6 +236,7 @@ var Dashboard = React.createClass({
 			        <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
 			        <li className="active">Dashboard</li>
 			      </ol>
+			      <div style={{borderBottom:"#000000" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
 			    </section>
 
 			    <section className="content">
