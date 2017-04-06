@@ -13,8 +13,7 @@ import {loadConfig} from './utils';
 
 const Main = React.createClass({
 	getInitialState: function(){
-		this.AuthService = new AuthService(this);
-		this.AuthService.checkAuth(this.onlogin);
+		loadConfig();
 		return {
 			logged: localStorage.getItem("token")?true:false,
 			pathname: 'admin'
@@ -26,7 +25,8 @@ const Main = React.createClass({
 		this.setState(_obj);
 	},
 	componentWillMount: function(){
-		loadConfig();
+		this.AuthService = new AuthService(this);
+		this.AuthService.checkAuth(this.onlogin);
 	},
 	render: function(){
 		return (

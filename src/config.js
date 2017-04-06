@@ -134,6 +134,8 @@ const permissionConfig = {
 const config = {
 	//scapholdUrl: 'https://us-west-2.api.scaphold.io/graphql/rendact',
 	scapholdUrl: 'https://us-west-2.api.scaphold.io/graphql/rendact-fork',
+	auth0ClientId: 'ppT7SigAoZtxsMkivihT2O1PLS7TYBFf',
+	auth0Domain: 'rendact.auth0.com',
 	menuList: MenuJson,
 	theme: ActiveThemeConfig,
 	permalinkTypeList: PermalinkTypeList,
