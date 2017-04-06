@@ -29,7 +29,7 @@ const Permission = React.createClass({
   },
   loadData: function(datatable) {
     datatable.clear();
-    var permissionConfig = Config.permissionConfig;
+    var permissionConfig = Query.getPermissionConfigQry;
     var roleList = Config.roleList;
     
     _.forEach(Config.permissionList, function(item){
@@ -39,7 +39,7 @@ const Permission = React.createClass({
       _.forEach(roleList, function(item){
         var checked = "";
         var val = item + "~" + roleId;
-        if (_.indexOf(permissionConfig[item], roleId)>-1)
+        if (_.indexOf(permissionConfig.value, roleId)>-1)
           checked = "checked";
           row.push('<td style="textAlign: center"><input type="checkbox" name="permissionCheckbox" value="'+val+'" '+checked+'/></td>');
       });
@@ -65,16 +65,8 @@ const Permission = React.createClass({
         _config[roleName] = [permissionName]; 
       }
     });
-    var isi =""; 
-    var qry ="";
-    for(var key in _config) {
-      if(_config.hasOwnProperty(key)) {
-        isi += key + ": " +"["+ _config[key]+"]";
-        //do something with value;
-    }
-      qry = Query.createUpdatePermissionMtn(null, isi);
-    }
-      
+    var isi = JSON.stringify(_config); 
+    var qry = Query.createUpdatePermissionMtn(null, isi);
 
     riques(qry, 
       function(error, response, body) {
@@ -128,6 +120,7 @@ const Permission = React.createClass({
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
               <li className="active">Permission Settings</li>
             </ol>
+            <div style={{borderBottom:"#000000" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
           </section>
           <Notification ref="notificationSystem" />
           <form onSubmit={this.handleSubmit} id="permissionForm" method="get"> 

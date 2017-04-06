@@ -39,6 +39,7 @@ const queries = {
   getRolesQry: User.getRolesQry,
   createUpdateCategoryOfPostMtn: Post.createUpdateCategoryOfPostMtn,
   loadSettingsQry: Settings.loadSettingsQry,
+  getPermissionConfigQry: Settings.getPermissionConfigQry,
   createUpdateSettingsMtn: Settings.createUpdateSettingsMtn,
   createUpdatePermissionMtn: Settings.createUpdatePermissionMtn,
   getContentListQry: Content.getContentListQry,

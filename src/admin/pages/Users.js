@@ -137,7 +137,7 @@ const Users = React.createClass({
     var status = event.target.text;
     this.setState({activeStatus: status});
     var re = this;
-    this.loadData(this.state.dt, status, function(){
+    this.loadData(status, function(){
       re.setState({deleteMode: false});
       re.disableForm(false);
     })  
@@ -178,6 +178,7 @@ const Users = React.createClass({
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
               <li className="active">User List</li>
             </ol>
+            <div style={{borderBottom:"#000000" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
           </section>
           <Notification ref="notificationSystem" />   
           <section className="content">

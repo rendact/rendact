@@ -43,8 +43,11 @@ const Posts = React.createClass({
             });
             if (categories.length===0)
               categories = "Uncategorized";
-            
-            var img = "/images/photo1.png";     
+              /*_.forEach(item.node.category.edges, function(item){ 
+                categories.push(item.node.category,{"name": "Uncategorized"})*/
+
+            var img = "/images/photo1.png"; 
+            //var img = "";     
             var tag = "";
             var like = _.find(item.node.meta.edges,{"node": {"item": "like"}})?_.find(item.node.meta.edges,{"node": {"item": "like"}}).node.value:"0";
 
@@ -303,6 +306,7 @@ const Posts = React.createClass({
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
               <li className="active">Post List</li>
             </ol>
+            <div style={{borderBottom:"#000000" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
           </section>  
           <Notification ref="notificationSystem" /> 
           <section className="content">

@@ -94,7 +94,7 @@ var NewUser = React.createClass({
 
 		var p = JSON.parse(localStorage.getItem("profile"));
 
-		var isAdmin = (_.indexOf(p.roles, "Administrator") > -1);
+		var isAdmin = (_.indexOf(p.roles, "Admin") > -1);
 		this.setState({isAdmin: isAdmin});
 		_.forEach(document.getElementsByTagName('roles[]'), function(el){ el.disabled = !isAdmin;})
 	},
@@ -362,6 +362,7 @@ var NewUser = React.createClass({
 			        <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
 			        <li className="active">Profile</li>
 			      </ol>
+			      <div style={{borderBottom:"#000000" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
 			    </section>
 			    <Notification ref="notificationSystem" />
 
