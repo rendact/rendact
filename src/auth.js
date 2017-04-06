@@ -190,6 +190,7 @@ function AuthService(){
     localStorage.removeItem('profile');
     localStorage.removeItem('loginType');
     localStorage.removeItem('auth0_profile');
+    localStorage.removeItem('config');
     request({url: 'https://rendact.auth0.com/v2/logout'});
   }
 
