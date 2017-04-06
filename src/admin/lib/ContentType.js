@@ -12,6 +12,8 @@ import {Table, SearchBoxPost, DeleteButtons} from './Table';
 const ContentType = React.createClass({
 	getInitialState: function(){
 	    require ('../pages/Posts.css');
+      var contentList = getConfig("contentList");
+      var contentData = _.find(contentList, {slug: this.props.name});
 
 	    return {
 	      dt: null,
@@ -22,12 +24,18 @@ const ContentType = React.createClass({
         statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
         dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
         activeStatus: "All",
-        itemSelected: false
+        itemSelected: false,
+        contentData: contentData
 	    }
 	},
-  loadData: function(type, callback) {
+  loadData: function(status, callback) {
     var me = this;
-    var qry = Query.getPostListQry(type);
+    var qry = Query.getContentsQry(this.props.name, status);
+
+    var fields = _.map(this.state.contentData.fields, function(item){
+      return item.slug
+    });
+
     riques(qry, 
       function(error, response, body) { 
         if (body.data) { 
@@ -36,31 +44,13 @@ const ContentType = React.createClass({
 
           _.forEach(body.data.viewer.allPosts.edges, function(item){
             var dt = new Date(item.node.createdAt);
-            var categories = [];
-            _.forEach(item.node.category.edges, function(item){ 
-              if (item.node.category)
-                categories.push(item.node.category.name)
+            var _obj = {};
+            _.forEach(fields, function(fld){
+              if (_.has(item.node, fld))
+                _obj[fld] = item.node[fld];
             });
-            if (categories.length===0)
-              categories = "Uncategorized";
-            
-            var img = "/images/photo1.png";     
-            var tag = "";
-            var like = _.find(item.node.meta.edges,{"node": {"item": "like"}})?_.find(item.node.meta.edges,{"node": {"item": "like"}}).node.value:"0";
 
-            _dataArr.push({
-              "postId": item.node.id,
-              "image": img,
-              "title": item.node.title,
-              "slug": item.node.slug?item.node.slug:"",
-              "author": item.node.author?item.node.author.username:"",
-              "category": categories,
-              "tags": tag,
-              "likes": like,
-              "status": item.node.status?item.node.status:"",
-              "comments": item.node.comments.edges.length,
-              "published": dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate()
-            });
+            _dataArr.push(_obj);
 
             var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
             if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
@@ -279,19 +269,16 @@ const ContentType = React.createClass({
     this.loadData("All");
   },
 	render: function(){
-    var contentList = getConfig("contentList");
-    var contentData = _.find(contentList, {slug: this.props.name});
-    debugger;
-		return (
+    return (
 			<div className="content-wrapper">
         <div className="container-fluid">
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
-              {contentData.name}
+              {this.state.contentData.name}
             </h1>
             <ol className="breadcrumb">
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-              <li className="active">{contentData.name}</li>
+              <li className="active">{this.state.contentData.name}</li>
             </ol>
           </section>  
           <Notification ref="notificationSystem" /> 
@@ -340,7 +327,7 @@ const ContentType = React.createClass({
                       </div>                   
                       <Table 
                           id="postList"
-                          columns={contentData.fields}
+                          columns={this.state.contentData.fields}
                           checkBoxAtFirstColumn="true"
                           ref="rendactTable"
                           onSelectAll={this.checkDynamicButtonState}
