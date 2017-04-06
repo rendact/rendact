@@ -77,11 +77,11 @@ const Posts = React.createClass({
       }
     );
   },
-  handleDeleteBtn: function(event){debugger;
+  handleDeleteBtn: function(event){;
     var me = this;
     var checkedRow = $("input.postListCb:checked");
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
-    debugger;
+    ;
     swal(_.merge({
       title: 'Sure want to delete?',
       text: "You might lost some data!",

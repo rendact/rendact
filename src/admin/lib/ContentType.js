@@ -81,7 +81,7 @@ const ContentType = React.createClass({
     var me = this;
     var checkedRow = $("input.postListCb:checked");
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
-    debugger;
+    ;
     swal(_.merge({
       title: 'Sure want to delete?',
       text: "You might lost some data!",
@@ -281,17 +281,17 @@ const ContentType = React.createClass({
 	render: function(){
     var contentList = getConfig("contentList");
     var contentData = _.find(contentList, {slug: this.props.name});
-
+    debugger;
 		return (
 			<div className="content-wrapper">
         <div className="container-fluid">
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
-              {this.props.name}
+              {contentData.name}
             </h1>
             <ol className="breadcrumb">
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-              <li className="active">Post List</li>
+              <li className="active">{contentData.name}</li>
             </ol>
           </section>  
           <Notification ref="notificationSystem" /> 
@@ -340,17 +340,7 @@ const ContentType = React.createClass({
                       </div>                   
                       <Table 
                           id="postList"
-                          columns={[
-                            {id: 'image', label: "Image", type: "image", width: 10},
-                            {id: 'title', label: "Title", width: 400, type: "link", target: "", cssClass:"titleText"},
-                            {id: 'slug', label: "Slug", textAlign:"center"},
-                            {id: 'author', label: "Author", textAlign:"center"},
-                            {id: 'category', label: "Category", textAlign:"center"},
-                            {id: 'tags', label: "Tags", textAlign:"center"},
-                            {id: 'likes', label: "Likes", textAlign:"center"},
-                            {id: 'comments', label: "Comments", width: 30, textAlign:"center"},
-                            {id: 'published', label: "Publish Date", textAlign:"center"}
-                          ]}
+                          columns={contentData.fields}
                           checkBoxAtFirstColumn="true"
                           ref="rendactTable"
                           onSelectAll={this.checkDynamicButtonState}

@@ -163,8 +163,7 @@ const PageLoader = React.createClass({
 	},
 	isContentType: function(page){
 		var contentList = getConfig("contentList");
-		var contentListIds = _.map(contentList, function(item){ return item.slug })
-		debugger;
+		var contentListIds = _.map(contentList, function(item){ return item.slug });
 		return (_.indexOf(contentListIds, page) !== -1);
 	},
 	render: function() {
