@@ -94,7 +94,7 @@ var NewUser = React.createClass({
 
 		var p = JSON.parse(localStorage.getItem("profile"));
 
-		var isAdmin = (_.indexOf(p.roles, "Administrator") > -1);
+		var isAdmin = (_.indexOf(p.roles, "Admin") > -1);
 		this.setState({isAdmin: isAdmin});
 		_.forEach(document.getElementsByTagName('roles[]'), function(el){ el.disabled = !isAdmin;})
 	},

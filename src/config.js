@@ -20,7 +20,7 @@ const MenuJson = [
 	{id: 'users', label: 'Users', icon: 'fa-users', open: false, role: 1, roleId: 'view-user',
 		elements: [
 			{id: 'users', label: 'Users', icon: 'fa-users', open: false, url: '/admin/users', role: 1, roleId: 'view-user'},
-			{id: 'permission', label: 'Permission', icon: 'fa-users', open: false, url: '/admin/users/permission', role: 10, roleId: 'modify-permission'},
+			{id: 'permission', label: 'Permissions', icon: 'fa-users', open: false, url: '/admin/users/permission', role: 10, roleId: 'modify-permission'},
 			{id: 'users-new', label: 'Add New', icon: 'fa-user-plus', open: false ,url: '/admin/users/new', role: 10, roleId: 'modify-user'}
 		]
 	},
@@ -60,7 +60,7 @@ const menuRoleValue = {
 }
 
 const roleValue = {
-	"Administrator": 10,
+	"Admin": 10,
 	"Editor": 6,
 	"Author": 5,
 	"Subscriber": 2,
@@ -100,7 +100,7 @@ const defaultSwalStyling = {
 
 const userMetaList = ["bio","website","facebook","twitter","linkedin","phone","timezone", "userPrefConfig"];
 
-const roleList = ["Administrator", "Editor", "Author", "Subscriber", "No Role"]
+const roleList = ["Admin", "Editor", "Author", "Subscriber", "No Role"]
 
 const permissionList = [
 	{id: "view-page", label: "View page list"},
@@ -126,7 +126,7 @@ const permissionConfig = {
 	"Subscriber"		: ["view-post","view-page", "view-stats"],
 	"Author"				: ["modify-post", "upload-media"],
 	"Editor"				: ["modify-post", "upload-media", "modify-page"],
-	"Administrator"	: ["view-post","view-page", "view-stats", "modify-post", "upload-media", "modify-page", 
+	"Admin"	: ["view-post","view-page", "view-stats", "modify-post", "upload-media", "modify-page", 
 										 "view-user", "modify-user", "modify-permission", "view-plugins", "modify-plugins", 
 										 "view-themes", "modify-themes", "modify-settings", "view-content", "modify-content"]
 }
