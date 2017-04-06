@@ -126,7 +126,7 @@ const permissionConfig = {
 	"Subscriber"		: ["view-post","view-page", "view-stats"],
 	"Author"				: ["modify-post", "upload-media"],
 	"Editor"				: ["modify-post", "upload-media", "modify-page"],
-	"Admin"	: ["view-post","view-page", "view-stats", "modify-post", "upload-media", "modify-page", 
+	"Admin"					: ["view-post","view-page", "view-stats", "modify-post", "upload-media", "modify-page", 
 										 "view-user", "modify-user", "modify-permission", "view-plugins", "modify-plugins", 
 										 "view-themes", "modify-themes", "modify-settings", "view-content", "modify-content"]
 }
