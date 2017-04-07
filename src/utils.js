@@ -146,7 +146,7 @@ const getConfig = function(name){
     return null;
 }
 
-const loadConfig = function(){
+const loadConfig = function(callback){
   var me = this;
   var qry = Query.getContentListQry;
   var config = {}
@@ -184,6 +184,8 @@ const loadConfig = function(){
         _.forEach(body.data.viewer.allOptions.edges, function(item){
           _saveConfig(item.node.item, item.node.value);
         });
+        if (callback) 
+          callback.call();
       } else {
         errorCallback(error, body.errors?body.errors[0].message:null);
       }

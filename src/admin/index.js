@@ -2,6 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import $ from 'jquery';
 import AdminHeader from './Header';
+import Loading from './Loading';
 import ControlSidebar from './ControlSidebar';
 import Footer from './Footer';
 import Dashboard from './pages/Dashboard';
@@ -28,6 +29,7 @@ import Config from '../config';
 import AdminLTEinit from './lib/app.js';
 import {riques, hasRole, errorCallback, getConfig} from '../utils';
 import Query from './query';
+import {loadConfig} from '../utils';
 
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -229,12 +231,18 @@ const Admin = React.createClass({
 		require ('jquery-ui/ui/widgets/tooltip')
 
 		AdminLTEinit();
+
+		var me = this;
+		loadConfig(function(){
+			me.setState({configLoaded: true})
+		});
 	},
 	getInitialState: function() {
 		return {
 			page: this.props.params['page']?this.props.params['page']:'dashboard',
 			action: this.props.params['action']?this.props.params['action']:'',
-			postId: this.props.params['postId']?this.props.params['postId']:null
+			postId: this.props.params['postId']?this.props.params['postId']:null,
+			configLoaded: false
 		}
 	},
 	getDefaultProps: function() {
@@ -277,7 +285,7 @@ const Admin = React.createClass({
 		this.props.onlogin(false);
 	},
 	render: function() {
-		if (this.props.AuthService.loggedIn()) {
+		if (this.props.AuthService.loggedIn() && this.state.configLoaded) {
 			return (
 				<div className="wrapper">
 	        		
@@ -291,9 +299,7 @@ const Admin = React.createClass({
 			);
 		} else {
 			return (
-				<div className="wrapper">
-				<p>Loading...</p>
-				</div>
+				<Loading />
 			)
 		}
 	}

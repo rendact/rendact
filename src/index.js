@@ -9,11 +9,10 @@ import {ThemeHome, ThemeSingle, ThemeBlog} from './admin/theme';
 import Admin from './admin';
 import Login from './login';
 import Register from './register';
-import {loadConfig} from './utils';
 
 const Main = React.createClass({
 	getInitialState: function(){
-		loadConfig();
+		
 		return {
 			logged: localStorage.getItem("token")?true:false,
 			pathname: 'admin'

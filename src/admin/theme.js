@@ -6,22 +6,7 @@ import Query from './query';
 import {riques} from '../utils';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
-
-const LoadingPage = React.createClass({
-	componentDidMount: function(){
-		require ('../../public/css/AdminLTE.css');
-		require ('../../public/css/skins/_all-skins.css');	
-		require ('font-awesome/css/font-awesome.css');
-		require ('../../public/css/ionicons.min.css');
-	},
-	render: function() {
-		return (
-			<div>
-			<h2 style={{marginTop:100,width:"100%",textAlign:"center"}}><i className="fa fa-spin fa-refresh"></i> Loading page...</h2>
-			</div>
-		)
-	}
-});
+import Loading from './Loading'
 
 const InvalidTheme = React.createClass({
 	componentDidMount: function(){
@@ -106,7 +91,7 @@ const ThemeHome = React.createClass({
 	},
 	render: function() {
 		if (!this.state.loadDone && this.state.slug) {
-			return <LoadingPage/>
+			return <Loading/>
 		} else {
 			if (this.state.slug){
 				let Single = getTemplateComponent('single');
