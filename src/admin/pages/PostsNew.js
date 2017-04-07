@@ -102,7 +102,13 @@ const NewPost = React.createClass({
     this.setState({visibilityTxt: $("input[name=visibilityRadio]:checked").val()});
   },
   disableForm: function(state){
-    disableForm(state, this.notification);
+    var me = this;
+  _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;});
+  _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;});
+  _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;});
+    if (state){
+        this.notification.removeNotification('saving');
+    }  
   },
   resetForm: function(){
     document.getElementById("postForm").reset();
@@ -269,10 +275,22 @@ const NewPost = React.createClass({
     if (this.state.mode==="create"){
       qry = Query.getCreatePostQry(v.title, v.content, v.status, v.visibility, v.passwordPage, v.publishDate, 
         localStorage.getItem('userId'), this.state.slug, v.summary);
+      this.notification.addNotification({
+        id: 'saving',
+        message: 'Creating Post...',
+        level: 'warning',
+        position: 'tr'
+      });
       noticeTxt = 'Post Published!';
     }else{
       qry = Query.getUpdatePostQry(this.props.postId, v.title, v.content, v.status, v.visibility, v.passwordPage, 
         v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary);
+      this.notification.addNotification({
+        id: 'saving',
+        message: 'Updating Post...',
+        level: 'warning',
+        position: 'tr'
+      });
       noticeTxt = 'Post Updated!';
     }
 
