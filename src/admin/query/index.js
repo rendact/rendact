@@ -44,6 +44,8 @@ const queries = {
   createUpdateSettingsMtn: Settings.createUpdateSettingsMtn,
   createUpdatePermissionMtn: Settings.createUpdatePermissionMtn,
   getContentListQry: Content.getContentListQry,
+  createContentMtn: Content.createContentMtn,
+  getContentQry: Content.getContentQry,
   deleteUserQry: User.deleteUserQry
 }
 

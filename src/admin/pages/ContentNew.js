@@ -14,7 +14,8 @@ const Field = React.createClass({
 			<div className="form-inline" >
 				<input type="text" value={this.props.name} className="form-control" disabled/> 
 				<input type="text" value={this.props.type} className="form-control" disabled/> 
-				<input type="button" value="Remove" data={this.props.name} className="form-control btn" onClick={this.props.onDelete}/> 
+				<input type="button" value="Remove" data={this.props.name} 
+					className="form-control btn" onClick={this.props.onDelete} disabled={!this.props.deletable}/> 
 			</div>
 		)
 	}
@@ -28,17 +29,21 @@ var Settings = React.createClass({
 			dateOfBirth = new Date(p.dateOfBirth)
 
 		return {
-			fields: [{name: "Title", type: "String"}]
+			fields: [
+				{id:"title", label: "Title", type: "link", deletable: false},
+				{id:"slug", label: "Slug", type: "text", deletable: false}
+			]
 		}
 	},
 	loadData: function(){
-		var qry = Query.loadSettingsQry;
+		if (!this.props.postId) return;
+		var qry = Query.getContentQry(this.props.postId);
 		
 		riques(qry, 
 			function(error, response, body){
 				if(!error && !body.errors) {
-					_.forEach(body.data.viewer.allOptions.edges, function(item){
-						var _el = document.getElementsByName(item.node.item);
+					_.forEach(body.data.viewer.allContents.edges, function(item){
+						var _el = document.getElementsById(item.node.item);
 						if (_el.length>0){
 							_el[0].value = item.node.value;
 							_el[0].id = item.node.id;
@@ -57,9 +62,10 @@ var Settings = React.createClass({
 		event.preventDefault();
 		var me = this;
 		var _objData = getFormData('rdt-input-form');
+		_objData['fields'] = this.state.fields;
 		this.disableForm(true);
 
-		var qry = Query.createUpdateSettingsMtn(_objData);
+		var qry = Query.createContentMtn(_objData);
 		riques(qry, 
 			function(error, response, body){
 				if(!error && !body.errors) {
@@ -75,7 +81,16 @@ var Settings = React.createClass({
 		var fields = this.state.fields;
 		var name = getValue("field-name");
 		var type = getValue("field-type");
-		fields.push({name: name, type: type});
+		var width = getValue("field-width");
+		var align = getValue("field-align");
+		fields.push(
+			{
+				id: name.toLowerCase(), 
+				label: name, 
+				type: type?type:"text", 
+				width: width?width:400, 
+				align:align?align:"left"
+			});
 		this.setState({fields: fields})
 	},
 	handleFieldDelete: function(event){
@@ -120,14 +135,14 @@ var Settings = React.createClass({
 					  		<div className="form-group">
 								 	<label htmlFor="name" className="col-md-3">Name</label>
 								 	<div className="col-md-9">
-										<input type="text" name="name" className="form-control rdt-input-form" />
+										<input type="text" name="name" className="form-control rdt-input-form" required/>
 									</div>
 								</div>
 
 								<div className="form-group">
 								 	<label htmlFor="slug" className="col-md-3">Slug</label>
 							  	<div className="col-md-9">
-										<input type="text" name="slug" className="form-control rdt-input-form" />
+										<input type="text" name="slug" className="form-control rdt-input-form" required/>
 									</div>
 								</div>
 
@@ -137,15 +152,29 @@ var Settings = React.createClass({
 							  		<div className="form-inline" >
 											<input type="text" id="field-name" placeholder="Field name" className="form-control"/> 
 											<select id="field-type" className="form-control select">
-												<option>String</option>
-												<option>Number</option>
+												<option value="text">String</option>
+												<option value="text">Number</option>
+												<option value="date">Date</option>
+												<option value="link">Link</option>
+												<option value="image">Image</option>
+											</select> 
+											<input type="text" id="field-width" placeholder="Width" className="form-control"/> 
+											<select id="field-align" className="form-control select">
+												<option value="left">Left</option>
+												<option value="right">Right</option>
+												<option value="center">Center</option>
 											</select> 
 											<input type="button" value="Add" className="form-control btn" onClick={this.handleAddField}/> 
 										</div>
 										<h4>Current fields</h4>
 										{
 											this.state.fields.map(function(item){
-												return <Field name={item.name} type={item.type} onDelete={this.handleFieldDelete}/>
+												return <Field 
+																name={item.name} 
+																type={item.type} 
+																onDelete={this.handleFieldDelete}
+																deletable={item.deletable==false?false:true}
+																/>
 											}.bind(this))
 										}
 									</div>
@@ -154,7 +183,7 @@ var Settings = React.createClass({
 								<div className="form-group">
 										<div className="col-md-9">
 											<div className="btn-group">
-												<input type="submit" value="Update Settings" className="btn btn-primary btn-sm" />
+												<input type="submit" value={this.state.mode==="update"?"Update":"Add"} className="btn btn-primary btn-sm" />
 											</div>
 										</div>
 									</div>
