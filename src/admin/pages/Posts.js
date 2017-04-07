@@ -41,10 +41,9 @@ const Posts = React.createClass({
               if (item.node.category)
                 categories.push(item.node.category.name)
             });
-            if (categories.length===0)
-              categories = "Uncategorized";
-              /*_.forEach(item.node.category.edges, function(item){ 
-                categories.push(item.node.category,{"name": "Uncategorized"})*/
+            //if (categories.length===0)
+            //  categories = "Uncategorized";
+             
 
             var img = "/images/photo1.png"; 
             //var img = "";     
@@ -69,7 +68,7 @@ const Posts = React.createClass({
             if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
           });
 
-          var bEdit = hasRole('modify-post');
+          var bEdit = hasRole('modify-page');
           me.table.loadData(_dataArr, bEdit);
           me.setState({monthList: monthList});
 
@@ -123,7 +122,7 @@ const Posts = React.createClass({
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, "Deleted", cb);
+            me.loadData("Deleted", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -149,7 +148,7 @@ const Posts = React.createClass({
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, "Deleted", cb);
+            me.loadData("Deleted", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -176,7 +175,7 @@ const Posts = React.createClass({
             console.log(JSON.stringify(body, null, 2));
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, "Deleted", cb);
+            me.loadData("Deleted", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -193,7 +192,7 @@ const Posts = React.createClass({
     this.setState({activeStatus: status});
     if (status==='Deleted'){
       var me = this;
-      this.loadData(this.state.dt, "Deleted", function(){
+      this.loadData("Deleted", function(){
         me.setState({deleteMode: true});
         me.disableForm(false);
       });
@@ -286,7 +285,7 @@ const Posts = React.createClass({
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
               Post List
-              { hasRole('modify-post') &&
+              { hasRole('modify-page') &&
               (<small style={{marginLeft: 5}}>
                 <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
               </small>)

@@ -17,6 +17,7 @@ const Users = React.createClass({
       dt: null,
       monthList: [],
       deleteMode: false,
+      isProcessing: false,
       statusList: Config.roleList,
       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
       activeStatus: "All",
@@ -66,24 +67,6 @@ const Users = React.createClass({
         }
     );
   },
-  /*disableForm: function(state){
-    var me = this;
-    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
-    _.forEach(document.getElementsByTagName('button'), function(el){ 
-      if (_.indexOf(me.state.dynamicStateBtnList, el.id) < 0)
-        el.disabled = state;
-    })
-    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.notification.addNotification({
-      message: 'Processing...',
-      level: 'warning',
-      position: 'tr',
-      autoDismiss: 2
-    });
-    if (!state) {
-      this.checkDynamicButtonState();
-    }
-  },*/
   disableForm: function(state){
     var me = this;
     _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
@@ -92,7 +75,7 @@ const Users = React.createClass({
         el.disabled = state;
     })
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.notif.addNotification({message: 'Processing...', level: 'warning',position: 'tr'});
+    this.setState({isProcessing: true});
     if (!state) {
       this.checkDynamicButtonState();
     }
@@ -140,7 +123,9 @@ const Users = React.createClass({
     this.loadData(status, function(){
       re.setState({deleteMode: false});
       re.disableForm(false);
-    })  
+      re.setState({isProcessing:false});
+    })
+      
   },
   handleViewUser: function(userId){
     this.props.handleNav('users','edit', userId);
@@ -206,7 +191,10 @@ const Users = React.createClass({
                                    </span>
                           }.bind(this))}
                         </div>
-                      </div>  
+                      </div>
+                      { this.state.isProcessing &&
+                      <p>Processing...</p>
+                      } 
                       <TableUser 
                           id="userListTbl"
                           columns={[

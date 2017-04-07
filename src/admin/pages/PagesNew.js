@@ -423,7 +423,7 @@ const NewPage = React.createClass({
               </h1>
                 <ol className="breadcrumb">
                   <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-                  <li>Pages</li>
+                  <li><a href={rootUrl+'/'+'admin/pages'}>Pages</a></li>
                   <li className="active">{this.state.mode==="update"?"Edit Page":"Add New"}</li>
                 </ol>
               <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div> 
