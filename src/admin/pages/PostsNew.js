@@ -127,9 +127,14 @@ const NewPost = React.createClass({
       publishDate: this.state.publishDate,
       type: "post",
       categories: _.map(document.getElementsByName("categoryCheckbox[]"), function(item){
-        if (item.checked)
-          return item.value
+      if (item.checked)
+        {return item.value}
+      else if (!item)
+      {return item.value==="Q2F0ZWdvcnk6MQ=="}
       })
+      /*if (categories ==="")
+        categories: _.map(document.getElementsByName("categoryCheckbox[]"), function(item){
+        {return item.value==="Q2F0ZWdvcnk6MQ=="}*/
     }
   },
   setFormValues: function(v){
@@ -273,7 +278,7 @@ const NewPost = React.createClass({
 
     riques(qry, 
       function(error, response, body) {
-        if (!error && !body.errors && response.statusCode === 200) {
+        if (!error && !body.errors && response.statusCode === 200) {debugger;
           var here = me;
           var postId = "";
           var pmQry = "";
@@ -342,7 +347,8 @@ const NewPost = React.createClass({
           var categoryList = [];
           $.each(body.data.viewer.allCategories.edges, function(key, item){
             categoryList.push((<div key={item.node.id}><input id={item.node.id}
-            name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
+            name="categoryCheckbox[]" type="checkbox" class="cb" value={item.node.id} 
+             /> {item.node.name}</div>));
           })
           me.setState({categoryList: categoryList});
 
