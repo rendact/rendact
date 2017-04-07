@@ -41,9 +41,9 @@ const Content = React.createClass({
             _dataArr.push({
               "postId": item.node.id,
               "name": item.node.name,
-              "fields": _.keys(item.node.fields),
+              "fields": _.map(item.node.fields, function(item){ return item.label}),
               "slug": item.node.slug?item.node.slug:"",
-              "status": item.node.status?item.node.status:"",
+              "status": item.node.status?item.node.status:"active",
               "createdAt": dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate()
             });
 
@@ -91,8 +91,8 @@ const Content = React.createClass({
         }
       );
   })},
-  handleAddNewBtn: function(event) {
-    
+  handleAddNewBtn: function(postId){
+    this.props.handleNav('content','new');
   },
   handleViewPage: function(postId){
     this.props.handleNav('pages','edit', postId);
@@ -120,7 +120,7 @@ const Content = React.createClass({
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
               <li className="active">Content Type List</li>
             </ol>
-            <div style={{borderBottom:"#000000" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
+            <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
           </section>
           <Notification ref="notificationSystem" /> 
           <section className="content">

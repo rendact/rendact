@@ -1,5 +1,5 @@
 const MenuJson = [
-	{id: 'dashboard', label: 'Dashboard', icon: 'fa-dashboard', open: false, role: 1, 
+	{id: 'dashboard', label: 'Site', icon: 'fa-dashboard', open: false, role: 1, 
 		elements: [
 			{id: 'dashboard', label: 'Dashboard', icon: 'fa-dashboard', open: true, url: '/admin/dashboard', role: 1},
 			{id: 'settings', label: 'Settings', icon: 'fa-gears', open: true, url: '/admin/settings', role: 10, roleId: 'modify-settings'},
@@ -56,7 +56,9 @@ const menuRoleValue = {
 	'posts-edit' : 'modify-post',
 	'pages-edit' : 'modify-page',
 	'users-edit' : 'modify-user',
-	'content': 'view-content'
+	'content': 'view-content',
+	'content-new': 'modify-content',
+	'content-edit': 'modify-content'
 }
 
 const roleValue = {

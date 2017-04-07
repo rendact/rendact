@@ -184,6 +184,9 @@ const Posts = React.createClass({
         }
       );
   })},
+  handleAddNewBtn: function(event) {
+    this.props.handleNav('posts','new');
+  },
   handleStatusFilter: function(event){
     this.disableForm(true);
     var status = event.target.text;
@@ -225,24 +228,6 @@ const Posts = React.createClass({
       })
     } ;
   },
-  /*disableForm: function(state){
-    var me = this;
-    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
-    _.forEach(document.getElementsByTagName('button'), function(el){ 
-      if (_.indexOf(me.state.dynamicStateBtnList, el.id) < 0)
-        el.disabled = state;
-    })
-    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.notification.addNotification({
-      message: 'Processing...',
-      level: 'warning',
-      position: 'tr',
-      autoDismiss: 2
-    });
-    if (!state) {
-      this.checkDynamicButtonState();
-    }
-  },*/
   disableForm: function(state){
     var me = this;
     _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
@@ -301,12 +286,17 @@ const Posts = React.createClass({
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
               Post List
+              { hasRole('modify-post') &&
+              (<small style={{marginLeft: 5}}>
+                <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
+              </small>)
+              }
             </h1>
             <ol className="breadcrumb">
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
               <li className="active">Post List</li>
             </ol>
-            <div style={{borderBottom:"#000000" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
+            <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
           </section>  
           <Notification ref="notificationSystem" /> 
           <section className="content">

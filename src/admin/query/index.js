@@ -20,6 +20,7 @@ const queries = {
   getCreatePostQry: Post.getCreatePostQry,
   getUpdatePostQry: Post.getUpdatePostQry,
   getPostListQry: Post.getPostListQry,
+  getContentsQry: Post.getContentsQry,
   getAllCategoryQry: Post.getAllCategoryQry,
   getCreateCategoryOfPostQry: Post.getCreateCategoryOfPostQry,
   getUpdateCategoryOfPostQry: Post.getUpdateCategoryOfPostQry,

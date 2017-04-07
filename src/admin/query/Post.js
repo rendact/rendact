@@ -12,6 +12,18 @@ const getPostListQry = function(s) {
   };
 }
 
+const getContentsQry = function(type, status) {
+  var status = '{ne: "Deleted"}';
+  if (status==="Deleted" || status==="Draft" || status==="Pending Review")
+    status = '{eq: "'+status+'"}';
+
+  return {
+    "query": 
+      'query getPosts{viewer {allPosts(where: {type: {eq: "'+type+'"}, status: '+status+'}) { edges { node { '
+     +'id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},comments{edges{node{id}}},createdAt}}}}}'
+  };
+}
+
 const getAllCategoryQry = {
   "query": `query getCategories{
     viewer {
@@ -26,6 +38,8 @@ const getAllCategoryQry = {
     }
   }`
 }
+
+
 
 const getCreatePostQry = function(title, content, draft, visibility, passwordPage,
   publishDate, userId, slug, summary, category){
@@ -259,7 +273,8 @@ const queries = {
   deletePostQry: deletePostQry,
   deletePostPermanentQry: deletePostPermanentQry,
   recoverPostQry: recoverPostQry,
-  createUpdateCategoryOfPostMtn: createUpdateCategoryOfPostMtn
+  createUpdateCategoryOfPostMtn: createUpdateCategoryOfPostMtn,
+  getContentsQry: getContentsQry
 }
 
 module.exports = queries;

@@ -236,7 +236,7 @@ var Dashboard = React.createClass({
 			        <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
 			        <li className="active">Dashboard</li>
 			      </ol>
-			      <div style={{borderBottom:"#000000" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
+			      <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
 			    </section>
 
 			    <section className="content">

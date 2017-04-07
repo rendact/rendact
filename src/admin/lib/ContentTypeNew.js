@@ -4,46 +4,29 @@ import $ from 'jquery';
 window.jQuery = $;
 import Config from '../../config';
 import Query from '../query';
-import {riques, setValue, getValue, disableForm, getConfig} from '../../utils';
-import {getTemplates} from '../theme';
+import {riques, setValue, getValue, disableForm, errorCallback, getConfig} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
 
-const errorCallback = function(msg1, msg2){
-  if (msg1) swal('Failed!', msg1, 'warning')
-  else if (msg2) swal('Failed!', msg2, 'warning')
-  else swal('Failed!', 'Unknown error','warning')
-}
-
-const NewPage = React.createClass({
-  getInitialState: function(){
-    return {
-      title:"",
-      slug:"",
-      content:"",
-      summary:"",
-      parent:"",
-      status:"Draft",
-      immediately:"",
-      immediatelyStatus:this.props.postId?false:true,
-      visibilityTxt:"Public",
-      permalinkEditing: false,
-      mode: this.props.postId?"update":"create",
-      pageList: null,
-      titleTagLeftCharacter: 65,
-      metaDescriptionLeftCharacter: 160,
-      permalinkInProcess: false,
-      publishDate: new Date(),
-      publishDateReset: new Date()
-    }
-  },
+const NewContentType = React.createClass({
   componentDidMount: function(){
+    require('../lib/bootstrap-tagsinput.js');
+    require('../lib/bootstrap-tagsinput.css');
     var me = this;
-    this.notification = this.refs.notificationSystem;
-    $.getScript("https://cdn.ckeditor.com/4.6.2/standard-all/ckeditor.js", function(data, status, xhr){
+
+    $('#tags-input').tagsinput({
+      confirmKeys: [13, 188]
+    });
+    $('#tags-input').on('keypress', function(e){
+      if (e.keyCode === 13){
+        e.keyCode = 188;
+        e.preventDefault();
+      };
+    });
+
+    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
       window.CKEDITOR.replace('content', {
-        extraPlugins: 'justify',
         height: 400,
         title: false
       });
@@ -58,7 +41,35 @@ const NewPage = React.createClass({
     }else $("#private").attr("checked", true);
 
     this.notification = this.refs.notificationSystem;
+  },
 
+  getInitialState: function(){
+    var contentList = getConfig("contentList");
+    var contentData = _.find(contentList, {slug: this.props.name});
+    
+    return {
+      title:"",
+      slug:"",
+      content:"",
+      category: "",
+      summary:"",
+      status:"Draft",
+      immediately:"",
+      immediatelyStatus:this.props.postId?false:true,
+      visibilityTxt:"Public",
+      permalinkEditing: false,
+      mode: this.props.postId?"update":"create",
+      categoryList: null,
+      postCategoryList: [],
+      titleTagLeftCharacter: 65,
+      metaDescriptionLeftCharacter: 160,
+      publishDate: new Date(),
+      publishDateReset: new Date(),
+      titleTag: "",
+      metaKeyword: "",
+      metaDescription: "",
+      contentData: contentData
+    }
   },
   checkSlug: function(slug){
     var me = this;
@@ -91,110 +102,38 @@ const NewPage = React.createClass({
   saveDraft: function(event){
     this.setState({status: $("#statusSelect option:selected").text()});
   },
-  saveDraftBtn: function(event){
-    event.preventDefault();
-    this.disableForm(true);
-
-    var me = this;
-    var v = this.getFormValues();
-
-    if (v.title.length<=3) {
-      swal('Invalid content', "Title is to short!", 'warning');
-      return;
-    }
-
-    if (!v.content) {
-      swal('Invalid content', "Content can't be empty", 'warning');
-      return;
-    }
-    
-    var qry = "", noticeTxt = "";
-    if (this.state.mode==="create"){
-      qry = Query.getCreatePageQry(v.title, v.content, "Draft", v.visibility, v.passwordPage, v.publishDate, 
-        localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder, v.type);
-      noticeTxt = 'Page Published!';
-    }else{
-      qry = Query.getUpdatePageQry(this.props.postId, v.title, v.content, "Draft", v.visibility, v.passwordPage, 
-        v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder);
-      noticeTxt = 'Page Updated!';
-    }
-
-    riques(qry, 
-      function(error, response, body){
-        if (!error && !body.errors && response.statusCode === 200) {
-          var here = me;
-          var postMetaId = "";
-          var postId = "";
-          var pmQry = "";
-          
-          if (me.state.mode==="create"){
-            postId = body.data.createPost.changedPost.id;
-            pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
-          } else {
-            postId = body.data.updatePost.changedPost.id;
-            if (body.data.updatePost.changedPost.meta.edges.length===0) {
-              pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
-            } else {
-              postMetaId = body.data.updatePost.changedPost.meta.edges[0].node.id;
-              pmQry = Query.updatePostMetaMtn(postMetaId, postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
-            }
-          }
-
-          riques(pmQry, 
-            function(error, response, body) {
-              if (!error && !body.errors && response.statusCode === 200) {
-                here.disableForm(false); 
-              } else {
-                errorCallback(error, body.errors?body.errors[0].message:null);
-              }
-            }
-          );
-
-          me.setState({mode: "update"});
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-      }
-    );
-    
-  },
   saveVisibility: function(event){
     this.setState({visibilityTxt: $("input[name=visibilityRadio]:checked").val()});
   },
   disableForm: function(state){
-    disableForm(state, this.notification)
+    disableForm(state, this.notification);
   },
   resetForm: function(){
-    document.getElementById("pageForm").reset();
+    document.getElementById("postForm").reset();
     window.CKEDITOR.instances['content'].setData(null);
-    this.setState({
-      title:"", slug:"", content:"", summary:"", parent:"",
-      status:"Draft", immediately:"", immediatelyStatus:true, visibilityTxt:"Public", publishDate: new Date(),
+    this.setState({title:"", slug:"", content:"", summary:"",
+      status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
       permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160});
     this.handleTitleChange();
-    $("#publishedNotice").hide();
-    window.history.pushState("", "", '/admin/pages/new');
+    window.history.pushState("", "", '/admin/posts/new');
   },
   getFormValues: function(){
-    var pageOrder = $("#pageOrder").val();
-    var pageOrderInt = 0;
-    try  {pageOrderInt=parseInt(pageOrder,10)} catch(e) {}
-    
     return {
-      title: getValue("titlePage"),
+      title: getValue("titlePost"),
       content: window.CKEDITOR.instances['content'].getData(),
       status: getValue("statusSelect"),
       titleTag: getValue("titleTag"),
       metaKeyword: getValue("metaKeyword"),
       metaDescription: getValue("metaDescription"),
+      passwordPage: "",
       summary: getValue("summary"),
       visibility: $("input[name=visibilityRadio]:checked").val(),
-      pageTemplate: $("#pageTemplate option:selected").text(),
-      passwordPage: "",
       publishDate: this.state.publishDate,
-      parentPage: getValue("parentPage"),
-      pageOrder: pageOrderInt,
-      type: "page"
+      type: this.state.contentData.slug,
+      categories: _.map(document.getElementsByName("categoryCheckbox[]"), function(item){
+        if (item.checked)
+          return item.value
+      })
     }
   },
   setFormValues: function(v){
@@ -204,14 +143,26 @@ const NewPage = React.createClass({
         meta[i.node.item] = i.node.value;
       });
     }
+    
+    var _postCategoryList = [];
+    if (v.category.edges.length>0) {
+      _.forEach(v.category.edges, function(i){
+        if (i.node.category){
+          _postCategoryList.push(i.node.category.id);
+          if (document.getElementById(i.node.category.id)){
+            document.getElementById(i.node.category.id).checked = true;
+          }
+        }
+      });
+      this.setState({postCategoryList: _postCategoryList});
+    }
+
     var pubDate = v.publishDate? new Date(v.publishDate) : new Date();
-    setValue("titlePage", v.title);
+    setValue("titlePost", v.title);
     setValue("content", v.content);
     window.CKEDITOR.instances['content'].setData(v.content);
     setValue("summary", v.summary);
     setValue("statusSelect", v.status);
-    setValue("parentPage", v.parent);
-    setValue("pageOrder", v.order);
     setValue("hours", pubDate.getHours());
     setValue("minutes", pubDate.getMinutes());
     document.getElementsByName("visibilityRadio")[v.visibility==="Public"?0:1].checked = true;
@@ -221,14 +172,11 @@ const NewPage = React.createClass({
     if (_.has(meta, "metaDescription")){
       setValue("metaDescription", meta.metaDescription);
     }
-    if (_.has(meta, "pageTemplate")){
-      setValue("pageTemplate", meta.pageTemplate);
-    }
     if (_.has(meta, "titleTag")){
       setValue("titleTag", meta.titleTag);
     }
     this.setState({title: v.title, content: v.content, summary: v.summary, 
-      status: v.status, parent: v.parent, visibilityTxt: v.visibility, 
+      status: v.status, visibilityTxt: v.visibility, 
       publishDate: pubDate, publishDateReset: pubDate, slug: v.slug});
     this.handleTitleChange();
     this.handleTitleTagChange();
@@ -246,7 +194,7 @@ const NewPage = React.createClass({
     this.setState({permalinkEditing: true});
   },
   handleTitleBlur: function(event) {
-    var title = $("#titlePage").val();
+    var title = $("#titlePost").val();
     var slug = title.split(" ").join("-").toLowerCase();
     this.checkSlug(slug);
   },
@@ -255,7 +203,7 @@ const NewPage = React.createClass({
     this.checkSlug(slug);
   },
   handleTitleChange: function(event){
-    var title = $("#titlePage").val();
+    var title = $("#titlePost").val();
     //var slug = title.split(" ").join("-").toLowerCase();
     this.setState({title: title});
   },
@@ -296,39 +244,39 @@ const NewPage = React.createClass({
     var v = this.getFormValues();
 
     if (v.title.length<=3) {
-      swal('Invalid content', "Title is to short!", 'warning');
+      this.notification.addNotification({
+        title: 'Error',
+        message: 'Title is too short',
+        level: 'error',
+        position: 'tr'
+      });
       return;
     }
 
     if (!v.content) {
-      swal('Invalid content', "Content can't be empty", 'warning');
+      this.notification.addNotification({
+        title: 'Error',
+        message: "Content can't be empty",
+        level: 'error',
+        position: 'tr'
+      });
       return;
     }
 
     this.disableForm(true);
     var qry = "", noticeTxt = "";
     if (this.state.mode==="create"){
-      qry = Query.getCreatePageQry(v.title, v.content, v.status, v.visibility, v.passwordPage, v.publishDate, 
-        localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder, v.type);
-      noticeTxt = this.notification.addNotification({
-      title: 'Notice',
-      message: 'Page Published!',
-      level: 'success',
-      position: 'tc'
-    });
+      qry = Query.getCreatePostQry(v.title, v.content, v.status, v.visibility, v.passwordPage, v.publishDate, 
+        localStorage.getItem('userId'), this.state.slug, v.summary);
+      noticeTxt = this.state.contentData.name+' Published!';
     }else{
-      qry = Query.getUpdatePageQry(this.props.postId, v.title, v.content, v.status, v.visibility, v.passwordPage, 
-        v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder);
-      noticeTxt = this.notification.addNotification({
-      title: 'Notice',
-      message: 'Page Updated!',
-      level: 'success',
-      position: 'tc'
-    });
+      qry = Query.getUpdatePostQry(this.props.postId, v.title, v.content, v.status, v.visibility, v.passwordPage, 
+        v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary);
+      noticeTxt = this.state.contentData.name+' Updated!';
     }
 
     riques(qry, 
-      function(error, response, body){
+      function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
           var here = me;
           var postId = "";
@@ -336,11 +284,11 @@ const NewPage = React.createClass({
           
           if (me.state.mode==="create"){
             postId = body.data.createPost.changedPost.id;
-            pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
+            pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, null);
           } else {
             postId = body.data.updatePost.changedPost.id;
             if (body.data.updatePost.changedPost.meta.edges.length===0) {
-              pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, v.pageTemplate);
+              pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, null);
             } else {
               var data = [];
               _.forEach(body.data.updatePost.changedPost.meta.edges, function(item){
@@ -353,68 +301,81 @@ const NewPage = React.createClass({
               pmQry = Query.updatePostMetaMtn(postId, data);
             }
           }
-
+          
           riques(pmQry, 
             function(error, response, body) {
               if (!error && !body.errors && response.statusCode === 200) {
-                here.notification.addNotification({
-                  message: noticeTxt,
-                  level: 'success',
-                  position: 'tr',
-                  autoDismiss: 2
-                });
+                var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.state.postCategoryList, v.categories);
+                riques(catQry,
+                  function(error, response, body) {
+                    if (!error && !body.errors && response.statusCode === 200) {
+                      here.notification.addNotification({
+                        message: noticeTxt,
+                        level: 'success',
+                        position: 'tr',
+                        autoDismiss: 2
+                      });
+                      here.setState({mode: "update"});
+                    } else {
+                      errorCallback(error, body.errors?body.errors[0].message:null);
+                    }
+                    here.disableForm(false);
+                  }
+                );
               } else {
                 errorCallback(error, body.errors?body.errors[0].message:null);
               }
               here.disableForm(false);
             }
           );
-
-          me.setState({mode: "update"});
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
       }
-    );
+    );  
+  },
+  onTagKeyDown: function(event){
+    ;
+    event.preventDefault();
   },
   componentWillMount: function(){
     var me = this;
-    riques(Query.getPageListQry("All"),
+    riques(Query.getAllCategoryQry, 
       function(error, response, body) {
         if (!error) {
-          var pageList = [(<option key="0" value="">(no parent)</option>)];
-          _.forEach(body.data.viewer.allPosts.edges, function(item){
-            pageList.push((<option key={item.node.id} value={item.node.id} checked={me.state.parent=item.node.id}>
-              {item.node.title}</option>));
+          var categoryList = [];
+          $.each(body.data.viewer.allCategories.edges, function(key, item){
+            categoryList.push((<div key={item.node.id}><input id={item.node.id}
+            name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
           })
-          me.setState({pageList: pageList});
+          me.setState({categoryList: categoryList});
 
           if (!me.props.postId) return;
-          var here = me;
 
-          riques(Query.getPageQry(here.props.postId),
+          riques(Query.getPostQry(me.props.postId), 
             function(error, response, body) {
-              if (!error) {
+              if (!error ) {
                 var values = body.data.getPost;
-                here.setFormValues(values);
+                me.setFormValues(values);
               }
             }
-          )
-        }
-    });
+          );
 
+        }
+      }
+    );
   },
   handleAddNewBtn: function(event) {
     this.resetForm();
   },
+  
   render: function(){
     var rootUrl = getConfig('rootUrl')
-    var templates = getTemplates();
-    const newPage=(
+    const newPost=(
       <div className="content-wrapper">
         <div className="container-fluid">
           <section className="content-header"  style={{marginBottom:20}}>
-              <h1>{this.state.mode==="update"?"Edit Current Page":"Add New Page"}
+              <h1>{this.state.mode==="update"?"Edit Current "+this.state.contentData.name:"Add New "+this.state.contentData.name}
               { this.state.mode==="update" &&
                 <small style={{marginLeft: 5}}>
                   <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
@@ -423,17 +384,18 @@ const NewPage = React.createClass({
               </h1>
                 <ol className="breadcrumb">
                   <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-                  <li>Pages</li>
-                  <li className="active">{this.state.mode==="update"?"Edit Page":"Add New"}</li>
+                  <li>{this.state.contentData.name}</li>
+                  <li className="active">{this.state.mode==="update"?"Edit "+this.state.contentData.name:"Add New"}</li>
                 </ol>
-              <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div> 
+               <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
           </section>
-          <Notification ref="notificationSystem" /> 
-          <form onSubmit={this.handleSubmit} id="pageForm" method="get">
+          <Notification ref="notificationSystem" />
+
+          <form onSubmit={this.handleSubmit} id="postForm" method="get">
           <div className="col-md-8">
             <div className="form-group"  style={{marginBottom:30}}>
               <div>
-                <input id="titlePage" style={{marginBottom: 20}} type="text" className="form-control" 
+                <input id="titlePost" style={{marginBottom: 20}} type="text" className="form-control" 
                   placeholder="Input Title Here" required="true" onChange={this.handleTitleChange} onBlur={this.handleTitleBlur}/>
                   <div className="form-inline">
                     { !this.state.permalinkEditing ? 
@@ -501,7 +463,7 @@ const NewPage = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4"><p>Title Tag</p></div>
                     <div className="col-md-8">
-                      <input id="titleTag" type="text" style={{width: '100%'}} placeholder={this.state.title} onChange={this.handleTitleTagChange} maxLength="65" />
+                      <input id="titleTag" type="text" style={{width: '100%'}} placeholder={this.state.title} onChange={this.handleTitleTagChange}/>
                         <span className="help-block">Up to 65 characters recommended<br/>
                         {this.state.titleTagLeftCharacter} characters left</span>                     
                     </div>
@@ -510,7 +472,7 @@ const NewPage = React.createClass({
                     <div className="col-md-4"><p>Meta Description</p></div>
                     <div className="col-md-8">
                       <textarea id="metaDescription" rows='2' style={{width:'100%'}} placeholder={this.state.summary} 
-                        onChange={this.handleMetaDescriptionChange} maxLength="160"></textarea>
+                      onChange={this.handleMetaDescriptionChange}></textarea>
                       <span className="help-block">160 characters maximum<br/>
                       {this.state.metaDescriptionLeftCharacter} characters left</span>
                     </div>
@@ -543,7 +505,7 @@ const NewPage = React.createClass({
                     </div>
                     <div className="box-body pad">
                       
-                      <div className="form-group">
+                       <div className="form-group">
                           <p style={{fontSize: 14}}><span className="glyphicon glyphicon-pushpin" style={{marginRight:10}}></span>
                           Status: <b>{this.state.status} </b>
                           <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption"> Edit </button></p>
@@ -586,7 +548,7 @@ const NewPage = React.createClass({
 
                         <div className="form-group">
                           <p><span className="glyphicon glyphicon-calendar" style={{marginRight: 10}}></span>{this.state.immediatelyStatus===true?
-                            (<span>Publish <b>Immediately</b></span>):<span>Published at <b>{this.formatDate(this.state.publishDate)}</b></span>} 
+                            (<span>Publish <b>Immediately </b></span>):<span>Published at <b>{this.formatDate(this.state.publishDate)}</b> </span>} 
                           <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#scheduleOption"> Edit </button></p>
 
                           <div id="scheduleOption" className="collapse">
@@ -619,7 +581,7 @@ const NewPage = React.createClass({
                               <span className="sr-only">Toggle Dropdown</span>
                             </button>
                             <ul className="dropdown-menu" role="menu">
-                              <li><button onClick={this.saveDraftBtn} className="btn btn-default btn-flat">{this.state.status==="Draft"?"Save As Draft":""}</button></li>
+                              <li><button onClick={this.saveDraft} className="btn btn-default btn-flat">{this.state.status==="Draft"?"Save As Draft":""}</button></li>
                             </ul>
                           </div>
                       </div>        
@@ -627,7 +589,7 @@ const NewPage = React.createClass({
                   </div>
                   <div className="box box-info" style={{marginTop:20}}>
                     <div className="box-header with-border">
-                      <h3 className="box-title">Page Attributes</h3>         
+                      <h3 className="box-title">Category</h3>         
                       <div className="pull-right box-tools">
                         <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
                         <i className="fa fa-minus"></i></button>
@@ -636,26 +598,24 @@ const NewPage = React.createClass({
                     <div className="box-body pad">
                       <div>
                       <div className="form-group">
-                        <p><b>Parent</b></p>
-                        <select id="parentPage" style={{width: 250}}>
-                          {this.state.pageList}
-                        </select>
-                      </div>
-                      <div className="form-group">
-                        <p><b>Page  Template</b></p>
-                        <select id="pageTemplate" style={{width: 250}} defaultValue={templates?templates[0].item:null}>
-                        { templates ?
-                          templates.map(function(item, index){
-                            return (<option key={item.id}>{item.name}</option>)
-                          }) : ""
-                        }
-                        </select>
-                      </div>
-                      <div className="form-group">
-                        <p><b>Order</b></p>
-                        <input type="text" id="pageOrder" placeholder="0" style={{width:50}} min="0" step="1" data-bind="value:pageOrder"/>
+                          {this.state.categoryList}
                       </div>
                       </div>                  
+                    </div>
+                  </div>
+                  <div className="box box-info" style={{marginTop:20}}>
+                    <div className="box-header with-border">
+                      <h3 className="box-title">Tags</h3>         
+                      <div className="pull-right box-tools">
+                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
+                        <i className="fa fa-minus"></i></button>
+                      </div>
+                    </div>
+                    <div className="box-body pad">
+                      <div className="form-group" style={{width: '100%'}}>
+                          <input id="tags-input" type="text" style={{width: '100%'}}/>
+                          <p><span className="help-block">Press enter after inputting tag</span></p>
+                      </div>
                     </div>
                   </div>
               </div>
@@ -666,9 +626,9 @@ const NewPage = React.createClass({
         </div>
       </div>
       )
-  return newPage;
+  return newPost;
 
 }
 });
 
-export default NewPage;
+export default NewContentType;
