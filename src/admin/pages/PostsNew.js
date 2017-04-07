@@ -382,6 +382,7 @@ const NewPost = React.createClass({
   handleAddNewBtn: function(event) {
     this.resetForm();
   },
+
   
   render: function(){
     var rootUrl = getConfig('rootUrl')
@@ -398,7 +399,7 @@ const NewPost = React.createClass({
               </h1>
                 <ol className="breadcrumb">
                   <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-                  <li>Posts</li>
+                  <li><a href={rootUrl+'/'+'admin/posts'}>Posts</a></li>
                   <li className="active">{this.state.mode==="update"?"Edit Post":"Add New"}</li>
                 </ol>
                <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
