@@ -331,7 +331,7 @@ const NewPost = React.createClass({
     );  
   },
   onTagKeyDown: function(event){
-    ;
+    debugger;
     event.preventDefault();
   },
   componentWillMount: function(){
