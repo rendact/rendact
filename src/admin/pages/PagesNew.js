@@ -58,7 +58,6 @@ const NewPage = React.createClass({
     }else $("#private").attr("checked", true);
 
     this.notification = this.refs.notificationSystem;
-
   },
   checkSlug: function(slug){
     var me = this;
@@ -402,7 +401,9 @@ const NewPage = React.createClass({
           )
         }
     });
-
+    $(document).on('change', 'input:not(.noWarning),textarea:not(.noWarning),select:not(.noWarning)', function () {
+      window.onbeforeunload = function(){ return 'Any unsaved data will be lost...' }
+    });
   },
   handleAddNewBtn: function(event) {
     this.resetForm();
