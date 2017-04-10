@@ -13,7 +13,6 @@ const Content = React.createClass({
   getInitialState: function(){
 
     return {
-      dt: null,
       deleteMode: false,
       activeStatus: "All",
       itemSelected: false,
@@ -83,7 +82,7 @@ const Content = React.createClass({
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, "All", cb);
+            me.loadData(me.table.datatable, "All", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -95,14 +94,21 @@ const Content = React.createClass({
     this.props.handleNav('content','new');
   },
   handleViewPage: function(postId){
-    this.props.handleNav('pages','edit', postId);
+    this.props.handleNav('content','edit', postId);
+  },
+  onAfterTableLoad: function(){
+    var me = this;
+    $(".contentName").click(function(event){
+      event.preventDefault();
+      var postId = this.id.split("-")[1];
+      me.handleViewPage(postId);
+    });
   },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
     this.table = this.refs.rendactTable;
     var datatable = this.table.datatable;
     this.refs.rendactSearchBoxPost.bindToTable(datatable);
-    this.setState({dt: datatable});
     this.loadData("All");
   },
   render: function(){
@@ -144,7 +150,7 @@ const Content = React.createClass({
                     <Table 
                       id="contentList"
                       columns={[
-                        {id: 'name', label: "Content Type Name", width: 400},
+                        {id: 'name', label: "Content Type Name", type: "link", width: 400, cssClass: "contentName"},
                         {id: 'slug', label: "Slug", width: 50},
                         {id: 'fields', label: "Fields", textAlign:"center"},
                         {id: 'status', label: "Status", textAlign:"center"},

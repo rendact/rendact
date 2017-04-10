@@ -22,6 +22,10 @@ const Field = React.createClass({
 });
 
 var Settings = React.createClass({
+	defaultFields: [
+		{id:"title", label: "Title", type: "link", deletable: false},
+		{id:"slug", label: "Slug", type: "text", deletable: false}
+	],
 	getInitialState: function(){
 		var p = JSON.parse(localStorage.getItem("profile"));
 		var dateOfBirth = "";
@@ -29,26 +33,21 @@ var Settings = React.createClass({
 			dateOfBirth = new Date(p.dateOfBirth)
 
 		return {
-			fields: [
-				{id:"title", label: "Title", type: "link", deletable: false},
-				{id:"slug", label: "Slug", type: "text", deletable: false}
-			]
+			mode: this.props.postId?"update":"create",
+			fields: this.defaultFields
 		}
 	},
 	loadData: function(){
 		if (!this.props.postId) return;
+		var me = this;
 		var qry = Query.getContentQry(this.props.postId);
-		
 		riques(qry, 
 			function(error, response, body){
 				if(!error && !body.errors) {
-					_.forEach(body.data.viewer.allContents.edges, function(item){
-						var _el = document.getElementsById(item.node.item);
-						if (_el.length>0){
-							_el[0].value = item.node.value;
-							_el[0].id = item.node.id;
-						}
-					});
+					var data = body.data.getContent; 
+					setValue("name", data.name);
+					setValue("slug", data.slug);
+					me.setState({fields: data.fields})
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
@@ -61,15 +60,20 @@ var Settings = React.createClass({
 	handleSubmitBtn: function(event){
 		event.preventDefault();
 		var me = this;
-		var _objData = getFormData('rdt-input-form');
-		_objData['fields'] = this.state.fields;
+		var _objData = {
+			name: getValue('name'),
+			slug: getValue('slug'),
+			fields: this.state.fields
+		};
 		this.disableForm(true);
 
 		var qry = Query.createContentMtn(_objData);
+		
 		riques(qry, 
 			function(error, response, body){
 				if(!error && !body.errors) {
 					me.disableForm(false);
+					me.resetForm();
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
@@ -83,6 +87,16 @@ var Settings = React.createClass({
 		var type = getValue("field-type");
 		var width = getValue("field-width");
 		var align = getValue("field-align");
+
+		if (!name) {
+			swal('Invalid value', "Field name can't be  empty!",'error')
+			return;
+		}
+		if (!type){
+			swal('Invalid value', "Field type can't be  empty!",'error');
+			return;
+		}
+
 		fields.push(
 			{
 				id: name.toLowerCase(), 
@@ -97,10 +111,18 @@ var Settings = React.createClass({
 		event.preventDefault();
 		var name = event.target.getAttribute("data");
 		var fields = this.state.fields;
-
-		var record = _.find(fields, {name: name});
+		
+		var record = _.find(fields, {label: name});
 		_.pull(fields, record);
 		this.setState({fields: fields});
+	},
+	handleAddNewBtn: function(event) {
+    this.resetForm();
+  },
+	resetForm: function(){
+		document.getElementById("contentForm").reset();
+		window.history.pushState("", "", '/admin/content/new');
+		this.setState({mode: "create", fields: this.defaultFields})
 	},
 	componentDidMount: function(){
 		this.notification = this.refs.notificationSystem;
@@ -130,19 +152,19 @@ var Settings = React.createClass({
 			    	<div className="row">
 					  	<div className="col-md-8">
 					  	<section className="content">
-			    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal">
+			    			<form onSubmit={this.handleSubmitBtn} id="contentForm" className="form-horizontal">
 			    			
 					  		<div className="form-group">
 								 	<label htmlFor="name" className="col-md-3">Name</label>
 								 	<div className="col-md-9">
-										<input type="text" name="name" className="form-control rdt-input-form" required/>
+										<input type="text" name="name" id="name" className="form-control rdt-input-form" required/>
 									</div>
 								</div>
 
 								<div className="form-group">
 								 	<label htmlFor="slug" className="col-md-3">Slug</label>
 							  	<div className="col-md-9">
-										<input type="text" name="slug" className="form-control rdt-input-form" required/>
+										<input type="text" name="slug" id="slug" className="form-control rdt-input-form" required/>
 									</div>
 								</div>
 
@@ -170,7 +192,7 @@ var Settings = React.createClass({
 										{
 											this.state.fields.map(function(item){
 												return <Field 
-																name={item.name} 
+																name={item.label} 
 																type={item.type} 
 																onDelete={this.handleFieldDelete}
 																deletable={item.deletable==false?false:true}
