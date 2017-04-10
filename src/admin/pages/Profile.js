@@ -223,7 +223,7 @@ var Profile = React.createClass({
 		else
 			document.getElementById("new-password").setAttribute("type","password")
 	},
-	handleTimezoneChange: function(tz){debugger;
+	handleTimezoneChange: function(tz){
 		this.setState({timezone: tz});
 	},
 	componentDidMount: function(){
@@ -412,7 +412,7 @@ var Profile = React.createClass({
 												  minLength={5}
 												  minScore={2}
 												  changeCallback={this.handlePasswordChange}
-												  scoreWords={['weak', 'okay', 'good', 'strong', 'stronger']}
+												  scoreWords={['weak', 'poor', 'okay', 'good', 'strong']}
 												  inputProps={{ name: "new-password", id:"new-password", value: "OK" }}
 												  value="OK"
 												/>

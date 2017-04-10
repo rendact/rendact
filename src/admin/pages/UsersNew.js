@@ -523,7 +523,7 @@ var NewUser = React.createClass({
 											  minLength={5}
 											  minScore={2}
 											  changeCallback={this.handlePasswordChange}
-											  scoreWords={['weak', 'okay', 'good', 'strong', 'stronger']}
+											  scoreWords={['weak', 'poor', 'okay', 'good', 'strong']}
 											  inputProps={{ name: "new-password", id:"new-password", value: "OK" }}
 											  value="OK"
 											/>
