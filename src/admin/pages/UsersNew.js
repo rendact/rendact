@@ -12,16 +12,6 @@ import Query from '../query';
 import Config from '../../config'
 import {riques, getValue, setValue, errorCallback, disableForm, getConfig} from '../../utils';
 
-window.getBase64Image = function(img) {
-  var canvas = document.createElement("canvas");
-  canvas.width = img.width;
-  canvas.height = img.height;
-  var ctx = canvas.getContext("2d");
-  ctx.drawImage(img, 0, 0);
-  var dataURL = canvas.toDataURL("image/png");
-  return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
-}
-
 var NewUser = React.createClass({
 	getInitialState: function(){
 		var image = getConfig('rootUrl')+"/images/avatar-default.png";
@@ -240,6 +230,9 @@ var NewUser = React.createClass({
 		var pw = new Password();
 		setValue("new-password", pw);
 		setValue("new-password-2", pw);
+
+		document.getElementById("togglePassword").checked = true;
+		document.getElementById("new-password").setAttribute("type","text");
 	},
 	handleShowPassword: function(event){
 		var checked = event.target.checked;

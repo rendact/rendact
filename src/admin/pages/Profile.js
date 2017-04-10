@@ -212,6 +212,9 @@ var Profile = React.createClass({
 		var pw = new Password();
 		setValue("new-password", pw);
 		setValue("new-password-2", pw);
+
+		document.getElementById("togglePassword").checked=true;
+		document.getElementById("new-password").setAttribute("type","text");
 	},
 	handleShowPassword: function(event){
 		var checked = event.target.checked;
