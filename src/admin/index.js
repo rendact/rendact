@@ -193,7 +193,7 @@ const PageLoader = React.createClass({
 			'pages-new' : <NewPage />,
 			'theme-new' : <NewTheme />,
 			'users-new' : <NewUser />,
-			'posts-edit' : <NewPost postId={this.props.postId}/>,
+			'posts-edit' : <NewPost postId={this.props.postId} handleNav={this.props.handleNav}/>,
 			'pages-edit' : <NewPage postId={this.props.postId}/>,
 			'users-edit' : <NewUser userId={this.props.postId}/>,
 		}
