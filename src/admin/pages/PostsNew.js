@@ -134,13 +134,8 @@ const NewPost = React.createClass({
       type: "post",
       categories: _.map(document.getElementsByName("categoryCheckbox[]"), function(item){
       if (item.checked)
-        {return item.value}
-      else if (!item)
-      {return item.value==="Q2F0ZWdvcnk6MQ=="}
+        return item.value
       })
-      /*if (categories ==="")
-        categories: _.map(document.getElementsByName("categoryCheckbox[]"), function(item){
-        {return item.value==="Q2F0ZWdvcnk6MQ=="}*/
     }
   },
   setFormValues: function(v){

@@ -41,18 +41,14 @@ const Posts = React.createClass({
               if (item.node.category)
                 categories.push(item.node.category.name)
             });
-            //if (categories.length===0)
-            //  categories = "Uncategorized";
-             
-
-            var img = "/images/photo1.png"; 
-            //var img = "";     
+            if (categories.length===0)
+              categories = "Uncategorized";
+                 
             var tag = "";
             var like = _.find(item.node.meta.edges,{"node": {"item": "like"}})?_.find(item.node.meta.edges,{"node": {"item": "like"}}).node.value:"0";
 
             _dataArr.push({
               "postId": item.node.id,
-              "image": img,
               "title": item.node.title,
               "slug": item.node.slug?item.node.slug:"",
               "author": item.node.author?item.node.author.username:"",
@@ -198,7 +194,7 @@ const Posts = React.createClass({
       });
     }else{
       var re = this;
-      this.loadData(this.state.dt, status, function(){
+      this.loadData(status, function(){
         re.setState({deleteMode: false});
         re.disableForm(false);
       })
@@ -344,7 +340,6 @@ const Posts = React.createClass({
                       <Table 
                           id="postList"
                           columns={[
-                            {id: 'image', label: "Image", type: "image", width: 10},
                             {id: 'title', label: "Title", width: 400, type: "link", target: "", cssClass:"titleText"},
                             {id: 'slug', label: "Slug", textAlign:"center"},
                             {id: 'author', label: "Author", textAlign:"center"},
