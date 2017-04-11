@@ -366,7 +366,7 @@ var NewUser = React.createClass({
 			    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" id="profileForm">
 			    			
 					  			<div className="form-group">
-								  	<label htmlFor="name" className="col-md-3">Name</label>
+								  	<label htmlFor="name" className="col-md-3">Name<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
 										<input type="text" name="name" id="name" className="form-control" required="true"/>
 										<p className="help-block">Your full name</p>
@@ -418,7 +418,7 @@ var NewUser = React.createClass({
 								</div>
 
 					  			<div className="form-group">
-								  	<label htmlFor="keywoards" className="col-md-3">Email</label>
+								  	<label htmlFor="keywoards" className="col-md-3">Email<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
 										<input type="text" name="email" id="email" className="form-control" 
 											disabled={this.state.mode==="update"?true:false} required="true"/>
@@ -515,7 +515,7 @@ var NewUser = React.createClass({
 								}
 
 								<div className="form-group">
-								 	<label htmlFor="new-password" className="col-md-3">Password</label>
+								 	<label htmlFor="new-password" className="col-md-3">Password<span style={{color:"red"}}>*</span></label>
 								 	<div className="col-md-9">
 								 			<ReactPasswordStrength
 											  className="passwordTester"
@@ -535,10 +535,14 @@ var NewUser = React.createClass({
 								</div>
 
 								<div className="form-group">
-								 	<label htmlFor="new-password-2" className="col-md-3">Re-type password</label>
+								 	<label htmlFor="new-password-2" className="col-md-3">Re-type password<span style={{color:"red"}}>*</span></label>
 								 	<div className="col-md-9">
 										<input type="password" name="new-password-2" id="new-password-2" className="form-control" style={{width:200}} disabled={!this.state.passwordActive}/>
 									</div>
+								</div>
+
+								<div className="form-group col-md-9">
+									<span style={{color:"red"}}>*</span> <i>must be filled</i>
 								</div>
 								
 								<div className="form-group">
