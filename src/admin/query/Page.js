@@ -167,7 +167,7 @@ const recoverPostQry = function(idList){
 
 const checkSlugQry = function(slug){
   return {
-    query: 'query checkSlug{ viewer { allPosts(where: {type: {eq: "page"}, slug: {like: "'+slug+'"}}) { edges { node { id } } } } }'
+    query: 'query checkSlug{ viewer { allPosts(where: {slug: {like: "'+slug+'"}}) { edges { node { id } } } } }'
   }
 }
 

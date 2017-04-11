@@ -592,7 +592,7 @@ const NewPost = React.createClass({
                       <div className="form-group pull-right">
                         <button type="button" className="btn btn-default btn-flat disabled" style={{marginRight: 5}}>Preview</button> 
                           <div className="btn-group">
-                            <button type="submit" id="publishBtn" className="btn btn-primary btn-flat">{this.state.mode==="update"?"Save":"Publish"}</button>
+                            <button type="submit" id="publishBtn" className="btn btn-primary btn-flat" disabled={this.state.slug===""}>{this.state.mode==="update"?"Save":"Publish"}</button>
                             <button type="button" className="btn btn-primary btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                               <span className="caret"></span>
                               <span className="sr-only">Toggle Dropdown</span>
