@@ -44,7 +44,14 @@ const Posts = React.createClass({
             if (categories.length===0)
               categories = "Uncategorized";
                  
-            var tag = "";
+            //var tag = "";
+            var tags = [];
+            _.forEach(item.node.tag.edges, function(item){ 
+              if (item.node.tag)
+                tags.push(item.node.tag.name)
+            });
+            if (tags.length===0)
+              tags = "Untag";
             var like = _.find(item.node.meta.edges,{"node": {"item": "like"}})?_.find(item.node.meta.edges,{"node": {"item": "like"}}).node.value:"0";
 
             _dataArr.push({
@@ -53,7 +60,7 @@ const Posts = React.createClass({
               "slug": item.node.slug?item.node.slug:"",
               "author": item.node.author?item.node.author.username:"",
               "category": categories,
-              "tags": tag,
+              "tag": tags,
               "likes": like,
               "status": item.node.status?item.node.status:"",
               "comments": item.node.comments.edges.length,
@@ -344,7 +351,7 @@ const Posts = React.createClass({
                             {id: 'slug', label: "Slug", textAlign:"center"},
                             {id: 'author', label: "Author", textAlign:"center"},
                             {id: 'category', label: "Category", textAlign:"center"},
-                            {id: 'tags', label: "Tags", textAlign:"center"},
+                            {id: 'tag', label: "Tags", textAlign:"center"},
                             {id: 'likes', label: "Likes", textAlign:"center"},
                             {id: 'comments', label: "Comments", width: 30, textAlign:"center"},
                             {id: 'published', label: "Publish Date", textAlign:"center"}

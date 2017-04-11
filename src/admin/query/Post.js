@@ -8,7 +8,7 @@ const getPostListQry = function(s) {
   return {
     "query": 
       'query getPosts{viewer {allPosts(where: {type: {eq: "post"}, status: '+status+'}) { edges { node { '
-     +'id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},comments{edges{node{id}}},createdAt}}}}}'
+     +'id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},tag{edges{node{tag{id, name}}}},comments{edges{node{id}}},createdAt}}}}}'
   };
 }
 

@@ -49,6 +49,7 @@ const NewPost = React.createClass({
       slug:"",
       content:"",
       category: "",
+      tag: "",
       summary:"",
       status:"Draft",
       immediately:"",
