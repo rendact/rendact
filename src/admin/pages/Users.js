@@ -3,6 +3,7 @@ import $ from 'jquery';
 window.jQuery = $;
 import _ from 'lodash';
 import Query from '../query';
+import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {riques, hasRole, errorCallback, getConfig} from '../../utils';
 import { default as swal } from 'sweetalert2';
@@ -18,6 +19,8 @@ const Users = React.createClass({
       monthList: [],
       deleteMode: false,
       isProcessing: false,
+      opacity: 1,
+      loading:[],
       statusList: Config.roleList,
       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
       activeStatus: "All",
@@ -68,6 +71,34 @@ const Users = React.createClass({
     );
   },
   disableForm: function(state){
+    var spinner = this.state.loading;
+    var color = '#4DAF7C';
+    var style = {
+            display: '-webkit-flex',
+            display: 'flex',
+            WebkitFlex: '0 1 auto',
+            flex: '0 1 auto',
+            WebkitFlexDirection: 'column',
+            flexDirection: 'column',
+            WebkitFlexGrow: 1,
+            flexGrow: 1,
+            WebkitFlexShrink: 0,
+            flexShrink: 0,
+            WebkitFlexBasis: '25%',
+            flexBasis: '25%',
+            maxWidth: '25%',
+            height: '200px',
+            top: '50%',
+            left: '50%',
+            position: 'absolute',
+            WebkitAlignItems: 'center',
+            alignItems: 'center',
+            WebkitJustifyContent: 'center',
+            justifyContent: 'center'
+      };
+    spinner.push(
+      <div style={style}><Halogen.PulseLoader color={color}/></div>
+      );
     var me = this;
     _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
     _.forEach(document.getElementsByTagName('button'), function(el){ 
@@ -76,6 +107,7 @@ const Users = React.createClass({
     })
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
     this.setState({isProcessing: true});
+    this.setState({opacity: 0.8});
     if (!state) {
       this.checkDynamicButtonState();
     }
@@ -124,6 +156,7 @@ const Users = React.createClass({
       re.setState({deleteMode: false});
       re.disableForm(false);
       re.setState({isProcessing:false});
+      re.setState({opacity: 1});
     })
       
   },
@@ -148,7 +181,7 @@ const Users = React.createClass({
   },
   render: function(){
     return (
-      <div className="content-wrapper">
+      <div className="content-wrapper" style={{opacity:this.state.opacity}}>
         <div className="container-fluid">
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
@@ -176,8 +209,7 @@ const Users = React.createClass({
                           <DeleteButtons 
                             deleteMode={this.state.deleteMode}
                             itemSelected={this.state.itemSelected}
-                            onDelete={this.handleDeleteBtn}
-                          />   
+                            onDelete={this.handleDeleteBtn}/>   
                         <div className="box-tools pull-right">
                           <SearchBoxPost datatable={this.table} ref="rendactSearchBoxPost"/>
                         </div>
@@ -193,8 +225,8 @@ const Users = React.createClass({
                         </div>
                       </div>
                       { this.state.isProcessing &&
-                      <p>Processing...</p>
-                      } 
+                          this.state.loading
+                      }     
                       <TableUser 
                           id="userListTbl"
                           columns={[
@@ -210,8 +242,8 @@ const Users = React.createClass({
                           ref="rendactTable"
                           onSelectAll={this.checkDynamicButtonState}
                           onCheckBoxClick={this.checkDynamicButtonState}
-                          onAfterLoad={this.onAfterTableLoad}
-                        />
+                          onAfterLoad={this.onAfterTableLoad}/>
+                        
                   </div>
                 </div>
               </div>
