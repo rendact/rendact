@@ -256,14 +256,16 @@ var NewUser = React.createClass({
 		}
 		var me = this;
 
-		this.disableForm(true);
+		me.disableForm(true);
 		
-    riques(qry, 
+    	riques(qry, 
 			function(error, response, body){
 				if(!error && !body.errors) {
-					this.disableForm(false);
+					var here = me
+					here.disableForm(false);
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
+					me.disableForm(false);
 				}
 				me.notification.removeNotification('saving');
 			}, this.state.isAdmin
@@ -387,7 +389,7 @@ var NewUser = React.createClass({
 								</div>
 
 					  			<div className="form-group">
-								  	<label htmlFor="tagline" className="col-md-3">Username</label>
+								  	<label htmlFor="tagline" className="col-md-3">Username<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
 										<input type="text" name="username" id="username" 
 											className="form-control" disabled={this.state.mode==="update"?true:false}/>

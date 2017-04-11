@@ -11,7 +11,7 @@ var NotPermissible = React.createClass({
 					<section className="content">
 						<div className="row">
 						  <h3 className="text-center">
-						    You don't have permission to access this page
+						    You don't have permissions to access this page
 						  </h3>
 						</div>
 					</section>
