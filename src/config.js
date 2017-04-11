@@ -20,7 +20,7 @@ const MenuJson = [
 	{id: 'users', label: 'Users', icon: 'fa-users', open: false, role: 1, roleId: 'view-user',
 		elements: [
 			{id: 'users', label: 'Users', icon: 'fa-users', open: false, url: '/admin/users', role: 1, roleId: 'view-user'},
-			{id: 'permission', label: 'Permission', icon: 'fa-users', open: false, url: '/admin/users/permission', role: 10, roleId: 'modify-permission'},
+			{id: 'permission', label: 'Permissions', icon: 'fa-users', open: false, url: '/admin/users/permissions', role: 10, roleId: 'modify-permission'},
 			{id: 'users-new', label: 'Add New', icon: 'fa-user-plus', open: false ,url: '/admin/users/new', role: 10, roleId: 'modify-user'}
 		]
 	},

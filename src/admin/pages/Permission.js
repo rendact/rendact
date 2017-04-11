@@ -114,11 +114,11 @@ const Permission = React.createClass({
         <div className="container-fluid">
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
-              Permission Settings
+              Permissions Settings
             </h1>
             <ol className="breadcrumb">
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-              <li className="active">Permission Settings</li>
+              <li className="active">Permissions Settings</li>
             </ol>
             <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
           </section>
