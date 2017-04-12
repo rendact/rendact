@@ -384,7 +384,8 @@ const NewContentType = React.createClass({
               </h1>
                 <ol className="breadcrumb">
                   <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-                  <li>{this.state.contentData.name}</li>
+                  <li><a href="#" onClick={function(){this.props.handleNav(this.state.contentData.slug)}.bind(this)}>
+                    {this.state.contentData.name}</a></li>
                   <li className="active">{this.state.mode==="update"?"Edit "+this.state.contentData.name:"Add New"}</li>
                 </ol>
                <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>

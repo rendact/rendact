@@ -257,7 +257,7 @@ var NewUser = React.createClass({
 		}
 		var me = this;
 
-    	riques(qry, 
+   	riques(qry, 
 			function(error, response, body){
 				if(!error && !body.errors) {
 					var here = me;
@@ -352,7 +352,8 @@ var NewUser = React.createClass({
 			      </h1>
 			      <ol className="breadcrumb">
 			        <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-			        <li className="active">Profile</li>
+			        <li><a href="#" onClick={function(){this.props.handleNav('users')}.bind(this)}> Users</a></li>
+			        <li className="active">Add New User</li>
 			      </ol>
 			      <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
 			    </section>

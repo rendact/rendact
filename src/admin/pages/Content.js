@@ -124,7 +124,7 @@ const Content = React.createClass({
             </h1>
             <ol className="breadcrumb">
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-              <li className="active">Content Type List</li>
+              <li className="active">Content Type</li>
             </ol>
             <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
           </section>
