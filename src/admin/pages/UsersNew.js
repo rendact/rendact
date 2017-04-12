@@ -559,7 +559,7 @@ var NewUser = React.createClass({
 								</div>
 
 								<div className="form-group col-md-9">
-									<span style={{color:"red"}}>*</span> <i>must be filled</i>
+									<span style={{color:"red"}}>*</span> <i>required</i>
 								</div>
 								
 								<div className="form-group">
