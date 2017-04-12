@@ -8,6 +8,7 @@ import {riques, setValue, getValue, disableForm, errorCallback, getConfig} from 
 import { default as swal } from 'sweetalert2';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
+import Dropzone from 'react-dropzone';
 
 const NewPost = React.createClass({
   componentDidMount: function(){
@@ -65,7 +66,8 @@ const NewPost = React.createClass({
       publishDateReset: new Date(),
       titleTag: "",
       metaKeyword: "",
-      metaDescription: ""
+      metaDescription: "",
+      featuredImage: null
     }
   },
   checkSlug: function(slug){
@@ -179,7 +181,7 @@ const NewPost = React.createClass({
       setValue("titleTag", meta.titleTag);
     }
     this.setState({title: v.title, content: v.content, summary: v.summary, 
-      status: v.status, visibilityTxt: v.visibility, 
+      status: v.status, visibilityTxt: v.visibility, featuredImage: v.featuredImage,
       publishDate: pubDate, publishDateReset: pubDate, slug: v.slug});
     this.handleTitleChange();
     this.handleTitleTagChange();
@@ -270,7 +272,7 @@ const NewPost = React.createClass({
     var qry = "", noticeTxt = "";
     if (this.state.mode==="create"){
       qry = Query.getCreatePostQry(v.title, v.content, v.status, v.visibility, v.passwordPage, v.publishDate, 
-        localStorage.getItem('userId'), this.state.slug, v.summary);
+        localStorage.getItem('userId'), this.state.slug, v.summary, this.state.featuredImage);
       this.notification.addNotification({
         id: 'saving',
         message: 'Creating Post...',
@@ -280,7 +282,7 @@ const NewPost = React.createClass({
       noticeTxt = 'Post Published!';
     }else{
       qry = Query.getUpdatePostQry(this.props.postId, v.title, v.content, v.status, v.visibility, v.passwordPage, 
-        v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary);
+        v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary, this.state.featuredImage);
       this.notification.addNotification({
         id: 'saving',
         message: 'Updating Post...',
@@ -384,7 +386,15 @@ const NewPost = React.createClass({
   handleAddNewBtn: function(event) {
     this.resetForm();
   },
-
+  handleImageDrop: function(accepted){
+    var me = this;
+    var reader = new FileReader();
+    reader.onloadend = function(res) {
+      var imageBase64 = res.target.result;
+      me.setState({featuredImage: imageBase64});
+    }
+    reader.readAsDataURL(accepted[0]);
+  },
   
   render: function(){
     var rootUrl = getConfig('rootUrl')
@@ -633,6 +643,27 @@ const NewPost = React.createClass({
                           <input id="tags-input" type="text" style={{width: '100%'}}/>
                           <p><span className="help-block">Press enter after inputting tag</span></p>
                       </div>
+                    </div>
+                  </div>
+                  <div className="box box-info" style={{marginTop:20}}>
+                    <div className="box-header with-border">
+                      <h3 className="box-title">Featured Image</h3>         
+                      <div className="pull-right box-tools">
+                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
+                        <i className="fa fa-minus"></i></button>
+                      </div>
+                    </div>
+                    <div className="box-body pad">
+                      <div>
+                        <Dropzone style={{width: "100%", height: 200, borderWidth: 2, borderColor: "#aaa", borderStyle: "dashed", borderRadius: 5}} onDrop={this.handleImageDrop}>
+                          <div className="dropzone-container">
+                            <img src={this.state.featuredImage} alt='' id="featuredImage"/> 
+                            <div className="dropzone-overlay"></div>
+                            <div className="dropzone-button"><a href="#"> Upload </a></div>
+                          </div>
+                        </Dropzone>
+                        <p><span className="help-block">Try dropping some an image file above, or click "Upload".</span></p>
+                      </div>                  
                     </div>
                   </div>
               </div>
