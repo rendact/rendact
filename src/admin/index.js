@@ -9,11 +9,8 @@ import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import Content from './pages/Content';
 import NewContent from './pages/ContentNew';
-import Posts from './pages/Posts';
-import Pages from './pages/Pages';
 import Themes from './pages/Themes';
 import Plugins from './pages/Plugins';
-import Users from './pages/Users';
 import Permission from './pages/Permission';
 import NewPost from './pages/PostsNew';
 import NewPage from './pages/PagesNew';
@@ -26,6 +23,7 @@ import ContentType from './lib/ContentType';
 import NewContentType from './lib/ContentTypeNew';
 
 import Config from '../config';
+import AdminConfig from './AdminConfig';
 import AdminLTEinit from './lib/app.js';
 import {riques, hasRole, errorCallback, getConfig} from '../utils';
 import Query from './query';
@@ -161,6 +159,54 @@ const SideMenu = React.createClass({
 	}
 });
 
+let Pages = React.createClass({
+  render: function() {
+    return <ContentType 
+			name="Page" 
+			slug="pages"
+			tableName="Post"
+			fields={AdminConfig.PageFields}
+			listQuery={Query.getPageListQry}
+			viewRole="view-page"
+			modifyRole="modify-page"
+			statusList={["All", "Published", "Draft", "Pending Review", "Deleted"]}
+			handleNav={this.props.handleNav}
+			/>
+  }
+});
+
+let Posts = React.createClass({
+  render: function() {
+    return <ContentType 
+			name="Post" 
+			slug="posts"
+			tableName="Post"
+			fields={AdminConfig.PostFields}
+			listQuery={Query.getPostListQry}
+			viewRole="view-post"
+			modifyRole="modify-post"
+			statusList={["All", "Published", "Draft", "Pending Review", "Deleted"]}
+			handleNav={this.props.handleNav}
+			/>
+  }
+});
+
+let Users = React.createClass({
+  render: function() {
+    return <ContentType 
+			name="User" 
+			slug="users"
+			tableName="User"
+			fields={AdminConfig.UserFields}
+			listQuery={Query.getUserListByTypeQry}
+			viewRole="view-user"
+			modifyRole="modify-user"
+			statusList={_.concat(["All"],Config.roleList)}
+			handleNav={this.props.handleNav}
+			/>
+  }
+});
+
 const PageLoader = React.createClass({
 	getDefaultProps: function() {
 		return {pageId: "dashboard", actionId: ''}
@@ -183,12 +229,12 @@ const PageLoader = React.createClass({
 			'content-new' : <NewContent handleNav={this.props.handleNav}/>,
 			'content-edit' : <NewContent postId={this.props.postId} handleNav={this.props.handleNav}/>,
 			'profile' : <Profile handleNav={this.props.handleNav}/>,
-			'posts' : <Posts handleNav={this.props.handleNav}/>,
-			'pages' : <Pages handleNav={this.props.handleNav}/>,
+			'posts': <Posts/>,
+			'pages': <Pages/>,
 			'themes' : <Themes handleNav={this.props.handleNav}/>,
 			'permission' : <Permission handleNav={this.props.handleNav}/>,
 			'plugins' : <Plugins handleNav={this.props.handleNav}/>,
-			'users' : <Users handleNav={this.props.handleNav}/>,
+			'users': <Users/>,
 			'posts-new' : <NewPost handleNav={this.props.handleNav}/>,
 			'pages-new' : <NewPage handleNav={this.props.handleNav}/>,
 			'theme-new' : <NewTheme handleNav={this.props.handleNav}/>,

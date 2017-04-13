@@ -4,6 +4,7 @@ import Query from '../query';
 import Fn from './functions';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
+import Halogen from 'halogen';
 import {riques, hasRole, errorCallback, getConfig} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
@@ -12,42 +13,95 @@ import {Table, SearchBoxPost, DeleteButtons} from './Table';
 const ContentType = React.createClass({
 	getInitialState: function(){
 	    require ('../pages/Posts.css');
-      var contentList = getConfig("contentList");
-      var contentData = _.find(contentList, {slug: this.props.name});
-
+      
 	    return {
 	      dt: null,
 	      errorMsg: null,
 	      loadingMsg: null,
 	      monthList: [],
         deleteMode: false,
-        statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
+        statusList: this.props.statusList,
         dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
         activeStatus: "All",
         itemSelected: false,
-        contentData: contentData
+        isProcessing: false,
+        opacity: 1,
+        loading:[]
 	    }
 	},
   loadData: function(status, callback) {
     var me = this;
-    var qry = Query.getContentsQry(this.props.name, status);
+    var qry = this.props.listQuery(status);
 
-    var fields = _.map(this.state.contentData.fields, function(item){
-      return item.slug
+    var fields = _.map(this.props.fields, function(item){
+      return item.id
     });
-
+    
     riques(qry, 
       function(error, response, body) { 
         if (body.data) { 
           var monthList = ["all"];
           var _dataArr = [];
+          var nodeName = "all"+me.props.tableName+"s";
 
-          _.forEach(body.data.viewer.allPosts.edges, function(item){
+          _.forEach(body.data.viewer[nodeName].edges, function(item){
             var dt = new Date(item.node.createdAt);
             var _obj = {};
             _.forEach(fields, function(fld){
-              if (_.has(item.node, fld))
-                _obj[fld] = item.node[fld];
+              if (_.has(item.node, fld)) { 
+                if (fld==="createdAt") {
+                  _obj[fld] = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+                }
+                else if (fld==="comments")
+                  _obj[fld] = item.node.comments.edges.length;
+                else if (fld==="author")
+                  _obj[fld] = item.node.author?item.node.author.username:"";
+                else if (fld==="category"){
+                  var categories = [];
+                  _.forEach(item.node.category.edges, function(item){ 
+                    if (item.node.category)
+                      categories.push(item.node.category.name)
+                  });
+                  if (categories.length===0)
+                    categories = "Uncategorized";
+                  _obj[fld] = categories;
+                }
+                else if (fld==="tag"){
+                  var tags = [];
+                  _.forEach(item.node.tag.edges, function(item){ 
+                    if (item.node.tag)
+                      tags.push(item.node.tag.name)
+                  });
+                  if (tags.length===0)
+                    tags = "";
+                  _obj[fld] = tags;
+                } else if (fld==="image"){
+                  _obj[fld] = item.node.image?item.node.image:getConfig('rootUrl')+"/images/avatar-default.png"
+                } else if (fld==="roles") {
+                  var roles = "No Role";
+                  var rolesLen = item.node.roles.edges.length;
+                  if (rolesLen>0) {
+                    roles = _.join(
+                      _.map(item.node.roles.edges, function(item){
+                        return item.node.name;
+                      }), "<br/>");
+                  }
+                  if (status==="No Role"){
+                    if (rolesLen>0) return;
+                  }
+                  _obj[fld] = roles;
+                } else if (fld==="posts") {
+                  _obj[fld] = item.node.posts.edges.length
+                }
+                else
+                  _obj[fld] = item.node[fld];
+              } else {
+                if (fld==="like"){
+                  var likeNode = _.find(item.node.meta.edges,{"node": {"item": "like"}});
+                  var likes = likeNode?likeNode.node.value:"0";
+                  _obj[fld] = likes;
+                }
+              }
             });
 
             _dataArr.push(_obj);
@@ -67,6 +121,48 @@ const ContentType = React.createClass({
       }
     );
   },
+  disableForm: function(state, processingState){
+    var spinner = this.state.loading;
+    var color = '#4DAF7C';
+    var style = {
+            display: '-webkit-flex',
+            display: 'flex',
+            WebkitFlex: '0 1 auto',
+            flex: '0 1 auto',
+            WebkitFlexDirection: 'column',
+            flexDirection: 'column',
+            WebkitFlexGrow: 1,
+            flexGrow: 1,
+            WebkitFlexShrink: 0,
+            flexShrink: 0,
+            WebkitFlexBasis: '25%',
+            flexBasis: '25%',
+            maxWidth: '25%',
+            height: '200px',
+            top: '50%',
+            left: '50%',
+            position: 'absolute',
+            WebkitAlignItems: 'center',
+            alignItems: 'center',
+            WebkitJustifyContent: 'center',
+            justifyContent: 'center'
+      };
+    spinner.push(
+      <div style={style}><Halogen.PulseLoader color={color}/></div>
+      );
+    var me = this;
+    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
+    _.forEach(document.getElementsByTagName('button'), function(el){ 
+      if (_.indexOf(me.state.dynamicStateBtnList, el.id) < 0)
+        el.disabled = state;
+    })
+    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
+    this.setState({isProcessing: processingState});
+    this.setState({opacity: 0.8});
+    if (!state) {
+      this.checkDynamicButtonState();
+    }
+  },
   handleDeleteBtn: function(event){
     var me = this;
     var checkedRow = $("input.postListCb:checked");
@@ -85,7 +181,7 @@ const ContentType = React.createClass({
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, "All", cb);
+            me.loadData("All", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -110,7 +206,7 @@ const ContentType = React.createClass({
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, "Deleted", cb);
+            me.loadData("Deleted", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -136,7 +232,7 @@ const ContentType = React.createClass({
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, "Deleted", cb);
+            me.loadData("Deleted", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -163,7 +259,7 @@ const ContentType = React.createClass({
             console.log(JSON.stringify(body, null, 2));
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData(me.state.dt, "Deleted", cb);
+            me.loadData("Deleted", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -172,7 +268,7 @@ const ContentType = React.createClass({
       );
   })},
   handleAddNewBtn: function(event) {
-    this.props.handleNav(this.props.name,'new');
+    this.props.handleNav(this.props.slug,'new');
   },
   handleStatusFilter: function(event){
     this.disableForm(true);
@@ -180,13 +276,13 @@ const ContentType = React.createClass({
     this.setState({activeStatus: status});
     if (status==='Deleted'){
       var me = this;
-      this.loadData(this.state.dt, "Deleted", function(){
+      this.loadData("Deleted", function(){
         me.setState({deleteMode: true});
         me.disableForm(false);
       });
     }else{
       var re = this;
-      this.loadData(this.state.dt, status, function(){
+      this.loadData(status, function(){
         re.setState({deleteMode: false});
         re.disableForm(false);
       })
@@ -197,7 +293,7 @@ const ContentType = React.createClass({
     var status = this.state.activeStatus;
     if (status==='Deleted'){
       var me = this;
-      this.loadData(this.state.dt, "Deleted", function(){
+      this.loadData("Deleted", function(){
         me.setState({deleteMode: true});
         me.disableForm(false);
       });
@@ -205,7 +301,7 @@ const ContentType = React.createClass({
       var date = $("#dateFilter").val();
       var searchValue = { 6: date };
       var te = this;
-      this.loadData(this.state.dt, status, function(){
+      this.loadData(status, function(){
         te.setState({deleteMode: false});
         te.state.dt.columns([6]).every( function () {
           this.search( searchValue[this.index()] ).draw();
@@ -214,24 +310,6 @@ const ContentType = React.createClass({
         te.disableForm(false);
       })
     } ;
-  },
-  disableForm: function(state){
-    var me = this;
-    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
-    _.forEach(document.getElementsByTagName('button'), function(el){ 
-      if (_.indexOf(me.state.dynamicStateBtnList, el.id) < 0)
-        el.disabled = state;
-    })
-    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.notification.addNotification({
-      message: 'Processing...',
-      level: 'warning',
-      position: 'tr',
-      autoDismiss: 2
-    });
-    if (!state) {
-      this.checkDynamicButtonState();
-    }
   },
   checkDynamicButtonState: function(){
     var checkedRow = $("input.postListCb:checked");
@@ -262,7 +340,7 @@ const ContentType = React.createClass({
         <div className="container-fluid">
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
-              {this.state.contentData.name}
+              {this.props.name} List
               { hasRole('modify-post') &&
               (<small style={{marginLeft: 5}}>
                 <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
@@ -271,7 +349,7 @@ const ContentType = React.createClass({
             </h1>
             <ol className="breadcrumb">
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-              <li className="active">{this.state.contentData.name}</li>
+              <li className="active">{this.props.name}</li>
             </ol>
             <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
           </section>  
@@ -318,7 +396,7 @@ const ContentType = React.createClass({
                       </div>                   
                       <Table 
                           id="postList"
-                          columns={this.state.contentData.fields}
+                          columns={this.props.fields}
                           checkBoxAtFirstColumn="true"
                           ref="rendactTable"
                           onSelectAll={this.checkDynamicButtonState}
