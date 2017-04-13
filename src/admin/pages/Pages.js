@@ -3,6 +3,7 @@ import $ from 'jquery';
 window.jQuery = $;
 import _ from 'lodash';
 import Notification from 'react-notification-system';
+import Halogen from 'halogen';
 import Query from '../query';
 import Fn from '../lib/functions';
 import {riques, hasRole, errorCallback} from '../../utils';
@@ -18,6 +19,9 @@ const Pages = React.createClass({
       dt: null,
       monthList: [],
       deleteMode: false,
+      isProcessing: false,
+      opacity: 1,
+      loading:[],
       statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
       activeStatus: "All",
@@ -61,7 +65,35 @@ const Pages = React.createClass({
       }
     );
   },
-  disableForm: function(state){
+  disableForm: function(state, processingState){
+    var spinner = this.state.loading;
+    var color = '#4DAF7C';
+    var style = {
+            display: '-webkit-flex',
+            display: 'flex',
+            WebkitFlex: '0 1 auto',
+            flex: '0 1 auto',
+            WebkitFlexDirection: 'column',
+            flexDirection: 'column',
+            WebkitFlexGrow: 1,
+            flexGrow: 1,
+            WebkitFlexShrink: 0,
+            flexShrink: 0,
+            WebkitFlexBasis: '25%',
+            flexBasis: '25%',
+            maxWidth: '25%',
+            height: '200px',
+            top: '50%',
+            left: '50%',
+            position: 'absolute',
+            WebkitAlignItems: 'center',
+            alignItems: 'center',
+            WebkitJustifyContent: 'center',
+            justifyContent: 'center'
+      };
+    spinner.push(
+      <div style={style}><Halogen.PulseLoader color={color}/></div>
+      );
     var me = this;
     _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
     _.forEach(document.getElementsByTagName('button'), function(el){ 
@@ -69,7 +101,8 @@ const Pages = React.createClass({
         el.disabled = state;
     })
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.notif.addNotification({message: 'Processing...', level: 'warning',position: 'tr'});
+    this.setState({isProcessing: processingState});
+    this.setState({opacity: 0.8});
     if (!state) {
       this.checkDynamicButtonState();
     }
@@ -89,16 +122,16 @@ const Pages = React.createClass({
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, cancel!',
     },Config.defaultSwalStyling)).then(function () {
-      me.disableForm(true);
+      me.disableForm(true, true);
       riques(Query.deletePostQry(idList), 
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
-            var cb = function(){here.disableForm(false)}
+            var cb = function(){here.disableForm(false, false)}
             me.loadData("All", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
-            me.disableForm(false);
+            me.disableForm(false, false);
           }
         }
       );
@@ -114,16 +147,16 @@ const Pages = React.createClass({
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, cancel!',
     },Config.defaultSwalStyling)).then(function () {
-      me.disableForm(true);
+      me.disableForm(true, true);
       riques(Query.deletePostPermanentQry(idList), 
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
-            var cb = function(){here.disableForm(false)}
+            var cb = function(){here.disableForm(false, false)}
             me.loadData("Deleted", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
-            me.disableForm(false);
+            me.disableForm(false, false);
           }
         }
       );
@@ -140,16 +173,16 @@ const Pages = React.createClass({
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, cancel!'
     }, Config.defaultSwalStyling)).then(function () {
-      me.disableForm(true);
+      me.disableForm(true, true);
       riques(Query.deletePostPermanentQry(idList), 
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
-            var cb = function(){here.disableForm(false)}
+            var cb = function(){here.disableForm(false, false)}
             me.loadData("Deleted", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
-            me.disableForm(false);
+            me.disableForm(false, false);
           }
         }
       );
@@ -166,17 +199,17 @@ const Pages = React.createClass({
       confirmButtonText: 'Yes, recover it!',
       cancelButtonText: 'No, cancel!',
     },Config.defaultSwalStyling)).then(function () {
-      me.disableForm(true);
+      me.disableForm(true, true);
       riques(Query.recoverPostQry(idList), 
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
             console.log(JSON.stringify(body, null, 2));
             var here = me;
-            var cb = function(){here.disableForm(false)}
+            var cb = function(){here.disableForm(false, false)}
             me.loadData("Deleted", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
-            me.disableForm(false);
+            me.disableForm(false, false);
           }
         }
       );
@@ -185,20 +218,22 @@ const Pages = React.createClass({
     this.props.handleNav('pages','new');
   },
   handleStatusFilter: function(event){
-    this.disableForm(true);
+    this.disableForm(true, true);
     var status = event.target.text;
     this.setState({activeStatus: status});
     if (status==='Deleted'){
       var me = this;
       this.loadData("Deleted", function(){
         me.setState({deleteMode: true});
-        me.disableForm(false);
+        me.disableForm(false, false);
+        me.setState({opacity: 1});
       });
     }else{
       var re = this;
       this.loadData(status, function(){
         re.setState({deleteMode: false});
-        re.disableForm(false);
+        re.disableForm(false, false);
+        re.setState({opacity: 1});
       })
     } ;
   },
@@ -209,7 +244,7 @@ const Pages = React.createClass({
       var me = this;
       this.loadData("Deleted", function(){
         me.setState({deleteMode: true});
-        me.disableForm(false);
+        me.disableForm(false, false);
       });
     }else{
       var date = $("#dateFilter").val();
@@ -221,7 +256,7 @@ const Pages = React.createClass({
           this.search( searchValue[this.index()] ).draw();
           return null;
         })
-        te.disableForm(false);
+        te.disableForm(false, false);
       })
     } ;
   },
@@ -246,7 +281,7 @@ const Pages = React.createClass({
   },
   render: function(){
     return (
-      <div className="content-wrapper">
+      <div className="content-wrapper" style={{opacity: this.state.opacity}}>
         <div className="container-fluid">
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
@@ -304,6 +339,9 @@ const Pages = React.createClass({
                           }.bind(this))}
                         </div>
                       </div>
+                      { this.state.isProcessing &&
+                          this.state.loading
+                      }
                       <Table 
                         id="pageList"
                         columns={[
