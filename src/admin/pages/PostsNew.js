@@ -342,7 +342,6 @@ const NewPost = React.createClass({
               } else {
                 errorCallback(error, body.errors?body.errors[0].message:null);
               }
-              here.disableForm(false);
             }
           );
         } else {
