@@ -39,7 +39,20 @@ const getAllCategoryQry = {
   }`
 }
 
-
+const getAllTagQry = {
+  "query": `query getTags{
+    viewer {
+      allTags {
+        edges {
+          node {
+            id,
+            name
+          }
+        }
+      }
+    }
+  }`
+}
 
 const getCreatePostQry = function(title, content, draft, visibility, passwordPage,
   publishDate, userId, slug, summary, featuredImage){
@@ -77,6 +90,46 @@ const getCreatePostQry = function(title, content, draft, visibility, passwordPag
           "slug": slug,
           "summary": summary,
           "featuredImage": featuredImage
+        }
+      }
+    }
+  };
+
+  const createCategory = function(name){
+  return {
+      "query": `
+    mutation createCategory($input: CreateCategoryInput!) {
+        createCategory(input: $input) {
+          changedCategory {
+            id,
+            name
+        }
+      }
+    }
+    `,
+      "variables": {
+        "input": {
+          "name": name
+        }
+      }
+    }
+  };
+
+  const createTag = function(name){
+  return {
+      "query": `
+    mutation createTag($input: CreateTagInput!) {
+        createTag(input: $input) {
+          changedTag {
+            id,
+            name
+        }
+      }
+    }
+    `,
+      "variables": {
+        "input": {
+          "name": name
         }
       }
     }
@@ -298,6 +351,30 @@ const deletePostPermanentQry = function(idList){
   }
 };
 
+const deleteCategoryPermanentQry = function(idList){
+  var query = "mutation { ";
+  _.forEach(idList, function(val, index){
+    query += ' DeleteCategory'+index+' : deleteCategory(input: {id: "'+val+'"}){ changedCategory{ id } }'; 
+  });
+  query += "}";
+
+  return {
+    "query": query
+  }
+};
+
+const deleteTagPermanentQry = function(idList){
+  var query = "mutation { ";
+  _.forEach(idList, function(val, index){
+    query += ' DeleteTag'+index+' : deleteTag(input: {id: "'+val+'"}){ changedTag{ id } }'; 
+  });
+  query += "}";
+
+  return {
+    "query": query
+  }
+};
+
 const recoverPostQry = function(idList){
   var query = "mutation { ";
   _.forEach(idList, function(val, index){
@@ -315,6 +392,7 @@ const recoverPostQry = function(idList){
 const queries = {
   getPostListQry: getPostListQry,
   getAllCategoryQry: getAllCategoryQry,
+  getAllTagQry: getAllTagQry,
   getPostQry: getPostQry,
   getCreatePostQry: getCreatePostQry,
   getUpdatePostQry: getUpdatePostQry,
@@ -325,7 +403,11 @@ const queries = {
   recoverPostQry: recoverPostQry,
   createUpdateCategoryOfPostMtn: createUpdateCategoryOfPostMtn,
   createUpdateTagOfPostMtn: createUpdateTagOfPostMtn,
-  getContentsQry: getContentsQry
+  getContentsQry: getContentsQry,
+  deleteCategoryPermanentQry: deleteCategoryPermanentQry,
+  deleteTagPermanentQry: deleteTagPermanentQry,
+  createCategory: createCategory,
+  createTag: createTag
 }
 
 module.exports = queries;

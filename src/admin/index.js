@@ -10,6 +10,8 @@ import Settings from './pages/Settings';
 import Content from './pages/Content';
 import NewContent from './pages/ContentNew';
 import Posts from './pages/Posts';
+import Category from './pages/Category';
+import Tag from './pages/Tag';
 import Pages from './pages/Pages';
 import Themes from './pages/Themes';
 import Plugins from './pages/Plugins';
@@ -184,6 +186,8 @@ const PageLoader = React.createClass({
 			'content-edit' : <NewContent postId={this.props.postId} handleNav={this.props.handleNav}/>,
 			'profile' : <Profile handleNav={this.props.handleNav}/>,
 			'posts' : <Posts handleNav={this.props.handleNav}/>,
+			'category' : <Category handleNav={this.props.handleNav}/>,
+			'tag' : <Tag handleNav={this.props.handleNav}/>,
 			'pages' : <Pages handleNav={this.props.handleNav}/>,
 			'themes' : <Themes handleNav={this.props.handleNav}/>,
 			'permission' : <Permission handleNav={this.props.handleNav}/>,

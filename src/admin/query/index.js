@@ -48,7 +48,12 @@ const queries = {
   createContentMtn: Content.createContentMtn,
   getContentQry: Content.getContentQry,
   deleteUserQry: User.deleteUserQry,
-  updateRoleUser: User.updateRoleUser
+  updateRoleUser: User.updateRoleUser,
+  getAllTagQry: Post.getAllTagQry,
+  deleteCategoryPermanentQry: Post.deleteCategoryPermanentQry,
+  deleteTagPermanentQry: Post.deleteTagPermanentQry,
+  createCategory: Post.createCategory,
+  createTag: Post.createTag
 }
 
 module.exports = queries;

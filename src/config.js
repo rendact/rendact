@@ -34,7 +34,9 @@ const MenuJson = [
 	{id: 'posts', label: 'Posts', icon: 'fa-pencil-square-o', open: false, role: 5, roleId: 'view-post',
 		elements: [
 			{id: 'posts', label: 'Posts', icon: 'fa-pencil-square-o', open: true, url: '/admin/posts', role: 5, roleId: 'view-post'},
-			{id: 'posts-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/posts/new', role: 5, roleId: 'modify-post'}
+			{id: 'posts-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/posts/new', role: 5, roleId: 'modify-post'},
+			{id: 'category', label: 'Categories', icon: 'fa-edit', open: false, url: '/admin/posts/categories', role: 5, roleId: 'modify-category'},
+			{id: 'tag', label: 'Tags', icon: 'fa-edit', open: false, url: '/admin/posts/tags', role: 5, roleId: 'modify-tag'}
 		]
 	},
 ];
@@ -50,6 +52,8 @@ const menuRoleValue = {
 	'users' : 'view-user',
 	'permission': 'modify-permission',
 	'posts-new' : 'modify-post',
+	'category' : 'modify-category',
+	'tag' : 'modify-tag',
 	'pages-new' : 'modify-page',
 	'theme-new' : 'modify-themes',
 	'users-new' : 'modify-user',
@@ -110,6 +114,8 @@ const permissionList = [
 	{id: "modify-page", label: "Add / modify page"},
 	{id: "view-post", label: "View post list"},
 	{id: "modify-post", label:"Add / modify post"},
+	{id: "modify-category", label:"Add / modify category"},
+	{id: "modify-tag", label:"Add / modify tag"},
 	{id: "view-user", label: "View user list"},
 	{id: "modify-user", label: "Add / modify user"},
 	{id: "modify-settings", label: "Modify settings"},
@@ -127,12 +133,12 @@ const permissionList = [
 const permissionConfig = {
 	"No Role"				: ["view-post","view-page","view-user"],
 	"Subscriber"		: ["view-post","view-page", "view-user", "view-stats"],
-	"Author"				: ["view-post","view-page", "view-user", "view-stats", "modify-post", "upload-media"],
-	"Editor"				: ["view-post","view-page", "view-user", "view-stats", "modify-post", "upload-media", "modify-page"],
-	"Admin"					: ["view-post","view-page", "view-stats", "modify-post", "upload-media", "modify-page", 
+	"Author"				: ["view-post","view-page", "view-user", "view-stats", "modify-post", "modify-category", "modify-tag", "upload-media"],
+	"Editor"				: ["view-post","view-page", "view-user", "view-stats", "modify-post", "modify-category", "modify-tag", "upload-media", "modify-page"],
+	"Admin"					: ["view-post","view-page", "view-stats", "modify-post", "modify-category", "modify-tag", "upload-media", "modify-page", 
 										 "view-user", "modify-user", "modify-permission", "view-plugins", "modify-plugins", 
 										 "view-themes", "modify-themes", "modify-settings", "view-content", "modify-content"],
-	"Owner"					: ["view-post","view-page", "view-stats", "modify-post", "upload-media", "modify-page", 
+	"Owner"					: ["view-post","view-page", "view-stats", "modify-post", "modify-category", "modify-tag", "upload-media", "modify-page", 
 										 "view-user", "modify-user", "modify-permission", "view-plugins", "modify-plugins", 
 										 "view-themes", "modify-themes", "modify-settings", "view-content", "modify-content"]
 }
