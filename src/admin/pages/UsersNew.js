@@ -21,7 +21,7 @@ var NewUser = React.createClass({
 			passwordActive: false,
 			mode: this.props.userId?"update":"create",
 			roleList: [],
-			userRole: [],
+			userRole: null,
 			userMetaList: Config.userMetaList,
 			timezone: "",
 			country: "",
@@ -73,13 +73,12 @@ var NewUser = React.createClass({
 			var roles = _.map(v.roles.edges, function(item){
 				return item.node.id
 			});
-			this.setState({userRole: roles});
-			var rolesInput = document.getElementsByName("roles[]");
-			_.forEach(rolesInput, function(item){
-				if (_.indexOf(roles, item.value) > -1) {
-					item.checked = true;
-				}
-			});
+			
+			if (roles.length>0) {
+				this.setState({userRole: roles[0]});
+				document.getElementById("role").value = roles[0];
+			}
+			
 		}
 
 		var p = JSON.parse(localStorage.getItem("profile"));
@@ -130,7 +129,7 @@ var NewUser = React.createClass({
 		    changePassword = true;
 	    }
 
-			qry = Query.saveProfileMtn(this.props.userId, name, gender, image, country, dateOfBirth);
+			qry = Query.saveProfileMtn({userId: this.props.userId, name: name, gender: gender, image: image, country: country, dateOfBirth: dateOfBirth});
 		} else {
 			if (!password) {
     		swal('Failed!', 'Please fill your password', 'warning')
@@ -199,6 +198,7 @@ var NewUser = React.createClass({
 		          		here.disableForm(false);
 							}
 						);
+						
 	        }
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
@@ -223,6 +223,9 @@ var NewUser = React.createClass({
 				}
 			);
 		}
+
+		var role = getValue("role");
+		this.handleRoleChange(this.state.userRole, role);
 	},
 	handleGeneratePassword: function(event){
 		event.preventDefault();
@@ -244,24 +247,26 @@ var NewUser = React.createClass({
 	handleDateChange: function(date){
 	    this.setState({dateOfBirth: new Date(date)});
 	},
-	handleRoleChange: function(event){
+	handleRoleChange: function(role1, role2){
 		var qry = '';
-		var roleId = event.target.value;
-		var checked = event.target.checked;
 
-		if (checked) {
-			qry = Query.addRoleToUser(this.props.userId, roleId, "admin");
+		if (role1) {
+			qry = Query.updateRoleUser(this.props.userId, role1, role2, "admin");
 		} else {
-			qry = Query.deleteRoleUser(this.props.userId, roleId);	
+			qry = Query.addRoleToUser(this.props.userId, role2, "admin");
 		}
 		var me = this;
 
-		me.disableForm(true);
-		
-    	riques(qry, 
+   	riques(qry, 
 			function(error, response, body){
 				if(!error && !body.errors) {
-					var here = me
+					var here = me;
+					me.notification.addNotification({
+							message: 'Role changed',
+							level: 'success',
+							position: 'tr',
+							autoDismiss: 2
+						})
 					here.disableForm(false);
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
@@ -294,7 +299,10 @@ var NewUser = React.createClass({
 	handleBirthDateChange: function(date){
 	 	this.setState({dateOfBirth: date});
 	},
-	componentWillMount: function(){
+	componentDidMount: function(){
+		require ('react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css');
+		require ('react-datetime/css/react-datetime.css');
+		this.notification = this.refs.notificationSystem;
 		var me = this;
 		riques( Query.getRolesQry,
 		function(error, response, body){
@@ -303,25 +311,14 @@ var NewUser = React.createClass({
           var roleList = me.state.roleList;
           for (var i=1;i < body.data.viewer.allRoles.edges.length; i++) {
           	var item = body.data.viewer.allRoles.edges[i];
-          	roleList.push(
-          		<div className="form-group" key={item.node.id}>
-          			<input type="checkbox" name="roles[]" value={item.node.id} onChange={here.handleRoleChange}/> 
-          			<label style={{marginLeft: 5}}>{item.node.name}</label>
-          		</div>);
+          	roleList.push({id: item.node.id, name: item.node.name});
           }
           here.setState({roleList: roleList});
+          if (me.state.mode==="update") {
+			  		me.loadData();
+			  	}
         }
-		}
-	  );
-	},
-	componentDidMount: function(){
-		require ('react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css');
-		require ('react-datetime/css/react-datetime.css');
-		this.notification = this.refs.notificationSystem;
-
-		if (this.state.mode==="update") {
-  		this.loadData();
-  	}
+		});
   },
   resetForm: function(){
     document.getElementById("profileForm").reset();
@@ -355,7 +352,8 @@ var NewUser = React.createClass({
 			      </h1>
 			      <ol className="breadcrumb">
 			        <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-			        <li className="active">Profile</li>
+			        <li><a href="#" onClick={function(){this.props.handleNav('users')}.bind(this)}> Users</a></li>
+			        <li className="active">Add New User</li>
 			      </ol>
 			      <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
 			    </section>
@@ -495,8 +493,20 @@ var NewUser = React.createClass({
 								</div>
 
 								{ this.state.mode==="create" &&
-								 ( <h4 style={{marginBottom: 20}}>Password</h4>
-								 )
+								 [<h4 style={{marginBottom: 20}}>Password</h4>,
+								 <div key="2" className="form-group">
+									 	<label htmlFor="homeUrl" className="col-md-3">Role</label>
+									 	<div className="col-md-9">
+											<select name="role" id="role" className="form-control select">
+												{
+													this.state.roleList.map(function(item){
+														return <option value={item.id}>{item.name}</option>
+													})
+												}
+											</select>
+										</div>
+									</div>]
+								 
 								}
 
 								{ this.state.mode==="update" &&
@@ -504,7 +514,13 @@ var NewUser = React.createClass({
 									<div key="2" className="form-group">
 									 	<label htmlFor="homeUrl" className="col-md-3">Role</label>
 									 	<div className="col-md-9">
-											{this.state.roleList}
+											<select name="role" id="role" className="form-control select">
+												{
+													this.state.roleList.map(function(item){
+														return <option value={item.id}>{item.name}</option>
+													})
+												}
+											</select>
 										</div>
 									</div>,
 									<div key="3" className="form-group">

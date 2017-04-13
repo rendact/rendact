@@ -8,7 +8,7 @@ const getPostListQry = function(s) {
   return {
     "query": 
       'query getPosts{viewer {allPosts(where: {type: {eq: "post"}, status: '+status+'}) { edges { node { '
-     +'id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},tag{edges{node{tag{id, name}}}},comments{edges{node{id}}},createdAt}}}}}'
+     +'id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},tag{edges{node{tag{id, name}}}},comments{edges{node{id}}},featuredImage,createdAt}}}}}'
   };
 }
 
@@ -20,7 +20,7 @@ const getContentsQry = function(type, status) {
   return {
     "query": 
       'query getPosts{viewer {allPosts(where: {type: {eq: "'+type+'"}, status: '+status+'}) { edges { node { '
-     +'id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},comments{edges{node{id}}},createdAt}}}}}'
+     +'id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},comments{edges{node{id}}},featuredImage,createdAt}}}}}'
   };
 }
 
@@ -42,7 +42,7 @@ const getAllCategoryQry = {
 
 
 const getCreatePostQry = function(title, content, draft, visibility, passwordPage,
-  publishDate, userId, slug, summary, category){
+  publishDate, userId, slug, summary, featuredImage){
   return {
       "query": `
     mutation createPost($input: CreatePostInput!) {
@@ -76,13 +76,14 @@ const getCreatePostQry = function(title, content, draft, visibility, passwordPag
           "authorId": userId,
           "slug": slug,
           "summary": summary,
+          "featuredImage": featuredImage
         }
       }
     }
   };
 
 const getUpdatePostQry = function(id, title, content, draft, visibility, passwordPage,
-  publishDate, userId, slug, summary, category){
+  publishDate, userId, slug, summary, featuredImage){
   return {
       "query": `
     mutation updatePost($input: UpdatePostInput!) {
@@ -118,6 +119,7 @@ const getUpdatePostQry = function(id, title, content, draft, visibility, passwor
           "authorId": userId,
           "slug": slug,
           "summary": summary,
+          "featuredImage": featuredImage
         }
       }
     }
@@ -266,7 +268,7 @@ const createUpdateTagOfPostMtn = function(postId, currentTag, newTag){
 
 const getPostQry = function(postId){
   return {"query": 
-      '{getPost(id:"'+postId+'"){ id,title,content,slug,author{username},status,visibility,'
+      '{getPost(id:"'+postId+'"){ id,title,content,slug,author{username},status,visibility,featuredImage,'
       +'summary,category{edges{node{category{id,name}}}}comments{edges{node{id}}},meta{edges{node{item,value}'
       +'}}createdAt}}'
     }

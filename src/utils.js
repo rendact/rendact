@@ -112,10 +112,12 @@ let disableForm = function(state, notif){
   if (notif) {
     if (state)
       notif.addNotification({
-        id: 'saving',
+        uid: 'saving',
         message: 'Processing...',
         level: 'warning',
-        position: 'tr'
+        position: 'tr',
+        dismissible: false,
+        autoDismiss: 0
       });
     else {
       notif.addNotification({

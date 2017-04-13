@@ -355,6 +355,39 @@ const deleteRoleUser = function(userId, roleId){
   }
 }
 
+const updateRoleUser = function(userId, role1, role2, accessLevel){
+  return {
+    "query": `mutation UpdateRolesConnection($input1: RemoveFromUserRolesConnectionInput!, $input2: AddToUserRolesConnectionInput!)
+      { 
+        removeFromUserRoles: removeFromUserRolesConnection(input: $input1){
+          changedUserRoles{
+            user {
+              id
+            }
+          }
+        }
+        addToUserRoles: addToUserRolesConnection(input: $input2){
+          changedUserRoles{
+            user {
+              id
+            }
+          }
+        }
+      }`,
+    "variables": {
+      input1: {
+        userId: userId,
+        roleId: role1
+      },
+      input2: {
+        userId: userId,
+        roleId: role2,
+        accessLevel: accessLevel
+      }
+    }
+  }
+}
+
 const getRolesQry = {
   "query": `
     query getRoles{
@@ -397,7 +430,8 @@ const queries = {
   addRoleToUser: addRoleToUser,
   deleteRoleUser: deleteRoleUser,
   getRolesQry: getRolesQry,
-  deleteUserQry: deleteUserQry
+  deleteUserQry: deleteUserQry,
+  updateRoleUser: updateRoleUser
 }
 
 module.exports = queries;

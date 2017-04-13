@@ -21,7 +21,7 @@ const Users = React.createClass({
       isProcessing: false,
       opacity: 1,
       loading:[],
-      statusList: Config.roleList,
+      statusList: _.concat(["All"],Config.roleList),
       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
       activeStatus: "All",
       itemSelected: false
