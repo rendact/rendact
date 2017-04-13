@@ -216,6 +216,54 @@ const createUpdateCategoryOfPostMtn = function(postId, currentCat, newCat){
   }
 }
 
+const createUpdateTagOfPostMtn = function(postId, currentTag, newTag){
+  var variables = {};
+  var deleteList = _.difference(currentTag, newTag);
+  var addList = _.difference(newTag, currentTag);
+
+  var query = "mutation (";
+  
+  var _tempArr = [];
+  var index = 0;
+  _.forEach(deleteList, function(item){
+    _tempArr.push("$input"+index+": DeleteTagOfPostInput!")
+    index++;
+  });
+  _.forEach(addList, function(item){
+    _tempArr.push("$input"+index+": CreateTagOfPostInput!")
+    index++;
+  });
+  query += _.join(_tempArr, ",");
+  query += ") {";
+
+  index = 0;
+  _.forEach(deleteList, function(item){
+    query += ' DeleteTagOfPost'+index+' : deleteTagOfPost(input: $input'+index+'){ changedTagOfPost{ id } }'; 
+    variables["input"+index] = {
+      postId: postId,
+      tagId: item
+    }
+
+    index++;
+  });
+
+  _.forEach(addList, function(item){
+    query += ' CreateTagOfPost'+index+' : createTagOfPost(input: $input'+index+'){ changedTagOfPost{ id } }'; 
+    variables["input"+index] = {
+      postId: postId,
+      tagId: item
+    }
+
+    index++;
+  });
+  
+  query += "}";
+  return {
+    "query": query,
+    "variables": variables
+  }
+}
+
 const getPostQry = function(postId){
   return {"query": 
       '{getPost(id:"'+postId+'"){ id,title,content,slug,author{username},status,visibility,'
@@ -274,6 +322,7 @@ const queries = {
   deletePostPermanentQry: deletePostPermanentQry,
   recoverPostQry: recoverPostQry,
   createUpdateCategoryOfPostMtn: createUpdateCategoryOfPostMtn,
+  createUpdateTagOfPostMtn: createUpdateTagOfPostMtn,
   getContentsQry: getContentsQry
 }
 
