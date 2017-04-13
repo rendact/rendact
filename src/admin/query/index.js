@@ -33,6 +33,7 @@ const queries = {
   saveUserMetaMtn: User.saveUserMetaMtn,
   createUserMetaMtn: User.createUserMetaMtn,
   createUpdateUserMetaMtn: User.createUpdateUserMetaMtn,
+  createUpdateTagOfPostMtn: User.createUpdateTagOfPostMtn,
   changePasswordMtn: User.changePasswordMtn,
   recoverPostQry: Page.recoverPostQry,
   addRoleToUser: User.addRoleToUser,
@@ -47,7 +48,12 @@ const queries = {
   createContentMtn: Content.createContentMtn,
   getContentQry: Content.getContentQry,
   deleteUserQry: User.deleteUserQry,
-  updateRoleUser: User.updateRoleUser
+  updateRoleUser: User.updateRoleUser,
+  getAllTagQry: Post.getAllTagQry,
+  deleteCategoryPermanentQry: Post.deleteCategoryPermanentQry,
+  deleteTagPermanentQry: Post.deleteTagPermanentQry,
+  createCategory: Post.createCategory,
+  createTag: Post.createTag
 }
 
 module.exports = queries;

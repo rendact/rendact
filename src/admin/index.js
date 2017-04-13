@@ -9,6 +9,8 @@ import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import Content from './pages/Content';
 import NewContent from './pages/ContentNew';
+import Category from './pages/Category';
+import Tag from './pages/Tag';
 import Themes from './pages/Themes';
 import Plugins from './pages/Plugins';
 import Permission from './pages/Permission';
@@ -231,6 +233,8 @@ const PageLoader = React.createClass({
 			'profile' : <Profile handleNav={this.props.handleNav}/>,
 			'posts': <Posts/>,
 			'pages': <Pages/>,
+			'category' : <Category handleNav={this.props.handleNav}/>,
+			'tag' : <Tag handleNav={this.props.handleNav}/>,
 			'themes' : <Themes handleNav={this.props.handleNav}/>,
 			'permission' : <Permission handleNav={this.props.handleNav}/>,
 			'plugins' : <Plugins handleNav={this.props.handleNav}/>,
