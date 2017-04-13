@@ -70,7 +70,7 @@ const Users = React.createClass({
         }
     );
   },
-  disableForm: function(state){
+  disableForm: function(state, processingState){
     var spinner = this.state.loading;
     var color = '#4DAF7C';
     var style = {
@@ -106,7 +106,7 @@ const Users = React.createClass({
         el.disabled = state;
     })
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.setState({isProcessing: true});
+    this.setState({isProcessing: processingState});
     this.setState({opacity: 0.8});
     if (!state) {
       this.checkDynamicButtonState();
@@ -127,18 +127,18 @@ const Users = React.createClass({
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, cancel!',
     },Config.defaultSwalStyling)).then(function () {
-      me.disableForm(true);
+      me.disableForm(true, true);
       riques(Query.deleteUserQry(idList), 
         function(error, response, body) {
           ;
           if (!error && !body.errors && response.statusCode === 200) {
             console.log(JSON.stringify(body, null, 2));
             var here = me;
-            var cb = function(){here.disableForm(false)}
+            var cb = function(){here.disableForm(false, false)}
             me.loadData("All", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
-            me.disableForm(false);
+            me.disableForm(false, false);
           }
         }
       );
@@ -148,14 +148,13 @@ const Users = React.createClass({
     this.props.handleNav('users','new');
   },
   handleStatusFilter: function(event){
-    this.disableForm(true);
+    this.disableForm(true, true);
     var status = event.target.text;
     this.setState({activeStatus: status});
     var re = this;
     this.loadData(status, function(){
       re.setState({deleteMode: false});
-      re.disableForm(false);
-      re.setState({isProcessing:false});
+      re.disableForm(false, false);
       re.setState({opacity: 1});
     })
       
