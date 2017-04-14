@@ -65,7 +65,7 @@ const createUpdateSettingsMtn = function(arrData){
   }
 }
 
-const createUpdatePermissionMtn = function(userId, arrData){
+const createUpdatePermissionMtn = function(optionId, arrData){
     return {
       "query": `
     mutation createOptions($input: CreateOptionsInput!) {

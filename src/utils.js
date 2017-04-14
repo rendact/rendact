@@ -104,11 +104,11 @@ let getFormData = function(className){
   return _objData;
 }
 
-let disableForm = function(state, notif){
+let disableForm = function(state, notif, excludeClass){
   var me = this;
-  _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;});
-  _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;});
-  _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;});
+  _.forEach(document.getElementsByTagName('input'), function(el){ if (_.indexOf(excludeClass, el.getAttribute("class"))<0) el.disabled = state;});
+  _.forEach(document.getElementsByTagName('button'), function(el){ if (_.indexOf(excludeClass, el.getAttribute("class"))<0) el.disabled = state;});
+  _.forEach(document.getElementsByTagName('select'), function(el){ if (_.indexOf(excludeClass, el.getAttribute("class"))<0) el.disabled = state;});
   if (notif) {
     if (state)
       notif.addNotification({

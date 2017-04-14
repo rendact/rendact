@@ -4,7 +4,7 @@ window.jQuery = $;
 import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Query from '../query';
-import {riques} from '../../utils';
+import {riques, disableForm} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
 
@@ -24,32 +24,56 @@ const Permission = React.createClass({
       dt: null,
       itemSelected: false,
       notification: null,
-      itemList: []
+      itemList: [],
+      optionId: null
     }
   },
   loadData: function(datatable) {
     datatable.clear();
-    var permissionConfig = Query.getPermissionConfigQry;
-    var roleList = Config.roleList;
-    
-    _.forEach(Config.permissionList, function(item){
-      var row = ['<td>'+item.label+'</td>']
-      var roleId = item.id;
+    var here = this;
+    var qry = Query.getPermissionConfigQry;
 
-      _.forEach(roleList, function(item){
-        var checked = "";
-        var val = item + "~" + roleId;
-        if (_.indexOf(permissionConfig.value, roleId)>-1)
-          checked = "checked";
-          row.push('<td style="textAlign: center"><center><input type="checkbox" name="permissionCheckbox" value="'+val+'" '+checked+'/></center></td>');
-      });
+    this.disableForm(true);
+    riques(qry, 
+      function(error, response, body) {
+        if (!error && !body.errors && response.statusCode === 200) {
+          var roleList = Config.roleList;
 
-      datatable.row.add(row);
-    });
-    datatable.draw();
+          if (body.data.viewer.allOptions.edges.length>0) {
+            var item = body.data.viewer.allOptions.edges[0];
+            here.setState({optionId: item.node.id});
+            var permissionConfig = JSON.parse(item.node.value);
+
+            _.forEach(Config.permissionList, function(item){
+              var row = ['<td>'+item.label+'</td>']
+              var roleId = item.id;
+
+              _.forEach(roleList, function(item){
+                var checked = "";
+                var disabled = "";
+                var val = item + "~" + roleId;
+                if (_.indexOf(permissionConfig[item], roleId)>-1) {
+                  checked = "checked";
+                }
+                if (item==="Admin" || item==="Owner") disabled="disabled";
+                row.push('<td style="textAlign: center"><center><input type="checkbox" class="permissionChk" name="permissionCheckbox" value="'+val+'" '+checked+' '+disabled+'/></center></td>');
+
+              });
+
+              datatable.row.add(row);
+            });
+            datatable.draw();
+            here.disableForm(false); 
+          }
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+      }
+    );
   },
   handleSubmit: function(event) {
     event.preventDefault();
+    this.disableForm(true);
     var here = this;
     var checkboxList = $('input[name="permissionCheckbox"]:checked');
 
@@ -66,7 +90,13 @@ const Permission = React.createClass({
       }
     });
     var isi = JSON.stringify(_config); 
-    var qry = Query.createUpdatePermissionMtn(null, isi);
+    //var qry = Query.createUpdatePermissionMtn(null, isi);
+    var _objData = {
+      item: "permissionConfig",
+      value: isi
+    };
+    if (this.state.optionId) _objData["id"] = this.state.optionId;
+    var qry = Query.createUpdateSettingsMtn([_objData]);
 
     riques(qry, 
       function(error, response, body) {
@@ -76,27 +106,15 @@ const Permission = React.createClass({
             level: 'success',
             position: 'tr'
           });
+          here.disableForm(false);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
-        here.disableForm(false);
       }
     );
   },
   disableForm: function(state){
-    var me = this;
-    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
-    _.forEach(document.getElementsByTagName('button'), function(el){ 
-      if (_.indexOf(me.state.dynamicStateBtnList, el.id) < 0)
-        el.disabled = state;
-    })
-    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.notification.addNotification({
-      message: 'Processing...',
-      level: 'warning',
-      position: 'tr',
-      autoDismiss: 2
-    });
+    disableForm(state, this.notification, ["permissionChk"]);
   },
   componentDidMount: function(){
     var datatable = $('#pageListTbl').DataTable({
