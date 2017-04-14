@@ -248,7 +248,7 @@ const PageLoader = React.createClass({
 			'users-edit' : <NewUser userId={this.props.postId} handleNav={this.props.handleNav}/>,
 		}
 		
-		var requiredRole = Config.menuRoleValue[page+action];
+		var requiredRole = AdminConfig.MenuRoleValue[page+action];
 
 		if (!hasRole(requiredRole) && !this.isContentType(page)){
 			return <NotPermissible/>

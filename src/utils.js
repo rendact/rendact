@@ -52,8 +52,9 @@ let hasRole = function(roleId){
   var p = JSON.parse(localStorage.getItem("profile"));
   
   var roleIdList = [];
+  var permissionConfig = JSON.parse(getConfig("permissionConfig"));
   _.forEach(p.roles, function(item){
-    roleIdList = _.concat(roleIdList, Config.permissionConfig[item])
+    roleIdList = _.concat(roleIdList, permissionConfig[item])
   })
   if (Config.adminMode) return true;
   return (_.indexOf(roleIdList, roleId)>-1)

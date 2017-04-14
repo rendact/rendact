@@ -7,6 +7,7 @@ import Query from '../query';
 import {riques, disableForm} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
+import AdminConfig from '../AdminConfig';
 
 
 const errorCallback = function(msg1, msg2){
@@ -37,14 +38,14 @@ const Permission = React.createClass({
     riques(qry, 
       function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
-          var roleList = Config.roleList;
+          var roleList = AdminConfig.RoleList;
 
           if (body.data.viewer.allOptions.edges.length>0) {
             var item = body.data.viewer.allOptions.edges[0];
             here.setState({optionId: item.node.id});
             var permissionConfig = JSON.parse(item.node.value);
 
-            _.forEach(Config.permissionList, function(item){
+            _.forEach(AdminConfig.PermissionList, function(item){
               var row = ['<td>'+item.label+'</td>']
               var roleId = item.id;
 
@@ -159,8 +160,8 @@ const Permission = React.createClass({
                           <tr>
                             <th style={{width: 500, color: 'blue'}}>Functionality</th>
                             {
-                              Config.roleList.map(function(item){
-                                return <th style={{width: 80, textAlign: 'center'}}>{item}</th>    
+                              AdminConfig.RoleList.map(function(item){
+                                return <th key={item} style={{width: 80, textAlign: 'center'}}>{item}</th>    
                               })
                             }
                           </tr>
@@ -169,8 +170,8 @@ const Permission = React.createClass({
                           <tr>
                             <td>Loading data...</td>
                             {
-                              Config.roleList.map(function(item, index){
-                                return (<td></td>)
+                              AdminConfig.RoleList.map(function(item, index){
+                                return (<td key={index}></td>)
                               })
                             }
                           </tr>
