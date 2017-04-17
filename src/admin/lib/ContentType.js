@@ -126,7 +126,7 @@ const ContentType = React.createClass({
     var color = '#4DAF7C';
     var style = {
             display: '-webkit-flex',
-            display: 'flex',
+            //display: 'flex',
             WebkitFlex: '0 1 auto',
             flex: '0 1 auto',
             WebkitFlexDirection: 'column',

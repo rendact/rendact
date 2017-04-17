@@ -2,10 +2,10 @@ import React from 'react';
 import _ from 'lodash';
 import $ from 'jquery';
 window.jQuery = $;
-import Config from '../../config';
+//import Config from '../../config';
 import Query from '../query';
-import {riques, setValue, getValue, disableForm, errorCallback, getConfig} from '../../utils';
-import { default as swal } from 'sweetalert2';
+import {riques, setValue, getValue, errorCallback, getConfig} from '../../utils';
+//import { default as swal } from 'sweetalert2';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
 import Dropzone from 'react-dropzone';
@@ -105,7 +105,7 @@ const NewPost = React.createClass({
     this.setState({visibilityTxt: $("input[name=visibilityRadio]:checked").val()});
   },
   disableForm: function(state){
-    var me = this;
+    //var me = this;
   _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;});
   _.forEach(document.getElementsByTagName('button'), function(el){ el.disabled = state;});
   _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;});

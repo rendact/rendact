@@ -1,12 +1,12 @@
 import React from 'react';
 import _ from 'lodash';
 import { default as swal } from 'sweetalert2';
-import TimezonePicker from 'react-bootstrap-timezone-picker';
+//import TimezonePicker from 'react-bootstrap-timezone-picker';
 import Notification from 'react-notification-system';
 
 import Query from '../query';
-import Config from '../../config'
-import {riques, getValue, setValue, errorCallback, getFormData, disableForm} from '../../utils';
+//import Config from '../../config'
+import {riques, getValue, setValue, errorCallback, disableForm} from '../../utils';
 
 const Field = React.createClass({
 	render: function(){
@@ -196,7 +196,7 @@ var Settings = React.createClass({
 																name={item.label} 
 																type={item.type} 
 																onDelete={this.handleFieldDelete}
-																deletable={item.deletable==false?false:true}
+																deletable={item.deletable===false?false:true}
 																/>
 											}.bind(this))
 										}

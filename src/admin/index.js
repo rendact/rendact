@@ -234,7 +234,7 @@ const PageLoader = React.createClass({
 			'posts': <Posts/>,
 			'pages': <Pages/>,
 			'category' : <Category handleNav={this.props.handleNav}/>,
-			'tag' : <Tag handleNav={this.props.handleNav}/>,
+			'tag' : <Tag tagId={this.props.tagId} handleNav={this.props.handleNav}/>,
 			'themes' : <Themes handleNav={this.props.handleNav}/>,
 			'permission' : <Permission handleNav={this.props.handleNav}/>,
 			'plugins' : <Plugins handleNav={this.props.handleNav}/>,
@@ -245,7 +245,7 @@ const PageLoader = React.createClass({
 			'users-new' : <NewUser handleNav={this.props.handleNav}/>,
 			'posts-edit' : <NewPost postId={this.props.postId} handleNav={this.props.handleNav}/>,
 			'pages-edit' : <NewPage postId={this.props.postId} handleNav={this.props.handleNav}/>,
-			'users-edit' : <NewUser userId={this.props.postId} handleNav={this.props.handleNav}/>,
+			'users-edit' : <NewUser userId={this.props.postId} handleNav={this.props.handleNav}/>,//'tag-edit' : <Tag tagId={this.props.tagId} handleNav={this.props.handleNav}/>,
 		}
 		
 		var requiredRole = AdminConfig.MenuRoleValue[page+action];

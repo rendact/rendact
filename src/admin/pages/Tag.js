@@ -1,13 +1,12 @@
 import React from 'react';
 import $ from 'jquery';
 import Query from '../query';
-import Fn from '../lib/functions';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
-import {riques, hasRole, errorCallback, setValue, getValue, disableForm, getConfig} from '../../utils';
+import {riques, hasRole, errorCallback, getValue} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
-import {Table, SearchBox, DeleteButtons} from '../lib/Table';
+import {TableTag, SearchBox, DeleteButtons} from '../lib/Table';
 
 const Tag = React.createClass({
   getInitialState: function(){
@@ -22,7 +21,8 @@ const Tag = React.createClass({
         statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
         dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
         activeStatus: "All",
-        itemSelected: false
+        itemSelected: false,
+        mode: this.props.tagId?"update":"create",
       }
   },
   loadData: function(type, callback) {
@@ -36,7 +36,7 @@ const Tag = React.createClass({
 
           _.forEach(body.data.viewer.allTags.edges, function(item){
             _dataArr.push({
-              "postId": item.node.id,
+              "tagId": item.node.id,
               "name": item.node.name,
               "description": "",
               "count": ""
@@ -97,15 +97,15 @@ const Tag = React.createClass({
     var checkedRow = $("input.tagCb:checked");
     this.setState({itemSelected: checkedRow.length>0})
   },
-  handleViewPost: function(postId){
-    this.props.handleNav('posts','edit', postId);
+  handleViewTag: function(tagId){
+    this.props.handleNav('tag',tagId);
   },
   onAfterTableLoad: function(){
     var me = this;
     $(".titleText").click(function(event){
       event.preventDefault();
-      var postId = this.id.split("-")[1];
-      me.handleViewPost(postId);
+      var tagId = this.id.split("-")[1];
+      me.handleViewTag(tagId);
     });
   },
   componentDidMount: function(){
@@ -120,22 +120,58 @@ const Tag = React.createClass({
     event.preventDefault();
     var me = this;
     var name = getValue("name");
-    var description = "";
-    var count = "";
 
-    me.disableForm(true);
+    /*me.disableForm(true);
     var qry = Query.createTag(name);
     var noticeTxt = "";
     riques(qry, 
       function(error, response, body) { 
         if (!error && !body.errors && response.statusCode === 200) {
-          /*var here = me;
+          var here = me;
+          this.notif.addNotification({
+                  message: noticeTxt,
+                  level: 'success',
+                  position: 'tr',
+                  autoDismiss: 2
+          });
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+        me.disableForm(false);
+      });*/
+
+    this.disableForm(true);
+    var qry = "", noticeTxt = "";
+    if (this.state.mode==="create"){
+      qry = Query.createTag(name);
+      this.notif.addNotification({
+        id: 'saving',
+        message: 'Creating Tag...',
+        level: 'warning',
+        position: 'tr'
+      });
+      noticeTxt = 'Tag Published!';
+    }else{
+      qry = Query.UpdateTag(this.props.tagId, name);
+      this.notif.addNotification({
+        id: 'saving',
+        message: 'Updating Tag...',
+        level: 'warning',
+        position: 'tr'
+      });
+      noticeTxt = 'Tag Updated!';
+    }
+
+    riques(qry, 
+      function(error, response, body) { 
+        if (!error && !body.errors && response.statusCode === 200) {
+          //var here = me;
           me.notification.addNotification({
                   message: noticeTxt,
                   level: 'success',
                   position: 'tr',
                   autoDismiss: 2
-          });*/
+          });
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
@@ -164,7 +200,7 @@ const Tag = React.createClass({
                 <div className="container-fluid">
                   <div className="row">
                     <div className="col-xs-4" style={{marginTop: 40}}>
-                    <form onSubmit={this.handleSubmit} id="pageForm" method="get">
+                    <form onSubmit={this.handleSubmit} id="tagForm" method="get">
                       <div className="form-group">
                         <h4><b>Add New Tag</b></h4>
                       </div>
@@ -183,9 +219,7 @@ const Tag = React.createClass({
                         </div>
                       </div>
                        <div className="form-group">
-                          
-                            <input type="submit" name="submit" id="submit" value="Add New Tag" className="btn btn-primary btn-sm" />
-                            
+                          <button type="submit" id="publishBtn" className="btn btn-primary btn-flat" disabled={this.state.name===""}>{this.state.mode==="update"?"Save":"Publish"}</button>
                       </div>
                     </form>
                     </div>
@@ -203,10 +237,10 @@ const Tag = React.createClass({
                           <SearchBox datatable={this.table} ref="rendactSearchBox"/>
                         </div>
                       </div>                   
-                      <Table 
+                      <TableTag 
                           id="tag"
                           columns={[
-                            {id: 'name', label: "Name", textAlign:"center"},
+                            {id: 'name', label: "Name", type: "link", target: "", cssClass:"titleText"},
                             {id: 'description', label: "Description", textAlign:"center", width: 400, cssClass:"titleText"},
                             {id: 'count', label: "Count", textAlign:"center"}
                           ]}

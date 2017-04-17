@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import $ from 'jquery';
 window.jQuery = $;
-import Config from '../../config';
+//import Config from '../../config';
 import Query from '../query';
 import {riques, setValue, getValue, disableForm, getConfig} from '../../utils';
 import {getTemplates} from '../theme';
@@ -107,7 +107,8 @@ const NewPage = React.createClass({
       return;
     }
     
-    var qry = "", noticeTxt = "";
+    var qry = "";
+    var noticeTxt = "";
     if (this.state.mode==="create"){
       qry = Query.getCreatePageQry(v.title, v.content, "Draft", v.visibility, v.passwordPage, v.publishDate, 
         localStorage.getItem('userId'), this.state.slug, v.summary, v.parentPage, v.pageOrder, v.type);

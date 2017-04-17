@@ -2,10 +2,10 @@ import React from 'react';
 import _ from 'lodash';
 import $ from 'jquery';
 window.jQuery = $;
-import Config from '../../config';
+//import Config from '../../config';
 import Query from '../query';
 import {riques, setValue, getValue, disableForm, errorCallback, getConfig} from '../../utils';
-import { default as swal } from 'sweetalert2';
+//import { default as swal } from 'sweetalert2';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
 

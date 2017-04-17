@@ -1,10 +1,9 @@
 import React from 'react';
 import $ from 'jquery';
 import Query from '../query';
-import Fn from '../lib/functions';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
-import {riques, hasRole, errorCallback, setValue, getValue, disableForm, getConfig} from '../../utils';
+import {riques, hasRole, errorCallback, getValue} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
 import {Table, SearchBox, DeleteButtons} from '../lib/Table';
@@ -120,12 +119,9 @@ const Category = React.createClass({
     event.preventDefault();
     var me = this;
     var name = getValue("name");
-    var description = "";
-    var count = "";
 
     me.disableForm(true);
     var qry = Query.createCategory(name);
-    var noticeTxt = "";
     riques(qry, 
       function(error, response, body) { 
         if (!error && !body.errors && response.statusCode === 200) {

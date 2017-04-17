@@ -178,6 +178,26 @@ const getUpdatePostQry = function(id, title, content, draft, visibility, passwor
     }
   };
 
+  const UpdateTag = function(name){
+  return {
+      "query": `
+    mutation updateTag($input: UpdateTagInput!) {
+        updateTag(input: $input) {
+          changedTag {
+            id,
+            name
+        }
+      }
+    }
+    `,
+      "variables": {
+        "input": {
+          "name": name
+        }
+      }
+    }
+  };
+
 const getCreateCategoryOfPostQry = function(postId, categoryId){
 return {
     "query": `
@@ -407,7 +427,8 @@ const queries = {
   deleteCategoryPermanentQry: deleteCategoryPermanentQry,
   deleteTagPermanentQry: deleteTagPermanentQry,
   createCategory: createCategory,
-  createTag: createTag
+  createTag: createTag,
+  UpdateTag: UpdateTag,
 }
 
 module.exports = queries;
