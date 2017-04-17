@@ -186,16 +186,16 @@ const PageLoader = React.createClass({
 			'content-new' : <NewContent handleNav={this.props.handleNav}/>,
 			'content-edit' : <NewContent postId={this.props.postId} handleNav={this.props.handleNav}/>,
 			'profile' : <Profile handleNav={this.props.handleNav}/>,
-			'posts': <Posts/>,
-			'pages': <Pages/>,
+			'posts': <Posts handleNav={this.props.handleNav}/>,
+			'pages': <Pages handleNav={this.props.handleNav}/>,
 			'category' : <Category handleNav={this.props.handleNav}/>,
 			'tag' : <Tag handleNav={this.props.handleNav}/>,
 			'themes' : <Themes handleNav={this.props.handleNav}/>,
 			'permission' : <Permission handleNav={this.props.handleNav}/>,
 			'plugins' : <Plugins handleNav={this.props.handleNav}/>,
-			'users': <Users/>,
-			'posts-new' : <NewPost/>,
-			'pages-new' : <NewPage/>,
+			'users': <Users handleNav={this.props.handleNav}/>,
+			'posts-new' : <NewPost handleNav={this.props.handleNav}/>,
+			'pages-new' : <NewPage handleNav={this.props.handleNav}/>,
 			'theme-new' : <NewTheme handleNav={this.props.handleNav}/>,
 			'users-new' : <NewUser handleNav={this.props.handleNav}/>,
 			'posts-edit' : <NewPost postId={this.props.postId} handleNav={this.props.handleNav}/>,
@@ -214,10 +214,36 @@ const PageLoader = React.createClass({
 		if (map[page+action]) {
 			return map[page+action]
 		} else if (this.isContentType(page)) {
+			var contentList = getConfig("contentList");
+			var contentData = _.find(contentList, {slug: page});
+			
 			if (action)
-				return <NewContentType name={page} postId={this.props.postId} handleNav={this.props.handleNav}/>
+				return <NewContentType 
+								name={contentData.name} 
+								slug={contentData.slug}
+								postId={this.props.postId} 
+								postType={page}
+					      loadQuery={Query.getPostQry}
+					      createQuery={Query.getCreatePostQry}
+					      updateQuery={Query.getUpdatePostQry}
+					      tableName="Post"
+					      widgets={["category", "featuredImage"]}
+					      viewRole="view-post"
+					      modifyRole="modify-post"
+					      handleNav={this.props.handleNav}
+							/>
 			else
-				return <ContentType name={page} handleNav={this.props.handleNav}/>
+				return <ContentType 
+								name={contentData.name}  
+								slug={contentData.slug} 
+								tableName="Post"
+								fields={contentData.fields}
+								listQuery={Query.getPostListQry}
+								viewRole="view-post"
+								modifyRole="modify-post"
+								statusList={["All", "Published", "Draft", "Pending Review", "Deleted"]}
+								handleNav={this.props.handleNav}
+							/>
 		} else {
 			return <NotFound/>
 		}

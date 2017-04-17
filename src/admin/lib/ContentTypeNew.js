@@ -238,7 +238,7 @@ const NewContentType = React.createClass({
       });
       return;
     }
-    debugger;
+    
     var _objData = {
       "title": v.title,
       "content": v.content,
@@ -320,6 +320,8 @@ const NewContentType = React.createClass({
                 here.disableForm(false);
               }
             );
+          } else {
+            here.disableForm(false);
           }
 
         } else {
