@@ -6,46 +6,13 @@ import Config from '../../config';
 import Query from '../query';
 import {riques, setValue, getValue, disableForm, errorCallback, getConfig} from '../../utils';
 import { default as swal } from 'sweetalert2';
+import {getTemplates} from '../theme';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
+import Dropzone from 'react-dropzone';
 
 const NewContentType = React.createClass({
-  componentDidMount: function(){
-    require('../lib/bootstrap-tagsinput.js');
-    require('../lib/bootstrap-tagsinput.css');
-    var me = this;
-
-    $('#tags-input').tagsinput({
-      confirmKeys: [13, 188]
-    });
-    $('#tags-input').on('keypress', function(e){
-      if (e.keyCode === 13){
-        e.keyCode = 188;
-        e.preventDefault();
-      };
-    });
-
-    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
-      window.CKEDITOR.replace('content', {
-        height: 400,
-        title: false
-      });
-      for (var i in window.CKEDITOR.instances) {
-        if (window.CKEDITOR.instances.hasOwnProperty(i))
-          window.CKEDITOR.instances[i].on('change', me.handleContentChange);
-      }
-    });
-
-    if (this.state.visibilityTxt==="Public") {
-      $("#public").attr("checked", true);
-    }else $("#private").attr("checked", true);
-
-    this.notification = this.refs.notificationSystem;
-  },
-
   getInitialState: function(){
-    var contentList = getConfig("contentList");
-    var contentData = _.find(contentList, {slug: this.props.name});
     
     return {
       title:"",
@@ -59,6 +26,7 @@ const NewContentType = React.createClass({
       visibilityTxt:"Public",
       permalinkEditing: false,
       mode: this.props.postId?"update":"create",
+      pageList: null,
       categoryList: null,
       postCategoryList: [],
       titleTagLeftCharacter: 65,
@@ -68,8 +36,13 @@ const NewContentType = React.createClass({
       titleTag: "",
       metaKeyword: "",
       metaDescription: "",
-      contentData: contentData
+      permalinkInProcess: false,
+      publishDate: new Date(),
+      publishDateReset: new Date()
     }
+  },
+  isWidgetActive: function(name){
+    return _.indexOf(this.props.widgets, name) > -1;
   },
   checkSlug: function(slug){
     var me = this;
@@ -115,7 +88,7 @@ const NewContentType = React.createClass({
       status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
       permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160});
     this.handleTitleChange();
-    window.history.pushState("", "", '/admin/posts/new');
+    window.history.pushState("", "", '/admin/'+this.props.slug+'/new');
   },
   getFormValues: function(){
     return {
@@ -129,7 +102,7 @@ const NewContentType = React.createClass({
       summary: getValue("summary"),
       visibility: $("input[name=visibilityRadio]:checked").val(),
       publishDate: this.state.publishDate,
-      type: this.state.contentData.slug,
+      type: this.props.slug,
       categories: _.map(document.getElementsByName("categoryCheckbox[]"), function(item){
         if (item.checked)
           return item.value
@@ -238,6 +211,9 @@ const NewContentType = React.createClass({
     var resetDate = this.state.publishDateReset;
     this.setState({publishDate: resetDate});
   },
+  handleAddNewBtn: function(event) {
+    this.resetForm();
+  },
   handleSubmit: function(event) {
     event.preventDefault();
     var me = this;
@@ -262,17 +238,32 @@ const NewContentType = React.createClass({
       });
       return;
     }
+    debugger;
+    var _objData = {
+      "title": v.title,
+      "content": v.content,
+      "status": v.status,
+      "visibility": v.visibility,
+      "passwordPage": v.passwordPage,
+      "publishDate": v.publishDate,
+      "type": this.props.postType,
+      "authorId": localStorage.getItem('userId'),
+      "slug": this.state.slug,
+      "summary": v.summary,
+      "parent": v.parentPage,
+      "order": v.pageOrder,
+      "featuredImage": v.featuredImage
+    }
 
     this.disableForm(true);
     var qry = "", noticeTxt = "";
     if (this.state.mode==="create"){
-      qry = Query.getCreatePostQry(v.title, v.content, v.status, v.visibility, v.passwordPage, v.publishDate, 
-        localStorage.getItem('userId'), this.state.slug, v.summary);
-      noticeTxt = this.state.contentData.name+' Published!';
+      qry = this.props.createQuery(_objData);
+      noticeTxt = this.props.name+' Published!';
     }else{
-      qry = Query.getUpdatePostQry(this.props.postId, v.title, v.content, v.status, v.visibility, v.passwordPage, 
-        v.publishDate, localStorage.getItem('userId'), this.state.slug, v.summary);
-      noticeTxt = this.state.contentData.name+' Updated!';
+      _objData["id"] = this.props.postId;
+      qry = this.props.updateQuery(_objData);
+      noticeTxt = this.props.name+' Updated!';
     }
 
     riques(qry, 
@@ -302,32 +293,35 @@ const NewContentType = React.createClass({
             }
           }
           
-          riques(pmQry, 
-            function(error, response, body) {
-              if (!error && !body.errors && response.statusCode === 200) {
-                var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.state.postCategoryList, v.categories);
-                riques(catQry,
-                  function(error, response, body) {
-                    if (!error && !body.errors && response.statusCode === 200) {
-                      here.notification.addNotification({
-                        message: noticeTxt,
-                        level: 'success',
-                        position: 'tr',
-                        autoDismiss: 2
-                      });
-                      here.setState({mode: "update"});
-                    } else {
-                      errorCallback(error, body.errors?body.errors[0].message:null);
+          if (me.isWidgetActive("category")) {
+            riques(pmQry, 
+              function(error, response, body) {
+                if (!error && !body.errors && response.statusCode === 200) {
+                  var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.state.postCategoryList, v.categories);
+                  riques(catQry,
+                    function(error, response, body) {
+                      if (!error && !body.errors && response.statusCode === 200) {
+                        here.notification.addNotification({
+                          message: noticeTxt,
+                          level: 'success',
+                          position: 'tr',
+                          autoDismiss: 2
+                        });
+                        here.setState({mode: "update"});
+                      } else {
+                        errorCallback(error, body.errors?body.errors[0].message:null);
+                      }
+                      here.disableForm(false);
                     }
-                    here.disableForm(false);
-                  }
-                );
-              } else {
-                errorCallback(error, body.errors?body.errors[0].message:null);
+                  );
+                } else {
+                  errorCallback(error, body.errors?body.errors[0].message:null);
+                }
+                here.disableForm(false);
               }
-              here.disableForm(false);
-            }
-          );
+            );
+          }
+
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
@@ -340,42 +334,93 @@ const NewContentType = React.createClass({
   },
   componentWillMount: function(){
     var me = this;
-    riques(Query.getAllCategoryQry, 
-      function(error, response, body) {
-        if (!error) {
-          var categoryList = [];
-          $.each(body.data.viewer.allCategories.edges, function(key, item){
-            categoryList.push((<div key={item.node.id}><input id={item.node.id}
-            name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
-          })
-          me.setState({categoryList: categoryList});
 
-          if (!me.props.postId) return;
+    if (this.isWidgetActive("pageHierarchy")) {
+      riques(Query.getPageListQry("All"),
+        function(error, response, body) {
+          if (!error) {
+            var pageList = [(<option key="0" value="">(no parent)</option>)];
+            _.forEach(body.data.viewer.allPosts.edges, function(item){
+              pageList.push((<option key={item.node.id} value={item.node.id} checked={me.state.parent=item.node.id}>
+                {item.node.title}</option>));
+            })
+            me.setState({pageList: pageList});
+          }
+      });
+    }
 
-          riques(Query.getPostQry(me.props.postId), 
-            function(error, response, body) {
-              if (!error ) {
-                var values = body.data.getPost;
-                me.setFormValues(values);
-              }
-            }
-          );
-
+    if (this.isWidgetActive("category")) {
+      riques(Query.getAllCategoryQry, 
+        function(error, response, body) {
+          if (!error) {
+            var categoryList = [];
+            $.each(body.data.viewer.allCategories.edges, function(key, item){
+              categoryList.push((<div key={item.node.id}><input id={item.node.id}
+              name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
+            })
+            me.setState({categoryList: categoryList});
+          }
         }
-      }
-    );
+      );
+    }
   },
-  handleAddNewBtn: function(event) {
-    this.resetForm();
+  componentDidMount: function(){
+    require('../lib/bootstrap-tagsinput.js');
+    require('../lib/bootstrap-tagsinput.css');
+    var me = this;
+
+    $('#tags-input').tagsinput({
+      confirmKeys: [13, 188]
+    });
+    $('#tags-input').on('keypress', function(e){
+      if (e.keyCode === 13){
+        e.keyCode = 188;
+        e.preventDefault();
+      };
+    });
+
+    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
+      window.CKEDITOR.replace('content', {
+        height: 400,
+        title: false
+      });
+      for (var i in window.CKEDITOR.instances) {
+        if (window.CKEDITOR.instances.hasOwnProperty(i))
+          window.CKEDITOR.instances[i].on('change', me.handleContentChange);
+      }
+    });
+
+    if (this.state.visibilityTxt==="Public") {
+      $("#public").attr("checked", true);
+    }else $("#private").attr("checked", true);
+
+    this.notification = this.refs.notificationSystem;
+
+    if (this.props.postId) {
+      riques(this.props.loadQuery(this.props.postId), 
+        function(error, response, body) {
+          if (!error ) {
+            var values = body.data.getPost;
+            me.setFormValues(values);
+          }
+        }
+      );
+    }
+
+    $(document).on('change', 'input:not(.noWarning),textarea:not(.noWarning),select:not(.noWarning)', function () {
+      window.onbeforeunload = function(){ return 'Any unsaved data will be lost...' }
+    });
   },
   
   render: function(){
-    var rootUrl = getConfig('rootUrl')
+    var rootUrl = getConfig('rootUrl');
+    var templates = getTemplates();
+
     const newPost=(
       <div className="content-wrapper">
         <div className="container-fluid">
           <section className="content-header"  style={{marginBottom:20}}>
-              <h1>{this.state.mode==="update"?"Edit Current "+this.state.contentData.name:"Add New "+this.state.contentData.name}
+              <h1>{this.state.mode==="update"?"Edit Current "+this.props.name:"Add New "+this.props.name}
               { this.state.mode==="update" &&
                 <small style={{marginLeft: 5}}>
                   <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
@@ -384,9 +429,9 @@ const NewContentType = React.createClass({
               </h1>
                 <ol className="breadcrumb">
                   <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-                  <li><a href="#" onClick={function(){this.props.handleNav(this.state.contentData.slug)}.bind(this)}>
-                    {this.state.contentData.name}</a></li>
-                  <li className="active">{this.state.mode==="update"?"Edit "+this.state.contentData.name:"Add New"}</li>
+                  <li><a href="#" onClick={function(){this.props.handleNav(this.props.slug)}.bind(this)}>
+                    {this.props.name}</a></li>
+                  <li className="active">{this.state.mode==="update"?"Edit "+this.props.name:"Add New"}</li>
                 </ol>
                <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
           </section>
@@ -588,6 +633,44 @@ const NewContentType = React.createClass({
                       </div>        
                     </div>
                   </div>
+
+                  { this.isWidgetActive("pageHierarchy") &&
+                  <div className="box box-info" style={{marginTop:20}}>
+                    <div className="box-header with-border">
+                      <h3 className="box-title">Page Attributes</h3>         
+                      <div className="pull-right box-tools">
+                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
+                        <i className="fa fa-minus"></i></button>
+                      </div>
+                    </div>
+                    <div className="box-body pad">
+                      <div>
+                      <div className="form-group">
+                        <p><b>Parent</b></p>
+                        <select id="parentPage" style={{width: 250}}>
+                          {this.state.pageList}
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <p><b>Page  Template</b></p>
+                        <select id="pageTemplate" style={{width: 250}} defaultValue={templates?templates[0].item:null}>
+                        { templates ?
+                          templates.map(function(item, index){
+                            return (<option key={item.id}>{item.name}</option>)
+                          }) : ""
+                        }
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <p><b>Order</b></p>
+                        <input type="text" id="pageOrder" placeholder="0" style={{width:50}} min="0" step="1" data-bind="value:pageOrder"/>
+                      </div>
+                      </div>                  
+                    </div>
+                  </div>
+                  }
+
+                  { this.isWidgetActive("category") &&
                   <div className="box box-info" style={{marginTop:20}}>
                     <div className="box-header with-border">
                       <h3 className="box-title">Category</h3>         
@@ -604,6 +687,9 @@ const NewContentType = React.createClass({
                       </div>                  
                     </div>
                   </div>
+                  }
+
+                  { this.isWidgetActive("tag") &&
                   <div className="box box-info" style={{marginTop:20}}>
                     <div className="box-header with-border">
                       <h3 className="box-title">Tags</h3>         
@@ -619,6 +705,32 @@ const NewContentType = React.createClass({
                       </div>
                     </div>
                   </div>
+                  }
+
+                  { this.isWidgetActive("featuredImage") &&
+                  <div className="box box-info" style={{marginTop:20}}>
+                    <div className="box-header with-border">
+                      <h3 className="box-title">Featured Image</h3>         
+                      <div className="pull-right box-tools">
+                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
+                        <i className="fa fa-minus"></i></button>
+                      </div>
+                    </div>
+                    <div className="box-body pad">
+                      <div>
+                        <Dropzone style={{width: "100%", height: 200, borderWidth: 2, borderColor: "#aaa", borderStyle: "dashed", borderRadius: 5}} onDrop={this.handleImageDrop}>
+                          <div className="dropzone-container">
+                            <img src={this.state.featuredImage} alt='' id="featuredImage"/> 
+                            <div className="dropzone-overlay"></div>
+                            <div className="dropzone-button"><a href="#"> Upload </a></div>
+                          </div>
+                        </Dropzone>
+                        <p><span className="help-block">Try dropping some an image file above, or click "Upload".</span></p>
+                      </div>                  
+                    </div>
+                  </div>
+                  }
+
               </div>
             </div>
           </div>

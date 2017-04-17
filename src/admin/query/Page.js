@@ -12,8 +12,7 @@ const getPageListQry = function(s) {
   };
 }
 
-const getCreatePageQry = function(title, content, draft, visibility, passwordPage, 
-  publishDate, userId, slug, summary, parentPage, pageOrder){
+const getCreatePageQry = function(data){
   return {
       "query": `
     mutation createPost($input: CreatePostInput!) {
@@ -36,26 +35,12 @@ const getCreatePageQry = function(title, content, draft, visibility, passwordPag
     }
     `,
       "variables": {
-        "input": {
-          "title": title,
-          "content": content,
-          "status": draft,
-          "visibility": visibility,
-          "passwordPage": passwordPage,
-          "publishDate": publishDate,
-          "type": "page",
-          "authorId": userId,
-          "slug": slug,
-          "summary": summary,
-          "parent": parentPage,
-          "order": pageOrder
-        }
+        "input": data
       }
     }
   };
 
-const getUpdatePageQry = function(id, title, content, draft, visibility, passwordPage, 
-  publishDate, userId, slug, summary, parentPage, pageOrder){
+const getUpdatePageQry = function(data){
   return {
       "query": `
     mutation updatePost($input: UpdatePostInput!) {
@@ -78,21 +63,7 @@ const getUpdatePageQry = function(id, title, content, draft, visibility, passwor
     }
     `,
       "variables": {
-        "input": {
-          "id": id,
-          "title": title,
-          "content": content,
-          "status": draft,
-          "visibility": visibility,
-          "passwordPage": passwordPage,
-          "publishDate": publishDate,
-          "type": "page",
-          "authorId": userId,
-          "slug": slug,
-          "summary": summary,
-          "parent": parentPage,
-          "order": pageOrder
-        }
+        "input": data
       }
     }
   };
