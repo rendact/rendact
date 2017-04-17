@@ -65,32 +65,11 @@ const createUpdateSettingsMtn = function(arrData){
   }
 }
 
-const createUpdatePermissionMtn = function(optionId, arrData){
-    return {
-      "query": `
-    mutation createOptions($input: CreateOptionsInput!) {
-        createOptions(input: $input) {
-          changedOptions {
-            id
-           
-        }
-      }
-    }
-    `,
-      "variables": {
-        "input": {
-          "item": "permissionConfig",
-          "value": arrData
-        }
-      }
-    }
-}
 
 const queries = {
   loadSettingsQry: loadSettingsQry,
   getPermissionConfigQry: getPermissionConfigQry,
-  createUpdateSettingsMtn: createUpdateSettingsMtn,
-  createUpdatePermissionMtn: createUpdatePermissionMtn
+  createUpdateSettingsMtn: createUpdateSettingsMtn
 }
 
 module.exports = queries;

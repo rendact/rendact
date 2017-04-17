@@ -32,7 +32,6 @@ const queries = {
   saveProfileMtn: User.saveProfileMtn,
   saveUserMetaMtn: User.saveUserMetaMtn,
   createUserMetaMtn: User.createUserMetaMtn,
-  createUpdateUserMetaMtn: User.createUpdateUserMetaMtn,
   createUpdateTagOfPostMtn: User.createUpdateTagOfPostMtn,
   changePasswordMtn: User.changePasswordMtn,
   recoverPostQry: Page.recoverPostQry,
