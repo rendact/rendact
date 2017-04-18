@@ -217,33 +217,46 @@ const PageLoader = React.createClass({
 			var contentList = getConfig("contentList");
 			var contentData = _.find(contentList, {slug: page});
 			
+			let ListComponent = React.createClass({
+				render: function(){
+					return <ContentType 
+						name={contentData.name}  
+						slug={contentData.slug} 
+						tableName="Post"
+						postType={page}
+						fields={contentData.fields}
+						listQuery={Query.getContentPostListQry}
+						viewRole="view-post"
+						modifyRole="modify-post"
+						statusList={["All", "Published", "Draft", "Pending Review", "Deleted"]}
+						handleNav={this.props.handleNav}
+					/>
+				}
+			});
+
+			let EditorComponent = React.createClass({
+				render: function(){
+					return <NewContentType 
+						name={contentData.name} 
+						slug={contentData.slug}
+						postId={this.props.postId} 
+						postType={page}
+			      loadQuery={Query.getPostQry}
+			      createQuery={Query.getCreatePostQry}
+			      updateQuery={Query.getUpdatePostQry}
+			      tableName="Post"
+			      widgets={["category", "featuredImage"]}
+			      viewRole="view-post"
+			      modifyRole="modify-post"
+			      handleNav={this.props.handleNav}
+					/>
+				}
+			});
+
 			if (action)
-				return <NewContentType 
-								name={contentData.name} 
-								slug={contentData.slug}
-								postId={this.props.postId} 
-								postType={page}
-					      loadQuery={Query.getPostQry}
-					      createQuery={Query.getCreatePostQry}
-					      updateQuery={Query.getUpdatePostQry}
-					      tableName="Post"
-					      widgets={["category", "featuredImage"]}
-					      viewRole="view-post"
-					      modifyRole="modify-post"
-					      handleNav={this.props.handleNav}
-							/>
+				return <EditorComponent/>
 			else
-				return <ContentType 
-								name={contentData.name}  
-								slug={contentData.slug} 
-								tableName="Post"
-								fields={contentData.fields}
-								listQuery={Query.getPostListQry}
-								viewRole="view-post"
-								modifyRole="modify-post"
-								statusList={["All", "Published", "Draft", "Pending Review", "Deleted"]}
-								handleNav={this.props.handleNav}
-							/>
+				return <ListComponent/>
 		} else {
 			return <NotFound/>
 		}

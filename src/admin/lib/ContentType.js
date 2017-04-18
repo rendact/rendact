@@ -26,14 +26,15 @@ const ContentType = React.createClass({
         itemSelected: false,
         isProcessing: false,
         opacity: 1,
-        loading:[]
+        loading:[],
+        fields: this.props.fields
 	    }
 	},
   loadData: function(status, callback) {
     var me = this;
-    var qry = this.props.listQuery(status);
+    var qry = this.props.listQuery(status, this.props.postType);
 
-    var fields = _.map(this.props.fields, function(item){
+    var fields = _.map(this.state.fields, function(item){
       return item.id
     });
     
@@ -395,8 +396,8 @@ const ContentType = React.createClass({
                         </div>
                       </div>                   
                       <Table 
-                          id="postList"
-                          columns={this.props.fields}
+                          id={this.props.slug+"List"}
+                          columns={this.state.fields}
                           checkBoxAtFirstColumn="true"
                           ref="rendactTable"
                           onSelectAll={this.checkDynamicButtonState}

@@ -52,11 +52,23 @@ const getContentQry = function(contentId){
   };
 }
 
+const getContentPostListQry = function(s, postType) {
+  var status = '{ne: "Deleted"}';
+  if (s==="Deleted" || s==="Draft" || s==="Pending Review")
+    status = '{eq: "'+s+'"}';
+
+  return {
+    "query": 
+      'query getPosts{viewer {allPosts(where: {type: {eq: "'+postType+'"}, status: '+status+'}) { edges { node { '
+     +'id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},tag{edges{node{tag{id, name}}}},comments{edges{node{id}}},featuredImage,createdAt}}}}}'
+  };
+}
 
 const queries = {
   getContentListQry: getContentListQry,
   createContentMtn: createContentMtn,
-  getContentQry: getContentQry
+  getContentQry: getContentQry,
+  getContentPostListQry: getContentPostListQry
 }
 
 module.exports = queries;
