@@ -236,7 +236,7 @@ getInitialState: function(){
       });
       return;
     }
-    debugger;
+    
     var _objData = {
       "title": v.title,
       "content": v.content,
@@ -318,6 +318,8 @@ getInitialState: function(){
                 here.disableForm(false);
               }
             );
+          } else {
+            here.disableForm(false);
           }
 
         } else {
