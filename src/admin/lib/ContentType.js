@@ -46,7 +46,7 @@ const ContentType = React.createClass({
 
           _.forEach(body.data.viewer[nodeName].edges, function(item){
             var dt = new Date(item.node.createdAt);
-            var _obj = {};
+            var _obj = {postId: item.node.id};
             _.forEach(fields, function(fld){
               if (_.has(item.node, fld)) { 
                 if (fld==="createdAt") {
@@ -110,7 +110,7 @@ const ContentType = React.createClass({
             if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
           });
 
-          var bEdit = hasRole('modify-post');
+          var bEdit = hasRole(me.props.modifyRole);
           me.table.loadData(_dataArr, bEdit);
           me.setState({monthList: monthList});
 
@@ -316,7 +316,7 @@ const ContentType = React.createClass({
     this.setState({itemSelected: checkedRow.length>0})
   },
   handleViewPost: function(postId){
-    this.props.handleNav('posts','edit', postId);
+    this.props.handleNav(this.props.slug,'edit', postId);
   },
   onAfterTableLoad: function(){
     var me = this;
@@ -341,7 +341,7 @@ const ContentType = React.createClass({
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
               {this.props.name} List
-              { hasRole('modify-post') &&
+              { hasRole(this.props.modifyRole) &&
               (<small style={{marginLeft: 5}}>
                 <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
               </small>)
