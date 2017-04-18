@@ -110,6 +110,7 @@ let disableForm = function(state, notif, excludeClass){
   _.forEach(document.getElementsByTagName('input'), function(el){ if (_.indexOf(excludeClass, el.getAttribute("class"))<0) el.disabled = state;});
   _.forEach(document.getElementsByTagName('button'), function(el){ if (_.indexOf(excludeClass, el.getAttribute("class"))<0) el.disabled = state;});
   _.forEach(document.getElementsByTagName('select'), function(el){ if (_.indexOf(excludeClass, el.getAttribute("class"))<0) el.disabled = state;});
+  /*
   if (notif) {
     if (state)
       notif.addNotification({
@@ -130,6 +131,7 @@ let disableForm = function(state, notif, excludeClass){
       notif.removeNotification('saving');
     }
   }
+  */
 }
 
 const _saveConfig = function(name, value){

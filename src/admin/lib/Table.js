@@ -162,7 +162,7 @@ const Table = React.createClass({
   },
   render: function(){
   	return (
-  		<table id={this.props.id} className="display">
+  		<table id={this.props.id} className="display" style={this.props.style}>
          <thead>
           <tr>
             {this.state.tableHead}

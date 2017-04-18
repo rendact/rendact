@@ -10,6 +10,31 @@ import { default as swal } from 'sweetalert2';
 import Config from '../../config';
 import {Table, SearchBoxPost, DeleteButtons} from './Table';
 
+const defaultHalogenStyle = {
+      display: '-webkit-flex',
+      display: 'flex',
+      WebkitFlex: '0 1 auto',
+      flex: '0 1 auto',
+      WebkitFlexDirection: 'column',
+      flexDirection: 'column',
+      WebkitFlexGrow: 1,
+      flexGrow: 1,
+      WebkitFlexShrink: 0,
+      flexShrink: 0,
+      WebkitFlexBasis: '25%',
+      flexBasis: '25%',
+      maxWidth: '25%',
+      height: '200px',
+      top: '50%',
+      left: '50%',
+      position: 'absolute',
+      WebkitAlignItems: 'center',
+      alignItems: 'center',
+      WebkitJustifyContent: 'center',
+      justifyContent: 'center',
+      zIndex: 100
+};
+
 const ContentType = React.createClass({
 	getInitialState: function(){
 	    require ('../pages/Posts.css');
@@ -26,7 +51,6 @@ const ContentType = React.createClass({
         itemSelected: false,
         isProcessing: false,
         opacity: 1,
-        loading:[],
         fields: this.props.fields
 	    }
 	},
@@ -122,35 +146,7 @@ const ContentType = React.createClass({
       }
     );
   },
-  disableForm: function(state, processingState){
-    var spinner = this.state.loading;
-    var color = '#4DAF7C';
-    var style = {
-            display: '-webkit-flex',
-            display: 'flex',
-            WebkitFlex: '0 1 auto',
-            flex: '0 1 auto',
-            WebkitFlexDirection: 'column',
-            flexDirection: 'column',
-            WebkitFlexGrow: 1,
-            flexGrow: 1,
-            WebkitFlexShrink: 0,
-            flexShrink: 0,
-            WebkitFlexBasis: '25%',
-            flexBasis: '25%',
-            maxWidth: '25%',
-            height: '200px',
-            top: '50%',
-            left: '50%',
-            position: 'absolute',
-            WebkitAlignItems: 'center',
-            alignItems: 'center',
-            WebkitJustifyContent: 'center',
-            justifyContent: 'center'
-      };
-    spinner.push(
-      <div style={style}><Halogen.PulseLoader color={color}/></div>
-      );
+  disableForm: function(state){
     var me = this;
     _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
     _.forEach(document.getElementsByTagName('button'), function(el){ 
@@ -158,8 +154,7 @@ const ContentType = React.createClass({
         el.disabled = state;
     })
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.setState({isProcessing: processingState});
-    this.setState({opacity: 0.8});
+    this.setState({isProcessing: state, opacity: state?0.4:1});
     if (!state) {
       this.checkDynamicButtonState();
     }
@@ -394,7 +389,10 @@ const ContentType = React.createClass({
                                    </span>
                           }.bind(this))}
                         </div>
-                      </div>                   
+                      </div>
+                      { this.state.isProcessing &&
+                      <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
+                      }
                       <Table 
                           id={this.props.slug+"List"}
                           columns={this.state.fields}
@@ -403,6 +401,7 @@ const ContentType = React.createClass({
                           onSelectAll={this.checkDynamicButtonState}
                           onCheckBoxClick={this.checkDynamicButtonState}
                           onAfterLoad={this.onAfterTableLoad}
+                          style={{opacity: this.state.opacity}}
                         />
                   </div>
                 </div>
