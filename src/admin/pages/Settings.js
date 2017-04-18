@@ -10,13 +10,13 @@ import {riques, errorCallback, getFormData, disableForm} from '../../utils';
 
 var Settings = React.createClass({
 	getInitialState: function(){
-		var p = JSON.parse(localStorage.getItem("profile"));
+		/*var p = JSON.parse(localStorage.getItem("profile"));
 		var dateOfBirth = "";
 		if (p.dateOfBirth && p.dateOfBirth!=="") 
 			dateOfBirth = new Date(p.dateOfBirth)
 
 		return {
-		}
+		}*/
 	},
 	loadData: function(){
 		var qry = Query.loadSettingsQry;

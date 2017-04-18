@@ -10,7 +10,7 @@ const getPostListQry = function(s) {
       'query getPosts{viewer {allPosts(where: {type: {eq: "post"}, status: '+status+'}) { edges { node { '
      +'id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},tag{edges{node{tag{id, name}}}},comments{edges{node{id}}},featuredImage,createdAt}}}}}'
   };
-}
+};
 
 const getContentsQry = function(type, status) {
   var status = '{ne: "Deleted"}';
@@ -54,8 +54,7 @@ const getAllTagQry = {
   }`
 }
 
-const getCreatePostQry = function(title, content, draft, visibility, passwordPage,
-  publishDate, userId, slug, summary, featuredImage){
+const getCreatePostQry = function(data){
   return {
       "query": `
     mutation createPost($input: CreatePostInput!) {
@@ -78,19 +77,7 @@ const getCreatePostQry = function(title, content, draft, visibility, passwordPag
     }
     `,
       "variables": {
-        "input": {
-          "title": title,
-          "content": content,
-          "status": draft,
-          "visibility": visibility,
-          "passwordPage": passwordPage,
-          "publishDate": publishDate,
-          "type": "post",
-          "authorId": userId,
-          "slug": slug,
-          "summary": summary,
-          "featuredImage": featuredImage
-        }
+        "input": data
       }
     }
   };
@@ -135,8 +122,7 @@ const getCreatePostQry = function(title, content, draft, visibility, passwordPag
     }
   };
 
-const getUpdatePostQry = function(id, title, content, draft, visibility, passwordPage,
-  publishDate, userId, slug, summary, featuredImage){
+const getUpdatePostQry = function(data){
   return {
       "query": `
     mutation updatePost($input: UpdatePostInput!) {
@@ -160,20 +146,7 @@ const getUpdatePostQry = function(id, title, content, draft, visibility, passwor
     }
     `,
       "variables": {
-        "input": {
-          "id": id,
-          "title": title,
-          "content": content,
-          "status": draft,
-          "visibility": visibility,
-          "passwordPage": passwordPage,
-          "publishDate": publishDate,
-          "type": "post",
-          "authorId": userId,
-          "slug": slug,
-          "summary": summary,
-          "featuredImage": featuredImage
-        }
+        "input": data
       }
     }
   };

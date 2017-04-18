@@ -14,6 +14,9 @@ import Tag from './pages/Tag';
 import Themes from './pages/Themes';
 import Plugins from './pages/Plugins';
 import Permission from './pages/Permission';
+import Pages from './pages/Pages';
+import Posts from './pages/Posts';
+import Users from './pages/Users';
 import NewPost from './pages/PostsNew';
 import NewPage from './pages/PagesNew';
 import NewTheme from './pages/ThemesNew';
@@ -161,54 +164,6 @@ const SideMenu = React.createClass({
 	}
 });
 
-let Pages = React.createClass({
-  render: function() {
-    return <ContentType 
-			name="Page" 
-			slug="pages"
-			tableName="Post"
-			fields={AdminConfig.PageFields}
-			listQuery={Query.getPageListQry}
-			viewRole="view-page"
-			modifyRole="modify-page"
-			statusList={["All", "Published", "Draft", "Pending Review", "Deleted"]}
-			handleNav={this.props.handleNav}
-			/>
-  }
-});
-
-let Posts = React.createClass({
-  render: function() {
-    return <ContentType 
-			name="Post" 
-			slug="posts"
-			tableName="Post"
-			fields={AdminConfig.PostFields}
-			listQuery={Query.getPostListQry}
-			viewRole="view-post"
-			modifyRole="modify-post"
-			statusList={["All", "Published", "Draft", "Pending Review", "Deleted"]}
-			handleNav={this.props.handleNav}
-			/>
-  }
-});
-
-let Users = React.createClass({
-  render: function() {
-    return <ContentType 
-			name="User" 
-			slug="users"
-			tableName="User"
-			fields={AdminConfig.UserFields}
-			listQuery={Query.getUserListByTypeQry}
-			viewRole="view-user"
-			modifyRole="modify-user"
-			statusList={_.concat(["All"],Config.roleList)}
-			handleNav={this.props.handleNav}
-			/>
-  }
-});
-
 const PageLoader = React.createClass({
 	getDefaultProps: function() {
 		return {pageId: "dashboard", actionId: ''}
@@ -239,8 +194,8 @@ const PageLoader = React.createClass({
 			'permission' : <Permission handleNav={this.props.handleNav}/>,
 			'plugins' : <Plugins handleNav={this.props.handleNav}/>,
 			'users': <Users/>,
-			'posts-new' : <NewPost handleNav={this.props.handleNav}/>,
-			'pages-new' : <NewPage handleNav={this.props.handleNav}/>,
+			'posts-new' : <NewPost/>,
+			'pages-new' : <NewPage/>,
 			'theme-new' : <NewTheme handleNav={this.props.handleNav}/>,
 			'users-new' : <NewUser handleNav={this.props.handleNav}/>,
 			'posts-edit' : <NewPost postId={this.props.postId} handleNav={this.props.handleNav}/>,

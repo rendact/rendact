@@ -91,7 +91,6 @@ const Permission = React.createClass({
       }
     });
     var isi = JSON.stringify(_config); 
-    //var qry = Query.createUpdatePermissionMtn(null, isi);
     var _objData = {
       item: "permissionConfig",
       value: isi

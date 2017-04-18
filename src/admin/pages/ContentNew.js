@@ -27,7 +27,7 @@ var Settings = React.createClass({
 		{id:"slug", label: "Slug", type: "text", deletable: false}
 	],
 	getInitialState: function(){
-		var p = JSON.parse(localStorage.getItem("profile"));
+		/*var p = JSON.parse(localStorage.getItem("profile"));
 		var dateOfBirth = "";
 		if (p.dateOfBirth && p.dateOfBirth!=="") 
 			dateOfBirth = new Date(p.dateOfBirth)
@@ -35,7 +35,7 @@ var Settings = React.createClass({
 		return {
 			mode: this.props.postId?"update":"create",
 			fields: this.defaultFields
-		}
+		}*/
 	},
 	loadData: function(){
 		if (!this.props.postId) return;
