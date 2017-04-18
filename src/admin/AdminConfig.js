@@ -34,7 +34,7 @@ const PermissionList = [
 	{id: "view-post", label: "View post list"},
 	{id: "modify-post", label:"Add / modify post"},
 	{id: "modify-category", label:"Add / modify category"},
-	{id: "modify-tag", label:"View / Add / modify tag"},
+	{id: "modify-tag", label:"Add / modify tag"},
 	{id: "view-user", label: "View user list"},
 	{id: "modify-user", label: "Add / modify user"},
 	{id: "modify-settings", label: "Modify settings"},

@@ -47,6 +47,14 @@ let getMaxRole = function(){
   return maxRole;
 }
 
+const getConfig = function(name){
+  var config = JSON.parse(localStorage.getItem('config'));
+  if (config && config[name])
+    return config[name]
+  else 
+    return null;
+}
+
 let hasRole = function(roleId){
   if (roleId==="all") return true;
   var p = JSON.parse(localStorage.getItem("profile"));
@@ -139,14 +147,6 @@ const _saveConfig = function(name, value){
   }
   config[name] = value;
   localStorage.setItem('config', JSON.stringify(config));
-}
-
-const getConfig = function(name){
-  var config = JSON.parse(localStorage.getItem('config'));
-  if (config && config[name])
-    return config[name]
-  else 
-    return null;
 }
 
 const loadConfig = function(callback){

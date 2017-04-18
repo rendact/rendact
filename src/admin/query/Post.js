@@ -151,7 +151,7 @@ const getUpdatePostQry = function(data){
     }
   };
 
-  const UpdateTag = function(name){
+  const UpdateTag = function(postId, name){
   return {
       "query": `
     mutation updateTag($input: UpdateTagInput!) {
@@ -165,6 +165,7 @@ const getUpdatePostQry = function(data){
     `,
       "variables": {
         "input": {
+          "id": postId,
           "name": name
         }
       }

@@ -6,7 +6,7 @@ import Notification from 'react-notification-system';
 import {riques, hasRole, errorCallback, getValue} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
-import {TableTag, SearchBox, DeleteButtons} from '../lib/Table';
+import { Table, SearchBox, DeleteButtons} from '../lib/Table';
 
 const Tag = React.createClass({
   getInitialState: function(){
@@ -22,7 +22,7 @@ const Tag = React.createClass({
         dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
         activeStatus: "All",
         itemSelected: false,
-        mode: this.props.tagId?"update":"create",
+        mode: this.props.postId?"update":"create",
       }
   },
   loadData: function(type, callback) {
@@ -36,7 +36,7 @@ const Tag = React.createClass({
 
           _.forEach(body.data.viewer.allTags.edges, function(item){
             _dataArr.push({
-              "tagId": item.node.id,
+              "postId": item.node.id,
               "name": item.node.name,
               "description": "",
               "count": ""
@@ -97,15 +97,15 @@ const Tag = React.createClass({
     var checkedRow = $("input.tagCb:checked");
     this.setState({itemSelected: checkedRow.length>0})
   },
-  handleViewTag: function(tagId){
-    this.props.handleNav('tag',tagId);
+  handleViewTag: function(postId){
+    this.props.handleNav('tag',postId);
   },
   onAfterTableLoad: function(){
     var me = this;
     $(".titleText").click(function(event){
       event.preventDefault();
-      var tagId = this.id.split("-")[1];
-      me.handleViewTag(tagId);
+      var postId = this.id.split("-")[1];
+      me.handleViewTag(postId);
     });
   },
   componentDidMount: function(){
@@ -152,7 +152,7 @@ const Tag = React.createClass({
       });
       noticeTxt = 'Tag Published!';
     }else{
-      qry = Query.UpdateTag(this.props.tagId, name);
+      qry = Query.UpdateTag(this.props.postId, name);
       this.notif.addNotification({
         id: 'saving',
         message: 'Updating Tag...',
@@ -237,7 +237,7 @@ const Tag = React.createClass({
                           <SearchBox datatable={this.table} ref="rendactSearchBox"/>
                         </div>
                       </div>                   
-                      <TableTag 
+                      <Table
                           id="tag"
                           columns={[
                             {id: 'name', label: "Name", type: "link", target: "", cssClass:"titleText"},
