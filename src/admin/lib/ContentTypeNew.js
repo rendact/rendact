@@ -10,9 +10,35 @@ import {getTemplates} from '../theme';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
 import Dropzone from 'react-dropzone';
+import Halogen from 'halogen';
+
+const defaultHalogenStyle = {
+      display: '-webkit-flex',
+      //display: 'flex',
+      WebkitFlex: '0 1 auto',
+      flex: '0 1 auto',
+      WebkitFlexDirection: 'column',
+      flexDirection: 'column',
+      WebkitFlexGrow: 1,
+      flexGrow: 1,
+      WebkitFlexShrink: 0,
+      flexShrink: 0,
+      WebkitFlexBasis: '25%',
+      flexBasis: '25%',
+      maxWidth: '25%',
+      height: '200px',
+      top: '50%',
+      left: '50%',
+      position: 'absolute',
+      WebkitAlignItems: 'center',
+      alignItems: 'center',
+      WebkitJustifyContent: 'center',
+      justifyContent: 'center',
+      zIndex: 100
+};
 
 const NewContentType = React.createClass({
-getInitialState: function(){
+  getInitialState: function(){
     
     return {
       title:"",
@@ -37,6 +63,8 @@ getInitialState: function(){
       metaKeyword: "",
       metaDescription: "",
       permalinkInProcess: false,
+      isProcessing: false,
+      opacity: 1
     }
   },
   isWidgetActive: function(name){
@@ -78,6 +106,7 @@ getInitialState: function(){
   },
   disableForm: function(state){
     disableForm(state, this.notification);
+    this.setState({isProcessing: state, opacity: state?0.4:1});
   },
   resetForm: function(){
     document.getElementById("postForm").reset();
@@ -437,7 +466,10 @@ getInitialState: function(){
           </section>
           <Notification ref="notificationSystem" />
 
-          <form onSubmit={this.handleSubmit} id="postForm" method="get">
+          <form onSubmit={this.handleSubmit} id="postForm" method="get" style={{opacity: this.state.opacity}}>
+          { this.state.isProcessing &&
+          <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
+          }
           <div className="col-md-8">
             <div className="form-group"  style={{marginBottom:30}}>
               <div>

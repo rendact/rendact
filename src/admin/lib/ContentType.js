@@ -10,15 +10,40 @@ import { default as swal } from 'sweetalert2';
 import Config from '../../config';
 import {Table, SearchBoxPost, DeleteButtons} from './Table';
 
+const defaultHalogenStyle = {
+      display: '-webkit-flex',
+      //display: 'flex',
+      WebkitFlex: '0 1 auto',
+      flex: '0 1 auto',
+      WebkitFlexDirection: 'column',
+      flexDirection: 'column',
+      WebkitFlexGrow: 1,
+      flexGrow: 1,
+      WebkitFlexShrink: 0,
+      flexShrink: 0,
+      WebkitFlexBasis: '25%',
+      flexBasis: '25%',
+      maxWidth: '25%',
+      height: '200px',
+      top: '50%',
+      left: '50%',
+      position: 'absolute',
+      WebkitAlignItems: 'center',
+      alignItems: 'center',
+      WebkitJustifyContent: 'center',
+      justifyContent: 'center',
+      zIndex: 100
+};
+
 const ContentType = React.createClass({
-	getInitialState: function(){
-	    require ('../pages/Posts.css');
+  getInitialState: function(){
+      require ('../pages/Posts.css');
       
-	    return {
-	      dt: null,
-	      errorMsg: null,
-	      loadingMsg: null,
-	      monthList: [],
+      return {
+        dt: null,
+        errorMsg: null,
+        loadingMsg: null,
+        monthList: [],
         deleteMode: false,
         statusList: this.props.statusList,
         dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
@@ -26,14 +51,14 @@ const ContentType = React.createClass({
         itemSelected: false,
         isProcessing: false,
         opacity: 1,
-        loading:[]
-	    }
-	},
+        fields: this.props.fields
+      }
+  },
   loadData: function(status, callback) {
     var me = this;
-    var qry = this.props.listQuery(status);
+    var qry = this.props.listQuery(status, this.props.postType);
 
-    var fields = _.map(this.props.fields, function(item){
+    var fields = _.map(this.state.fields, function(item){
       return item.id
     });
     
@@ -46,7 +71,7 @@ const ContentType = React.createClass({
 
           _.forEach(body.data.viewer[nodeName].edges, function(item){
             var dt = new Date(item.node.createdAt);
-            var _obj = {};
+            var _obj = {postId: item.node.id};
             _.forEach(fields, function(fld){
               if (_.has(item.node, fld)) { 
                 if (fld==="createdAt") {
@@ -110,7 +135,7 @@ const ContentType = React.createClass({
             if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
           });
 
-          var bEdit = hasRole('modify-post');
+          var bEdit = hasRole(me.props.modifyRole);
           me.table.loadData(_dataArr, bEdit);
           me.setState({monthList: monthList});
 
@@ -121,35 +146,7 @@ const ContentType = React.createClass({
       }
     );
   },
-  disableForm: function(state, processingState){
-    var spinner = this.state.loading;
-    var color = '#4DAF7C';
-    var style = {
-            display: '-webkit-flex',
-            //display: 'flex',
-            WebkitFlex: '0 1 auto',
-            flex: '0 1 auto',
-            WebkitFlexDirection: 'column',
-            flexDirection: 'column',
-            WebkitFlexGrow: 1,
-            flexGrow: 1,
-            WebkitFlexShrink: 0,
-            flexShrink: 0,
-            WebkitFlexBasis: '25%',
-            flexBasis: '25%',
-            maxWidth: '25%',
-            height: '200px',
-            top: '50%',
-            left: '50%',
-            position: 'absolute',
-            WebkitAlignItems: 'center',
-            alignItems: 'center',
-            WebkitJustifyContent: 'center',
-            justifyContent: 'center'
-      };
-    spinner.push(
-      <div style={style}><Halogen.PulseLoader color={color}/></div>
-      );
+  disableForm: function(state){
     var me = this;
     _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
     _.forEach(document.getElementsByTagName('button'), function(el){ 
@@ -157,8 +154,7 @@ const ContentType = React.createClass({
         el.disabled = state;
     })
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.setState({isProcessing: processingState});
-    this.setState({opacity: 0.8});
+    this.setState({isProcessing: state, opacity: state?0.4:1});
     if (!state) {
       this.checkDynamicButtonState();
     }
@@ -316,7 +312,7 @@ const ContentType = React.createClass({
     this.setState({itemSelected: checkedRow.length>0})
   },
   handleViewPost: function(postId){
-    this.props.handleNav('posts','edit', postId);
+    this.props.handleNav(this.props.slug,'edit', postId);
   },
   onAfterTableLoad: function(){
     var me = this;
@@ -334,14 +330,14 @@ const ContentType = React.createClass({
     this.setState({dt: datatable});
     this.loadData("All");
   },
-	render: function(){
+  render: function(){
     return (
-			<div className="content-wrapper">
+      <div className="content-wrapper">
         <div className="container-fluid">
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
               {this.props.name} List
-              { hasRole('modify-post') &&
+              { hasRole(this.props.modifyRole) &&
               (<small style={{marginLeft: 5}}>
                 <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
               </small>)
@@ -393,15 +389,19 @@ const ContentType = React.createClass({
                                    </span>
                           }.bind(this))}
                         </div>
-                      </div>                   
+                      </div>
+                      { this.state.isProcessing &&
+                      <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
+                      }
                       <Table 
-                          id="postList"
-                          columns={this.props.fields}
+                          id={this.props.slug+"List"}
+                          columns={this.state.fields}
                           checkBoxAtFirstColumn="true"
                           ref="rendactTable"
                           onSelectAll={this.checkDynamicButtonState}
                           onCheckBoxClick={this.checkDynamicButtonState}
                           onAfterLoad={this.onAfterTableLoad}
+                          style={{opacity: this.state.opacity}}
                         />
                   </div>
                 </div>
@@ -411,7 +411,7 @@ const ContentType = React.createClass({
           </section>
         </div>
       </div>
-		)},
+    )},
 });
 
 export default ContentType;
