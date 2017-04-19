@@ -93,12 +93,22 @@ const Tag = React.createClass({
       this.checkDynamicButtonState();
     }
   },
+  resetForm: function(){
+    document.getElementById("tagForm").reset();
+    this.setState({name:"", mode: "create"});
+    this.handleNameChange();
+    window.history.pushState("", "", '/admin/posts/tags');
+  },
   checkDynamicButtonState: function(){
     var checkedRow = $("input.tagCb:checked");
     this.setState({itemSelected: checkedRow.length>0})
   },
   handleViewTag: function(postId){
-    this.props.handleNav('tag',postId);
+    this.props.handleNav('tag','edit', postId);
+  },
+  handleNameChange: function(event){
+    var name = $("#name").val();
+    this.setState({name: name})
   },
   onAfterTableLoad: function(){
     var me = this;
@@ -166,12 +176,15 @@ const Tag = React.createClass({
       function(error, response, body) { 
         if (!error && !body.errors && response.statusCode === 200) {
           //var here = me;
-          me.notification.addNotification({
+          me.notif.addNotification({
                   message: noticeTxt,
                   level: 'success',
                   position: 'tr',
                   autoDismiss: 2
           });
+          var here = me;
+          var cb = function(){here.disableForm(false)}
+          me.loadData("All", cb);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
@@ -207,7 +220,7 @@ const Tag = React.createClass({
                       <div className="form-group">
                           <label htmlFor="name" >Name</label>
                           <div >
-                            <input type="text" name="name" id="name" className="form-control" required="true"/>
+                            <input type="text" name="name" id="name" className="form-control" required="true" onChange={this.handleNameChange}/>
                             <p className="help-block">The name appears on your site</p>
                           </div>
                       </div>

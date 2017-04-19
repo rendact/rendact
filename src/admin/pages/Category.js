@@ -132,6 +132,9 @@ const Category = React.createClass({
                   position: 'tr',
                   autoDismiss: 2
           });*/
+          var here = me;
+          var cb = function(){here.disableForm(false)}
+          me.loadData("All", cb);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
