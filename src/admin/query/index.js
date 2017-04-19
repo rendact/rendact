@@ -53,7 +53,8 @@ const queries = {
   deleteCategoryPermanentQry: Post.deleteCategoryPermanentQry,
   deleteTagPermanentQry: Post.deleteTagPermanentQry,
   createCategory: Post.createCategory,
-  createTag: Post.createTag
+  createTag: Post.createTag,
+  UpdateTag: Post.UpdateTag,
 }
 
 module.exports = queries;

@@ -6,7 +6,7 @@ import Notification from 'react-notification-system';
 import Query from '../query';
 import {riques, disableForm} from '../../utils';
 import { default as swal } from 'sweetalert2';
-import Config from '../../config';
+//import Config from '../../config';
 import AdminConfig from '../AdminConfig';
 
 

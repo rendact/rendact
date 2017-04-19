@@ -1,22 +1,22 @@
 import React from 'react';
 import _ from 'lodash';
-import { default as swal } from 'sweetalert2';
-import TimezonePicker from 'react-bootstrap-timezone-picker';
+//import { default as swal } from 'sweetalert2';
+//import TimezonePicker from 'react-bootstrap-timezone-picker';
 import Notification from 'react-notification-system';
 
 import Query from '../query';
-import Config from '../../config'
-import {riques, getValue, setValue, errorCallback, getFormData, disableForm} from '../../utils';
+//import Config from '../../config'
+import {riques, errorCallback, getFormData, disableForm} from '../../utils';
 
 var Settings = React.createClass({
 	getInitialState: function(){
-		var p = JSON.parse(localStorage.getItem("profile"));
+		/*var p = JSON.parse(localStorage.getItem("profile"));
 		var dateOfBirth = "";
 		if (p.dateOfBirth && p.dateOfBirth!=="") 
 			dateOfBirth = new Date(p.dateOfBirth)
 
 		return {
-		}
+		}*/
 	},
 	loadData: function(){
 		var qry = Query.loadSettingsQry;

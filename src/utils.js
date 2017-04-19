@@ -47,6 +47,14 @@ let getMaxRole = function(){
   return maxRole;
 }
 
+const getConfig = function(name){
+  var config = JSON.parse(localStorage.getItem('config'));
+  if (config && config[name])
+    return config[name]
+  else 
+    return null;
+}
+
 let hasRole = function(roleId){
   if (roleId==="all") return true;
   var p = JSON.parse(localStorage.getItem("profile"));
@@ -106,7 +114,7 @@ let getFormData = function(className){
 }
 
 let disableForm = function(state, notif, excludeClass){
-  var me = this;
+  //var me = this;
   _.forEach(document.getElementsByTagName('input'), function(el){ if (_.indexOf(excludeClass, el.getAttribute("class"))<0) el.disabled = state;});
   _.forEach(document.getElementsByTagName('button'), function(el){ if (_.indexOf(excludeClass, el.getAttribute("class"))<0) el.disabled = state;});
   _.forEach(document.getElementsByTagName('select'), function(el){ if (_.indexOf(excludeClass, el.getAttribute("class"))<0) el.disabled = state;});
@@ -143,18 +151,10 @@ const _saveConfig = function(name, value){
   localStorage.setItem('config', JSON.stringify(config));
 }
 
-const getConfig = function(name){
-  var config = JSON.parse(localStorage.getItem('config'));
-  if (config && config[name])
-    return config[name]
-  else 
-    return null;
-}
-
 const loadConfig = function(callback){
-  var me = this;
+  //var me = this;
   var qry = Query.getContentListQry;
-  var config = {}
+  //var config = {}
 
   riques(qry, 
     function(error, response, body) { 

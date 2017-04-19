@@ -11,7 +11,7 @@ import Config from '../../config';
 import {Table, SearchBoxPost, DeleteButtons} from './Table';
 
 const defaultHalogenStyle = {
-      display: 'flex',
+      display: '-webkit-flex',
       WebkitFlex: '0 1 auto',
       flex: '0 1 auto',
       WebkitFlexDirection: 'column',
@@ -35,14 +35,14 @@ const defaultHalogenStyle = {
 };
 
 const ContentType = React.createClass({
-	getInitialState: function(){
-	    require ('../pages/Posts.css');
+  getInitialState: function(){
+      require ('../pages/Posts.css');
       
-	    return {
-	      dt: null,
-	      errorMsg: null,
-	      loadingMsg: null,
-	      monthList: [],
+      return {
+        dt: null,
+        errorMsg: null,
+        loadingMsg: null,
+        monthList: [],
         deleteMode: false,
         statusList: this.props.statusList,
         statusCount: {},
@@ -52,8 +52,8 @@ const ContentType = React.createClass({
         isProcessing: false,
         opacity: 1,
         fields: this.props.fields
-	    }
-	},
+      }
+  },
   loadData: function(status, callback) {
     var me = this;
 
@@ -350,9 +350,9 @@ const ContentType = React.createClass({
     this.setState({dt: datatable});
     this.loadData("All");
   },
-	render: function(){
+  render: function(){
     return (
-			<div className="content-wrapper">
+      <div className="content-wrapper">
         <div className="container-fluid">
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
@@ -434,7 +434,7 @@ const ContentType = React.createClass({
           </section>
         </div>
       </div>
-		)},
+    )},
 });
 
 export default ContentType;

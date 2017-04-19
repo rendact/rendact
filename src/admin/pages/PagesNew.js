@@ -1,6 +1,6 @@
 import React from 'react';
 import NewContentType from '../lib/ContentTypeNew';
-import AdminConfig from '../AdminConfig';
+//import AdminConfig from '../AdminConfig';
 import Query from '../query';
 
 let NewPage = React.createClass({

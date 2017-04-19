@@ -190,6 +190,7 @@ const PageLoader = React.createClass({
 			'pages': <Pages handleNav={this.props.handleNav}/>,
 			'category' : <Category handleNav={this.props.handleNav}/>,
 			'tag' : <Tag handleNav={this.props.handleNav}/>,
+			//'tag' : <Tag tagId={this.props.postId} handleNav={this.props.handleNav}/>,
 			'themes' : <Themes handleNav={this.props.handleNav}/>,
 			'permission' : <Permission handleNav={this.props.handleNav}/>,
 			'plugins' : <Plugins handleNav={this.props.handleNav}/>,

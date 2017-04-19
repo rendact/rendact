@@ -2,10 +2,10 @@ import React from 'react';
 import _ from 'lodash';
 import $ from 'jquery';
 window.jQuery = $;
-import Config from '../../config';
+//import Config from '../../config';
 import Query from '../query';
 import {riques, setValue, getValue, disableForm, errorCallback, getConfig} from '../../utils';
-import { default as swal } from 'sweetalert2';
+//import { default as swal } from 'sweetalert2';
 import {getTemplates} from '../theme';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
@@ -14,7 +14,7 @@ import Halogen from 'halogen';
 
 const defaultHalogenStyle = {
       display: '-webkit-flex',
-      display: 'flex',
+      //display: 'flex',
       WebkitFlex: '0 1 auto',
       flex: '0 1 auto',
       WebkitFlexDirection: 'column',
@@ -63,8 +63,6 @@ const NewContentType = React.createClass({
       metaKeyword: "",
       metaDescription: "",
       permalinkInProcess: false,
-      publishDate: new Date(),
-      publishDateReset: new Date(),
       isProcessing: false,
       opacity: 1
     }

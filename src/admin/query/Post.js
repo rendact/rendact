@@ -10,7 +10,7 @@ const getPostListQry = function(s) {
       'query getPosts{viewer {allPosts(where: {type: {eq: "post"}, status: '+status+'}) { edges { node { '
      +'id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},tag{edges{node{tag{id, name}}}},comments{edges{node{id}}},featuredImage,createdAt}}}}}'
   };
-}
+};
 
 const getContentsQry = function(type, status) {
   var status = '{ne: "Deleted"}';
@@ -147,6 +147,27 @@ const getUpdatePostQry = function(data){
     `,
       "variables": {
         "input": data
+      }
+    }
+  };
+
+  const UpdateTag = function(postId, name){
+  return {
+      "query": `
+    mutation updateTag($input: UpdateTagInput!) {
+        updateTag(input: $input) {
+          changedTag {
+            id,
+            name
+        }
+      }
+    }
+    `,
+      "variables": {
+        "input": {
+          "id": postId,
+          "name": name
+        }
       }
     }
   };
@@ -380,7 +401,8 @@ const queries = {
   deleteCategoryPermanentQry: deleteCategoryPermanentQry,
   deleteTagPermanentQry: deleteTagPermanentQry,
   createCategory: createCategory,
-  createTag: createTag
+  createTag: createTag,
+  UpdateTag: UpdateTag,
 }
 
 module.exports = queries;

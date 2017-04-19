@@ -1,5 +1,5 @@
 import React from 'react';
-import Config from '../config';
+//import Config from '../config';
 import { getConfig } from '../utils';
 
 const AdminHeader = React.createClass({
