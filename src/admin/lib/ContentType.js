@@ -12,7 +12,6 @@ import {Table, SearchBoxPost, DeleteButtons} from './Table';
 
 const defaultHalogenStyle = {
       display: '-webkit-flex',
-      //display: 'flex',
       WebkitFlex: '0 1 auto',
       flex: '0 1 auto',
       WebkitFlexDirection: 'column',
@@ -46,6 +45,7 @@ const ContentType = React.createClass({
         monthList: [],
         deleteMode: false,
         statusList: this.props.statusList,
+        statusCount: {},
         dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
         activeStatus: "All",
         itemSelected: false,
@@ -56,8 +56,23 @@ const ContentType = React.createClass({
   },
   loadData: function(status, callback) {
     var me = this;
-    var qry = this.props.listQuery(status, this.props.postType);
 
+    riques(this.props.listQuery("All", this.props.postType), 
+      function(error, response, body) { 
+        var nodeName = "all"+me.props.tableName+"s";
+        var _postArr = body.data.viewer[nodeName].edges;
+        var _statusCount = me.state.statusCount;
+
+        _.forEach(me.state.statusList, function(status){
+          var found = _.filter(_postArr, {node: {status: status}});
+          _statusCount[status] = found?found.length:0;
+        });
+        _statusCount["All"] = _postArr.length;
+        me.setState({statusCount: _statusCount});
+      }
+    );
+
+    var qry = this.props.listQuery(status, this.props.postType);
     var fields = _.map(this.state.fields, function(item){
       return item.id
     });
@@ -68,8 +83,9 @@ const ContentType = React.createClass({
           var monthList = ["all"];
           var _dataArr = [];
           var nodeName = "all"+me.props.tableName+"s";
+          var _postArr = body.data.viewer[nodeName].edges;
 
-          _.forEach(body.data.viewer[nodeName].edges, function(item){
+          _.forEach(_postArr, function(item){
             var dt = new Date(item.node.createdAt);
             var _obj = {postId: item.node.id};
             _.forEach(fields, function(fld){
@@ -322,6 +338,10 @@ const ContentType = React.createClass({
       me.handleViewPost(postId);
     });
   },
+  getStatusCount: function(status){
+    if (this.state.statusCount[status]) return this.state.statusCount[status]
+    else return 0;
+  },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
     this.table = this.refs.rendactTable;
@@ -381,11 +401,14 @@ const ContentType = React.createClass({
                         </div>
                         <div className="box-tools" style={{marginTop: 10}}>
                           <b>Status:</b> {this.state.statusList.map(function(item, index, array){
-                            var last = (index===(array.length-1));
-                            var border = last?"":"1px solid";
+                            var first = (index===0);
+                            var border = first?"":"1px solid";
+                            var count = this.getStatusCount(item);
+                            if (count===0) return null;
+
                             var color = item===this.state.activeStatus?{color: "black", fontWeight: "bold"}:{};
-                            return <span key={index} style={{paddingRight: 7, paddingLeft: 7, borderRight: border}}>
-                                    <a href="#" onClick={this.handleStatusFilter} style={color}>{item}</a>
+                            return <span key={index} style={{paddingRight: 7, paddingLeft: 7, borderLeft: border}}>
+                                    <a href="#" onClick={this.handleStatusFilter} style={color}>{item}</a> ({count})
                                    </span>
                           }.bind(this))}
                         </div>
