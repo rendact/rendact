@@ -46,8 +46,8 @@ const roleValue = {
 	"Admin": 10,
 	"Editor": 6,
 	"Author": 5,
-	"Subscriber": 2,
-	"Guest": 1
+	"Contributor": 2,
+	"Subscriber": 1
 }
 
 const ActiveThemeConfig = {
