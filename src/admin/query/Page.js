@@ -4,6 +4,9 @@ const getPageListQry = function(s) {
   var status = '{ne: "Deleted"}';
   if (s==="Deleted" || s==="Draft" || s==="Pending Review")
     status = '{eq: "'+s+'"}';
+  if (s==="Full") {
+    status = '{ne: ""}';
+  }
 
   return {
     "query": 

@@ -198,6 +198,30 @@ const loadConfig = function(callback){
   );
 }
 
+const defaultHalogenStyle = {
+    display: '-webkit-flex',
+    WebkitFlex: '0 1 auto',
+    flex: '0 1 auto',
+    WebkitFlexDirection: 'column',
+    flexDirection: 'column',
+    WebkitFlexGrow: 1,
+    flexGrow: 1,
+    WebkitFlexShrink: 0,
+    flexShrink: 0,
+    WebkitFlexBasis: '25%',
+    flexBasis: '25%',
+    maxWidth: '25%',
+    height: '200px',
+    top: '50%',
+    left: '50%',
+    position: 'absolute',
+    WebkitAlignItems: 'center',
+    alignItems: 'center',
+    WebkitJustifyContent: 'center',
+    justifyContent: 'center',
+    zIndex: 100
+};
+
 module.exports = {
 	riques: riques,
 	setValue: setValue,
@@ -210,5 +234,6 @@ module.exports = {
   getFormData: getFormData,
   disableForm: disableForm,
   loadConfig: loadConfig,
-  getConfig: getConfig
+  getConfig: getConfig,
+  defaultHalogenStyle: defaultHalogenStyle
 };

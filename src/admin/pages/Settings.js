@@ -1,26 +1,21 @@
 import React from 'react';
 import _ from 'lodash';
-//import { default as swal } from 'sweetalert2';
-//import TimezonePicker from 'react-bootstrap-timezone-picker';
 import Notification from 'react-notification-system';
-
+import Halogen from 'halogen';
 import Query from '../query';
-//import Config from '../../config'
-import {riques, errorCallback, getFormData, disableForm} from '../../utils';
+import {riques, errorCallback, getFormData, disableForm, defaultHalogenStyle} from '../../utils';
 
 var Settings = React.createClass({
 	getInitialState: function(){
-		/*var p = JSON.parse(localStorage.getItem("profile"));
-		var dateOfBirth = "";
-		if (p.dateOfBirth && p.dateOfBirth!=="") 
-			dateOfBirth = new Date(p.dateOfBirth)
-
 		return {
-		}*/
+			isProcessing: false,
+      opacity: 1
+		}
 	},
 	loadData: function(){
 		var qry = Query.loadSettingsQry;
-		
+		var me = this;
+		this.maskArea(true);
 		riques(qry, 
 			function(error, response, body){
 				if(!error && !body.errors) {
@@ -31,6 +26,7 @@ var Settings = React.createClass({
 							_el[0].id = item.node.id;
 						}
 					});
+					me.maskArea(false);
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
@@ -39,6 +35,10 @@ var Settings = React.createClass({
 	},
 	disableForm: function(state){
     disableForm(state, this.notification);
+    this.maskArea(state);
+  },
+  maskArea: function(state){
+  	this.setState({isProcessing: state, opacity: state?0.4:1});
   },
 	handleSubmitBtn: function(event){
 		event.preventDefault();
@@ -74,6 +74,9 @@ var Settings = React.createClass({
 			        <li className="active">Settings</li>
 			      </ol>
 			      <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
+			      { this.state.isProcessing &&
+            <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
+            }
 			    </section>
 			    <Notification ref="notificationSystem" />
 
@@ -81,7 +84,7 @@ var Settings = React.createClass({
 			    	<div className="row">
 					  	<div className="col-md-8">
 					  	<section className="content">
-			    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal">
+			    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" style={{opacity: this.state.opacity}}>
 			    			
 					  			<div className="form-group">
 								  	<label htmlFor="name" className="col-md-3">Website name</label>

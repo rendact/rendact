@@ -2,8 +2,11 @@ import _ from 'lodash';
 
 const getPostListQry = function(s) {
   var status = '{ne: "Deleted"}';
-  if (s==="Deleted" || s==="Draft" || s==="Pending Review")
+  if (s==="Published" || s==="Deleted" || s==="Draft" || s==="Pending Review")
     status = '{eq: "'+s+'"}';
+  if (s==="Full") {
+    status = '{ne: ""}';
+  }
 
   return {
     "query": 
@@ -12,10 +15,13 @@ const getPostListQry = function(s) {
   };
 };
 
-const getContentsQry = function(type, status) {
+const getContentsQry = function(type, s) {
   var status = '{ne: "Deleted"}';
-  if (status==="Deleted" || status==="Draft" || status==="Pending Review")
-    status = '{eq: "'+status+'"}';
+  if (s==="Published" || s==="Deleted" || s==="Draft" || s==="Pending Review")
+    status = '{eq: "'+s+'"}';
+  if (s==="Full") {
+    status = '{ne: ""}';
+  }
 
   return {
     "query": 

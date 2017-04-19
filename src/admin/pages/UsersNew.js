@@ -7,10 +7,11 @@ import DateTime from 'react-datetime';
 import TimezonePicker from 'react-bootstrap-timezone-picker';
 import CountrySelect from '../lib/CountrySelect';
 import Notification from 'react-notification-system';
+import Halogen from 'halogen';
 
 import Query from '../query';
 import Config from '../../config'
-import {riques, getValue, setValue, errorCallback, disableForm, getConfig} from '../../utils';
+import {riques, getValue, setValue, errorCallback, disableForm, getConfig, defaultHalogenStyle} from '../../utils';
 
 var NewUser = React.createClass({
 	getInitialState: function(){
@@ -26,16 +27,20 @@ var NewUser = React.createClass({
 			timezone: "",
 			country: "",
 			dateOfBirth: "",
-			isAdmin: false
+			isAdmin: false,
+			isProcessing: false,
+      opacity: 1
 		}
 	},
 	loadData: function(){
 		var me = this;
+		this.maskArea(true);
 		riques(Query.getUserQry(this.props.userId),
 			function(error, response, body){
 				if (!error && !body.errors) {
           var values = body.data.getUser;
           me.setFormValues(values);
+          me.maskArea(false);
         } else {
         	errorCallback(error, body.errors?body.errors[0].message:null);
         }
@@ -88,8 +93,12 @@ var NewUser = React.createClass({
 		_.forEach(document.getElementsByTagName('roles[]'), function(el){ el.disabled = !isAdmin;})
 	},
 	disableForm: function(state){
-		disableForm(state, this.notification)
+		disableForm(state, this.notification);
+		this.maskArea(state);
 	},
+	maskArea: function(state){
+  	this.setState({isProcessing: state, opacity: state?0.4:1});
+  },
 	handleSubmitBtn: function(event){
 		event.preventDefault();
 		
@@ -225,7 +234,8 @@ var NewUser = React.createClass({
 		}
 
 		var role = getValue("role");
-		this.handleRoleChange(this.state.userRole, role);
+		if (this.state.userRole !== role)
+			this.handleRoleChange(this.state.userRole, role);
 	},
 	handleGeneratePassword: function(event){
 		event.preventDefault();
@@ -262,7 +272,7 @@ var NewUser = React.createClass({
 				if(!error && !body.errors) {
 					var here = me;
 					me.notification.addNotification({
-							message: 'Role changed',
+							message: 'Role updated',
 							level: 'success',
 							position: 'tr',
 							autoDismiss: 2
@@ -356,6 +366,9 @@ var NewUser = React.createClass({
 			        <li className="active">Add New User</li>
 			      </ol>
 			      <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
+			      { this.state.isProcessing &&
+              <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
+            }
 			    </section>
 			    <Notification ref="notificationSystem" />
 
@@ -363,8 +376,8 @@ var NewUser = React.createClass({
 			    	<div className="row">
 					  	<div className="col-md-8">
 					  	<section className="content">
-			    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" id="profileForm">
-			    			
+			    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" id="profileForm" style={{opacity: this.state.opacity}}>
+			    				
 					  			<div className="form-group">
 								  	<label htmlFor="name" className="col-md-3">Name<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">

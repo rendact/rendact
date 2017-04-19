@@ -5,34 +5,10 @@ import Fn from './functions';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen';
-import {riques, hasRole, errorCallback, getConfig} from '../../utils';
+import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
 import {Table, SearchBoxPost, DeleteButtons} from './Table';
-
-const defaultHalogenStyle = {
-      display: '-webkit-flex',
-      WebkitFlex: '0 1 auto',
-      flex: '0 1 auto',
-      WebkitFlexDirection: 'column',
-      flexDirection: 'column',
-      WebkitFlexGrow: 1,
-      flexGrow: 1,
-      WebkitFlexShrink: 0,
-      flexShrink: 0,
-      WebkitFlexBasis: '25%',
-      flexBasis: '25%',
-      maxWidth: '25%',
-      height: '200px',
-      top: '50%',
-      left: '50%',
-      position: 'absolute',
-      WebkitAlignItems: 'center',
-      alignItems: 'center',
-      WebkitJustifyContent: 'center',
-      justifyContent: 'center',
-      zIndex: 100
-};
 
 const ContentType = React.createClass({
   getInitialState: function(){
@@ -51,13 +27,14 @@ const ContentType = React.createClass({
         itemSelected: false,
         isProcessing: false,
         opacity: 1,
-        fields: this.props.fields
+        fields: this.props.fields,
+        allPostId: []
       }
   },
   loadData: function(status, callback) {
     var me = this;
 
-    riques(this.props.listQuery("All", this.props.postType), 
+    riques(this.props.listQuery("Full", this.props.postType), 
       function(error, response, body) { 
         var nodeName = "all"+me.props.tableName+"s";
         var _postArr = body.data.viewer[nodeName].edges;
@@ -82,12 +59,14 @@ const ContentType = React.createClass({
         if (body.data) { 
           var monthList = ["all"];
           var _dataArr = [];
+          var _allPostId = [];
           var nodeName = "all"+me.props.tableName+"s";
           var _postArr = body.data.viewer[nodeName].edges;
 
           _.forEach(_postArr, function(item){
             var dt = new Date(item.node.createdAt);
             var _obj = {postId: item.node.id};
+            _allPostId.push(item.node.id);
             _.forEach(fields, function(fld){
               if (_.has(item.node, fld)) { 
                 if (fld==="createdAt") {
@@ -153,7 +132,7 @@ const ContentType = React.createClass({
 
           var bEdit = hasRole(me.props.modifyRole);
           me.table.loadData(_dataArr, bEdit);
-          me.setState({monthList: monthList});
+          me.setState({monthList: monthList, allPostId: _allPostId});
 
           if (callback) callback.call();
         } else {
@@ -177,7 +156,7 @@ const ContentType = React.createClass({
   },
   handleDeleteBtn: function(event){
     var me = this;
-    var checkedRow = $("input.postListCb:checked");
+    var checkedRow = $("input."+this.props.slug+"ListCb:checked");
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
     ;
     swal(_.merge({
@@ -202,7 +181,7 @@ const ContentType = React.createClass({
       );
   })},
   handleDeletePermanent: function(event){
-    var checkedRow = $("input.postListCb:checked");
+    var checkedRow = $("input."+this.props.slug+"ListCb:checked");
     var me = this;
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
     swal(_.merge({
@@ -228,9 +207,7 @@ const ContentType = React.createClass({
     })
   },
   handleEmptyTrash: function(event){
-    var checkedRow = $("input.postListCb");
     var me = this;
-    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
     swal(_.merge({
       title: 'Sure want to empty trash?',
       text: "You might lost some data forever!",
@@ -239,7 +216,7 @@ const ContentType = React.createClass({
       cancelButtonText: 'No, cancel!'
     }, Config.defaultSwalStyling)).then(function () {
       me.disableForm(true);
-      riques(Query.deletePostPermanentQry(idList), 
+      riques(Query.deletePostPermanentQry(me.state.allPostId), 
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
@@ -254,7 +231,7 @@ const ContentType = React.createClass({
     })
   },
   handleRecover: function(event){
-    var checkedRow = $("input.postListCb:checked");
+    var checkedRow = $("input."+this.props.slug+"ListCb:checked");
     var me = this;
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
     swal(_.merge({
@@ -324,7 +301,7 @@ const ContentType = React.createClass({
     } ;
   },
   checkDynamicButtonState: function(){
-    var checkedRow = $("input.postListCb:checked");
+    var checkedRow = $("input."+this.props.slug+"ListCb:checked");
     this.setState({itemSelected: checkedRow.length>0})
   },
   handleViewPost: function(postId){
