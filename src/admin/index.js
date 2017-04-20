@@ -33,6 +33,7 @@ import AdminLTEinit from './lib/app.js';
 import {riques, hasRole, errorCallback, getConfig} from '../utils';
 import Query from './query';
 import {loadConfig} from '../utils';
+import { default as swal } from 'sweetalert2';
 
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -50,11 +51,14 @@ const SideMenu = React.createClass({
 	},
 	onClick: function(id, url, e){
 		e.preventDefault();
-		this.props.onClick(id);
-		this.setState({activeMenu: id});
-		$(".menu-item").removeClass("active");
-		$("#menu-"+id).addClass("active");
-		window.history.pushState("", "", url);
+		var me = this;
+		var callback = function(){
+			me.setState({activeMenu: id});
+			$(".menu-item").removeClass("active");
+			$("#menu-"+id).addClass("active");
+			window.history.pushState("", "", url);
+		}
+		this.props.onClick(id, callback);
 	},
 	loadMenuOfContent: function(){
 		var me = this;
@@ -179,29 +183,32 @@ const PageLoader = React.createClass({
 		if (this.props.actionId) {
 			action = "-"+this.props.actionId;
 		}
+		var pid = this.props.postId;
+		var hn = this.props.handleNav;
+		var hud = this.props.handleUnsavedData;
 		var map = {
 			'dashboard' : <Dashboard />,
-			'settings' : <Settings handleNav={this.props.handleNav}/>,
-			'content' : <Content handleNav={this.props.handleNav}/>,
-			'content-new' : <NewContent handleNav={this.props.handleNav}/>,
-			'content-edit' : <NewContent postId={this.props.postId} handleNav={this.props.handleNav}/>,
-			'profile' : <Profile handleNav={this.props.handleNav}/>,
-			'posts': <Posts handleNav={this.props.handleNav}/>,
-			'pages': <Pages handleNav={this.props.handleNav}/>,
-			'category' : <Category handleNav={this.props.handleNav}/>,
-			'tag' : <Tag handleNav={this.props.handleNav}/>,
-			'tag-edit' : <Tag tagId={this.props.postId} handleNav={this.props.handleNav}/>,
-			'themes' : <Themes handleNav={this.props.handleNav}/>,
-			'permission' : <Permission handleNav={this.props.handleNav}/>,
-			'plugins' : <Plugins handleNav={this.props.handleNav}/>,
-			'users': <Users handleNav={this.props.handleNav}/>,
-			'posts-new' : <NewPost handleNav={this.props.handleNav}/>,
-			'pages-new' : <NewPage handleNav={this.props.handleNav}/>,
-			'theme-new' : <NewTheme handleNav={this.props.handleNav}/>,
-			'users-new' : <NewUser handleNav={this.props.handleNav}/>,
-			'posts-edit' : <NewPost postId={this.props.postId} handleNav={this.props.handleNav}/>,
-			'pages-edit' : <NewPage postId={this.props.postId} handleNav={this.props.handleNav}/>,
-			'users-edit' : <NewUser userId={this.props.postId} handleNav={this.props.handleNav}/>,
+			'settings' : <Settings handleNav={hn}/>,
+			'content' : <Content handleNav={hn}/>,
+			'content-new' : <NewContent handleNav={hn}/>,
+			'content-edit' : <NewContent postId={pid} handleNav={hn}/>,
+			'profile' : <Profile handleNav={hn}/>,
+			'posts': <Posts handleNav={hn}/>,
+			'pages': <Pages handleNav={hn}/>,
+			'category' : <Category handleNav={hn}/>,
+			'tag' : <Tag handleNav={hn}/>,
+			'tag-edit' : <Tag tagId={this.props.postId} handleNav={hn}/>,
+			'themes' : <Themes handleNav={hn}/>,
+			'permission' : <Permission handleNav={hn}/>,
+			'plugins' : <Plugins handleNav={hn}/>,
+			'users': <Users handleNav={hn}/>,
+			'posts-new' : <NewPost handleNav={hn} handleUnsavedData={hud}/>,
+			'pages-new' : <NewPage handleNav={hn} handleUnsavedData={hud}/>,
+			'theme-new' : <NewTheme handleNav={hn}/>,
+			'users-new' : <NewUser handleNav={hn}/>,
+			'posts-edit' : <NewPost postId={pid} handleNav={hn} handleUnsavedData={hud}/>,
+			'pages-edit' : <NewPage postId={pid} handleNav={hn} handleUnsavedData={hud}/>,
+			'users-edit' : <NewUser userId={pid} handleNav={hn}/>
 		}
 		
 		var requiredRole = AdminConfig.MenuRoleValue[page+action];
@@ -287,7 +294,8 @@ const Admin = React.createClass({
 			page: this.props.params['page']?this.props.params['page']:'dashboard',
 			action: this.props.params['action']?this.props.params['action']:'',
 			postId: this.props.params['postId']?this.props.params['postId']:null,
-			configLoaded: false
+			configLoaded: false,
+			hasUnsavedData: false
 		}
 	},
 	getDefaultProps: function() {
@@ -298,32 +306,73 @@ const Admin = React.createClass({
 			}
 		}
 	},
+	setUnsavedDataState: function(state){
+		this.setState({hasUnsavedData: state});
+	},
+	confirmUnsavedData: function(callback){
+		var state = true;
+		var me = this;
+		if (!callback)
+			callback = function() {}
+
+		if (this.state.hasUnsavedData) {
+			swal(_.merge({
+	      title: 'Sure want to navigate away?',
+	      text: "You might lost some data!",
+	      type: 'warning',
+	      confirmButtonText: 'Yes, I am sure!',
+	      cancelButtonText: 'No, cancel!',
+	    },Config.defaultSwalStyling)).then(
+	    	function(){
+	    		callback.call();
+	    		state = true;
+	    		me.setUnsavedDataState(false);
+	    	},
+	    	function(){
+	    		state = false;
+	    	}
+	    );
+		} else {
+			callback.call();
+			state = true;
+		}
+		return state;
+	},
 	handleProfileClick: function(){
-		this.redirectToPage('profile')
+		this.redirectToPage('profile');
 	},
 	redirectToPage: function(pageId, actionId, postId){
-		if (postId) {
-			this.setState({
-				page: pageId,
-				action: actionId,
-				postId: postId
-			})
-			window.history.pushState("", "", '/admin/'+pageId+'/'+actionId+'/'+postId);
-		} else {
-			this.setState({
-				page: pageId,
-				action: actionId
-			})
-			if (actionId)
-				window.history.pushState("", "", '/admin/'+pageId+'/'+actionId);
-			else 
-				window.history.pushState("", "", '/admin/'+pageId);
-		}
+		var me = this;
+		this.confirmUnsavedData(
+			function() {
+			if (postId) {
+				me.setState({
+					page: pageId,
+					action: actionId,
+					postId: postId
+				})
+				window.history.pushState("", "", '/admin/'+pageId+'/'+actionId+'/'+postId);
+			} else {
+				me.setState({
+					page: pageId,
+					action: actionId
+				})
+				if (actionId)
+					window.history.pushState("", "", '/admin/'+pageId+'/'+actionId);
+				else 
+					window.history.pushState("", "", '/admin/'+pageId);
+			}
+		});
 	},
-	handleMenuClick: function(pageId){
-		var pg = pageId.split("-");
-		this.setState({page: pg[0], action: pg[1]?pg[1]:''})
-		//PageLoader.openPage();
+	handleMenuClick: function(pageId, callback){
+		var me = this;
+		this.confirmUnsavedData(
+			function(){
+				var pg = pageId.split("-");
+				me.setState({page: pg[0], action: pg[1]?pg[1]:''});
+				callback.call();
+			}
+		);
 	},
 	handleSignout: function(){
 		this.props.AuthService.logout();
@@ -336,7 +385,13 @@ const Admin = React.createClass({
 	        		
 	        <AdminHeader authService={this.props.AuthService} handleSignout={this.handleSignout} onProfileClick={this.handleProfileClick} />
 	  			<SideMenu onClick={this.handleMenuClick} activeMenu={this.state.page+(this.state.action?'-':'')+this.state.action}/>
-					<PageLoader pageId={this.state.page} actionId={this.state.action} postId={this.state.postId} handleNav={this.redirectToPage}/>
+					<PageLoader 
+						pageId={this.state.page} 
+						actionId={this.state.action} 
+						postId={this.state.postId} 
+						handleNav={this.redirectToPage}
+						handleUnsavedData={this.setUnsavedDataState}
+					/>
 					<Footer/>
 					<ControlSidebar/>
 					<div className="control-sidebar-bg"></div>

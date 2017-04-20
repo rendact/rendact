@@ -53,7 +53,7 @@ const getUserListQry = {
 
 const getUserListByTypeQry = function(type){
   var typeQry = "";
-  if (type==="No Role") {
+  if (type==="No Role" || type==="Full") {
     typeQry = "";
   } else if (type!=="All") {
     typeQry = '(where: {roles:  {node: {name: {eq: "'+type+'"}}}})';

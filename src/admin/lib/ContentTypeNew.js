@@ -11,6 +11,7 @@ import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
 import Dropzone from 'react-dropzone';
 import Halogen from 'halogen';
+import {NavigationPrompt} from 'react-router'
 
 const defaultHalogenStyle = {
       display: '-webkit-flex',
@@ -188,6 +189,11 @@ const NewContentType = React.createClass({
     if (min.length<2) min = "0"+min;
     return date.getDate()+"/"+(1+date.getMonth())+"/"+date.getFullYear()+" "+date.getHours()+":"+min;
   },
+  notifyUnsavedData: function(state){
+    if (this.props.handleUnsavedData){
+      this.props.handleUnsavedData(state)
+    }
+  },
   handlePermalinkBtn: function(event) {
     var slug = this.state.slug;
     $("#slugcontent").val(slug);
@@ -206,25 +212,31 @@ const NewContentType = React.createClass({
     var title = $("#titlePost").val();
     //var slug = title.split(" ").join("-").toLowerCase();
     this.setState({title: title});
+    this.notifyUnsavedData(true);
   },
   handleContentChange: function(event){
     var content = $(window.CKEDITOR.instances['content'].getData()).text();
     this.setState({content: content})
+    this.notifyUnsavedData(true);
   },
   handleSummaryChange: function(event){
     var summary = $("#summary").val();
-    this.setState({summary: summary})
+    this.setState({summary: summary});
+    this.notifyUnsavedData(true);
   },
   handleTitleTagChange: function(event){
     var titleTag = $("#titleTag").val();
     this.setState({titleTagLeftCharacter: 65-(titleTag.length)});
+    this.notifyUnsavedData(true);
   },
   handleMetaDescriptionChange: function(event){
     var metaDescription = $("#metaDescription").val();
     this.setState({metaDescriptionLeftCharacter: 160-(metaDescription.length)});
+    this.notifyUnsavedData(true);
   },
   handleDateChange: function(date){
     this.setState({immediatelyStatus: false, publishDate: new Date(date)});
+    this.notifyUnsavedData(true);
   },
   handleTimeChange: function(event){
     var hours = getValue("hours");
@@ -232,7 +244,8 @@ const NewContentType = React.createClass({
     var d = this.state.publishDate;
     d.setHours(parseInt(hours, 10));
     d.setMinutes(parseInt(minutes, 10));
-    this.setState({publishDate: d})
+    this.setState({publishDate: d});
+    this.notifyUnsavedData(true);
   },
   handlePublishDateCancel: function(event){
     var resetDate = this.state.publishDateReset;
@@ -339,16 +352,19 @@ const NewContentType = React.createClass({
                         errorCallback(error, body.errors?body.errors[0].message:null);
                       }
                       here.disableForm(false);
+                      here.notifyUnsavedData(false);
                     }
                   );
                 } else {
                   errorCallback(error, body.errors?body.errors[0].message:null);
                 }
                 here.disableForm(false);
+                here.notifyUnsavedData(false);
               }
             );
           } else {
             here.disableForm(false);
+            here.notifyUnsavedData(false);
           }
 
         } else {
@@ -439,6 +455,9 @@ const NewContentType = React.createClass({
     $(document).on('change', 'input:not(.noWarning),textarea:not(.noWarning),select:not(.noWarning)', function () {
       window.onbeforeunload = function(){ return 'Any unsaved data will be lost...' }
     });
+  },
+  componentWillUnmount: function(){
+
   },
   
   render: function(){
