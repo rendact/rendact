@@ -23,6 +23,12 @@ var NewUser = React.createClass({
 			mode: this.props.userId?"update":"create",
 			roleList: [],
 			userRole: null,
+			classDivUsername:"form-group",
+			classInputUsername:"form-control",
+			classDivEmail:"form-group",
+			classInputEmail:"form-control",
+			usernameTextBlock:"The short unique name describes you",
+			emailTextBlock:"",
 			userMetaList: Config.userMetaList,
 			timezone: "",
 			country: "",
@@ -144,6 +150,7 @@ var NewUser = React.createClass({
     		swal('Failed!', 'Please fill your password', 'warning')
 	    	return;
     	}
+    		
     	if (password!==repassword) {
 	    	swal('Failed!', 'Password is not match', 'warning')
 	    	return;
@@ -347,7 +354,71 @@ var NewUser = React.createClass({
 	handleAddNewBtn: function(event) {
   	this.resetForm();
 	},
-	render: function(){
+	checkUsername: function(username){
+		var me = this;
+		riques( Query.checkUsernameQry(username),
+      	function(error, response, body) {
+        if (!error && !body.errors && response.statusCode === 200) {
+          var usernameCount = body.data.viewer.allUsers.edges.length;
+          if (me.state.mode==="create") {
+            if (usernameCount === 0 ){
+            	me.setState({classDivUsername: "form-group has-success", classInputUsername:"form-control form-control-success", usernameTextBlock:"The short unique name describes you"});
+            }
+            else {
+            	me.setState({classDivUsername: "form-group has-error", classInputUsername:"form-control form-control-error", usernameTextBlock:"Username already exist"});
+            }
+          } else {
+            if (usernameCount === 0 ){
+            	me.setState({classDivUsername: "form-group has-success", classInputUsername:"form-control form-control-success", usernameTextBlock:"The short unique name describes you"});
+            }
+            else {
+            	me.setState({classDivUsername: "form-group has-error", classInputUsername:"form-control form-control-error", usernameTextBlock:"Username already exist"});
+            }
+          }
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+      }
+    );
+	},
+	checkEmail: function(email){
+		var me = this;
+		riques( Query.checkEmailQry(email),
+      	function(error, response, body) {
+        if (!error && !body.errors && response.statusCode === 200) {
+          var emailCount = body.data.viewer.allUsers.edges.length;
+          if (me.state.mode==="create") {
+            if (emailCount === 0 ){
+            	me.setState({classDivEmail: "form-group has-success", classInputEmail:"form-control form-control-success", emailTextBlock:""});
+            }
+            else {
+            	me.setState({classDivEmail: "form-group has-error", classInputEmail:"form-control form-control-error", emailTextBlock:"Email already exist"});
+            }
+          } else {
+            if (emailCount === 0 ){
+            	me.setState({classDivEmail: "form-group has-success", classInputEmail:"form-control form-control-success", emailTextBlock:""});
+            }
+            else {
+            	me.setState({classDivEmail: "form-group has-error", classInputEmail:"form-control form-control-error", emailTextBlock:"Email already exist"});
+            }
+          }
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+      }
+    );
+	},
+	handleUsernameHighlight: function(event){
+		var me = this;
+		var username = getValue("username");		
+		me.checkUsername(username);
+	},
+	handleEmailHighlight: function(event){
+		var me = this;
+		var email = getValue("email");		
+		me.checkEmail(email);
+	},
+	render: function(){		
 		return (
 			<div className="content-wrapper">
 				<div className="container-fluid">
@@ -399,12 +470,12 @@ var NewUser = React.createClass({
 								</div>
 								</div>
 
-					  			<div className="form-group">
+					  			<div className={this.state.classDivUsername}>
 								  	<label htmlFor="tagline" className="col-md-3">Username<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
 										<input type="text" name="username" id="username" 
-											className="form-control" disabled={this.state.mode==="update"?true:false}/>
-										<p className="help-block">The short unique name describes you</p>
+											className={this.state.classInputUsername} onChange={this.handleUsernameHighlight} disabled={this.state.mode==="update"?true:false}/>
+										<p className="help-block">{this.state.usernameTextBlock}</p>
 									</div>
 								</div>
 
@@ -430,11 +501,12 @@ var NewUser = React.createClass({
 									</div>
 								</div>
 
-					  			<div className="form-group">
+					  			<div className={this.state.classDivEmail}>
 								  	<label htmlFor="keywoards" className="col-md-3">Email<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
-										<input type="text" name="email" id="email" className="form-control" 
-											disabled={this.state.mode==="update"?true:false} required="true"/>
+										<input type="text" name="email" id="email" className={this.state.classInputEmail} 
+											onChange={this.handleEmailHighlight} disabled={this.state.mode==="update"?true:false} required="true"/>
+											<p className="help-block">{this.state.emailTextBlock}</p>
 									</div>
 								</div>
 

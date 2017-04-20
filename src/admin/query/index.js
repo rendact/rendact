@@ -31,6 +31,8 @@ const queries = {
   checkSlugQry: Page.checkSlugQry,
   saveProfileMtn: User.saveProfileMtn,
   saveUserMetaMtn: User.saveUserMetaMtn,
+  checkUsernameQry: User.checkUsernameQry,
+  checkEmailQry: User.checkEmailQry,
   createUserMetaMtn: User.createUserMetaMtn,
   createUpdateTagOfPostMtn: User.createUpdateTagOfPostMtn,
   changePasswordMtn: User.changePasswordMtn,

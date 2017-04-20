@@ -417,6 +417,18 @@ const deleteUserQry = function(idList){
   }
 };
 
+const checkUsernameQry = function(username){
+  return {
+    query: 'query checkUsername{ viewer { allUsers(where: {username: {like: "'+username+'"}}) { edges { node { id } } } } }'
+  }
+}
+
+const checkEmailQry = function(email){
+  return {
+    query: 'query checkEmail{ viewer { allUsers(where: {email: {like: "'+email+'"}}) { edges { node { id } } } } }'
+  }
+}
+
 const queries = {
   getUserQry: getUserQry,
   getUserListQry: getUserListQry,
@@ -431,7 +443,9 @@ const queries = {
   deleteRoleUser: deleteRoleUser,
   getRolesQry: getRolesQry,
   deleteUserQry: deleteUserQry,
-  updateRoleUser: updateRoleUser
+  updateRoleUser: updateRoleUser,
+  checkUsernameQry: checkUsernameQry,
+  checkEmailQry: checkEmailQry
 }
 
 module.exports = queries;
