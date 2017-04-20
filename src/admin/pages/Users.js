@@ -15,7 +15,7 @@ let Users = React.createClass({
 			listQuery={Query.getUserListByTypeQry}
 			viewRole="view-user"
 			modifyRole="modify-user"
-			statusList={_.concat(["All"],Config.roleList)}
+			statusList={_.concat(["All"],AdminConfig.roleList)}
 			handleNav={this.props.handleNav}
 			/>
   }
