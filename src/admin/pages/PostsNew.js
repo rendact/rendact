@@ -18,6 +18,7 @@ let NewPost = React.createClass({
       viewRole="view-post"
       modifyRole="modify-post"
       handleNav={this.props.handleNav}
+      handleUnsavedData={this.props.handleUnsavedData}
     />
   }
 });
