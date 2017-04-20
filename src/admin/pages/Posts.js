@@ -13,7 +13,7 @@ let Posts = React.createClass({
 			listQuery={Query.getPostListQry}
 			viewRole="view-post"
 			modifyRole="modify-post"
-			statusList={["All", "Published", "Draft", "Pending Review", "Deleted"]}
+			statusList={["All", "Published", "Draft", "Reviewing", "Trash"]}
 			handleNav={this.props.handleNav}
 			/>
   }
