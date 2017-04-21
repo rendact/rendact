@@ -1,6 +1,6 @@
 import React from 'react';
-import Config from '../config';
-window.config = Config;
+import AdminConfig from './AdminConfig';
+window.config = AdminConfig;
 import NotFound from './NotFound';
 import Query from './query';
 import {riques} from '../utils';

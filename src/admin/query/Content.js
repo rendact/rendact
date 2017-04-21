@@ -64,11 +64,18 @@ const getContentPostListQry = function(s, postType) {
   };
 }
 
+const checkContentSlugQry = function(slug){
+  return {
+    query: 'query checkContentSlug{ viewer { allContents(where: {slug: {like: "'+slug+'"}}) { edges { node { id } } } } }'
+  }
+}
+
 const queries = {
   getContentListQry: getContentListQry,
   createContentMtn: createContentMtn,
   getContentQry: getContentQry,
-  getContentPostListQry: getContentPostListQry
+  getContentPostListQry: getContentPostListQry,
+  checkContentSlugQry: checkContentSlugQry
 }
 
 module.exports = queries;

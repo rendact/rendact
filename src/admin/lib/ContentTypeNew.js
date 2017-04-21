@@ -11,7 +11,6 @@ import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
 import Dropzone from 'react-dropzone';
 import Halogen from 'halogen';
-import {NavigationPrompt} from 'react-router'
 
 const defaultHalogenStyle = {
       display: '-webkit-flex',

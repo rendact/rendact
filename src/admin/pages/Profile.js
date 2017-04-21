@@ -9,7 +9,7 @@ import CountrySelect from '../lib/CountrySelect';
 import Notification from 'react-notification-system';
 
 import Query from '../query';
-import Config from '../../config'
+import AdminConfig from '../AdminConfig';
 import {riques, getValue, setValue, errorCallback, getFormData, disableForm, getConfig} from '../../utils';
 
 window.getBase64Image = function(img) {
@@ -35,7 +35,7 @@ var Profile = React.createClass({
 		return {
 			avatar: image,
 			passwordActive: false,
-			userMetaList: Config.userMetaList,
+			userMetaList: AdminConfig.userMetaList,
 			timezone: p.timezone,
 			country: "",
 			dateOfBirth: dateOfBirth,

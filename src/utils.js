@@ -1,5 +1,6 @@
 import request from 'request';
 import Config from './config';
+import AdminConfig from './admin/AdminConfig';
 import Query from './admin/query';
 import _ from 'lodash';
 import { default as swal } from 'sweetalert2';
@@ -11,7 +12,7 @@ const riques = function(query, callback, isadmin){
   }
   
 	request({
-      url: Config.scapholdUrl,
+      url: Config.graphqlApiUrl,
       method: "POST",
       json: true,
       headers: {
@@ -40,7 +41,7 @@ let getValueName = function(element){
 
 let getMaxRole = function(){
   var p = JSON.parse(localStorage.getItem("profile"));
-  var roleValueList = _.map(p.roles, function(item){ return Config.roleValue[item] });
+  var roleValueList = _.map(p.roles, function(item){ return AdminConfig.roleValue[item] });
   var maxRole = _.max(roleValueList);
   if (!maxRole) maxRole=1;
   if (Config.adminMode) return 1000;

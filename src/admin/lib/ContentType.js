@@ -158,6 +158,7 @@ const ContentType = React.createClass({
     var me = this;
     var checkedRow = $("input."+this.props.slug+"ListCb:checked");
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
+   
       me.disableForm(true);
       riques(Query.deletePostQry(idList), 
         function(error, response, body) {
@@ -226,6 +227,7 @@ const ContentType = React.createClass({
     var checkedRow = $("input."+this.props.slug+"ListCb:checked");
     var me = this;
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
+   
       this.disableForm(true);
       riques(Query.recoverPostQry(idList), 
         function(error, response, body) {

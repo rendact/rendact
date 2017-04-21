@@ -27,7 +27,6 @@ import NotPermissible from './NotPermissible';
 import ContentType from './lib/ContentType';
 import NewContentType from './lib/ContentTypeNew';
 
-import Config from '../config';
 import AdminConfig from './AdminConfig';
 import AdminLTEinit from './lib/app.js';
 import {riques, hasRole, errorCallback, getConfig} from '../utils';
@@ -46,7 +45,7 @@ const SideMenu = React.createClass({
 	getInitialState: function() {
 		return {
 			activeMenu: this.props.activeMenu,
-			menuList: Config.menuList
+			menuList: AdminConfig.menuList
 		}
 	},
 	onClick: function(id, url, e){
@@ -322,7 +321,7 @@ const Admin = React.createClass({
 	      type: 'warning',
 	      confirmButtonText: 'Yes, I am sure!',
 	      cancelButtonText: 'No, cancel!',
-	    },Config.defaultSwalStyling)).then(
+	    },AdminConfig.defaultSwalStyling)).then(
 	    	function(){
 	    		callback.call();
 	    		state = true;

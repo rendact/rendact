@@ -5,6 +5,7 @@ import {browserHistory, Match, Redirect } from 'react-router'
 window.browserHistory = browserHistory;
 window.Redirect = Redirect;
 import Config from './config';
+import AdminConfig from './admin/AdminConfig';
 import Query from './admin/query';
 import {riques, getConfig} from './utils';
 import _ from 'lodash';
@@ -43,7 +44,7 @@ function AuthService(){
 
   var _setProfile = function(p) { 
     var meta = {}
-    var metaList = Config.userMetaList;
+    var metaList = AdminConfig.userMetaList;
     var metaIdList = {};
     _.forEach(metaList, function(item){
       meta[item] = _.find(p.meta.edges, {"node": {"item": item}});
@@ -137,7 +138,7 @@ function AuthService(){
     let loginUserQry = Query.loginUserQry(username, password);
 
     request({
-      url: Config.scapholdUrl,
+      url: Config.graphqlApiUrl,
       method: "POST",
       json: true,
       headers: {

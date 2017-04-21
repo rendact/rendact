@@ -1,5 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
+import $ from 'jquery';
 import { default as swal } from 'sweetalert2';
 //import TimezonePicker from 'react-bootstrap-timezone-picker';
 import Notification from 'react-notification-system';
@@ -21,21 +22,18 @@ const Field = React.createClass({
 	}
 });
 
-var Settings = React.createClass({
+var ContentNew = React.createClass({
 	defaultFields: [
 		{id:"title", label: "Title", type: "link", deletable: false},
 		{id:"slug", label: "Slug", type: "text", deletable: false}
 	],
 	getInitialState: function(){
-		/*var p = JSON.parse(localStorage.getItem("profile"));
-		var dateOfBirth = "";
-		if (p.dateOfBirth && p.dateOfBirth!=="") 
-			dateOfBirth = new Date(p.dateOfBirth)
-
 		return {
 			mode: this.props.postId?"update":"create",
-			fields: this.defaultFields
-		}*/
+			fields: this.defaultFields,
+			checkingSlug: false,
+			slug: ''
+		}
 	},
 	loadData: function(){
 		if (!this.props.postId) return;
@@ -54,6 +52,38 @@ var Settings = React.createClass({
 			}
 		);
 	},
+	checkSlug: function(slug){
+    var me = this;
+    this.setState({checkingSlug: true});
+    riques( Query.checkContentSlugQry(slug),
+      function(error, response, body) {
+        if (!error && !body.errors && response.statusCode === 200) {
+          var slugCount = body.data.viewer.allContents.edges.length;
+          if (me.state.mode==="create") {
+            if (slugCount > 0) { me.setState({checkingSlug: false, slug: slug+"-"+slugCount}); $('#slug').val(slug+"-"+slugCount)}
+            else me.setState({checkingSlug: false, slug: slug});
+          } else {
+            if (slugCount > 1) { me.setState({checkingSlug: false, slug: slug+"-"+slugCount}); $('#slug').val(slug+"-"+slugCount)}
+            else me.setState({checkingSlug: false, slug: slug});
+          }
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+        me.setState({checkingSlug: false});
+      }
+    );
+  },
+  handleNameBlur: function(event) {
+    var name = $("#name").val();
+    var slug = name.split(" ").join("-").toLowerCase();
+    $("#slug").val(slug);
+    this.checkSlug(slug);
+  },
+  handleSlugBlur: function(event) {
+    var slug = $("#slug").val();
+    slug = slug.split(" ").join("-").toLowerCase();
+    this.checkSlug(slug);
+  },
 	disableForm: function(state){
     disableForm(state, this.notification);
   },
@@ -158,14 +188,17 @@ var Settings = React.createClass({
 					  		<div className="form-group">
 								 	<label htmlFor="name" className="col-md-3">Name</label>
 								 	<div className="col-md-9">
-										<input type="text" name="name" id="name" className="form-control rdt-input-form" required/>
+										<input type="text" name="name" id="name" className="form-control rdt-input-form" onBlur={this.handleNameBlur} required/>
 									</div>
 								</div>
 
 								<div className="form-group">
 								 	<label htmlFor="slug" className="col-md-3">Slug</label>
 							  	<div className="col-md-9">
-										<input type="text" name="slug" id="slug" className="form-control rdt-input-form" required/>
+							  		<div className="form-inline">
+											<input type="text" name="slug" id="slug" className="form-control rdt-input-form" onBlur={this.handleSlugBlur} required/>
+											{ this.state.checkingSlug && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
+										</div>
 									</div>
 								</div>
 
@@ -221,4 +254,4 @@ var Settings = React.createClass({
 	}
 });
 
-export default Settings;
+export default ContentNew;
