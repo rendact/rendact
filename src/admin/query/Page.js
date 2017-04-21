@@ -1,8 +1,8 @@
 import _ from 'lodash';
 
 const getPageListQry = function(s) {
-  var status = '{ne: "Deleted"}';
-  if (s==="Deleted" || s==="Draft" || s==="Pending Review")
+  var status = '{ne: "Trash"}';
+  if (s==="Trash" || s==="Draft" || s==="Reviewing")
     status = '{eq: "'+s+'"}';
   if (s==="Full") {
     status = '{ne: ""}';
@@ -105,7 +105,7 @@ const getPageQry = function(postId){
 const deletePostQry = function(idList){
   var query = "mutation { ";
   _.forEach(idList, function(val, index){
-    query += ' DeletePost'+index+' : updatePost(input: {id: "'+val+'", status: "Deleted", deleteDate: "'+new Date()+'"}){ changedPost{ id } }'; 
+    query += ' DeletePost'+index+' : updatePost(input: {id: "'+val+'", status: "Trash", deleteDate: "'+new Date()+'"}){ changedPost{ id } }'; 
   });
   query += "}";
 

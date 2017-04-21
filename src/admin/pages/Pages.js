@@ -13,7 +13,7 @@ let Pages = React.createClass({
 			listQuery={Query.getPageListQry}
 			viewRole="view-page"
 			modifyRole="modify-page"
-			statusList={["All", "Published", "Draft", "Pending Review", "Deleted"]}
+			statusList={["All", "Published", "Draft", "Reviewing", "Trash"]}
 			handleNav={this.props.handleNav}
 			/>
   }

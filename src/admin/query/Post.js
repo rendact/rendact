@@ -1,8 +1,8 @@
 import _ from 'lodash';
 
 const getPostListQry = function(s) {
-  var status = '{ne: "Deleted"}';
-  if (s==="Published" || s==="Deleted" || s==="Draft" || s==="Pending Review")
+  var status = '{ne: "Trash"}';
+  if (s==="Published" || s==="Trash" || s==="Draft" || s==="Reviewing")
     status = '{eq: "'+s+'"}';
   if (s==="Full") {
     status = '{ne: ""}';
@@ -16,8 +16,8 @@ const getPostListQry = function(s) {
 };
 
 const getContentsQry = function(type, s) {
-  var status = '{ne: "Deleted"}';
-  if (s==="Published" || s==="Deleted" || s==="Draft" || s==="Pending Review")
+  var status = '{ne: "Trash"}';
+  if (s==="Published" || s==="Trash" || s==="Draft" || s==="Reviewing")
     status = '{eq: "'+s+'"}';
   if (s==="Full") {
     status = '{ne: ""}';
@@ -330,7 +330,7 @@ const getPostQry = function(postId){
 const deletePostQry = function(idList){
   var query = "mutation { ";
   _.forEach(idList, function(val, index){
-    query += ' DeletePost'+index+' : updatePost(input: {id: "'+val+'", status: "Deleted", deleteDate: "'+new Date()+'"}){ changedPost{ id } }'; 
+    query += ' DeletePost'+index+' : updatePost(input: {id: "'+val+'", status: "Trash", deleteDate: "'+new Date()+'"}){ changedPost{ id } }'; 
   });
   query += "}";
 

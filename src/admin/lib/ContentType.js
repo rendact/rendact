@@ -197,7 +197,7 @@ const ContentType = React.createClass({
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData("Deleted", cb);
+            me.loadData("Trash", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -221,7 +221,7 @@ const ContentType = React.createClass({
           if (!error && !body.errors && response.statusCode === 200) {
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData("Deleted", cb);
+            me.loadData("Trash", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -248,7 +248,7 @@ const ContentType = React.createClass({
             console.log(JSON.stringify(body, null, 2));
             var here = me;
             var cb = function(){here.disableForm(false)}
-            me.loadData("Deleted", cb);
+            me.loadData("Trash", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             me.disableForm(false);
@@ -263,9 +263,9 @@ const ContentType = React.createClass({
     this.disableForm(true);
     var status = event.target.text;
     this.setState({activeStatus: status});
-    if (status==='Deleted'){
+    if (status==='Trash'){
       var me = this;
-      this.loadData("Deleted", function(){
+      this.loadData("Trash", function(){
         me.setState({deleteMode: true});
         me.disableForm(false);
       });
@@ -280,9 +280,9 @@ const ContentType = React.createClass({
   handleDateFilter: function(event){
     this.disableForm(true);
     var status = this.state.activeStatus;
-    if (status==='Deleted'){
+    if (status==='Trash'){
       var me = this;
-      this.loadData("Deleted", function(){
+      this.loadData("Trash", function(){
         me.setState({deleteMode: true});
         me.disableForm(false);
       });

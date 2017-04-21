@@ -610,7 +610,7 @@ const NewContentType = React.createClass({
                             <div className="form-group">
                                 <select id="statusSelect" style={{marginRight: 10, height: 30}}>
                                   <option>Published</option>
-                                  <option>Pending Review</option>
+                                  <option>Reviewing</option>
                                 </select>
                                 <button type="button" onClick={this.saveDraft} className="btn btn-flat btn-xs btn-primary" 
                                 style={{marginRight: 10}} data-toggle="collapse" data-target="#statusOption">OK</button>
