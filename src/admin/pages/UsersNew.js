@@ -175,6 +175,8 @@ var NewUser = React.createClass({
 
 	        var isMetaEmpty = (bio+website+facebook+twitter+linkedin+timezone+phone)==='';
 
+	        if (!here.checkUsername(username)) swal('Failed!', 'Username already exist', 'warning')
+	        if (!here.checkEmail(email)) swal('Failed!', 'Email already exist', 'warning')
           if (isMetaEmpty) {
           	if (me.state.mode==="create")
           		me.resetForm();
@@ -222,6 +224,7 @@ var NewUser = React.createClass({
 			}
 		);
 		
+
 		// Change password
 		if (changePassword) {
 			riques(Query.changePasswordMtn(oldPassword, password), 
@@ -474,7 +477,7 @@ var NewUser = React.createClass({
 								  	<label htmlFor="tagline" className="col-md-3">Username<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
 										<input type="text" name="username" id="username" 
-											className={this.state.classInputUsername} onChange={this.handleUsernameHighlight} disabled={this.state.mode==="update"?true:false}/>
+											className={this.state.classInputUsername} onBlur={this.handleUsernameHighlight} disabled={this.state.mode==="update"?true:false}/>
 										<p className="help-block">{this.state.usernameTextBlock}</p>
 									</div>
 								</div>
@@ -505,7 +508,7 @@ var NewUser = React.createClass({
 								  	<label htmlFor="keywoards" className="col-md-3">Email<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
 										<input type="text" name="email" id="email" className={this.state.classInputEmail} 
-											onChange={this.handleEmailHighlight} disabled={this.state.mode==="update"?true:false} required="true"/>
+											onBlur={this.handleEmailHighlight} disabled={this.state.mode==="update"?true:false} required="true"/>
 											<p className="help-block">{this.state.emailTextBlock}</p>
 									</div>
 								</div>
