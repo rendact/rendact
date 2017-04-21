@@ -287,6 +287,12 @@ const Admin = React.createClass({
 		loadConfig(function(){
 			me.setState({configLoaded: true})
 		});
+
+		window.onpopstate = this.onBackButtonEvent;
+	},
+	onBackButtonEvent:function(e){
+	  e.preventDefault();
+	 	this._reactInternalInstance._context.history.go(0);
 	},
 	getInitialState: function() {
 		return {
