@@ -6,7 +6,6 @@ import Notification from 'react-notification-system';
 import Query from '../query';
 import {riques, hasRole, errorCallback, disableForm} from '../../utils';
 import { default as swal } from 'sweetalert2';
-import Config from '../../config';
 import AdminConfig from '../AdminConfig';
 import {Table, SearchBoxPost, DeleteButtons} from '../lib/Table';
 
@@ -86,7 +85,7 @@ const Content = React.createClass({
       type: 'warning',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, cancel!',
-    },Config.defaultSwalStyling)).then(function () {
+    },AdminConfig.defaultSwalStyling)).then(function () {
       me.disableForm(true);
       riques(Query.deletePostQry(idList), 
         function(error, response, body) {

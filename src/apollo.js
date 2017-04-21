@@ -1,7 +1,7 @@
 import ApolloClient, {createNetworkInterface} from 'apollo-client';
 import config from './config';
 
-const networkInterface = createNetworkInterface(config.scapholdUrl);
+const networkInterface = createNetworkInterface(config.graphqlApiUrl);
 networkInterface.use([
 	{
 		applyMiddleware(req, next) {

@@ -10,7 +10,7 @@ import Notification from 'react-notification-system';
 import Halogen from 'halogen';
 
 import Query from '../query';
-import Config from '../../config'
+import AdminConfig from '../AdminConfig';
 import {riques, getValue, setValue, errorCallback, disableForm, getConfig, defaultHalogenStyle} from '../../utils';
 
 var NewUser = React.createClass({
@@ -29,7 +29,7 @@ var NewUser = React.createClass({
 			classInputEmail:"form-control",
 			usernameTextBlock:"The short unique name describes you",
 			emailTextBlock:"",
-			userMetaList: Config.userMetaList,
+			userMetaList: AdminConfig.userMetaList,
 			timezone: "",
 			country: "",
 			dateOfBirth: "",

@@ -7,7 +7,7 @@ import Notification from 'react-notification-system';
 import Halogen from 'halogen';
 import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle} from '../../utils';
 import { default as swal } from 'sweetalert2';
-import Config from '../../config';
+import AdminConfig from '../AdminConfig';
 import {Table, SearchBoxPost, DeleteButtons} from './Table';
 
 const ContentType = React.createClass({
@@ -165,7 +165,7 @@ const ContentType = React.createClass({
       type: 'warning',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, cancel!',
-    },Config.defaultSwalStyling)).then(function () {
+    },AdminConfig.defaultSwalStyling)).then(function () {
       me.disableForm(true);
       riques(Query.deletePostQry(idList), 
         function(error, response, body) {
@@ -190,7 +190,7 @@ const ContentType = React.createClass({
       type: 'warning',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, cancel!',
-    },Config.defaultSwalStyling)).then(function () {
+    },AdminConfig.defaultSwalStyling)).then(function () {
       me.disableForm(true);
       riques(Query.deletePostPermanentQry(idList), 
         function(error, response, body) {
@@ -214,7 +214,7 @@ const ContentType = React.createClass({
       type: 'warning',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, cancel!'
-    }, Config.defaultSwalStyling)).then(function () {
+    }, AdminConfig.defaultSwalStyling)).then(function () {
       me.disableForm(true);
       riques(Query.deletePostPermanentQry(me.state.allPostId), 
         function(error, response, body) {
@@ -240,7 +240,7 @@ const ContentType = React.createClass({
       type: 'warning',
       confirmButtonText: 'Yes, recover it!',
       cancelButtonText: 'No, cancel!',
-    },Config.defaultSwalStyling)).then(function () {
+    },AdminConfig.defaultSwalStyling)).then(function () {
       me.disableForm(true);
       riques(Query.recoverPostQry(idList), 
         function(error, response, body) {

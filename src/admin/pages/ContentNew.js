@@ -28,11 +28,6 @@ var ContentNew = React.createClass({
 		{id:"slug", label: "Slug", type: "text", deletable: false}
 	],
 	getInitialState: function(){
-		var p = JSON.parse(localStorage.getItem("profile"));
-		var dateOfBirth = "";
-		if (p.dateOfBirth && p.dateOfBirth!=="") 
-			dateOfBirth = new Date(p.dateOfBirth)
-
 		return {
 			mode: this.props.postId?"update":"create",
 			fields: this.defaultFields,
@@ -86,7 +81,7 @@ var ContentNew = React.createClass({
   },
   handleSlugBlur: function(event) {
     var slug = $("#slug").val();
-    var slug = slug.split(" ").join("-").toLowerCase();
+    slug = slug.split(" ").join("-").toLowerCase();
     this.checkSlug(slug);
   },
 	disableForm: function(state){

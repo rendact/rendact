@@ -5,7 +5,7 @@ import _ from 'lodash';
 import Notification from 'react-notification-system';
 import {riques, hasRole, errorCallback, getValue} from '../../utils';
 import { default as swal } from 'sweetalert2';
-import Config from '../../config';
+import AdminConfig from '../AdminConfig';
 import {Table, SearchBox, DeleteButtons} from '../lib/Table';
 
 const Category = React.createClass({
@@ -64,7 +64,7 @@ const Category = React.createClass({
       type: 'warning',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, cancel!',
-    },Config.defaultSwalStyling)).then(function () {
+    },AdminConfig.defaultSwalStyling)).then(function () {
       me.disableForm(true);
       riques(Query.deleteCategoryPermanentQry(idList), 
         function(error, response, body) {

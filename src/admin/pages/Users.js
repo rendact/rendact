@@ -3,7 +3,6 @@ import ContentType from '../lib/ContentType';
 import AdminConfig from '../AdminConfig';
 import Query from '../query';
 import _ from 'lodash';
-import Config from '../../config';
 
 let Users = React.createClass({
   render: function() {

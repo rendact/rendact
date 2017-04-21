@@ -68,7 +68,7 @@ const Register = React.createClass({
 		console.log("register user");
     
     request({
-      url: Config.scapholdUrl,
+      url: Config.graphqlApiUrl,
       method: "POST",
       json: true,
       headers: {
