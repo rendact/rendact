@@ -7,6 +7,7 @@ import Query from '../query';
 import {riques, hasRole, errorCallback, disableForm} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import Config from '../../config';
+import AdminConfig from '../AdminConfig';
 import {Table, SearchBoxPost, DeleteButtons} from '../lib/Table';
 
 const Content = React.createClass({
@@ -20,7 +21,7 @@ const Content = React.createClass({
         "postId": "fixed",
         "name": "Posts",
         "slug": "post",
-        "fields": null,
+        "fields": this._fieldTemplate(AdminConfig.PostFields),
         "status": "active",
         "createdAt": null
       }
@@ -40,7 +41,7 @@ const Content = React.createClass({
             _dataArr.push({
               "postId": item.node.id,
               "name": item.node.name,
-              "fields": _.map(item.node.fields, function(item){ return item.label}),
+              "fields": me._fieldTemplate(item.node.fields),
               "slug": item.node.slug?item.node.slug:"",
               "status": item.node.status?item.node.status:"active",
               "createdAt": dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate()
@@ -57,6 +58,16 @@ const Content = React.createClass({
         }
       }
     );
+  },
+  _fieldTemplate: function(arr){
+    var fields = "<ul>";
+    _.forEach(arr, function(item){ 
+      var type = item.type?item.type:"text";
+      fields += "<li>"+item.label+" ("+type+")</li>"
+    })
+    fields += "</ul>";
+
+    return fields;
   },
   disableForm: function(state){
     disableForm(state, this.notification)
@@ -150,9 +161,9 @@ const Content = React.createClass({
                     <Table 
                       id="contentList"
                       columns={[
-                        {id: 'name', label: "Content Type Name", type: "link", width: 400, cssClass: "contentName"},
+                        {id: 'name', label: "Content Type Name", type: "link", width: 250, cssClass: "contentName"},
                         {id: 'slug', label: "Slug", width: 50},
-                        {id: 'fields', label: "Fields", textAlign:"center"},
+                        {id: 'fields', label: "Fields", width: 250},
                         {id: 'status', label: "Status", textAlign:"center"},
                         {id: 'createdAt', label: "Publish Date", textAlign:"center"}
                       ]}

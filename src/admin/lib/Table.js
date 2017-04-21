@@ -118,19 +118,22 @@ const Table = React.createClass({
   	this.datatable.clear();
   	_.forEach(dataArr, function(item){
       var _cols = [];
-      if (me.props.checkBoxAtFirstColumn) 
-      	_cols.push('<input class="'+me.props.id+'Cb" id="cb-'+item.postId+'" type="checkbox" ></input>');
+      if (me.props.checkBoxAtFirstColumn) {
+        if (item.postId==="fixed")
+      	  _cols.push('<input class="'+me.props.id+'Cb" id="cb-'+item.postId+'" type="checkbox" disabled></input>');
+        else
+          _cols.push('<input class="'+me.props.id+'Cb" id="cb-'+item.postId+'" type="checkbox"></input>');
+      }
 
       _.forEach(me.props.columns, function(col, index){
       	var textAlign = col.textAlign?col.textAlign:'left';
-	      var cssClass = col.cssClass?col.cssClass:'';
+	      var cssClass = col.cssClass && item.postId!=="fixed"?col.cssClass:'';
 	      var target = col.target?col.target:'#';
+      	var _link = item.postId==="fixed"?item[col.id]:'<a href="'+target+'">'+item[col.id]+'</a>';
 
-      	
       	if (col.type && col.type==="link" && canEdit) {
-      		_cols.push('<span id="'+item.id+'-'+item.postId+'" class="'+cssClass+'" style="text-align: '+textAlign+'; width:100%; display: block">'+
-      			'<a href="'+target+'">'+item[col.id]+'</a>'+
-      			'</span>')
+      		_cols.push('<span id="'+item.id+'-'+item.postId+'" class="'+cssClass+'" style="text-align: '+textAlign+'; width:100%; display: block">'
+            +_link+'</span>')
       	} else if (col.type && col.type==="image" && canEdit) {
           _cols.push('<center><img src='+item[col.id]+' width="50" /></center>')
       	} else {
