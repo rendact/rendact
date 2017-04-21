@@ -158,14 +158,6 @@ const ContentType = React.createClass({
     var me = this;
     var checkedRow = $("input."+this.props.slug+"ListCb:checked");
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
-    ;
-    swal(_.merge({
-      title: 'Sure want to delete?',
-      text: "You might lost some data!",
-      type: 'warning',
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, cancel!',
-    },Config.defaultSwalStyling)).then(function () {
       me.disableForm(true);
       riques(Query.deletePostQry(idList), 
         function(error, response, body) {
@@ -179,7 +171,7 @@ const ContentType = React.createClass({
           }
         }
       );
-  })},
+  },
   handleDeletePermanent: function(event){
     var checkedRow = $("input."+this.props.slug+"ListCb:checked");
     var me = this;
@@ -234,14 +226,7 @@ const ContentType = React.createClass({
     var checkedRow = $("input."+this.props.slug+"ListCb:checked");
     var me = this;
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
-    swal(_.merge({
-      title: 'Sure want to recover?',
-      text: "Please look carefully!",
-      type: 'warning',
-      confirmButtonText: 'Yes, recover it!',
-      cancelButtonText: 'No, cancel!',
-    },Config.defaultSwalStyling)).then(function () {
-      me.disableForm(true);
+      this.disableForm(true);
       riques(Query.recoverPostQry(idList), 
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
@@ -255,7 +240,7 @@ const ContentType = React.createClass({
           }
         }
       );
-  })},
+  },
   handleAddNewBtn: function(event) {
     this.props.handleNav(this.props.slug,'new');
   },

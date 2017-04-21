@@ -35,8 +35,8 @@ const MenuJson = [
 		elements: [
 			{id: 'posts', label: 'Posts', icon: 'fa-pencil-square-o', open: true, url: '/admin/posts', role: 5, roleId: 'view-post'},
 			{id: 'posts-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/posts/new', role: 5, roleId: 'modify-post'},
-			{id: 'category', label: 'Categories', icon: 'fa-edit', open: false, url: '/admin/posts/categories', role: 5, roleId: 'modify-category'},
-			{id: 'tag', label: 'Tags', icon: 'fa-edit', open: false, url: '/admin/posts/tags', role: 5, roleId: 'modify-tag'}
+			{id: 'category', label: 'Categories', icon: 'fa-edit', open: false, url: '/admin/categories', role: 5, roleId: 'modify-category'},
+			{id: 'tag-new', label: 'Tags', icon: 'fa-edit', open: false, url: '/admin/tags', role: 5, roleId: 'modify-tag'}
 		]
 	},
 ];

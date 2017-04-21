@@ -196,8 +196,8 @@ const PageLoader = React.createClass({
 			'posts': <Posts handleNav={hn}/>,
 			'pages': <Pages handleNav={hn}/>,
 			'category' : <Category handleNav={hn}/>,
-			'tag' : <Tag handleNav={hn}/>,
-			'tag-edit' : <Tag tagId={this.props.postId} handleNav={hn}/>,
+			'tag-new' : <Tag handleNav={hn}/>,
+			'tag-edit' : <Tag tagId={this.props.postId} handleNav={hn} handleUnsavedData={hud}/>,
 			'themes' : <Themes handleNav={hn}/>,
 			'permission' : <Permission handleNav={hn}/>,
 			'plugins' : <Plugins handleNav={hn}/>,
@@ -236,7 +236,7 @@ const PageLoader = React.createClass({
 						listQuery={Query.getContentPostListQry}
 						viewRole="view-post"
 						modifyRole="modify-post"
-						statusList={["All", "Published", "Draft", "Pending Review", "Deleted"]}
+						statusList={["All", "Published", "Draft", "Reviewing", "Trash"]}
 						handleNav={this.props.handleNav}
 					/>
 				}
