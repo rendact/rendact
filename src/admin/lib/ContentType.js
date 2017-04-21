@@ -44,7 +44,7 @@ const ContentType = React.createClass({
           var found = _.filter(_postArr, {node: {status: status}});
           _statusCount[status] = found?found.length:0;
         });
-        _statusCount["All"] = _postArr.length;
+        _statusCount["All"] = _postArr.length-_statusCount["Trash"];
         me.setState({statusCount: _statusCount});
       }
     );
