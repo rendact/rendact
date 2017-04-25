@@ -460,8 +460,14 @@ const NewContentType = React.createClass({
       window.onbeforeunload = function(){ return 'Any unsaved data will be lost...' }
     });
   },
-  componentWillUnmount: function(){
-
+  handleImageDrop: function(accepted){
+    var me = this;
+    var reader = new FileReader();
+    reader.onloadend = function(res) {
+      var imageBase64 = res.target.result;
+      me.setState({featuredImage: imageBase64});
+    }
+    reader.readAsDataURL(accepted[0]);
   },
   
   render: function(){
@@ -763,6 +769,30 @@ const NewContentType = React.createClass({
                   }
 
                   { this.isWidgetActive("featuredImage") &&
+                  <div className="box box-info" style={{marginTop:20}}>
+                    <div className="box-header with-border">
+                      <h3 className="box-title">Featured Image</h3>         
+                      <div className="pull-right box-tools">
+                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
+                        <i className="fa fa-minus"></i></button>
+                      </div>
+                    </div>
+                    <div className="box-body pad">
+                      <div>
+                        <Dropzone style={{width: "100%", height: 200, borderWidth: 2, borderColor: "#aaa", borderStyle: "dashed", borderRadius: 5}} onDrop={this.handleImageDrop}>
+                          <div className="dropzone-container">
+                            <img src={this.state.featuredImage} alt='' id="featuredImage"/> 
+                            <div className="dropzone-overlay"></div>
+                            <div className="dropzone-button"><a href="#"> Upload </a></div>
+                          </div>
+                        </Dropzone>
+                        <p><span className="help-block">Try dropping some an image file above, or click "Upload".</span></p>
+                      </div>                  
+                    </div>
+                  </div>
+                  }
+
+                  { this.isWidgetActive("imageGallery") &&
                   <div className="box box-info" style={{marginTop:20}}>
                     <div className="box-header with-border">
                       <h3 className="box-title">Featured Image</h3>         

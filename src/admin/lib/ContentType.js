@@ -28,7 +28,8 @@ const ContentType = React.createClass({
         isProcessing: false,
         opacity: 1,
         fields: this.props.fields,
-        allPostId: []
+        allPostId: [],
+        replaceStatusWithRole: this.props.replaceStatusWithRole?true:false
       }
   },
   loadData: function(status, callback) {
@@ -40,11 +41,27 @@ const ContentType = React.createClass({
         var _postArr = body.data.viewer[nodeName].edges;
         var _statusCount = me.state.statusCount;
 
+        if (me.state.replaceStatusWithRole){
+          var _postArr0 = _postArr;
+          _.forEach(_postArr0, function(item, index){
+            var role = "";
+            
+            if (item.node.roles.edges.length>0)
+              role = item.node.roles.edges[0].node.name
+            _postArr[index].node.status = role;
+          })
+        }
+        
         _.forEach(me.state.statusList, function(status){
           var found = _.filter(_postArr, {node: {status: status}});
           _statusCount[status] = found?found.length:0;
         });
-        _statusCount["All"] = _postArr.length-_statusCount["Trash"];
+        
+        if (me.state.replaceStatusWithRole){
+          _statusCount["All"] = _postArr.length;
+        } else {
+          _statusCount["All"] = _postArr.length-_statusCount["Trash"];
+        }
         me.setState({statusCount: _statusCount});
       }
     );
