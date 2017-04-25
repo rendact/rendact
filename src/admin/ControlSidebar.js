@@ -2,17 +2,10 @@ import React from 'react';
 import $ from 'jquery';
 import Query from './query';
 import _ from 'lodash';
-import {riques, disableForm} from '../utils';
-import { default as swal } from 'sweetalert2';
+import {riques, disableForm, errorCallback} from '../utils';
 import Notification from 'react-notification-system';
 
 window.$ = $;
-
-const errorCallback = function(msg1, msg2){
-  if (msg1) swal('Failed!', msg1, 'warning')
-  else if (msg2) swal('Failed!', msg2, 'warning')
-  else swal('Failed!', 'Unknown error','warning')
-}
 
 const mySkins = [
     "skin-blue",

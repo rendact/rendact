@@ -5097,3 +5097,16 @@ div.passwordTester > span.ReactPasswordStrength-strength-desc {
 .datetime-input {
   width: 150px;
 }
+
+.swal2-modal {
+  width: 400px !important;
+  color: #ffffff;
+}
+.swal2-title {
+  font-size: 22px !important;
+  color: #ffffff !important;
+}
+.swal2-content {
+  font-size: 16px !important;  
+  color: #ffffff !important;
+}

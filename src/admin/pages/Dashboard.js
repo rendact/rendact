@@ -1,5 +1,4 @@
 import React from 'react';
-//import config from '../../config';
 import $ from 'jquery';
 import _ from 'lodash';
 import {hasRole} from '../../utils';

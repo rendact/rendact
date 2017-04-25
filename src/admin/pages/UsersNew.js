@@ -2,7 +2,6 @@ import React from 'react';
 import _ from 'lodash';
 import ReactPasswordStrength from 'react-password-strength';
 import Dropzone from 'react-dropzone';
-import { default as swal } from 'sweetalert2';
 import DateTime from 'react-datetime';
 import TimezonePicker from 'react-bootstrap-timezone-picker';
 import CountrySelect from '../lib/CountrySelect';
@@ -12,7 +11,7 @@ import Halogen from 'halogen';
 import Query from '../query';
 import AdminConfig from '../AdminConfig';
 import Config from '../../config';
-import {riques, getValue, setValue, errorCallback, disableForm, getConfig, defaultHalogenStyle} from '../../utils';
+import {riques, getValue, setValue, errorCallback, disableForm, getConfig, defaultHalogenStyle, swalert} from '../../utils';
 
 var NewUser = React.createClass({
 	getInitialState: function(){
@@ -135,7 +134,7 @@ var NewUser = React.createClass({
     var changePassword = false;
 
     if (this.state.hasErrors) {
-  		swal('Failed!', 'There are some errors in the form', 'warning')
+  		swalert('error','Failed!', 'There are some errors in the form')
     	return;
   	}
 
@@ -143,11 +142,11 @@ var NewUser = React.createClass({
 		if (this.state.mode==="update"){
 			if (password) {
 	    	if (!oldPassword) {
-	    		swal('Failed!', 'Please fill your old password', 'warning')
+	    		swalert('error','Failed!', 'Please fill your old password')
 		    	return;
 	    	}
 	    	if (password!==repassword) {
-		    	swal('Failed!', 'Password is not match', 'warning')
+		    	swalert('error','Failed!', 'Password is not match')
 		    	return;
 		    }
 		    changePassword = true;
@@ -156,12 +155,12 @@ var NewUser = React.createClass({
 			qry = Query.saveProfileMtn({userId: this.props.userId, name: name, gender: gender, image: image, country: country, dateOfBirth: dateOfBirth});
 		} else {
 			if (!password) {
-    		swal('Failed!', 'Please fill your password', 'warning')
+    		swalert('error','Failed!', 'Please fill your password')
 	    	return;
     	}
     		
     	if (password!==repassword) {
-	    	swal('Failed!', 'Password is not match', 'warning')
+	    	swalert('error','Failed!', 'Password is not match')
 	    	return;
 	    }
 			qry = Query.createUserMtn(username, password, email, name, gender, country, dateOfBirth)

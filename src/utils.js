@@ -199,6 +199,46 @@ const loadConfig = function(callback){
   );
 }
 
+const swalert = function(type, title, body, callback){
+  var background = '#fff';
+  var buttonColor = '#357ca5';
+  var showCancelButton = true;
+  if (type==="warning") {
+    background = '#f39c12';
+    buttonColor = '#ff0000';
+  }
+  if (type==="info") {
+    background = '#00c0ef';
+    buttonColor = '#00a7d0';
+    showCancelButton = false;
+  }
+  if (type==="error"){
+    background = '#dd4b39';
+    buttonColor = '#ff0000';
+    showCancelButton = false;
+  }
+
+  if (!callback) {
+    callback = function(){}
+  }
+
+  swal({
+      title: title,
+      text: body,
+      showCancelButton: showCancelButton,
+      background: background,
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No',
+      showCancelButton: true,
+      confirmButtonColor: buttonColor,
+      cancelButtonColor: 'grey',
+      confirmButtonClass: 'btn swal-btn-success',
+      cancelButtonClass: 'btn swal-btn-danger',
+      buttonsStyling: true,
+      customClass: 'swal'
+    }).then(callback)
+}
+
 const defaultHalogenStyle = {
     display: '-webkit-flex',
     WebkitFlex: '0 1 auto',
@@ -236,5 +276,6 @@ module.exports = {
   disableForm: disableForm,
   loadConfig: loadConfig,
   getConfig: getConfig,
-  defaultHalogenStyle: defaultHalogenStyle
+  defaultHalogenStyle: defaultHalogenStyle,
+  swalert: swalert
 };

@@ -4,8 +4,7 @@ window.jQuery = $;
 import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Query from '../query';
-import {riques, hasRole, errorCallback, disableForm} from '../../utils';
-import { default as swal } from 'sweetalert2';
+import {riques, hasRole, errorCallback, disableForm, swalert} from '../../utils';
 import AdminConfig from '../AdminConfig';
 import {Table, SearchBoxPost, DeleteButtons} from '../lib/Table';
 
@@ -79,27 +78,24 @@ const Content = React.createClass({
     var me = this;
     var checkedRow = $("input.postListCb:checked");
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
-    swal(_.merge({
-      title: 'Sure want to delete?',
-      text: "You might lost some data!",
-      type: 'warning',
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, cancel!',
-    },AdminConfig.defaultSwalStyling)).then(function () {
-      me.disableForm(true);
-      riques(Query.deletePostQry(idList), 
-        function(error, response, body) {
-          if (!error && !body.errors && response.statusCode === 200) {
-            var here = me;
-            var cb = function(){here.disableForm(false)}
-            me.loadData(me.table.datatable, "All", cb);
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-            me.disableForm(false);
+    swalert('warning', 'Sure want to delete?', "You might lost some data!",
+      function () {
+        me.disableForm(true);
+        riques(Query.deletePostQry(idList), 
+          function(error, response, body) {
+            if (!error && !body.errors && response.statusCode === 200) {
+              var here = me;
+              var cb = function(){here.disableForm(false)}
+              me.loadData(me.table.datatable, "All", cb);
+            } else {
+              errorCallback(error, body.errors?body.errors[0].message:null);
+              me.disableForm(false);
+            }
           }
-        }
-      );
-  })},
+        );
+      }
+    );
+  },
   handleAddNewBtn: function(postId){
     this.props.handleNav('content','new');
   },

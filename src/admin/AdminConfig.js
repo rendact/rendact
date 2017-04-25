@@ -62,6 +62,7 @@ const MenuRoleValue = {
 	'permission': 'modify-permission',
 	'posts-new' : 'modify-post',
 	'category' : 'modify-category',
+	'tag' : 'modify-tag',
 	'tag-new' : 'modify-tag',
 	'tag-edit' : 'modify-tag',
 	'pages-new' : 'modify-page',
@@ -129,8 +130,8 @@ const MenuJson = [
 		elements: [
 			{id: 'posts', label: 'Posts', icon: 'fa-pencil-square-o', open: true, url: '/admin/posts', role: 5, roleId: 'view-post'},
 			{id: 'posts-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/posts/new', role: 5, roleId: 'modify-post'},
-			{id: 'category', label: 'Categories', icon: 'fa-edit', open: false, url: '/admin/posts/categories', role: 5, roleId: 'modify-category'},
-			{id: 'tag', label: 'Tags', icon: 'fa-edit', open: false, url: '/admin/posts/tags', role: 5, roleId: 'modify-tag'}
+			{id: 'category', label: 'Categories', icon: 'fa-edit', open: false, url: '/admin/category', role: 5, roleId: 'modify-category'},
+			{id: 'tag', label: 'Tags', icon: 'fa-edit', open: false, url: '/admin/tag', role: 5, roleId: 'modify-tag'}
 		]
 	},
 ];
@@ -144,11 +145,12 @@ const ActiveThemeConfig = {
 
 const defaultSwalStyling = {
   showCancelButton: true,
-  confirmButtonColor: '#3085d6',
-  cancelButtonColor: '#d33',
+  confirmButtonColor: '#ff0000',
+  cancelButtonColor: 'grey',
   confirmButtonClass: 'btn swal-btn-success',
   cancelButtonClass: 'btn swal-btn-danger',
-  buttonsStyling: true
+  buttonsStyling: true,
+  customClass: 'swal'
 }
 
 const userMetaList = ["bio","website","facebook","twitter","linkedin","phone","timezone", "userPrefConfig"];

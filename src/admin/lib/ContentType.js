@@ -5,9 +5,9 @@ import Fn from './functions';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen';
-import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle} from '../../utils';
-import { default as swal } from 'sweetalert2';
+import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle, swalert} from '../../utils';
 import Config from '../../config';
+import AdminConfig from '../AdminConfig';
 import {Table, SearchBoxPost, DeleteButtons} from './Table';
 
 const ContentType = React.createClass({
@@ -177,50 +177,41 @@ const ContentType = React.createClass({
     var checkedRow = $("input."+this.props.slug+"ListCb:checked");
     var me = this;
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
-    swal(_.merge({
-      title: 'Sure want to delete permanently?',
-      text: "You might lost some data forever!",
-      type: 'warning',
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, cancel!',
-    },Config.defaultSwalStyling)).then(function () {
-      me.disableForm(true);
-      riques(Query.deletePostPermanentQry(idList), 
-        function(error, response, body) {
-          if (!error && !body.errors && response.statusCode === 200) {
-            var here = me;
-            var cb = function(){here.disableForm(false)}
-            me.loadData("Trash", cb);
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-            me.disableForm(false);
+    swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
+      function () {
+        me.disableForm(true);
+        riques(Query.deletePostPermanentQry(idList), 
+          function(error, response, body) {
+            if (!error && !body.errors && response.statusCode === 200) {
+              var here = me;
+              var cb = function(){here.disableForm(false)}
+              me.loadData("Trash", cb);
+            } else {
+              errorCallback(error, body.errors?body.errors[0].message:null);
+              me.disableForm(false);
+            }
           }
-        }
-      );
-    })
+        );
+      }
+    );
   },
   handleEmptyTrash: function(event){
     var me = this;
-    swal(_.merge({
-      title: 'Sure want to empty trash?',
-      text: "You might lost some data forever!",
-      type: 'warning',
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, cancel!'
-    }, Config.defaultSwalStyling)).then(function () {
-      me.disableForm(true);
-      riques(Query.deletePostPermanentQry(me.state.allPostId), 
-        function(error, response, body) {
-          if (!error && !body.errors && response.statusCode === 200) {
-            var here = me;
-            var cb = function(){here.disableForm(false)}
-            me.loadData("Trash", cb);
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-            me.disableForm(false);
+    swalert('warning','Sure want to empty trash?','You might lost some data forever!',
+      function () {
+        me.disableForm(true);
+        riques(Query.deletePostPermanentQry(me.state.allPostId), 
+          function(error, response, body) {
+            if (!error && !body.errors && response.statusCode === 200) {
+              var here = me;
+              var cb = function(){here.disableForm(false)}
+              me.loadData("Trash", cb);
+            } else {
+              errorCallback(error, body.errors?body.errors[0].message:null);
+              me.disableForm(false);
+            }
           }
-        }
-      );
+        );
     })
   },
   handleRecover: function(event){
@@ -247,6 +238,7 @@ const ContentType = React.createClass({
     this.props.handleNav(this.props.slug,'new');
   },
   handleStatusFilter: function(event){
+    event.preventDefault();
     this.disableForm(true);
     var status = event.target.text;
     this.setState({activeStatus: status});
