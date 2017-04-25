@@ -89,7 +89,7 @@ const PermalinkTypeList = {
 
 const ActivePermalinkType = 'post-id';
 
-const RoleList = ["Owner","Admin", "Editor", "Author", "Subscriber", "No Role"]
+const RoleList = ["Admin", "Editor", "Author", "Subscriber", "No Role"]
 
 const MenuJson = [
 	{id: 'dashboard', label: 'Site', icon: 'fa-dashboard', open: false, role: 1, 

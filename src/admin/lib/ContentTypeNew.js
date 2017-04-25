@@ -362,6 +362,13 @@ const NewContentType = React.createClass({
               }
             );
           } else {
+            here.notification.addNotification({
+              message: noticeTxt,
+              level: 'success',
+              position: 'tr',
+              autoDismiss: 2
+            });
+            here.setState({mode: "update"});
             here.disableForm(false);
             here.notifyUnsavedData(false);
           }
