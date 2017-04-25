@@ -11,6 +11,7 @@ import Halogen from 'halogen';
 
 import Query from '../query';
 import AdminConfig from '../AdminConfig';
+import Config from '../../config';
 import {riques, getValue, setValue, errorCallback, disableForm, getConfig, defaultHalogenStyle} from '../../utils';
 
 var NewUser = React.createClass({
@@ -133,7 +134,7 @@ var NewUser = React.createClass({
     var repassword = getValue("new-password-2");
     var changePassword = false;
 
-    if (!this.state.hasErrors) {
+    if (this.state.hasErrors) {
   		swal('Failed!', 'There are some errors in the form', 'warning')
     	return;
   	}
@@ -183,13 +184,12 @@ var NewUser = React.createClass({
 
 	        var isMetaEmpty = (bio+website+facebook+twitter+linkedin+timezone+phone)==='';
 
-	        if (!here.checkUsername(username)) swal('Failed!', 'Username already exist', 'warning')
-	        if (!here.checkEmail(email)) swal('Failed!', 'Email already exist', 'warning')
-          if (isMetaEmpty) {
+	        if (isMetaEmpty) {
           	if (me.state.mode==="create")
           		me.resetForm();
           	else
           		me.notification.removeNotification('saving');
+          	me.disableForm(false);
           }	else {
 		        var userMetaData0 = {
 		          	"bio": bio,
@@ -224,7 +224,6 @@ var NewUser = React.createClass({
 		          		here.disableForm(false);
 							}
 						);
-						
 	        }
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
@@ -243,7 +242,8 @@ var NewUser = React.createClass({
 							level: 'success',
 							position: 'tr',
 							autoDismiss: 5
-						})
+						});
+						disableForm(false);
 					} else {
 						errorCallback(error, body.errors?body.errors[0].message:null);
 					}
@@ -337,8 +337,10 @@ var NewUser = React.createClass({
 			if (body.data) {
           var here = me;
           var roleList = me.state.roleList;
-          for (var i=1;i < body.data.viewer.allRoles.edges.length; i++) {
+          for (var i=0;i < body.data.viewer.allRoles.edges.length; i++) {
           	var item = body.data.viewer.allRoles.edges[i];
+          	if (item.node.name==="Owner" && !Config.adminMode)
+          		continue;
           	roleList.push({id: item.node.id, name: item.node.name});
           }
           here.setState({roleList: roleList});
