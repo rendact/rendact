@@ -104,7 +104,7 @@ const Tag = React.createClass({
     this.setState({itemSelected: checkedRow.length>0})
   },
   handleViewTag: function(postId){
-    this.props.handleNav('tag','edit', postId);
+    this.props.handleNav('tags','edit', postId);
   },
   handleNameChange: function(event){
     var name = $("#name").val();
