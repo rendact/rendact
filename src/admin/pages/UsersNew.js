@@ -35,7 +35,9 @@ var NewUser = React.createClass({
 			dateOfBirth: "",
 			isAdmin: false,
 			isProcessing: false,
-      opacity: 1
+      opacity: 1,
+      checkingUsername: false,
+      checkingEmail: false
 		}
 	},
 	loadData: function(){
@@ -359,6 +361,8 @@ var NewUser = React.createClass({
 	},
 	checkUsername: function(username){
 		var me = this;
+		this.setState({checkingUsername: true});
+		//this.disableForm(true);
 		riques( Query.checkUsernameQry(username),
       	function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
@@ -378,14 +382,19 @@ var NewUser = React.createClass({
             	me.setState({classDivUsername: "form-group has-error", classInputUsername:"form-control form-control-error", usernameTextBlock:"Username already exist"});
             }
           }
+          me.setState({checkingUsername: false});
+          me.disableForm(false);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
+          me.disableForm(false);
         }
       }
     );
 	},
 	checkEmail: function(email){
 		var me = this;
+		me.setState({checkingEmail: true});
+		//this.disableForm(true);
 		riques( Query.checkEmailQry(email),
       	function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
@@ -405,8 +414,11 @@ var NewUser = React.createClass({
             	me.setState({classDivEmail: "form-group has-error", classInputEmail:"form-control form-control-error", emailTextBlock:"Email already exist"});
             }
           }
+          me.setState({checkingEmail: false});
+          me.disableForm(false);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
+          me.disableForm(false);
         }
       }
     );
@@ -476,10 +488,13 @@ var NewUser = React.createClass({
 					  			<div className={this.state.classDivUsername}>
 								  	<label htmlFor="tagline" className="col-md-3">Username<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
-										<input type="text" name="username" id="username" 
-											className={this.state.classInputUsername} onBlur={this.handleUsernameHighlight} disabled={this.state.mode==="update"?true:false}/>
-										<p className="help-block">{this.state.usernameTextBlock}</p>
-									</div>
+								  		<div className="form-inline">
+											<input type="text" name="username" id="username" 
+												className={this.state.classInputUsername} onBlur={this.handleUsernameHighlight} disabled={this.state.mode==="update"?true:false}/>
+												{ this.state.checkingUsername && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
+											</div>
+											<p className="help-block">{this.state.usernameTextBlock}</p>
+										</div>
 								</div>
 
 								<div className="form-group">
@@ -507,8 +522,11 @@ var NewUser = React.createClass({
 					  			<div className={this.state.classDivEmail}>
 								  	<label htmlFor="keywoards" className="col-md-3">Email<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
-										<input type="text" name="email" id="email" className={this.state.classInputEmail} 
-											onBlur={this.handleEmailHighlight} disabled={this.state.mode==="update"?true:false} required="true"/>
+								  		<div className="form-inline">
+												<input type="email" name="email" id="email" className={this.state.classInputEmail} 
+													onBlur={this.handleEmailHighlight} disabled={this.state.mode==="update"?true:false} required="true"/>
+												{ this.state.checkingEmail && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
+											</div>
 											<p className="help-block">{this.state.emailTextBlock}</p>
 									</div>
 								</div>
