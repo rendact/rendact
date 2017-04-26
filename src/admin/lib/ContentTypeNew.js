@@ -62,7 +62,8 @@ const NewContentType = React.createClass({
       metaDescription: "",
       permalinkInProcess: false,
       isProcessing: false,
-      opacity: 1
+      opacity: 1,
+      imageGallery: []
     }
   },
   isWidgetActive: function(name){
@@ -128,6 +129,7 @@ const NewContentType = React.createClass({
       visibility: $("input[name=visibilityRadio]:checked").val(),
       publishDate: this.state.publishDate,
       type: this.props.slug,
+      featuredImage: this.state.featuredImage,
       categories: _.map(document.getElementsByName("categoryCheckbox[]"), function(item){
         if (item.checked)
           return item.value
@@ -154,6 +156,16 @@ const NewContentType = React.createClass({
       });
       this.setState({postCategoryList: _postCategoryList});
     }
+    var _imageGalleryList = [];
+    
+    if (v.file.edges.length>0) {
+      _.forEach(v.file.edges, function(i){
+        if (i.node.value){
+          _imageGalleryList.push(i.node.value);
+        }
+      });
+      this.setState({imageGallery: _imageGalleryList});
+    }
 
     var pubDate = v.publishDate? new Date(v.publishDate) : new Date();
     setValue("titlePost", v.title);
@@ -175,7 +187,7 @@ const NewContentType = React.createClass({
     }
     this.setState({title: v.title, content: v.content, summary: v.summary, 
       status: v.status, visibilityTxt: v.visibility, 
-      publishDate: pubDate, publishDateReset: pubDate, slug: v.slug});
+      publishDate: pubDate, publishDateReset: pubDate, slug: v.slug, featuredImage: v.featuredImage});
     this.handleTitleChange();
     this.handleTitleTagChange();
     this.handleMetaDescriptionChange();
@@ -455,21 +467,72 @@ const NewContentType = React.createClass({
         }
       );
     }
-
+    /*
     $(document).on('change', 'input:not(.noWarning),textarea:not(.noWarning),select:not(.noWarning)', function () {
       window.onbeforeunload = function(){ return 'Any unsaved data will be lost...' }
     });
+    */
   },
-  handleImageDrop: function(accepted){
+  featuredImageChange: function(e){
     var me = this;
     var reader = new FileReader();
-    reader.onloadend = function(res) {
-      var imageBase64 = res.target.result;
-      me.setState({featuredImage: imageBase64});
-    }
-    reader.readAsDataURL(accepted[0]);
+    reader.onload = function(){
+      me.setState({featuredImage: reader.result})
+    };
+    reader.readAsDataURL(e.target.files[0]);
   },
-  
+  imageGalleryChange: function(e){
+    var me = this;
+    var reader = new FileReader();
+    reader.onload = function(){
+      /*
+      var imageGallery = me.state.imageGallery;
+      imageGallery.push(reader.result);
+      me.setState({imageGallery: imageGallery});
+      */
+      
+      var query = {
+        "query": `mutation CreateFile($input: CreateFileInput!) {
+          createFile(input: $input) {
+            changedFile {
+              id
+              type
+              value
+              blobMimeType
+              blobUrl
+            }
+          }
+        }`,
+        "variables": {
+          input: {
+            type: "gallery",
+            value: reader.result,
+            postId: me.props.postId,
+            blobFieldName: "myBlobField"
+          }
+        },
+        "myBlobField": ""
+      }
+      riques(query, 
+        function(error, response, body){
+          var data = body.data.createFile.changedFile;
+          console.log(data);
+          var imageGallery = me.state.imageGallery;
+          imageGallery.push(data.value);
+          me.setState({imageGallery: imageGallery});
+        }
+      );
+      
+    }
+    reader.readAsDataURL(e.target.files[0]);
+  },
+  handleImageRemove: function(e){
+    var id = e.target.id;
+    var index = id.split("-")[1];
+    var imageGallery = this.state.imageGallery;
+    _.pull(imageGallery, _.nth(imageGallery, index));
+    this.setState({imageGallery: imageGallery});
+  },
   render: function(){
     var rootUrl = getConfig('rootUrl');
     var templates = getTemplates();
@@ -779,14 +842,10 @@ const NewContentType = React.createClass({
                     </div>
                     <div className="box-body pad">
                       <div>
-                        <Dropzone style={{width: "100%", height: 200, borderWidth: 2, borderColor: "#aaa", borderStyle: "dashed", borderRadius: 5}} onDrop={this.handleImageDrop}>
-                          <div className="dropzone-container">
-                            <img src={this.state.featuredImage} alt='' id="featuredImage"/> 
-                            <div className="dropzone-overlay"></div>
-                            <div className="dropzone-button"><a href="#"> Upload </a></div>
-                          </div>
-                        </Dropzone>
-                        <p><span className="help-block">Try dropping some an image file above, or click "Upload".</span></p>
+                        { this.state.featuredImage &&
+                          <p><img src={this.state.featuredImage} style={{width: "100%"}}/></p>
+                        }
+                        <input type="file" name="featuredImage" onChange={this.featuredImageChange}/>
                       </div>                  
                     </div>
                   </div>
@@ -795,7 +854,7 @@ const NewContentType = React.createClass({
                   { this.isWidgetActive("imageGallery") &&
                   <div className="box box-info" style={{marginTop:20}}>
                     <div className="box-header with-border">
-                      <h3 className="box-title">Featured Image</h3>         
+                      <h3 className="box-title">Image Gallery</h3>         
                       <div className="pull-right box-tools">
                         <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
                         <i className="fa fa-minus"></i></button>
@@ -803,14 +862,15 @@ const NewContentType = React.createClass({
                     </div>
                     <div className="box-body pad">
                       <div>
-                        <Dropzone style={{width: "100%", height: 200, borderWidth: 2, borderColor: "#aaa", borderStyle: "dashed", borderRadius: 5}} onDrop={this.handleImageDrop}>
-                          <div className="dropzone-container">
-                            <img src={this.state.featuredImage} alt='' id="featuredImage"/> 
-                            <div className="dropzone-overlay"></div>
-                            <div className="dropzone-button"><a href="#"> Upload </a></div>
-                          </div>
-                        </Dropzone>
-                        <p><span className="help-block">Try dropping some an image file above, or click "Upload".</span></p>
+                        <input type="file" name="imageGallery" onChange={this.imageGalleryChange}/>
+                        {
+                          _.map(this.state.imageGallery, function(item, index){
+                            return <div key={index} className="margin" style={{width: 150, float: "left", position: "relative"}}>
+                            <img src={item} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue"}}/>
+                            <button onClick={this.handleImageRemove} type="button" className="close" id={"imageGallery-"+index} data-dismiss="alert" aria-hidden="true" style={{top: 15, right: 5, position: "absolute"}}>×</button>
+                            </div>
+                          }.bind(this))
+                        }
                       </div>                  
                     </div>
                   </div>
