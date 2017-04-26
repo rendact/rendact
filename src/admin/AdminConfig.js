@@ -62,7 +62,7 @@ const MenuRoleValue = {
 	'permission': 'modify-permission',
 	'posts-new' : 'modify-post',
 	'category' : 'modify-category',
-	'tag-new' : 'modify-tag',
+	'tag' : 'modify-tag',
 	'tag-edit' : 'modify-tag',
 	'pages-new' : 'modify-page',
 	'theme-new' : 'modify-themes',
@@ -90,7 +90,7 @@ const PermalinkTypeList = {
 
 const ActivePermalinkType = 'post-id';
 
-const RoleList = ["Admin", "Editor", "Author", "Subscriber", "No Role"]
+const RoleList = ["Owner","Admin", "Editor", "Author", "Subscriber", "No Role"]
 
 const MenuJson = [
 	{id: 'dashboard', label: 'Site', icon: 'fa-dashboard', open: false, role: 1, 
@@ -129,8 +129,8 @@ const MenuJson = [
 		elements: [
 			{id: 'posts', label: 'Posts', icon: 'fa-pencil-square-o', open: true, url: '/admin/posts', role: 5, roleId: 'view-post'},
 			{id: 'posts-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/posts/new', role: 5, roleId: 'modify-post'},
-			{id: 'category', label: 'Categories', icon: 'fa-edit', open: false, url: '/admin/posts/categories', role: 5, roleId: 'modify-category'},
-			{id: 'tag', label: 'Tags', icon: 'fa-edit', open: false, url: '/admin/posts/tags', role: 5, roleId: 'modify-tag'}
+			{id: 'category', label: 'Categories', icon: 'fa-edit', open: false, url: '/admin/categories', role: 5, roleId: 'modify-category'},
+			{id: 'tag', label: 'Tags', icon: 'fa-edit', open: false, url: '/admin/tags', role: 5, roleId: 'modify-tag'}
 		]
 	},
 ];

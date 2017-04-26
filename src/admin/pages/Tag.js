@@ -43,7 +43,7 @@ const Tag = React.createClass({
             });
           });
 
-          var bEdit = hasRole('modify-page');
+          var bEdit = hasRole('modify-tag');
           me.table.loadData(_dataArr, bEdit);
           me.setState({monthList: monthList});
 
@@ -97,7 +97,7 @@ const Tag = React.createClass({
     document.getElementById("tagForm").reset();
     this.setState({name:"", mode: "create"});
     this.handleNameChange();
-    window.history.pushState("", "", '/admin/posts/tags');
+    window.history.pushState("", "", '/admin/tags');
   },
   checkDynamicButtonState: function(){
     var checkedRow = $("input.tagCb:checked");
