@@ -1,13 +1,9 @@
 import React from 'react';
 import _ from 'lodash';
 import $ from 'jquery';
-import { default as swal } from 'sweetalert2';
-//import TimezonePicker from 'react-bootstrap-timezone-picker';
 import Notification from 'react-notification-system';
-
 import Query from '../query';
-//import Config from '../../config'
-import {riques, getValue, setValue, errorCallback, disableForm} from '../../utils';
+import {riques, getValue, setValue, errorCallback, disableForm, swalert} from '../../utils';
 
 const Field = React.createClass({
 	render: function(){
@@ -119,11 +115,11 @@ var ContentNew = React.createClass({
 		var align = getValue("field-align");
 
 		if (!name) {
-			swal('Invalid value', "Field name can't be  empty!",'error')
+			swalert('error', 'Invalid value', "Field name can't be  empty!")
 			return;
 		}
 		if (!type){
-			swal('Invalid value', "Field type can't be  empty!",'error');
+			swalert('Invalid value', "Field type can't be  empty!",'error');
 			return;
 		}
 

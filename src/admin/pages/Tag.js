@@ -3,7 +3,7 @@ import $ from 'jquery';
 import Query from '../query';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
-import {riques, hasRole, errorCallback, getValue} from '../../utils';
+import {riques, hasRole, errorCallback, setValue, getValue} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import AdminConfig from '../AdminConfig';
 import { Table, SearchBox, DeleteButtons} from '../lib/Table';
@@ -13,6 +13,7 @@ const Tag = React.createClass({
       require ('./Posts.css');
 
       return {
+        name:"",
         dt: null,
         errorMsg: null,
         loadingMsg: null,
@@ -25,7 +26,17 @@ const Tag = React.createClass({
         mode: this.props.postId?"update":"create",
       }
   },
-  loadData: function(type, callback) {
+  getFormValues: function(){
+    return {
+      name: getValue("name")
+    }
+  },
+  setFormValues: function(v){
+      setValue("name", v.name);
+      this.setState({name: v.name});
+      this.handleNameChange();
+  },
+  loadData: function(postId, callback) {
     var me = this;
     var qry = Query.getAllTagQry;
     riques(qry, 
@@ -54,11 +65,11 @@ const Tag = React.createClass({
       }
     );
   },
-  handleDeleteBtn: function(event){;
+  handleDeleteBtn: function(event){
     var me = this;
     var checkedRow = $("input.tagCb:checked");
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
-    ;
+    
     swal(_.merge({
       title: 'Sure want to delete?',
       text: "You might lost some data!",
@@ -97,58 +108,48 @@ const Tag = React.createClass({
     document.getElementById("tagForm").reset();
     this.setState({name:"", mode: "create"});
     this.handleNameChange();
-    window.history.pushState("", "", '/admin/tags');
+    window.history.pushState("", "", '/admin/tag');
   },
   checkDynamicButtonState: function(){
     var checkedRow = $("input.tagCb:checked");
     this.setState({itemSelected: checkedRow.length>0})
   },
-  handleViewTag: function(postId){
-    this.props.handleNav('tags','edit', postId);
-  },
   handleNameChange: function(event){
     var name = $("#name").val();
     this.setState({name: name})
   },
-  onAfterTableLoad: function(){
+  loadDataEdit: function(postId, callback) {
     var me = this;
-    $(".titleText").click(function(event){
-      event.preventDefault();
-      var postId = this.id.split("-")[1];
-      me.handleViewTag(postId);
-    });
-  },
-  componentDidMount: function(){
-    this.notif = this.refs.notificationSystem;
-    this.table = this.refs.rendactTable;
-    var datatable = this.table.datatable;
-    this.refs.rendactSearchBox.bindToTable(datatable);
-    this.setState({dt: datatable});
-    this.loadData("All");
-  },
-  handleSubmit: function(event){
-    event.preventDefault();
-    var me = this;
-    var name = getValue("name");
-
-    /*me.disableForm(true);
-    var qry = Query.createTag(name);
-    var noticeTxt = "";
+    var qry = Query.getAllTagQry(postId);
     riques(qry, 
       function(error, response, body) { 
-        if (!error && !body.errors && response.statusCode === 200) {
-          var here = me;
-          this.notif.addNotification({
-                  message: noticeTxt,
-                  level: 'success',
-                  position: 'tr',
-                  autoDismiss: 2
-          });
+        if (body.data) { 
+          var values = body.data.viewer.allTags.edges;
+          me.setFormValues(values);
+
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
-        me.disableForm(false);
-      });*/
+      }
+    );
+  },
+  onAfterTableLoad: function(){
+    var me = this;
+    $(".nameText").click(function(event){
+      event.preventDefault();
+      var postId = this.id.split("-")[1];
+      debugger;
+      this.setState({postId: "postId"});
+      this.loadDataEdit();
+    });
+  },
+  
+  handleSubmit: function(event){
+    event.preventDefault();
+    var me = this;
+    //var name = getValue("name");
+    var v = this.getFormValues();
+    var name = v.name;
 
     this.disableForm(true);
     var qry = "", noticeTxt = "";
@@ -160,15 +161,17 @@ const Tag = React.createClass({
         level: 'warning',
         position: 'tr'
       });
+      this.resetForm();
       noticeTxt = 'Tag Published!';
     }else{
-      qry = Query.UpdateTag(this.props.postId, name);
+      qry = Query.UpdateTag(this.state.postId, name);
       this.notif.addNotification({
         id: 'saving',
         message: 'Updating Tag...',
         level: 'warning',
         position: 'tr'
       });
+      this.resetForm();
       noticeTxt = 'Tag Updated!';
     }
 
@@ -190,6 +193,14 @@ const Tag = React.createClass({
         }
         me.disableForm(false);
       });
+  },
+  componentDidMount: function(){
+    this.notif = this.refs.notificationSystem;
+    this.table = this.refs.rendactTable;
+    var datatable = this.table.datatable;
+    this.refs.rendactSearchBox.bindToTable(datatable);
+    this.setState({dt: datatable});
+    this.loadData("All");
   },
 
   render: function(){
@@ -215,7 +226,7 @@ const Tag = React.createClass({
                     <div className="col-xs-4" style={{marginTop: 40}}>
                     <form onSubmit={this.handleSubmit} id="tagForm" method="get">
                       <div className="form-group">
-                        <h4><b>Add New Tag</b></h4>
+                        <h4><b>{this.state.mode==="update"?"Edit New Tag":"Add New Tag"}</b></h4>
                       </div>
                       <div className="form-group">
                           <label htmlFor="name" >Name</label>
@@ -253,8 +264,8 @@ const Tag = React.createClass({
                       <Table
                           id="tag"
                           columns={[
-                            {id: 'name', label: "Name", type: "link", target: "", cssClass:"titleText"},
-                            {id: 'description', label: "Description", textAlign:"center", width: 400, cssClass:"titleText"},
+                            {id: 'name', label: "Name", type: "link", target: "", cssClass:"nameText"},
+                            {id: 'description', label: "Description", textAlign:"center", width: 400},
                             {id: 'count', label: "Count", textAlign:"center"}
                           ]}
                           checkBoxAtFirstColumn="true"

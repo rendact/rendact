@@ -2,7 +2,6 @@ import React from 'react';
 import _ from 'lodash';
 import ReactPasswordStrength from 'react-password-strength';
 import Dropzone from 'react-dropzone';
-import { default as swal } from 'sweetalert2';
 import DateTime from 'react-datetime';
 import TimezonePicker from 'react-bootstrap-timezone-picker';
 import CountrySelect from '../lib/CountrySelect';
@@ -10,7 +9,7 @@ import Notification from 'react-notification-system';
 
 import Query from '../query';
 import AdminConfig from '../AdminConfig';
-import {riques, getValue, setValue, errorCallback, getFormData, disableForm, getConfig} from '../../utils';
+import {riques, getValue, setValue, errorCallback, getFormData, disableForm, getConfig, swalert} from '../../utils';
 
 window.getBase64Image = function(img) {
   var canvas = document.createElement("canvas");
@@ -109,11 +108,11 @@ var Profile = React.createClass({
 
     if (password) {
     	if (!oldPassword) {
-    		swal('Failed!', 'Please fill your old password', 'warning')
+    		swalert('error','Failed!', 'Please fill your old password')
 	    	return;
     	}
     	if (password!==repassword) {
-    		swal('Failed!', 'Password is not match', 'warning')
+    		swalert('error','Failed!', 'Password is not match')
 	    	return;
 	    }
 	    changePassword = true;

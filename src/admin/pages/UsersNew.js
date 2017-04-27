@@ -2,7 +2,6 @@ import React from 'react';
 import _ from 'lodash';
 import ReactPasswordStrength from 'react-password-strength';
 import Dropzone from 'react-dropzone';
-import { default as swal } from 'sweetalert2';
 import DateTime from 'react-datetime';
 import TimezonePicker from 'react-bootstrap-timezone-picker';
 import CountrySelect from '../lib/CountrySelect';
@@ -11,7 +10,8 @@ import Halogen from 'halogen';
 
 import Query from '../query';
 import AdminConfig from '../AdminConfig';
-import {riques, getValue, setValue, errorCallback, disableForm, getConfig, defaultHalogenStyle} from '../../utils';
+import Config from '../../config';
+import {riques, getValue, setValue, errorCallback, disableForm, getConfig, defaultHalogenStyle, swalert} from '../../utils';
 
 var NewUser = React.createClass({
 	getInitialState: function(){
@@ -35,7 +35,10 @@ var NewUser = React.createClass({
 			dateOfBirth: "",
 			isAdmin: false,
 			isProcessing: false,
-      opacity: 1
+      opacity: 1,
+      checkingUsername: false,
+      checkingEmail: false,
+      hasErrors: false
 		}
 	},
 	loadData: function(){
@@ -130,15 +133,20 @@ var NewUser = React.createClass({
     var repassword = getValue("new-password-2");
     var changePassword = false;
 
+    if (this.state.hasErrors) {
+  		swalert('error','Failed!', 'There are some errors in the form')
+    	return;
+  	}
+
 		var qry = '';
 		if (this.state.mode==="update"){
 			if (password) {
 	    	if (!oldPassword) {
-	    		swal('Failed!', 'Please fill your old password', 'warning')
+	    		swalert('error','Failed!', 'Please fill your old password')
 		    	return;
 	    	}
 	    	if (password!==repassword) {
-		    	swal('Failed!', 'Password is not match', 'warning')
+		    	swalert('error','Failed!', 'Password is not match')
 		    	return;
 		    }
 		    changePassword = true;
@@ -147,12 +155,12 @@ var NewUser = React.createClass({
 			qry = Query.saveProfileMtn({userId: this.props.userId, name: name, gender: gender, image: image, country: country, dateOfBirth: dateOfBirth});
 		} else {
 			if (!password) {
-    		swal('Failed!', 'Please fill your password', 'warning')
+    		swalert('error','Failed!', 'Please fill your password')
 	    	return;
     	}
     		
     	if (password!==repassword) {
-	    	swal('Failed!', 'Password is not match', 'warning')
+	    	swalert('error','Failed!', 'Password is not match')
 	    	return;
 	    }
 			qry = Query.createUserMtn(username, password, email, name, gender, country, dateOfBirth)
@@ -175,13 +183,12 @@ var NewUser = React.createClass({
 
 	        var isMetaEmpty = (bio+website+facebook+twitter+linkedin+timezone+phone)==='';
 
-	        if (!here.checkUsername(username)) swal('Failed!', 'Username already exist', 'warning')
-	        if (!here.checkEmail(email)) swal('Failed!', 'Email already exist', 'warning')
-          if (isMetaEmpty) {
+	        if (isMetaEmpty) {
           	if (me.state.mode==="create")
           		me.resetForm();
           	else
           		me.notification.removeNotification('saving');
+          	me.disableForm(false);
           }	else {
 		        var userMetaData0 = {
 		          	"bio": bio,
@@ -216,7 +223,6 @@ var NewUser = React.createClass({
 		          		here.disableForm(false);
 							}
 						);
-						
 	        }
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
@@ -235,7 +241,8 @@ var NewUser = React.createClass({
 							level: 'success',
 							position: 'tr',
 							autoDismiss: 5
-						})
+						});
+						disableForm(false);
 					} else {
 						errorCallback(error, body.errors?body.errors[0].message:null);
 					}
@@ -329,8 +336,10 @@ var NewUser = React.createClass({
 			if (body.data) {
           var here = me;
           var roleList = me.state.roleList;
-          for (var i=1;i < body.data.viewer.allRoles.edges.length; i++) {
+          for (var i=0;i < body.data.viewer.allRoles.edges.length; i++) {
           	var item = body.data.viewer.allRoles.edges[i];
+          	if (item.node.name==="Owner" && !Config.adminMode)
+          		continue;
           	roleList.push({id: item.node.id, name: item.node.name});
           }
           here.setState({roleList: roleList});
@@ -357,56 +366,114 @@ var NewUser = React.createClass({
 	handleAddNewBtn: function(event) {
   	this.resetForm();
 	},
+	_markUsernameError: function(msg){
+		this.setState({
+			classDivUsername: "form-group has-error", 
+			classInputUsername:"form-control form-control-error", 
+			usernameTextBlock:msg,
+			hasErrors: true
+		});
+	},
+	_markUsernameSuccess: function(){
+		this.setState({
+			classDivUsername: "form-group has-success", 
+			classInputUsername: "form-control form-control-success", 
+			usernameTextBlock: "Good to go",
+			hasErrors: false
+		});
+	},
 	checkUsername: function(username){
 		var me = this;
+		if (username.length<4){
+			this._markUsernameError("Username is too short! Make sure it has minimum 4 characters");
+			return;
+		}
+		var usernameRegex = /^[a-zA-Z0-9]+$/;
+		if(!usernameRegex.test(username)) {
+			this._markUsernameError("Username is invalid, only letters and numbers allowed");
+			return
+		}
+
+		this.setState({checkingUsername: true});
+		//this.disableForm(true);
 		riques( Query.checkUsernameQry(username),
       	function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
           var usernameCount = body.data.viewer.allUsers.edges.length;
           if (me.state.mode==="create") {
             if (usernameCount === 0 ){
-            	me.setState({classDivUsername: "form-group has-success", classInputUsername:"form-control form-control-success", usernameTextBlock:"The short unique name describes you"});
+            	me._markUsernameSuccess();
             }
             else {
-            	me.setState({classDivUsername: "form-group has-error", classInputUsername:"form-control form-control-error", usernameTextBlock:"Username already exist"});
+            	me._markUsernameError("Username is already exists");
             }
           } else {
             if (usernameCount === 0 ){
-            	me.setState({classDivUsername: "form-group has-success", classInputUsername:"form-control form-control-success", usernameTextBlock:"The short unique name describes you"});
+            	me._markUsernameSuccess();
             }
             else {
-            	me.setState({classDivUsername: "form-group has-error", classInputUsername:"form-control form-control-error", usernameTextBlock:"Username already exist"});
+            	me._markUsernameError("Username is already exists");
             }
           }
+          me.setState({checkingUsername: false});
+          me.disableForm(false);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
+          me.disableForm(false);
         }
       }
     );
 	},
+	_markEmailError: function(msg){
+		this.setState({
+			classDivEmail: "form-group has-error", 
+			classInputEmail:"form-control form-control-error", 
+			emailTextBlock:msg,
+			hasErrors: true
+		});
+	},
+	_markEmailSuccess: function(){
+		this.setState({
+			classDivEmail: "form-group has-success", 
+			classInputEmail:"form-control form-control-success", 
+			emailTextBlock:"Good to go",
+			hasErrors: false
+		});
+	},
 	checkEmail: function(email){
 		var me = this;
+		var email_regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
+		if(!email_regex.test(email)) {
+			this._markEmailError("Email is invalid");
+			return
+		}
+
+		me.setState({checkingEmail: true});
+		//this.disableForm(true);
 		riques( Query.checkEmailQry(email),
       	function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
           var emailCount = body.data.viewer.allUsers.edges.length;
           if (me.state.mode==="create") {
             if (emailCount === 0 ){
-            	me.setState({classDivEmail: "form-group has-success", classInputEmail:"form-control form-control-success", emailTextBlock:""});
+            	me._markEmailSuccess();
             }
             else {
-            	me.setState({classDivEmail: "form-group has-error", classInputEmail:"form-control form-control-error", emailTextBlock:"Email already exist"});
+            	me._markEmailError("Email is already exists");
             }
           } else {
             if (emailCount === 0 ){
-            	me.setState({classDivEmail: "form-group has-success", classInputEmail:"form-control form-control-success", emailTextBlock:""});
+            	me._markEmailSuccess();
             }
             else {
-            	me.setState({classDivEmail: "form-group has-error", classInputEmail:"form-control form-control-error", emailTextBlock:"Email already exist"});
+            	me._markEmailError("Email is already exists");
             }
           }
+          me.setState({checkingEmail: false});
+          me.disableForm(false);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
+          me.disableForm(false);
         }
       }
     );
@@ -476,10 +543,13 @@ var NewUser = React.createClass({
 					  			<div className={this.state.classDivUsername}>
 								  	<label htmlFor="tagline" className="col-md-3">Username<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
-										<input type="text" name="username" id="username" 
-											className={this.state.classInputUsername} onBlur={this.handleUsernameHighlight} disabled={this.state.mode==="update"?true:false}/>
-										<p className="help-block">{this.state.usernameTextBlock}</p>
-									</div>
+								  		<div className="form-inline">
+											<input type="text" name="username" id="username" 
+												className={this.state.classInputUsername} onBlur={this.handleUsernameHighlight} disabled={this.state.mode==="update"?true:false}/>
+												{ this.state.checkingUsername && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
+											</div>
+											<p className="help-block">{this.state.usernameTextBlock}</p>
+										</div>
 								</div>
 
 								<div className="form-group">
@@ -507,8 +577,11 @@ var NewUser = React.createClass({
 					  			<div className={this.state.classDivEmail}>
 								  	<label htmlFor="keywoards" className="col-md-3">Email<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
-										<input type="text" name="email" id="email" className={this.state.classInputEmail} 
-											onBlur={this.handleEmailHighlight} disabled={this.state.mode==="update"?true:false} required="true"/>
+								  		<div className="form-inline">
+												<input type="email" name="email" id="email" className={this.state.classInputEmail} 
+													onBlur={this.handleEmailHighlight} disabled={this.state.mode==="update"?true:false} required="true"/>
+												{ this.state.checkingEmail && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
+											</div>
 											<p className="help-block">{this.state.emailTextBlock}</p>
 									</div>
 								</div>
@@ -581,14 +654,14 @@ var NewUser = React.createClass({
 								</div>
 
 								{ this.state.mode==="create" &&
-								 [<h4 style={{marginBottom: 20}}>Password</h4>,
+								 [<h4 key="1" style={{marginBottom: 20}}>Password</h4>,
 								 <div key="2" className="form-group">
 									 	<label htmlFor="homeUrl" className="col-md-3">Role</label>
 									 	<div className="col-md-9">
 											<select name="role" id="role" className="form-control select">
 												{
 													this.state.roleList.map(function(item){
-														return <option value={item.id}>{item.name}</option>
+														return <option key={item.id} value={item.id}>{item.name}</option>
 													})
 												}
 											</select>
@@ -605,7 +678,7 @@ var NewUser = React.createClass({
 											<select name="role" id="role" className="form-control select">
 												{
 													this.state.roleList.map(function(item){
-														return <option value={item.id}>{item.name}</option>
+														return <option key={item.id} value={item.id}>{item.name}</option>
 													})
 												}
 											</select>

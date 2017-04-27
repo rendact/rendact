@@ -38,11 +38,11 @@ const Category = React.createClass({
               "postId": item.node.id,
               "name": item.node.name,
               "description": "",
-              "count": ""
+              "count": item.node.post.edges.length
             });
           });
 
-          var bEdit = hasRole('modify-page');
+          var bEdit = hasRole('modify-category');
           me.table.loadData(_dataArr, bEdit);
           me.setState({monthList: monthList});
 

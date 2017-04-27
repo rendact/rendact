@@ -37,7 +37,15 @@ const getAllCategoryQry = {
         edges {
           node {
             id,
-            name
+            name,
+            description,
+            post {
+              edges {
+                node{
+                  id
+                }
+              }
+            }
           }
         }
       }
