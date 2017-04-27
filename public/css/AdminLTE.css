@@ -5110,3 +5110,6 @@ div.passwordTester > span.ReactPasswordStrength-strength-desc {
   font-size: 16px !important;  
   color: #ffffff !important;
 }
+.imageSwal {
+  width: 600px !important;
+}

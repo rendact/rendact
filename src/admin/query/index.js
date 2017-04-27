@@ -58,7 +58,9 @@ const queries = {
   createCategory: Post.createCategory,
   createTag: Post.createTag,
   UpdateTag: Post.UpdateTag,
-  checkContentSlugQry: Content.checkContentSlugQry
+  checkContentSlugQry: Content.checkContentSlugQry,
+  addImageGallery: Post.addImageGallery,
+  removeImageGallery: Post.removeImageGallery
 }
 
 module.exports = queries;

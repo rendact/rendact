@@ -12,7 +12,7 @@ const getPostListQry = function(s) {
     "query": 
       `query getPosts{viewer {allPosts(where: {type: {eq: "post"}, status: `+status+`}) { edges { node { 
        id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},
-       tag{edges{node{tag{id, name}}}},comments{edges{node{id}}},file{edges{node{value}}}, featuredImage,createdAt}}}}}`
+       tag{edges{node{tag{id, name}}}},comments{edges{node{id}}},file{edges{node{id,value}}}, featuredImage,createdAt}}}}}`
   };
 };
 
@@ -28,7 +28,7 @@ const getContentsQry = function(type, s) {
     "query": 
       `query getPosts{viewer {allPosts(where: {type: {eq: "`+type+`"}, status: `+status+`}) { edges { node { 
        id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},
-       comments{edges{node{id}}},file{edges{node{value}}},featuredImage,createdAt}}}}}`
+       comments{edges{node{id}}},file{edges{node{id,value}}},featuredImage,createdAt}}}}}`
   };
 }
 
@@ -332,7 +332,7 @@ const createUpdateTagOfPostMtn = function(postId, currentTag, newTag){
 const getPostQry = function(postId){
   return {"query": 
       '{getPost(id:"'+postId+'"){ id,title,content,slug,author{username},status,visibility,featuredImage,'
-      +'summary,category{edges{node{category{id,name}}}},comments{edges{node{id}}},file{edges{node{value}}},meta{edges{node{item,value}'
+      +'summary,category{edges{node{category{id,name}}}},comments{edges{node{id}}},file{edges{node{id value}}},meta{edges{node{item,value}'
       +'}}createdAt}}'
     }
   };
@@ -397,7 +397,51 @@ const recoverPostQry = function(idList){
   }
 };
 
+const addImageGallery = function(blob, postId){
+  return {
+      "query": `mutation CreateFile($input: CreateFileInput!) {
+        createFile(input: $input) {
+          changedFile {
+            id
+            type
+            value
+            blobMimeType
+            blobUrl
+          }
+        }
+      }`,
+      "variables": {
+        input: {
+          type: "gallery",
+          value: blob,
+          postId: postId,
+          blobFieldName: "myBlobField"
+        }
+      },
+      "myBlobField": ""
+    }
+}
 
+const removeImageGallery = function(imageId){
+  return {
+      "query": `mutation DeleteFile($input: DeleteFileInput!) {
+        deleteFile(input: $input) {
+          changedFile {
+            id
+            type
+            value
+            blobMimeType
+            blobUrl
+          }
+        }
+      }`,
+      "variables": {
+        input: {
+          id: imageId
+        }
+      }
+    }
+}
 
 const queries = {
   getPostListQry: getPostListQry,
@@ -419,6 +463,8 @@ const queries = {
   createCategory: createCategory,
   createTag: createTag,
   UpdateTag: UpdateTag,
+  addImageGallery: addImageGallery,
+  removeImageGallery: removeImageGallery
 }
 
 module.exports = queries;
