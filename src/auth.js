@@ -181,7 +181,6 @@ function AuthService(){
   }
 
   this.getProfile = function() {
-    console.log("getProfile");
     return JSON.parse(localStorage.getItem('profile'))
   }
 

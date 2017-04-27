@@ -263,6 +263,11 @@ const defaultHalogenStyle = {
     zIndex: 100
 };
 
+const removeTags = function(txt){
+    var rex = /(<([^>]+)>)/ig;
+    return txt.replace(rex , "");
+}
+
 module.exports = {
 	riques: riques,
 	setValue: setValue,
@@ -277,5 +282,6 @@ module.exports = {
   loadConfig: loadConfig,
   getConfig: getConfig,
   defaultHalogenStyle: defaultHalogenStyle,
-  swalert: swalert
+  swalert: swalert,
+  removeTags:removeTags
 };
