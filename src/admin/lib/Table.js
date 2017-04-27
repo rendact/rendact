@@ -132,12 +132,12 @@ const Table = React.createClass({
       	var _link = item.postId==="fixed"?item[col.id]:'<a href="'+target+'">'+item[col.id]+'</a>';
 
       	if (col.type && col.type==="link" && canEdit) {
-      		_cols.push('<span id="'+item.id+'-'+item.postId+'" class="'+cssClass+'" style="text-align: '+textAlign+'; width:100%; display: block">'
+      		_cols.push('<span id="'+index+'-'+item.postId+'" class="'+cssClass+'" style="text-align: '+textAlign+'; width:100%; display: block">'
             +_link+'</span>')
       	} else if (col.type && col.type==="image" && canEdit) {
           _cols.push('<center><img src='+item[col.id]+' width="50" /></center>')
       	} else {
-      		_cols.push('<span id="'+item.id+'-'+item.postId+'" class="'+cssClass+'" style="text-align: '+textAlign+'; width:100%; display: block">'+item[col.id]+'</span>',)
+      		_cols.push('<span id="'+index+'-'+item.postId+'" class="'+cssClass+'" style="text-align: '+textAlign+'; width:100%; display: block">'+item[col.id]+'</span>',)
       	}
       });
       me.datatable.row.add(_cols);

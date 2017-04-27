@@ -3,7 +3,7 @@ import $ from 'jquery';
 import Query from '../query';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
-import {riques, hasRole, errorCallback, getValue} from '../../utils';
+import {riques, hasRole, errorCallback, getValue, setValue, removeTags} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import AdminConfig from '../AdminConfig';
 import {Table, SearchBox, DeleteButtons} from '../lib/Table';
@@ -18,6 +18,7 @@ const Category = React.createClass({
         loadingMsg: null,
         monthList: [],
         deleteMode: false,
+        mode: "create",
         statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
         dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
         activeStatus: "All",
@@ -101,10 +102,14 @@ const Category = React.createClass({
   },
   onAfterTableLoad: function(){
     var me = this;
-    $(".titleText").click(function(event){
+    $(".nameText").click(function(event){
       event.preventDefault();
-      var postId = this.id.split("-")[1];
-      me.handleViewPost(postId);
+      var index = this.id.split("-")[0];
+      var row = me.table.datatable.data()[index];
+      
+      var name = removeTags(row[1]);
+      setValue("name", name);
+      me.setState({mode: "update"});
     });
   },
   componentDidMount: function(){
@@ -165,7 +170,7 @@ const Category = React.createClass({
                     <div className="col-xs-4" style={{marginTop: 40}}>
                     <form onSubmit={this.handleSubmit} id="pageForm" method="get">
                       <div className="form-group">
-                        <h4><b>Add New Category</b></h4>
+                        <h4><b>{this.state.mode==="create"?"Add New Category":"Edit Category"}</b></h4>
                       </div>
                       <div className="form-group">
                           <label htmlFor="name" >Name</label>
@@ -205,8 +210,8 @@ const Category = React.createClass({
                       <Table 
                           id="category"
                           columns={[
-                            {id: 'name', label: "Name", textAlign:"center"},
-                            {id: 'description', label: "Description", textAlign:"center", width: 400, cssClass:"titleText"},
+                            {id: 'name', label: "Name", type: "link", textAlign:"center", cssClass:"nameText"},
+                            {id: 'description', label: "Description", textAlign:"center", width: 400},
                             {id: 'count', label: "Count", textAlign:"center"}
                           ]}
                           checkBoxAtFirstColumn="true"
