@@ -3,7 +3,7 @@ import $ from 'jquery';
 import Query from '../query';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
-import {riques, hasRole, errorCallback, setValue, getValue} from '../../utils';
+import {riques, hasRole, errorCallback, setValue, getValue, removeTags} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import AdminConfig from '../AdminConfig';
 import { Table, SearchBox, DeleteButtons} from '../lib/Table';
@@ -23,14 +23,15 @@ const Tag = React.createClass({
         dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
         activeStatus: "All",
         itemSelected: false,
-        mode: this.props.postId?"update":"create",
+        mode: "create",
       }
   },
-  getFormValues: function(){
+  /*getFormValues: function(){
     return {
+      postId: getValue("postId"),
       name: getValue("name")
     }
-  },
+  },*/
   setFormValues: function(v){
       setValue("name", v.name);
       this.setState({name: v.name});
@@ -118,40 +119,30 @@ const Tag = React.createClass({
     var name = $("#name").val();
     this.setState({name: name})
   },
-  loadDataEdit: function(postId, callback) {
-    var me = this;
-    var qry = Query.getAllTagQry(postId);
-    riques(qry, 
-      function(error, response, body) { 
-        if (body.data) { 
-          var values = body.data.viewer.allTags.edges;
-          me.setFormValues(values);
-
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-      }
-    );
-  },
   onAfterTableLoad: function(){
     var me = this;
     $(".nameText").click(function(event){
       event.preventDefault();
+      var index = this.id.split("-")[0];
+      var row = me.table.datatable.data()[index];
       var postId = this.id.split("-")[1];
-      debugger;
-      this.setState({postId: "postId"});
-      this.loadDataEdit();
+      var name = removeTags(row[1]);
+      setValue("postId", postId);
+      setValue("name", name);
+      me.setState({mode: "update"});
+      me.this.setState({postId: postId})
     });
   },
   
   handleSubmit: function(event){
     event.preventDefault();
     var me = this;
-    //var name = getValue("name");
-    var v = this.getFormValues();
-    var name = v.name;
-
-    this.disableForm(true);
+    var name = getValue("name");
+    //var postId = getValue("postId");
+    //var v = this.getFormValues();
+    //var name = v.name;
+    //var postId = v.postId;
+    this.disableForm(true);debugger;
     var qry = "", noticeTxt = "";
     if (this.state.mode==="create"){
       qry = Query.createTag(name);
@@ -226,7 +217,7 @@ const Tag = React.createClass({
                     <div className="col-xs-4" style={{marginTop: 40}}>
                     <form onSubmit={this.handleSubmit} id="tagForm" method="get">
                       <div className="form-group">
-                        <h4><b>{this.state.mode==="update"?"Edit New Tag":"Add New Tag"}</b></h4>
+                        <h4><b>{this.state.mode==="create"?"Add New Tag":"Edit Tag"}</b></h4>
                       </div>
                       <div className="form-group">
                           <label htmlFor="name" >Name</label>
@@ -243,7 +234,8 @@ const Tag = React.createClass({
                         </div>
                       </div>
                        <div className="form-group">
-                          <button type="submit" id="publishBtn" className="btn btn-primary btn-flat" disabled={this.state.name===""}>{this.state.mode==="update"?"Save":"Publish"}</button>
+                          <button type="submit" id="submit" className="btn btn-primary btn-flat" 
+                          disabled={this.state.name===""}>{this.state.mode==="update"?"Save Changes":"Add New Tag"}</button>
                       </div>
                     </form>
                     </div>
