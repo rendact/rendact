@@ -29,10 +29,9 @@ import NewContentType from './lib/ContentTypeNew';
 
 import AdminConfig from './AdminConfig';
 import AdminLTEinit from './lib/app.js';
-import {riques, hasRole, errorCallback, getConfig} from '../utils';
+import {riques, hasRole, errorCallback, getConfig, swalert} from '../utils';
 import Query from './query';
 import {loadConfig} from '../utils';
-import { default as swal } from 'sweetalert2';
 
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -322,13 +321,7 @@ const Admin = React.createClass({
 			callback = function() {}
 
 		if (this.state.hasUnsavedData) {
-			swal(_.merge({
-	      title: 'Sure want to navigate away?',
-	      text: "You might lost some data!",
-	      type: 'warning',
-	      confirmButtonText: 'Yes, I am sure!',
-	      cancelButtonText: 'No, cancel!',
-	    },AdminConfig.defaultSwalStyling)).then(
+			swalert('warning','Sure want to navigate away?','You might lost some data',
 	    	function(){
 	    		callback.call();
 	    		state = true;

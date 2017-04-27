@@ -70,9 +70,9 @@ let hasRole = function(roleId){
 }
 
 let errorCallback = function(msg1, msg2){
-  if (msg1) swal('Failed!', msg1, 'warning')
-  else if (msg2) swal('Failed!', msg2, 'warning')
-  else swal('Failed!', 'Unknown error','warning')
+  if (msg1) swalert('error','Failed!', msg1)
+  else if (msg2) swalert('error','Failed!', msg2)
+  else swalert('error','Failed!', 'Unknown error')
 }
 
 let sendMail = function(to, title, message, callback){
@@ -223,8 +223,8 @@ const swalert = function(type, title, body, callback){
   }
 
   swal({
-      title: title,
-      text: body,
+      /*title: title,*/
+      text: title,
       showCancelButton: showCancelButton,
       background: background,
       confirmButtonText: 'Yes',
