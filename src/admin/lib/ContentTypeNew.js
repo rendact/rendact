@@ -3,37 +3,13 @@ import _ from 'lodash';
 import $ from 'jquery';
 window.jQuery = $;
 import Query from '../query';
-import {riques, setValue, getValue, disableForm, errorCallback, getConfig} from '../../utils';
+import {riques, setValue, getValue, disableForm, errorCallback, getConfig, defaultHalogenStyle} from '../../utils';
 import {getTemplates} from '../theme';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
 import Dropzone from 'react-dropzone';
 import Halogen from 'halogen';
-
-const defaultHalogenStyle = {
-      display: '-webkit-flex',
-      //display: 'flex',
-      WebkitFlex: '0 1 auto',
-      flex: '0 1 auto',
-      WebkitFlexDirection: 'column',
-      flexDirection: 'column',
-      WebkitFlexGrow: 1,
-      flexGrow: 1,
-      WebkitFlexShrink: 0,
-      flexShrink: 0,
-      WebkitFlexBasis: '25%',
-      flexBasis: '25%',
-      maxWidth: '25%',
-      height: '200px',
-      top: '50%',
-      left: '50%',
-      position: 'absolute',
-      WebkitAlignItems: 'center',
-      alignItems: 'center',
-      WebkitJustifyContent: 'center',
-      justifyContent: 'center',
-      zIndex: 100
-};
+import { default as swal } from 'sweetalert2';
 
 const NewContentType = React.createClass({
   getInitialState: function(){
@@ -63,6 +39,7 @@ const NewContentType = React.createClass({
       permalinkInProcess: false,
       isProcessing: false,
       opacity: 1,
+      featuredImage: null,
       imageGallery: []
     }
   },
@@ -161,7 +138,7 @@ const NewContentType = React.createClass({
     if (v.file.edges.length>0) {
       _.forEach(v.file.edges, function(i){
         if (i.node.value){
-          _imageGalleryList.push(i.node.value);
+          _imageGalleryList.push({id: i.node.id, value: i.node.value});
         }
       });
       this.setState({imageGallery: _imageGalleryList});
@@ -481,57 +458,64 @@ const NewContentType = React.createClass({
     };
     reader.readAsDataURL(e.target.files[0]);
   },
+  handleFeaturedImageRemove: function(e){
+    this.setState({featuredImage: null})
+  },
   imageGalleryChange: function(e){
     var me = this;
+    this.disableForm(true);
     var reader = new FileReader();
     reader.onload = function(){
-      /*
-      var imageGallery = me.state.imageGallery;
-      imageGallery.push(reader.result);
-      me.setState({imageGallery: imageGallery});
-      */
-      
-      var query = {
-        "query": `mutation CreateFile($input: CreateFileInput!) {
-          createFile(input: $input) {
-            changedFile {
-              id
-              type
-              value
-              blobMimeType
-              blobUrl
-            }
-          }
-        }`,
-        "variables": {
-          input: {
-            type: "gallery",
-            value: reader.result,
-            postId: me.props.postId,
-            blobFieldName: "myBlobField"
-          }
-        },
-        "myBlobField": ""
-      }
-      riques(query, 
+      riques(Query.addImageGallery(reader.result, me.props.postId), 
         function(error, response, body){
-          var data = body.data.createFile.changedFile;
-          console.log(data);
-          var imageGallery = me.state.imageGallery;
-          imageGallery.push(data.value);
-          me.setState({imageGallery: imageGallery});
+          if (!error && !body.errors && response.statusCode === 200) {
+            var data = body.data.createFile.changedFile;
+            var imageGallery = me.state.imageGallery;
+            imageGallery.push({id: data.id, value:data.value});
+            me.setState({imageGallery: imageGallery});
+          } else {
+            errorCallback(error, body.errors?body.errors[0].message:null);
+          }
+          me.disableForm(false);
+          document.getElementById("imageGallery").value=null;
         }
       );
       
     }
     reader.readAsDataURL(e.target.files[0]);
   },
+  handleImageClick: function(e){
+    e.preventDefault();
+    
+    swal({
+      imageUrl: e.target.src,
+      imageWidth: "100%",
+      animation: true,
+      customClass: 'imageSwal',
+      confirmButtonText: 'Close'
+    })
+  },
   handleImageRemove: function(e){
+    var me = this;
     var id = e.target.id;
     var index = id.split("-")[1];
-    var imageGallery = this.state.imageGallery;
-    _.pull(imageGallery, _.nth(imageGallery, index));
-    this.setState({imageGallery: imageGallery});
+    var imageId = id.split("-")[0];
+    this.disableForm(true);
+    
+    var qry = Query.removeImageGallery(imageId);
+    riques(qry, 
+      function(error, response, body){
+        if (!error && !body.errors && response.statusCode === 200) {
+          var imageGallery = me.state.imageGallery;
+          _.pull(imageGallery, _.nth(imageGallery, index));
+          me.setState({imageGallery: imageGallery});
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+        me.disableForm(false);
+        document.getElementById("imageGallery").value=null;
+      }
+    );
   },
   render: function(){
     var rootUrl = getConfig('rootUrl');
@@ -843,9 +827,14 @@ const NewContentType = React.createClass({
                     <div className="box-body pad">
                       <div>
                         { this.state.featuredImage &&
-                          <p><img src={this.state.featuredImage} style={{width: "100%"}}/></p>
+                          <div style={{position: "relative"}}>
+                            <img src={this.state.featuredImage} style={{width: "100%"}}/>
+                            <button onClick={this.handleFeaturedImageRemove} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
+                          </div>
                         }
-                        <input type="file" name="featuredImage" onChange={this.featuredImageChange}/>
+                        { !this.state.featuredImage &&
+                          <input type="file" name="featuredImage" onChange={this.featuredImageChange}/>
+                        }
                       </div>                  
                     </div>
                   </div>
@@ -862,12 +851,12 @@ const NewContentType = React.createClass({
                     </div>
                     <div className="box-body pad">
                       <div>
-                        <input type="file" name="imageGallery" onChange={this.imageGalleryChange}/>
+                        <input type="file" id= "imageGallery" name="imageGallery" onChange={this.imageGalleryChange}/>
                         {
                           _.map(this.state.imageGallery, function(item, index){
                             return <div key={index} className="margin" style={{width: 150, float: "left", position: "relative"}}>
-                            <img src={item} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue"}}/>
-                            <button onClick={this.handleImageRemove} type="button" className="close" id={"imageGallery-"+index} data-dismiss="alert" aria-hidden="true" style={{top: 15, right: 5, position: "absolute"}}>×</button>
+                            <a href="" onClick={this.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue"}}/></a>
+                            <button id={item.id+"-"+index} onClick={this.handleImageRemove} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
                             </div>
                           }.bind(this))
                         }
