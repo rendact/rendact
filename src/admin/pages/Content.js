@@ -1,6 +1,4 @@
 import React from 'react';
-import $ from 'jquery';
-window.jQuery = $;
 import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Query from '../query';
@@ -71,12 +69,12 @@ const Content = React.createClass({
     disableForm(state, this.notification)
   },
   checkDynamicButtonState: function(){
-    var checkedRow = $("input.contentListCb:checked");
+    var checkedRow = document.querySelectorAll("input.contentListCb:checked");
     this.setState({itemSelected: checkedRow.length>0})
   },
   handleDeleteBtn: function(event){
     var me = this;
-    var checkedRow = $("input.postListCb:checked");
+    var checkedRow = document.querySelectorAll("input.postListCb:checked");
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
     swalert('warning', 'Sure want to delete?', "You might lost some data!",
       function () {
@@ -104,7 +102,7 @@ const Content = React.createClass({
   },
   onAfterTableLoad: function(){
     var me = this;
-    $(".contentName").click(function(event){
+    document.getElementByClassName("contentName").addEventListener("click", function(event){
       event.preventDefault();
       var postId = this.id.split("-")[1];
       me.handleViewPage(postId);

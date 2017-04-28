@@ -1,13 +1,10 @@
 import React from 'react';
-import $ from 'jquery';
 import Query from '../query';
 import Fn from './functions';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen';
-import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle, swalert} from '../../utils';
-import Config from '../../config';
-import AdminConfig from '../AdminConfig';
+import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle, swalert, getValue} from '../../utils';
 import {Table, SearchBoxPost, DeleteButtons} from './Table';
 
 const ContentType = React.createClass({
@@ -173,7 +170,7 @@ const ContentType = React.createClass({
   },
   handleDeleteBtn: function(event){
     var me = this;
-    var checkedRow = $("input."+this.props.slug+"ListCb:checked");
+    var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
    
       me.disableForm(true);
@@ -191,7 +188,7 @@ const ContentType = React.createClass({
       );
   },
   handleDeletePermanent: function(event){
-    var checkedRow = $("input."+this.props.slug+"ListCb:checked");
+    var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     var me = this;
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
     swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
@@ -232,7 +229,7 @@ const ContentType = React.createClass({
     })
   },
   handleRecover: function(event){
-    var checkedRow = $("input."+this.props.slug+"ListCb:checked");
+    var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     var me = this;
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
    
@@ -283,7 +280,7 @@ const ContentType = React.createClass({
         me.disableForm(false);
       });
     }else{
-      var date = $("#dateFilter").val();
+      var date = getValue("dateFilter");
       var searchValue = { 6: date };
       var te = this;
       this.loadData(status, function(){
@@ -297,7 +294,7 @@ const ContentType = React.createClass({
     } ;
   },
   checkDynamicButtonState: function(){
-    var checkedRow = $("input."+this.props.slug+"ListCb:checked");
+    var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     this.setState({itemSelected: checkedRow.length>0})
   },
   handleViewPost: function(postId){
@@ -305,10 +302,16 @@ const ContentType = React.createClass({
   },
   onAfterTableLoad: function(){
     var me = this;
-    $(".titleText").click(function(event){
+
+    var postLink = function(event){
       event.preventDefault();
       var postId = this.id.split("-")[1];
       me.handleViewPost(postId);
+    }
+
+    var titles = document.getElementsByClassName('titleText');
+    _.forEach(titles, function(item){
+      item.addEventListener('click',postLink);
     });
   },
   getStatusCount: function(status){
@@ -350,7 +353,7 @@ const ContentType = React.createClass({
                   <div className="row">
                     <div className="col-xs-12">
                       <div style={{marginTop: 10, marginBottom: 20}}>
-                          <select className="btn select" id="dateFilter" onChange={this.handleDateFilter} style={{marginRight:10,height:35}}>
+                          <select className="btn select" id="dateFilter" name="dateFilter" onChange={this.handleDateFilter} style={{marginRight:10,height:35}}>
                             {this.state.monthList.map(function(item){
                               if (item==="all")
                                 return (<option key="0" value="">Show all months</option>);

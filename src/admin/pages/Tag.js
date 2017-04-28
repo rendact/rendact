@@ -3,7 +3,7 @@ import $ from 'jquery';
 import Query from '../query';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
-import {riques, hasRole, errorCallback, setValue, getValue, removeTags} from '../../utils';
+import {riques, hasRole, errorCallback, setValue, getValue, removeTags, disableForm} from '../../utils';
 import { default as swal } from 'sweetalert2';
 import AdminConfig from '../AdminConfig';
 import { Table, SearchBox, DeleteButtons} from '../lib/Table';
@@ -27,17 +27,6 @@ const Tag = React.createClass({
         mode: "create",
       }
   },
-  /*getFormValues: function(){
-    return {
-      postId: getValue("postId"),
-      name: getValue("name")
-    }
-  },*/
-  /*setFormValues: function(v){
-      setValue("name", v.name);
-      this.setState({name: v.name});
-      this.handleNameChange();
-  },*/
   loadData: function(postId, callback) {
     var me = this;
     var qry = Query.getAllTagQry;
@@ -94,17 +83,7 @@ const Tag = React.createClass({
       );
   })},
   disableForm: function(state){
-    var me = this;
-    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
-    _.forEach(document.getElementsByTagName('button'), function(el){ 
-      if (_.indexOf(me.state.dynamicStateBtnList, el.id) < 0)
-        el.disabled = state;
-    })
-    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.notif.addNotification({message: 'Processing...', level: 'warning',position: 'tr'});
-    if (!state) {
-      this.checkDynamicButtonState();
-    }
+    disableForm(state, this.notif)
   },
   resetForm: function(){
     document.getElementById("tagForm").reset();
@@ -142,30 +121,18 @@ const Tag = React.createClass({
     var postId = this.state.postId;
     this.disableForm(true);
     var qry = "", noticeTxt = "";
+
     if (this.state.mode==="create"){
       qry = Query.createTag(name);
-      this.notif.addNotification({
-        id: 'saving',
-        message: 'Creating Tag...',
-        level: 'warning',
-        position: 'tr'
-      });
       noticeTxt = 'Tag Published!';
     }else{
       qry = Query.UpdateTag(postId, name);
-      this.notif.addNotification({
-        id: 'saving',
-        message: 'Updating Tag...',
-        level: 'warning',
-        position: 'tr'
-      });
       noticeTxt = 'Tag Updated!';
     }
 
     riques(qry, 
       function(error, response, body) { 
         if (!error && !body.errors && response.statusCode === 200) {
-          //var here = me;
           me.notif.addNotification({
                   message: noticeTxt,
                   level: 'success',

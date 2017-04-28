@@ -1,7 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
 import $ from 'jquery';
-window.jQuery = $;
 import Query from '../query';
 import {riques, setValue, getValue, disableForm, errorCallback, getConfig, defaultHalogenStyle} from '../../utils';
 import {getTemplates} from '../theme';
@@ -69,19 +68,19 @@ const NewContentType = React.createClass({
   },
   saveImmediately: function(event){
     this.setState({immediatelyStatus: false});
-    var hours = $("#hours").val();
-    var minute = $("#minute").val();
+    var hours = getValue("hours");
+    var minute = getValue("minute");
     var time = this.state.publishDate + hours + minute;
     this.setState({immediately: time});
   },
   handleChangeStatus: function(event){
-    this.setState({status: $("#statusSelect option:selected").text()});
+    this.setState({status: document.querySelector('#statusSelect').value});
   },
   saveDraft: function(event){
     this.setState({status: "Draft"});
   },
   saveVisibility: function(event){
-    this.setState({visibilityTxt: $("input[name=visibilityRadio]:checked").val()});
+    this.setState({visibilityTxt: document.querySelector("input[name=visibilityRadio]:checked").value});
   },
   disableForm: function(state){
     disableForm(state, this.notification);
@@ -106,7 +105,7 @@ const NewContentType = React.createClass({
       metaDescription: getValue("metaDescription"),
       passwordPage: "",
       summary: getValue("summary"),
-      visibility: $("input[name=visibilityRadio]:checked").val(),
+      visibility: document.querySelector("input[name=visibilityRadio]:checked").value,
       publishDate: this.state.publishDate,
       type: this.props.slug,
       featuredImage: this.state.featuredImage,
@@ -185,41 +184,40 @@ const NewContentType = React.createClass({
   },
   handlePermalinkBtn: function(event) {
     var slug = this.state.slug;
-    $("#slugcontent").val(slug);
+    setValue("slugcontent", slug);
     this.setState({permalinkEditing: true});
   },
   handleTitleBlur: function(event) {
-    var title = $("#titlePost").val();
+    var title = getValue("titlePost");
     var slug = title.split(" ").join("-").toLowerCase();
     this.checkSlug(slug);
   },
   handleSavePermalinkBtn: function(event) {
-    var slug = $("#slugcontent").val();
+    var slug = getValue("slugcontent");
     this.checkSlug(slug);
   },
   handleTitleChange: function(event){
-    var title = $("#titlePost").val();
-    //var slug = title.split(" ").join("-").toLowerCase();
+    var title = getValue("titlePost");
     this.setState({title: title});
     this.notifyUnsavedData(true);
   },
   handleContentChange: function(event){
-    var content = $(window.CKEDITOR.instances['content'].getData()).text();
+    var content = window.CKEDITOR.instances['content'].getData();
     this.setState({content: content})
     this.notifyUnsavedData(true);
   },
   handleSummaryChange: function(event){
-    var summary = $("#summary").val();
+    var summary = getValue("summary");
     this.setState({summary: summary});
     this.notifyUnsavedData(true);
   },
   handleTitleTagChange: function(event){
-    var titleTag = $("#titleTag").val();
+    var titleTag = getValue("titleTag");
     this.setState({titleTagLeftCharacter: 65-(titleTag.length)});
     this.notifyUnsavedData(true);
   },
   handleMetaDescriptionChange: function(event){
-    var metaDescription = $("#metaDescription").val();
+    var metaDescription = getValue("metaDescription");
     this.setState({metaDescriptionLeftCharacter: 160-(metaDescription.length)});
     this.notifyUnsavedData(true);
   },
@@ -401,7 +399,7 @@ const NewContentType = React.createClass({
         function(error, response, body) {
           if (!error) {
             var categoryList = [];
-            $.each(body.data.viewer.allCategories.edges, function(key, item){
+            _.forEach(body.data.viewer.allCategories.edges, function(item){
               categoryList.push((<div key={item.node.id}><input id={item.node.id}
               name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
             })
@@ -416,15 +414,16 @@ const NewContentType = React.createClass({
     require('../lib/bootstrap-tagsinput.css');
     var me = this;
 
+    
     $('#tags-input').tagsinput({
       confirmKeys: [13, 188]
     });
-    $('#tags-input').on('keypress', function(e){
+    document.getElementById("tags-input").addEventListener("keypress", function(e){
       if (e.keyCode === 13){
         e.keyCode = 188;
         e.preventDefault();
       };
-    });
+    })
 
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
       window.CKEDITOR.replace('content', {
@@ -437,9 +436,10 @@ const NewContentType = React.createClass({
       }
     });
 
-    if (this.state.visibilityTxt==="Public") {
-      $("#public").attr("checked", true);
-    }else $("#private").attr("checked", true);
+    if (this.state.visibilityTxt==="Public") 
+      document.getElementById("public").setAttribute('checked', true);
+    else
+      document.getElementById("private").setAttribute('checked', true);
 
     this.notification = this.refs.notificationSystem;
 

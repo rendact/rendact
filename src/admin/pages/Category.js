@@ -3,7 +3,7 @@ import $ from 'jquery';
 import Query from '../query';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
-import {riques, hasRole, errorCallback, getValue, setValue, removeTags, swalert} from '../../utils';
+import {riques, hasRole, errorCallback, getValue, setValue, removeTags, swalert, disableForm} from '../../utils';
 import AdminConfig from '../AdminConfig';
 import {Table, SearchBox, DeleteButtons} from '../lib/Table';
 
@@ -58,7 +58,6 @@ const Category = React.createClass({
     var me = this;
     var checkedRow = $("input.categoryCb:checked");
     var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
-    ;
     swalert('warning','Sure want to delete?',"You might lost some data!",
       function () {
         me.disableForm(true);
@@ -76,17 +75,7 @@ const Category = React.createClass({
         );
   })},
   disableForm: function(state){
-    var me = this;
-    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
-    _.forEach(document.getElementsByTagName('button'), function(el){ 
-      if (_.indexOf(me.state.dynamicStateBtnList, el.id) < 0)
-        el.disabled = state;
-    })
-    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.notif.addNotification({message: 'Processing...', level: 'warning',position: 'tr'});
-    if (!state) {
-      this.checkDynamicButtonState();
-    }
+    disableForm(state, this.notif);
   },
   checkDynamicButtonState: function(){
     var checkedRow = $("input.categoryCb:checked");
@@ -129,14 +118,6 @@ const Category = React.createClass({
     riques(qry, 
       function(error, response, body) { 
         if (!error && !body.errors && response.statusCode === 200) {
-
-          /*var here = me;
-          me.notification.addNotification({
-                  message: noticeTxt,
-                  level: 'success',
-                  position: 'tr',
-                  autoDismiss: 2
-          });*/
           var here = me;
           var cb = function(){here.disableForm(false)}
           me.loadData("All", cb);
