@@ -14,6 +14,7 @@ const Tag = React.createClass({
 
       return {
         name:"",
+        postId:"",
         dt: null,
         errorMsg: null,
         loadingMsg: null,
@@ -32,11 +33,11 @@ const Tag = React.createClass({
       name: getValue("name")
     }
   },*/
-  setFormValues: function(v){
+  /*setFormValues: function(v){
       setValue("name", v.name);
       this.setState({name: v.name});
       this.handleNameChange();
-  },
+  },*/
   loadData: function(postId, callback) {
     var me = this;
     var qry = Query.getAllTagQry;
@@ -127,10 +128,10 @@ const Tag = React.createClass({
       var row = me.table.datatable.data()[index];
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
-      setValue("postId", postId);
+      //setValue("postId", postId);
       setValue("name", name);
+      me.setState({postId: postId});
       me.setState({mode: "update"});
-      me.this.setState({postId: postId})
     });
   },
   
@@ -138,10 +139,7 @@ const Tag = React.createClass({
     event.preventDefault();
     var me = this;
     var name = getValue("name");
-    //var postId = getValue("postId");
-    //var v = this.getFormValues();
-    //var name = v.name;
-    //var postId = v.postId;
+    var postId = this.state.postId;
     this.disableForm(true);debugger;
     var qry = "", noticeTxt = "";
     if (this.state.mode==="create"){
@@ -152,17 +150,15 @@ const Tag = React.createClass({
         level: 'warning',
         position: 'tr'
       });
-      this.resetForm();
       noticeTxt = 'Tag Published!';
     }else{
-      qry = Query.UpdateTag(this.state.postId, name);
+      qry = Query.UpdateTag(postId, name);
       this.notif.addNotification({
         id: 'saving',
         message: 'Updating Tag...',
         level: 'warning',
         position: 'tr'
       });
-      this.resetForm();
       noticeTxt = 'Tag Updated!';
     }
 
@@ -176,6 +172,7 @@ const Tag = React.createClass({
                   position: 'tr',
                   autoDismiss: 2
           });
+          me.resetForm();
           var here = me;
           var cb = function(){here.disableForm(false)}
           me.loadData("All", cb);
