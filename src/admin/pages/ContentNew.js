@@ -1,6 +1,5 @@
 import React from 'react';
 import _ from 'lodash';
-import $ from 'jquery';
 import Notification from 'react-notification-system';
 import Query from '../query';
 import {riques, getValue, setValue, errorCallback, disableForm, swalert} from '../../utils';
@@ -56,10 +55,15 @@ var ContentNew = React.createClass({
         if (!error && !body.errors && response.statusCode === 200) {
           var slugCount = body.data.viewer.allContents.edges.length;
           if (me.state.mode==="create") {
-            if (slugCount > 0) { me.setState({checkingSlug: false, slug: slug+"-"+slugCount}); $('#slug').val(slug+"-"+slugCount)}
-            else me.setState({checkingSlug: false, slug: slug});
+            if (slugCount > 0) { 
+            	me.setState({checkingSlug: false, slug: slug+"-"+slugCount}); 
+            	setValue('slug', slug+"-"+slugCount)
+            } else me.setState({checkingSlug: false, slug: slug});
           } else {
-            if (slugCount > 1) { me.setState({checkingSlug: false, slug: slug+"-"+slugCount}); $('#slug').val(slug+"-"+slugCount)}
+            if (slugCount > 1) { 
+            	me.setState({checkingSlug: false, slug: slug+"-"+slugCount}); 
+            	setValue('slug', slug+"-"+slugCount)
+            }
             else me.setState({checkingSlug: false, slug: slug});
           }
         } else {
@@ -70,13 +74,13 @@ var ContentNew = React.createClass({
     );
   },
   handleNameBlur: function(event) {
-    var name = $("#name").val();
+    var name = getValue("name");
     var slug = name.split(" ").join("-").toLowerCase();
-    $("#slug").val(slug);
+    setValue("slug", slug);
     this.checkSlug(slug);
   },
   handleSlugBlur: function(event) {
-    var slug = $("#slug").val();
+    var slug = getValue("slug");
     slug = slug.split(" ").join("-").toLowerCase();
     this.checkSlug(slug);
   },

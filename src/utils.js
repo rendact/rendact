@@ -39,10 +39,6 @@ let getValueName = function(element){
   return document.getElementsByName(element);
 }
 
-let getValueName = function(element){
-  return document.getElementsByName(element);
-}
-
 let getMaxRole = function(){
   var p = JSON.parse(localStorage.getItem("profile"));
   var roleValueList = _.map(p.roles, function(item){ return AdminConfig.roleValue[item] });
