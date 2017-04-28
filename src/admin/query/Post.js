@@ -118,7 +118,7 @@ const getCreatePostQry = function(data){
     }
   };
 
-  const updateCategory = function(name){
+  const updateCategory = function(postId, name){
   return {
       "query": `
     mutation updateCategory($input: UpdateCategoryInput!) {
@@ -133,6 +133,7 @@ const getCreatePostQry = function(data){
     `,
       "variables": {
         "input": {
+          "id": postId,
           "name": name
         }
       }

@@ -16,6 +16,7 @@ const Category = React.createClass({
         errorMsg: null,
         loadingMsg: null,
         monthList: [],
+        postId:"",
         deleteMode: false,
         mode: "create",
         statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
@@ -100,10 +101,10 @@ const Category = React.createClass({
       event.preventDefault();
       var index = this.id.split("-")[0];
       var row = me.table.datatable.data()[index];
-      
+      var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
       setValue("name", name);
-      me.setState({mode: "update"});
+      me.setState({mode: "update", postId: postId});
     });
   },
   componentDidMount: function(){
@@ -118,12 +119,12 @@ const Category = React.createClass({
     event.preventDefault();
     var me = this;
     var name = getValue("name");
-
     me.disableForm(true);
     if (this.state.mode==="create") {
     var qry = Query.createCategory(name);
+    this.setState({mode: "update"});
   } else {
-    var qry = Query.updateCategory(name);
+    var qry = Query.updateCategory(this.state.postId, name);
   }
     riques(qry, 
       function(error, response, body) { 

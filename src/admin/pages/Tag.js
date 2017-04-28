@@ -140,7 +140,7 @@ const Tag = React.createClass({
     var me = this;
     var name = getValue("name");
     var postId = this.state.postId;
-    this.disableForm(true);debugger;
+    this.disableForm(true);
     var qry = "", noticeTxt = "";
     if (this.state.mode==="create"){
       qry = Query.createTag(name);
