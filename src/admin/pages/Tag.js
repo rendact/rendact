@@ -40,8 +40,7 @@ const Tag = React.createClass({
             _dataArr.push({
               "postId": item.node.id,
               "name": item.node.name,
-              "description": "",
-              "count": ""
+              "count": item.node.post.edges.length
             });
           });
 
@@ -107,7 +106,6 @@ const Tag = React.createClass({
       var row = me.table.datatable.data()[index];
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
-      //setValue("postId", postId);
       setValue("name", name);
       me.setState({postId: postId});
       me.setState({mode: "update"});
@@ -190,13 +188,6 @@ const Tag = React.createClass({
                             <p className="help-block">The name appears on your site</p>
                           </div>
                       </div>
-                      <div className="form-group">
-                        <label htmlFor="homeUrl" >Description</label>
-                        <div >
-                          <textarea name="description" id="description" className="form-control"></textarea>
-                          <p className="help-block">The description is not prominent by default; however, some themes may show it.</p>
-                        </div>
-                      </div>
                        <div className="form-group">
                           <button type="submit" id="submit" className="btn btn-primary btn-flat" 
                           disabled={this.state.name===""}>{this.state.mode==="update"?"Save Changes":"Add New Tag"}</button>
@@ -221,7 +212,6 @@ const Tag = React.createClass({
                           id="tag"
                           columns={[
                             {id: 'name', label: "Name", type: "link", target: "", cssClass:"nameText"},
-                            {id: 'description', label: "Description", textAlign:"center", width: 400},
                             {id: 'count', label: "Count", textAlign:"center"}
                           ]}
                           checkBoxAtFirstColumn="true"
