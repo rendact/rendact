@@ -4,7 +4,7 @@ window.jQuery = $;
 import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Query from '../query';
-import {riques, disableForm, swalert, errorCallback} from '../../utils';
+import {riques, disableForm, errorCallback} from '../../utils';
 import AdminConfig from '../AdminConfig';
 
 const Permission = React.createClass({

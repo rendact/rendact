@@ -117,7 +117,7 @@ const SideMenu = React.createClass({
 			        </div>
 			      </form>
 			      <ul className="sidebar-menu">
-			      	{ this.state.menuList.map(function(item) {
+			      	{ this.state.menuList.map(function(item, index) {
 			      		if (item.roleId) {
 			      			if (!hasRole(item.roleId)) {
 			      				return null
@@ -273,19 +273,19 @@ const PageLoader = React.createClass({
 
 const Admin = React.createClass({
 	componentDidMount: function(){
-		require ('jquery-ui/themes/base/theme.css');
-		require ('jquery-ui/themes/base/tooltip.css');
-		require ('font-awesome/css/font-awesome.css');
-		require ('../../public/css/ionicons.min.css');
-		require ('../../public/css/AdminLTE.css');
-		require ('../../public/css/skins/_all-skins.css');
-		require ('jquery-ui/ui/widgets/tooltip')
-
-		AdminLTEinit();
-
 		var me = this;
 		loadConfig(function(){
 			me.setState({configLoaded: true})
+
+			require ('jquery-ui/themes/base/theme.css');
+			require ('jquery-ui/themes/base/tooltip.css');
+			require ('font-awesome/css/font-awesome.css');
+			require ('../../public/css/ionicons.min.css');
+			require ('../../public/css/AdminLTE.css');
+			require ('../../public/css/skins/_all-skins.css');
+			require ('jquery-ui/ui/widgets/tooltip')
+
+			AdminLTEinit();
 		});
 
 		window.onpopstate = this.onBackButtonEvent;
