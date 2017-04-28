@@ -60,7 +60,8 @@ const queries = {
   UpdateTag: Post.UpdateTag,
   checkContentSlugQry: Content.checkContentSlugQry,
   addImageGallery: Post.addImageGallery,
-  removeImageGallery: Post.removeImageGallery
+  removeImageGallery: Post.removeImageGallery,
+  bindImageGallery: Post.bindImageGallery
 }
 
 module.exports = queries;

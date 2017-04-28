@@ -74,8 +74,11 @@ const NewContentType = React.createClass({
     var time = this.state.publishDate + hours + minute;
     this.setState({immediately: time});
   },
-  saveDraft: function(event){
+  handleChangeStatus: function(event){
     this.setState({status: $("#statusSelect option:selected").text()});
+  },
+  saveDraft: function(event){
+    this.setState({status: "Draft"});
   },
   saveVisibility: function(event){
     this.setState({visibilityTxt: $("input[name=visibilityRadio]:checked").val()});
@@ -97,7 +100,7 @@ const NewContentType = React.createClass({
     return {
       title: getValue("titlePost"),
       content: window.CKEDITOR.instances['content'].getData(),
-      status: getValue("statusSelect"),
+      status: this.state.status,
       titleTag: getValue("titleTag"),
       metaKeyword: getValue("metaKeyword"),
       metaDescription: getValue("metaDescription"),
@@ -245,24 +248,26 @@ const NewContentType = React.createClass({
     var me = this;
     var v = this.getFormValues();
 
-    if (v.title.length<=3) {
-      this.notification.addNotification({
-        title: 'Error',
-        message: 'Title is too short',
-        level: 'error',
-        position: 'tr'
-      });
-      return;
-    }
+    if (v.status === "Published") {
+      if (v.title === null || v.title.length<=3) {
+        this.notification.addNotification({
+          title: 'Error',
+          message: 'Title is too short',
+          level: 'error',
+          position: 'tr'
+        });
+        return;
+      }
 
-    if (!v.content) {
-      this.notification.addNotification({
-        title: 'Error',
-        message: "Content can't be empty",
-        level: 'error',
-        position: 'tr'
-      });
-      return;
+      if (!v.content) {
+        this.notification.addNotification({
+          title: 'Error',
+          message: "Content can't be empty",
+          level: 'error',
+          position: 'tr'
+        });
+        return;
+      }
     }
     
     var _objData = {
@@ -326,6 +331,9 @@ const NewContentType = React.createClass({
                   var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.state.postCategoryList, v.categories);
                   riques(catQry,
                     function(error, response, body) {
+                      here.disableForm(false);
+                      here.notifyUnsavedData(false);
+                      here.bindPostToImageGallery(postId);
                       if (!error && !body.errors && response.statusCode === 200) {
                         here.notification.addNotification({
                           message: noticeTxt,
@@ -334,11 +342,10 @@ const NewContentType = React.createClass({
                           autoDismiss: 2
                         });
                         here.setState({mode: "update"});
+                        here.props.handleNav(me.props.slug,"edit",postId);
                       } else {
                         errorCallback(error, body.errors?body.errors[0].message:null);
                       }
-                      here.disableForm(false);
-                      here.notifyUnsavedData(false);
                     }
                   );
                 } else {
@@ -358,6 +365,8 @@ const NewContentType = React.createClass({
             here.setState({mode: "update"});
             here.disableForm(false);
             here.notifyUnsavedData(false);
+            here.bindPostToImageGallery(postId);
+            here.props.handleNav(me.props.slug,"edit",postId);
           }
 
         } else {
@@ -466,6 +475,7 @@ const NewContentType = React.createClass({
     this.disableForm(true);
     var reader = new FileReader();
     reader.onload = function(){
+      if (!me.props.postId) me.setState({imageGalleryUnbinded: true});
       riques(Query.addImageGallery(reader.result, me.props.postId), 
         function(error, response, body){
           if (!error && !body.errors && response.statusCode === 200) {
@@ -495,13 +505,29 @@ const NewContentType = React.createClass({
       confirmButtonText: 'Close'
     })
   },
+  bindPostToImageGallery: function(postId){
+    var me = this;
+    if (this.state.imageGallery.length>0 && this.state.imageGalleryUnbinded) {
+      var qry = Query.bindImageGallery(this.state.imageGallery, postId);
+      debugger;
+      riques(qry, 
+        function(error, response, body){
+          if (!error && !body.errors && response.statusCode === 200) {
+            me.setState({imageGalleryUnbinded: false})
+          } else {
+            errorCallback(error, body.errors?body.errors[0].message:null);
+          }
+        }
+      );
+    }
+  },
   handleImageRemove: function(e){
     var me = this;
     var id = e.target.id;
     var index = id.split("-")[1];
     var imageId = id.split("-")[0];
     this.disableForm(true);
-    
+
     var qry = Query.removeImageGallery(imageId);
     riques(qry, 
       function(error, response, body){
@@ -550,7 +576,7 @@ const NewContentType = React.createClass({
             <div className="form-group"  style={{marginBottom:30}}>
               <div>
                 <input id="titlePost" style={{marginBottom: 20}} type="text" className="form-control" 
-                  placeholder="Input Title Here" required="true" onChange={this.handleTitleChange} onBlur={this.handleTitleBlur}/>
+                  placeholder="Input Title Here" onChange={this.handleTitleChange} onBlur={this.handleTitleBlur}/>
                   <div className="form-inline">
                     { !this.state.permalinkEditing ? 
                       ( <p>Permalink: &nbsp;
@@ -577,7 +603,7 @@ const NewContentType = React.createClass({
                       )
                     }
                   </div>
-                  <textarea id="content" name="content" rows="25" style={{width: "100%"}} wrap="hard" required="true"></textarea>
+                  <textarea id="content" name="content" rows="25" style={{width: "100%"}} wrap="hard"></textarea>
                   <div id="trackingDiv"></div>
               </div>
             </div>
@@ -669,7 +695,7 @@ const NewContentType = React.createClass({
                                   <option>Published</option>
                                   <option>Reviewing</option>
                                 </select>
-                                <button type="button" onClick={this.saveDraft} className="btn btn-flat btn-xs btn-primary" 
+                                <button type="button" onClick={this.handleChangeStatus} className="btn btn-flat btn-xs btn-primary" 
                                 style={{marginRight: 10}} data-toggle="collapse" data-target="#statusOption">OK</button>
                                 <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption">Cancel</button>
                             </div>
