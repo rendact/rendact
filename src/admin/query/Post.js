@@ -443,6 +443,18 @@ const removeImageGallery = function(imageId){
     }
 }
 
+const bindImageGallery = function(arr, postId){
+  var query = "mutation { ";
+  _.forEach(arr, function(val, index){
+    query += ' UpdateFile'+index+' : updateFile(input: {id: "'+val.id+'", postId: "'+postId+'"}){ changedFile{ id } }'; 
+  });
+  query += "}";
+
+  return {
+    "query": query
+  }
+}
+
 const queries = {
   getPostListQry: getPostListQry,
   getAllCategoryQry: getAllCategoryQry,
@@ -464,7 +476,8 @@ const queries = {
   createTag: createTag,
   UpdateTag: UpdateTag,
   addImageGallery: addImageGallery,
-  removeImageGallery: removeImageGallery
+  removeImageGallery: removeImageGallery,
+  bindImageGallery: bindImageGallery
 }
 
 module.exports = queries;

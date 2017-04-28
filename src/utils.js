@@ -203,9 +203,12 @@ const swalert = function(type, title, body, callback){
   var background = '#fff';
   var buttonColor = '#357ca5';
   var showCancelButton = true;
+  var text = body;
+
   if (type==="warning") {
     background = '#f39c12';
-    buttonColor = '#ff0000';
+    buttonColor = '#db8b0b';
+    text = title;
   }
   if (type==="info") {
     background = '#00c0ef';
@@ -214,7 +217,7 @@ const swalert = function(type, title, body, callback){
   }
   if (type==="error"){
     background = '#dd4b39';
-    buttonColor = '#ff0000';
+    buttonColor = '#d33724';
     showCancelButton = false;
   }
 
@@ -224,7 +227,7 @@ const swalert = function(type, title, body, callback){
 
   swal({
       /*title: title,*/
-      text: title,
+      text: text,
       showCancelButton: showCancelButton,
       background: background,
       confirmButtonText: 'Yes',
