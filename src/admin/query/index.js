@@ -56,6 +56,7 @@ const queries = {
   deleteCategoryPermanentQry: Post.deleteCategoryPermanentQry,
   deleteTagPermanentQry: Post.deleteTagPermanentQry,
   createCategory: Post.createCategory,
+  updateCategory: Post.updateCategory,
   createTag: Post.createTag,
   UpdateTag: Post.UpdateTag,
   checkContentSlugQry: Content.checkContentSlugQry,

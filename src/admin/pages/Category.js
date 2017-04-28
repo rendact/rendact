@@ -120,10 +120,15 @@ const Category = React.createClass({
     var name = getValue("name");
 
     me.disableForm(true);
+    if (this.state.mode==="create") {
     var qry = Query.createCategory(name);
+  } else {
+    var qry = Query.updateCategory(name);
+  }
     riques(qry, 
       function(error, response, body) { 
         if (!error && !body.errors && response.statusCode === 200) {
+
           /*var here = me;
           me.notification.addNotification({
                   message: noticeTxt,
@@ -139,6 +144,13 @@ const Category = React.createClass({
         }
         me.disableForm(false);
       });
+  },
+
+  resetForm: function(){
+    document.getElementById("pageForm").reset();
+    setValue("name", "");
+    this.setState({mode: "create"});
+    window.history.pushState("", "", '/admin/category');
   },
 
   render: function(){
@@ -182,7 +194,8 @@ const Category = React.createClass({
                       </div>
                        <div className="form-group">
                           
-                            <input type="submit" name="submit" id="submit" value="Add New Category" className="btn btn-primary btn-sm" />
+                            <input type="submit" name="submit" id="submit" value={this.state.mode==="create"?"Add New Category":"Edit Category"} className="btn btn-primary btn-sm" />
+                            <input type="button" value="Reset" style={{marginLeft: 10}} onClick={this.resetForm} className="btn btn-primary btn-sm"/>
                             
                       </div>
                     </form>

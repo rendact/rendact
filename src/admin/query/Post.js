@@ -118,14 +118,15 @@ const getCreatePostQry = function(data){
     }
   };
 
-  const createTag = function(name){
+  const updateCategory = function(name){
   return {
       "query": `
-    mutation createTag($input: CreateTagInput!) {
-        createTag(input: $input) {
-          changedTag {
+    mutation updateCategory($input: UpdateCategoryInput!) {
+        updateCategory(input: $input) {
+          changedCategory {
             id,
-            name
+            name,
+            
         }
       }
     }
@@ -137,6 +138,8 @@ const getCreatePostQry = function(data){
       }
     }
   };
+
+  
 
 const getUpdatePostQry = function(data){
   return {
@@ -163,6 +166,26 @@ const getUpdatePostQry = function(data){
     `,
       "variables": {
         "input": data
+      }
+    }
+  };
+
+  const createTag = function(name){
+  return {
+      "query": `
+    mutation createTag($input: CreateTagInput!) {
+        createTag(input: $input) {
+          changedTag {
+            id,
+            name
+        }
+      }
+    }
+    `,
+      "variables": {
+        "input": {
+          "name": name
+        }
       }
     }
   };
@@ -473,6 +496,7 @@ const queries = {
   deleteCategoryPermanentQry: deleteCategoryPermanentQry,
   deleteTagPermanentQry: deleteTagPermanentQry,
   createCategory: createCategory,
+  updateCategory: updateCategory,
   createTag: createTag,
   UpdateTag: UpdateTag,
   addImageGallery: addImageGallery,
