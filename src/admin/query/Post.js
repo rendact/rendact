@@ -62,7 +62,14 @@ const getAllTagQry = {
         edges {
           node {
             id,
-            name
+            name,
+            post {
+              edges {
+                node{
+                  id
+                }
+              }
+            }
           }
         }
       }

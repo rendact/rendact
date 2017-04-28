@@ -146,7 +146,6 @@ const Category = React.createClass({
         me.disableForm(false);
       });
   },
-
   resetForm: function(){
     document.getElementById("pageForm").reset();
     setValue("name", "");
