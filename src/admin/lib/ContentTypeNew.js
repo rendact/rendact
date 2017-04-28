@@ -509,7 +509,7 @@ const NewContentType = React.createClass({
     var me = this;
     if (this.state.imageGallery.length>0 && this.state.imageGalleryUnbinded) {
       var qry = Query.bindImageGallery(this.state.imageGallery, postId);
-      debugger;
+      
       riques(qry, 
         function(error, response, body){
           if (!error && !body.errors && response.statusCode === 200) {

@@ -27,17 +27,6 @@ const Tag = React.createClass({
         mode: "create",
       }
   },
-  /*getFormValues: function(){
-    return {
-      postId: getValue("postId"),
-      name: getValue("name")
-    }
-  },*/
-  /*setFormValues: function(v){
-      setValue("name", v.name);
-      this.setState({name: v.name});
-      this.handleNameChange();
-  },*/
   loadData: function(postId, callback) {
     var me = this;
     var qry = Query.getAllTagQry;
@@ -51,8 +40,7 @@ const Tag = React.createClass({
             _dataArr.push({
               "postId": item.node.id,
               "name": item.node.name,
-              "description": "",
-              "count": ""
+              "count": item.node.post.edges.length
             });
           });
 
@@ -140,7 +128,7 @@ const Tag = React.createClass({
     var me = this;
     var name = getValue("name");
     var postId = this.state.postId;
-    this.disableForm(true);debugger;
+    this.disableForm(true);
     var qry = "", noticeTxt = "";
     if (this.state.mode==="create"){
       qry = Query.createTag(name);
@@ -223,13 +211,6 @@ const Tag = React.createClass({
                             <p className="help-block">The name appears on your site</p>
                           </div>
                       </div>
-                      <div className="form-group">
-                        <label htmlFor="homeUrl" >Description</label>
-                        <div >
-                          <textarea name="description" id="description" className="form-control"></textarea>
-                          <p className="help-block">The description is not prominent by default; however, some themes may show it.</p>
-                        </div>
-                      </div>
                        <div className="form-group">
                           <button type="submit" id="submit" className="btn btn-primary btn-flat" 
                           disabled={this.state.name===""}>{this.state.mode==="update"?"Save Changes":"Add New Tag"}</button>
@@ -254,7 +235,6 @@ const Tag = React.createClass({
                           id="tag"
                           columns={[
                             {id: 'name', label: "Name", type: "link", target: "", cssClass:"nameText"},
-                            {id: 'description', label: "Description", textAlign:"center", width: 400},
                             {id: 'count', label: "Count", textAlign:"center"}
                           ]}
                           checkBoxAtFirstColumn="true"
