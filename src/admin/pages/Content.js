@@ -74,21 +74,22 @@ const Content = React.createClass({
   },
   handleDeleteBtn: function(event){
     var me = this;
-    var checkedRow = document.querySelectorAll("input.postListCb:checked");
-    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
+    var checkedRow = document.querySelectorAll("input.contentListCb:checked");
+    var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
     swalert('warning', 'Sure want to delete?', "You might lost some data!",
       function () {
         me.disableForm(true);
-        riques(Query.deletePostQry(idList), 
+        var qry = Query.deleteContentQry(idList);
+        riques(qry, 
           function(error, response, body) {
             if (!error && !body.errors && response.statusCode === 200) {
               var here = me;
               var cb = function(){here.disableForm(false)}
-              me.loadData(me.table.datatable, "All", cb);
+              me.loadData("All", cb);
             } else {
               errorCallback(error, body.errors?body.errors[0].message:null);
-              me.disableForm(false);
             }
+            me.disableForm(false);
           }
         );
       }
@@ -102,10 +103,14 @@ const Content = React.createClass({
   },
   onAfterTableLoad: function(){
     var me = this;
-    document.getElementByClassName("contentName").addEventListener("click", function(event){
+    var linkFn = function(event){
       event.preventDefault();
       var postId = this.id.split("-")[1];
       me.handleViewPage(postId);
+    }
+    var titles = document.getElementsByClassName('contentName');
+    _.forEach(titles, function(item){
+      item.addEventListener("click", linkFn);
     });
   },
   componentDidMount: function(){

@@ -1,3 +1,4 @@
+import _ from 'lodash';
 
 let getContentListQry = {
   "query": `query getContentList{
@@ -70,12 +71,26 @@ const checkContentSlugQry = function(slug){
   }
 }
 
+const deleteContentQry = function(idList){
+  var query = "mutation { ";
+  _.forEach(idList, function(val, index){
+    query += ' DeleteContent'+index+' : deleteContent(input: {id: "'+val+'"}){ changedContent{ id } }'; 
+  });
+  query += "}";
+
+  return {
+    "query": query
+  }
+};
+
+
 const queries = {
   getContentListQry: getContentListQry,
   createContentMtn: createContentMtn,
   getContentQry: getContentQry,
   getContentPostListQry: getContentPostListQry,
-  checkContentSlugQry: checkContentSlugQry
+  checkContentSlugQry: checkContentSlugQry,
+  deleteContentQry: deleteContentQry
 }
 
 module.exports = queries;
