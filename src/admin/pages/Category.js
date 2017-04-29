@@ -57,7 +57,7 @@ const Category = React.createClass({
   handleDeleteBtn: function(event){;
     var me = this;
     var checkedRow = $("input.categoryCb:checked");
-    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
+    var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
     swalert('warning','Sure want to delete?',"You might lost some data!",
       function () {
         me.disableForm(true);

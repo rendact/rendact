@@ -1,6 +1,5 @@
 import React from 'react';
 import $ from 'jquery';
-window.jQuery = $;
 import _ from 'lodash';
 import {hasRole} from '../../utils';
 

@@ -58,7 +58,7 @@ const Tag = React.createClass({
   handleDeleteBtn: function(event){
     var me = this;
     var checkedRow = $("input.tagCb:checked");
-    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
+    var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
     
     swal(_.merge({
       title: 'Sure want to delete?',

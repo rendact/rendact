@@ -171,7 +171,7 @@ const ContentType = React.createClass({
   handleDeleteBtn: function(event){
     var me = this;
     var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
-    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
+    var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
    
       me.disableForm(true);
       riques(Query.deletePostQry(idList), 
@@ -190,7 +190,7 @@ const ContentType = React.createClass({
   handleDeletePermanent: function(event){
     var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     var me = this;
-    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
+    var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
     swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
       function () {
         me.disableForm(true);
@@ -231,7 +231,7 @@ const ContentType = React.createClass({
   handleRecover: function(event){
     var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     var me = this;
-    var idList =checkedRow.map(function(index, item){ return item.id.split("-")[1]});
+    var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
    
       this.disableForm(true);
       riques(Query.recoverPostQry(idList), 
