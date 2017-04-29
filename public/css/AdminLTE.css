@@ -5114,3 +5114,11 @@ div.passwordTester > span.ReactPasswordStrength-strength-desc {
 .imageSwal {
   width: 600px !important;
 }
+.sidebar-toggle {
+  display: none;
+}
+@media (max-width: 767px) {
+  .sidebar-toggle {
+    display: inherit;
+  }
+}

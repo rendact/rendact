@@ -36,22 +36,13 @@ const AdminHeader = React.createClass({
           </span>
         </a>
         <ul className="dropdown-menu logo-menu">
-          <li>
-            <a href="#">
-              Documentation
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              Supports Forum
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              Feedback
-            </a>
-          </li>
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">Supports Forum</a></li>
+          <li><a href="#">Feedback</a></li>
         </ul>
+        <a href="#" className="sidebar-toggle" data-toggle="offcanvas" role="button">
+          <span className="sr-only">Toggle navigation</span>
+        </a>
         <a href="/" className="site-name dropdown-toggle" data-toggle="dropdown">
           <span><i className="fa fa-home"></i> My Site</span>
         </a>
