@@ -246,7 +246,7 @@ const NewContentType = React.createClass({
     var me = this;
     var v = this.getFormValues();
 
-    if (v.status === "Published") {
+    if (v.status === "Published" || v.status === "Draft" || v.status === "Reviewing") {
       if (v.title === null || v.title.length<=3) {
         this.notification.addNotification({
           title: 'Error',
