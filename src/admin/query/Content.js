@@ -54,9 +54,12 @@ const getContentQry = function(contentId){
 }
 
 const getContentPostListQry = function(s, postType) {
-  var status = '{ne: "Deleted"}';
-  if (s==="Deleted" || s==="Draft" || s==="Pending Review")
+  var status = '{ne: "Trash"}';
+  if (s==="Trash" || s==="Draft" || s==="Pending Review")
     status = '{eq: "'+s+'"}';
+  if (s==="Full") {
+    status = '{ne: ""}';
+  }
 
   return {
     "query": 

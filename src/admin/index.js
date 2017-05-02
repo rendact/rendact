@@ -195,8 +195,6 @@ const PageLoader = React.createClass({
 			'pages': <Pages handleNav={hn}/>,
 			'category' : <Category handleNav={hn}/>,
 			'tag' : <Tag handleNav={hn}/>,
-			//'tag-new' : <Tag handleNav={hn}/>,
-			//'tag-edit' : <Tag tagId={this.props.postId} handleNav={hn} handleUnsavedData={hud}/>,
 			'themes' : <Themes handleNav={hn}/>,
 			'permission' : <Permission handleNav={hn}/>,
 			'plugins' : <Plugins handleNav={hn}/>,
@@ -248,14 +246,14 @@ const PageLoader = React.createClass({
 						slug={contentData.slug}
 						postId={this.props.postId} 
 						postType={page}
-			      loadQuery={Query.getPostQry}
-			      createQuery={Query.getCreatePostQry}
-			      updateQuery={Query.getUpdatePostQry}
-			      tableName="Post"
-			      widgets={["category", "featuredImage"]}
-			      viewRole="view-post"
-			      modifyRole="modify-post"
-			      handleNav={this.props.handleNav}
+				      loadQuery={Query.getPostQry}
+				      createQuery={Query.getCreatePostQry}
+				      updateQuery={Query.getUpdatePostQry}
+				      tableName="Post"
+				      widgets={["category", "featuredImage"]}
+				      viewRole="view-post"
+				      modifyRole="modify-post"
+				      handleNav={this.props.handleNav}
 					/>
 				}
 			});

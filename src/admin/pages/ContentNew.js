@@ -220,7 +220,7 @@ var ContentNew = React.createClass({
 												<option value="right">Right</option>
 												<option value="center">Center</option>
 											</select> 
-											<input type="button" value="Add" className="form-control btn" onClick={this.handleAddField}/> 
+											<input type="button" value="Add" className="form-control btn btn-primary " onClick={this.handleAddField}/> 
 										</div>
 										<h4>Current fields</h4>
 										{
