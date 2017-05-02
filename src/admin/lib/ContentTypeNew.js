@@ -6,7 +6,6 @@ import {riques, setValue, getValue, disableForm, errorCallback, getConfig, defau
 import {getTemplates} from '../theme';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
-import Dropzone from 'react-dropzone';
 import Halogen from 'halogen';
 import { default as swal } from 'sweetalert2';
 
@@ -28,6 +27,7 @@ const NewContentType = React.createClass({
       pageList: null,
       categoryList: null,
       postCategoryList: [],
+      postTagList: [],
       titleTagLeftCharacter: 65,
       metaDescriptionLeftCharacter: 160,
       publishDate: new Date(),
@@ -135,6 +135,16 @@ const NewContentType = React.createClass({
       });
       this.setState({postCategoryList: _postCategoryList});
     }
+    var _postTagList = [];
+    if (v.tag.edges.length>0) {
+      _.forEach(v.tag.edges, function(i){
+        if (i.node.tag){
+          _postTagList.push(i.node.tag.id);
+          $('#tags-input').tagsinput('add', { id: i.node.tag.id, text: i.node.tag.name });
+        }
+      });
+      this.setState({postTagList: _postTagList});
+    }
     var _imageGalleryList = [];
     
     if (v.file.edges.length>0) {
@@ -241,34 +251,8 @@ const NewContentType = React.createClass({
   handleAddNewBtn: function(event) {
     this.resetForm();
   },
-  handleSubmit: function(event) {
-    event.preventDefault();
-    var me = this;
-    var v = this.getFormValues();
-
-    if (v.status === "Published" || v.status === "Draft" || v.status === "Reviewing") {
-      if (v.title === null || v.title.length<=3) {
-        this.notification.addNotification({
-          title: 'Error',
-          message: 'Title is too short',
-          level: 'error',
-          position: 'tr'
-        });
-        return;
-      }
-
-      if (!v.content) {
-        this.notification.addNotification({
-          title: 'Error',
-          message: "Content can't be empty",
-          level: 'error',
-          position: 'tr'
-        });
-        return;
-      }
-    }
-    
-    var _objData = {
+  _emulateDataForSaving: function(v){
+    return {
       "title": v.title,
       "content": v.content,
       "status": v.status,
@@ -283,8 +267,25 @@ const NewContentType = React.createClass({
       "order": v.pageOrder,
       "featuredImage": v.featuredImage
     }
+  },
+  handleSubmit: function(event) {
+    event.preventDefault();
+    var me = this;
+    var v = this.getFormValues();
 
-    this.disableForm(true);
+    if (v.status === "Published" || v.status === "Draft" || v.status === "Reviewing") {
+      if (v.title === null || v.title.length<=3) {
+        this._errorNotif('Title is too short');
+        return;
+      }
+
+      if (!v.content) {
+        this._errorNotif("Content can't be empty");
+        return;
+      }
+    }
+    
+    var _objData = this._emulateDataForSaving(v);
     var qry = "", noticeTxt = "";
     if (this.state.mode==="create"){
       qry = this.props.createQuery(_objData);
@@ -295,12 +296,11 @@ const NewContentType = React.createClass({
       noticeTxt = this.props.name+' Updated!';
     }
 
+    this.disableForm(true);
     riques(qry, 
       function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
-          var here = me;
-          var postId = "";
-          var pmQry = "";
+          var here = me, postId = "", pmQry = "";
           
           if (me.state.mode==="create"){
             postId = body.data.createPost.changedPost.id;
@@ -321,52 +321,58 @@ const NewContentType = React.createClass({
               pmQry = Query.updatePostMetaMtn(postId, data);
             }
           }
+
+          riques(pmQry, 
+            function(error, response, body) {
+              if (!error && !body.errors && response.statusCode === 200) {
+                
+              } else {
+                errorCallback(error, body.errors?body.errors[0].message:null);
+              }
+              here.disableForm(false);
+              here.notifyUnsavedData(false);
+            }
+          );
           
           if (me.isWidgetActive("category")) {
-            riques(pmQry, 
+            var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.state.postCategoryList, v.categories);
+            riques(catQry,
               function(error, response, body) {
+                here.disableForm(false);
+                here.notifyUnsavedData(false);
+                here.bindPostToImageGallery(postId);
                 if (!error && !body.errors && response.statusCode === 200) {
-                  var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.state.postCategoryList, v.categories);
-                  riques(catQry,
-                    function(error, response, body) {
-                      here.disableForm(false);
-                      here.notifyUnsavedData(false);
-                      here.bindPostToImageGallery(postId);
-                      if (!error && !body.errors && response.statusCode === 200) {
-                        here.notification.addNotification({
-                          message: noticeTxt,
-                          level: 'success',
-                          position: 'tr',
-                          autoDismiss: 2
-                        });
-                        here.setState({mode: "update"});
-                        here.props.handleNav(me.props.slug,"edit",postId);
-                      } else {
-                        errorCallback(error, body.errors?body.errors[0].message:null);
-                      }
-                    }
-                  );
+                  
                 } else {
                   errorCallback(error, body.errors?body.errors[0].message:null);
                 }
-                here.disableForm(false);
-                here.notifyUnsavedData(false);
               }
             );
-          } else {
-            here.notification.addNotification({
-              message: noticeTxt,
-              level: 'success',
-              position: 'tr',
-              autoDismiss: 2
-            });
-            here.setState({mode: "update"});
-            here.disableForm(false);
-            here.notifyUnsavedData(false);
-            here.bindPostToImageGallery(postId);
-            here.props.handleNav(me.props.slug,"edit",postId);
           }
 
+          if (me.isWidgetActive("tag")) {
+            var tagQry = Query.createUpdateTagOfPostMtn(postId, me.state.postTagList, v.categories);
+            riques(tagQry,
+              function(error, response, body) {
+                here.disableForm(false);
+                here.notifyUnsavedData(false);
+                here.bindPostToImageGallery(postId);
+                if (!error && !body.errors && response.statusCode === 200) {
+                  
+                } else {
+                  errorCallback(error, body.errors?body.errors[0].message:null);
+                }
+              }
+            );
+          } 
+
+          // do these when post data succesfully saved
+          here._successNotif(noticeTxt);
+          here.setState({mode: "update"});
+          here.disableForm(false);
+          here.notifyUnsavedData(false);
+          here.bindPostToImageGallery(postId);
+          here.props.handleNav(me.props.slug,"edit",postId);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
@@ -416,7 +422,9 @@ const NewContentType = React.createClass({
 
     
     $('#tags-input').tagsinput({
-      confirmKeys: [13, 188]
+      confirmKeys: [13, 188],
+      itemValue: 'id',
+      itemText: 'text'
     });
     document.getElementById("tags-input").addEventListener("keypress", function(e){
       if (e.keyCode === 13){
@@ -453,11 +461,22 @@ const NewContentType = React.createClass({
         }
       );
     }
-    /*
-    $(document).on('change', 'input:not(.noWarning),textarea:not(.noWarning),select:not(.noWarning)', function () {
-      window.onbeforeunload = function(){ return 'Any unsaved data will be lost...' }
+  },
+  _errorNotif: function(msg){
+    this.refs.notificationSystem.addNotification({
+      title: 'Error',
+      message: msg,
+      level: 'error',
+      position: 'tr'
     });
-    */
+  },
+  _successNotif: function(msg){
+    this.refs.notificationSystem.addNotification({
+      message: msg,
+      level: 'success',
+      position: 'tr',
+      autoDismiss: 2
+    });
   },
   featuredImageChange: function(e){
     var me = this;
@@ -854,7 +873,7 @@ const NewContentType = React.createClass({
                       <div>
                         { this.state.featuredImage &&
                           <div style={{position: "relative"}}>
-                            <img src={this.state.featuredImage} style={{width: "100%"}}/>
+                            <img src={this.state.featuredImage} style={{width: "100%"}} alt={this.state.title}/>
                             <button onClick={this.handleFeaturedImageRemove} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
                           </div>
                         }
@@ -877,11 +896,11 @@ const NewContentType = React.createClass({
                     </div>
                     <div className="box-body pad">
                       <div>
-                        <input type="file" id= "imageGallery" name="imageGallery" onChange={this.imageGalleryChange}/>
+                        <input type="file" id="imageGallery" name="imageGallery" onChange={this.imageGalleryChange}/>
                         {
                           _.map(this.state.imageGallery, function(item, index){
                             return <div key={index} className="margin" style={{width: 150, float: "left", position: "relative"}}>
-                            <a href="" onClick={this.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue"}}/></a>
+                            <a href="" onClick={this.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue"}} alt={"gallery"+index}/></a>
                             <button id={item.id+"-"+index} onClick={this.handleImageRemove} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
                             </div>
                           }.bind(this))

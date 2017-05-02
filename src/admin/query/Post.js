@@ -28,7 +28,7 @@ const getContentsQry = function(type, s) {
     "query": 
       `query getPosts{viewer {allPosts(where: {type: {eq: "`+type+`"}, status: `+status+`}) { edges { node { 
        id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},
-       comments{edges{node{id}}},file{edges{node{id,value}}},featuredImage,createdAt}}}}}`
+       tag{edges{node{tag{id, name}}}},comments{edges{node{id}}},file{edges{node{id,value}}},featuredImage,createdAt}}}}}`
   };
 }
 
@@ -362,11 +362,11 @@ const createUpdateTagOfPostMtn = function(postId, currentTag, newTag){
 
 const getPostQry = function(postId){
   return {"query": 
-      '{getPost(id:"'+postId+'"){ id,title,content,slug,author{username},status,visibility,featuredImage,'
-      +'summary,category{edges{node{category{id,name}}}},comments{edges{node{id}}},file{edges{node{id value}}},meta{edges{node{item,value}'
-      +'}}createdAt}}'
+     `{getPost(id:"`+postId+`"){ id,title,content,slug,author{username},status,visibility,featuredImage,
+      summary,category{edges{node{category{id,name}}}},comments{edges{node{id}}},file{edges{node{id value}}},
+      tag{edges{node{tag{id,name}}}},meta{edges{node{item,value}}},createdAt}}`
     }
-  };
+};
 
 const deletePostQry = function(idList){
   var query = "mutation { ";
