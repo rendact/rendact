@@ -51,6 +51,7 @@ const queries = {
   getContentQry: Content.getContentQry,
   deleteContentQry: Content.deleteContentQry,
   getContentPostListQry: Content.getContentPostListQry,
+  updateContentMtn: Content.updateContentMtn,
   deleteUserQry: User.deleteUserQry,
   updateRoleUser: User.updateRoleUser,
   getAllTagQry: Post.getAllTagQry,

@@ -39,6 +39,27 @@ const createContentMtn = function(data){
     }
   };
 
+  const updateContentMtn = function(data){
+  return {
+      "query": `
+    mutation updateContent($input: UpdateContentInput!) {
+        updateContent(input: $input) {
+          changedContent {
+            id,
+            name,
+            slug,
+            fields,
+            createdAt
+        }
+      }
+    }
+    `,
+      "variables": {
+        "input": data
+      }
+    }
+  };
+
 const getContentQry = function(contentId){
   return {"query": 
       `{
@@ -93,7 +114,8 @@ const queries = {
   getContentQry: getContentQry,
   getContentPostListQry: getContentPostListQry,
   checkContentSlugQry: checkContentSlugQry,
-  deleteContentQry: deleteContentQry
+  deleteContentQry: deleteContentQry,
+  updateContentMtn: updateContentMtn
 }
 
 module.exports = queries;

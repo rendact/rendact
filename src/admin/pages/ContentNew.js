@@ -97,8 +97,15 @@ var ContentNew = React.createClass({
 		};
 		this.disableForm(true);
 
-		var qry = Query.createContentMtn(_objData);
-		
+		var qry = "", noticeTxt = "";
+	    if (this.state.mode==="create"){
+	      qry = Query.createContentMtn(_objData);
+	    }else{
+	      _objData["id"] = this.props.postId;
+	      qry = Query.updateContentMtn(_objData);
+	    }
+
+		//var qry = Query.createContentMtn(_objData);
 		riques(qry, 
 			function(error, response, body){
 				if(!error && !body.errors) {
