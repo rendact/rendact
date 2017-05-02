@@ -5,6 +5,48 @@ import Query from './admin/query';
 import _ from 'lodash';
 import { default as swal } from 'sweetalert2';
 
+const swalert = function(type, title, body, callback){
+  var background = '#fff';
+  var buttonColor = '#357ca5';
+  var showCancelButton = true;
+  var text = body;
+
+  if (type==="warning") {
+    background = '#f39c12';
+    buttonColor = '#db8b0b';
+    text = title;
+  }
+  if (type==="info") {
+    background = '#00c0ef';
+    buttonColor = '#00a7d0';
+    showCancelButton = false;
+  }
+  if (type==="error"){
+    background = '#dd4b39';
+    buttonColor = '#d33724';
+    showCancelButton = false;
+  }
+
+  if (!callback) {
+    callback = function(){}
+  }
+
+  swal({
+      /*title: title,*/
+      text: text,
+      showCancelButton: showCancelButton,
+      background: background,
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No',
+      confirmButtonColor: buttonColor,
+      cancelButtonColor: 'grey',
+      confirmButtonClass: 'btn swal-btn-success',
+      cancelButtonClass: 'btn swal-btn-danger',
+      buttonsStyling: true,
+      customClass: 'swal'
+    }).then(callback)
+}
+
 const riques = function(query, callback, isadmin){
   var token = localStorage.getItem("token");
   if (isadmin || Config.adminMode){
@@ -197,49 +239,6 @@ const loadConfig = function(callback){
       }
     }
   );
-}
-
-const swalert = function(type, title, body, callback){
-  var background = '#fff';
-  var buttonColor = '#357ca5';
-  var showCancelButton = true;
-  var text = body;
-
-  if (type==="warning") {
-    background = '#f39c12';
-    buttonColor = '#db8b0b';
-    text = title;
-  }
-  if (type==="info") {
-    background = '#00c0ef';
-    buttonColor = '#00a7d0';
-    showCancelButton = false;
-  }
-  if (type==="error"){
-    background = '#dd4b39';
-    buttonColor = '#d33724';
-    showCancelButton = false;
-  }
-
-  if (!callback) {
-    callback = function(){}
-  }
-
-  swal({
-      /*title: title,*/
-      text: text,
-      showCancelButton: showCancelButton,
-      background: background,
-      confirmButtonText: 'Yes',
-      cancelButtonText: 'No',
-      showCancelButton: true,
-      confirmButtonColor: buttonColor,
-      cancelButtonColor: 'grey',
-      confirmButtonClass: 'btn swal-btn-success',
-      cancelButtonClass: 'btn swal-btn-danger',
-      buttonsStyling: true,
-      customClass: 'swal'
-    }).then(callback)
 }
 
 const defaultHalogenStyle = {

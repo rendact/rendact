@@ -97,7 +97,7 @@ var ContentNew = React.createClass({
 		};
 		this.disableForm(true);
 
-		var qry = "", noticeTxt = "";
+		var qry = "";
 	    if (this.state.mode==="create"){
 	      qry = Query.createContentMtn(_objData);
 	    }else{

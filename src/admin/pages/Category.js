@@ -4,7 +4,6 @@ import Query from '../query';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
 import {riques, hasRole, errorCallback, getValue, setValue, removeTags, swalert, disableForm} from '../../utils';
-import AdminConfig from '../AdminConfig';
 import {Table, SearchBox, DeleteButtons} from '../lib/Table';
 
 const Category = React.createClass({
@@ -108,13 +107,15 @@ const Category = React.createClass({
     event.preventDefault();
     var me = this;
     var name = getValue("name");
+    var qry = "";
+    
     me.disableForm(true);
     if (this.state.mode==="create") {
-    var qry = Query.createCategory(name);
-    this.setState({mode: "update"});
-  } else {
-    var qry = Query.updateCategory(this.state.postId, name);
-  }
+      qry = Query.createCategory(name);
+      this.setState({mode: "update"});
+    } else {
+      qry = Query.updateCategory(this.state.postId, name);
+    }
     riques(qry, 
       function(error, response, body) { 
         if (!error && !body.errors && response.statusCode === 200) {
