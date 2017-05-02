@@ -221,7 +221,7 @@ const PageLoader = React.createClass({
 		} else if (this.isContentType(page)) {
 			var contentList = getConfig("contentList");
 			var contentData = _.find(contentList, {slug: page});
-			
+			var me = this;
 			let ListComponent = React.createClass({
 				render: function(){
 					return <ContentType 
@@ -234,7 +234,7 @@ const PageLoader = React.createClass({
 						viewRole="view-post"
 						modifyRole="modify-post"
 						statusList={["All", "Published", "Draft", "Reviewing", "Trash"]}
-						handleNav={this.props.handleNav}
+						handleNav={me.props.handleNav}
 					/>
 				}
 			});
@@ -253,7 +253,7 @@ const PageLoader = React.createClass({
 				      widgets={["category", "featuredImage"]}
 				      viewRole="view-post"
 				      modifyRole="modify-post"
-				      handleNav={this.props.handleNav}
+				      handleNav={me.props.handleNav}
 					/>
 				}
 			});

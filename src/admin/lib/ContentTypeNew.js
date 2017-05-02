@@ -420,18 +420,19 @@ const NewContentType = React.createClass({
     require('../lib/bootstrap-tagsinput.css');
     var me = this;
 
-    
-    $('#tags-input').tagsinput({
-      confirmKeys: [13, 188],
-      itemValue: 'id',
-      itemText: 'text'
-    });
-    document.getElementById("tags-input").addEventListener("keypress", function(e){
-      if (e.keyCode === 13){
-        e.keyCode = 188;
-        e.preventDefault();
-      };
-    })
+    if (this.isWidgetActive("tag")) {
+      $('#tags-input').tagsinput({
+        confirmKeys: [13, 188],
+        itemValue: 'id',
+        itemText: 'text'
+      });
+      document.getElementById("tags-input").addEventListener("keypress", function(e){
+        if (e.keyCode === 13){
+          e.keyCode = 188;
+          e.preventDefault();
+        };
+      })
+    }
 
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
       window.CKEDITOR.replace('content', {
