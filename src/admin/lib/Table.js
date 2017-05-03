@@ -126,7 +126,7 @@ const Table = React.createClass({
 
       _.forEach(me.props.columns, function(col, index){
       	var textAlign = col.textAlign?col.textAlign:'left';
-	      var cssClass = col.cssClass && item.postId!=="fixed"?col.cssClass:'';
+	      var cssClass = col.cssClass && item.postId!=="fixed"?col.cssClass:'titleText';
 	      var target = col.target?col.target:'#';
       	var _link = item.postId==="fixed"?item[col.id]:'<a href="'+target+'">'+item[col.id]+'</a>';
 

@@ -441,7 +441,7 @@ const NewContentType = React.createClass({
       document.getElementById("private").setAttribute('checked', true);
 
     this.notification = this.refs.notificationSystem;
-
+    
     if (this.props.postId) {
       riques(this.props.loadQuery(this.props.postId), 
         function(error, response, body) {

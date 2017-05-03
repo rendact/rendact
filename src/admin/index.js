@@ -244,7 +244,7 @@ const PageLoader = React.createClass({
 					return <NewContentType 
 						name={contentData.name} 
 						slug={contentData.slug}
-						postId={this.props.postId} 
+						postId={me.props.postId} 
 						postType={page}
 				      loadQuery={Query.getPostQry}
 				      createQuery={Query.getCreatePostQry}
