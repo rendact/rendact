@@ -76,7 +76,7 @@ const getContentQry = function(contentId){
 
 const getContentPostListQry = function(s, postType) {
   var status = '{ne: "Trash"}';
-  if (s==="Trash" || s==="Draft" || s==="Pending Review")
+  if (s==="Published" || s==="Trash" || s==="Draft" || s==="Reviewing")
     status = '{eq: "'+s+'"}';
   if (s==="Full") {
     status = '{ne: ""}';
