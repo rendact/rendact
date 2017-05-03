@@ -5,26 +5,33 @@ import Query from './admin/query';
 import _ from 'lodash';
 import { default as swal } from 'sweetalert2';
 
-const swalert = function(type, title, body, callback){
+const swalert = function(type, title, body, callback, rgba){
   var background = '#fff';
   var buttonColor = '#357ca5';
   var showCancelButton = true;
+  var confirmButtonText = "";
   var text = body;
 
   if (type==="warning") {
-    background = '#f39c12';
+    //background = '#f39c12';
+    background = "rgba(239,203,4,.2)";
     buttonColor = '#db8b0b';
     text = title;
+    confirmButtonText = "Save"
   }
   if (type==="info") {
-    background = '#00c0ef';
+    //background = '#00c0ef';
+    background = "rgba(0,0,128,.2)";
     buttonColor = '#00a7d0';
     showCancelButton = false;
+    confirmButtonText = "Okay";
   }
   if (type==="error"){
-    background = '#dd4b39';
+    //background = '#dd4b39';
+    background = "rgba(239,4,16,.2)";
     buttonColor = '#d33724';
     showCancelButton = false;
+    confirmButtonText = "Okay";
   }
 
   if (!callback) {
@@ -36,8 +43,8 @@ const swalert = function(type, title, body, callback){
       text: text,
       showCancelButton: showCancelButton,
       background: background,
-      confirmButtonText: 'Yes',
-      cancelButtonText: 'No',
+      confirmButtonText: confirmButtonText,
+      cancelButtonText: 'Cancel',
       confirmButtonColor: buttonColor,
       cancelButtonColor: 'grey',
       confirmButtonClass: 'btn swal-btn-success',
