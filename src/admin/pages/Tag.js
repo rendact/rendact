@@ -3,9 +3,7 @@ import $ from 'jquery';
 import Query from '../query';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
-import {riques, hasRole, errorCallback, setValue, getValue, removeTags, disableForm} from '../../utils';
-import { default as swal } from 'sweetalert2';
-import AdminConfig from '../AdminConfig';
+import {swalert, riques, hasRole, errorCallback, setValue, getValue, removeTags, disableForm} from '../../utils';
 import { Table, SearchBox, DeleteButtons} from '../lib/Table';
 
 const Tag = React.createClass({
@@ -60,13 +58,8 @@ const Tag = React.createClass({
     var checkedRow = $("input.tagCb:checked");
     var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
     
-    swal(_.merge({
-      title: 'Sure want to delete?',
-      text: "You might lost some data!",
-      type: 'warning',
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, cancel!',
-    },AdminConfig.defaultSwalStyling)).then(function () {
+    swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
+      function () {
       me.disableForm(true);
       riques(Query.deleteTagPermanentQry(idList), 
         function(error, response, body) {
