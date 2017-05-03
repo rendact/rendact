@@ -139,8 +139,8 @@ const NewContentType = React.createClass({
     if (v.tag.edges.length>0) {
       _.forEach(v.tag.edges, function(i){
         if (i.node.tag){
-          _postTagList.push(i.node.tag.id);
-          $('#tags-input').tagsinput('add', { id: i.node.tag.id, text: i.node.tag.name });
+          _postTagList.push({id: i.node.tag.id, name: i.node.tag.name});
+          $('#tag').tagsinput('add', i.node.tag.name);
         }
       });
       this.setState({postTagList: _postTagList});
@@ -248,6 +248,9 @@ const NewContentType = React.createClass({
     var resetDate = this.state.publishDateReset;
     this.setState({publishDate: resetDate});
   },
+  handleTagChange: function(tag){
+    debugger;
+  },
   handleAddNewBtn: function(event) {
     this.resetForm();
   },
@@ -351,7 +354,8 @@ const NewContentType = React.createClass({
           }
 
           if (me.isWidgetActive("tag")) {
-            var tagQry = Query.createUpdateTagOfPostMtn(postId, me.state.postTagList, v.categories);
+            var currentTag = $('#tag').tagsinput('items');
+            var tagQry = Query.createUpdateTagOfPostMtn(postId, me.state.postTagList, currentTag);
             riques(tagQry,
               function(error, response, body) {
                 here.disableForm(false);
@@ -419,21 +423,7 @@ const NewContentType = React.createClass({
     require('../lib/bootstrap-tagsinput.js');
     require('../lib/bootstrap-tagsinput.css');
     var me = this;
-
-    if (this.isWidgetActive("tag")) {
-      $('#tags-input').tagsinput({
-        confirmKeys: [13, 188],
-        itemValue: 'id',
-        itemText: 'text'
-      });
-      document.getElementById("tags-input").addEventListener("keypress", function(e){
-        if (e.keyCode === 13){
-          e.keyCode = 188;
-          e.preventDefault();
-        };
-      })
-    }
-
+    
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
       window.CKEDITOR.replace('content', {
         height: 400,
@@ -854,7 +844,7 @@ const NewContentType = React.createClass({
                     </div>
                     <div className="box-body pad">
                       <div className="form-group" style={{width: '100%'}}>
-                          <input id="tags-input" type="text" style={{width: '100%'}}/>
+                          <input id="tag" data-role="tagsinput" style={{width: '100%'}} onChange={this.handleTagChange}/>
                           <p><span className="help-block">Press enter after inputting tag</span></p>
                       </div>
                     </div>
