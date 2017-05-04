@@ -312,7 +312,7 @@ const createUpdateCategoryOfPostMtn = function(postId, currentCat, newCat){
   }
 }
 
-const createUpdateTagOfPostMtn = function(postId, oldTag, currentTag){
+const createUpdateTagOfPostMtn = function(postId, oldTag, currentTag, tagMap){
   var variables = {};
   var oldTagNameArr = _.map(oldTag, function(item){return item.name});
   var deleteList = _.difference(oldTagNameArr, currentTag);
@@ -350,12 +350,10 @@ const createUpdateTagOfPostMtn = function(postId, oldTag, currentTag){
 
   _.forEach(addList, function(item){
     query += ' CreateTagOfPost'+index+' : createTagOfPost(input: $input'+index+'){ changedTagOfPost{ id } }'; 
-    variables["input"+index] = {
-      postId: postId,
-      tag: {
-        "name": item
-      }
-    }
+    var _key = "input"+index 
+    variables[_key] = {postId: postId,tag: {"name": item}}
+    if (_.has(tagMap, item)) 
+      variables[_key] = {postId: postId,tagId: tagMap[item].id}
 
     index++;
   });

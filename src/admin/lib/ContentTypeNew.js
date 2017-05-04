@@ -39,7 +39,8 @@ const NewContentType = React.createClass({
       isProcessing: false,
       opacity: 1,
       featuredImage: null,
-      imageGallery: []
+      imageGallery: [],
+      tagMap: {}
     }
   },
   isWidgetActive: function(name){
@@ -355,7 +356,7 @@ const NewContentType = React.createClass({
 
           if (me.isWidgetActive("tag")) {
             var currentTag = $('#tag').tagsinput('items');
-            var tagQry = Query.createUpdateTagOfPostMtn(postId, me.state.postTagList, currentTag);
+            var tagQry = Query.createUpdateTagOfPostMtn(postId, me.state.postTagList, currentTag, me.state.tagMap);
             riques(tagQry,
               function(error, response, body) {
                 here.disableForm(false);
@@ -414,6 +415,19 @@ const NewContentType = React.createClass({
               name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
             })
             me.setState({categoryList: categoryList});
+          }
+        }
+      );
+    }
+    if (this.isWidgetActive("tag")) {
+      riques(Query.getAllTagQry, 
+        function(error, response, body) {
+          if (!error) {
+            var _tagMap = {};
+            _.forEach(body.data.viewer.allTags.edges, function(item){
+              _tagMap[item.node.name] = {id: item.node.id, name: item.node.name}
+            })
+            me.setState({tagMap: _tagMap});
           }
         }
       );
