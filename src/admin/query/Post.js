@@ -312,16 +312,22 @@ const createUpdateCategoryOfPostMtn = function(postId, currentCat, newCat){
   }
 }
 
-const createUpdateTagOfPostMtn = function(postId, currentTag, newTag){
+const createUpdateTagOfPostMtn = function(postId, oldTag, currentTag){
   var variables = {};
-  var deleteList = _.difference(currentTag, newTag);
-  var addList = _.difference(newTag, currentTag);
+  var oldTagNameArr = _.map(oldTag, function(item){return item.name});
+  var deleteList = _.difference(oldTagNameArr, currentTag);
+  var addList = _.difference(currentTag, oldTagNameArr);
 
+  var deleteListId = _.map(deleteList, function(item){
+    var obj = _.find(oldTag, {name: item});
+    return obj.id;
+  })
+  
   var query = "mutation (";
   
   var _tempArr = [];
   var index = 0;
-  _.forEach(deleteList, function(item){
+  _.forEach(deleteListId, function(item){
     _tempArr.push("$input"+index+": DeleteTagOfPostInput!")
     index++;
   });
@@ -333,11 +339,10 @@ const createUpdateTagOfPostMtn = function(postId, currentTag, newTag){
   query += ") {";
 
   index = 0;
-  _.forEach(deleteList, function(item){
+  _.forEach(deleteListId, function(item){
     query += ' DeleteTagOfPost'+index+' : deleteTagOfPost(input: $input'+index+'){ changedTagOfPost{ id } }'; 
     variables["input"+index] = {
-      postId: postId,
-      tagId: item
+      id: item
     }
 
     index++;
@@ -347,7 +352,9 @@ const createUpdateTagOfPostMtn = function(postId, currentTag, newTag){
     query += ' CreateTagOfPost'+index+' : createTagOfPost(input: $input'+index+'){ changedTagOfPost{ id } }'; 
     variables["input"+index] = {
       postId: postId,
-      tagId: item
+      tag: {
+        "name": item
+      }
     }
 
     index++;
