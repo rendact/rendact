@@ -3,12 +3,12 @@ import CategoryContent from '../lib/CategoryContent';
 //import AdminConfig from '../AdminConfig';
 //import Query from '../query';
 
-let Category = React.createClass({
+let CategoryPost = React.createClass({
   render: function() {
     return <CategoryContent 
-      
+        postType="post"
       />
   }
 });
 
-module.exports = Category;
+module.exports = CategoryPost;
