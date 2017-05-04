@@ -32,10 +32,11 @@ const getContentsQry = function(type, s) {
   };
 }
 
-const getAllCategoryQry = {
+const getAllCategoryQry = function( postType) {
+  return{
   "query": `query getCategories{
     viewer {
-      allCategories {
+      allCategories (where: {type: {eq: "`+postType+`"}}) {
         edges {
           node {
             id,
@@ -53,6 +54,7 @@ const getAllCategoryQry = {
       }
     }
   }`
+};
 }
 
 const getAllTagQry = {
@@ -105,27 +107,29 @@ const getCreatePostQry = function(data){
     }
   };
 
-  const createCategory = function(name){
+  const createCategory = function(name, type){
   return {
       "query": `
     mutation createCategory($input: CreateCategoryInput!) {
         createCategory(input: $input) {
           changedCategory {
             id,
-            name
+            name, 
+            type
         }
       }
     }
     `,
       "variables": {
         "input": {
-          "name": name
+          "name": name,
+          "type" : type
         }
       }
     }
   };
 
-  const updateCategory = function(postId, name){
+  const updateCategory = function(postId, name, type){
   return {
       "query": `
     mutation updateCategory($input: UpdateCategoryInput!) {
@@ -133,7 +137,7 @@ const getCreatePostQry = function(data){
           changedCategory {
             id,
             name,
-            
+            type
         }
       }
     }
@@ -141,7 +145,8 @@ const getCreatePostQry = function(data){
       "variables": {
         "input": {
           "id": postId,
-          "name": name
+          "name": name,
+          "type" : type
         }
       }
     }

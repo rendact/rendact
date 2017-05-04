@@ -262,6 +262,7 @@ const PageLoader = React.createClass({
 			let CategoryComponent = React.createClass({
 				render: function(){
 					return <CategoryContent
+						postType={page}
 					/>
 				}
 			});

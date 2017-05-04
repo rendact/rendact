@@ -26,9 +26,9 @@ const CategoryContent = React.createClass({
   },
   loadData: function(type, callback) {
     var me = this;
-    var qry = Query.getAllCategoryQry;
+    var qry = Query.getAllCategoryQry(this.props.postType);
     riques(qry, 
-      function(error, response, body) { 
+      function(error, response, body) { debugger;
         if (body.data) { 
           var monthList = ["all"];
           var _dataArr = [];
@@ -107,14 +107,15 @@ const CategoryContent = React.createClass({
     event.preventDefault();
     var me = this;
     var name = getValue("name");
+    var type = me.props.postType;
     var qry = "";
     
     me.disableForm(true);
     if (this.state.mode==="create") {
-      qry = Query.createCategory(name);
+      qry = Query.createCategory(name, type);
       this.setState({mode: "update"});
     } else {
-      qry = Query.updateCategory(this.state.postId, name);
+      qry = Query.updateCategory(this.state.postId, name, type);
     }
     riques(qry, 
       function(error, response, body) { 
