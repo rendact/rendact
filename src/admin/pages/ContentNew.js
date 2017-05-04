@@ -188,14 +188,20 @@ var ContentNew = React.createClass({
 
 			    <section className="content">
 			    	<div className="row">
-					  	<div className="col-md-8">
-					  	<section className="content">
+					  	<div className="col-md-12">
+					  	<div className="box box-primary">
+
 			    			<form onSubmit={this.handleSubmitBtn} id="contentForm" className="form-horizontal">
-			    			
+			    			<div className="box-header with-border">
+		              <h3 className="box-title">General Info</h3>
+		            </div>
+			    			<div className="box-body">
+
 					  		<div className="form-group">
 								 	<label htmlFor="name" className="col-md-3">Name</label>
 								 	<div className="col-md-9">
-										<input type="text" name="name" id="name" className="form-control rdt-input-form" onBlur={this.handleNameBlur} required/>
+										<input type="text" name="name" id="name" className="form-control rdt-input-form" onBlur={this.handleNameBlur} style={{width: 'auto'}} required/>
+										<p className="help-block">The new post type system name ( max. 20 characters ). Min 2 letters. Once added the post type system name cannot be changed.</p>
 									</div>
 								</div>
 
@@ -205,13 +211,48 @@ var ContentNew = React.createClass({
 							  		<div className="form-inline">
 											<input type="text" name="slug" id="slug" className="form-control rdt-input-form" onBlur={this.handleSlugBlur} required/>
 											{ this.state.checkingSlug && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
+											<p className="help-block">ID for the custom content type ( max. 20 characters ). Alphanumeric lower-case characters and underscores only. Min 2 letters. Once added the post type system name cannot be changed.</p>
 										</div>
 									</div>
 								</div>
 
 								<div className="form-group">
-								 	<label htmlFor="fields" className="col-md-3">Fields</label>
+								 	<label htmlFor="name" className="col-md-3">Menu icon</label>
+								 	<div className="col-md-9">
+										<input type="text" name="menu-icon" id="menu-icon" className="form-control rdt-input-form" style={{width: 'auto'}} required/>
+										<p className="help-block">Font awesome icon class for menu icon</p>
+									</div>
+								</div>
+
+								</div>
+
+								<div className="box-header with-border">
+		              <h3 className="box-title">Fields</h3>
+		            </div>
+
+		            <div className="box-body">
+
+			          <div className="form-group">
+			          	<label htmlFor="fields" className="col-md-3">Provided Fields</label>
 							  	<div className="col-md-9">
+							  		<p className="help-block">Select some provided fields for custom content.</p>
+	                  <div className="checkbox"><label><input type="checkbox"/>Title</label></div>
+	                  <div className="checkbox"><label><input type="checkbox"/>Slug</label></div>
+	                  <div className="checkbox"><label><input type="checkbox"/>Author</label></div>
+	                  <div className="checkbox"><label><input type="checkbox"/>Summary</label></div>
+	                  <div className="checkbox"><label><input type="checkbox"/>Comment</label></div>
+	                  <div className="checkbox"><label><input type="checkbox"/>Image</label></div>
+	                  <div className="checkbox"><label><input type="checkbox"/>Like</label></div>
+	                  <div className="checkbox"><label><input type="checkbox"/>Featured Image</label></div>
+	                  <div className="checkbox"><label><input type="checkbox"/>Galley</label></div>
+	                  <div className="checkbox"><label><input type="checkbox"/>Publish Date</label></div>
+	                </div>
+	              </div>
+
+		            <div className="form-group">
+								 	<label htmlFor="fields" className="col-md-3">Custom Fields</label>
+							  	<div className="col-md-9">
+							  		<p className="help-block">Add some custom fields for custom content.</p>
 							  		<div className="form-inline" >
 											<input type="text" id="field-name" placeholder="Field name" className="form-control"/> 
 											<select id="field-type" className="form-control select">
@@ -244,14 +285,15 @@ var ContentNew = React.createClass({
 								</div>
 								
 								<div className="form-group">
-										<div className="col-md-9">
-											<div className="btn-group">
-												<input type="submit" value={this.state.mode==="update"?"Update":"Add"} className="btn btn-primary btn-sm" />
-											</div>
+									<div className="col-md-9">
+										<div className="btn-group">
+											<input type="submit" value={this.state.mode==="update"?"Update":"Add"} className="btn btn-primary btn-sm" />
 										</div>
 									</div>
+								</div>
+							</div>
 							</form>
-						</section>
+						</div>
 					</div>
 				</div>
 			 </section>

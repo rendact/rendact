@@ -357,6 +357,7 @@ const NewContentType = React.createClass({
           if (me.isWidgetActive("tag")) {
             var currentTag = $('#tag').tagsinput('items');
             var tagQry = Query.createUpdateTagOfPostMtn(postId, me.state.postTagList, currentTag, me.state.tagMap);
+            debugger;
             riques(tagQry,
               function(error, response, body) {
                 here.disableForm(false);
