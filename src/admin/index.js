@@ -9,7 +9,7 @@ import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import Content from './pages/Content';
 import NewContent from './pages/ContentNew';
-import Category from './pages/Category';
+import CategoryPost from './pages/Category';
 import Tag from './pages/Tag';
 import Themes from './pages/Themes';
 import Plugins from './pages/Plugins';
@@ -26,7 +26,7 @@ import NotFound from './NotFound';
 import NotPermissible from './NotPermissible';
 import ContentType from './lib/ContentType';
 import NewContentType from './lib/ContentTypeNew';
-
+import CategoryContent from './lib/CategoryContent';
 import AdminConfig from './AdminConfig';
 import AdminLTEinit from './lib/app.js';
 import {riques, hasRole, errorCallback, getConfig, swalert} from '../utils';
@@ -71,7 +71,8 @@ const SideMenu = React.createClass({
             	{id: item.node.slug, label: item.node.name, icon: 'fa-drivers-license-o', open: false, role: 5, roleId: 'view-post',
 								elements: [
 									{id: item.node.slug, label: item.node.name, icon: 'fa-drivers-license-o', open: true, url: '/admin/'+item.node.slug, role: 5, roleId: 'view-post'},
-									{id: item.node.slug+'-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/'+item.node.slug+'/new', role: 5, roleId: 'modify-post'}
+									{id: item.node.slug+'-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/'+item.node.slug+'/new', role: 5, roleId: 'modify-post'},
+									{id: item.node.slug+'-category', label: 'Category', icon: 'fa-edit', open: false, url: '/admin/'+item.node.slug+'/category', role: 5, roleId: 'modify-category'}
 								]
 							}
             );
@@ -193,7 +194,7 @@ const PageLoader = React.createClass({
 			'profile' : <Profile handleNav={hn}/>,
 			'posts': <Posts handleNav={hn}/>,
 			'pages': <Pages handleNav={hn}/>,
-			'category' : <Category handleNav={hn}/>,
+			'posts-category' : <CategoryPost handleNav={hn}/>,
 			'tag' : <Tag handleNav={hn}/>,
 			'themes' : <Themes handleNav={hn}/>,
 			'permission' : <Permission handleNav={hn}/>,
@@ -246,20 +247,29 @@ const PageLoader = React.createClass({
 						slug={contentData.slug}
 						postId={me.props.postId} 
 						postType={page}
-				      loadQuery={Query.getPostQry}
-				      createQuery={Query.getCreatePostQry}
-				      updateQuery={Query.getUpdatePostQry}
-				      tableName="Post"
-				      widgets={["category", "featuredImage"]}
-				      viewRole="view-post"
-				      modifyRole="modify-post"
-				      handleNav={me.props.handleNav}
+				        loadQuery={Query.getPostQry}
+				        createQuery={Query.getCreatePostQry}
+				        updateQuery={Query.getUpdatePostQry}
+				        tableName="Post"
+				        widgets={["category", "featuredImage"]}
+				        viewRole="view-post"
+				        modifyRole="modify-post"
+				        handleNav={me.props.handleNav}
 					/>
 				}
 			});
 
-			if (action)
+			let CategoryComponent = React.createClass({
+				render: function(){
+					return <CategoryContent
+					/>
+				}
+			});
+
+			if (action=== '-edit' || action=== '-new')
 				return <EditorComponent/>
+			if (action=== '-category')
+				return <CategoryComponent/>
 			else
 				return <ListComponent/>
 		} else {

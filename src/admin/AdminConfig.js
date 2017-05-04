@@ -61,7 +61,7 @@ const MenuRoleValue = {
 	'users' : 'view-user',
 	'permission': 'modify-permission',
 	'posts-new' : 'modify-post',
-	'category' : 'modify-category',
+	'posts-category' : 'modify-category',
 	'tag' : 'modify-tag',
 	'tag-new' : 'modify-tag',
 	'tag-edit' : 'modify-tag',
@@ -130,7 +130,7 @@ const MenuJson = [
 		elements: [
 			{id: 'posts', label: 'Posts', icon: 'fa-pencil-square-o', open: true, url: '/admin/posts', role: 5, roleId: 'view-post'},
 			{id: 'posts-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/posts/new', role: 5, roleId: 'modify-post'},
-			{id: 'category', label: 'Categories', icon: 'fa-edit', open: false, url: '/admin/category', role: 5, roleId: 'modify-category'},
+			{id: 'posts-category', label: 'Categories', icon: 'fa-edit', open: false, url: '/admin/category', role: 5, roleId: 'modify-category'},
 			{id: 'tag', label: 'Tags', icon: 'fa-edit', open: false, url: '/admin/tag', role: 5, roleId: 'modify-tag'}
 		]
 	},
