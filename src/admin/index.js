@@ -265,6 +265,8 @@ const PageLoader = React.createClass({
 				render: function(){
 					return <CategoryContent
 						postType={page}
+						slug={page}
+						handleNav={me.props.handleNav}
 					/>
 				}
 			});
@@ -273,6 +275,8 @@ const PageLoader = React.createClass({
 				render: function(){
 					return <TagContent
 						postType={page}
+						slug={page}
+						handleNav={me.props.handleNav}
 					/>
 				}
 			});

@@ -91,6 +91,9 @@ const TagContent = React.createClass({
     var name = $("#name").val();
     this.setState({name: name})
   },
+  handleViewPage: function(name){
+    this.props.handleNav(this.props.slug);
+  },
   onAfterTableLoad: function(){
     var me = this;
     $(".nameText").click(function(event){
@@ -103,8 +106,20 @@ const TagContent = React.createClass({
       me.setState({postId: postId});
       me.setState({mode: "update"});
     });
+
+     var postLink = function(event){
+      event.preventDefault();
+      var index = this.id.split("-")[0];
+      var row = me.table.datatable.data()[index];
+      var name = removeTags(row[1]);
+      me.handleViewPage(name);
+    }
+
+    var titles = document.getElementsByClassName('tagText');
+    _.forEach(titles, function(item){
+      item.addEventListener('click',postLink);
+    });
   },
-  
   handleSubmit: function(event){
     event.preventDefault();
     var me = this;
@@ -206,7 +221,7 @@ const TagContent = React.createClass({
                           id="tag"
                           columns={[
                             {id: 'name', label: "Name", type: "link", target: "", cssClass:"nameText"},
-                            {id: 'count', label: "Count", textAlign:"center"}
+                            {id: 'count', label: "Count", textAlign:"center", type: "link", target: "", cssClass:"tagText"}
                           ]}
                           checkBoxAtFirstColumn="true"
                           ref="rendactTable"
