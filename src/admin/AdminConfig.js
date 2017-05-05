@@ -1,6 +1,6 @@
 const PageFields = [
-  {id: 'title', label: "Title", width: 400, type: "link", target: "", cssClass:"titleText"},
-  {id: 'slug', label: "Slug", textAlign:"center"},
+  {id: 'title', label: "Title", width: 220, type: "link", target: "", cssClass:"titleText"},
+  {id: 'slug', label: "Slug", width: 220, textAlign:"center"},
   {id: 'author', label: "Author", textAlign:"center"},
   {id: 'status', label: "Status", textAlign:"center"},
   {id: 'comments', label: "Comments", width: 30, textAlign:"center"},
@@ -8,19 +8,19 @@ const PageFields = [
 ];
 
 const PostFields = [
-  {id: 'title', label: "Title", width: 400, type: "link", target: "", cssClass:"titleText"},
-  {id: 'slug', label: "Slug", textAlign:"center"},
+  {id: 'title', label: "Title", width: 220, type: "link", target: "", cssClass:"titleText"},
+  {id: 'slug', label: "Slug", width: 220, textAlign:"center"},
   {id: 'author', label: "Author", textAlign:"center"},
   {id: 'category', label: "Category", textAlign:"center"},
   {id: 'tag', label: "Tags", textAlign:"center"},
   {id: 'like', label: "Likes", textAlign:"center"},
   {id: 'comments', label: "Comments", width: 30, textAlign:"center"},
-  {id: 'createdAt', label: "Publish Date", textAlign:"center"}
+  {id: 'createdAt', label: "Published", textAlign:"center"}
 ]
 
 const UserFields = [
   {id: 'image', label: "Image", type: "image", width: 10},
-  {id: 'username', label: "Username", width: 400, type: "link", target: "", cssClass:"titleText"},
+  {id: 'username', label: "Username", width: 250, type: "link", target: "", cssClass:"titleText"},
   {id: 'email', label: "Email"},
   {id: 'fullName', label: "Full name"},
   {id: 'gender', label: "Gender", textAlign:"center"},
@@ -35,7 +35,6 @@ const PermissionList = [
 	{id: "modify-post", label:"Add / modify post"},
 	{id: "modify-category", label:"Add / modify category"},
 	{id: "modify-tag", label:"View tag list / Add / modify tag"},
-	//{id: "view-tag", label: "View tag list"},
 	{id: "view-user", label: "View user list"},
 	{id: "modify-user", label: "Add / modify user"},
 	{id: "modify-settings", label: "Modify settings"},
@@ -62,7 +61,7 @@ const MenuRoleValue = {
 	'permission': 'modify-permission',
 	'posts-new' : 'modify-post',
 	'posts-category' : 'modify-category',
-	'tag' : 'modify-tag',
+	'posts-tag' : 'modify-tag',
 	'tag-new' : 'modify-tag',
 	'tag-edit' : 'modify-tag',
 	'pages-new' : 'modify-page',
@@ -131,7 +130,7 @@ const MenuJson = [
 			{id: 'posts', label: 'Posts', icon: 'fa-pencil-square-o', open: true, url: '/admin/posts', role: 5, roleId: 'view-post'},
 			{id: 'posts-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/posts/new', role: 5, roleId: 'modify-post'},
 			{id: 'posts-category', label: 'Categories', icon: 'fa-edit', open: false, url: '/admin/posts/category', role: 5, roleId: 'modify-category'},
-			{id: 'tag', label: 'Tags', icon: 'fa-edit', open: false, url: '/admin/tag', role: 5, roleId: 'modify-tag'}
+			{id: 'posts-tag', label: 'Tags', icon: 'fa-edit', open: false, url: '/admin/posts/tag', role: 5, roleId: 'modify-tag'}
 		]
 	},
 ];
