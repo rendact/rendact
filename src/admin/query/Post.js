@@ -32,7 +32,7 @@ const getContentsQry = function(type, s) {
   };
 }
 
-const getAllCategoryQry = function( postType) {
+const getAllCategoryQry = function(postType) {
   return{
   "query": `query getCategories{
     viewer {
@@ -274,6 +274,8 @@ const createUpdateCategoryOfPostMtn = function(postId, currentCat, newCat){
   var deleteList = _.difference(currentCat, newCat);
   var addList = _.difference(newCat, currentCat);
 
+  if (deleteList.length===0 && addList.length===0) return null;
+  
   var query = "mutation (";
   
   var _tempArr = [];
@@ -325,9 +327,11 @@ const createUpdateTagOfPostMtn = function(postId, oldTag, currentTag, tagMap){
 
   var deleteListId = _.map(deleteList, function(item){
     var obj = _.find(oldTag, {name: item});
-    return obj.id;
+    return obj.connectionId;
   })
-  
+
+  if (deleteListId.length===0 && addList.length===0) return null;
+
   var query = "mutation (";
   
   var _tempArr = [];
@@ -374,7 +378,7 @@ const getPostQry = function(postId){
   return {"query": 
      `{getPost(id:"`+postId+`"){ id,title,content,slug,author{username},status,visibility,featuredImage,
       summary,category{edges{node{category{id,name}}}},comments{edges{node{id}}},file{edges{node{id value}}},
-      tag{edges{node{tag{id,name}}}},meta{edges{node{item,value}}},createdAt}}`
+      tag{edges{node{id,tag{id,name}}}},meta{edges{node{item,value}}},createdAt}}`
     }
 };
 

@@ -118,10 +118,14 @@ let hasRole = function(roleId){
   return (_.indexOf(roleIdList, roleId)>-1)
 }
 
-let errorCallback = function(msg1, msg2){
-  if (msg1) swalert('error','Failed!', msg1)
-  else if (msg2) swalert('error','Failed!', msg2)
-  else swalert('error','Failed!', 'Unknown error')
+let errorCallback = function(msg1, msg2, module){
+  var moduleTxt = ""
+  if (module) {
+    moduleTxt = " ("+module+")";
+  }
+  if (msg1) swalert('error','Failed!', msg1+moduleTxt)
+  else if (msg2) swalert('error','Failed!', msg2+moduleTxt)
+  else swalert('error','Failed!', 'Unknown error'+moduleTxt)
 }
 
 let sendMail = function(to, title, message, callback){
