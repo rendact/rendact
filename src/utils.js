@@ -13,25 +13,22 @@ const swalert = function(type, title, body, callback, rgba){
   var text = body;
 
   if (type==="warning") {
-    //background = '#f39c12';
     background = "rgba(239,203,4,.2)";
     buttonColor = '#db8b0b';
     text = title;
-    confirmButtonText = "Save"
+    confirmButtonText = "OK"
   }
   if (type==="info") {
-    //background = '#00c0ef';
     background = "rgba(0,0,128,.2)";
     buttonColor = '#00a7d0';
     showCancelButton = false;
-    confirmButtonText = "Okay";
+    confirmButtonText = "OK";
   }
   if (type==="error"){
-    //background = '#dd4b39';
     background = "rgba(239,4,16,.2)";
     buttonColor = '#d33724';
     showCancelButton = false;
-    confirmButtonText = "Okay";
+    confirmButtonText = "OK";
   }
 
   if (!callback) {
