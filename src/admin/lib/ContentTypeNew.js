@@ -61,7 +61,7 @@ const NewContentType = React.createClass({
             else me.setState({permalinkEditing: false, slug: slug});
           }
         } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
+          errorCallback(error, body.errors?body.errors[0].message:null, "Check Slug");
         }
         me.setState({permalinkInProcess: false});
       }
@@ -97,6 +97,10 @@ const NewContentType = React.createClass({
     window.history.pushState("", "", '/admin/'+this.props.slug+'/new');
   },
   getFormValues: function(){
+    var categories = _.filter(document.getElementsByName("categoryCheckbox[]"), function(item){
+      return item.checked
+    });
+    
     return {
       title: getValue("titlePost"),
       content: window.CKEDITOR.instances['content'].getData(),
@@ -110,10 +114,7 @@ const NewContentType = React.createClass({
       publishDate: this.state.publishDate,
       type: this.props.slug,
       featuredImage: this.state.featuredImage,
-      categories: _.map(document.getElementsByName("categoryCheckbox[]"), function(item){
-        if (item.checked)
-          return item.value
-      })
+      categories: _.map(categories, function(item){return item.value})
     }
   },
   setFormValues: function(v){
@@ -140,7 +141,7 @@ const NewContentType = React.createClass({
     if (v.tag.edges.length>0) {
       _.forEach(v.tag.edges, function(i){
         if (i.node.tag){
-          _postTagList.push({id: i.node.tag.id, name: i.node.tag.name});
+          _postTagList.push({id: i.node.tag.id, name: i.node.tag.name, connectionId: i.node.id});
           $('#tag').tagsinput('add', i.node.tag.name);
         }
       });
@@ -331,7 +332,7 @@ const NewContentType = React.createClass({
               if (!error && !body.errors && response.statusCode === 200) {
                 
               } else {
-                errorCallback(error, body.errors?body.errors[0].message:null);
+                errorCallback(error, body.errors?body.errors[0].message:null, "Save Post Meta");
               }
               here.disableForm(false);
               here.notifyUnsavedData(false);
@@ -340,36 +341,37 @@ const NewContentType = React.createClass({
           
           if (me.isWidgetActive("category")) {
             var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.state.postCategoryList, v.categories);
-            riques(catQry,
-              function(error, response, body) {
-                here.disableForm(false);
-                here.notifyUnsavedData(false);
-                here.bindPostToImageGallery(postId);
-                if (!error && !body.errors && response.statusCode === 200) {
-                  
-                } else {
-                  errorCallback(error, body.errors?body.errors[0].message:null);
+            if (catQry)
+              riques(catQry,
+                function(error, response, body) {
+                  here.disableForm(false);
+                  here.notifyUnsavedData(false);
+                  here.bindPostToImageGallery(postId);
+                  if (!error && !body.errors && response.statusCode === 200) {
+                    
+                  } else {
+                    errorCallback(error, body.errors?body.errors[0].message:null, "Save Category");
+                  }
                 }
-              }
-            );
+              );
           }
 
           if (me.isWidgetActive("tag")) {
             var currentTag = $('#tag').tagsinput('items');
             var tagQry = Query.createUpdateTagOfPostMtn(postId, me.state.postTagList, currentTag, me.state.tagMap);
-            debugger;
-            riques(tagQry,
-              function(error, response, body) {
-                here.disableForm(false);
-                here.notifyUnsavedData(false);
-                here.bindPostToImageGallery(postId);
-                if (!error && !body.errors && response.statusCode === 200) {
-                  
-                } else {
-                  errorCallback(error, body.errors?body.errors[0].message:null);
+            if (tagQry)
+              riques(tagQry,
+                function(error, response, body) {
+                  here.disableForm(false);
+                  here.notifyUnsavedData(false);
+                  here.bindPostToImageGallery(postId);
+                  if (!error && !body.errors && response.statusCode === 200) {
+                    
+                  } else {
+                    errorCallback(error, body.errors?body.errors[0].message:null, "Save Tag");
+                  }
                 }
-              }
-            );
+              );
           } 
 
           // do these when post data succesfully saved
@@ -380,7 +382,7 @@ const NewContentType = React.createClass({
           here.bindPostToImageGallery(postId);
           here.props.handleNav(me.props.slug,"edit",postId);
         } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
+          errorCallback(error, body.errors?body.errors[0].message:null, "Save Post");
         }
       }
     );  
@@ -407,7 +409,7 @@ const NewContentType = React.createClass({
     }
 
     if (this.isWidgetActive("category")) {
-      riques(Query.getAllCategoryQry, 
+      riques(Query.getAllCategoryQry(this.props.slug), 
         function(error, response, body) {
           if (!error) {
             var categoryList = [];
@@ -509,7 +511,7 @@ const NewContentType = React.createClass({
             imageGallery.push({id: data.id, value:data.value});
             me.setState({imageGallery: imageGallery});
           } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
+            errorCallback(error, body.errors?body.errors[0].message:null, "Image Gallery");
           }
           me.disableForm(false);
           document.getElementById("imageGallery").value=null;
@@ -540,7 +542,7 @@ const NewContentType = React.createClass({
           if (!error && !body.errors && response.statusCode === 200) {
             me.setState({imageGalleryUnbinded: false})
           } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
+            errorCallback(error, body.errors?body.errors[0].message:null, "Bind To Image Galley");
           }
         }
       );

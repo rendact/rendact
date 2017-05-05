@@ -13,25 +13,22 @@ const swalert = function(type, title, body, callback, rgba){
   var text = body;
 
   if (type==="warning") {
-    //background = '#f39c12';
     background = "rgba(239,203,4,.2)";
     buttonColor = '#db8b0b';
     text = title;
-    confirmButtonText = "Save"
+    confirmButtonText = "OK"
   }
   if (type==="info") {
-    //background = '#00c0ef';
     background = "rgba(0,0,128,.2)";
     buttonColor = '#00a7d0';
     showCancelButton = false;
-    confirmButtonText = "Okay";
+    confirmButtonText = "OK";
   }
   if (type==="error"){
-    //background = '#dd4b39';
     background = "rgba(239,4,16,.2)";
     buttonColor = '#d33724';
     showCancelButton = false;
-    confirmButtonText = "Okay";
+    confirmButtonText = "OK";
   }
 
   if (!callback) {
@@ -118,10 +115,14 @@ let hasRole = function(roleId){
   return (_.indexOf(roleIdList, roleId)>-1)
 }
 
-let errorCallback = function(msg1, msg2){
-  if (msg1) swalert('error','Failed!', msg1)
-  else if (msg2) swalert('error','Failed!', msg2)
-  else swalert('error','Failed!', 'Unknown error')
+let errorCallback = function(msg1, msg2, module){
+  var moduleTxt = ""
+  if (module) {
+    moduleTxt = " ("+module+")";
+  }
+  if (msg1) swalert('error','Failed!', msg1+moduleTxt)
+  else if (msg2) swalert('error','Failed!', msg2+moduleTxt)
+  else swalert('error','Failed!', 'Unknown error'+moduleTxt)
 }
 
 let sendMail = function(to, title, message, callback){
