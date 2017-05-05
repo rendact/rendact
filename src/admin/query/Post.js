@@ -57,10 +57,11 @@ const getAllCategoryQry = function( postType) {
 };
 }
 
-const getAllTagQry = {
+const getAllTagQry = function( postType) {
+  return{
   "query": `query getTags{
     viewer {
-      allTags {
+      allTags (where: {type: {eq: "`+postType+`"}}) {
         edges {
           node {
             id,
@@ -77,6 +78,7 @@ const getAllTagQry = {
       }
     }
   }`
+};
 }
 
 const getCreatePostQry = function(data){
@@ -183,21 +185,23 @@ const getUpdatePostQry = function(data){
     }
   };
 
-  const createTag = function(name){
+  const createTag = function(name, type){
   return {
       "query": `
     mutation createTag($input: CreateTagInput!) {
         createTag(input: $input) {
           changedTag {
             id,
-            name
+            name,
+            type
         }
       }
     }
     `,
       "variables": {
         "input": {
-          "name": name
+          "name": name,
+          "type" : type
         }
       }
     }

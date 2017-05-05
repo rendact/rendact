@@ -3,46 +3,46 @@ import $ from 'jquery';
 import Query from '../query';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
-import {riques, hasRole, errorCallback, getValue, setValue, removeTags, swalert, disableForm} from '../../utils';
-import {Table, SearchBox, DeleteButtons} from '../lib/Table';
+import {swalert, riques, hasRole, errorCallback, setValue, getValue, removeTags, disableForm} from '../../utils';
+import { Table, SearchBox, DeleteButtons} from '../lib/Table';
 
-const CategoryContent = React.createClass({
+const TagContent = React.createClass({
   getInitialState: function(){
       require ('../pages/Posts.css');
 
       return {
+        name:"",
+        postId:"",
         dt: null,
         errorMsg: null,
         loadingMsg: null,
         monthList: [],
-        postId:"",
         deleteMode: false,
-        mode: "create",
         statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
         dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
         activeStatus: "All",
-        itemSelected: false
+        itemSelected: false,
+        mode: "create",
       }
   },
-  loadData: function(type, callback) {
+  loadData: function(postId, callback) {
     var me = this;
-    var qry = Query.getAllCategoryQry(this.props.postType);
+    var qry = Query.getAllTagQry(this.props.postType);
     riques(qry, 
-      function(error, response, body) {
+      function(error, response, body) { 
         if (body.data) { 
           var monthList = ["all"];
           var _dataArr = [];
 
-          _.forEach(body.data.viewer.allCategories.edges, function(item){
+          _.forEach(body.data.viewer.allTags.edges, function(item){
             _dataArr.push({
               "postId": item.node.id,
               "name": item.node.name,
-              "description": "",
               "count": item.node.post.edges.length
             });
           });
 
-          var bEdit = hasRole('modify-category');
+          var bEdit = hasRole('modify-tag');
           me.table.loadData(_dataArr, bEdit);
           me.setState({monthList: monthList});
 
@@ -53,35 +53,43 @@ const CategoryContent = React.createClass({
       }
     );
   },
-  handleDeleteBtn: function(event){;
+  handleDeleteBtn: function(event){
     var me = this;
-    var checkedRow = $("input.categoryCb:checked");
+    var checkedRow = $("input.tagCb:checked");
     var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
-    swalert('warning','Sure want to delete?',"You might lost some data!",
+    
+    swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
       function () {
-        me.disableForm(true);
-        riques(Query.deleteCategoryPermanentQry(idList), 
-          function(error, response, body) {
-            if (!error && !body.errors && response.statusCode === 200) {
-              var here = me;
-              var cb = function(){here.disableForm(false)}
-              me.loadData("All", cb);
-            } else {
-              errorCallback(error, body.errors?body.errors[0].message:null);
-              me.disableForm(false);
-            }
+      me.disableForm(true);
+      riques(Query.deleteTagPermanentQry(idList), 
+        function(error, response, body) {
+          if (!error && !body.errors && response.statusCode === 200) {
+            var here = me;
+            var cb = function(){here.disableForm(false)}
+            me.loadData("All", cb);
+          } else {
+            errorCallback(error, body.errors?body.errors[0].message:null);
+            me.disableForm(false);
           }
-        );
+        }
+      );
   })},
   disableForm: function(state){
-    disableForm(state, this.notif);
+    disableForm(state, this.notif)
+  },
+  resetForm: function(){
+    document.getElementById("tagForm").reset();
+    this.setState({name:"", mode: "create"});
+    this.handleNameChange();
+    window.history.pushState("", "", '/admin/tag');
   },
   checkDynamicButtonState: function(){
-    var checkedRow = $("input.categoryCb:checked");
+    var checkedRow = $("input.tagCb:checked");
     this.setState({itemSelected: checkedRow.length>0})
   },
-  handleViewPost: function(postId){
-    this.props.handleNav('posts','edit', postId);
+  handleNameChange: function(event){
+    var name = $("#name").val();
+    this.setState({name: name})
   },
   onAfterTableLoad: function(){
     var me = this;
@@ -92,34 +100,38 @@ const CategoryContent = React.createClass({
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
       setValue("name", name);
-      me.setState({mode: "update", postId: postId});
+      me.setState({postId: postId});
+      me.setState({mode: "update"});
     });
   },
-  componentDidMount: function(){
-    this.notif = this.refs.notificationSystem;
-    this.table = this.refs.rendactTable;
-    var datatable = this.table.datatable;
-    this.refs.rendactSearchBox.bindToTable(datatable);
-    this.setState({dt: datatable});
-    this.loadData("All");
-  },
+  
   handleSubmit: function(event){
     event.preventDefault();
     var me = this;
     var name = getValue("name");
+    var postId = this.state.postId;
     var type = me.props.postType;
-    var qry = "";
-    
-    me.disableForm(true);
-    if (this.state.mode==="create") {
-      qry = Query.createCategory(name, type);
-      this.setState({mode: "update"});
-    } else {
-      qry = Query.updateCategory(this.state.postId, name, type);
+    this.disableForm(true);
+    var qry = "", noticeTxt = "";
+
+    if (this.state.mode==="create"){
+      qry = Query.createTag(name, type);
+      noticeTxt = 'Tag Published!';
+    }else{
+      qry = Query.UpdateTag(postId, name, type);
+      noticeTxt = 'Tag Updated!';
     }
+
     riques(qry, 
       function(error, response, body) { 
         if (!error && !body.errors && response.statusCode === 200) {
+          me.notif.addNotification({
+                  message: noticeTxt,
+                  level: 'success',
+                  position: 'tr',
+                  autoDismiss: 2
+          });
+          me.resetForm();
           var here = me;
           var cb = function(){here.disableForm(false)}
           me.loadData("All", cb);
@@ -129,11 +141,13 @@ const CategoryContent = React.createClass({
         me.disableForm(false);
       });
   },
-  resetForm: function(){
-    document.getElementById("pageForm").reset();
-    setValue("name", "");
-    this.setState({mode: "create"});
-    window.history.pushState("", "", '/admin/category');
+  componentDidMount: function(){
+    this.notif = this.refs.notificationSystem;
+    this.table = this.refs.rendactTable;
+    var datatable = this.table.datatable;
+    this.refs.rendactSearchBox.bindToTable(datatable);
+    this.setState({dt: datatable});
+    this.loadData("All");
   },
 
   render: function(){
@@ -142,11 +156,11 @@ const CategoryContent = React.createClass({
         <div className="container-fluid">
           <section className="content-header" style={{marginBottom:20}}>
             <h1>
-              Categories
+              Tags
             </h1>
             <ol className="breadcrumb">
               <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-              <li className="active">Categories</li>
+              <li className="active">Tags</li>
             </ol>
             <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
           </section>  
@@ -157,29 +171,20 @@ const CategoryContent = React.createClass({
                 <div className="container-fluid">
                   <div className="row">
                     <div className="col-xs-4" style={{marginTop: 40}}>
-                    <form onSubmit={this.handleSubmit} id="pageForm" method="get">
+                    <form onSubmit={this.handleSubmit} id="tagForm" method="get">
                       <div className="form-group">
-                        <h4><b>{this.state.mode==="create"?"Add New Category":"Edit Category"}</b></h4>
+                        <h4><b>{this.state.mode==="create"?"Add New Tag":"Edit Tag"}</b></h4>
                       </div>
                       <div className="form-group">
                           <label htmlFor="name" >Name</label>
                           <div >
-                            <input type="text" name="name" id="name" className="form-control" required="true"/>
+                            <input type="text" name="name" id="name" className="form-control" required="true" onChange={this.handleNameChange}/>
                             <p className="help-block">The name appears on your site</p>
                           </div>
                       </div>
-                      <div className="form-group">
-                        <label htmlFor="homeUrl" >Description</label>
-                        <div >
-                          <textarea name="description" id="description" className="form-control"></textarea>
-                          <p className="help-block">The description is not prominent by default; however, some themes may show it.</p>
-                        </div>
-                      </div>
                        <div className="form-group">
-                          
-                            <input type="submit" name="submit" id="submit" value={this.state.mode==="create"?"Add New Category":"Edit Category"} className="btn btn-primary btn-sm" />
-                            <input type="button" value="Reset" style={{marginLeft: 10}} onClick={this.resetForm} className="btn btn-primary btn-sm"/>
-                            
+                          <button type="submit" id="submit" className="btn btn-primary btn-flat" 
+                          disabled={this.state.name===""}>{this.state.mode==="update"?"Save Changes":"Add New Tag"}</button>
                       </div>
                     </form>
                     </div>
@@ -197,11 +202,10 @@ const CategoryContent = React.createClass({
                           <SearchBox datatable={this.table} ref="rendactSearchBox"/>
                         </div>
                       </div>                   
-                      <Table 
-                          id="category"
+                      <Table
+                          id="tag"
                           columns={[
-                            {id: 'name', label: "Name", type: "link", textAlign:"center", cssClass:"nameText"},
-                            {id: 'description', label: "Description", textAlign:"center", width: 400},
+                            {id: 'name', label: "Name", type: "link", target: "", cssClass:"nameText"},
                             {id: 'count', label: "Count", textAlign:"center"}
                           ]}
                           checkBoxAtFirstColumn="true"
@@ -221,4 +225,4 @@ const CategoryContent = React.createClass({
     )},
 });
 
-export default CategoryContent;
+export default TagContent;

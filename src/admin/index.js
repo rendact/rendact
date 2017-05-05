@@ -10,7 +10,7 @@ import Settings from './pages/Settings';
 import Content from './pages/Content';
 import NewContent from './pages/ContentNew';
 import CategoryPost from './pages/Category';
-import Tag from './pages/Tag';
+import TagPost from './pages/Tag';
 import Themes from './pages/Themes';
 import Plugins from './pages/Plugins';
 import Permission from './pages/Permission';
@@ -27,6 +27,7 @@ import NotPermissible from './NotPermissible';
 import ContentType from './lib/ContentType';
 import NewContentType from './lib/ContentTypeNew';
 import CategoryContent from './lib/CategoryContent';
+import TagContent from './lib/TagContent';
 import AdminConfig from './AdminConfig';
 import AdminLTEinit from './lib/app.js';
 import {riques, hasRole, errorCallback, getConfig, swalert} from '../utils';
@@ -72,7 +73,8 @@ const SideMenu = React.createClass({
 								elements: [
 									{id: item.node.slug, label: item.node.name, icon: 'fa-drivers-license-o', open: true, url: '/admin/'+item.node.slug, role: 5, roleId: 'view-post'},
 									{id: item.node.slug+'-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/'+item.node.slug+'/new', role: 5, roleId: 'modify-post'},
-									{id: item.node.slug+'-category', label: 'Category', icon: 'fa-edit', open: false, url: '/admin/'+item.node.slug+'/category', role: 5, roleId: 'modify-category'}
+									{id: item.node.slug+'-category', label: 'Category', icon: 'fa-edit', open: false, url: '/admin/'+item.node.slug+'/category', role: 5, roleId: 'modify-category'},
+									{id: item.node.slug+'-tag', label: 'Tag', icon: 'fa-edit', open: false, url: '/admin/'+item.node.slug+'/tag', role: 5, roleId: 'modify-tag'}
 								]
 							}
             );
@@ -195,7 +197,7 @@ const PageLoader = React.createClass({
 			'posts': <Posts handleNav={hn}/>,
 			'pages': <Pages handleNav={hn}/>,
 			'posts-category' : <CategoryPost handleNav={hn}/>,
-			'tag' : <Tag handleNav={hn}/>,
+			'posts-tag' : <TagPost handleNav={hn}/>,
 			'themes' : <Themes handleNav={hn}/>,
 			'permission' : <Permission handleNav={hn}/>,
 			'plugins' : <Plugins handleNav={hn}/>,
@@ -267,10 +269,20 @@ const PageLoader = React.createClass({
 				}
 			});
 
+			let TagComponent = React.createClass({
+				render: function(){
+					return <TagContent
+						postType={page}
+					/>
+				}
+			});
+
 			if (action=== '-edit' || action=== '-new')
 				return <EditorComponent/>
 			if (action=== '-category')
 				return <CategoryComponent/>
+			if (action=== '-tag')
+				return <TagComponent/>
 			else
 				return <ListComponent/>
 		} else {

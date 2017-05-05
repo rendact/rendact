@@ -35,7 +35,6 @@ const PermissionList = [
 	{id: "modify-post", label:"Add / modify post"},
 	{id: "modify-category", label:"Add / modify category"},
 	{id: "modify-tag", label:"View tag list / Add / modify tag"},
-	//{id: "view-tag", label: "View tag list"},
 	{id: "view-user", label: "View user list"},
 	{id: "modify-user", label: "Add / modify user"},
 	{id: "modify-settings", label: "Modify settings"},
@@ -62,7 +61,7 @@ const MenuRoleValue = {
 	'permission': 'modify-permission',
 	'posts-new' : 'modify-post',
 	'posts-category' : 'modify-category',
-	'tag' : 'modify-tag',
+	'posts-tag' : 'modify-tag',
 	'tag-new' : 'modify-tag',
 	'tag-edit' : 'modify-tag',
 	'pages-new' : 'modify-page',
@@ -131,7 +130,7 @@ const MenuJson = [
 			{id: 'posts', label: 'Posts', icon: 'fa-pencil-square-o', open: true, url: '/admin/posts', role: 5, roleId: 'view-post'},
 			{id: 'posts-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/posts/new', role: 5, roleId: 'modify-post'},
 			{id: 'posts-category', label: 'Categories', icon: 'fa-edit', open: false, url: '/admin/posts/category', role: 5, roleId: 'modify-category'},
-			{id: 'tag', label: 'Tags', icon: 'fa-edit', open: false, url: '/admin/tag', role: 5, roleId: 'modify-tag'}
+			{id: 'posts-tag', label: 'Tags', icon: 'fa-edit', open: false, url: '/admin/posts/tag', role: 5, roleId: 'modify-tag'}
 		]
 	},
 ];
