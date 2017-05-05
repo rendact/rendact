@@ -139,7 +139,7 @@ var ContentNew = React.createClass({
 				id: name.toLowerCase(), 
 				label: name, 
 				type: type?type:"text", 
-				width: width?width:400, 
+				width: width?width:225, 
 				align:align?align:"left"
 			});
 		this.setState({fields: fields})
