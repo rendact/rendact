@@ -25,10 +25,29 @@ var NewUser = React.createClass({
 			userRole: null,
 			classDivUsername:"form-group",
 			classInputUsername:"form-control",
+			classDivName:"form-group",
+			classInputName:"form-control",
 			classDivEmail:"form-group",
 			classInputEmail:"form-control",
+			classDivPhone:"form-group",
+			classInputPhone:"form-control",
+			classDivBio:"form-group",
+			classInputBio:"form-control",
+			classDivWebsite:"form-group",
+			classInputWebsite:"form-control",
+			classDivFacebook:"form-group",
+			classInputFacebook:"form-control",
+			classDivTwitter:"form-group",
+			classInputTwitter:"form-control",
+			classDivLinkedin:"form-group",
+			classInputLinkedin:"form-control",
 			usernameTextBlock:"The short unique name describes you",
+			nameTextBlock:"Your full name",
 			emailTextBlock:"",
+			websiteTextBlock:"Your website name",
+			facebookTextBlock:"URL to your facebook page",
+			twitterTextBlock:"URL to your twitter page",
+			linkedinTextBlock:"URL to your linkedin page",
 			userMetaList: AdminConfig.userMetaList,
 			timezone: "",
 			country: "",
@@ -391,7 +410,7 @@ var NewUser = React.createClass({
 		var usernameRegex = /^[a-zA-Z0-9]+$/;
 		if(!usernameRegex.test(username)) {
 			this._markUsernameError("Username is invalid, only letters and numbers allowed");
-			return
+			return;
 		}
 
 		this.setState({checkingUsername: true});
@@ -478,15 +497,243 @@ var NewUser = React.createClass({
       }
     );
 	},
+	checkName: function(name){
+		var me = this;	
+		if (name.length<4){
+			this._markNameError("Name is too short! Make sure it has minimum 4 characters");
+			return;		
+		}
+		else{
+			this._markNameSuccess();
+			return;
+		}
+
+	},
+	_markNameError: function(msg){
+		this.setState({
+			classDivName: "form-group has-error", 
+			classInputName:"form-control form-control-error", 
+			nameTextBlock:msg,
+			hasErrors: true
+		});
+	},
+	_markNameSuccess: function(){
+		this.setState({
+			classDivName: "form-group has-success", 
+			classInputName: "form-control form-control-success", 
+			nameTextBlock: "Good to go",
+			hasErrors: false
+		});
+	},
+	
+	checkPhone: function(phone){
+		var me = this;	
+		var phoneRegex = /^[0-9-+]+$/;
+		if(!phoneRegex.test(phone)) {
+			this._markPhoneError();
+			return;
+		}
+		else{
+			this._markPhoneSuccess();
+			return;
+		}
+	},
+	_markPhoneError: function(){
+		this.setState({
+			classDivPhone: "form-group has-error", 
+			classInputPhone:"form-control form-control-error", 
+			hasErrors: true
+		});
+	},
+	_markPhoneSuccess: function(){
+		this.setState({
+			classDivPhone: "form-group has-success", 
+			classInputPhone: "form-control form-control-success", 
+			hasErrors: false
+		});
+	},
+	checkBio: function(bio){
+		var me = this;	
+		if(bio.length > 100) {
+			this._markBioError();
+			return;
+		}
+		else{
+			this._markBioSuccess();
+			return;
+		}
+	},
+	_markBioError: function(){
+		this.setState({
+			classDivBio: "form-group has-error", 
+			classInputBio:"form-control form-control-error", 
+			hasErrors: true
+		});
+	},
+	_markBioSuccess: function(){
+		this.setState({
+			classDivBio: "form-group has-success", 
+			classInputBio: "form-control form-control-success", 
+			hasErrors: false
+		});
+	},
+	checkWebsite: function(website){
+		var me = this;	
+		var websiteRegex = /^[a-zA-Z0-9._-]+$/;
+		if(!websiteRegex.test(website)) {
+			this._markWebsiteError("Website is invalid, no regular expression allowed");
+			return;
+		}
+		else{
+			this._markWebsiteSuccess();
+			return;
+		}
+	},
+	_markWebsiteError: function(msg){
+		this.setState({
+			classDivWebsite: "form-group has-error", 
+			classInputWebsite:"form-control form-control-error", 
+			websiteTextBlock:msg,
+			hasErrors: true
+		});
+	},
+	_markWebsiteSuccess: function(){
+		this.setState({
+			classDivWebsite: "form-group has-success", 
+			classInputWebsite: "form-control form-control-success", 
+			websiteTextBlock: "Good to go",
+			hasErrors: false
+		});
+	},
+	checkFacebook: function(facebook){
+		var me = this;	
+		var facebookRegex = /(?:(?:http|https):\/\/)?(?:www.)?facebook.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/;
+
+		if(!facebookRegex.test(facebook)) {
+			this._markFacebookError("Facebook is invalid, have wrong regular expression");
+			return;
+		}
+		else{
+			this._markFacebookSuccess();
+			return;
+		}
+	},
+	_markFacebookError: function(msg){
+		this.setState({
+			classDivFacebook: "form-group has-error", 
+			classInputFacebook:"form-control form-control-error", 
+			facebookTextBlock:msg,
+			hasErrors: true
+		});
+	},
+	_markFacebookSuccess: function(){
+		this.setState({
+			classDivFacebook: "form-group has-success", 
+			classInputFacebook: "form-control form-control-success", 
+			facebookTextBlock: "Good to go",
+			hasErrors: false
+		});
+	},
+	checkTwitter: function(twitter){
+		var me = this;	
+		var twitterRegex = /(?:(?:http|https):\/\/)?(?:www.)?twitter.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/;
+		if(!twitterRegex.test(twitter)) {
+			this._markTwitterError("Twitter is invalid, have wrong regular expression");
+			return;
+		}
+		else{
+			this._markTwitterSuccess();
+			return;
+		}
+	},
+	_markTwitterError: function(msg){
+		this.setState({
+			classDivTwitter: "form-group has-error", 
+			classInputTwitter:"form-control form-control-error", 
+			twitterTextBlock:msg,
+			hasErrors: true
+		});
+	},
+	_markTwitterSuccess: function(){
+		this.setState({
+			classDivTwitter: "form-group has-success", 
+			classInputTwitter: "form-control form-control-success", 
+			twitterTextBlock: "Good to go",
+			hasErrors: false
+		});
+	},
+	checkLinkedin: function(linkedin){
+		var me = this;	
+		var linkedinRegex = /(?:(?:http|https):\/\/)?(?:www.)?linkedin.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/;
+		if(!linkedinRegex.test(linkedin)) {
+			this._markLinkedinError("Linkedin is invalid, have wrong regular expression");
+			return;
+		}
+		else{
+			this._markLinkedinSuccess();
+			return;
+		}
+	},
+	_markLinkedinError: function(msg){
+		this.setState({
+			classDivLinkedin: "form-group has-error", 
+			classInputLinkedin:"form-control form-control-error", 
+			linkedinTextBlock:msg,
+			hasErrors: true
+		});
+	},
+	_markLinkedinSuccess: function(){
+		this.setState({
+			classDivLinkedin: "form-group has-success", 
+			classInputLinkedin: "form-control form-control-success", 
+			linkedinTextBlock: "Good to go",
+			hasErrors: false
+		});
+	},
 	handleUsernameHighlight: function(event){
 		var me = this;
 		var username = getValue("username");		
 		me.checkUsername(username);
 	},
+	handleNameHighlight: function(event){
+		var me = this;
+		var name = getValue("name");		
+		me.checkName(name);
+	},
 	handleEmailHighlight: function(event){
 		var me = this;
 		var email = getValue("email");		
 		me.checkEmail(email);
+	},
+	handlePhoneHighlight: function(event){
+		var me = this;
+		var phone = getValue("phone");		
+		me.checkPhone(phone);
+	},
+	handleBioHighlight: function(event){
+		var me = this;
+		var bio = getValue("bio");		
+		me.checkBio(bio);
+	},
+	handleWebsiteHighlight: function(event){
+		var me = this;
+		var website = getValue("website");		
+		me.checkWebsite(website);
+	},
+	handleFacebookHighlight: function(event){
+		var me = this;
+		var facebook = getValue("facebook");		
+		me.checkFacebook(facebook);
+	},
+	handleTwitterHighlight: function(event){
+		var me = this;
+		var twitter = getValue("twitter");		
+		me.checkTwitter(twitter);
+	},
+	handleLinkedinHighlight: function(event){
+		var me = this;
+		var linkedin = getValue("linkedin");		
+		me.checkLinkedin(linkedin);
 	},
 	render: function(){		
 		return (
@@ -519,11 +766,11 @@ var NewUser = React.createClass({
 					  	<section className="content">
 			    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" id="profileForm" style={{opacity: this.state.opacity}}>
 			    				
-					  			<div className="form-group">
+					  			<div className={this.state.classDivName}>
 								  	<label htmlFor="name" className="col-md-3">Name<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
-										<input type="text" name="name" id="name" className="form-control" required="true"/>
-										<p className="help-block">Your full name</p>
+										<input type="text" name="name" id="name" onBlur={this.handleNameHighlight} className={this.state.classInputName} required="true"/>
+										<p className="help-block">{this.state.nameTextBlock}</p>
 									</div>
 								</div>
 
@@ -586,17 +833,17 @@ var NewUser = React.createClass({
 									</div>
 								</div>
 
-								<div className="form-group">
+								<div className={this.state.classDivPhone}>
 								  	<label htmlFor="phone" className="col-md-3">Phone</label>
 								  	<div className="col-md-9">
-										<input type="text" name="phone" id="phone" className="form-control" />
+										<input type="text" name="phone" id="phone" onBlur={this.handlePhoneHighlight} className={this.state.classInputPhone} />
 									</div>
 								</div>
 
-								<div className="form-group">
+								<div className={this.state.classDivBio}>
 								 	<label htmlFor="homeUrl" className="col-md-3">Biography</label>
 								 	<div className="col-md-9">
-										<textarea name="bio" id="bio" className="form-control"></textarea>
+										<textarea name="bio" id="bio" onBlur={this.handleBioHighlight} className={this.state.classInputBio}></textarea>
 									</div>
 								</div>
 
@@ -621,35 +868,35 @@ var NewUser = React.createClass({
 								</div>
 
 								<h4 style={{marginBottom: 20}}>Social Media Accounts</h4>
-								<div className="form-group">
+								<div className={this.state.classDivWebsite}>
 								  	<label htmlFor="website" className="col-md-3">Website</label>
 								  	<div className="col-md-9">
-										<input type="text" name="website" id="website" placeholder="example: www.ussunnah.com" className="form-control" />
-										<p className="help-block">Your website name</p>
+										<input type="text" onBlur={this.handleWebsiteHighlight} name="website" id="website" placeholder="example: www.ussunnah.com" className={this.state.classInputWebsite} />
+										<p className="help-block">{this.state.websiteTextBlock}</p>
 									</div>
 								</div>
 
-								<div className="form-group">
+								<div className={this.state.classDivFacebook}>
 								  	<label htmlFor="facebook" className="col-md-3">Facebook Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="facebook" id="facebook" placeholder="example: www.facebook.com/ussunnah" className="form-control" />
-										<p className="help-block">URL to your Facebook Page</p>
+										<input type="text" name="facebook" id="facebook" placeholder="example: www.facebook.com/ussunnah" onBlur={this.handleFacebookHighlight} className={this.state.classInputFacebook} />
+										<p className="help-block">{this.state.facebookTextBlock}</p>
 									</div>
 								</div>
 
-								<div className="form-group">
+								<div className={this.state.classDivTwitter}>
 								  	<label htmlFor="twitter" className="col-md-3">Twitter Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="twitter" id="twitter" placeholder="example: www.twitter.com/ussunnah" className="form-control" />
-										<p className="help-block">URL to your Twitter Page</p>
+										<input type="text" name="twitter" id="twitter" placeholder="example: www.twitter.com/ussunnah" onBlur={this.handleTwitterHighlight} className={this.state.classInputTwitter} />
+										<p className="help-block">{this.state.twitterTextBlock}</p>
 									</div>
 								</div>
 
-								<div className="form-group">
+								<div className={this.state.classDivLinkedin}>
 								  	<label htmlFor="linkedin" className="col-md-3">Linkedin Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="linkedin" id="linkedin" placeholder="example: www.linkedin.com/in/ussunnah" className="form-control" />
-										<p className="help-block">URL to your LinkedIn Page</p>
+										<input type="text" name="linkedin" id="linkedin" placeholder="example: www.linkedin.com/in/ussunnah" onBlur={this.handleLinkedinHighlight} className={this.state.classInputLinkedin} />
+										<p className="help-block">{this.state.linkedinTextBlock}</p>
 									</div>
 								</div>
 
