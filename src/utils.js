@@ -13,19 +13,19 @@ const swalert = function(type, title, body, callback, rgba){
   var text = body;
 
   if (type==="warning") {
-    background = "rgba(239,203,4,.2)";
+    background = "rgba(239,203,4,.75)";
     buttonColor = '#db8b0b';
     text = title;
-    confirmButtonText = "OK"
+    confirmButtonText = "Yes"
   }
   if (type==="info") {
-    background = "rgba(0,0,128,.2)";
+    background = "rgba(0,0,128,.75)";
     buttonColor = '#00a7d0';
     showCancelButton = false;
     confirmButtonText = "OK";
   }
   if (type==="error"){
-    background = "rgba(239,4,16,.2)";
+    background = "rgba(239,4,16,.75)";
     buttonColor = '#d33724';
     showCancelButton = false;
     confirmButtonText = "OK";
