@@ -9,6 +9,7 @@ import {ThemeHome, ThemeSingle, ThemeBlog} from './admin/theme';
 import Admin from './admin';
 import Login from './login';
 import Register from './register';
+import Query from './admin/query';
 
 const Main = React.createClass({
 	getInitialState: function(){
@@ -27,9 +28,25 @@ const Main = React.createClass({
 		this.AuthService = new AuthService(this);
 		this.AuthService.checkAuth(this.onlogin);
 	},
+	componentDidMount: function(){
+		this.subscribe();
+	},
+	subscribe(repoName, updateQuery){
+	  this.subscriptionObserver = this.refs.provider.props.client.subscribe({
+		    query: Query.subscriptionQry
+	  }).subscribe({
+	    next(data) {
+	    	console.log("Data received");
+	    },
+	    error(err) { 
+	    	console.log(err); 
+	    },
+	  });
+	},
+
 	render: function(){
 		return (
-			<ApolloProvider client={client}>
+			<ApolloProvider client={client} ref="provider">
 				<BrowserRouter>
 					<div id="router" style={{height: "100vh"}}>
 						<MatchWhenAuthorized pattern="/admin/:page?/:action?/:postId?" 
