@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Query from '../query';
-import {riques, getValue, setValue, errorCallback, disableForm, swalert} from '../../utils';
+import {riques, getValue, setValue, getFormData, errorCallback, disableForm, swalert} from '../../utils';
 
 const Field = React.createClass({
 	render: function(){
@@ -90,11 +90,8 @@ var ContentNew = React.createClass({
 	handleSubmitBtn: function(event){
 		event.preventDefault();
 		var me = this;
-		var _objData = {
-			name: getValue('name'),
-			slug: getValue('slug'),
-			fields: this.state.fields
-		};
+		var _objData = getFormData('rdt-input-form');
+		_objData['fields'] = this.state.fields;
 		this.disableForm(true);
 
 		var qry = "";
@@ -217,6 +214,16 @@ var ContentNew = React.createClass({
 								</div>
 
 								<div className="form-group">
+								 	<label htmlFor="description" className="col-md-3">Description</label>
+							  	<div className="col-md-9">
+							  		<div className="form-inline">
+											<input type="text" name="description" id="description" className="form-control rdt-input-form"/>
+											<p className="help-block">A short descriptive summary of what the post type is.</p>
+										</div>
+									</div>
+								</div>
+
+								<div className="form-group">
 								 	<label htmlFor="name" className="col-md-3">Menu icon</label>
 								 	<div className="col-md-9">
 										<input type="text" name="menu-icon" id="menu-icon" className="form-control rdt-input-form" style={{width: 'auto'}} required/>
@@ -283,6 +290,40 @@ var ContentNew = React.createClass({
 										}
 									</div>
 								</div>
+
+								<div className="box-header with-border">
+		              <h3 className="box-title">Labels</h3>
+		            </div>
+
+		            <div className="box-body">
+		            	<div className="form-group">
+									 	<label htmlFor="label" className="col-md-3">Name</label>
+									 	<div className="col-md-9">
+											<input type="text" name="label" id="label" className="form-control rdt-input-form" style={{width: 'auto'}} />
+										</div>
+									</div>
+
+									<div className="form-group">
+									 	<label htmlFor="label-singular" className="col-md-3">Singular Name</label>
+									 	<div className="col-md-9">
+											<input type="text" name="label-singular" id="label-singular" className="form-control rdt-input-form" style={{width: 'auto'}} />
+										</div>
+									</div>
+
+									<div className="form-group">
+									 	<label htmlFor="label-add-new" className="col-md-3">Add New</label>
+									 	<div className="col-md-9">
+											<input type="text" name="label-add-new" id="label-add-new" className="form-control rdt-input-form" style={{width: 'auto'}} />
+										</div>
+									</div>
+
+									<div className="form-group">
+									 	<label htmlFor="label-edit" className="col-md-3">Edit</label>
+									 	<div className="col-md-9">
+											<input type="text" name="label-edit" id="label-edit" className="form-control rdt-input-form" style={{width: 'auto'}} />
+										</div>
+									</div>
+		            </div>
 								
 								<div className="form-group">
 									<div className="col-md-9">
