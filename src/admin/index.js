@@ -69,7 +69,7 @@ const SideMenu = React.createClass({
 
           _.forEach(body.data.viewer.allContents.edges, function(item){
             _dataArr.push(
-            	{id: item.node.slug, label: item.node.name, icon: 'fa-drivers-license-o', open: false, role: 5, roleId: 'view-post',
+            	{id: item.node.slug, label: item.node.name, icon: item.node.menuIcon?item.node.menuIcon:'fa-drivers-license-o', open: false, role: 5, roleId: 'view-post',
 								elements: [
 									{id: item.node.slug, label: item.node.name, icon: 'fa-drivers-license-o', open: true, url: '/admin/'+item.node.slug, role: 5, roleId: 'view-post'},
 									{id: item.node.slug+'-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/'+item.node.slug+'/new', role: 5, roleId: 'modify-post'},
@@ -198,6 +198,7 @@ const PageLoader = React.createClass({
 			'pages': <Pages handleNav={hn}/>,
 			'posts-category' : <CategoryPost handleNav={hn}/>,
 			'posts-tag' : <TagPost handleNav={hn}/>,
+			'posts-bytag' : <Posts handleNav={hn} tagId={pid}/>,
 			'themes' : <Themes handleNav={hn}/>,
 			'permission' : <Permission handleNav={hn}/>,
 			'plugins' : <Plugins handleNav={hn}/>,
@@ -249,14 +250,15 @@ const PageLoader = React.createClass({
 						slug={contentData.slug}
 						postId={me.props.postId} 
 						postType={page}
-				        loadQuery={Query.getPostQry}
-				        createQuery={Query.getCreatePostQry}
-				        updateQuery={Query.getUpdatePostQry}
-				        tableName="Post"
-				        widgets={["category", "featuredImage"]}
-				        viewRole="view-post"
-				        modifyRole="modify-post"
-				        handleNav={me.props.handleNav}
+		        loadQuery={Query.getPostQry}
+		        createQuery={Query.getCreatePostQry}
+		        updateQuery={Query.getUpdatePostQry}
+		        customFields={contentData.customFields}
+		        tableName="Post"
+		        widgets={["category", "featuredImage"]}
+		        viewRole="view-post"
+		        modifyRole="modify-post"
+		        handleNav={me.props.handleNav}
 					/>
 				}
 			});
