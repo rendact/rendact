@@ -138,7 +138,7 @@ const NewContentType = React.createClass({
       this.setState({postCategoryList: _postCategoryList});
     }
     var _postTagList = [];
-    if (v.tag.edges.length>0) {
+    if (v.tag && v.tag.edges.length>0) {
       _.forEach(v.tag.edges, function(i){
         if (i.node.tag){
           _postTagList.push({id: i.node.tag.id, name: i.node.tag.name, connectionId: i.node.id});
@@ -147,9 +147,10 @@ const NewContentType = React.createClass({
       });
       this.setState({postTagList: _postTagList});
     }
+
     var _imageGalleryList = [];
     
-    if (v.file.edges.length>0) {
+    if (v.tag && v.file.edges.length>0) {
       _.forEach(v.file.edges, function(i){
         if (i.node.value){
           _imageGalleryList.push({id: i.node.id, value: i.node.value});
@@ -422,6 +423,7 @@ const NewContentType = React.createClass({
         }
       );
     }
+    if (this.props.postType==="post") {
     if (this.isWidgetActive("tag")) {
       riques(Query.getAllTagQry, 
         function(error, response, body) {
@@ -435,6 +437,7 @@ const NewContentType = React.createClass({
         }
       );
     }
+    };
   },
   componentDidMount: function(){
     require('../lib/bootstrap-tagsinput.js');
