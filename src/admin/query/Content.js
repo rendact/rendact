@@ -9,7 +9,14 @@ let getContentListQry = {
             id,
             name,
             slug,
+            description,
+            menuIcon,
             fields,
+            customFields,
+            label,
+            labelSingular,
+            labelAddNew,
+            labelEdit,
             createdAt
           }
         }
@@ -67,7 +74,14 @@ const getContentQry = function(contentId){
           id,
           name,
           slug,
+          description,
+          menuIcon,
           fields,
+          customFields,
+          label,
+          labelSingular,
+          labelAddNew,
+          labelEdit,
           createdAt
         }
       }`

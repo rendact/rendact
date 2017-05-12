@@ -13,19 +13,19 @@ const swalert = function(type, title, body, callback, rgba){
   var text = body;
 
   if (type==="warning") {
-    background = "rgba(239,203,4,.2)";
+    background = "rgba(239,203,4,.75)";
     buttonColor = '#db8b0b';
     text = title;
-    confirmButtonText = "OK"
+    confirmButtonText = "Yes"
   }
   if (type==="info") {
-    background = "rgba(0,0,128,.2)";
+    background = "rgba(0,0,128,.75)";
     buttonColor = '#00a7d0';
     showCancelButton = false;
     confirmButtonText = "OK";
   }
   if (type==="error"){
-    background = "rgba(239,4,16,.2)";
+    background = "rgba(239,4,16,.75)";
     buttonColor = '#d33724';
     showCancelButton = false;
     confirmButtonText = "OK";
@@ -150,18 +150,30 @@ let sendMail = function(to, title, message, callback){
     });
 }
 
-let getFormData = function(className){
-  var _objData = [];
-  _.forEach(document.getElementsByClassName(className), function(item){
-    var _obj = {
-      value: item.value,
-      item: item.name
-    }
-    if (item.id)
-      _obj['id'] = item.id
-    _objData.push(_obj);
-  });
-  return _objData;
+let getFormData = function(className, output){
+  if (!output) output = "list";
+
+  if (output==="list") {
+    var _objData = [];
+    _.forEach(document.getElementsByClassName(className), function(item){
+      var _obj = {
+        value: item.value,
+        item: item.name
+      }
+      if (item.id)
+        _obj['id'] = item.id
+      _objData.push(_obj);
+    });
+    return _objData;
+  }
+
+  if (output==="object") {
+    var _objData = {};
+    _.forEach(document.getElementsByClassName(className), function(item){
+      _objData[item.id] = item.value;
+    });
+    return _objData;
+  }
 }
 
 let disableForm = function(state, notif, excludeClass){
@@ -218,7 +230,8 @@ const loadConfig = function(callback){
           _dataArr.push({
             "postId": item.node.id,
             "name": item.node.name,
-            "fields": item.node.fields,
+            "fields": _.concat(item.node.fields, item.node.customFields),
+            "customFields": item.node.customFields,
             "slug": item.node.slug?item.node.slug:"",
             "status": item.node.status?item.node.status:"",
             "createdAt": dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate()

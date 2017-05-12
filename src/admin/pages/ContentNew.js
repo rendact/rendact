@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Query from '../query';
-import {riques, getValue, setValue, errorCallback, disableForm, swalert} from '../../utils';
+import {riques, getValue, setValue, getFormData, errorCallback, disableForm, swalert} from '../../utils';
 
 const Field = React.createClass({
 	render: function(){
@@ -22,10 +22,21 @@ var ContentNew = React.createClass({
 		{id:"title", label: "Title", type: "link", deletable: false},
 		{id:"slug", label: "Slug", type: "text", deletable: false}
 	],
+	providedFields: [
+		{id:"author", label: "Author", type: "link"},
+		{id:"summary", label: "Summary", type: "link"},
+		{id:"content", label: "Content", type: "text"},
+		{id:"image", label: "Image", type: "text"},
+		{id:"like", label: "Like", type: "text"},
+		{id:"featuredImage", label: "Featured Image", type: "text"},
+		{id:"gallery", label: "Gallery", type: "text"}
+	],
 	getInitialState: function(){
 		return {
 			mode: this.props.postId?"update":"create",
 			fields: this.defaultFields,
+			providedFields: this.defaultFields,
+			customFields: [],
 			checkingSlug: false,
 			slug: ''
 		}
@@ -38,14 +49,32 @@ var ContentNew = React.createClass({
 			function(error, response, body){
 				if(!error && !body.errors) {
 					var data = body.data.getContent; 
-					setValue("name", data.name);
-					setValue("slug", data.slug);
-					me.setState({fields: data.fields})
+					me.setFormValues(data);
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
 			}
 		);
+	},
+	setFormValues: function(data){
+		setValue("name", data.name);
+		setValue("slug", data.slug);
+		setValue("description", data.description);
+		setValue("menuIcon", data.menuIcon);
+		setValue("label", data.label);
+		setValue("labelSingular", data.labelSingular);
+		setValue("labelAddNew", data.labelAddNew);
+		setValue("labelEdit", data.labelEdit);
+		debugger;
+		this.setState({providedFields: data.fields});
+		this.setState({customFields: data.customFields});
+		this.setState({fields: _.concat(data.fields, data.customFields)});
+
+		var providedFieldsId = _.map(data.fields, function(item){ return item.id });
+		_.forEach(document.getElementsByName("checkboxField[]"), function(item){
+      if (_.indexOf(providedFieldsId, item.value) > -1)
+      	item.checked = true;
+    });
 	},
 	checkSlug: function(slug){
     var me = this;
@@ -78,6 +107,17 @@ var ContentNew = React.createClass({
     var slug = name.split(" ").join("-").toLowerCase();
     setValue("slug", slug);
     this.checkSlug(slug);
+
+    var label = getValue("label");
+    var labelSingular = getValue("labelSingular");
+    var labelAddNew = getValue("labelAddNew");
+    var labelEdit = getValue("labelEdit");
+    this.setState({
+    	label: label?null:name+"s",
+    	labelSingular: labelSingular?null:name,
+    	labelAddNew: labelAddNew?null:"Add "+name,
+    	labelEdit: labelEdit?null:"Edit "+name
+    });
   },
   handleSlugBlur: function(event) {
     var slug = getValue("slug");
@@ -90,11 +130,9 @@ var ContentNew = React.createClass({
 	handleSubmitBtn: function(event){
 		event.preventDefault();
 		var me = this;
-		var _objData = {
-			name: getValue('name'),
-			slug: getValue('slug'),
-			fields: this.state.fields
-		};
+		var _objData = getFormData('rdt-input-form', 'object');
+		_objData['fields'] = this.state.providedFields;
+		_objData['customFields'] = this.state.customFields;
 		this.disableForm(true);
 
 		var qry = "";
@@ -104,8 +142,7 @@ var ContentNew = React.createClass({
 	      _objData["id"] = this.props.postId;
 	      qry = Query.updateContentMtn(_objData);
 	    }
-
-		//var qry = Query.createContentMtn(_objData);
+	  
 		riques(qry, 
 			function(error, response, body){
 				if(!error && !body.errors) {
@@ -117,9 +154,27 @@ var ContentNew = React.createClass({
 			}
 		);
 	}, 
-	handleAddField: function(event){
+	handleAddProvidedField: function(event){
+		var me = this;
+		var fields = this.state.fields;
+		var providedFields = [];
+		var allProvidedField = _.concat(me.providedFields, me.defaultFields);
+
+		var checkedFields = _.filter(document.getElementsByName("checkboxField[]"), function(item){
+      return item.checked
+    });
+    
+    _.forEach(checkedFields, function(item){
+    	var newField = _.find(allProvidedField, {id: item.value});
+			if (newField) providedFields.push(newField);
+    })
+		
+		this.setState({providedFields: providedFields, fields: _.concat(providedFields, this.state.customFields)});
+	},
+	handleAddCustomField: function(event){
 		event.preventDefault();
 		var fields = this.state.fields;
+		var customFields = this.state.customFields;
 		var name = getValue("field-name");
 		var type = getValue("field-type");
 		var width = getValue("field-width");
@@ -134,24 +189,37 @@ var ContentNew = React.createClass({
 			return;
 		}
 
-		fields.push(
-			{
-				id: name.toLowerCase(), 
-				label: name, 
-				type: type?type:"text", 
-				width: width?width:225, 
-				align:align?align:"left"
-			});
-		this.setState({fields: fields})
+		
+		var newField = {
+			id: name.toLowerCase(), 
+			label: name, 
+			type: type?type:"text", 
+			width: width?width:225, 
+			align:align?align:"left"
+		};
+		customFields.push(newField);
+		this.setState({customFields: customFields, fields: _.concat(this.state.providedFields, customFields)});
 	},
 	handleFieldDelete: function(event){
 		event.preventDefault();
 		var name = event.target.getAttribute("data");
-		var fields = this.state.fields;
+		var cfields = this.state.customFields;
+		var pfields = this.state.providedFields;
 		
-		var record = _.find(fields, {label: name});
-		_.pull(fields, record);
-		this.setState({fields: fields});
+		var record = _.find(cfields, {label: name});
+		if (record) {
+			_.pull(cfields, record);
+			this.setState({customFields: cfields});
+		}
+
+		var precord = _.find(pfields, {label: name});
+		if (precord) {
+			_.pull(pfields, precord);
+			this.setState({providedFields: pfields});
+			_.forEach(document.getElementsByName("checkboxField[]"), function(item){ if (item.value===precord.id) item.checked=false});
+		}
+
+		this.setState({fields: _.concat(cfields, pfields)});
 	},
 	handleAddNewBtn: function(event) {
     this.resetForm();
@@ -217,9 +285,19 @@ var ContentNew = React.createClass({
 								</div>
 
 								<div className="form-group">
+								 	<label htmlFor="description" className="col-md-3">Description</label>
+							  	<div className="col-md-9">
+							  		<div className="form-inline">
+											<input type="text" name="description" id="description" className="form-control rdt-input-form"/>
+											<p className="help-block">A short descriptive summary of what the post type is.</p>
+										</div>
+									</div>
+								</div>
+
+								<div className="form-group">
 								 	<label htmlFor="name" className="col-md-3">Menu icon</label>
 								 	<div className="col-md-9">
-										<input type="text" name="menu-icon" id="menu-icon" className="form-control rdt-input-form" style={{width: 'auto'}} required/>
+										<input type="text" name="menuIcon" id="menuIcon" className="form-control rdt-input-form" style={{width: 'auto'}}/>
 										<p className="help-block">Font awesome icon class for menu icon</p>
 									</div>
 								</div>
@@ -236,16 +314,16 @@ var ContentNew = React.createClass({
 			          	<label htmlFor="fields" className="col-md-3">Provided Fields</label>
 							  	<div className="col-md-9">
 							  		<p className="help-block">Select some provided fields for custom content.</p>
-	                  <div className="checkbox"><label><input type="checkbox"/>Title</label></div>
-	                  <div className="checkbox"><label><input type="checkbox"/>Slug</label></div>
-	                  <div className="checkbox"><label><input type="checkbox"/>Author</label></div>
-	                  <div className="checkbox"><label><input type="checkbox"/>Summary</label></div>
-	                  <div className="checkbox"><label><input type="checkbox"/>Comment</label></div>
-	                  <div className="checkbox"><label><input type="checkbox"/>Image</label></div>
-	                  <div className="checkbox"><label><input type="checkbox"/>Like</label></div>
-	                  <div className="checkbox"><label><input type="checkbox"/>Featured Image</label></div>
-	                  <div className="checkbox"><label><input type="checkbox"/>Galley</label></div>
-	                  <div className="checkbox"><label><input type="checkbox"/>Publish Date</label></div>
+	                  {
+	                  	_.map(this.defaultFields, function(item){
+	                  		return <div key={item.id} className="checkbox"><label><input type="checkbox" name="checkboxField[]" value={item.id} readOnly="true" checked/>{item.label}</label></div>
+	                  	}.bind(this))
+	                  }
+	                  {
+	                  	_.map(this.providedFields, function(item){
+	                  		return <div key={item.id} className="checkbox"><label><input type="checkbox" name="checkboxField[]" onChange={this.handleAddProvidedField} value={item.id}/>{item.label}</label></div>
+	                  	}.bind(this))
+	                  }
 	                </div>
 	              </div>
 
@@ -268,12 +346,13 @@ var ContentNew = React.createClass({
 												<option value="right">Right</option>
 												<option value="center">Center</option>
 											</select> 
-											<input type="button" value="Add" className="form-control btn btn-primary " onClick={this.handleAddField}/> 
+											<input type="button" value="Add" className="form-control btn btn-primary " onClick={this.handleAddCustomField}/> 
 										</div>
 										<h4>Current fields</h4>
 										{
 											this.state.fields.map(function(item){
 												return <Field 
+																key={item.label}
 																name={item.label} 
 																type={item.type} 
 																onDelete={this.handleFieldDelete}
@@ -283,6 +362,40 @@ var ContentNew = React.createClass({
 										}
 									</div>
 								</div>
+
+								<div className="box-header with-border">
+		              <h3 className="box-title">Labels</h3>
+		            </div>
+
+		            <div className="box-body">
+		            	<div className="form-group">
+									 	<label htmlFor="label" className="col-md-3">Name</label>
+									 	<div className="col-md-9">
+											<input type="text" name="label" id="label" placeholder={this.state.label} className="form-control rdt-input-form" style={{width: 'auto'}} />
+										</div>
+									</div>
+
+									<div className="form-group">
+									 	<label htmlFor="label-singular" className="col-md-3">Singular Name</label>
+									 	<div className="col-md-9">
+											<input type="text" name="labelSingular" id="labelSingular" placeholder={this.state.labelSingular} className="form-control rdt-input-form" style={{width: 'auto'}} />
+										</div>
+									</div>
+
+									<div className="form-group">
+									 	<label htmlFor="label-add-new" className="col-md-3">Add New</label>
+									 	<div className="col-md-9">
+											<input type="text" name="labelAddNew" id="labelAddNew" placeholder={this.state.labelAddNew} className="form-control rdt-input-form" style={{width: 'auto'}} />
+										</div>
+									</div>
+
+									<div className="form-group">
+									 	<label htmlFor="label-edit" className="col-md-3">Edit</label>
+									 	<div className="col-md-9">
+											<input type="text" name="labelEdit" id="labelEdit" placeholder={this.state.labelEdit} className="form-control rdt-input-form" style={{width: 'auto'}} />
+										</div>
+									</div>
+		            </div>
 								
 								<div className="form-group">
 									<div className="col-md-9">
