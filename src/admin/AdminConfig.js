@@ -62,6 +62,7 @@ const MenuRoleValue = {
 	'posts-new' : 'modify-post',
 	'posts-category' : 'modify-category',
 	'posts-tag' : 'modify-tag',
+	'posts-bytag' : 'view-post',
 	'tag-new' : 'modify-tag',
 	'tag-edit' : 'modify-tag',
 	'pages-new' : 'modify-page',

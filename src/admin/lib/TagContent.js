@@ -13,6 +13,7 @@ const TagContent = React.createClass({
       return {
         name:"",
         postId:"",
+        tagId:"",
         dt: null,
         errorMsg: null,
         loadingMsg: null,
@@ -91,8 +92,8 @@ const TagContent = React.createClass({
     var name = $("#name").val();
     this.setState({name: name})
   },
-  handleViewPage: function(name){
-    this.props.handleNav(this.props.slug);
+  handleViewPage: function(tagId){
+    this.props.handleNav(this.props.slug,'bytag', tagId);
   },
   onAfterTableLoad: function(){
     var me = this;
@@ -109,10 +110,8 @@ const TagContent = React.createClass({
 
      var postLink = function(event){
       event.preventDefault();
-      var index = this.id.split("-")[0];
-      var row = me.table.datatable.data()[index];
-      var name = removeTags(row[1]);
-      me.handleViewPage(name);
+      var tagId = this.id.split("-")[1];
+      me.handleViewPage(tagId);
     }
 
     var titles = document.getElementsByClassName('tagText');

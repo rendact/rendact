@@ -1,20 +1,27 @@
 import _ from 'lodash';
 
-const getPostListQry = function(s) {
+const getPostListQry = function(s, tagId) {
   var status = '{ne: "Trash"}';
   if (s==="Published" || s==="Trash" || s==="Draft" || s==="Reviewing")
     status = '{eq: "'+s+'"}';
   if (s==="Full") {
     status = '{ne: ""}';
   }
+   var tag = "";
+  if (tagId){
+    tag = '{eq: "'+tagId+'"}';
+  }
+  if (!tagId){
+    tag = '{ne: ""}';
+  }
 
   return {
     "query": 
-      `query getPosts{viewer {allPosts(where: {type: {eq: "post"}, status: `+status+`}) { edges { node { 
+      `query getPosts{viewer {allPosts(where: {type: {eq: "post"}, status: `+status+`, tag: {tag: {id: `+tag+`}} }) { edges { node { 
        id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},
        tag{edges{node{tag{id, name}}}},comments{edges{node{id}}},file{edges{node{id,value}}}, featuredImage,createdAt}}}}}`
   };
-};
+}
 
 const getContentsQry = function(type, s) {
   var status = '{ne: "Trash"}';

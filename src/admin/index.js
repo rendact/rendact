@@ -195,6 +195,7 @@ const PageLoader = React.createClass({
 			'content-edit' : <NewContent postId={pid} handleNav={hn}/>,
 			'profile' : <Profile handleNav={hn}/>,
 			'posts': <Posts handleNav={hn}/>,
+			'posts-bytag' : <Posts handleNav={hn} tagId={pid} />,
 			'pages': <Pages handleNav={hn}/>,
 			'posts-category' : <CategoryPost handleNav={hn}/>,
 			'posts-tag' : <TagPost handleNav={hn}/>,
@@ -225,6 +226,7 @@ const PageLoader = React.createClass({
 			var contentList = getConfig("contentList");
 			var contentData = _.find(contentList, {slug: page});
 			var me = this;
+			var tagId = this.props.postId;
 			let ListComponent = React.createClass({
 				render: function(){
 					return <ContentType 
@@ -238,6 +240,8 @@ const PageLoader = React.createClass({
 						modifyRole="modify-post"
 						statusList={["All", "Published", "Draft", "Reviewing", "Trash"]}
 						handleNav={me.props.handleNav}
+						//tagId={"VGFnOjIx"}
+						tagId={tagId}
 					/>
 				}
 			});
@@ -324,6 +328,7 @@ const Admin = React.createClass({
 			page: this.props.params['page']?this.props.params['page']:'dashboard',
 			action: this.props.params['action']?this.props.params['action']:'',
 			postId: this.props.params['postId']?this.props.params['postId']:null,
+			tagId: this.props.params['tagId']?this.props.params['tagId']:null,
 			configLoaded: false,
 			hasUnsavedData: false
 		}
@@ -365,7 +370,7 @@ const Admin = React.createClass({
 	handleProfileClick: function(){
 		this.redirectToPage('profile');
 	},
-	redirectToPage: function(pageId, actionId, postId){
+	redirectToPage: function(pageId, actionId, postId, tagId){
 		var me = this;
 		this.confirmUnsavedData(
 			function() {

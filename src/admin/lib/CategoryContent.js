@@ -80,8 +80,8 @@ const CategoryContent = React.createClass({
     var checkedRow = $("input.categoryCb:checked");
     this.setState({itemSelected: checkedRow.length>0})
   },
-  handleViewPost: function(postId){
-    this.props.handleNav('posts','edit', postId);
+  handleViewPage: function(name){
+    this.props.handleNav(this.props.slug);
   },
   onAfterTableLoad: function(){
     var me = this;
@@ -93,6 +93,19 @@ const CategoryContent = React.createClass({
       var name = removeTags(row[1]);
       setValue("name", name);
       me.setState({mode: "update", postId: postId});
+    });
+
+    var postLink = function(event){
+      event.preventDefault();
+      var index = this.id.split("-")[0];
+      var row = me.table.datatable.data()[index];
+      var name = removeTags(row[1]);
+      me.handleViewPage(name);
+    }
+
+    var titles = document.getElementsByClassName('categoryText');
+    _.forEach(titles, function(item){
+      item.addEventListener('click',postLink);
     });
   },
   componentDidMount: function(){
@@ -202,7 +215,7 @@ const CategoryContent = React.createClass({
                           columns={[
                             {id: 'name', label: "Name", type: "link", textAlign:"center", cssClass:"nameText"},
                             {id: 'description', label: "Description", textAlign:"center", width: 400},
-                            {id: 'count', label: "Count", textAlign:"center"}
+                            {id: 'count', label: "Count", textAlign:"center", type: "link", target: "", cssClass:"categoryText"}
                           ]}
                           checkBoxAtFirstColumn="true"
                           ref="rendactTable"
