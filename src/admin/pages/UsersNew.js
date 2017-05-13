@@ -498,7 +498,6 @@ var NewUser = React.createClass({
     );
 	},
 	checkName: function(name){
-		var me = this;	
 		if (name.length<4){
 			this._markNameError("Name is too short! Make sure it has minimum 4 characters");
 			return;		
@@ -527,7 +526,6 @@ var NewUser = React.createClass({
 	},
 	
 	checkPhone: function(phone){
-		var me = this;	
 		var phoneRegex = /^[0-9-+]+$/;
 		if(!phoneRegex.test(phone)) {
 			this._markPhoneError();
@@ -553,7 +551,6 @@ var NewUser = React.createClass({
 		});
 	},
 	checkBio: function(bio){
-		var me = this;	
 		if(bio.length > 100) {
 			this._markBioError();
 			return;
@@ -578,7 +575,6 @@ var NewUser = React.createClass({
 		});
 	},
 	checkWebsite: function(website){
-		var me = this;	
 		var websiteRegex = /^[a-zA-Z0-9._-]+$/;
 		if(!websiteRegex.test(website)) {
 			this._markWebsiteError("Website is invalid, no regular expression allowed");
@@ -606,7 +602,6 @@ var NewUser = React.createClass({
 		});
 	},
 	checkFacebook: function(facebook){
-		var me = this;	
 		var facebookRegex = /(?:(?:http|https):\/\/)?(?:www.)?facebook.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/;
 
 		if(!facebookRegex.test(facebook)) {
@@ -634,8 +629,7 @@ var NewUser = React.createClass({
 			hasErrors: false
 		});
 	},
-	checkTwitter: function(twitter){
-		var me = this;	
+	checkTwitter: function(twitter){	
 		var twitterRegex = /(?:(?:http|https):\/\/)?(?:www.)?twitter.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/;
 		if(!twitterRegex.test(twitter)) {
 			this._markTwitterError("Twitter is invalid, have wrong regular expression");
@@ -663,7 +657,6 @@ var NewUser = React.createClass({
 		});
 	},
 	checkLinkedin: function(linkedin){
-		var me = this;	
 		var linkedinRegex = /(?:(?:http|https):\/\/)?(?:www.)?linkedin.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/;
 		if(!linkedinRegex.test(linkedin)) {
 			this._markLinkedinError("Linkedin is invalid, have wrong regular expression");
