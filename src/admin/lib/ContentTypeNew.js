@@ -2,7 +2,8 @@ import React from 'react';
 import _ from 'lodash';
 import $ from 'jquery';
 import Query from '../query';
-import {riques, setValue, getValue, disableForm, errorCallback, getConfig, defaultHalogenStyle} from '../../utils';
+import {riques, setValue, getValue, disableForm, errorCallback, 
+        getConfig, defaultHalogenStyle, getFormData} from '../../utils';
 import {getTemplates} from '../theme';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
@@ -118,10 +119,10 @@ const NewContentType = React.createClass({
     }
   },
   setFormValues: function(v){
-    var meta = {};
+    var meta = [];
     if (v.meta.edges.length>0) {
       _.forEach(v.meta.edges, function(i){
-        meta[i.node.item] = i.node.value;
+        meta.push(i.node);
       });
     }
     
@@ -168,15 +169,15 @@ const NewContentType = React.createClass({
     setValue("hours", pubDate.getHours());
     setValue("minutes", pubDate.getMinutes());
     document.getElementsByName("visibilityRadio")[v.visibility==="Public"?0:1].checked = true;
-    if (_.has(meta, "metaKeyword")){
-      setValue("metaKeyword", meta.metaKeyword);
-    }
-    if (_.has(meta, "metaDescription")){
-      setValue("metaDescription", meta.metaDescription);
-    }
-    if (_.has(meta, "titleTag")){
-      setValue("titleTag", meta.titleTag);
-    }
+
+    _.forEach(meta, function(item){
+      setValue(item.item, item.value);
+      var el = document.getElementsByName(item.item);
+      if (el && el.length>0) {
+        el[0].id = item.id
+      }
+    })
+
     this.setState({title: v.title, content: v.content, summary: v.summary, 
       status: v.status, visibilityTxt: v.visibility, 
       publishDate: pubDate, publishDateReset: pubDate, slug: v.slug, featuredImage: v.featuredImage});
@@ -301,28 +302,31 @@ const NewContentType = React.createClass({
       qry = this.props.updateQuery(_objData);
       noticeTxt = this.props.name+' Updated!';
     }
-
+    
     this.disableForm(true);
     riques(qry, 
       function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
           var here = me, postId = "", pmQry = "";
           
+          var metaDataList = getFormData("metaField");
+
           if (me.state.mode==="create"){
             postId = body.data.createPost.changedPost.id;
-            pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, null);
+            pmQry = Query.createPostMetaMtn(metaDataList);
           } else {
             postId = body.data.updatePost.changedPost.id;
             if (body.data.updatePost.changedPost.meta.edges.length===0) {
-              pmQry = Query.createPostMetaMtn(postId, v.metaKeyword, v.metaDescription, v.titleTag, null);
+              pmQry = Query.createPostMetaMtn(metaDataList);
             } else {
               var data = [];
-              _.forEach(body.data.updatePost.changedPost.meta.edges, function(item){
-                data.push({
-                  postMetaId: item.node.id,
-                  item: item.node.item,
-                  value: _.has(v, item.node.item)?v[item.node.item]:null
-                });
+              _.forEach(metaDataList, function(item){
+                if (item.id)
+                  data.push({
+                    postMetaId: item.id,
+                    item: item.item,
+                    value: item.value
+                  });
               });
               pmQry = Query.updatePostMetaMtn(postId, data);
             }
@@ -391,87 +395,6 @@ const NewContentType = React.createClass({
   onTagKeyDown: function(event){
     ;
     event.preventDefault();
-  },
-  componentWillMount: function(){
-    var me = this;
-
-    if (this.isWidgetActive("pageHierarchy")) {
-      riques(Query.getPageListQry("All"),
-        function(error, response, body) {
-          if (!error) {
-            var pageList = [(<option key="0" value="">(no parent)</option>)];
-            _.forEach(body.data.viewer.allPosts.edges, function(item){
-              pageList.push((<option key={item.node.id} value={item.node.id} checked={me.state.parent=item.node.id}>
-                {item.node.title}</option>));
-            })
-            me.setState({pageList: pageList});
-          }
-      });
-    }
-
-    if (this.isWidgetActive("category")) {
-      riques(Query.getAllCategoryQry(this.props.slug), 
-        function(error, response, body) {
-          if (!error) {
-            var categoryList = [];
-            _.forEach(body.data.viewer.allCategories.edges, function(item){
-              categoryList.push((<div key={item.node.id}><input id={item.node.id}
-              name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
-            })
-            me.setState({categoryList: categoryList});
-          }
-        }
-      );
-    }
-    if (this.props.postType==="post") {
-    if (this.isWidgetActive("tag")) {
-      riques(Query.getAllTagQry, 
-        function(error, response, body) {
-          if (!error) {
-            var _tagMap = {};
-            _.forEach(body.data.viewer.allTags.edges, function(item){
-              _tagMap[item.node.name] = {id: item.node.id, name: item.node.name}
-            })
-            me.setState({tagMap: _tagMap});
-          }
-        }
-      );
-    }
-    };
-  },
-  componentDidMount: function(){
-    require('../lib/bootstrap-tagsinput.js');
-    require('../lib/bootstrap-tagsinput.css');
-    var me = this;
-    
-    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
-      window.CKEDITOR.replace('content', {
-        height: 400,
-        title: false
-      });
-      for (var i in window.CKEDITOR.instances) {
-        if (window.CKEDITOR.instances.hasOwnProperty(i))
-          window.CKEDITOR.instances[i].on('change', me.handleContentChange);
-      }
-    });
-
-    if (this.state.visibilityTxt==="Public") 
-      document.getElementById("public").setAttribute('checked', true);
-    else
-      document.getElementById("private").setAttribute('checked', true);
-
-    this.notification = this.refs.notificationSystem;
-    
-    if (this.props.postId) {
-      riques(this.props.loadQuery(this.props.postId), 
-        function(error, response, body) {
-          if (!error ) {
-            var values = body.data.getPost;
-            me.setFormValues(values);
-          }
-        }
-      );
-    }
   },
   _errorNotif: function(msg){
     this.refs.notificationSystem.addNotification({
@@ -573,6 +496,87 @@ const NewContentType = React.createClass({
       }
     );
   },
+  componentWillMount: function(){
+    var me = this;
+
+    if (this.isWidgetActive("pageHierarchy")) {
+      riques(Query.getPageListQry("All"),
+        function(error, response, body) {
+          if (!error) {
+            var pageList = [(<option key="0" value="">(no parent)</option>)];
+            _.forEach(body.data.viewer.allPosts.edges, function(item){
+              pageList.push((<option key={item.node.id} value={item.node.id} checked={me.state.parent=item.node.id}>
+                {item.node.title}</option>));
+            })
+            me.setState({pageList: pageList});
+          }
+      });
+    }
+
+    if (this.isWidgetActive("category")) {
+      riques(Query.getAllCategoryQry(this.props.slug), 
+        function(error, response, body) {
+          if (!error) {
+            var categoryList = [];
+            _.forEach(body.data.viewer.allCategories.edges, function(item){
+              categoryList.push((<div key={item.node.id}><input id={item.node.id}
+              name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
+            })
+            me.setState({categoryList: categoryList});
+          }
+        }
+      );
+    }
+    if (this.props.postType==="post") {
+    if (this.isWidgetActive("tag")) {
+      riques(Query.getAllTagQry, 
+        function(error, response, body) {
+          if (!error) {
+            var _tagMap = {};
+            _.forEach(body.data.viewer.allTags.edges, function(item){
+              _tagMap[item.node.name] = {id: item.node.id, name: item.node.name}
+            })
+            me.setState({tagMap: _tagMap});
+          }
+        }
+      );
+    }
+    };
+  },
+  componentDidMount: function(){
+    require('../lib/bootstrap-tagsinput.js');
+    require('../lib/bootstrap-tagsinput.css');
+    var me = this;
+    
+    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
+      window.CKEDITOR.replace('content', {
+        height: 400,
+        title: false
+      });
+      for (var i in window.CKEDITOR.instances) {
+        if (window.CKEDITOR.instances.hasOwnProperty(i))
+          window.CKEDITOR.instances[i].on('change', me.handleContentChange);
+      }
+    });
+
+    if (this.state.visibilityTxt==="Public") 
+      document.getElementById("public").setAttribute('checked', true);
+    else
+      document.getElementById("private").setAttribute('checked', true);
+
+    this.notification = this.refs.notificationSystem;
+    
+    if (this.props.postId) {
+      riques(this.props.loadQuery(this.props.postId), 
+        function(error, response, body) {
+          if (!error ) {
+            var values = body.data.getPost;
+            me.setFormValues(values);
+          }
+        }
+      );
+    }
+  },
   render: function(){
     var rootUrl = getConfig('rootUrl');
     var templates = getTemplates();
@@ -639,18 +643,18 @@ const NewContentType = React.createClass({
             </div>
             
             <div className="box box-info" style={{marginTop:20}}>
-                <div className="box-header with-border">
-                  <h3 className="box-title">Summary</h3>         
-                  <div className="pull-right box-tools">
-                    <button type="button" className="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
-                    <i className="fa fa-minus"></i></button>
-                  </div>
-                </div>
-                <div className="box-body pad">
-                <textarea id="summary" name="summary" wrap="hard" rows="3" style={{width: '100%'}} onChange={this.handleSummaryChange}>
-                </textarea>                 
+              <div className="box-header with-border">
+                <h3 className="box-title">Summary</h3>         
+                <div className="pull-right box-tools">
+                  <button type="button" className="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+                  <i className="fa fa-minus"></i></button>
                 </div>
               </div>
+              <div className="box-body pad">
+              <textarea id="summary" name="summary" wrap="hard" rows="3" style={{width: '100%'}} onChange={this.handleSummaryChange}>
+              </textarea>                 
+              </div>
+            </div>
 
             <div className="box box-info" style={{marginTop:20}}>
               <div className="box-header with-border">
@@ -673,7 +677,7 @@ const NewContentType = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4"><p>Title Tag</p></div>
                     <div className="col-md-8">
-                      <input id="titleTag" type="text" style={{width: '100%'}} placeholder={this.state.title} onChange={this.handleTitleTagChange}/>
+                      <input id="titleTag" className="metaField" type="text" style={{width: '100%'}} placeholder={this.state.title} onChange={this.handleTitleTagChange}/>
                         <span className="help-block">Up to 65 characters recommended<br/>
                         {this.state.titleTagLeftCharacter} characters left</span>                     
                     </div>
@@ -681,7 +685,7 @@ const NewContentType = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4"><p>Meta Description</p></div>
                     <div className="col-md-8">
-                      <textarea id="metaDescription" rows='2' style={{width:'100%'}} placeholder={this.state.summary} 
+                      <textarea id="metaDescription" className="metaField" rows='2' style={{width:'100%'}} placeholder={this.state.summary} 
                       onChange={this.handleMetaDescriptionChange}></textarea>
                       <span className="help-block">160 characters maximum<br/>
                       {this.state.metaDescriptionLeftCharacter} characters left</span>
@@ -691,7 +695,7 @@ const NewContentType = React.createClass({
                     <div className="col-md-4"><p>Meta Keywords</p></div>
                     <div className="col-md-8">
                       <div className="form-group">
-                        <input id="metaKeyword" type="text" style={{width: '100%'}}/>
+                        <input id="metaKeyword" className="metaField" type="text" style={{width: '100%'}}/>
                         <span className="help-block"><b>News keywords </b><a>(?)</a></span>
                       </div>
                     </div>
@@ -817,7 +821,7 @@ const NewContentType = React.createClass({
                       </div>
                       <div className="form-group">
                         <p><b>Page  Template</b></p>
-                        <select id="pageTemplate" style={{width: 250}} defaultValue={templates?templates[0].item:null}>
+                        <select id="pageTemplate" className="metaField" style={{width: 250}} defaultValue={templates?templates[0].item:null}>
                         { templates ?
                           templates.map(function(item, index){
                             return (<option key={item.id}>{item.name}</option>)
@@ -919,6 +923,23 @@ const NewContentType = React.createClass({
                       </div>                  
                     </div>
                   </div>
+                  }
+
+                  {
+                    this.props.customFields.map(function(item){
+                      return <div className="box box-info" style={{marginTop:20}}>
+                        <div className="box-header with-border">
+                          <h3 className="box-title">{item.label}</h3>         
+                          <div className="pull-right box-tools">
+                            <button type="button" className="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+                            <i className="fa fa-minus"></i></button>
+                          </div>
+                        </div>
+                        <div className="box-body pad">
+                          <input id={item.id} name={item.id} className="metaField" type="text" style={{width: '100%'}}/>
+                        </div>
+                      </div>
+                    })
                   }
 
               </div>

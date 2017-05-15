@@ -71,15 +71,15 @@ const getUpdatePageQry = function(data){
     }
   };
 
-const createPostMetaMtn = function(postId, metaKeyword, metaDescription, titleTag, pageTemplate){
+const createPostMetaMtn = function(postId, data){
+  var query = "mutation { ";
+  _.forEach(data, function(val, index){
+    query += ' CreatePostMeta'+index+' : createPostMeta(input: {postId: "'+postId+'", item: "'+val.item+'", value: "'+val.value+'"}){ changedPostMeta{ id } }'; 
+  });
+  query += "}";
   return {
-    "query": 'mutation{'
-    + 'insertKeyword: createPostMeta(input: {postId: "'+postId+'", item: "metaKeyword", value: "'+metaKeyword+'"}){ changedPostMeta{ id } } '
-    + 'insertDescription: createPostMeta(input: {postId: "'+postId+'", item: "metaDescription", value: "'+metaDescription+'"}){ changedPostMeta{ id } } '
-    + 'insertTitleTag: createPostMeta(input: {postId: "'+postId+'", item: "titleTag", value: "'+titleTag+'"}){ changedPostMeta{ id } } '
-    + 'insertTemplate: createPostMeta(input: {postId: "'+postId+'", item: "pageTemplate", value: "'+pageTemplate+'"}){ changedPostMeta{ id } } '
-    + '}'
-  };
+    "query": query
+  }
 }
 
 const updatePostMetaMtn = function(postId, data){
