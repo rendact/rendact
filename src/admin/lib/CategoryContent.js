@@ -80,8 +80,8 @@ const CategoryContent = React.createClass({
     var checkedRow = $("input.categoryCb:checked");
     this.setState({itemSelected: checkedRow.length>0})
   },
-  handleViewPage: function(name){
-    this.props.handleNav(this.props.slug);
+  handleViewPage: function(categoryId){
+    this.props.handleNav(this.props.slug,'bycategory', categoryId);
   },
   onAfterTableLoad: function(){
     var me = this;
@@ -97,10 +97,8 @@ const CategoryContent = React.createClass({
 
     var postLink = function(event){
       event.preventDefault();
-      var index = this.id.split("-")[0];
-      var row = me.table.datatable.data()[index];
-      var name = removeTags(row[1]);
-      me.handleViewPage(name);
+      var categoryId = this.id.split("-")[1];
+      me.handleViewPage(categoryId);
     }
 
     var titles = document.getElementsByClassName('categoryText');

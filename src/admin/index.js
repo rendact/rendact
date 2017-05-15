@@ -196,10 +196,10 @@ const PageLoader = React.createClass({
 			'profile' : <Profile handleNav={hn}/>,
 			'posts': <Posts handleNav={hn}/>,
 			'posts-bytag' : <Posts handleNav={hn} tagId={pid} />,
+			'posts-bycategory' : <Posts handleNav={hn} categoryId={pid}/>,
 			'pages': <Pages handleNav={hn}/>,
 			'posts-category' : <CategoryPost handleNav={hn}/>,
 			'posts-tag' : <TagPost handleNav={hn}/>,
-			'posts-bytag' : <Posts handleNav={hn} tagId={pid}/>,
 			'themes' : <Themes handleNav={hn}/>,
 			'permission' : <Permission handleNav={hn}/>,
 			'plugins' : <Plugins handleNav={hn}/>,
@@ -227,7 +227,13 @@ const PageLoader = React.createClass({
 			var contentList = getConfig("contentList");
 			var contentData = _.find(contentList, {slug: page});
 			var me = this;
-			var tagId = this.props.postId;
+			//if (action==="-bytag"){
+				var tagId = this.props.postId;
+			//}
+			//if (action==="-bycategory"){
+				var categoryId = this.props.postId;
+			//}
+			//debugger;
 			let ListComponent = React.createClass({
 				render: function(){
 					return <ContentType 
@@ -241,7 +247,6 @@ const PageLoader = React.createClass({
 						modifyRole="modify-post"
 						statusList={["All", "Published", "Draft", "Reviewing", "Trash"]}
 						handleNav={me.props.handleNav}
-						//tagId={"VGFnOjIx"}
 						tagId={tagId}
 					/>
 				}
@@ -254,15 +259,15 @@ const PageLoader = React.createClass({
 						slug={contentData.slug}
 						postId={me.props.postId} 
 						postType={page}
-		        loadQuery={Query.getPostQry}
-		        createQuery={Query.getCreatePostQry}
-		        updateQuery={Query.getUpdatePostQry}
-		        customFields={contentData.customFields}
-		        tableName="Post"
-		        widgets={["category", "featuredImage"]}
-		        viewRole="view-post"
-		        modifyRole="modify-post"
-		        handleNav={me.props.handleNav}
+				        loadQuery={Query.getPostQry}
+				        createQuery={Query.getCreatePostQry}
+				        updateQuery={Query.getUpdatePostQry}
+				        customFields={contentData.customFields}
+				        tableName="Post"
+				        widgets={["category", "featuredImage"]}
+				        viewRole="view-post"
+				        modifyRole="modify-post"
+				        handleNav={me.props.handleNav}
 					/>
 				}
 			});
