@@ -88,19 +88,20 @@ const getContentQry = function(contentId){
   };
 }
 
-const getContentPostListQry = function(s, postType, tagId) {
+const getContentPostListQry = function(s, postType, tagId, categoryId) {
   var status = '{ne: "Trash"}';
   if (s==="Published" || s==="Trash" || s==="Draft" || s==="Reviewing")
     status = '{eq: "'+s+'"}';
   if (s==="Full") {
     status = '{ne: ""}';
   }
+
   var tag = "";
   if (tagId){
     tag = '{eq: "'+tagId+'"}';
   }
   if (tagId===null){
-    tag = `{ne: ""}`;debugger;
+    tag = '{ne: ""}';
   }
 
   return {
