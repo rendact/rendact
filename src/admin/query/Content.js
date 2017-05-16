@@ -96,25 +96,19 @@ const getContentPostListQry = function(s, postType, tagId, cateId) {
     status = '{ne: ""}';
   }
 
-  var tag = "";
+var tag = "";
   if (tagId){
-    tag = '{eq: "'+tagId+'"}';
-  }
-  else{
-    tag = '{ne: ""}';
+    tag = ', tag: {tag: {id: {eq: "'+tagId+'"}}}';
   }
 
   var category = "";
   if (cateId){
-    category = '{eq: "'+cateId+'"}';
-  }
-  else{
-    category = '{ne: ""}';
+    category = ', category: {category: {id: {eq: "'+cateId+'"}}}';
   }
 
   return {
     "query": 
-      'query getPosts{viewer {allPosts(where: {type: {eq: "'+postType+'"}, status: '+status+', tag: {tag: {id: '+tag+'}}, category: {category: {id: '+category+'}} }) { edges { node { '
+      'query getPosts{viewer {allPosts(where: {type: {eq: "'+postType+'"}, status: '+status+' '+tag+' '+category+' }) { edges { node { '
      +'id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},tag{edges{node{tag{id, name}}}},comments{edges{node{id}}},featuredImage,createdAt}}}}}'
   };
 }
