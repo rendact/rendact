@@ -31,6 +31,7 @@ const ContentType = React.createClass({
   },
   loadData: function(status, callback) {
     var me = this;
+    var metaItemList = _.map(this.props.customFields, function(item) { return item.id });
 
     riques(this.props.listQuery("Full", this.props.postType, this.props.tagId, this.props.cateId), 
       function(error, response, body) { 
@@ -135,6 +136,12 @@ const ContentType = React.createClass({
                   var likeNode = _.find(item.node.meta.edges,{"node": {"item": "like"}});
                   var likes = likeNode?likeNode.node.value:"0";
                   _obj[fld] = likes;
+                }
+
+                if (_.indexOf(metaItemList, fld)>-1) {
+                  var _edge = _.find(item.node.meta.edges,{"node": {"item": fld}});
+                  var _val = _edge?_edge.node.value:"";
+                  _obj[fld] = _val; 
                 }
               }
             });

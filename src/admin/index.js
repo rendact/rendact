@@ -243,6 +243,7 @@ const PageLoader = React.createClass({
 						tableName="Post"
 						postType={page}
 						fields={contentData.fields}
+						customFields={contentData.customFields}
 						listQuery={Query.getContentPostListQry}
 						viewRole="view-post"
 						modifyRole="modify-post"
@@ -261,15 +262,15 @@ const PageLoader = React.createClass({
 						slug={contentData.slug}
 						postId={me.props.postId} 
 						postType={page}
-				        loadQuery={Query.getPostQry}
-				        createQuery={Query.getCreatePostQry}
-				        updateQuery={Query.getUpdatePostQry}
-				        customFields={contentData.customFields}
-				        tableName="Post"
-				        widgets={["category", "featuredImage"]}
-				        viewRole="view-post"
-				        modifyRole="modify-post"
-				        handleNav={me.props.handleNav}
+		        loadQuery={Query.getPostQry}
+		        createQuery={Query.getCreatePostQry}
+		        updateQuery={Query.getUpdatePostQry}
+		        customFields={contentData.customFields}
+		        tableName="Post"
+		        widgets={["category", "featuredImage"]}
+		        viewRole="view-post"
+		        modifyRole="modify-post"
+		        handleNav={me.props.handleNav}
 					/>
 				}
 			});
