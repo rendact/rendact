@@ -32,7 +32,7 @@ const ContentType = React.createClass({
   loadData: function(status, callback) {
     var me = this;
 
-    riques(this.props.listQuery("Full", this.props.postType, this.props.tagId), 
+    riques(this.props.listQuery("Full", this.props.postType, this.props.tagId, this.props.cateId), 
       function(error, response, body) { 
         var nodeName = "all"+me.props.tableName+"s";
         var _postArr = body.data.viewer[nodeName].edges;
@@ -63,7 +63,7 @@ const ContentType = React.createClass({
       }
     );
 
-    var qry = this.props.listQuery(status, this.props.postType, this.props.tagId);
+    var qry = this.props.listQuery(status, this.props.postType, this.props.tagId, this.props.cateId);
     var fields = _.map(this.state.fields, function(item){
       return item.id
     });

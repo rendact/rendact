@@ -17,6 +17,8 @@ let Posts = React.createClass({
 			handleNav={this.props.handleNav}
 			//tagId="VGFnOjMz"
 			tagId={this.props.tagId}
+			//cateId="Q2F0ZWdvcnk6MzE="
+			cateId={this.props.cateId}
 			/>
   }
 });

@@ -186,7 +186,7 @@ const PageLoader = React.createClass({
 		}
 		var pid = this.props.postId;
 		var hn = this.props.handleNav;
-		var hud = this.props.handleUnsavedData;
+		var hud = this.props.handleUnsavedData;debugger;
 		var map = {
 			'dashboard' : <Dashboard />,
 			'settings' : <Settings handleNav={hn}/>,
@@ -196,7 +196,7 @@ const PageLoader = React.createClass({
 			'profile' : <Profile handleNav={hn}/>,
 			'posts': <Posts handleNav={hn}/>,
 			'posts-bytag' : <Posts handleNav={hn} tagId={pid} />,
-			'posts-bycategory' : <Posts handleNav={hn} categoryId={pid}/>,
+			'posts-bycategory' : <Posts handleNav={hn} cateId={pid}/>,
 			'pages': <Pages handleNav={hn}/>,
 			'posts-category' : <CategoryPost handleNav={hn}/>,
 			'posts-tag' : <TagPost handleNav={hn}/>,
