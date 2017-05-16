@@ -88,7 +88,7 @@ const getContentQry = function(contentId){
   };
 }
 
-const getContentPostListQry = function(s, postType, tagId, categoryId) {
+const getContentPostListQry = function(s, postType, tagId, cateId) {
   var status = '{ne: "Trash"}';
   if (s==="Published" || s==="Trash" || s==="Draft" || s==="Reviewing")
     status = '{eq: "'+s+'"}';
@@ -100,13 +100,21 @@ const getContentPostListQry = function(s, postType, tagId, categoryId) {
   if (tagId){
     tag = '{eq: "'+tagId+'"}';
   }
-  if (tagId===null){
+  else{
     tag = '{ne: ""}';
+  }
+
+  var category = "";
+  if (cateId){
+    category = '{eq: "'+cateId+'"}';
+  }
+  else{
+    category = '{ne: ""}';
   }
 
   return {
     "query": 
-      'query getPosts{viewer {allPosts(where: {type: {eq: "'+postType+'"}, status: '+status+', tag: {tag: {id: '+tag+'}} }) { edges { node { '
+      'query getPosts{viewer {allPosts(where: {type: {eq: "'+postType+'"}, status: '+status+', tag: {tag: {id: '+tag+'}}, category: {category: {id: '+category+'}} }) { edges { node { '
      +'id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},tag{edges{node{tag{id, name}}}},comments{edges{node{id}}},featuredImage,createdAt}}}}}'
   };
 }

@@ -186,7 +186,7 @@ const PageLoader = React.createClass({
 		}
 		var pid = this.props.postId;
 		var hn = this.props.handleNav;
-		var hud = this.props.handleUnsavedData;debugger;
+		var hud = this.props.handleUnsavedData;
 		var map = {
 			'dashboard' : <Dashboard />,
 			'settings' : <Settings handleNav={hn}/>,
@@ -227,13 +227,14 @@ const PageLoader = React.createClass({
 			var contentList = getConfig("contentList");
 			var contentData = _.find(contentList, {slug: page});
 			var me = this;
-			//if (action==="-bytag"){
-				var tagId = this.props.postId;
-			//}
-			//if (action==="-bycategory"){
-				var categoryId = this.props.postId;
-			//}
-			//debugger;
+			var tagId = "";
+			var cateId = "";
+			if (action==="-bytag"){
+				tagId = this.props.postId;
+			}
+			if (action==="-bycategory"){
+				cateId = this.props.postId;
+			}
 			let ListComponent = React.createClass({
 				render: function(){
 					return <ContentType 
@@ -248,6 +249,7 @@ const PageLoader = React.createClass({
 						statusList={["All", "Published", "Draft", "Reviewing", "Trash"]}
 						handleNav={me.props.handleNav}
 						tagId={tagId}
+						cateId={cateId}
 					/>
 				}
 			});

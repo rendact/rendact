@@ -15,9 +15,7 @@ let Posts = React.createClass({
 			modifyRole="modify-post"
 			statusList={["All", "Published", "Draft", "Reviewing", "Trash"]}
 			handleNav={this.props.handleNav}
-			//tagId="VGFnOjMz"
 			tagId={this.props.tagId}
-			//cateId="Q2F0ZWdvcnk6MzE="
 			cateId={this.props.cateId}
 			/>
   }
