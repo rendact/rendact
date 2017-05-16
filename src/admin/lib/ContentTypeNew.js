@@ -304,6 +304,7 @@ const NewContentType = React.createClass({
     }
     
     this.disableForm(true);
+
     riques(qry, 
       function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
@@ -313,11 +314,11 @@ const NewContentType = React.createClass({
 
           if (me.state.mode==="create"){
             postId = body.data.createPost.changedPost.id;
-            pmQry = Query.createPostMetaMtn(metaDataList);
+            pmQry = Query.createPostMetaMtn(postId, metaDataList);
           } else {
             postId = body.data.updatePost.changedPost.id;
             if (body.data.updatePost.changedPost.meta.edges.length===0) {
-              pmQry = Query.createPostMetaMtn(metaDataList);
+              pmQry = Query.createPostMetaMtn(postId, metaDataList);
             } else {
               var data = [];
               _.forEach(metaDataList, function(item){
@@ -331,7 +332,7 @@ const NewContentType = React.createClass({
               pmQry = Query.updatePostMetaMtn(postId, data);
             }
           }
-
+          
           riques(pmQry, 
             function(error, response, body) {
               if (!error && !body.errors && response.statusCode === 200) {
@@ -388,6 +389,7 @@ const NewContentType = React.createClass({
           here.props.handleNav(me.props.slug,"edit",postId);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null, "Save Post");
+          here.disableForm(false);
         }
       }
     );  
@@ -927,6 +929,11 @@ const NewContentType = React.createClass({
 
                   {
                     this.props.customFields.map(function(item){
+                      var form;
+                      if (item.type === "text" || item.type === "number")
+                        form = (<input id={item.id} name={item.id} className="metaField" type="text" style={{width: '100%'}}/>)
+                      if (item.type === "date")
+                        form = (<DatePicker id={item.id} name={item.id} style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.state.publishDate.toISOString()} onChange={this.handleDateChange}/>)
                       return <div className="box box-info" style={{marginTop:20}}>
                         <div className="box-header with-border">
                           <h3 className="box-title">{item.label}</h3>         
@@ -936,7 +943,7 @@ const NewContentType = React.createClass({
                           </div>
                         </div>
                         <div className="box-body pad">
-                          <input id={item.id} name={item.id} className="metaField" type="text" style={{width: '100%'}}/>
+                          {form}
                         </div>
                       </div>
                     })

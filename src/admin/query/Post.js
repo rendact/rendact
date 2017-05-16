@@ -416,7 +416,7 @@ const getPostQry = function(postId){
   return {"query": 
      `{getPost(id:"`+postId+`"){ id,title,content,slug,author{username},status,visibility,featuredImage,
       summary,category{edges{node{category{id,name}}}},comments{edges{node{id}}},file{edges{node{id value}}},
-      tag{edges{node{id,tag{id,name}}}},meta{edges{node{item,value}}},createdAt}}`
+      tag{edges{node{id,tag{id,name}}}},meta{edges{node{id,item,value}}},createdAt}}`
     }
 };
 

@@ -74,7 +74,8 @@ const getUpdatePageQry = function(data){
 const createPostMetaMtn = function(postId, data){
   var query = "mutation { ";
   _.forEach(data, function(val, index){
-    query += ' CreatePostMeta'+index+' : createPostMeta(input: {postId: "'+postId+'", item: "'+val.item+'", value: "'+val.value+'"}){ changedPostMeta{ id } }'; 
+    if (val.item && val.item!=="")
+      query += ' CreatePostMeta'+index+' : createPostMeta(input: {postId: "'+postId+'", item: "'+val.item+'", value: "'+val.value+'"}){ changedPostMeta{ id } }'; 
   });
   query += "}";
   return {
@@ -85,7 +86,8 @@ const createPostMetaMtn = function(postId, data){
 const updatePostMetaMtn = function(postId, data){
   var query = "mutation { ";
   _.forEach(data, function(val, index){
-    query += ' UpdatePostMeta'+index+' : updatePostMeta(input: {id: "'+val.postMetaId+'", item: "'+val.item+'", value: "'+val.value+'"}){ changedPostMeta{ id } }'; 
+    if (val.item && val.item!=="")
+      query += ' UpdatePostMeta'+index+' : updatePostMeta(input: {id: "'+val.postMetaId+'", item: "'+val.item+'", value: "'+val.value+'"}){ changedPostMeta{ id } }'; 
   });
   query += "}";
   return {
@@ -97,7 +99,7 @@ const updatePostMetaMtn = function(postId, data){
 const getPageQry = function(postId){
   return {"query": 
       '{getPost(id:"'+postId+'"){ id,title,content,slug,author{username},status,visibility,parent,publishDate,order,'
-      +'summary,category{edges{node{category{id,name}}}}comments{edges{node{id}}},meta{edges{node{item,value}'
+      +'summary,category{edges{node{category{id,name}}}}comments{edges{node{id}}},meta{edges{node{id,item,value}'
       +'}}createdAt}}'
     }
   };
