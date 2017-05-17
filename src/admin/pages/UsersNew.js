@@ -274,8 +274,8 @@ var NewUser = React.createClass({
 			this.handleRoleChange(this.state.userRole, role);
 	},
 	handleOwnerRole: function(event){
-		var qry = Query.addRoleToUser(this.props.userId, "Um9sZToy", "admin");
-		
+		var role1 = this.state.userRole;
+		var qry = Query.updateRoleUser(this.props.userId, role1, "Um9sZToy", "admin");
 		var me = this;
 
    	riques(qry, 
