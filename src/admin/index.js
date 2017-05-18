@@ -235,6 +235,7 @@ const PageLoader = React.createClass({
 			if (action==="-bycategory"){
 				cateId = this.props.postId;
 			}
+			
 			let ListComponent = React.createClass({
 				render: function(){
 					return <ContentType 

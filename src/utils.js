@@ -223,11 +223,13 @@ const loadConfig = function(callback){
 
         _.forEach(body.data.viewer.allContents.edges, function(item){
           var dt = new Date(item.node.createdAt);
-          
+          var fields = item.node.fields;
+          if (item.node.customFields) fields = _.concat(item.node.fields, item.node.customFields)
+
           _dataArr.push({
             "postId": item.node.id,
             "name": item.node.name,
-            "fields": _.concat(item.node.fields, item.node.customFields),
+            "fields": fields,
             "customFields": item.node.customFields,
             "slug": item.node.slug?item.node.slug:"",
             "status": item.node.status?item.node.status:"",
