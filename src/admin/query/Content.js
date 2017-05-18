@@ -23,7 +23,8 @@ const getContentListQry = function(status){
               labelAddNew,
               labelEdit,
               createdAt,
-              status
+              status,
+              connection
             }
           }
         }
@@ -90,7 +91,8 @@ const getContentQry = function(contentId){
           labelAddNew,
           labelEdit,
           createdAt,
-          status
+          status,
+          connection
         }
       }`
   };
