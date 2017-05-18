@@ -1,28 +1,35 @@
 import _ from 'lodash';
 
-let getContentListQry = {
-  "query": `query getContentList{
-    viewer {
-      allContents {
-        edges {
-          node {
-            id,
-            name,
-            slug,
-            description,
-            menuIcon,
-            fields,
-            customFields,
-            label,
-            labelSingular,
-            labelAddNew,
-            labelEdit,
-            createdAt
+const getContentListQry = function(status){
+  var statusFilter = "";
+  if (status) {
+    statusFilter = '(where: {status: {eq: "'+status+'"}})'
+  }
+  return {
+    "query": `query getContentList{
+      viewer {
+        allContents `+statusFilter+` {
+          edges {
+            node {
+              id,
+              name,
+              slug,
+              description,
+              menuIcon,
+              fields,
+              customFields,
+              label,
+              labelSingular,
+              labelAddNew,
+              labelEdit,
+              createdAt,
+              status
+            }
           }
         }
       }
-    }
-  }`
+    }`
+  }
 }
 
 const createContentMtn = function(data){
@@ -82,7 +89,8 @@ const getContentQry = function(contentId){
           labelSingular,
           labelAddNew,
           labelEdit,
-          createdAt
+          createdAt,
+          status
         }
       }`
   };

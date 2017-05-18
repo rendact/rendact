@@ -215,10 +215,7 @@ const _saveConfig = function(name, value){
 }
 
 const loadConfig = function(callback){
-  //var me = this;
-  var qry = Query.getContentListQry;
-  //var config = {}
-
+  var qry = Query.getContentListQry("active");
   riques(qry, 
     function(error, response, body) { 
       if (body.data) { 

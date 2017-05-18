@@ -61,7 +61,7 @@ const SideMenu = React.createClass({
 	},
 	loadMenuOfContent: function(){
 		var me = this;
-    var qry = Query.getContentListQry;
+    var qry = Query.getContentListQry("active");
     riques(qry, 
       function(error, response, body) { 
         if (body.data) { 
