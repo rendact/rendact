@@ -209,7 +209,7 @@ const CategoryContent = React.createClass({
                         </div>
                       </div>                   
                       <Table 
-                          id="category"
+                          id={this.props.slug+"category"}
                           columns={[
                             {id: 'name', label: "Name", type: "link", textAlign:"center", cssClass:"nameText"},
                             {id: 'description', label: "Description", textAlign:"center", width: 400},

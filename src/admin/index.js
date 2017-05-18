@@ -262,15 +262,15 @@ const PageLoader = React.createClass({
 						slug={contentData.slug}
 						postId={me.props.postId} 
 						postType={page}
-		        loadQuery={Query.getPostQry}
-		        createQuery={Query.getCreatePostQry}
-		        updateQuery={Query.getUpdatePostQry}
-		        customFields={contentData.customFields}
-		        tableName="Post"
-		        widgets={["category", "featuredImage"]}
-		        viewRole="view-post"
-		        modifyRole="modify-post"
-		        handleNav={me.props.handleNav}
+				        loadQuery={Query.getPostQry}
+				        createQuery={Query.getCreatePostQry}
+				        updateQuery={Query.getUpdatePostQry}
+				        customFields={contentData.customFields}
+				        tableName="Post"
+				        widgets={["category", "featuredImage"]}
+				        viewRole="view-post"
+				        modifyRole="modify-post"
+				        handleNav={me.props.handleNav}
 					/>
 				}
 			});
