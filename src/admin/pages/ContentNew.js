@@ -186,6 +186,7 @@ var ContentNew = React.createClass({
 		var type = getValue("field-type");
 		var width = getValue("field-width");
 		var align = getValue("field-align");
+		var connection = getValue("connection");
 
 		if (!name) {
 			swalert('error', 'Invalid value', "Field name can't be  empty!")
@@ -202,7 +203,8 @@ var ContentNew = React.createClass({
 			label: name, 
 			type: type?type:"text", 
 			width: width?width:225, 
-			align:align?align:"left"
+			align:align?align:"left",
+			connection: connection?connection:null
 		};
 		customFields.push(newField);
 		this.setState({customFields: customFields, fields: _.concat(this.state.providedFields, customFields)});
@@ -230,6 +232,11 @@ var ContentNew = React.createClass({
 	},
 	handleAddNewBtn: function(event) {
     this.resetForm();
+  },
+  handleFieldTypeChange: function(event) {
+  	var value = event.target.value;
+  	var isConnection = value==="connection";
+  	document.getElementById("connection").disabled = !isConnection;
   },
 	resetForm: function(){
 		document.getElementById("contentForm").reset();
@@ -347,21 +354,78 @@ var ContentNew = React.createClass({
 								 	<label htmlFor="fields" className="col-md-3">Custom Fields</label>
 							  	<div className="col-md-9">
 							  		<p className="help-block">Add some custom fields for custom content.</p>
-							  		<div className="form-inline" >
-											<input type="text" id="field-name" placeholder="Field name" className="form-control"/> 
-											<select id="field-type" className="form-control select">
-												<option value="text">String</option>
-												<option value="text">Number</option>
-												<option value="date">Date</option>
-												<option value="link">Link</option>
-												<option value="image">Image</option>
-											</select> 
-											<input type="text" id="field-width" placeholder="Width" className="form-control"/> 
-											<select id="field-align" className="form-control select">
-												<option value="left">Left</option>
-												<option value="right">Right</option>
-												<option value="center">Center</option>
-											</select> 
+							  		<div className="form" >
+							  			<div className="form-group">
+							  				<div className="col-md-3">
+							  					<label htmlFor="fields">Field Name</label>
+								  			</div>
+								  			<div className="col-md-9">
+								  				<input type="text" id="field-name" placeholder="Field name" className="form-control"/> 
+								  			</div>
+							  			</div>
+
+							  			<div className="form-group">
+							  				<div className="col-md-3">
+							  					<label htmlFor="fields">Field Type</label>
+								  			</div>
+								  			<div className="col-md-9">
+								  				<select id="field-type" className="form-control select" onChange={this.handleFieldTypeChange}>
+														<option value="text">String</option>
+														<option value="text">Number</option>
+														<option value="date">Date</option>
+														<option value="link">Link</option>
+														<option value="image">Image</option>
+														<option value="connection">Connection</option>
+													</select> 
+								  			</div>
+							  			</div>
+
+							  			<div className="form-group">
+							  				<div className="col-md-3">
+							  					<label htmlFor="fields">Connect to other content</label>
+								  			</div>
+								  			<div className="col-md-9">
+								  				<select id="connection" className="form-control select" disabled="true">
+														<option value="testing">Testing</option>
+														<option value="developer">Developer</option>
+													</select>
+								  			</div>
+							  			</div>
+
+							  			<div className="form-group">
+							  				<div className="col-md-3">
+							  					<label htmlFor="fields">Width</label>
+								  			</div>
+								  			<div className="col-md-9">
+								  				<input type="text" id="field-width" placeholder="Width" className="form-control"/> 
+								  			</div>
+							  			</div>
+												
+											<div className="form-group">
+							  				<div className="col-md-3">
+							  					<label htmlFor="fields">Align</label>
+								  			</div>
+								  			<div className="col-md-9">
+								  				<select id="field-align" className="form-control select">
+														<option value="left">Left</option>
+														<option value="right">Right</option>
+														<option value="center">Center</option>
+													</select> 	
+								  			</div>
+							  			</div>	
+
+							  			<div className="form-group">
+							  				<div className="col-md-3">
+							  					<label htmlFor="fields">Position in editor</label>
+								  			</div>
+								  			<div className="col-md-9">
+								  				<select id="field-align" className="form-control select">
+														<option value="left">Left</option>
+														<option value="right">Right</option>
+													</select> 	
+								  			</div>
+							  			</div>	
+												
 											<input type="button" value="Add" className="form-control btn btn-primary " onClick={this.handleAddCustomField}/> 
 										</div>
 										<h4>Current fields</h4>
