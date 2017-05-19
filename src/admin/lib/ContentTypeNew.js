@@ -516,7 +516,7 @@ const NewContentType = React.createClass({
     }
 
     if (this.isWidgetActive("category")) {
-      riques(Query.getAllCategoryQry(this.props.slug), 
+      riques(Query.getAllCategoryQry(this.props.postType), 
         function(error, response, body) {
           if (!error) {
             var categoryList = [];
@@ -529,20 +529,21 @@ const NewContentType = React.createClass({
         }
       );
     }
-    if (this.props.postType==="post") {
-    if (this.isWidgetActive(this.props.slug)) {
-      riques(Query.getAllTagQry, 
+    
+    if (this.isWidgetActive("tag")) {
+      riques(Query.getAllTagQry(this.props.postType), 
         function(error, response, body) {
           if (!error) {
             var _tagMap = {};
             _.forEach(body.data.viewer.allTags.edges, function(item){
               _tagMap[item.node.name] = {id: item.node.id, name: item.node.name}
+              
             })
             me.setState({tagMap: _tagMap});
           }
         }
       );
-    }
+    
     };
   },
   componentDidMount: function(){
