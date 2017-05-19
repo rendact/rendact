@@ -25,7 +25,8 @@ const Content = React.createClass({
   },
   loadData: function(type, callback) {
     var me = this;
-    var qry = Query.getContentListQry;
+    var qry = Query.getContentListQry();
+    
     riques(qry, 
       function(error, response, body) { 
         if (body.data) { 
@@ -39,7 +40,7 @@ const Content = React.createClass({
               "name": item.node.name,
               "fields": me._fieldTemplate(item.node.fields),
               "slug": item.node.slug?item.node.slug:"",
-              "status": item.node.status?item.node.status:"active",
+              "status": item.node.status?item.node.status:"inactive",
               "createdAt": dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate()
             });
 

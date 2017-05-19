@@ -273,6 +273,30 @@ var NewUser = React.createClass({
 		if (this.state.userRole !== role)
 			this.handleRoleChange(this.state.userRole, role);
 	},
+	handleOwnerRole: function(event){
+		var role1 = this.state.userRole;
+		var qry = Query.updateRoleUser(this.props.userId, role1, "Um9sZToy", "admin");
+		var me = this;
+
+   	riques(qry, 
+			function(error, response, body){
+				if(!error && !body.errors) {
+					var here = me;
+					me.notification.addNotification({
+							message: 'Role updated',
+							level: 'success',
+							position: 'tr',
+							autoDismiss: 2
+						})
+					here.disableForm(false);
+				} else {
+					errorCallback(error, body.errors?body.errors[0].message:null);
+					me.disableForm(false);
+				}
+				me.notification.removeNotification('saving');
+			}, this.state.isAdmin
+		);
+	},
 	handleGeneratePassword: function(event){
 		event.preventDefault();
 		var Password = require('node-password').Password;
@@ -968,6 +992,7 @@ var NewUser = React.createClass({
 									<div className="col-md-9">
 										<div className="btn-group">
 											<input type="submit" value={this.state.mode==="update"?"Update User":"Add User"} className="btn btn-primary btn-sm" />
+											<input type="button" style={{marginLeft: 5}} value="Make user as owner" onClick={this.handleOwnerRole} className="btn btn-primary btn-sm" />
 										</div>
 									</div>
 								</div>

@@ -217,7 +217,7 @@ const TagContent = React.createClass({
                         </div>
                       </div>                   
                       <Table
-                          id={this.props.slug+"tag"}
+                          id={"tag-"+this.props.slug}
                           columns={[
                             {id: 'name', label: "Name", type: "link", target: "", cssClass:"nameText"},
                             {id: 'count', label: "Count", textAlign:"center", type: "link", target: "", cssClass:"tagText"}

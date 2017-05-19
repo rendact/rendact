@@ -65,7 +65,8 @@ var ContentNew = React.createClass({
 		setValue("labelSingular", data.labelSingular);
 		setValue("labelAddNew", data.labelAddNew);
 		setValue("labelEdit", data.labelEdit);
-		debugger;
+		document.getElementById("status").checked = data.status==="active"?true:false;
+		
 		this.setState({providedFields: data.fields});
 		this.setState({customFields: data.customFields});
 		this.setState({fields: _.concat(data.fields, data.customFields)});
@@ -133,6 +134,12 @@ var ContentNew = React.createClass({
 		var _objData = getFormData('rdt-input-form', 'object');
 		_objData['fields'] = this.state.providedFields;
 		_objData['customFields'] = this.state.customFields;
+
+		var status = "inactive";
+		var statusEl = document.getElementById("status");
+		if (statusEl) status = statusEl.checked?"active":"inactive";
+		_objData['status'] = status;
+
 		this.disableForm(true);
 
 		var qry = "";
@@ -147,7 +154,7 @@ var ContentNew = React.createClass({
 			function(error, response, body){
 				if(!error && !body.errors) {
 					me.disableForm(false);
-					me.resetForm();
+					//me.resetForm();
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
@@ -264,6 +271,15 @@ var ContentNew = React.createClass({
 		              <h3 className="box-title">General Info</h3>
 		            </div>
 			    			<div className="box-body">
+
+			    			{ this.state.mode === "update" &&
+			    			<div className="form-group">
+			          	<label htmlFor="fields" className="col-md-3">Content type status</label>
+							  	<div className="col-md-9">
+							  		<div className="checkbox"><label><input type="checkbox" name="status" id="status" value="active" />Content type is active</label></div>
+							  	</div>
+							  </div>
+								}
 
 					  		<div className="form-group">
 								 	<label htmlFor="name" className="col-md-3">Name</label>

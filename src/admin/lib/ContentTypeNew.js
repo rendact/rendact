@@ -530,7 +530,7 @@ const NewContentType = React.createClass({
       );
     }
     if (this.props.postType==="post") {
-    if (this.isWidgetActive("tag")) {
+    if (this.isWidgetActive(this.props.slug)) {
       riques(Query.getAllTagQry, 
         function(error, response, body) {
           if (!error) {
@@ -928,8 +928,8 @@ const NewContentType = React.createClass({
                   }
 
                   {
-                    this.props.customFields.map(function(item){
-                      var form;
+                    this.props.customFields && this.props.customFields.map(function(item){
+                      var form;debugger;
                       if (item.type === "text" || item.type === "number")
                         form = (<input id={item.id} name={item.id} className="metaField" type="text" style={{width: '100%'}}/>)
                       if (item.type === "date")

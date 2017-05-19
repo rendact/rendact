@@ -61,7 +61,7 @@ const SideMenu = React.createClass({
 	},
 	loadMenuOfContent: function(){
 		var me = this;
-    var qry = Query.getContentListQry;
+    var qry = Query.getContentListQry("active");
     riques(qry, 
       function(error, response, body) { 
         if (body.data) { 
@@ -235,6 +235,7 @@ const PageLoader = React.createClass({
 			if (action==="-bycategory"){
 				cateId = this.props.postId;
 			}
+			
 			let ListComponent = React.createClass({
 				render: function(){
 					return <ContentType 
