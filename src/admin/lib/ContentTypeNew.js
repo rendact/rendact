@@ -537,7 +537,7 @@ const NewContentType = React.createClass({
             var _tagMap = {};
             _.forEach(body.data.viewer.allTags.edges, function(item){
               _tagMap[item.node.name] = {id: item.node.id, name: item.node.name}
-              
+              //_tagMap.push(item.node.name);
             })
             me.setState({tagMap: _tagMap});
           }
