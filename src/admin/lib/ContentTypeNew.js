@@ -9,6 +9,8 @@ import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen';
 import { default as swal } from 'sweetalert2';
+import ReactSelect from 'react-select';
+import 'react-select/dist/react-select.css';
 
 const NewContentType = React.createClass({
   getInitialState: function(){
@@ -41,7 +43,8 @@ const NewContentType = React.createClass({
       opacity: 1,
       featuredImage: null,
       imageGallery: [],
-      tagMap: {}
+      tagMap: {},
+      connectionValue: "one"
     }
   },
   isWidgetActive: function(name){
@@ -498,6 +501,36 @@ const NewContentType = React.createClass({
       }
     );
   },
+  handleSelectConnectionChange: function(newValue) {
+    this.setState({connectionValue: newValue})
+  },
+  _genReactSelect: function(contentId){
+    var getConnectionOptions = function(input, callback) {
+      var qry = Query.getContentPostListQry("All", contentId);
+      
+      riques(qry, 
+        function(error, response, body) {
+          var options = [];
+          _.forEach(body.data.viewer.allPosts.edges, function(item){
+            options.push({value: item.node.slug, label: item.node.title});
+          });
+          callback(error, {
+            options: options,
+            complete: true
+          });
+        }
+      );
+    }
+    return (
+      <ReactSelect.Async
+        name="connection"
+        value={this.state.connectionValue}
+        loadOptions={getConnectionOptions}
+        onChange={this.handleSelectConnectionChange}
+        connectedContent={contentId}
+      />
+    )
+  },
   componentWillMount: function(){
     var me = this;
 
@@ -930,11 +963,14 @@ const NewContentType = React.createClass({
 
                   {
                     this.props.customFields && this.props.customFields.map(function(item){
-                      var form;debugger;
+                      var form;
                       if (item.type === "text" || item.type === "number")
                         form = (<input id={item.id} name={item.id} className="metaField" type="text" style={{width: '100%'}}/>)
                       if (item.type === "date")
                         form = (<DatePicker id={item.id} name={item.id} style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.state.publishDate.toISOString()} onChange={this.handleDateChange}/>)
+                      if (item.type === "connection") {
+                        form = this._genReactSelect(item.connection)
+                      }
                       return <div className="box box-info" style={{marginTop:20}}>
                         <div className="box-header with-border">
                           <h3 className="box-title">{item.label}</h3>         
@@ -947,7 +983,7 @@ const NewContentType = React.createClass({
                           {form}
                         </div>
                       </div>
-                    })
+                    }.bind(this))
                   }
 
               </div>
