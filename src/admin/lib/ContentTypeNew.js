@@ -44,7 +44,7 @@ const NewContentType = React.createClass({
       featuredImage: null,
       imageGallery: [],
       tagMap: {},
-      connectionValue: "one"
+      connectionValue: {}
     }
   },
   isWidgetActive: function(name){
@@ -121,7 +121,20 @@ const NewContentType = React.createClass({
       categories: _.map(categories, function(item){return item.value})
     }
   },
+  getMetaFormValues: function(){
+    var out = getFormData("metaField");
+
+    _.forEach(this.state.connectionValue, function(item, key){
+      out.push({
+        item: "conn~"+key,
+        value: item.value
+      });
+    });
+
+    return out;
+  },
   setFormValues: function(v){
+    var me = this;
     var meta = [];
     if (v.meta.edges.length>0) {
       _.forEach(v.meta.edges, function(i){
@@ -178,6 +191,13 @@ const NewContentType = React.createClass({
       var el = document.getElementsByName(item.item);
       if (el && el.length>0) {
         el[0].id = item.id
+      }
+      
+      var isConnItem = item.item.split("~");
+      if (isConnItem.length > 1) {
+        var _connectionValue = me.state.connectionValue;
+        _connectionValue[isConnItem[1]] = item.value; 
+        me.setState({connectionValue: _connectionValue})
       }
     })
 
@@ -313,28 +333,14 @@ const NewContentType = React.createClass({
         if (!error && !body.errors && response.statusCode === 200) {
           var here = me, postId = "", pmQry = "";
           
-          var metaDataList = getFormData("metaField");
+          var metaDataList = me.getMetaFormValues();
 
           if (me.state.mode==="create"){
             postId = body.data.createPost.changedPost.id;
-            pmQry = Query.createPostMetaMtn(postId, metaDataList);
           } else {
             postId = body.data.updatePost.changedPost.id;
-            if (body.data.updatePost.changedPost.meta.edges.length===0) {
-              pmQry = Query.createPostMetaMtn(postId, metaDataList);
-            } else {
-              var data = [];
-              _.forEach(metaDataList, function(item){
-                if (item.id)
-                  data.push({
-                    postMetaId: item.id,
-                    item: item.item,
-                    value: item.value
-                  });
-              });
-              pmQry = Query.updatePostMetaMtn(postId, data);
-            }
           }
+          pmQry = Query.createUpdatePostMetaMtn(postId, metaDataList);
           
           riques(pmQry, 
             function(error, response, body) {
@@ -501,10 +507,8 @@ const NewContentType = React.createClass({
       }
     );
   },
-  handleSelectConnectionChange: function(newValue) {
-    this.setState({connectionValue: newValue})
-  },
   _genReactSelect: function(contentId){
+    var me = this;
     var getConnectionOptions = function(input, callback) {
       var qry = Query.getContentPostListQry("All", contentId);
       
@@ -521,12 +525,19 @@ const NewContentType = React.createClass({
         }
       );
     }
+
+    var handleSelectConnectionChange = function(newValue) {
+      var _connectionValue = me.state.connectionValue;
+      _connectionValue[contentId] = newValue
+      me.setState({connectionValue: _connectionValue})
+    }
+
     return (
       <ReactSelect.Async
-        name="connection"
-        value={this.state.connectionValue}
+        name={contentId}
+        value={this.state.connectionValue[contentId]}
         loadOptions={getConnectionOptions}
-        onChange={this.handleSelectConnectionChange}
+        onChange={handleSelectConnectionChange}
         connectedContent={contentId}
       />
     )
@@ -971,7 +982,7 @@ const NewContentType = React.createClass({
                       if (item.type === "connection") {
                         form = this._genReactSelect(item.connection)
                       }
-                      return <div className="box box-info" style={{marginTop:20}}>
+                      return <div key={item.id} className="box box-info" style={{marginTop:20}}>
                         <div className="box-header with-border">
                           <h3 className="box-title">{item.label}</h3>         
                           <div className="pull-right box-tools">
