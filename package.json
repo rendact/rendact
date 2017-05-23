@@ -36,7 +36,7 @@
     "react-password-strength": "^1.1.0",
     "react-router": "^4.0.0-alpha.6",
     "react-router-scroll": "^0.3.2",
-    "react-select": "^1.0.0",
+    "react-select": "^1.0.0-rc.4",
     "request": "^2.81.0",
     "subscriptions-transport-ws": "^0.6.0",
     "sweetalert2": "^6.4.0"
