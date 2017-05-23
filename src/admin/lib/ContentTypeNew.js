@@ -9,6 +9,8 @@ import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen';
 import { default as swal } from 'sweetalert2';
+import ReactSelect from 'react-select';
+import 'react-select/dist/react-select.css';
 
 const NewContentType = React.createClass({
   getInitialState: function(){
@@ -977,7 +979,7 @@ const NewContentType = React.createClass({
 
                   {
                     this.props.customFields && this.props.customFields.map(function(item){
-                      var form;debugger;
+                      var form;
                       if (item.type === "text" || item.type === "number")
                         form = (<input id={item.id} name={item.id} className="metaField" type="text" style={{width: '100%'}}/>)
                       if (item.type === "date")
@@ -997,7 +999,7 @@ const NewContentType = React.createClass({
                           {form}
                         </div>
                       </div>
-                    })
+                    }.bind(this))
                   }
 
               </div>
