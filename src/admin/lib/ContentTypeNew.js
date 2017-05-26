@@ -979,7 +979,7 @@ const NewContentType = React.createClass({
 
                   {
                     this.props.customFields && this.props.customFields.map(function(item){
-                      var form;debugger;
+                      var form;
                       if (item.type === "text" || item.type === "number")
                         form = (<input id={item.id} name={item.id} className="metaField" type="text" style={{width: '100%'}}/>)
                       if (item.type === "date")
@@ -999,7 +999,7 @@ const NewContentType = React.createClass({
                           {form}
                         </div>
                       </div>
-                    })
+                    }.bind(this))
                   }
 
               </div>
