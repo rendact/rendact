@@ -9,6 +9,8 @@ import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen';
 import { default as swal } from 'sweetalert2';
+import ReactSelect from 'react-select';
+import 'react-select/dist/react-select.css';
 
 const NewContentType = React.createClass({
   getInitialState: function(){
