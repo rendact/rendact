@@ -28,9 +28,11 @@ const Main = React.createClass({
 		this.AuthService = new AuthService(this);
 		this.AuthService.checkAuth(this.onlogin);
 	},
+	/*
 	componentDidMount: function(){
 		this.subscribe();
 	},
+	
 	subscribe(repoName, updateQuery){
 	  this.subscriptionObserver = this.refs.provider.props.client.subscribe({
 		    query: Query.subscriptionQry
@@ -43,7 +45,7 @@ const Main = React.createClass({
 	    },
 	  });
 	},
-
+	*/
 	render: function(){
 		return (
 			<ApolloProvider client={client} ref="provider">
