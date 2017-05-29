@@ -74,7 +74,8 @@ const queries = {
   addImageGallery: Post.addImageGallery,
   removeImageGallery: Post.removeImageGallery,
   bindImageGallery: Post.bindImageGallery,
-  subscriptionQry: subscriptionQry
+  subscriptionQry: subscriptionQry,
+  setAsOwner: User.setAsOwner
 }
 
 module.exports = queries;
