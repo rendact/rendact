@@ -1,10 +1,9 @@
-//import './Home.css'
 import React from 'react'
-
+import {latestPosts} from '../../../includes/hooks'
 import Header from '../includes/Header'
-//import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
-//import RM from 
+import _ from 'lodash'
+
 const Home = () => {
 
 	return (
@@ -119,7 +118,8 @@ const Home = () => {
 
 <div className="new-section">
 		   <div className="container">
-		         <h3>Latest Posts</h3>
+		     <h3>Latest Posts</h3>
+		     
 				 <div className="new">
 				   <div className="col-md-6 new-text wow rollIn animated animated" data-wow-delay="0.4s" style={{"visibility": "visible", "animationDelay": "0.4s", "animationName": "rollIn"}}>
 					   <h5>THU 14 May, 2015</h5>
