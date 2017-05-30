@@ -117,10 +117,14 @@ const ContentType = React.createClass({
                   var roles = "No Role";
                   var rolesLen = item.node.roles.edges.length;
                   if (rolesLen>0) {
-                    roles = _.join(
-                      _.map(item.node.roles.edges, function(item){
-                        return item.node.name;
-                      }), "<br/>");
+                    var isOwner = _.find(item.node.roles.edges, {node: {name: "Owner"}} );
+                    if (isOwner) roles = "Owner";
+                    else {
+                      roles = _.join(
+                        _.map(item.node.roles.edges, function(item){
+                          return item.node.name;
+                        }), "<br/>");
+                    }
                   }
                   if (status==="No Role"){
                     if (rolesLen>0) return;
@@ -175,6 +179,9 @@ const ContentType = React.createClass({
     if (!state) {
       this.checkDynamicButtonState();
     }
+  },
+  isWidgetActive: function(name){
+    return _.indexOf(this.props.widgets, name) > -1;
   },
   handleDeleteBtn: function(event){
     var me = this;
@@ -301,12 +308,49 @@ const ContentType = React.createClass({
       })
     } ;
   },
+  handleSetOwnerButton: function(e){
+    var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
+    if (checkedRow.length > 1) {
+      swalert('error','Only one user','Only one user allowed to be an owner');
+      return;
+    }
+
+    this.disableForm(true);
+    var selectedId = checkedRow[0].id.split("-")[1];
+    var qry = Query.setAsOwner(selectedId, this.state.allPostId, "admin");
+    var me = this;
+    
+    riques(qry, 
+      function(error, response, body){
+        if(!error && !body.errors) {
+          var here = me;
+          me.notif.addNotification({
+              message: 'Role updated',
+              level: 'success',
+              position: 'tr',
+              autoDismiss: 2
+            })
+          here.disableForm(false);
+          here.loadData("All");
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+          me.disableForm(false);
+        }
+        me.notif.removeNotification('saving');
+      }, true
+    );
+  },
   checkDynamicButtonState: function(){
     var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     this.setState({itemSelected: checkedRow.length>0})
   },
   handleViewPost: function(postId){
     this.props.handleNav(this.props.slug,'edit', postId);
+  },
+  isOwner: function(){
+    var p = JSON.parse(localStorage.getItem("profile"));
+    var roles = p["roles"];
+    return _.indexOf("Owner", roles) > -1;
   },
   onAfterTableLoad: function(){
     var me = this;
@@ -379,7 +423,11 @@ const ContentType = React.createClass({
                             onRecover={this.handleRecover}
                             onDeletePermanent={this.handleDeletePermanent}
                             onEmptyTrash={this.handleEmptyTrash}
-                          />                  
+                          />  
+                          {
+                            (this.isWidgetActive("ownerButton") /* && this.isOwner() */ ) && 
+                            <button className="btn btn-default" onClick={this.handleSetOwnerButton} disabled={!this.state.itemSelected}>Set as owner</button>
+                          }                
                         <div className="box-tools pull-right">
                           <SearchBoxPost datatable={this.table} ref="rendactSearchBoxPost"/>
                         </div>

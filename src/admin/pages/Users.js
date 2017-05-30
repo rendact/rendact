@@ -15,6 +15,7 @@ let Users = React.createClass({
 			viewRole="view-user"
 			modifyRole="modify-user"
 			statusList={_.concat(["All"],AdminConfig.RoleList)}
+			widgets={["ownerButton"]}
 			handleNav={this.props.handleNav}
 			replaceStatusWithRole={true}
 			/>

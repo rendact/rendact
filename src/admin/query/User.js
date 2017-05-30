@@ -388,6 +388,19 @@ const updateRoleUser = function(userId, role1, role2, accessLevel){
   }
 }
 
+const setAsOwner = function(newOwner, allUserId, accessLevel){
+  var query = "mutation { ";
+  _.forEach(allUserId, function(val, index){
+    query += ' removeFromUserRoles'+index+' : removeFromUserRolesConnection(input: {userId: "'+val+'", roleId: "Um9sZToy"}){ changedUserRoles{ user {id} } }'; 
+  });
+  query += ' addToUserRoles1 : addToUserRolesConnection(input: {userId: "'+newOwner+'", roleId: "Um9sZToy", accessLevel: admin}){ changedUserRoles{ user {id} } }'; 
+  query += "}";
+
+  return {
+    "query": query
+  }
+}
+
 const getRolesQry = {
   "query": `
     query getRoles{
@@ -445,7 +458,8 @@ const queries = {
   deleteUserQry: deleteUserQry,
   updateRoleUser: updateRoleUser,
   checkUsernameQry: checkUsernameQry,
-  checkEmailQry: checkEmailQry
+  checkEmailQry: checkEmailQry,
+  setAsOwner: setAsOwner
 }
 
 module.exports = queries;
