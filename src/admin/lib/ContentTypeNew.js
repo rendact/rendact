@@ -11,6 +11,7 @@ import Halogen from 'halogen';
 import { default as swal } from 'sweetalert2';
 import ReactSelect from 'react-select';
 import 'react-select/dist/react-select.css';
+//import { Creatable } from 'react-select';
 
 const NewContentType = React.createClass({
   getInitialState: function(){
@@ -575,19 +576,28 @@ const NewContentType = React.createClass({
     }
     
     if (this.isWidgetActive("tag")) {
-      //var me = this;
       riques(Query.getAllTagQry(this.props.postType), 
         function(error, response, body) {
           if (!error) {
-            var _tagMap = {}
+            var _tagMap = {};
+            var options = [];
+            
             _.forEach(body.data.viewer.allTags.edges, function(item){
-              if (me.state.mode==="update") {
+              
                 _tagMap[item.node.name] = {id: item.node.id, name: item.node.name}
-              }else{
-                $('#tag').typeahead('add', item.node.name);
-              }
+              
+                options.push({value: item.node.name, label: item.node.name});
+                me.setState({options: options});
+
+                function logChange(value) {
+                  console.log("Selected: " + value);
+                  me.setState({value});
+                }
+                me.setState({logChange: logChange});
+              
             })
             me.setState({tagMap: _tagMap});
+            
           }
         }
       );
@@ -920,7 +930,18 @@ const NewContentType = React.createClass({
                     </div>
                     <div className="box-body pad">
                       <div className="form-group" style={{width: '100%'}}>
-                          <input id="tag" data-role={this.state.mode==="update"?"tagsinput":"typeahead" }style={{width: '100%'}} onChange={this.handleTagChange}/>
+                        
+                          <input type="text" id="tag" data-role="tagsinput" style={{width: '100%'}} onChange={this.handleTagChange}/>
+                        
+                          <ReactSelect.Creatable
+                            id="tag"
+                            name="form-field-name"
+                            value={this.state.value}
+                            options={this.state.options}
+                            onChange={this.state.logChange}
+                            multi={true}
+                          />
+                        
                           <p><span className="help-block">Press enter after inputting tag</span></p>
                       </div>
                     </div>
