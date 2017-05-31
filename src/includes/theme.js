@@ -1,12 +1,16 @@
 import React from 'react';
-import AdminConfig from './AdminConfig';
+import AdminConfig from '../admin/AdminConfig';
 window.config = AdminConfig;
-import NotFound from './NotFound';
-import Query from './query';
-import {riques} from '../utils';
+import NotFound from '../admin/NotFound';
+import Query from '../admin/query';
+import Config from '../config';
+
+import {riques, errorCallback} from '../utils';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
-import Loading from './Loading'
+import Loading from '../admin/Loading';
+import {latestPosts} from './hooks';
+import _ from 'lodash';
 
 const InvalidTheme = React.createClass({
 	componentDidMount: function(){
@@ -63,7 +67,8 @@ const ThemeHome = React.createClass({
 		return {
 			loadDone: false,
 			isSlugExist: false,
-			slug: this.props.location.pathname.replace("/","")
+			slug: this.props.location.pathname.replace("/",""),
+			latestPosts: []
 		}
 	},
 	componentWillMount: function(){
@@ -79,7 +84,21 @@ const ThemeHome = React.createClass({
 	      } else {
 	        me.setState({errorMsg: "error when checking slug"});
 	      }
-	      me.setState({loadDone: true});
+
+	      riques(Query.getPostListQry("Full"), 
+		      function(error, response, body) { 
+		        if (!error && !body.errors && response.statusCode === 200) {
+		          var _postArr = [];
+		          _.forEach(body.data.viewer.allPosts.edges, function(item){
+		            _postArr.push(item.node);
+		          });
+		          me.setState({latestPosts: _postArr});
+		        } else {
+		          errorCallback(error, body.errors?body.errors[0].message:null);
+		        }
+		        me.setState({loadDone: true});
+		      }
+		    );
 	    }
 		);
 	},
@@ -96,12 +115,12 @@ const ThemeHome = React.createClass({
 			if (this.state.slug){
 				let Single = getTemplateComponent('single');
 				if (this.state.isSlugExist)
-					return <Single slug={this.state.slug} />
+					return <Single slug={this.state.slug}/>
 				else 
 					return <NotFound/>
 			} else {
 				let Home = getTemplateComponent('home');
-				return <Home />
+				return <Home latestPosts={this.state.latestPosts}/>
 			}
 		}
 	}

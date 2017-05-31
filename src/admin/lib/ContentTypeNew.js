@@ -4,7 +4,7 @@ import $ from 'jquery';
 import Query from '../query';
 import {riques, setValue, getValue, disableForm, errorCallback, 
         getConfig, defaultHalogenStyle, getFormData} from '../../utils';
-import {getTemplates} from '../theme';
+import {getTemplates} from '../../includes/theme';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen';
