@@ -156,11 +156,13 @@ const NewContentType = React.createClass({
       this.setState({postCategoryList: _postCategoryList});
     }
     var _postTagList = [];
+    var value=[];
     if (v.tag && v.tag.edges.length>0) {
       _.forEach(v.tag.edges, function(i){
         if (i.node.tag){
-          _postTagList.push({id: i.node.tag.id, name: i.node.tag.name, connectionId: i.node.id});
+          _postTagList.push({id: i.node.tag.id, value: i.node.tag.name, name: i.node.tag.name, label: i.node.tag.name, connectionId: i.node.id});
           $('#tag').tagsinput('add', i.node.tag.name);
+          me.setState({NewValue: value})
         }
       });
       this.setState({postTagList: _postTagList});
@@ -586,12 +588,16 @@ const NewContentType = React.createClass({
               
                 _tagMap[item.node.name] = {id: item.node.id, name: item.node.name}
               
-                options.push({value: item.node.name, label: item.node.name});
+                options.push({id: item.node.id, value: item.node.name, label: item.node.name});
                 me.setState({options: options});
 
                 function logChange(value) {
                   console.log("Selected: " + value);
-                  me.setState({value});
+                    me.setState({value});
+                    
+                  var valueArr = me.state.newValue;
+                  valueArr.push(me.state.value);
+                  me.setState({value: valueArr});
                 }
                 me.setState({logChange: logChange});
               
@@ -937,6 +943,15 @@ const NewContentType = React.createClass({
                             id="tag"
                             name="form-field-name"
                             value={this.state.value}
+                            options={this.state.options}
+                            onChange={this.state.logChange}
+                            multi={true}
+                          />
+
+                          <ReactSelect
+                            id="tag"
+                            name="form-field-name"
+                            value={this.state.postTagList}
                             options={this.state.options}
                             onChange={this.state.logChange}
                             multi={true}
