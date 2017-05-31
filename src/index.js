@@ -5,7 +5,7 @@ import {BrowserRouter, Match, Miss, Redirect} from 'react-router'
 import {AuthService, MatchWhenAuthorized} from './auth'
 window.AuthService = AuthService;
 import client from './apollo';
-import {ThemeHome, ThemeSingle, ThemeBlog} from './admin/theme';
+import {ThemeHome, ThemeSingle, ThemeBlog} from './includes/theme';
 import Admin from './admin';
 import Login from './login';
 import Register from './register';
