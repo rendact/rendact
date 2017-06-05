@@ -117,7 +117,7 @@ const Home = React.createClass({
 				     		return <div className="new">
 											   <div className="col-md-6 new-text wow rollIn animated animated" data-wow-delay="0.4s" style={{"visibility": "visible", "animationDelay": "0.4s", "animationName": "rollIn"}}>
 												   <h5>{item.createdAt}</h5>
-												   <a href="article"><h4>{item.title}</h4></a>
+												   <a href={"/post/"+item.id}><h4>{item.title}</h4></a>
 												   {item.content}
 											   </div>
 												<div className="col-md-6 welcome-img">

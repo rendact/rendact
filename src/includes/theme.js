@@ -5,7 +5,7 @@ import NotFound from '../admin/NotFound';
 import Query from '../admin/query';
 import Config from '../config';
 
-import {riques, errorCallback} from '../utils';
+import {riques, errorCallback, toHTMLObject} from '../utils';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
 import Loading from '../admin/Loading';
@@ -140,6 +140,27 @@ const ThemeBlog = React.createClass({
 });
 
 const ThemeSingle = React.createClass({
+	getInitialState: function(){
+		return {
+			loadDone: false,
+			postData: false
+		}
+	},
+	componentWillMount: function() {
+		var me = this;
+		riques(Query.getPostQry(this.props.params.postId), 
+      function(error, response, body) { 
+        if (!error && !body.errors && response.statusCode === 200) {
+          var data = body.data.getPost;
+          //data.content = toHTMLObject(data.content);
+          me.setState({postData: data});
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+        me.setState({loadDone: true});
+      }
+    );
+	},
 	componentDidMount: function(){
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
@@ -147,14 +168,18 @@ const ThemeSingle = React.createClass({
 		require('../theme/'+c.path+'/functions.js');
 	},
 	render: function() {
-		if (this.params.pageId){
-			let Single = getTemplateComponent('single');
-			return <Single postId={this.params.pageId}/>;
-		} else if (this.params.postId){
-			let Single = getTemplateComponent('single');
-			return <Single postId={this.params.postId}/>;
+		if (!this.state.loadDone) {
+			return <Loading/>
 		} else {
-			return <NotFound/>
+			if (this.props.params.postId){
+				let Single = getTemplateComponent('single');
+				return <Single postId={this.props.params.postId} postData={this.state.postData}/>;
+			} else if (this.params.postId){
+				let Single = getTemplateComponent('single');
+				return <Single postId={this.props.params.postId} postData={this.state.postData}/>;
+			} else {
+				return <NotFound/>
+			}
 		}
 	}
 });

@@ -290,6 +290,12 @@ const removeTags = function(txt){
     return txt.replace(rex , "");
 }
 
+const toHTMLObject = function(text){
+  var parser=new DOMParser();
+  var htmlDoc=parser.parseFromString(text, "text/html");
+  return htmlDoc;
+}
+
 module.exports = {
 	riques: riques,
 	setValue: setValue,
@@ -305,5 +311,6 @@ module.exports = {
   getConfig: getConfig,
   defaultHalogenStyle: defaultHalogenStyle,
   swalert: swalert,
-  removeTags:removeTags
+  removeTags:removeTags,
+  toHTMLObject: toHTMLObject
 };
