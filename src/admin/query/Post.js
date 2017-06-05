@@ -367,7 +367,7 @@ const createUpdateTagOfPostMtn = function(postId, oldTag, currentTag, tagMap){
     var obj = _.find(oldTag, {name: item});
     return obj.connectionId;
   })
-
+  debugger;
   if (deleteListId.length===0 && addList.length===0) return null;
 
   var query = "mutation (";
@@ -398,9 +398,9 @@ const createUpdateTagOfPostMtn = function(postId, oldTag, currentTag, tagMap){
   _.forEach(addList, function(item){
     query += ' CreateTagOfPost'+index+' : createTagOfPost(input: $input'+index+'){ changedTagOfPost{ id } }'; 
     var _key = "input"+index 
-    variables[_key] = {postId: postId,tag: {"name": item}}
-    if (_.has(tagMap, item)) 
-      variables[_key] = {postId: postId,tagId: tagMap[item].id}
+    variables[_key] = {postId: postId,tag: {"name": item.label}}
+    if (_.has(tagMap, item.label)) 
+      variables[_key] = {postId: postId,tagId: tagMap[item.label].id}
 
     index++;
   });
