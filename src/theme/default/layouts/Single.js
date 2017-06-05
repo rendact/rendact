@@ -21,10 +21,14 @@ const Single = React.createClass({
 				  	   	<div className="blog_box">
 						 <div className="blog_grid">
 						  <h3 className="wow rollIn animated" data-wow-delay="0.4s">{this.props.postData.title}</h3>
-						  <a href="single.html"><img src="images/blog1.jpg" className="img-responsive" alt=""/></a>
+						  { this.props.postData.featuredImage &&
+						  <a href="single.html">
+							  <img src={this.props.postData.featuredImage} className="img-responsive" alt=""/>
+							</a>
+							}
 				  
 						  <div className="singe_desc">
-						    {[this.props.postData.content]}
+						    <div dangerouslySetInnerHTML={{__html: this.props.postData.content}} />
 						    
 						     <div className="comments">
 				  				<ul className="links">

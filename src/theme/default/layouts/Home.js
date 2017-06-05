@@ -117,8 +117,8 @@ const Home = React.createClass({
 				     		return 	<div className="new">
 										<div className="col-md-6 new-text wow rollIn animated animated" data-wow-delay="0.4s" style={{"visibility": "visible", "animationDelay": "0.4s", "animationName": "rollIn"}}>
 											<h5>{item.createdAt}</h5>
-											<a href="article"><h4>{item.title}</h4></a>
-											{item.content.replace(/<[^>]*>/g, "")}
+											<a href={"/post/"+item.id}><h4>{item.title}</h4></a>
+											<div dangerouslySetInnerHTML={{__html: item.content}} />
 										</div>
 										<div className="col-md-6 welcome-img">
 											<a href="article" className="mask"><img src={item.featuredImage} alt="" className="img-responsive zoom-img" /></a>
