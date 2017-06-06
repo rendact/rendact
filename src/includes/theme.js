@@ -71,6 +71,17 @@ const ThemeHome = React.createClass({
 			latestPosts: []
 		}
 	},
+	handlePostClick: function(e){
+		e.preventDefault();
+		var id = e.currentTarget.id;
+		this._reactInternalInstance._context.history.push('/post/'+id)
+	},
+	theTitle: function(id, title){
+		return <a href={"/post/"+id} onClick={this.handlePostClick} id={id}><h4>{title}</h4></a>
+	},
+	theContent: function(content){
+		return <div dangerouslySetInnerHTML={{__html: content}} />
+	},
 	componentWillMount: function(){
 		var me = this;
 
@@ -120,7 +131,11 @@ const ThemeHome = React.createClass({
 					return <NotFound/>
 			} else {
 				let Home = getTemplateComponent('home');
-				return <Home latestPosts={this.state.latestPosts}/>
+				return <Home 
+								latestPosts={this.state.latestPosts}
+								theTitle={this.theTitle}
+								theContent={this.theContent}
+								/>
 			}
 		}
 	}
