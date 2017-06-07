@@ -156,13 +156,11 @@ const NewContentType = React.createClass({
       this.setState({postCategoryList: _postCategoryList});
     }
     var _postTagList = [];
-    var value=[];
     if (v.tag && v.tag.edges.length>0) {
       _.forEach(v.tag.edges, function(i){
         if (i.node.tag){
           _postTagList.push({id: i.node.tag.id, value: i.node.tag.name, name: i.node.tag.name, label: i.node.tag.name, connectionId: i.node.id});
           $('#tag').tagsinput('add', i.node.tag.name);
-          me.setState({NewValue: value})
         }
       });
       this.setState({postTagList: _postTagList});
@@ -510,6 +508,12 @@ const NewContentType = React.createClass({
       }
     );
   },
+  logChange: function (value) {
+    this.setState({value: value});
+/*var valueArr = this.state.postTagList;
+valueArr.push(this.state.value);
+this.setState({value: valueArr})*/
+  },
   _genReactSelect: function(contentId){
     var me = this;
     var getConnectionOptions = function(input, callback) {
@@ -591,15 +595,15 @@ const NewContentType = React.createClass({
                 options.push({id: item.node.id, value: item.node.name, label: item.node.name});
                 me.setState({options: options});
 
-                function logChange(value) {
+                /*function logChange(value) {
                   console.log("Selected: " + value);
                     me.setState({value});
                     
-                  var valueArr = me.state.newValue;
-                  valueArr.push(me.state.value);
+                  var valueArr = me.state.value;
+                  valueArr.push(me.state.NewValue);
                   me.setState({value: valueArr});
                 }
-                me.setState({logChange: logChange});
+                me.setState({logChange: logChange});*/
               
             })
             me.setState({tagMap: _tagMap});
@@ -944,7 +948,7 @@ const NewContentType = React.createClass({
                             name="form-field-name"
                             value={this.state.value}
                             options={this.state.options}
-                            onChange={this.state.logChange}
+                            onChange={this.logChange}
                             multi={true}
                           />
 
@@ -952,7 +956,7 @@ const NewContentType = React.createClass({
                             id="tag"
                             name="form-field-name"
                             value={this.state.postTagList}
-                            options={this.state.options}
+                            options={this.state.postTagList}
                             onChange={this.state.logChange}
                             multi={true}
                           />
