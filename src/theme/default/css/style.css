@@ -414,7 +414,7 @@ a.button {
 }
 /*-----start-blog----*/
 .new-section{
-   padding: 4em 0 2em 0;
+   padding: 2em 0 2em 0;
    text-align:center;
  }
  a.mask {
@@ -456,7 +456,7 @@ img.zoom-img {
   width: 50%;
   margin: 0 auto;
   text-align: left;
-  padding: 5em 3em 2em 3em;
+  padding: 2em 3em 2em 3em;
 }
 .new h5 {
   color:rgba(44, 47, 47, 1);
@@ -5173,4 +5173,22 @@ Copyright (c) 2013 Daniel Eden
 .zoomOutUp {
   -webkit-animation-name: zoomOutUp;
   animation-name: zoomOutUp;
+}
+
+.content-body {
+  padding-top: 2em;
+}
+.sidebar-grid {
+  margin-left: 2em;
+}
+.sidebar-grid h3{
+  color: #fff;
+  font-size: 1.3em;
+  text-align:left;
+  margin-bottom: 6%;
+  text-transform: uppercase;
+  font-family: 'Orbitron', sans-serif;
+}
+.sidebar-grid p, .sidebar-grid a {
+  text-align:left;
 }
