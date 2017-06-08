@@ -11,6 +11,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import Loading from '../admin/Loading';
 import {latestPosts} from './hooks';
 import _ from 'lodash';
+import {searchWidget, topPostWidget} from './widgets';
 
 const InvalidTheme = React.createClass({
 	componentDidMount: function(){
@@ -82,6 +83,16 @@ const ThemeHome = React.createClass({
 	theContent: function(content){
 		return <div dangerouslySetInnerHTML={{__html: content}} />
 	},
+	theMenu: function(){
+		return <ul className="cl-effect-16">
+						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
+						<li><a href="blogs">Blogs</a></li>
+						<li><a href="#">Menu 2</a></li>
+						<li><a href="#">Menu 3</a></li>
+						<li><a href="#">Menu 4</a></li>
+						<li><a href="#">Menu 5</a></li>
+					</ul>
+	},
 	componentWillMount: function(){
 		var me = this;
 
@@ -135,7 +146,9 @@ const ThemeHome = React.createClass({
 								latestPosts={this.state.latestPosts}
 								theTitle={this.theTitle}
 								theContent={this.theContent}
-								/>
+								theMenu={this.theMenu}
+								widgets={[searchWidget, topPostWidget]}
+							/>
 			}
 		}
 	}
