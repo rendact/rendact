@@ -82,6 +82,16 @@ const ThemeHome = React.createClass({
 	theContent: function(content){
 		return <div dangerouslySetInnerHTML={{__html: content}} />
 	},
+	theImage: function(image){
+		var fImage="";
+		if(image!=null){
+   			fImage=image;
+   		}
+   		else{
+   			fImage=require('../theme/default/images/logo.png');
+   		}
+		return <a href="article" className="mask"><img src={fImage} alt="" style={{width:'auto', height:'auto'}} className="img-responsive img-thumbnail" /></a>
+	},
 	componentWillMount: function(){
 		var me = this;
 
@@ -135,6 +145,7 @@ const ThemeHome = React.createClass({
 								latestPosts={this.state.latestPosts}
 								theTitle={this.theTitle}
 								theContent={this.theContent}
+								theImage={this.theImage}
 								/>
 			}
 		}

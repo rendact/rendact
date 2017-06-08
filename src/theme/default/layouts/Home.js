@@ -114,6 +114,7 @@ const Home = React.createClass({
 				     <h3>Latest Posts</h3>
 				     {
 				     	this.props.latestPosts && this.props.latestPosts.map(function(item){
+
 				     		return 	<div className="new">
 										<div className="col-md-6 new-text wow rollIn animated animated" data-wow-delay="0.4s" style={{"visibility": "visible", "animationDelay": "0.4s", "animationName": "rollIn"}}>
 											<h5>{item.createdAt}</h5>
@@ -121,7 +122,7 @@ const Home = React.createClass({
 											{this.props.theContent(item.content)}
 										</div>
 										<div className="col-md-6 welcome-img">
-											<a href="article" className="mask"><img src={item.featuredImage} alt="" className="img-responsive zoom-img" /></a>
+											{this.props.theImage(item.featuredImage)}
 										</div>
 										<div className="clearfix"> </div>
 									</div>
