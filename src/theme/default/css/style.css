@@ -5192,3 +5192,6 @@ Copyright (c) 2013 Daniel Eden
 .sidebar-grid p, .sidebar-grid a {
   text-align:left;
 }
+.sidebar-box {
+  padding-bottom: 2em;
+}

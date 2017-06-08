@@ -11,6 +11,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import Loading from '../admin/Loading';
 import {latestPosts} from './hooks';
 import _ from 'lodash';
+import {searchWidget, topPostWidget} from './widgets';
 
 const InvalidTheme = React.createClass({
 	componentDidMount: function(){
@@ -146,6 +147,7 @@ const ThemeHome = React.createClass({
 								theTitle={this.theTitle}
 								theContent={this.theContent}
 								theMenu={this.theMenu}
+								widgets={[searchWidget, topPostWidget]}
 							/>
 			}
 		}
