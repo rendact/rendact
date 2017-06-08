@@ -31,6 +31,7 @@ const NewContentType = React.createClass({
       pageList: null,
       categoryList: null,
       postCategoryList: [],
+      postTagListInit: [],
       postTagList: [],
       titleTagLeftCharacter: 65,
       metaDescriptionLeftCharacter: 160,
@@ -160,10 +161,10 @@ const NewContentType = React.createClass({
       _.forEach(v.tag.edges, function(i){
         if (i.node.tag){
           _postTagList.push({id: i.node.tag.id, value: i.node.tag.name, name: i.node.tag.name, label: i.node.tag.name, connectionId: i.node.id});
-          $('#tag').tagsinput('add', i.node.tag.name);
+
         }
       });
-      this.setState({postTagList: _postTagList});
+      this.setState({postTagList: _postTagList, postTagListInit: _postTagList});
     }
 
     var _imageGalleryList = [];
@@ -276,9 +277,6 @@ const NewContentType = React.createClass({
     var resetDate = this.state.publishDateReset;
     this.setState({publishDate: resetDate});
   },
-  handleTagChange: function(tag){
-    debugger;
-  },
   handleAddNewBtn: function(event) {
     this.resetForm();
   },
@@ -335,25 +333,28 @@ const NewContentType = React.createClass({
           var here = me, postId = "", pmQry = "";
           
           var metaDataList = me.getMetaFormValues();
-
+ 
           if (me.state.mode==="create"){
             postId = body.data.createPost.changedPost.id;
           } else {
             postId = body.data.updatePost.changedPost.id;
           }
-          pmQry = Query.createUpdatePostMetaMtn(postId, metaDataList);
-          
-          riques(pmQry, 
-            function(error, response, body) {
-              if (!error && !body.errors && response.statusCode === 200) {
-                
-              } else {
-                errorCallback(error, body.errors?body.errors[0].message:null, "Save Post Meta");
+
+          if (metaDataList.length>0) {
+            pmQry = Query.createUpdatePostMetaMtn(postId, metaDataList);
+            
+            riques(pmQry, 
+              function(error, response, body) {
+                if (!error && !body.errors && response.statusCode === 200) {
+                  
+                } else {
+                  errorCallback(error, body.errors?body.errors[0].message:null, "Save Post Meta");
+                }
+                here.disableForm(false);
+                here.notifyUnsavedData(false);
               }
-              here.disableForm(false);
-              here.notifyUnsavedData(false);
-            }
-          );
+            );
+          }
           
           if (me.isWidgetActive("category")) {
             var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.state.postCategoryList, v.categories);
@@ -373,8 +374,8 @@ const NewContentType = React.createClass({
           }
 
           if (me.isWidgetActive("tag")) {
-            var currentTag = $('#tag').tagsinput('items');
-            var tagQry = Query.createUpdateTagOfPostMtn(postId, me.state.postTagList, currentTag, me.state.tagMap);
+            var tagQry = Query.createUpdateTagOfPostMtn(postId, me.state.postTagListInit, me.state.postTagList, me.state.tagMap);
+            
             if (tagQry)
               riques(tagQry,
                 function(error, response, body) {
@@ -403,10 +404,6 @@ const NewContentType = React.createClass({
         }
       }
     );  
-  },
-  onTagKeyDown: function(event){
-    ;
-    event.preventDefault();
   },
   _errorNotif: function(msg){
     this.refs.notificationSystem.addNotification({
@@ -510,9 +507,6 @@ const NewContentType = React.createClass({
   },
   logChange: function (value) {
     this.setState({value: value});
-/*var valueArr = this.state.postTagList;
-valueArr.push(this.state.value);
-this.setState({value: valueArr})*/
   },
   _genReactSelect: function(contentId){
     var me = this;
@@ -548,6 +542,9 @@ this.setState({value: valueArr})*/
         connectedContent={contentId}
       />
     )
+  },
+  handleTagChange: function(value) {
+    this.setState({postTagList: value});
   },
   componentWillMount: function(){
     var me = this;
@@ -595,16 +592,6 @@ this.setState({value: valueArr})*/
                 options.push({id: item.node.id, value: item.node.name, label: item.node.name});
                 me.setState({options: options});
 
-                /*function logChange(value) {
-                  console.log("Selected: " + value);
-                    me.setState({value});
-                    
-                  var valueArr = me.state.value;
-                  valueArr.push(me.state.NewValue);
-                  me.setState({value: valueArr});
-                }
-                me.setState({logChange: logChange});*/
-              
             })
             me.setState({tagMap: _tagMap});
             
@@ -616,8 +603,6 @@ this.setState({value: valueArr})*/
   },
  
   componentDidMount: function(){
-    require('../lib/bootstrap-tagsinput.js');
-    require('../lib/bootstrap-tagsinput.css');
     var me = this;
     
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
@@ -940,27 +925,16 @@ this.setState({value: valueArr})*/
                     </div>
                     <div className="box-body pad">
                       <div className="form-group" style={{width: '100%'}}>
-                        
-                          <input type="text" id="tag" data-role="tagsinput" style={{width: '100%'}} onChange={this.handleTagChange}/>
-                        
                           <ReactSelect.Creatable
                             id="tag"
                             name="form-field-name"
-                            value={this.state.value}
-                            options={this.state.options}
-                            onChange={this.logChange}
-                            multi={true}
-                          />
 
-                          <ReactSelect
-                            id="tag"
-                            name="form-field-name"
                             value={this.state.postTagList}
-                            options={this.state.postTagList}
-                            onChange={this.state.logChange}
+                            options={this.state.options}
+                            onChange={this.handleTagChange}
+
                             multi={true}
                           />
-                        
                           <p><span className="help-block">Press enter after inputting tag</span></p>
                       </div>
                     </div>

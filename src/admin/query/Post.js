@@ -46,7 +46,7 @@ const getPostListQry = function(s, postType, tagId, cateId) {
   return {
     "query": 
       'query getPosts{viewer {allPosts(where: {type: {eq: "post"}, status: '+status+' '+tag+' '+category+' }) { edges { node { '
-      +'id,title,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},tag{edges{node{tag{id, name}}}},comments{edges{node{id}}},file{edges{node{id,value}}}, featuredImage,createdAt}}}}}'
+      +'id,title,content,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},tag{edges{node{tag{id, name}}}},comments{edges{node{id}}},file{edges{node{id,value}}}, featuredImage,createdAt}}}}}'
   };
 }
 
@@ -367,7 +367,7 @@ const createUpdateTagOfPostMtn = function(postId, oldTag, currentTag, tagMap){
     var obj = _.find(oldTag, {name: item});
     return obj.connectionId;
   })
-
+  debugger;
   if (deleteListId.length===0 && addList.length===0) return null;
 
   var query = "mutation (";
@@ -398,9 +398,9 @@ const createUpdateTagOfPostMtn = function(postId, oldTag, currentTag, tagMap){
   _.forEach(addList, function(item){
     query += ' CreateTagOfPost'+index+' : createTagOfPost(input: $input'+index+'){ changedTagOfPost{ id } }'; 
     var _key = "input"+index 
-    variables[_key] = {postId: postId,tag: {"name": item}}
-    if (_.has(tagMap, item)) 
-      variables[_key] = {postId: postId,tagId: tagMap[item].id}
+    variables[_key] = {postId: postId,tag: {"name": item.label}}
+    if (_.has(tagMap, item.label)) 
+      variables[_key] = {postId: postId,tagId: tagMap[item.label].id}
 
     index++;
   });
