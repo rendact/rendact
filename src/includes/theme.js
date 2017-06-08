@@ -11,7 +11,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import Loading from '../admin/Loading';
 import {latestPosts} from './hooks';
 import _ from 'lodash';
-import {searchWidget, topPostWidget} from './widgets';
+import {searchWidget, topPostWidget, categoriesWidget, archiveWidget} from './widgets';
 
 const InvalidTheme = React.createClass({
 	componentDidMount: function(){
@@ -147,7 +147,7 @@ const ThemeHome = React.createClass({
 								theTitle={this.theTitle}
 								theContent={this.theContent}
 								theMenu={this.theMenu}
-								widgets={[searchWidget, topPostWidget]}
+								widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 							/>
 			}
 		}
@@ -201,10 +201,18 @@ const ThemeSingle = React.createClass({
 		} else {
 			if (this.props.params.postId){
 				let Single = getTemplateComponent('single');
-				return <Single postId={this.props.params.postId} postData={this.state.postData}/>;
-			} else if (this.params.postId){
+				return <Single 
+									postId={this.props.params.postId} 
+									postData={this.state.postData}
+									widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
+								/>;
+			} else if (this.params.pageId){
 				let Single = getTemplateComponent('single');
-				return <Single postId={this.props.params.postId} postData={this.state.postData}/>;
+				return <Single 
+									postId={this.props.params.postId} 
+									postData={this.state.postData}
+									widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
+								/>;
 			} else {
 				return <NotFound/>
 			}

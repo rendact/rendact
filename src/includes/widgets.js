@@ -19,7 +19,33 @@ const topPostWidget =
 			<p className="month">April 1, 2014 , By Robert Louise</p>
 		</div>
 
+const categoriesWidget = 
+		<div className="sidebar-box">
+			<h3><span className="opening">Categories</span></h3>
+			<ul className="category">
+				<li><a href="#">News</a></li>
+				<li><a href="#">Arts</a></li>
+				<li><a href="#">Opinion</a></li>
+				<li><a href="#">Hot Info</a></li>
+			</ul>
+		</div>
+
+const archiveWidget = 
+		<div className="sidebar-box">
+			<h3><span className="opening">Archives</span></h3>
+				<ul>
+					<li><a href="#">February 2015</a></li>
+					<li><a href="#">January 2015</a></li>
+					<li><a href="#">December 2015</a></li>
+					<li><a href="#">November 2015</a></li>
+					<li><a href="#">February 2015</a></li>
+					<li><a href="#">December 2015</a></li>
+				</ul>
+		</div>
+
 module.exports = {
 	searchWidget: searchWidget,
-	topPostWidget: topPostWidget
+	topPostWidget: topPostWidget,
+	categoriesWidget: categoriesWidget,
+	archiveWidget: archiveWidget
 }

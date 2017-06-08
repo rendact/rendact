@@ -1,5 +1,6 @@
 import React from 'react'
 import Header from '../includes/Header'
+import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
 import {searchWidget} from '../../../includes/widgets'
 import _ from 'lodash'
@@ -29,16 +30,10 @@ const Home = React.createClass({
 						     	}.bind(this))
 						     }
 					</div>	
-					<div className="col-md-4 new-section">	
-						<div className="sidebar-grid wow fadeInUpBig animated" data-wow-delay="0.4s">
-							{
-								this.props.widgets.map(function(item) { return item })
-							}
-						</div>
-					</div>
+					<Sidebar {...this.props} />
 				  <div className="clearfix"></div>
 				</div>
-				<Footer />	
+				<Footer {...this.props} />	
 			</div>
 		)
 	}

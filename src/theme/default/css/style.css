@@ -5194,4 +5194,21 @@ Copyright (c) 2013 Daniel Eden
 }
 .sidebar-box {
   padding-bottom: 2em;
+  text-align:left;
+}
+.sidebar-box ul li {
+  list-style:none;
+  display:block;
+}
+.sidebar-box ul li a {
+  font-size:0.9em;
+  margin: 0 0 1em 0;
+   color: #1b1b1b;
+  line-height: 1.8em;
+  text-decoration: none;
+  padding-left: 2em;
+  background: url(../images/arrow.png) no-repeat 0px 6px;
+}
+.sidebar-box ul li a:hover {
+  padding-left: 3em;
 }

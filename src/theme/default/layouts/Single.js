@@ -43,7 +43,7 @@ const Single = React.createClass({
 						 </div>
 						</div>
 					   </div>			
-						<Sidebar />
+						<Sidebar {...this.props} />
 					   <div className="clearfix"></div>
 					  
 					  
@@ -109,7 +109,7 @@ const Single = React.createClass({
 					  </div>
 		      	</div>
 				
-				<Footer />	
+				<Footer {...this.props} />	
 				
 			</div>
 
