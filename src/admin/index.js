@@ -12,6 +12,7 @@ import NewContent from './pages/ContentNew';
 import CategoryPost from './pages/Category';
 import TagPost from './pages/Tag';
 import Themes from './pages/Themes';
+import Menu from './pages/Menu';
 import Plugins from './pages/Plugins';
 import Permission from './pages/Permission';
 import Pages from './pages/Pages';
@@ -201,6 +202,7 @@ const PageLoader = React.createClass({
 			'posts-category' : <CategoryPost handleNav={hn}/>,
 			'posts-tag' : <TagPost handleNav={hn}/>,
 			'themes' : <Themes handleNav={hn}/>,
+			'menu': <Menu handleNav={hn}/>,
 			'permission' : <Permission handleNav={hn}/>,
 			'plugins' : <Plugins handleNav={hn}/>,
 			'users': <Users handleNav={hn}/>,

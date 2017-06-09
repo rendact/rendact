@@ -4,6 +4,7 @@ import Login from './Login.js'
 import Post from './Post.js'
 import Settings from './Settings.js'
 import Content from './Content.js'
+import Menu from './Menu.js'
 
 const subscriptionQry = `subscription {
       subscribeToPost(filter: {status: {eq: "Published"}}, mutations: [createPost]) {
@@ -75,7 +76,9 @@ const queries = {
   removeImageGallery: Post.removeImageGallery,
   bindImageGallery: Post.bindImageGallery,
   subscriptionQry: subscriptionQry,
-  setAsOwner: User.setAsOwner
+  setAsOwner: User.setAsOwner,
+  createMenu: Menu.createMenu,
+  getAllMenu: Menu.getAllMenu,
 }
 
 module.exports = queries;

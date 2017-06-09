@@ -1,51 +1,111 @@
 import React from 'react';
-import images1 from '../../../public/images/photo4.jpg';
-import images2 from '../../../public/images/photo1.png';
-import images3 from '../../../public/images/photo2.png';
+import $ from 'jquery';
+import Query from '../query';
+import _ from 'lodash';
+import Notification from 'react-notification-system';
+import {swalert, riques, hasRole, errorCallback, setValue, getValue, removeTags, disableForm} from '../../utils';
+import { Table, SearchBox, DeleteButtons} from '../lib/Table';
 
 var Menu = React.createClass({
+  getInitialState: function(){
+      require ('../pages/Posts.css');
+
+      return {
+        name:"",
+        postId:"",
+        tagId:"",
+        dt: null,
+        errorMsg: null,
+        loadingMsg: null,
+        deleteMode: false,activeStatus: "All",
+        pageList: null,
+      }
+  },
+  disableForm: function(state){
+    disableForm(state, this.notif)
+  },
+  resetForm: function(){
+    document.getElementById("menu").reset();
+    this.setState({name:""});
+    window.history.pushState("", "", '/admin/menu');
+  },
+  handleSubmit: function(event){
+    event.preventDefault();
+    var me = this;
+    var name = getValue("name");
+    var postId = this.state.postId;
+    this.disableForm(true);
+    var qry = Query.createMenu(name);
+    var noticeTxt = "Menu Saved";
+
+    riques(qry, 
+      function(error, response, body) { 
+        if (!error && !body.errors && response.statusCode === 200) {
+          me.notif.addNotification({
+                  message: noticeTxt,
+                  level: 'success',
+                  position: 'tr',
+                  autoDismiss: 2
+          });
+          me.resetForm();
+          me.disableForm(false);
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+        me.disableForm(false);
+      });
+  },
+  componentWillMount: function(){
+    var me = this;
+      riques(Query.getAllMenu, 
+        function(error, response, body) {
+        	debugger;
+          if (!error) {
+            var pageList = [(<option key="0" value="">--select menu--</option>)];
+            _.forEach(body.data.viewer.allMenus.edges, function(item){
+              pageList.push((<option key={item.node.id} value={item.node.id}>
+                {item.node.name}</option>));
+            })
+            me.setState({pageList: pageList});
+          }
+        }
+      );
+    },
+  componentDidMount: function(){
+    this.notif = this.refs.notificationSystem;
+  },
 	render: function(){
 		return (
 			<div className="content-wrapper">
         	  <div className="container-fluid">
 				<section className="content-header">
-			    	<h1>
-            			Menus
-          			</h1>
-          			<ol className="breadcrumb">
-            			<li><a href="#"><i className="fa fa-dashboard"></i>Home</a></li>
-            			<li className="active">Menus</li>
-          			</ol>
-          			<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+			      <h1>
+            		Menus
+          		  </h1>
+          		  <ol className="breadcrumb">
+            		<li><a href="#"><i className="fa fa-dashboard"></i>Home</a></li>
+            		<li className="active">Menus</li>
+          		  </ol>
+          		  <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
 			    </section>
-		            <div className="box box-default">
-		              <div className="box-header with-border attachment-block clearfix">
-		                <div className="container-fluid">
-		                  <div className="row">
-		                    <div className="col-xs-12">
-		                      <div className="row">
-		                    	<div className="col-xs-2">
-		                    		<h5><b>Select a menu to edit :</b></h5>
-		                    	</div>
-		                    	<div className="col-md-3">
-								   <div className="form-group">
-									<select className="form-control">
-									  <option>option 1</option>
-									  <option>option 2</option>
-									</select>
-								  </div>
-								</div>
-								<div className="col-md-2">
-								  <h5> or <a href="#">create a new menu</a> </h5> 
-								</div>
-		                  	  </div>
-		                    </div>
-		                  </div>
-			    		</div>
-			    	  </div>
-			    	</div>
+		        <Notification ref="notificationSystem" />     
 			    	<div className="row">
 				     	<div className="col-md-3">
+				     	  <form onSubmit={this.handleSubmit} id="menu" method="get">
+					     	  <div className="box box-default">
+								<div className="box-header with-border attachment-block clearfix">
+									<div className="form-group">
+										<h4>Create A New Menu :</h4>
+									</div>
+									<div>
+										<input type="text" name="name" id="name" className="form-control" />
+									</div>
+									<div className="pull-right" style={{marginTop: 10}}>
+										<button type="submit" id="submit" className="btn btn-flat btn-success">Create Menu</button>
+									</div>
+								</div>
+							  </div>
+						  </form>
 							<div className="box box-default box-solid">
 								<div className="box-header with-border">
 									<h3 className="box-title">Pages</h3>
@@ -96,16 +156,38 @@ var Menu = React.createClass({
 							</div>
 						</div>
 		                <div className="col-md-9">
+		                  <div className="box box-default">
+				              <div className="box-header with-border attachment-block clearfix">
+				                <div className="container-fluid">
+				                  <div className="row">
+				                    <div className="col-xs-12">
+				                      <div className="row">
+				                    	<div className="col-xs-3">
+				                    		<h5><b>Select a menu to edit :</b></h5>
+				                    	</div>
+				                    	<div className="col-md-7">
+										   <div className="form-group">
+											<select className="form-control">
+											  {this.state.pageList}
+											</select>
+										  </div>
+										</div>
+				                  	  </div>
+				                    </div>
+				                  </div>
+					    		</div>
+					    	  </div>
+					      </div>
 					      <div className="box box-default">
 							<div className="box-header with-border attachment-block clearfix">
 								<div className="form-group">
 									<div className="col-md-2">
 										<h4>Menu Name :</h4>
 									</div>
-									<div className="col-md-4">
+									<div className="col-md-6">
 										<input type="text" name="name" className="form-control" />
 									</div>
-									<div className="col-md-6">
+									<div className="col-md-4">
 										<div className="box-tools pull-right">
 										<button className="btn btn-flat btn-primary">Save Menu</button>
 										</div>
@@ -143,7 +225,7 @@ var Menu = React.createClass({
 												<div className="checkbox">
 								                    <label>
 								                      <input type="checkbox"/>
-								                      Checkbox 1
+								                      Automatically add new top-level pages to this menu
 								                    </label>
 								                </div>
 											</div>
@@ -156,11 +238,22 @@ var Menu = React.createClass({
 												<div className="checkbox">
 								                    <label>
 								                      <input type="checkbox"/>
-								                      Checkbox 2
+								                      Top Menu
+								                    </label>
+								                </div>
+								                <div className="checkbox">
+								                    <label>
+								                      <input type="checkbox"/>
+								                      Social Links Menu
 								                    </label>
 								                </div>
 											</div>
 										</div>
+			<div>	
+				<select class="form-control">
+                    {this.state.pageList}
+                </select>
+			</div>
 									</section>
 								</div>
 								<div className="box-header with-border attachment-block clearfix">
@@ -175,7 +268,7 @@ var Menu = React.createClass({
 									</div>
 								</div>
 							</div>
-							 </div>
+						  </div>
 		                </div>
 		            </div>
           	  </div>
