@@ -83,6 +83,16 @@ const ThemeHome = React.createClass({
 	theContent: function(content){
 		return <div dangerouslySetInnerHTML={{__html: content}} />
 	},
+	theMenu: function(){
+		return <ul className="cl-effect-16">
+						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
+						<li><a href="blogs">Blogs</a></li>
+						<li><a href="#">Menu 2</a></li>
+						<li><a href="#">Menu 3</a></li>
+						<li><a href="#">Menu 4</a></li>
+						<li><a href="#">Menu 5</a></li>
+					</ul>
+	},
 	theImage: function(image){
 		var fImage="";
 		if(image!=null){
