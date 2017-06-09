@@ -83,15 +83,15 @@ const ThemeHome = React.createClass({
 	theContent: function(content){
 		return <div dangerouslySetInnerHTML={{__html: content}} />
 	},
-	theMenu: function(){
-		return <ul className="cl-effect-16">
-						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
-						<li><a href="blogs">Blogs</a></li>
-						<li><a href="#">Menu 2</a></li>
-						<li><a href="#">Menu 3</a></li>
-						<li><a href="#">Menu 4</a></li>
-						<li><a href="#">Menu 5</a></li>
-					</ul>
+	theImage: function(image){
+		var fImage="";
+		if(image!=null){
+   			fImage=image;
+   		}
+   		else{
+   			fImage=require('../theme/default/images/logo.png');
+   		}
+		return <a href="article" className="mask"><img src={fImage} alt="" style={{width:'auto', height:'auto'}} className="img-responsive img-thumbnail" /></a>
 	},
 	componentWillMount: function(){
 		var me = this;
@@ -147,6 +147,7 @@ const ThemeHome = React.createClass({
 								theTitle={this.theTitle}
 								theContent={this.theContent}
 								theMenu={this.theMenu}
+								theImage={this.theImage}
 								widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 								footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 							/>

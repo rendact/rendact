@@ -161,7 +161,6 @@ const NewContentType = React.createClass({
       _.forEach(v.tag.edges, function(i){
         if (i.node.tag){
           _postTagList.push({id: i.node.tag.id, value: i.node.tag.name, name: i.node.tag.name, label: i.node.tag.name, connectionId: i.node.id});
-
         }
       });
       this.setState({postTagList: _postTagList, postTagListInit: _postTagList});
@@ -375,7 +374,7 @@ const NewContentType = React.createClass({
 
           if (me.isWidgetActive("tag")) {
             var tagQry = Query.createUpdateTagOfPostMtn(postId, me.state.postTagListInit, me.state.postTagList, me.state.tagMap);
-            
+            debugger;
             if (tagQry)
               riques(tagQry,
                 function(error, response, body) {
@@ -505,9 +504,6 @@ const NewContentType = React.createClass({
       }
     );
   },
-  logChange: function (value) {
-    this.setState({value: value});
-  },
   _genReactSelect: function(contentId){
     var me = this;
     var getConnectionOptions = function(input, callback) {
@@ -591,7 +587,6 @@ const NewContentType = React.createClass({
               
                 options.push({id: item.node.id, value: item.node.name, label: item.node.name});
                 me.setState({options: options});
-
             })
             me.setState({tagMap: _tagMap});
             
@@ -928,11 +923,9 @@ const NewContentType = React.createClass({
                           <ReactSelect.Creatable
                             id="tag"
                             name="form-field-name"
-
                             value={this.state.postTagList}
                             options={this.state.options}
                             onChange={this.handleTagChange}
-
                             multi={true}
                           />
                           <p><span className="help-block">Press enter after inputting tag</span></p>
