@@ -43,9 +43,45 @@ const archiveWidget =
 				</ul>
 		</div>
 
+const recentPostWidget = 
+		<div className="col-md-4 footer-grid">
+			<h3>Recent<span className="opening">Posts</span></h3>
+			<a href="#"><h5>Lorem ipsum dolor sit amet</h5></a>
+			<p>Sed rhoncus nulla turpis, vitae rutrum velit iaculis et. Curabitur vestibulum, erat non im</p>
+			<p className="month">April 1, 2014 , By Robert Louise</p>
+			<a href="#"><h5>Lorem ipsum dolor sit amet</h5></a>
+			<p>Sed rhoncus nulla turpis, vitae rutrum velit iaculis et. Curabitur vestibulum, erat non im</p>
+			<p className="month">April 1, 2014 , By Robert Louise</p>
+		</div>
+
+const aboutUsWidget = 
+		<div className="col-md-4 footer-grid">
+			<h3>About<span className="opening">Us</span></h3>
+		  <a href="#"><h5>Lorem ipsum dolor sit amet</h5></a>
+		  <p>Sed rhoncus nulla turpis, vitae rutrum velit iaculis et. Curabitur vestibulum, erat non im</p>
+		</div>
+
+const contactUsWidget = 
+		<div className="col-md-4 footer-grid">
+			<h3>contact<span className="opening">info</span></h3>
+			<ul className="address">
+				 <li>123, new street, 129907 New Yark</li>
+				 <li>023 456 23456</li>
+				 <li><a className="mail" href="mailto:info@example.com">123 int@example.com</a></li>
+			</ul>
+			<div className="support">
+				<input type="text" className="text" defaultValue="Enter email... " />
+				<input type="submit" value="SUBMIT" className="botton" />
+				<p>Lorem ipsum dolor sit amet conse aliqua. Ut enim ad minim veniam Lorem ctetur adipisicing .</p>
+			</div>
+		</div>
+
 module.exports = {
 	searchWidget: searchWidget,
 	topPostWidget: topPostWidget,
 	categoriesWidget: categoriesWidget,
-	archiveWidget: archiveWidget
+	archiveWidget: archiveWidget,
+	aboutUsWidget: aboutUsWidget,
+	recentPostWidget: recentPostWidget,
+	contactUsWidget: contactUsWidget
 }

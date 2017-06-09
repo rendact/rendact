@@ -11,6 +11,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import Loading from '../admin/Loading';
 import {latestPosts} from './hooks';
 import _ from 'lodash';
+import {searchWidget, topPostWidget, categoriesWidget, archiveWidget, aboutUsWidget, contactUsWidget, recentPostWidget} from './widgets';
 
 const InvalidTheme = React.createClass({
 	componentDidMount: function(){
@@ -82,6 +83,16 @@ const ThemeHome = React.createClass({
 	theContent: function(content){
 		return <div dangerouslySetInnerHTML={{__html: content}} />
 	},
+	theMenu: function(){
+		return <ul className="cl-effect-16">
+						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
+						<li><a href="blogs">Blogs</a></li>
+						<li><a href="#">Menu 2</a></li>
+						<li><a href="#">Menu 3</a></li>
+						<li><a href="#">Menu 4</a></li>
+						<li><a href="#">Menu 5</a></li>
+					</ul>
+	},
 	theImage: function(image){
 		var fImage="";
 		if(image!=null){
@@ -145,14 +156,77 @@ const ThemeHome = React.createClass({
 								latestPosts={this.state.latestPosts}
 								theTitle={this.theTitle}
 								theContent={this.theContent}
+								theMenu={this.theMenu}
 								theImage={this.theImage}
-								/>
+								widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
+								footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
+							/>
 			}
 		}
 	}
 });
 
 const ThemeBlog = React.createClass({
+	getInitialState: function(){
+		return {
+			loadDone: false,
+			isSlugExist: false,
+			slug: this.props.location.pathname.replace("/",""),
+			latestPosts: []
+		}
+	},
+	handlePostClick: function(e){
+		e.preventDefault();
+		var id = e.currentTarget.id;
+		this._reactInternalInstance._context.history.push('/post/'+id)
+	},
+	theTitle: function(id, title){
+		return <a href={"/post/"+id} onClick={this.handlePostClick} id={id}><h4>{title}</h4></a>
+	},
+	theContent: function(content){
+		return <div dangerouslySetInnerHTML={{__html: content}} />
+	},
+	theMenu: function(){
+		return <ul className="cl-effect-16">
+						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
+						<li><a href="blogs">Blogs</a></li>
+						<li><a href="#">Menu 2</a></li>
+						<li><a href="#">Menu 3</a></li>
+						<li><a href="#">Menu 4</a></li>
+						<li><a href="#">Menu 5</a></li>
+					</ul>
+	},
+	componentWillMount: function(){
+		var me = this;
+
+		riques(Query.checkSlugQry(this.state.slug), 
+			(error, response, body) => {
+	      if (!error && !body.errors && response.statusCode === 200) {
+	        var slugCount = body.data.viewer.allPosts.edges.length;
+	        if (slugCount > 0) {
+	        	me.setState({isSlugExist: true});
+	        }
+	      } else {
+	        me.setState({errorMsg: "error when checking slug"});
+	      }
+
+	      riques(Query.getPostListQry("Full"), 
+		      function(error, response, body) { 
+		        if (!error && !body.errors && response.statusCode === 200) {
+		          var _postArr = [];
+		          _.forEach(body.data.viewer.allPosts.edges, function(item){
+		            _postArr.push(item.node);
+		          });
+		          me.setState({latestPosts: _postArr});
+		        } else {
+		          errorCallback(error, body.errors?body.errors[0].message:null);
+		        }
+		        me.setState({loadDone: true});
+		      }
+		    );
+	    }
+		);
+	},
 	componentDidMount: function(){
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
@@ -160,8 +234,19 @@ const ThemeBlog = React.createClass({
 		require('../theme/'+c.path+'/functions.js');
 	},
 	render: function() {
-		let Blog = getTemplateComponent('blog');
-		return <Blog/>;
+		if (!this.state.loadDone && this.state.slug) {
+			return <Loading/>
+		} else {
+			let Blog = getTemplateComponent('blog');
+			return <Blog 
+							latestPosts={this.state.latestPosts}
+							theTitle={this.theTitle}
+							theContent={this.theContent}
+							theMenu={this.theMenu}
+							widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
+							footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
+						/>
+		}
 	}
 });
 
@@ -199,10 +284,20 @@ const ThemeSingle = React.createClass({
 		} else {
 			if (this.props.params.postId){
 				let Single = getTemplateComponent('single');
-				return <Single postId={this.props.params.postId} postData={this.state.postData}/>;
-			} else if (this.params.postId){
+				return <Single 
+									postId={this.props.params.postId} 
+									postData={this.state.postData}
+									widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
+									footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
+								/>;
+			} else if (this.params.pageId){
 				let Single = getTemplateComponent('single');
-				return <Single postId={this.props.params.postId} postData={this.state.postData}/>;
+				return <Single 
+									postId={this.props.params.postId} 
+									postData={this.state.postData}
+									widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
+									footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
+								/>;
 			} else {
 				return <NotFound/>
 			}
