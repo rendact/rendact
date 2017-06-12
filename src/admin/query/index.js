@@ -79,6 +79,8 @@ const queries = {
   setAsOwner: User.setAsOwner,
   createMenu: Menu.createMenu,
   getAllMenu: Menu.getAllMenu,
+  deleteMenuQry: Menu.deleteMenuQry,
+  updateMenu: Menu.updateMenu,
 }
 
 module.exports = queries;

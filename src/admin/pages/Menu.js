@@ -21,13 +21,21 @@ var Menu = React.createClass({
         pageList: null,
       }
   },
+  handleMenu: function(event){
+    this.setState({menu: document.querySelector('#menuSelect').value});
+ },
   disableForm: function(state){
     disableForm(state, this.notif)
   },
   resetForm: function(){
     document.getElementById("menu").reset();
     this.setState({name:""});
+    this.handleNameChange();
     window.history.pushState("", "", '/admin/menu');
+  },
+  handleNameChange: function(event){
+    var names = getValue("names");
+    this.setState({names: names})
   },
   handleSubmit: function(event){
     event.preventDefault();
@@ -48,7 +56,38 @@ var Menu = React.createClass({
                   autoDismiss: 2
           });
           me.resetForm();
-          me.disableForm(false);
+          var here = me;
+          var cb = function(){here.disableForm(false)}
+          me.componentWillMount("All", cb);
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+        me.disableForm(false);
+      });
+  },
+  handleSubmitChange: function(event){
+    event.preventDefault();
+    var me = this;
+    var names = this.state.menu.split("-")[1];
+    var postId = this.state.menu.split("-")[0];
+    this.disableForm(true);
+    var qry = Query.updateMenu(postId, name);
+    var noticeTxt = "Menu Updated";
+    debugger;
+
+    riques(qry, 
+      function(error, response, body) { 
+        if (!error && !body.errors && response.statusCode === 200) {
+          me.notif.addNotification({
+                  message: noticeTxt,
+                  level: 'success',
+                  position: 'tr',
+                  autoDismiss: 2
+          });
+          me.resetForm();
+          var here = me;
+          var cb = function(){here.disableForm(false)}
+          me.componentWillMount("All", cb);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
@@ -59,20 +98,41 @@ var Menu = React.createClass({
     var me = this;
       riques(Query.getAllMenu, 
         function(error, response, body) {
-        	debugger;
           if (!error) {
             var pageList = [(<option key="0" value="">--select menu--</option>)];
             _.forEach(body.data.viewer.allMenus.edges, function(item){
-              pageList.push((<option key={item.node.id} value={item.node.id}>
-                {item.node.name}</option>));
+              pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
             })
             me.setState({pageList: pageList});
           }
         }
       );
     },
+  handleDelete: function(event){
+    var me = this;
+    var idList = this.state.menu.split("-")[0];
+    swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
+      function () {
+      me.disableForm(true);
+      riques(Query.deleteMenuQry(idList), 
+        function(error, response, body) {
+          if (!error && !body.errors && response.statusCode === 200) {
+            me.resetForm();
+	        var here = me;
+	        var cb = function(){here.disableForm(false)}
+	        me.componentWillMount("All", cb);
+          } else {
+            errorCallback(error, body.errors?body.errors[0].message:null);
+          }
+          me.disableForm(false);
+        }
+      );
+  	})
+  },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
+    //var name = this.state.menu.split("-")[1];
+    //setValue("name", name);
   },
 	render: function(){
 		return (
@@ -166,8 +226,8 @@ var Menu = React.createClass({
 				                    		<h5><b>Select a menu to edit :</b></h5>
 				                    	</div>
 				                    	<div className="col-md-7">
-										   <div className="form-group">
-											<select className="form-control">
+										  <div className="form-group">
+										    <select id="menuSelect" onChange={this.handleMenu} data-toggle="collapse" className="form-control" >
 											  {this.state.pageList}
 											</select>
 										  </div>
@@ -181,17 +241,19 @@ var Menu = React.createClass({
 					      <div className="box box-default">
 							<div className="box-header with-border attachment-block clearfix">
 								<div className="form-group">
+								  <form onSubmit={this.handleSubmitChange} id="menuName" method="get">
 									<div className="col-md-2">
 										<h4>Menu Name :</h4>
 									</div>
-									<div className="col-md-6">
-										<input type="text" name="name" className="form-control" />
-									</div>
+									  <div className="col-md-6">
+										<input type="text" name="names" id="names" className="form-control" required="true" onChange={this.handleNameChange}/>
+									  </div>
 									<div className="col-md-4">
 										<div className="box-tools pull-right">
-										<button className="btn btn-flat btn-primary">Save Menu</button>
+										<button type="submit" id="submit" name="submit" className="btn btn-flat btn-primary">Save Menu</button>
 										</div>
 									</div>
+								  </form>
 								</div>
 							</div>
 								<div class="box-body">
@@ -249,17 +311,12 @@ var Menu = React.createClass({
 								                </div>
 											</div>
 										</div>
-			<div>	
-				<select class="form-control">
-                    {this.state.pageList}
-                </select>
-			</div>
 									</section>
 								</div>
 								<div className="box-header with-border attachment-block clearfix">
 								<div className="form-group">
 									<div className="col-md-6">
-										<button className="btn btn-flat btn-danger">Delete Menu</button>
+										<button className="btn btn-flat btn-danger" id="deleteBtn" onClick={this.handleDelete}>Delete Menu</button>
 									</div>
 									<div className="col-md-6">
 										<div className="box-tools pull-right">
