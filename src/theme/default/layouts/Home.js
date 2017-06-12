@@ -29,6 +29,7 @@ const Home = React.createClass({
 											</div>
 						     	}.bind(this))
 						     }
+						     {this.props.thePagination()}
 					</div>	
 					<Sidebar {...this.props} />
 				  <div className="clearfix"></div>

@@ -70,7 +70,9 @@ const ThemeHome = React.createClass({
 			isSlugExist: false,
 			slug: this.props.location.pathname.replace("/",""),
 			latestPosts: [],
-			config: null
+			config: null,
+			postPerPage: 5,
+			pageCount: 1
 		}
 	},
 	handlePostClick: function(e){
@@ -104,6 +106,18 @@ const ThemeHome = React.createClass({
    		}
 		return <a href="article" className="mask"><img src={fImage} alt="" style={{width:'auto', height:'auto'}} className="img-responsive img-thumbnail" /></a>
 	},
+	thePagination: function(){
+		let pages = [<li><a href="#">«</a></li>];
+		for(var i=0;i<this.state.pageCount;i++){
+  		pages.push(<li><a href="#">{i+1}</a></li>)
+  	}
+  	pages.push(<li><a href="#">»</a></li>);
+		return <div className="box-tools">
+                <ul className="pagination pagination-sm no-margin">
+                {pages}  
+                </ul>
+              </div>
+	},
 	componentWillMount: function(){
 		var me = this;
 		loadConfig(function(){
@@ -122,14 +136,14 @@ const ThemeHome = React.createClass({
 	        me.setState({errorMsg: "error when checking slug"});
 	      }
 
-	      riques(Query.getPostListQry("Full"), 
+	      riques(Query.getPostListQry("Full", "post", null, null, "2"), 
 		      function(error, response, body) { 
 		        if (!error && !body.errors && response.statusCode === 200) {
 		          var _postArr = [];
 		          _.forEach(body.data.viewer.allPosts.edges, function(item){
 		            _postArr.push(item.node);
 		          });
-		          me.setState({latestPosts: _postArr});
+		          me.setState({latestPosts: _.slice(_postArr, 0, me.state.postPerPage), pageCount: _postArr.length%me.state.postPerPage});
 		        } else {
 		          errorCallback(error, body.errors?body.errors[0].message:null);
 		        }
@@ -164,6 +178,7 @@ const ThemeHome = React.createClass({
 								theMenu={this.theMenu}
 								theImage={this.theImage}
 								theConfig={this.state.config}
+								thePagination={this.thePagination}
 								widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 								footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 							/>
