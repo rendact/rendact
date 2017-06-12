@@ -5,7 +5,7 @@ import NotFound from '../admin/NotFound';
 import Query from '../admin/query';
 import Config from '../config';
 
-import {riques, errorCallback, toHTMLObject} from '../utils';
+import {riques, errorCallback, toHTMLObject, loadConfig} from '../utils';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
 import Loading from '../admin/Loading';
@@ -69,7 +69,8 @@ const ThemeHome = React.createClass({
 			loadDone: false,
 			isSlugExist: false,
 			slug: this.props.location.pathname.replace("/",""),
-			latestPosts: []
+			latestPosts: [],
+			config: null
 		}
 	},
 	handlePostClick: function(e){
@@ -105,6 +106,10 @@ const ThemeHome = React.createClass({
 	},
 	componentWillMount: function(){
 		var me = this;
+		loadConfig(function(){
+			var config = JSON.parse(localStorage.getItem('config'));
+			me.setState({config: config});
+		});
 
 		riques(Query.checkSlugQry(this.state.slug), 
 			(error, response, body) => {
@@ -141,7 +146,7 @@ const ThemeHome = React.createClass({
 		require('../theme/'+c.path+'/functions.js');
 	},
 	render: function() {
-		if (!this.state.loadDone && this.state.slug) {
+		if (!this.state.loadDone && !this.state.slug) {
 			return <Loading/>
 		} else {
 			if (this.state.slug){
@@ -158,6 +163,7 @@ const ThemeHome = React.createClass({
 								theContent={this.theContent}
 								theMenu={this.theMenu}
 								theImage={this.theImage}
+								theConfig={this.state.config}
 								widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 								footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 							/>
@@ -254,11 +260,26 @@ const ThemeSingle = React.createClass({
 	getInitialState: function(){
 		return {
 			loadDone: false,
-			postData: false
+			postData: false,
+			config: null
 		}
+	},
+	theMenu: function(){
+		return <ul className="cl-effect-16">
+						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
+						<li><a href="blogs">Blogs</a></li>
+						<li><a href="#">Menu 2</a></li>
+						<li><a href="#">Menu 3</a></li>
+						<li><a href="#">Menu 4</a></li>
+						<li><a href="#">Menu 5</a></li>
+					</ul>
 	},
 	componentWillMount: function() {
 		var me = this;
+		loadConfig(function(){
+			var config = JSON.parse(localStorage.getItem('config'));
+			me.setState({config: config});
+		});
 		riques(Query.getPostQry(this.props.params.postId), 
       function(error, response, body) { 
         if (!error && !body.errors && response.statusCode === 200) {
@@ -289,6 +310,8 @@ const ThemeSingle = React.createClass({
 									postData={this.state.postData}
 									widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 									footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
+									theMenu={this.theMenu}
+									theConfig={this.state.config}
 								/>;
 			} else if (this.params.pageId){
 				let Single = getTemplateComponent('single');
@@ -297,6 +320,8 @@ const ThemeSingle = React.createClass({
 									postData={this.state.postData}
 									widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 									footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
+									theMenu={this.theMenu}
+									theConfig={this.state.config}
 								/>;
 			} else {
 				return <NotFound/>

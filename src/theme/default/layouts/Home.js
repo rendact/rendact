@@ -9,7 +9,7 @@ const Home = React.createClass({
 	render: function() {
 		return (
 			<div className="application">
-				<Header theMenu={this.props.theMenu()}/>	   
+				<Header theMenu={this.props.theMenu()} theConfig={this.props.theConfig}/>	   
 				<div className="container">
 					<div className="col-md-8 new-section">
 						     {
