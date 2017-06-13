@@ -5,7 +5,7 @@ import NotFound from '../admin/NotFound';
 import Query from '../admin/query';
 import Config from '../config';
 
-import {riques, errorCallback, toHTMLObject} from '../utils';
+import {riques, errorCallback, toHTMLObject, loadConfig} from '../utils';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
 import Loading from '../admin/Loading';
@@ -69,7 +69,11 @@ const ThemeHome = React.createClass({
 			loadDone: false,
 			isSlugExist: false,
 			slug: this.props.location.pathname.replace("/",""),
-			latestPosts: []
+			latestPosts: [],
+			config: null,
+			postPerPage: 5,
+			pageCount: 1,
+			activePage: 1
 		}
 	},
 	handlePostClick: function(e){
@@ -103,8 +107,38 @@ const ThemeHome = React.createClass({
    		}
 		return <a href="article" className="mask"><img src={fImage} alt="" style={{width:'auto', height:'auto'}} className="img-responsive img-thumbnail" /></a>
 	},
+	thePagination: function(){
+		let pages = [<li><a href="#" onClick={this.handlePageClick}>«</a></li>];
+		for(var i=0;i<this.state.pageCount;i++){
+			if (this.state.activePage===i+1)
+  			pages.push(<li><a href="#" onClick={this.handlePageClick} disabled="true">{i+1}</a></li>)
+  		else 
+  			pages.push(<li><a href="#" onClick={this.handlePageClick}>{i+1}</a></li>)
+  	}
+  	pages.push(<li><a href="#" onClick={this.handlePageClick}>»</a></li>);
+		return <div className="box-tools">
+                <ul className="pagination pagination-sm no-margin">
+                {pages}  
+                </ul>
+              </div>
+	},
+	handlePageClick: function(e){
+		var page = 1;
+		if (e.target.text==="«")
+			page = this.state.activePage - 1;
+		else if (e.target.text==="»")
+			page = this.state.activePage + 1;
+		else 
+			page = parseInt(e.target.text);
+		var start = (this.state.postPerPage * page) - this.state.postPerPage;
+		this.setState({latestPosts: _.slice(this.state.allPosts, start, start+this.state.postPerPage), activePage: page});
+	},
 	componentWillMount: function(){
 		var me = this;
+		loadConfig(function(){
+			var config = JSON.parse(localStorage.getItem('config'));
+			me.setState({config: config});
+		});
 
 		riques(Query.checkSlugQry(this.state.slug), 
 			(error, response, body) => {
@@ -117,14 +151,14 @@ const ThemeHome = React.createClass({
 	        me.setState({errorMsg: "error when checking slug"});
 	      }
 
-	      riques(Query.getPostListQry("Full"), 
+	      riques(Query.getPostListQry("Full", "post", null, null, "2"), 
 		      function(error, response, body) { 
 		        if (!error && !body.errors && response.statusCode === 200) {
 		          var _postArr = [];
 		          _.forEach(body.data.viewer.allPosts.edges, function(item){
 		            _postArr.push(item.node);
 		          });
-		          me.setState({latestPosts: _postArr});
+		          me.setState({allPosts: _postArr, latestPosts: _.slice(_postArr, 0, me.state.postPerPage), pageCount: _postArr.length%me.state.postPerPage});
 		        } else {
 		          errorCallback(error, body.errors?body.errors[0].message:null);
 		        }
@@ -141,7 +175,7 @@ const ThemeHome = React.createClass({
 		require('../theme/'+c.path+'/functions.js');
 	},
 	render: function() {
-		if (!this.state.loadDone && this.state.slug) {
+		if (!this.state.loadDone && !this.state.slug) {
 			return <Loading/>
 		} else {
 			if (this.state.slug){
@@ -158,6 +192,8 @@ const ThemeHome = React.createClass({
 								theContent={this.theContent}
 								theMenu={this.theMenu}
 								theImage={this.theImage}
+								theConfig={this.state.config}
+								thePagination={this.thePagination}
 								widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 								footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 							/>
@@ -254,11 +290,26 @@ const ThemeSingle = React.createClass({
 	getInitialState: function(){
 		return {
 			loadDone: false,
-			postData: false
+			postData: false,
+			config: null
 		}
+	},
+	theMenu: function(){
+		return <ul className="cl-effect-16">
+						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
+						<li><a href="blogs">Blogs</a></li>
+						<li><a href="#">Menu 2</a></li>
+						<li><a href="#">Menu 3</a></li>
+						<li><a href="#">Menu 4</a></li>
+						<li><a href="#">Menu 5</a></li>
+					</ul>
 	},
 	componentWillMount: function() {
 		var me = this;
+		loadConfig(function(){
+			var config = JSON.parse(localStorage.getItem('config'));
+			me.setState({config: config});
+		});
 		riques(Query.getPostQry(this.props.params.postId), 
       function(error, response, body) { 
         if (!error && !body.errors && response.statusCode === 200) {
@@ -289,6 +340,8 @@ const ThemeSingle = React.createClass({
 									postData={this.state.postData}
 									widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 									footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
+									theMenu={this.theMenu}
+									theConfig={this.state.config}
 								/>;
 			} else if (this.params.pageId){
 				let Single = getTemplateComponent('single');
@@ -297,6 +350,8 @@ const ThemeSingle = React.createClass({
 									postData={this.state.postData}
 									widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 									footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
+									theMenu={this.theMenu}
+									theConfig={this.state.config}
 								/>;
 			} else {
 				return <NotFound/>

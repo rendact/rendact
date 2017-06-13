@@ -5,13 +5,17 @@ import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
 
 const Single = React.createClass({
+	goHome: function(e) {
+		e.preventDefault();
+		this._reactInternalInstance._context.history.push('/')
+	},
 	render: function() {
 		return (
 			<div className="application">
-				<Header/>
+				<Header theMenu={this.props.theMenu()} />	   
 				<div className="second-head">
 					<div className="container">
-						<h2><a href="index.html"><h5>Home </h5></a> / PAGE</h2>
+						<h2><a href="#" onClick={this.goHome}><h5>Home </h5></a> / PAGE</h2>
 					 </div>
 				</div>
 				
