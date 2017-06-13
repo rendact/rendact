@@ -72,7 +72,8 @@ const ThemeHome = React.createClass({
 			latestPosts: [],
 			config: null,
 			postPerPage: 5,
-			pageCount: 1
+			pageCount: 1,
+			activePage: 1
 		}
 	},
 	handlePostClick: function(e){
@@ -107,16 +108,30 @@ const ThemeHome = React.createClass({
 		return <a href="article" className="mask"><img src={fImage} alt="" style={{width:'auto', height:'auto'}} className="img-responsive img-thumbnail" /></a>
 	},
 	thePagination: function(){
-		let pages = [<li><a href="#">«</a></li>];
+		let pages = [<li><a href="#" onClick={this.handlePageClick}>«</a></li>];
 		for(var i=0;i<this.state.pageCount;i++){
-  		pages.push(<li><a href="#">{i+1}</a></li>)
+			if (this.state.activePage===i+1)
+  			pages.push(<li><a href="#" onClick={this.handlePageClick} disabled="true">{i+1}</a></li>)
+  		else 
+  			pages.push(<li><a href="#" onClick={this.handlePageClick}>{i+1}</a></li>)
   	}
-  	pages.push(<li><a href="#">»</a></li>);
+  	pages.push(<li><a href="#" onClick={this.handlePageClick}>»</a></li>);
 		return <div className="box-tools">
                 <ul className="pagination pagination-sm no-margin">
                 {pages}  
                 </ul>
               </div>
+	},
+	handlePageClick: function(e){
+		var page = 1;
+		if (e.target.text==="«")
+			page = this.state.activePage - 1;
+		else if (e.target.text==="»")
+			page = this.state.activePage + 1;
+		else 
+			page = parseInt(e.target.text);
+		var start = (this.state.postPerPage * page) - this.state.postPerPage;
+		this.setState({latestPosts: _.slice(this.state.allPosts, start, start+this.state.postPerPage), activePage: page});
 	},
 	componentWillMount: function(){
 		var me = this;
@@ -143,7 +158,7 @@ const ThemeHome = React.createClass({
 		          _.forEach(body.data.viewer.allPosts.edges, function(item){
 		            _postArr.push(item.node);
 		          });
-		          me.setState({latestPosts: _.slice(_postArr, 0, me.state.postPerPage), pageCount: _postArr.length%me.state.postPerPage});
+		          me.setState({allPosts: _postArr, latestPosts: _.slice(_postArr, 0, me.state.postPerPage), pageCount: _postArr.length%me.state.postPerPage});
 		        } else {
 		          errorCallback(error, body.errors?body.errors[0].message:null);
 		        }
