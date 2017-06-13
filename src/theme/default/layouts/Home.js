@@ -4,6 +4,7 @@ import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
 import {searchWidget} from '../../../includes/widgets'
 import _ from 'lodash'
+import moment from 'moment';
 
 const Home = React.createClass({
 	render: function() {
@@ -16,8 +17,8 @@ const Home = React.createClass({
 						     	this.props.latestPosts && this.props.latestPosts.map(function(item){
 						     		return 	<div className="new">
 												<div className="col-md-6 new-text wow rollIn animated animated" data-wow-delay="0.4s" style={{"visibility": "visible", "animationDelay": "0.4s", "animationName": "rollIn"}}>
-													<small>{item.createdAt}</small>
 													{this.props.theTitle(item.id, item.title)}
+													<small>{moment(item.createdAt).format("MMMM Do YY, h:mm:ss a")}</small>
 													<section className="content-body">
 														{this.props.theContent(item.content)}
 													</section>
