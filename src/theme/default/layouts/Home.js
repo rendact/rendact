@@ -16,7 +16,7 @@ const Home = React.createClass({
 						     {
 						     	this.props.latestPosts && this.props.latestPosts.map(function(item){
 						     		return 	<div className="new">
-												<div className="col-md-6 new-text wow rollIn animated animated" data-wow-delay="0.4s" style={{"visibility": "visible", "animationDelay": "0.4s", "animationName": "rollIn"}}>
+												<div className="col-md-6 new-text wow fadeIn animated">
 													{this.props.theTitle(item.id, item.title)}
 													<small>{moment(item.createdAt).format("MMMM Do YY, h:mm:ss a")}</small>
 													<section className="content-body">
