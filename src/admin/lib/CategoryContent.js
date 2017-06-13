@@ -73,6 +73,10 @@ const CategoryContent = React.createClass({
           }
         );
   })},
+  handleNameChange: function(event){
+    var name = $("#name").val();
+    this.setState({name: name})
+  },
   disableForm: function(state){
     disableForm(state, this.notif);
   },
@@ -119,18 +123,25 @@ const CategoryContent = React.createClass({
     var me = this;
     var name = getValue("name");
     var type = me.props.postType;
-    var qry = "";
+    var qry = "", noticeTxt = "";
     
     me.disableForm(true);
     if (this.state.mode==="create") {
       qry = Query.createCategory(name, type);
-      this.setState({mode: "update"});
+      noticeTxt = 'Category Published!';
     } else {
       qry = Query.updateCategory(this.state.postId, name, type);
+      noticeTxt = 'Category Updated!';
     }
     riques(qry, 
       function(error, response, body) { 
         if (!error && !body.errors && response.statusCode === 200) {
+          me.notif.addNotification({
+                  message: noticeTxt,
+                  level: 'success',
+                  position: 'tr',
+                  autoDismiss: 2
+          });
           var here = me;
           var cb = function(){here.disableForm(false)}
           me.loadData("All", cb);
@@ -175,7 +186,7 @@ const CategoryContent = React.createClass({
                       <div className="form-group">
                           <label htmlFor="name" >Name</label>
                           <div >
-                            <input type="text" name="name" id="name" className="form-control" required="true"/>
+                            <input type="text" name="name" id="name" className="form-control" required="true" onChange={this.handleNameChange}/>
                             <p className="help-block">The name appears on your site</p>
                           </div>
                       </div>

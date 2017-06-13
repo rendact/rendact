@@ -10,6 +10,8 @@ var Menu = React.createClass({
 
       return {
         name:"",
+        newMenuName:"",
+        selectedMenuName:"",
         postId:"",
         tagId:"",
         dt: null,
@@ -160,7 +162,8 @@ var Menu = React.createClass({
 										<input type="text" name="newMenuName" id="newMenuName" className="form-control" />
 									</div>
 									<div className="pull-right" style={{marginTop: 10}}>
-										<button type="submit" id="submit" className="btn btn-flat btn-success">Create Menu</button>
+										<button type="submit" id="submit" className="btn btn-flat btn-success" 
+										disabled={this.state.name===""}>Create Menu</button>
 									</div>
 								</div>
 							  </div>
