@@ -103,6 +103,7 @@ const TagContent = React.createClass({
       var row = me.table.datatable.data()[index];
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
+      debugger;
       setValue("name", name);
       me.setState({postId: postId});
       me.setState({mode: "update"});
