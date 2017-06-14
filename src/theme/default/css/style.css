@@ -5,7 +5,7 @@ License: Creative Commons Attribution 3.0 Unported
 License URL: http://creativecommons.org/licenses/by/3.0/
 --*/
 
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700|Orbitron:400,500,700,900");
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700|Arial:400,500,700,900");
 
 html, body{
 font-family: 'Open Sans', sans-serif;
@@ -42,6 +42,9 @@ ul{
 label{
   margin:0;
 }
+small {
+  font-size: 65%;
+}
 /*----header--------*/
 /*.banner{
   background: url(../images/banner.jpg) no-repeat 0px 0px;
@@ -61,7 +64,7 @@ label{
   font-weight: 900;
   color: #fff;
   text-transform: uppercase;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
 }
 .logo  a h1:hover{
  color:#fff;  
@@ -113,7 +116,7 @@ label{
 .header-bottom {
   padding: 1.5em 0;
   z-index: 999;
-  background-color: rgba(39, 40, 40, 0.74);
+  background-color: rgba(39, 40, 40, 0.9);
 }
 nav.navigation a {
   display: block;
@@ -172,7 +175,7 @@ nav.navigation a:focus {
   font-weight: 700;
   color: #292B2B;
   text-align: center;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
 }
 .trainee-grids {
   margin-top: 5em;
@@ -245,7 +248,7 @@ nav.navigation a:focus {
    font-size: 2.5em;
   font-weight:700;
   color:#698a9a;
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'Arial', sans-serif;
 }
 .banner-bottom p {
   text-align: center;
@@ -278,7 +281,7 @@ nav.navigation a:focus {
    font-size: 2.5em;
   font-weight: 700;
   color: #698a9a;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
   text-transform: uppercase;
   line-height: 1.4em;
 }
@@ -301,7 +304,7 @@ nav.navigation a:focus {
   font-weight: 700;
     color: #292B2B;
   text-align:center;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
 }
 .class-text h5 {
   font-size: 4em;
@@ -320,7 +323,7 @@ nav.navigation a:focus {
 .bottom-color h4 {
   color:#fff;
    font-size:1.4em;
-     font-family: 'Orbitron', sans-serif;
+     font-family: 'Arial', sans-serif;
  }
  .bottom-color p {
    color: #698a9a;
@@ -385,13 +388,13 @@ a.button {
 }
 /*---about----*/
 .banner.two {
-  background: url(../images/banner-two.jpg) no-repeat 0px 0px;
+  /* background: url(../images/banner-two.jpg) no-repeat 0px 0px; */
   background-size: cover;
   -webkit-background-size: cover;
   -o-background-size: cover;
   -moz-background-size: cover;
   -ms-background-size: cover;
-  min-height:300px;
+  /* min-height:300px; */
 }
 .second-head {
   background: #698a9a;
@@ -403,7 +406,7 @@ a.button {
 }
 .second-head h2 ,.second-head a h5{
  color:#fff;font-size:1em;
- font-family: 'Orbitron', sans-serif;
+ font-family: 'Arial', sans-serif;
  display:inline-block;
 }
 .second-head a h5{
@@ -426,6 +429,7 @@ a.mask {
   text-decoration: none;
   overflow: hidden;
   display: block;
+  
 }
 img.zoom-img:hover {
   -webkit-transform: scale(1.15);
@@ -443,13 +447,31 @@ img.zoom-img {
   -moz-transform: scale(1, 1);
   -moz-transition-timing-function: ease-out;
   -moz-transition-duration: 250ms;
+  width: 500px;
+  height: auto;
+  left: 0px;
+  position: absolute;
+  clip: rect(0px, 380px, 176px, 0px);
+}
+img.img-thumbnail {
+  -webkit-transform: scale(1, 1);
+  -webkit-transition-timing-function: ease-out;
+  -webkit-transition-duration: 250ms;
+  -moz-transform: scale(1, 1);
+  -moz-transition-timing-function: ease-out;
+  -moz-transition-duration: 250ms;
+  width: 500px;
+  height: auto;
+  left: 0px;
+  position: absolute;
+  clip: rect(0px, 380px, 176px, 0px);
 }
 .new-section  h3 {
     font-size: 2.5em;
   font-weight: 700;
   color: #698a9a;
   text-transform:uppercase;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
   margin-bottom: 1.5em;
 }
 .new-text {
@@ -465,13 +487,16 @@ img.zoom-img {
     margin: 0.25em 0;
 }
 .new a h4{
-   color: #698a9a;
-  font-size: 1.3em;
-  font-weight:700; 
+  color: #698a9a;
+  font-size: 1.6em;
+  font-weight: 500; 
   text-decoration:none;
   text-transform:uppercase;
   line-height: 1.4em;
-font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
+}
+.new a h4:hover{
+  color: #111111;
 }
 .new-img {
   width:50%;
@@ -495,10 +520,12 @@ font-family: 'Orbitron', sans-serif;
  }
  .welcome-img {
   padding: 0;
+  position: relative;
 }
 .new {
   margin-bottom: 3em;
   background-color: #eee;
+  border-radius: 0.5em;
 }
 /*----about-top---------*/
 .about-section {
@@ -512,7 +539,7 @@ font-family: 'Orbitron', sans-serif;
   font-weight: 700;
   color: #292B2B;
   text-align:center;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
 }
 h4.col-md-3.f-logo {
   width: 90px;
@@ -521,7 +548,7 @@ h4.col-md-3.f-logo {
   font-size: 4em;
   color: #698a9a;
   padding: 26px 10px 14px 21px;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
 }
 p.ab,p.para,.about-text p,.about-section p{
   text-align:left;
@@ -546,7 +573,7 @@ p.ab,p.para,.about-text p,.about-section p{
   line-height: 1.4em;
   text-decoration: none;
   text-transform: uppercase;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
 }
 .blog_grid h3{
  font-size: 1.35em;
@@ -662,7 +689,7 @@ ul.blog-list h4, ul.recent-list h4{
   text-align: left;
   margin-bottom:3%;
   text-transform: uppercase;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
 }
 .sidebar-bottom ul li,.categories ul li{
   list-style:none;
@@ -709,7 +736,7 @@ ul.blog-list1 h4, ul.archive-list h4{
   text-align: left;
   margin-bottom: 4%;
   text-transform: uppercase;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
 }
 ul.blog-list1 li  a{
   float: left;
@@ -735,7 +762,7 @@ ul.times.two h3 {
   text-align: left;
   margin-bottom: 6%;
   text-transform: uppercase;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
 }
 ul.times.two li span.week {
   color: #1b1b1b;
@@ -753,7 +780,7 @@ p.tzweight_Bold,.single h4{
   text-align: left;
   margin-bottom: 3%;
   text-transform: uppercase;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
 }
 .preview1 img,.preview img,ul.single_post1 li.single_post1-img img  {
   border-radius: 50%;
@@ -878,7 +905,7 @@ p.form-submit {
   font-weight: 700;
   margin: 0;
   color:#292B2B;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
 }
 .error-top h3 span {
    font-size: 0.1em;
@@ -913,7 +940,7 @@ p.form-submit {
    font-size: 2.5em;
   font-weight: 700;
   color:#292B2B;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
   text-align:center;
   text-transform:uppercase;
     margin-bottom: 1em;
@@ -991,7 +1018,7 @@ color: #698a9a;
   text-transform: uppercase;
   margin: 1em 0;
   font-weight:700;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
 }
 .company_address p {
     font-size: 0.9em;
@@ -1023,7 +1050,7 @@ ul.times h3,.footer-grid h3{
   text-align:left;
   margin-bottom: 6%;
   text-transform: uppercase;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
 }
 .footer-grid p ,.footer-grid a  h5{
   text-align:left;
@@ -5183,14 +5210,18 @@ Copyright (c) 2013 Daniel Eden
 }
 .sidebar-grid h3{
   color: #fff;
-  font-size: 1.3em;
+  font-size: 1.2em;
   text-align:left;
   margin-bottom: 6%;
   text-transform: uppercase;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Arial', sans-serif;
 }
 .sidebar-grid p, .sidebar-grid a {
   text-align:left;
+  font-size: 0.9em;
+  line-height: 1.7em;
+  color: #1b1b1b;
+  font-weight: 400;
 }
 .sidebar-box {
   padding-bottom: 2em;
@@ -5211,4 +5242,26 @@ Copyright (c) 2013 Daniel Eden
 }
 .sidebar-box ul li a:hover {
   padding-left: 3em;
+}
+.sidebar-box > ul.posts-list li a {
+  margin: 0;
+  line-height: inherit;
+  text-decoration: none;
+  padding: 0;
+  background: none;
+}
+.sidebar-box > ul.posts-list li {
+  padding-bottom: 1em;
+}
+.sidebar-box h3 {
+  color: #555;
+}
+.sidebar-box h5 {
+  color: #698a9a;
+  font-weight: 500;
+  font-size: 1.3em;
+}
+
+.sidebar-box a h5:hover {
+  color: #111111;
 }

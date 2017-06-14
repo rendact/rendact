@@ -46,7 +46,7 @@ const getPostListQry = function(s, postType, tagId, cateId) {
   return {
     "query": 
       'query getPosts{viewer {allPosts(where: {type: {eq: "post"}, status: '+status+' '+tag+' '+category+' }) { edges { node { '
-      +'id,title,content,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},tag{edges{node{tag{id, name}}}},comments{edges{node{id}}},file{edges{node{id,value}}}, featuredImage,createdAt}}}}}'
+      +'id,title,content,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},tag{edges{node{tag{id, name}}}},comments{edges{node{id,content,name,email,website}}},file{edges{node{id,value}}}, featuredImage,createdAt}}}}}'
   };
 }
 
@@ -415,7 +415,7 @@ const createUpdateTagOfPostMtn = function(postId, oldTag, currentTag, tagMap){
 const getPostQry = function(postId){
   return {"query": 
      `{getPost(id:"`+postId+`"){ id,title,content,slug,author{username},status,visibility,featuredImage,
-      summary,category{edges{node{category{id,name}}}},comments{edges{node{id}}},file{edges{node{id value}}},
+      summary,category{edges{node{category{id,name}}}},comments{edges{node{id,content,name,email,website}}},file{edges{node{id value}}},
       tag{edges{node{id,tag{id,name}}}},meta{edges{node{id,item,value}}},createdAt}}`
     }
 };

@@ -3,6 +3,7 @@ import React from 'react'
 import Header from '../includes/Header'
 import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
+import moment from 'moment'
 
 const Single = React.createClass({
 	goHome: function(e) {
@@ -56,33 +57,18 @@ const Single = React.createClass({
 					            <p className="tzweight_Bold">Comments</p>
 					        </h4>
 					        <ul className="list">
-					        <li>
-					            <div className="col-md-2 preview"><a href="#"><img src="images/co.png" className="img-responsive" alt="" /></a></div>
-					            <div className="col-md-10 data">
-					                <div className="title"><a href="#">User 1</a><br /><span className="m_14">APR 2, 2015</span></div>
-					                <p>Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature</p>
-									<h5 className="m_26"> <a href="#">reply</a></h5>
-					            </div>
-					           <div className="clearfix"></div>
-					        </li>
-					     	  <li>
-					            <div className="col-md-2 preview"><a href="#"><img src="images/co.png" className="img-responsive" alt="" /></a></div>
-					            <div className="col-md-10 data">
-					                <div className="title"><a href="#">User 2</a><br /><span className="m_14">MAY2, 2015</span></div>
-					                <p>Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature</p>
-									<h5 className="m_26"> <a href="#">reply</a></h5>
-					            </div>
-					           <div className="clearfix"></div>
-					        </li>
-					        <li>
-					            <div className="col-md-2 preview"><a href="#"><img src="images/co.png" className="img-responsive" alt="" /></a></div>
-					            <div className="col-md-10 data">
-					                <div className="title"><a href="#">User 3</a><br /><span className="m_14">JUNE 2, 2015</span></div>
-					                <p>Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature</p>
-									<h5 className="m_26"> <a href="#">reply</a></h5>
-					            </div>
-					           <div className="clearfix"></div>
-					        </li>
+					        {
+					        	this.props.postData.comments && this.props.postData.comments.edges.map(function(item){
+					        		return <li>
+									            <div className="col-md-10 data">
+									                <div className="title"><a href={item.node.website}>{item.node.name}</a><br /><span className="m_14">{moment(item.node.createdAt).format("MMMM Do YY, h:mm:ss a")}</span></div>
+									                <p>{item.node.content}</p>
+																	<h5 className="m_26"> <a href="#">reply</a></h5>
+									            </div>
+									           <div className="clearfix"></div>
+									        </li>
+					        	})
+					        }
 					     </ul>
 					</div>
 					
