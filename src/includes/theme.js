@@ -105,7 +105,7 @@ const ThemeHome = React.createClass({
    		else{
    			fImage=require('../theme/default/images/logo.png');
    		}
-		return <a href="article" className="mask"><img src={fImage} alt="" style={{width:'auto', height:'auto'}} className="img-responsive img-thumbnail" /></a>
+		return <a href="article" className="mask"><img src={fImage} alt="" className="img-responsive img-thumbnail" /></a>
 	},
 	thePagination: function(){
 		let pages = [<li><a href="#" onClick={this.handlePageClick}>«</a></li>];
