@@ -314,7 +314,6 @@ const ThemeSingle = React.createClass({
       function(error, response, body) { 
         if (!error && !body.errors && response.statusCode === 200) {
           var data = body.data.getPost;
-          //data.content = toHTMLObject(data.content);
           me.setState({postData: data});
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
