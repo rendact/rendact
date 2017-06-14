@@ -76,6 +76,10 @@ const ThemeHome = React.createClass({
 			activePage: 1
 		}
 	},
+	goHome: function(e) {
+		e.preventDefault();
+		this._reactInternalInstance._context.history.push('/')
+	},
 	handlePostClick: function(e){
 		e.preventDefault();
 		var id = e.currentTarget.id;
@@ -96,6 +100,11 @@ const ThemeHome = React.createClass({
 						<li><a href="#">Menu 4</a></li>
 						<li><a href="#">Menu 5</a></li>
 					</ul>
+	},
+	theLogo: function(){
+		return <div className="logo">
+							<a href="#" onClick={this.goHome}><h1>Rend<span>act</span></h1></a>
+						</div>
 	},
 	theImage: function(image){
 		var fImage="";
@@ -191,6 +200,7 @@ const ThemeHome = React.createClass({
 								theTitle={this.theTitle}
 								theContent={this.theContent}
 								theMenu={this.theMenu}
+								theLogo={this.theLogo}
 								theImage={this.theImage}
 								theConfig={this.state.config}
 								thePagination={this.thePagination}
@@ -294,6 +304,10 @@ const ThemeSingle = React.createClass({
 			config: null
 		}
 	},
+	goHome: function(e) {
+		e.preventDefault();
+		this._reactInternalInstance._context.history.push('/')
+	},
 	theMenu: function(){
 		return <ul className="cl-effect-16">
 						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
@@ -303,6 +317,14 @@ const ThemeSingle = React.createClass({
 						<li><a href="#">Menu 4</a></li>
 						<li><a href="#">Menu 5</a></li>
 					</ul>
+	},
+	theBreadcrumb: function(){
+		return <h2><a href="#" onClick={this.goHome}><h5>Home </h5></a> / PAGE</h2>
+	},
+	theLogo: function(){
+		return <div className="logo">
+							<a href="#" onClick={this.goHome}><h1>Rend<span>act</span></h1></a>
+						</div>
 	},
 	componentWillMount: function() {
 		var me = this;
@@ -340,6 +362,8 @@ const ThemeSingle = React.createClass({
 									widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 									footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 									theMenu={this.theMenu}
+									theLogo={this.theLogo}
+									theBreadcrumb={this.theBreadcrumb}
 									theConfig={this.state.config}
 								/>;
 			} else if (this.params.pageId){
@@ -350,6 +374,8 @@ const ThemeSingle = React.createClass({
 									widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 									footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 									theMenu={this.theMenu}
+									theLogo={this.theLogo}
+									theBreadcrumb={this.theBreadcrumb}
 									theConfig={this.state.config}
 								/>;
 			} else {

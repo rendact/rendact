@@ -6,17 +6,13 @@ import Footer from '../includes/Footer'
 import moment from 'moment'
 
 const Single = React.createClass({
-	goHome: function(e) {
-		e.preventDefault();
-		this._reactInternalInstance._context.history.push('/')
-	},
 	render: function() {
 		return (
 			<div className="application">
-				<Header theMenu={this.props.theMenu()} />	   
+				<Header {...this.props} />	   
 				<div className="second-head">
 					<div className="container">
-						<h2><a href="#" onClick={this.goHome}><h5>Home </h5></a> / PAGE</h2>
+						{this.props.theBreadcrumb()}
 					 </div>
 				</div>
 				
