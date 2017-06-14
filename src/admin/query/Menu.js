@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-const createMenu = function(name){
+const createMenu = function(newMenuName){
   return {
       "query": `
     mutation createMenu($input: CreateMenuInput!) {
@@ -14,7 +14,7 @@ const createMenu = function(name){
     `,
       "variables": {
         "input": {
-          "name": name
+          "name": newMenuName
         }
       }
     }

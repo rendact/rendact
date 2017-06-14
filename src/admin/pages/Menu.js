@@ -10,8 +10,8 @@ var Menu = React.createClass({
 
       return {
         name:"",
-        newMenuName:"",
         selectedMenuName:"",
+        newMenuName:"",
         postId:"",
         tagId:"",
         dt: null,
@@ -34,9 +34,15 @@ var Menu = React.createClass({
   resetForm: function(){
     document.getElementById("menu").reset();
     document.getElementById("menuName").reset();
-    this.setState({name:""});
+    this.setState({newMenuName:""});
+    this.setState({selectedMenuName:""});
     this.handleNameChange();
+    this.handleNewChange();
     window.history.pushState("", "", '/admin/menu');
+  },
+  handleNewChange: function(event){
+    var newMenuName = getValue("newMenuName");
+    this.setState({newMenuName: newMenuName})
   },
   handleNameChange: function(event){
     var selectedMenuName = getValue("selectedMenuName");
@@ -45,9 +51,9 @@ var Menu = React.createClass({
   handleSubmit: function(event){
     event.preventDefault();
     var me = this;
-    var name = getValue("newMenuName");
+    var newMenuName = getValue("newMenuName");
     this.disableForm(true);
-    var qry = Query.createMenu(name);
+    var qry = Query.createMenu(newMenuName);
     var noticeTxt = "Menu Saved";
 
     riques(qry, 
@@ -159,11 +165,10 @@ var Menu = React.createClass({
 										<h4>Create A New Menu :</h4>
 									</div>
 									<div>
-										<input type="text" name="newMenuName" id="newMenuName" className="form-control" />
+										<input type="text" name="newMenuName" id="newMenuName" className="form-control" onChange={this.handleNewChange}/>
 									</div>
 									<div className="pull-right" style={{marginTop: 10}}>
-										<button type="submit" id="submit" className="btn btn-flat btn-success" 
-										disabled={this.state.name===""}>Create Menu</button>
+										<button type="submit" id="submit" disabled={this.state.newMenuName===""} className="btn btn-flat btn-success">Create Menu</button>
 									</div>
 								</div>
 							  </div>
@@ -252,7 +257,7 @@ var Menu = React.createClass({
 									  </div>
 									<div className="col-md-4">
 										<div className="box-tools pull-right">
-										<button type="submit" id="submit" name="submit" className="btn btn-flat btn-primary">Save Menu</button>
+										<button type="submit" id="submit" name="submit" className="btn btn-flat btn-primary" disabled={this.state.selectedMenuName===""}>Save Menu</button>
 										</div>
 									</div>
 								  </div>
