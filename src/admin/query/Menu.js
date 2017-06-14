@@ -35,6 +35,16 @@ const getAllMenu = {
   }`
 }
 
+const getAllPage = {
+  "query": 
+      'query getPages{viewer {allPosts(where: {type: {eq: "page"}}) { edges { node { '+'id,title}}}}}'
+}
+
+const getAllPost = {
+  "query": 
+      'query getPages{viewer {allPosts(where: {type: {eq: "post"}}) { edges { node { '+'id,title}}}}}'
+}
+
 const deleteMenuQry = function(idList) {
   return{
   "query": `
@@ -80,6 +90,8 @@ const queries = {
   getAllMenu: getAllMenu,
   deleteMenuQry: deleteMenuQry,
   updateMenu: updateMenu,
+  getAllPage: getAllPage,
+  getAllPost: getAllPost,
 }
 
 module.exports = queries;

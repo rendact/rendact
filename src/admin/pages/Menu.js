@@ -19,6 +19,9 @@ var Menu = React.createClass({
         loadingMsg: null,
         deleteMode: false,activeStatus: "All",
         pageList: null,
+        allPageList: null,
+        allPostList: null,
+        categoryList: null,
       }
   },
   handleMenu: function(event){
@@ -118,6 +121,44 @@ var Menu = React.createClass({
           }
         }
       );
+      riques(Query.getAllPage, 
+        function(error, response, body) {
+          if (!error) {
+            var allPageList = [];
+            _.forEach(body.data.viewer.allPosts.edges, function(item){
+              allPageList.push((<div key={item.node.id}><input id={item.node.id}
+              name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.title}</div>));
+            })
+            me.setState({allPageList: allPageList});
+            debugger;
+          }
+        }
+      );
+      riques(Query.getAllPost, 
+        function(error, response, body) {
+          if (!error) {
+            var allPostList = [];
+            _.forEach(body.data.viewer.allPosts.edges, function(item){
+              allPostList.push((<div key={item.node.id}><input id={item.node.id}
+              name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.title}</div>));
+            })
+            me.setState({allPostList: allPostList});
+            debugger;
+          }
+        }
+      );
+      riques(Query.getAllCategoryQry("post"), 
+        function(error, response, body) {
+          if (!error) {
+            var categoryList = [];
+            _.forEach(body.data.viewer.allCategories.edges, function(item){
+              categoryList.push((<div key={item.node.id}><input id={item.node.id}
+              name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
+            })
+            me.setState({categoryList: categoryList});
+          }
+        }
+      );
     },
   handleDelete: function(event){
     var me = this;
@@ -173,7 +214,7 @@ var Menu = React.createClass({
 								</div>
 							  </div>
 						  </form>
-							<div className="box box-default box-solid">
+							<div className="box box-default collapsed-box box-solid">
 								<div className="box-header with-border">
 									<h3 className="box-title">Pages</h3>
 									<div className="box-tools pull-right">
@@ -181,8 +222,14 @@ var Menu = React.createClass({
 									    </button>
 									</div>
 								</div>
-								<div className="box-body">
-									The body of the box
+								<div className="box-body pad">
+									<div>
+								  		{this.state.allPageList}
+								  	</div>
+								  	<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+								  	<div className="box-tools pull-right">
+								  		<button className="btn btn-flat btn-default">Add to Menu</button>
+								  	</div>
 								</div>
 							</div>
 							<div className="box box-default collapsed-box box-solid">
@@ -193,8 +240,14 @@ var Menu = React.createClass({
 									    </button>
 									</div>
 								</div>
-								<div className="box-body">
-									The body of the box
+								<div className="box-body pad">
+									<div>
+								  		{this.state.allPostList}
+								  	</div>
+								  	<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+								  	<div className="box-tools pull-right">
+								  		<button className="btn btn-flat btn-default">Add to Menu</button>
+								  	</div>
 								</div>
 							</div>
 							<div className="box box-default collapsed-box box-solid">
@@ -205,8 +258,14 @@ var Menu = React.createClass({
 									    </button>
 									</div>
 								</div>
-								<div className="box-body">
-									The body of the box
+								<div className="box-body pad">
+									<div>
+								  		.................
+								  	</div>
+								  	<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+								  	<div className="box-tools pull-right">
+								  		<button className="btn btn-flat btn-default">Add to Menu</button>
+								  	</div>
 								</div>
 							</div>
 							<div className="box box-default collapsed-box box-solid">
@@ -217,8 +276,14 @@ var Menu = React.createClass({
 									    </button>
 									</div>
 								</div>
-								<div className="box-body">
-									The body of the box
+								<div className="box-body pad">
+									<div>
+								  		{this.state.categoryList}
+								  	</div>
+								  	<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+								  	<div className="box-tools pull-right">
+								  		<button className="btn btn-flat btn-default">Add to Menu</button>
+								  	</div>
 								</div>
 							</div>
 						</div>
@@ -320,15 +385,15 @@ var Menu = React.createClass({
 										</div>
 									</section>
 								</div>
-								<div className="box-header with-border attachment-block clearfix">
+							<div className="box-header with-border attachment-block clearfix">
 								<div className="form-group">
 									<div className="col-md-6">
 										<button className="btn btn-flat btn-danger" id="deleteBtn" onClick={this.handleDelete}>Delete Menu</button>
 									</div>
 									<div className="col-md-6">
-										<div className="box-tools pull-right">
+									  <div className="box-tools pull-right">
 										<button className="btn btn-flat btn-primary">Save Menu</button>
-										</div>
+									  </div>
 									</div>
 								</div>
 							</div>
