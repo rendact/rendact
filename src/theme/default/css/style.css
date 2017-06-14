@@ -429,6 +429,7 @@ a.mask {
   text-decoration: none;
   overflow: hidden;
   display: block;
+  
 }
 img.zoom-img:hover {
   -webkit-transform: scale(1.15);
@@ -446,6 +447,24 @@ img.zoom-img {
   -moz-transform: scale(1, 1);
   -moz-transition-timing-function: ease-out;
   -moz-transition-duration: 250ms;
+  width: 500px;
+  height: auto;
+  left: 0px;
+  position: absolute;
+  clip: rect(0px, 380px, 176px, 0px);
+}
+img.img-thumbnail {
+  -webkit-transform: scale(1, 1);
+  -webkit-transition-timing-function: ease-out;
+  -webkit-transition-duration: 250ms;
+  -moz-transform: scale(1, 1);
+  -moz-transition-timing-function: ease-out;
+  -moz-transition-duration: 250ms;
+  width: 500px;
+  height: auto;
+  left: 0px;
+  position: absolute;
+  clip: rect(0px, 380px, 176px, 0px);
 }
 .new-section  h3 {
     font-size: 2.5em;
@@ -501,6 +520,7 @@ img.zoom-img {
  }
  .welcome-img {
   padding: 0;
+  position: relative;
 }
 .new {
   margin-bottom: 3em;
