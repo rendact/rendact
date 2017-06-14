@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-const createMenu = function(name){
+const createMenu = function(newMenuName){
   return {
       "query": `
     mutation createMenu($input: CreateMenuInput!) {
@@ -14,7 +14,7 @@ const createMenu = function(name){
     `,
       "variables": {
         "input": {
-          "name": name
+          "name": newMenuName
         }
       }
     }
@@ -33,6 +33,16 @@ const getAllMenu = {
       }
     }
   }`
+}
+
+const getAllPage = {
+  "query": 
+      'query getPages{viewer {allPosts(where: {type: {eq: "page"}}) { edges { node { '+'id,title}}}}}'
+}
+
+const getAllPost = {
+  "query": 
+      'query getPages{viewer {allPosts(where: {type: {eq: "post"}}) { edges { node { '+'id,title}}}}}'
 }
 
 const deleteMenuQry = function(idList) {
@@ -80,6 +90,8 @@ const queries = {
   getAllMenu: getAllMenu,
   deleteMenuQry: deleteMenuQry,
   updateMenu: updateMenu,
+  getAllPage: getAllPage,
+  getAllPost: getAllPost,
 }
 
 module.exports = queries;

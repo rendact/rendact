@@ -81,6 +81,8 @@ const queries = {
   getAllMenu: Menu.getAllMenu,
   deleteMenuQry: Menu.deleteMenuQry,
   updateMenu: Menu.updateMenu,
+  getAllPage: Menu.getAllPage,
+  getAllPost: Menu.getAllPost,
 }
 
 module.exports = queries;
