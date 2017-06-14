@@ -9,7 +9,7 @@ import {ThemeHome, ThemeSingle, ThemeBlog} from './includes/theme';
 import Admin from './admin';
 import Login from './login';
 import Register from './register';
-import Query from './admin/query';
+//import Query from './admin/query';
 
 const Main = React.createClass({
 	getInitialState: function(){

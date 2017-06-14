@@ -163,7 +163,6 @@ var ContentNew = React.createClass({
 	}, 
 	handleAddProvidedField: function(event){
 		var me = this;
-		var fields = this.state.fields;
 		var providedFields = [];
 		var allProvidedField = _.concat(me.providedFields, me.defaultFields);
 
@@ -180,7 +179,6 @@ var ContentNew = React.createClass({
 	},
 	handleAddCustomField: function(event){
 		event.preventDefault();
-		var fields = this.state.fields;
 		var customFields = this.state.customFields;
 		var name = getValue("field-name");
 		var type = getValue("field-type");
@@ -340,7 +338,7 @@ var ContentNew = React.createClass({
 	                  {
 	                  	_.map(this.defaultFields, function(item){
 	                  		return <div key={item.id} className="checkbox"><label><input type="checkbox" name="checkboxField[]" value={item.id} readOnly="true" checked/>{item.label}</label></div>
-	                  	}.bind(this))
+	                  	})
 	                  }
 	                  {
 	                  	_.map(this.providedFields, function(item){

@@ -2,7 +2,6 @@ import React from 'react'
 import Header from '../includes/Header'
 import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
-import {searchWidget} from '../../../includes/widgets'
 import _ from 'lodash'
 import moment from 'moment';
 
@@ -15,7 +14,7 @@ const Home = React.createClass({
 					<div className="col-md-8 new-section">
 						     {
 						     	this.props.latestPosts && this.props.latestPosts.map(function(item){
-						     		return 	<div className="new">
+						     		return 	<div key={item.id} className="new">
 												<div className="col-md-6 new-text wow fadeIn animated">
 													{this.props.theTitle(item.id, item.title)}
 													<small>{moment(item.createdAt).format("MMMM Do YY, h:mm:ss a")}</small>

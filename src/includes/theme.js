@@ -3,13 +3,10 @@ import AdminConfig from '../admin/AdminConfig';
 window.config = AdminConfig;
 import NotFound from '../admin/NotFound';
 import Query from '../admin/query';
-import Config from '../config';
-
-import {riques, errorCallback, toHTMLObject, loadConfig} from '../utils';
+import {riques, errorCallback, loadConfig} from '../utils';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
 import Loading from '../admin/Loading';
-import {latestPosts} from './hooks';
 import _ from 'lodash';
 import {searchWidget, topPostWidget, categoriesWidget, archiveWidget, aboutUsWidget, contactUsWidget, recentPostWidget} from './widgets';
 
@@ -117,14 +114,14 @@ const ThemeHome = React.createClass({
 		return <a href="article" className="mask"><img src={fImage} alt="" className="img-responsive img-thumbnail" /></a>
 	},
 	thePagination: function(){
-		let pages = [<li><a href="#" onClick={this.handlePageClick}>«</a></li>];
+		let pages = [<li key="998" ><a href="#" onClick={this.handlePageClick}>«</a></li>];
 		for(var i=0;i<this.state.pageCount;i++){
 			if (this.state.activePage===i+1)
-  			pages.push(<li><a href="#" onClick={this.handlePageClick} disabled="true">{i+1}</a></li>)
+  			pages.push(<li key={i}><a href="#" onClick={this.handlePageClick} disabled="true">{i+1}</a></li>)
   		else 
-  			pages.push(<li><a href="#" onClick={this.handlePageClick}>{i+1}</a></li>)
+  			pages.push(<li key={i}><a href="#" onClick={this.handlePageClick}>{i+1}</a></li>)
   	}
-  	pages.push(<li><a href="#" onClick={this.handlePageClick}>»</a></li>);
+  	pages.push(<li key="999"><a href="#" onClick={this.handlePageClick}>»</a></li>);
 		return <div className="box-tools">
                 <ul className="pagination pagination-sm no-margin">
                 {pages}  
@@ -138,7 +135,7 @@ const ThemeHome = React.createClass({
 		else if (e.target.text==="»")
 			page = this.state.activePage + 1;
 		else 
-			page = parseInt(e.target.text);
+			page = parseInt(e.target.text, 10);
 		var start = (this.state.postPerPage * page) - this.state.postPerPage;
 		this.setState({latestPosts: _.slice(this.state.allPosts, start, start+this.state.postPerPage), activePage: page});
 	},
