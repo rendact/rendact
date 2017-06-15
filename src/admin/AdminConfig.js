@@ -44,6 +44,7 @@ const PermissionList = [
 	{id: "view-plugins", label: "View plugins list"},
 	{id: "modify-plugins", label: "Add / modify plugins"},
 	{id: "view-themes", label: "View themes list"},
+	{id: "modify-themes", label: "Modify theme"},
 	{id: "view-menu", label: "View menu list"},
 	{id: "modify-themes", label: "Add / modify themes"},
 	{id: "view-content", label: "View content type list"},
@@ -69,7 +70,7 @@ const MenuRoleValue = {
 	'tag-new' : 'modify-tag',
 	'tag-edit' : 'modify-tag',
 	'pages-new' : 'modify-page',
-	'theme-new' : 'modify-themes',
+	'theme-customize' : 'modify-themes',
 	'users-new' : 'modify-user',
 	'posts-edit' : 'modify-post',
 	'pages-edit' : 'modify-page',
@@ -107,7 +108,7 @@ const MenuJson = [
 	{id: 'themes', label: 'Themes', icon: 'fa-image', open: false, role: 10, roleId: 'view-themes',
 		elements: [
 			{id: 'themes', label: 'Themes', icon: 'fa-image', open: true, url: '/admin/themes', role: 10, roleId: 'view-themes'},
-			{id: 'customize-theme', label: 'Customize', icon: 'fa-gears', open: false, url: '/admin/themes/customize', role: 10, roleId: 'view-themes'},
+			{id: 'customize-theme', label: 'Customize', icon: 'fa-gears', open: false, url: '/admin/themes/customize', role: 10, roleId: 'modify-themes'},
 			{id: 'menu', label: 'Menu', icon: 'fa-pencil-square-o', open: true, url: '/admin/menu', role: 5, roleId: 'view-themes'}
 		]
 	},
