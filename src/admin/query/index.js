@@ -83,6 +83,7 @@ const queries = {
   updateMenu: Menu.updateMenu,
   getAllPage: Menu.getAllPage,
   getAllPost: Menu.getAllPost,
+  getAllCategory: Menu.getAllCategory,
 }
 
 module.exports = queries;

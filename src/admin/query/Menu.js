@@ -35,6 +35,21 @@ const getAllMenu = {
   }`
 }
 
+const getAllCategory = {
+  "query": `query getCategories{
+    viewer {
+      allCategories {
+        edges {
+          node {
+            id,
+            name
+          }
+        }
+      }
+    }
+  }`
+}
+
 const getAllPage = {
   "query": 
       'query getPages{viewer {allPosts(where: {type: {eq: "page"}}) { edges { node { '+'id,title}}}}}'
@@ -92,6 +107,7 @@ const queries = {
   updateMenu: updateMenu,
   getAllPage: getAllPage,
   getAllPost: getAllPost,
+  getAllCategory: getAllCategory,
 }
 
 module.exports = queries;
