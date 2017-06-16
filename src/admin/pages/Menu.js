@@ -69,8 +69,7 @@ var Menu = React.createClass({
   resetForm: function(){
     document.getElementById("menu").reset();
     document.getElementById("menuName").reset();
-    this.setState({newMenuName:""});
-    this.setState({selectedMenuName:""});
+    this.setState({newMenuName:"", selectedMenuName:""});
     this.handleNameChange();
     this.handleNewChange();
     window.history.pushState("", "", '/admin/menu');

@@ -3,13 +3,10 @@ import AdminConfig from '../admin/AdminConfig';
 window.config = AdminConfig;
 import NotFound from '../admin/NotFound';
 import Query from '../admin/query';
-import Config from '../config';
-
-import {riques, errorCallback, toHTMLObject, loadConfig} from '../utils';
+import {riques, errorCallback, loadConfig} from '../utils';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
 import Loading from '../admin/Loading';
-import {latestPosts} from './hooks';
 import _ from 'lodash';
 import {searchWidget, topPostWidget, categoriesWidget, archiveWidget, aboutUsWidget, contactUsWidget, recentPostWidget} from './widgets';
 
@@ -76,6 +73,10 @@ const ThemeHome = React.createClass({
 			activePage: 1
 		}
 	},
+	goHome: function(e) {
+		e.preventDefault();
+		this._reactInternalInstance._context.history.push('/')
+	},
 	handlePostClick: function(e){
 		e.preventDefault();
 		var id = e.currentTarget.id;
@@ -97,6 +98,11 @@ const ThemeHome = React.createClass({
 						<li><a href="#">Menu 5</a></li>
 					</ul>
 	},
+	theLogo: function(){
+		return <div className="logo">
+							<a href="#" onClick={this.goHome}><h1>Rend<span>act</span></h1></a>
+						</div>
+	},
 	theImage: function(image){
 		var fImage="";
 		if(image!=null){
@@ -108,14 +114,14 @@ const ThemeHome = React.createClass({
 		return <a href="article" className="mask"><img src={fImage} alt="" className="img-responsive img-thumbnail" /></a>
 	},
 	thePagination: function(){
-		let pages = [<li><a href="#" onClick={this.handlePageClick}>«</a></li>];
+		let pages = [<li key="998" ><a href="#" onClick={this.handlePageClick}>«</a></li>];
 		for(var i=0;i<this.state.pageCount;i++){
 			if (this.state.activePage===i+1)
-  			pages.push(<li><a href="#" onClick={this.handlePageClick} disabled="true">{i+1}</a></li>)
+  			pages.push(<li key={i}><a href="#" onClick={this.handlePageClick} disabled="true">{i+1}</a></li>)
   		else 
-  			pages.push(<li><a href="#" onClick={this.handlePageClick}>{i+1}</a></li>)
+  			pages.push(<li key={i}><a href="#" onClick={this.handlePageClick}>{i+1}</a></li>)
   	}
-  	pages.push(<li><a href="#" onClick={this.handlePageClick}>»</a></li>);
+  	pages.push(<li key="999"><a href="#" onClick={this.handlePageClick}>»</a></li>);
 		return <div className="box-tools">
                 <ul className="pagination pagination-sm no-margin">
                 {pages}  
@@ -129,7 +135,7 @@ const ThemeHome = React.createClass({
 		else if (e.target.text==="»")
 			page = this.state.activePage + 1;
 		else 
-			page = parseInt(e.target.text);
+			page = parseInt(e.target.text, 10);
 		var start = (this.state.postPerPage * page) - this.state.postPerPage;
 		this.setState({latestPosts: _.slice(this.state.allPosts, start, start+this.state.postPerPage), activePage: page});
 	},
@@ -191,6 +197,7 @@ const ThemeHome = React.createClass({
 								theTitle={this.theTitle}
 								theContent={this.theContent}
 								theMenu={this.theMenu}
+								theLogo={this.theLogo}
 								theImage={this.theImage}
 								theConfig={this.state.config}
 								thePagination={this.thePagination}
@@ -294,6 +301,10 @@ const ThemeSingle = React.createClass({
 			config: null
 		}
 	},
+	goHome: function(e) {
+		e.preventDefault();
+		this._reactInternalInstance._context.history.push('/')
+	},
 	theMenu: function(){
 		return <ul className="cl-effect-16">
 						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
@@ -303,6 +314,14 @@ const ThemeSingle = React.createClass({
 						<li><a href="#">Menu 4</a></li>
 						<li><a href="#">Menu 5</a></li>
 					</ul>
+	},
+	theBreadcrumb: function(){
+		return <h2><a href="#" onClick={this.goHome}><h5>Home </h5></a> / PAGE</h2>
+	},
+	theLogo: function(){
+		return <div className="logo">
+							<a href="#" onClick={this.goHome}><h1>Rend<span>act</span></h1></a>
+						</div>
 	},
 	componentWillMount: function() {
 		var me = this;
@@ -340,6 +359,8 @@ const ThemeSingle = React.createClass({
 									widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 									footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 									theMenu={this.theMenu}
+									theLogo={this.theLogo}
+									theBreadcrumb={this.theBreadcrumb}
 									theConfig={this.state.config}
 								/>;
 			} else if (this.params.pageId){
@@ -350,6 +371,8 @@ const ThemeSingle = React.createClass({
 									widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 									footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 									theMenu={this.theMenu}
+									theLogo={this.theLogo}
+									theBreadcrumb={this.theBreadcrumb}
 									theConfig={this.state.config}
 								/>;
 			} else {

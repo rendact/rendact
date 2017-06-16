@@ -52,12 +52,12 @@ const getAllCategory = {
 
 const getAllPage = {
   "query": 
-      'query getPages{viewer {allPosts(where: {type: {eq: "page"}}) { edges { node { '+'id,title}}}}}'
+      'query getPages{viewer {allPosts(where: {type: {eq: "page"}}) { edges { node { id,title}}}}}'
 }
 
 const getAllPost = {
   "query": 
-      'query getPages{viewer {allPosts(where: {type: {eq: "post"}}) { edges { node { '+'id,title}}}}}'
+      'query getPages{viewer {allPosts(where: {type: {eq: "post"}}) { edges { node { id,title}}}}}'
 }
 
 const deleteMenuQry = function(idList) {

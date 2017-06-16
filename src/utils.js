@@ -151,10 +151,11 @@ let sendMail = function(to, title, message, callback){
 }
 
 let getFormData = function(className, output){
+  var _objData;
   if (!output) output = "list";
 
   if (output==="list") {
-    var _objData = [];
+    _objData = [];
     _.forEach(document.getElementsByClassName(className), function(item){
       var _obj = {
         value: item.value,
@@ -168,7 +169,7 @@ let getFormData = function(className, output){
   }
 
   if (output==="object") {
-    var _objData = {};
+    _objData = {};
     _.forEach(document.getElementsByClassName(className), function(item){
       _objData[item.id] = item.value;
     });
