@@ -129,7 +129,7 @@ nav.navigation a:focus {
   outline: none;
 }
 /*-- sticky-nav --*/
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 700px) {
     span.menu{
     width:35px;
     height:35px;
@@ -1199,7 +1199,7 @@ ul.address li a {
   font-size: 1.1em;
   }
 }
-@media (max-width:1024px){
+@media (max-width:768px){
    .main-contact h2, .trainee-section h3, .new-section h3, .tainer h3, .about-section h3, .clases-section h3, .banner-bottom h2 {
     font-size: 2.2em;
   }
@@ -1289,7 +1289,7 @@ ul.address li a {
     padding: 3em 0;
   }
 }
-@media (max-width:768px){
+@media (max-width:700px){
   .logo a h1 {
     font-size: 3.2em;
     margin-top: 4px;

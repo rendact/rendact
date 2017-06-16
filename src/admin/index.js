@@ -316,6 +316,25 @@ const PageLoader = React.createClass({
 
 
 const Admin = React.createClass({
+	getInitialState: function() {
+		return {
+			page: this.props.params['page']?this.props.params['page']:'dashboard',
+			action: this.props.params['action']?this.props.params['action']:'',
+			postId: this.props.params['postId']?this.props.params['postId']:null,
+			tagId: this.props.params['tagId']?this.props.params['tagId']:null,
+			configLoaded: false,
+			hasUnsavedData: false,
+			showCtrlSidebar: true
+		}
+	},
+	getDefaultProps: function() {
+		return { 
+			params: {
+				page: 'dashboard',
+				action: ''
+			}
+		}
+	},
 	componentDidMount: function(){
 		var me = this;
 		loadConfig(function(){
@@ -332,29 +351,17 @@ const Admin = React.createClass({
 			AdminLTEinit();
 		});
 
+		if (this.state.page==="themes" && this.state.action==="customize") {
+			this.setState({showCtrlSidebar: false})
+		} else {
+			this.setState({showCtrlSidebar: true})
+		}
+
 		window.onpopstate = this.onBackButtonEvent;
 	},
 	onBackButtonEvent:function(e){
 	  e.preventDefault();
 	 	this._reactInternalInstance._context.history.go(0);
-	},
-	getInitialState: function() {
-		return {
-			page: this.props.params['page']?this.props.params['page']:'dashboard',
-			action: this.props.params['action']?this.props.params['action']:'',
-			postId: this.props.params['postId']?this.props.params['postId']:null,
-			tagId: this.props.params['tagId']?this.props.params['tagId']:null,
-			configLoaded: false,
-			hasUnsavedData: false
-		}
-	},
-	getDefaultProps: function() {
-		return { 
-			params: {
-				page: 'dashboard',
-				action: ''
-			}
-		}
 	},
 	setUnsavedDataState: function(state){
 		this.setState({hasUnsavedData: state});
@@ -437,7 +444,9 @@ const Admin = React.createClass({
 						handleUnsavedData={this.setUnsavedDataState}
 					/>
 					<Footer/>
-					<ControlSidebar/>
+					{ this.state.showCtrlSidebar && 
+						<ControlSidebar/>
+					}
 					<div className="control-sidebar-bg"></div>
 	      </div>
 			);

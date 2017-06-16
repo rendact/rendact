@@ -70,7 +70,7 @@ const MenuRoleValue = {
 	'tag-new' : 'modify-tag',
 	'tag-edit' : 'modify-tag',
 	'pages-new' : 'modify-page',
-	'theme-customize' : 'modify-themes',
+	'themes-customize' : 'modify-themes',
 	'users-new' : 'modify-user',
 	'posts-edit' : 'modify-post',
 	'pages-edit' : 'modify-page',
@@ -108,7 +108,7 @@ const MenuJson = [
 	{id: 'themes', label: 'Themes', icon: 'fa-image', open: false, role: 10, roleId: 'view-themes',
 		elements: [
 			{id: 'themes', label: 'Themes', icon: 'fa-image', open: true, url: '/admin/themes', role: 10, roleId: 'view-themes'},
-			{id: 'customize-theme', label: 'Customize', icon: 'fa-gears', open: false, url: '/admin/themes/customize', role: 10, roleId: 'modify-themes'},
+			{id: 'themes-customize', label: 'Customize', icon: 'fa-gears', open: false, url: '/admin/themes/customize', role: 10, roleId: 'modify-themes'},
 			{id: 'menu', label: 'Menu', icon: 'fa-pencil-square-o', open: true, url: '/admin/menu', role: 5, roleId: 'view-themes'}
 		]
 	},
