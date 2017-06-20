@@ -22,6 +22,7 @@ var Menu = React.createClass({
         allPageList: null,
         allPostList: null,
         categoryList: null,
+        coba: null,
       }
   },
   handleMenu: function(event){
@@ -30,9 +31,40 @@ var Menu = React.createClass({
 	var selectedMenuName = event.target.value.split("-")[1];
 	setValue("selectedMenuName", selectedMenuName); 
 	this.setState({postId:postId});
- },
+  },
   disableForm: function(state){
     disableForm(state, this.notif)
+  },
+  addToMenu: function(event){
+    var menuFiltered = _.filter(document.getElementsByName("itemsChecked[]"), function(item){
+      		return item.checked
+    	});
+	var menuValues = [];
+	_.map(menuFiltered, function(item){
+	  menuValues.push((
+		<div className="box box-default collapsed-box box-solid" 
+		key={item.id} value={item.value} id={item.id} name="menuLoadedList[]">
+		  <div className="box-header with-border">
+			<h3 className="box-title">{item.value}</h3>
+			  <div className="box-tools pull-right">
+				<button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+				</button>
+			  </div>
+			</div>
+			<div className="box-body pad">
+			  <div>
+				Bismillah
+			  </div>
+			<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+			  <div className="box-tools pull-right">
+				<button className="btn btn-flat btn-default">Add to Menu</button>
+			</div>
+		  </div>
+		</div>
+	  ))
+	})
+    this.setState({storeMenu: menuValues});
+    debugger;
   },
   resetForm: function(){
     document.getElementById("menu").reset();
@@ -125,11 +157,10 @@ var Menu = React.createClass({
           if (!error) {
             var allPageList = [];
             _.forEach(body.data.viewer.allPosts.edges, function(item){
-              allPageList.push((<div key={item.node.id}><input id={item.node.id}
-              name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.title}</div>));
+              allPageList.push((<div key={item.node.id}><input class="pageMenu" id={item.node.id}
+              name="itemsChecked[]" type="checkbox" value={item.node.title} /> {item.node.title}</div>));
             })
             me.setState({allPageList: allPageList});
-            debugger;
           }
         }
       );
@@ -139,20 +170,19 @@ var Menu = React.createClass({
             var allPostList = [];
             _.forEach(body.data.viewer.allPosts.edges, function(item){
               allPostList.push((<div key={item.node.id}><input id={item.node.id}
-              name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.title}</div>));
+              name="itemsChecked[]" type="checkbox" value={item.node.title} /> {item.node.title}</div>));
             })
             me.setState({allPostList: allPostList});
-            debugger;
           }
         }
       );
-      riques(Query.getAllCategoryQry("post"), 
+      riques(Query.getAllCategory, 
         function(error, response, body) {
           if (!error) {
             var categoryList = [];
             _.forEach(body.data.viewer.allCategories.edges, function(item){
               categoryList.push((<div key={item.node.id}><input id={item.node.id}
-              name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
+              name="itemsChecked[]" type="checkbox" value={item.node.name} /> {item.node.name}</div>));
             })
             me.setState({categoryList: categoryList});
           }
@@ -222,12 +252,13 @@ var Menu = React.createClass({
 									</div>
 								</div>
 								<div className="box-body pad">
-									<div>
+									<div id="IDpageList">
 								  		{this.state.allPageList}
 								  	</div>
 								  	<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
 								  	<div className="box-tools pull-right">
-								  		<button className="btn btn-flat btn-default">Add to Menu</button>
+								  		<button className="btn btn-flat btn-default" type="button" onClick={this.addToMenu} 
+                              			style={{marginRight: 10}} data-target="#IDpageList">Add to Menu</button>
 								  	</div>
 								</div>
 							</div>
@@ -240,12 +271,13 @@ var Menu = React.createClass({
 									</div>
 								</div>
 								<div className="box-body pad">
-									<div>
+									<div id="IDpostList">
 								  		{this.state.allPostList}
 								  	</div>
 								  	<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
 								  	<div className="box-tools pull-right">
-								  		<button className="btn btn-flat btn-default">Add to Menu</button>
+								  		<button className="btn btn-flat btn-default" type="button" onClick={this.addToMenu} 
+                              			style={{marginRight: 10}} data-target="#IDpostList">Add to Menu</button>
 								  	</div>
 								</div>
 							</div>
@@ -276,12 +308,13 @@ var Menu = React.createClass({
 									</div>
 								</div>
 								<div className="box-body pad">
-									<div>
+									<div id="IDcategorytList">
 								  		{this.state.categoryList}
 								  	</div>
 								  	<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
 								  	<div className="box-tools pull-right">
-								  		<button className="btn btn-flat btn-default">Add to Menu</button>
+								  		<button className="btn btn-flat btn-default" type="button" onClick={this.addToMenu} 
+                              			style={{marginRight: 10}} data-target="#IDcategorytList">Add to Menu</button>
 								  	</div>
 								</div>
 							</div>
@@ -333,19 +366,10 @@ var Menu = React.createClass({
 										<p>Drag each item into the order you prefer. Click the arrow on the right of the item to reveal additional configuration options.</p>
 										<div className="row">
 									        <div className="col-md-6">
-									          <div className="box box-default collapsed-box box-solid">
-									            <div className="box-header with-border">
-									              <h3 className="box-title">Home</h3>
-
-									              <div className="box-tools pull-right">
-									                <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
-									                </button>
-									              </div>
-									            </div>
-									            <div className="box-body">
-									              The body of the box
-									            </div>
-									          </div>
+									          
+									              
+								                        {this.state.storeMenu}
+									            
 									        </div>
 									    </div>
 									    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}></div>
