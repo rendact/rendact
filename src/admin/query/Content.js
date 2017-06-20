@@ -75,6 +75,30 @@ const createContentMtn = function(data){
     }
   };
 
+  const createComment = function(author, email, comment){
+  return {
+      "query": `
+    mutation createComment($input: CreateCommentInput!) {
+        createComment(input: $input) {
+          changedComment {
+            id,
+            name,
+            email,
+            content
+        }
+      }
+    }
+    `,
+      "variables": {
+        "input": {
+          "name": author,
+          "email": email,
+          "content": comment
+        }
+      }
+    }
+  };
+
 const getContentQry = function(contentId){
   return {"query": 
       `{
@@ -145,6 +169,7 @@ const deleteContentQry = function(idList){
 const queries = {
   getContentListQry: getContentListQry,
   createContentMtn: createContentMtn,
+  createComment: createComment,
   getContentQry: getContentQry,
   getContentPostListQry: getContentPostListQry,
   checkContentSlugQry: checkContentSlugQry,
