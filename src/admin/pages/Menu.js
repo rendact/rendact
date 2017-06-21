@@ -1,4 +1,5 @@
 import React from 'react';
+import SortableTree from 'react-sortable-tree';
 import Query from '../query';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
@@ -40,30 +41,9 @@ var Menu = React.createClass({
       		return item.checked
     	});
 	var menuValues = [];
-	_.map(menuFiltered, function(item){
-	  menuValues.push((
-		<div className="box box-default collapsed-box box-solid" 
-		key={item.id} value={item.value} id={item.id} name="menuLoadedList[]">
-		  <div className="box-header with-border">
-			<h3 className="box-title">{item.value}</h3>
-			  <div className="box-tools pull-right">
-				<button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
-				</button>
-			  </div>
-			</div>
-			<div className="box-body pad">
-			  <div>
-				Bismillah
-			  </div>
-			<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
-			  <div className="box-tools pull-right">
-				<button className="btn btn-flat btn-default">Add to Menu</button>
-			</div>
-		  </div>
-		</div>
-	  ))
-	})
-    this.setState({storeMenu: menuValues});
+	menuValues = _.map(menuFiltered, function(item){{return {title: item.value}}})
+
+    this.setState ({treeData: menuValues });
     debugger;
   },
   resetForm: function(){
@@ -364,14 +344,14 @@ var Menu = React.createClass({
 									<section className="content">
 										<h4>Menu Structure</h4>
 										<p>Drag each item into the order you prefer. Click the arrow on the right of the item to reveal additional configuration options.</p>
-										<div className="row">
-									        <div className="col-md-6">
-									          
-									              
-								                        {this.state.storeMenu}
-									            
-									        </div>
-									    </div>
+									          <div className="row">
+												<div style={{ height: 400 }}>
+										            <SortableTree
+										              treeData={this.state.treeData}
+										              onChange={treeData => this.setState({ treeData })}
+										            />
+										        </div>
+											  </div>
 									    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}></div>
 										<h4>Menu Settings</h4>
 										<div className="row">
