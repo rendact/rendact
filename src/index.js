@@ -1,15 +1,18 @@
-import React from 'react';
+import React from 'react'
 import {render} from 'react-dom'
-import {ApolloProvider} from 'react-apollo';
+import {ApolloProvider} from 'react-apollo'
 import {BrowserRouter, Match, Miss, Redirect} from 'react-router'
 import {AuthService, MatchWhenAuthorized} from './auth'
-window.AuthService = AuthService;
-import client from './apollo';
-import {ThemeHome, ThemeSingle, ThemeBlog} from './includes/theme';
-import Admin from './admin';
-import Login from './login';
-import Register from './register';
-//import Query from './admin/query';
+window.AuthService = AuthService
+import client from './apollo'
+import {ThemeHome, ThemeSingle, ThemeBlog} from './includes/theme'
+import Admin from './admin'
+import Login from './login'
+import Register from './register'
+import reducer from './reducers'
+import { createStore } from 'redux'
+
+const store = createStore(reducer)
 
 const Main = React.createClass({
 	getInitialState: function(){
@@ -48,7 +51,7 @@ const Main = React.createClass({
 	*/
 	render: function(){
 		return (
-			<ApolloProvider client={client} ref="provider">
+			<ApolloProvider client={client} ref="provider" store={store}>
 				<BrowserRouter>
 					<div id="router" style={{height: "100vh"}}>
 						<MatchWhenAuthorized pattern="/admin/:page?/:action?/:postId?" 

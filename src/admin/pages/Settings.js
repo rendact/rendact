@@ -1,9 +1,11 @@
-import React from 'react';
-import _ from 'lodash';
-import Notification from 'react-notification-system';
-import Halogen from 'halogen';
-import Query from '../query';
-import {riques, errorCallback, getFormData, disableForm, defaultHalogenStyle} from '../../utils';
+import React from 'react'
+import _ from 'lodash'
+import Notification from 'react-notification-system'
+import Halogen from 'halogen'
+import Query from '../query'
+import {riques, errorCallback, getFormData, disableForm, defaultHalogenStyle} from '../../utils'
+import {connect} from 'react-redux'
+import {maskArea} from '../../actions'
 
 var Settings = React.createClass({
 	getInitialState: function(){
@@ -15,7 +17,7 @@ var Settings = React.createClass({
 	loadData: function(){
 		var qry = Query.loadSettingsQry;
 		var me = this;
-		this.maskArea(true);
+		this.props.dispatch(maskArea(true))
 		riques(qry, 
 			function(error, response, body){
 				if(!error && !body.errors) {
@@ -26,7 +28,7 @@ var Settings = React.createClass({
 							_el[0].id = item.node.id;
 						}
 					});
-					me.maskArea(false);
+					me.props.dispatch(maskArea(false))
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
@@ -35,10 +37,7 @@ var Settings = React.createClass({
 	},
 	disableForm: function(state){
     disableForm(state, this.notification);
-    this.maskArea(state);
-  },
-  maskArea: function(state){
-  	this.setState({isProcessing: state, opacity: state?0.4:1});
+    this.props.dispatch(maskArea(state))
   },
 	handleSubmitBtn: function(event){
 		event.preventDefault();
@@ -191,4 +190,5 @@ var Settings = React.createClass({
 	}
 });
 
+Settings = connect()(Settings)
 export default Settings;
