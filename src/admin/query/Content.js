@@ -75,7 +75,7 @@ const createContentMtn = function(data){
     }
   };
 
-  const createComment = function(author, email, comment){
+  const createComment = function(author, email, comment, post){
   return {
       "query": `
     mutation createComment($input: CreateCommentInput!) {
@@ -93,7 +93,8 @@ const createContentMtn = function(data){
         "input": {
           "name": author,
           "email": email,
-          "content": comment
+          "content": comment,
+          "postId": post
         }
       }
     }

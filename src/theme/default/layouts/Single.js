@@ -23,7 +23,7 @@ const Single = React.createClass({
 
 		var qry = "";
 
-	    qry = Query.createComment(author,email,comment);
+	    qry = Query.createComment(author,email,comment,this.props.postId);
 	    
 	  
 		riques(qry, 
@@ -42,7 +42,8 @@ const Single = React.createClass({
 					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
 			}
-		);	
+		);
+		debugger;	
 	}, 
 	render: function() {
 		return (
