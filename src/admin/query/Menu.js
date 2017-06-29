@@ -79,14 +79,15 @@ const deleteMenuQry = function(idList) {
   }
 };
 
-const updateMenu = function(postId, name){
+const updateMenu = function(postId, name, menuSortableTree){
   return {
       "query": `
     mutation UpdateMenu($input: UpdateMenuInput!) {
         updateMenu(input: $input) {
           changedMenu{
             id,
-            name
+            name,
+            items
         }
       }
     }
@@ -94,7 +95,8 @@ const updateMenu = function(postId, name){
       "variables": {
         "input": {
           "id": postId,
-          "name": name
+          "name": name,
+          "items": menuSortableTree,
         }
       }
     }

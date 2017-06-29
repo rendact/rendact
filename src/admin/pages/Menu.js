@@ -24,9 +24,24 @@ var Menu = React.createClass({
         allPostList: null,
         categoryList: null,
         coba: null,
+        items: [],
+        menuSortableTree:[],
       }
   },
-  handleMenu: function(event){
+  removeNodeMenu: function(rowInfo) {
+    let {node, treeIndex, path} = rowInfo;
+    var removeNodeMenuAtPath="";
+    removeNodeMenuAtPath({
+                   treeData: this.state.treeData,
+                   path: path,   // You can use path from here
+                   getNodeKey: ({node: TreeNode, treeIndex: number}) => {
+                       console.log(number);
+                       return number;
+                   },
+              ignoreCollapsed: false,
+           })
+  },
+  handleMenuName: function(event){
     this.setState({menu: document.querySelector('#menuSelect').value});
     var postId = event.target.value.split("-")[0];
 	var selectedMenuName = event.target.value.split("-")[1];
@@ -44,17 +59,16 @@ var Menu = React.createClass({
 	menuValues = _.map(menuFiltered, function(item){{return {title: item.value}}})
 
     this.setState ({treeData: menuValues });
-    debugger;
   },
   resetForm: function(){
     document.getElementById("menu").reset();
     document.getElementById("menuName").reset();
     this.setState({newMenuName:"", selectedMenuName:""});
     this.handleNameChange();
-    this.handleNewChange();
+    this.handleNewMenuChange();
     window.history.pushState("", "", '/admin/menu');
   },
-  handleNewChange: function(event){
+  handleNewMenuChange: function(event){
     var newMenuName = getValue("newMenuName");
     this.setState({newMenuName: newMenuName})
   },
@@ -92,15 +106,16 @@ var Menu = React.createClass({
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
   },
-  handleSubmitChange: function(event){
-    event.preventDefault();
+  handleUpdateMenu: function(event){
+  	event.preventDefault();
     var me = this;
     var name = getValue("selectedMenuName");
+    var menuSortableTree = this.state.treeData;
     var postId = this.state.postId;
     this.disableForm(true);
-    var qry = Query.updateMenu(postId, name);
+    var qry = Query.updateMenu(postId, name, menuSortableTree);
     var noticeTxt = "Menu Updated";
-
+debugger;
     riques(qry, 
       function(error, response, body) { 
         if (!error && !body.errors && response.statusCode === 200) {
@@ -208,21 +223,19 @@ var Menu = React.createClass({
 		        <Notification ref="notificationSystem" />     
 			    	<div className="row">
 				     	<div className="col-md-3">
-				     	  <form onSubmit={this.handleSubmit} id="menu" method="get">
-					     	  <div className="box box-default">
+					     	<div className="box box-default">
 								<div className="box-header with-border attachment-block clearfix">
 									<div className="form-group">
 										<h4>Create A New Menu :</h4>
 									</div>
 									<div>
-										<input type="text" name="newMenuName" id="newMenuName" className="form-control" onChange={this.handleNewChange}/>
+										<input type="text" name="newMenuName" id="newMenuName" className="form-control" onChange={this.handleNewMenuChange}/>
 									</div>
 									<div className="pull-right" style={{marginTop: 10}}>
 										<button type="submit" id="submit" disabled={this.state.newMenuName===""} className="btn btn-flat btn-success">Create Menu</button>
 									</div>
 								</div>
-							  </div>
-						  </form>
+							</div>
 							<div className="box box-default collapsed-box box-solid">
 								<div className="box-header with-border">
 									<h3 className="box-title">Pages</h3>
@@ -311,7 +324,7 @@ var Menu = React.createClass({
 				                    	</div>
 				                    	<div className="col-md-7">
 										  <div className="form-group">
-										    <select id="menuSelect" onClick={this.handleMenu} name="menuSelect" className="form-control btn select" >
+										    <select id="menuSelect" onClick={this.handleMenuName} name="menuSelect" className="form-control btn select" >
 											  {this.state.pageList}
 											</select>
 										  </div>
@@ -322,33 +335,33 @@ var Menu = React.createClass({
 					    		</div>
 					    	  </div>
 					      </div>
-					      <div className="box box-default">
-							<div className="box-header with-border attachment-block clearfix">
-								<form onSubmit={this.handleSubmitChange} id="menuName" method="get">
+					      <form onSubmit={this.handleUpdateMenu} id="menuName" method="get">
+					        <div className="box box-default">
+								<div className="box-header with-border attachment-block clearfix">
 								  <div className="form-group">
-									<div className="col-md-2">
-										<h4>Menu Name :</h4>
-									</div>
-									  <div className="col-md-6">
-										<input type="text" name="selectedMenuName" id="selectedMenuName" className="form-control" required="true" onChange={this.handleNameChange}/>
-									  </div>
-									<div className="col-md-4">
-										<div className="box-tools pull-right">
-										<button type="submit" id="submit" name="submit" className="btn btn-flat btn-primary" disabled={this.state.selectedMenuName===""}>Save Menu</button>
-										</div>
-									</div>
+								  	<div className="col-md-3">
+								  	  <h4>Menu Name :</h4>
+								  	</div>
+									<div className="col-md-9">
+									  <input type="text" name="selectedMenuName" id="selectedMenuName" className="form-control" required="true" onChange={this.handleNameChange}/>
+								  	</div>
 								  </div>
-								</form>
-							</div>
+								</div>
 								<div class="box-body">
-									<section className="content">
+								  	<section className="content">
 										<h4>Menu Structure</h4>
 										<p>Drag each item into the order you prefer. Click the arrow on the right of the item to reveal additional configuration options.</p>
 									          <div className="row">
 												<div style={{ height: 400 }}>
 										            <SortableTree
+										              id="treeData"
 										              treeData={this.state.treeData}
 										              onChange={treeData => this.setState({ treeData })}
+										              generateNodeProps={rowInfo => ({
+												        buttons: [
+												          <button onClick={(event) => this.removeNodeMenu(rowInfo)}>Delete</button>
+												        ],
+												      })}
 										            />
 										        </div>
 											  </div>
@@ -388,19 +401,20 @@ var Menu = React.createClass({
 										</div>
 									</section>
 								</div>
-							<div className="box-header with-border attachment-block clearfix">
-								<div className="form-group">
-									<div className="col-md-6">
-										<button className="btn btn-flat btn-danger" id="deleteBtn" onClick={this.handleDelete}>Delete Menu</button>
-									</div>
-									<div className="col-md-6">
-									  <div className="box-tools pull-right">
-										<button className="btn btn-flat btn-primary">Save Menu</button>
-									  </div>
+								<div className="box-header with-border attachment-block clearfix">
+									<div className="form-group">
+										<div className="col-md-6">
+											<button className="btn btn-flat btn-danger" id="deleteBtn" onClick={this.handleDelete}>Delete Menu</button>
+										</div>
+										<div className="col-md-6">
+											<div className="box-tools pull-right">
+											<button type="submit" id="submit" name="submit" className="btn btn-flat btn-primary" >Update Menu</button>
+											</div>
+										</div>
 									</div>
 								</div>
-							</div>
-						  </div>
+						    </div>
+						  </form>
 		                </div>
 		            </div>
           	  </div>
