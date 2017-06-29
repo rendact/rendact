@@ -12,7 +12,7 @@ import { default as swal } from 'sweetalert2';
 import ReactSelect from 'react-select';
 import 'react-select/dist/react-select.css';
 import {connect} from 'react-redux'
-import {maskArea, setSlug, togglePermalinkProcessState} from '../../actions'
+import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPostEditor} from '../../actions'
 
 let NewContentType = React.createClass({
   getInitialState: function(){
@@ -82,22 +82,22 @@ let NewContentType = React.createClass({
     this.setState({immediately: time});
   },
   handleChangeStatus: function(event){
-    me.props.dispatch(setPostStatus(document.querySelector('#statusSelect').value));
+    this.props.dispatch(setPostStatus(document.querySelector('#statusSelect').value));
   },
   saveDraft: function(event){
-    me.props.dispatch(setPostStatus("Draft"));
+    this.props.dispatch(setPostStatus("Draft"));
   },
   saveVisibility: function(event){
     this.setState({visibilityTxt: document.querySelector("input[name=visibilityRadio]:checked").value});
   },
   disableForm: function(isFormDisabled){
     disableForm(isFormDisabled, this.notification);
-    me.props.dispatch(maskArea(isFormDisabled));
+    this.props.dispatch(maskArea(isFormDisabled));
   },
   resetForm: function(){
     document.getElementById("postForm").reset();
     window.CKEDITOR.instances['content'].setData(null);
-    me.props.dispatch(resetPostEditor());
+    this.props.dispatch(resetPostEditor());
     this.handleTitleChange();
     window.history.pushState("", "", '/admin/'+this.props.slug+'/new');
   },
