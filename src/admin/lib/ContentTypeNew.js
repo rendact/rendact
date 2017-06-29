@@ -11,9 +11,10 @@ import Halogen from 'halogen';
 import { default as swal } from 'sweetalert2';
 import ReactSelect from 'react-select';
 import 'react-select/dist/react-select.css';
-//import { Creatable } from 'react-select';
+import {connect} from 'react-redux'
+import {maskArea, setSlug, togglePermalinkProcessState} from '../../actions'
 
-const NewContentType = React.createClass({
+let NewContentType = React.createClass({
   getInitialState: function(){
     
     return {
@@ -54,22 +55,22 @@ const NewContentType = React.createClass({
   },
   checkSlug: function(slug){
     var me = this;
-    this.setState({permalinkInProcess: true});
+    me.props.dispatch(togglePermalinkProcessState(true));
     riques( Query.checkSlugQry(slug),
       function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
           var slugCount = body.data.viewer.allPosts.edges.length;
           if (me.state.mode==="create") {
-            if (slugCount > 0) me.setState({permalinkEditing: false, slug: slug+"-"+slugCount});
-            else me.setState({permalinkEditing: false, slug: slug});
+            if (slugCount > 0) me.props.dispatch(setSlug(slug+"-"+slugCount, false));
+            else me.props.dispatch(setSlug(slug, false));
           } else {
-            if (slugCount > 1) me.setState({permalinkEditing: false, slug: slug+"-"+slugCount});
-            else me.setState({permalinkEditing: false, slug: slug});
+            if (slugCount > 1) me.props.dispatch(setSlug(slug+"-"+slugCount, false));
+            else me.props.dispatch(setSlug(slug, false));
           }
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null, "Check Slug");
         }
-        me.setState({permalinkInProcess: false});
+        me.props.dispatch(togglePermalinkProcessState(false));
       }
     );
   },
@@ -81,24 +82,22 @@ const NewContentType = React.createClass({
     this.setState({immediately: time});
   },
   handleChangeStatus: function(event){
-    this.setState({status: document.querySelector('#statusSelect').value});
+    me.props.dispatch(setPostStatus(document.querySelector('#statusSelect').value));
   },
   saveDraft: function(event){
-    this.setState({status: "Draft"});
+    me.props.dispatch(setPostStatus("Draft"));
   },
   saveVisibility: function(event){
     this.setState({visibilityTxt: document.querySelector("input[name=visibilityRadio]:checked").value});
   },
-  disableForm: function(state){
-    disableForm(state, this.notification);
-    this.setState({isProcessing: state, opacity: state?0.4:1});
+  disableForm: function(isFormDisabled){
+    disableForm(isFormDisabled, this.notification);
+    me.props.dispatch(maskArea(isFormDisabled));
   },
   resetForm: function(){
     document.getElementById("postForm").reset();
     window.CKEDITOR.instances['content'].setData(null);
-    this.setState({title:"", slug:"", content:"", summary:"", featuredImage: null, imageGallery:"",
-      status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
-      permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160});
+    me.props.dispatch(resetPostEditor());
     this.handleTitleChange();
     window.history.pushState("", "", '/admin/'+this.props.slug+'/new');
   },
@@ -1022,4 +1021,5 @@ const NewContentType = React.createClass({
 }
 });
 
+NewContentType = connect()(NewContentType);
 export default NewContentType;

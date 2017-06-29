@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux'
 import settings from './Settings'
 import contentType from './ContentType'
+import contentTypeNew from './ContentTypeNew'
 
 const main = (state = [], action) => {
   switch (action.type) {
@@ -20,7 +21,8 @@ const main = (state = [], action) => {
 const rendactApp = combineReducers({
 	main,
   settings,
-  contentType
+  contentType,
+  contentTypeNew
 })
 
 export default rendactApp

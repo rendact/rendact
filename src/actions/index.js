@@ -30,3 +30,23 @@ export const toggleSelectedItemState = (isSelected) => ({
   type: 'TOGGLE_SELECTED_ITEM',
   isSelected
 })
+
+export const setSlug = (slug, isEditorEnabled) => ({
+  type: 'UPDATE_SLUG',
+  slug,
+  isEditorEnabled
+})
+
+export const togglePermalinkProcessState = (state) => ({
+  type: 'TOGGLE_PERMALINK_PROCESS_STATE',
+  state
+})
+
+export const setPostStatus = (status) => ({
+  type: 'UPDATE_POST_STATUS',
+  status
+})
+
+export const resetPostEditor = () => ({
+  type: 'RESET_POST_EDITOR'
+})
