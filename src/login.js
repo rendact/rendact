@@ -1,9 +1,11 @@
-import React from 'react';
-import AdminLTEinit from './admin/lib/app.js';
-import 'bootstrap/dist/css/bootstrap.css';
-import '../public/css/Login.css';
+import React from 'react'
+import AdminLTEinit from './admin/lib/app.js'
+import 'bootstrap/dist/css/bootstrap.css'
+import '../public/css/Login.css'
+import {setLogged} from './actions'
+import {connect} from 'react-redux'
 
-const Login = React.createClass({
+let Login = React.createClass({
 	getInitialState: function(){
 		return {
 			errorMsg:null,
@@ -38,6 +40,8 @@ const Login = React.createClass({
 
 		function successFn(){
 			me.disableForm(false);
+			debugger;
+			//this.props.dispatch(setLogged(true, pathname))
 			me.props.onlogin(true, pathname);
 		}
 		function failedFn(msg){
@@ -111,4 +115,5 @@ const Login = React.createClass({
 	}
 })
 
+Login = connect()(Login);
 export default Login;

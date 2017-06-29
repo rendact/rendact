@@ -9,6 +9,7 @@ import AdminConfig from './admin/AdminConfig';
 import Query from './admin/query';
 import {riques, getConfig} from './utils';
 import _ from 'lodash';
+import {setLogged} from './actions'
 
 function AuthService(){
   var me = this;
@@ -200,7 +201,7 @@ function AuthService(){
 const MatchWhenAuthorized = ({ component: Component, logged: Logged, authService: AuthService, onlogin: OnLogin, ...rest }) => (
   <Match {...rest} render={props => (
     Logged ? (
-      <Component AuthService={AuthService} onlogin={OnLogin} logged={Logged} {...props}/>
+      <Component AuthService={AuthService} onlogin={setLogged} logged={Logged} {...props}/>
     ) : (
       <Redirect to={{
         pathname: '/login',

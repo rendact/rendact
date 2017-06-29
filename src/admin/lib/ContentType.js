@@ -1,18 +1,19 @@
-import React from 'react';
-import Query from '../query';
-import Fn from './functions';
-import _ from 'lodash';
-import Notification from 'react-notification-system';
-import Halogen from 'halogen';
-import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle, swalert, getValue} from '../../utils';
-import {Table, SearchBoxPost, DeleteButtons} from './Table';
+import React from 'react'
+import Query from '../query'
+import Fn from './functions'
+import _ from 'lodash'
+import Notification from 'react-notification-system'
+import Halogen from 'halogen'
+import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle, swalert, getValue} from '../../utils'
+import {Table, SearchBoxPost, DeleteButtons} from './Table'
+import {connect} from 'react-redux'
+import {setStatusCounter, initContentList, maskArea, toggleDeleteMode, toggleSelectedItemState} from '../../actions'
 
-const ContentType = React.createClass({
+let ContentType = React.createClass({
   getInitialState: function(){
       require ('../pages/Posts.css');
       
       return {
-        dt: null,
         errorMsg: null,
         loadingMsg: null,
         monthList: [],
@@ -29,6 +30,7 @@ const ContentType = React.createClass({
         replaceStatusWithRole: this.props.replaceStatusWithRole?true:false
       }
   },
+  dt: null,
   loadData: function(status, callback) {
     var me = this;
     var metaItemList = _.map(this.props.customFields, function(item) { return item.id });
@@ -60,7 +62,7 @@ const ContentType = React.createClass({
         } else {
           _statusCount["All"] = _postArr.length-_statusCount["Trash"];
         }
-        me.setState({statusCount: _statusCount});
+        me.props.dispatch(setStatusCounter(_statusCount))
       }
     );
 
@@ -158,7 +160,7 @@ const ContentType = React.createClass({
 
           var bEdit = hasRole(me.props.modifyRole);
           me.table.loadData(_dataArr, bEdit);
-          me.setState({monthList: monthList, allPostId: _allPostId});
+          me.props.dispatch(initContentList(monthList, _allPostId))
 
           if (callback) callback.call();
         } else {
@@ -167,18 +169,16 @@ const ContentType = React.createClass({
       }
     );
   },
-  disableForm: function(state){
+  disableForm: function(isDisabled){
     var me = this;
-    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = state;})
+    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = isDisabled;})
     _.forEach(document.getElementsByTagName('button'), function(el){ 
       if (_.indexOf(me.state.dynamicStateBtnList, el.id) < 0)
-        el.disabled = state;
+        el.disabled = isDisabled;
     })
-    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = state;})
-    this.setState({isProcessing: state, opacity: state?0.4:1});
-    if (!state) {
-      this.checkDynamicButtonState();
-    }
+    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = isDisabled;})
+    this.props.dispatch(maskArea(isDisabled))
+    if (!isDisabled) { this.checkDynamicButtonState();}
   },
   isWidgetActive: function(name){
     return _.indexOf(this.props.widgets, name) > -1;
@@ -270,17 +270,16 @@ const ContentType = React.createClass({
     event.preventDefault();
     this.disableForm(true);
     var status = event.target.text;
-    this.setState({activeStatus: status});
     if (status==='Trash'){
       var me = this;
       this.loadData("Trash", function(){
-        me.setState({deleteMode: true});
+        me.props.dispatch(toggleDeleteMode(status, true));
         me.disableForm(false);
       });
     }else{
       var re = this;
       this.loadData(status, function(){
-        re.setState({deleteMode: false});
+        re.props.dispatch(toggleDeleteMode(status, false));
         re.disableForm(false);
       })
     } ;
@@ -291,7 +290,7 @@ const ContentType = React.createClass({
     if (status==='Trash'){
       var me = this;
       this.loadData("Trash", function(){
-        me.setState({deleteMode: true});
+        me.props.dispatch(toggleDeleteMode(status, true));
         me.disableForm(false);
       });
     }else{
@@ -299,8 +298,8 @@ const ContentType = React.createClass({
       var searchValue = { 6: date };
       var te = this;
       this.loadData(status, function(){
-        te.setState({deleteMode: false});
-        te.state.dt.columns([6]).every( function () {
+        te.props.dispatch(toggleDeleteMode(status, false));
+        te.dt.columns([6]).every( function () {
           this.search( searchValue[this.index()] ).draw();
           return null;
         })
@@ -342,7 +341,7 @@ const ContentType = React.createClass({
   },
   checkDynamicButtonState: function(){
     var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
-    this.setState({itemSelected: checkedRow.length>0})
+    this.props.dispatch(toggleSelectedItemState(checkedRow.length>0));
   },
   handleViewPost: function(postId){
     this.props.handleNav(this.props.slug,'edit', postId);
@@ -375,7 +374,7 @@ const ContentType = React.createClass({
     this.table = this.refs.rendactTable;
     var datatable = this.table.datatable;
     this.refs.rendactSearchBoxPost.bindToTable(datatable);
-    this.setState({dt: datatable});
+    this.dt=datatable;
     this.loadData("All");
   },
   render: function(){
@@ -469,4 +468,5 @@ const ContentType = React.createClass({
     )},
 });
 
+ContentType = connect()(ContentType)
 export default ContentType;
