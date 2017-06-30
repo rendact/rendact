@@ -1,8 +1,28 @@
 import { combineReducers } from 'redux'
-import settings from './settings'
+import settings from './Settings'
+import contentType from './ContentType'
+import contentTypeNew from './ContentTypeNew'
+
+const main = (state = [], action) => {
+  switch (action.type) {
+    case 'LOGGED':
+      return [
+        ...state,
+        {
+          logged: action.isLogged, pathname: action.pathname?action.pathname:null
+        }
+      ]
+    default:
+      return state
+  }
+}
+
 
 const rendactApp = combineReducers({
-  settings
+	main,
+  settings,
+  contentType,
+  contentTypeNew
 })
 
 export default rendactApp
