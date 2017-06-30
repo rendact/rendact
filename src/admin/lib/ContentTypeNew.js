@@ -12,7 +12,11 @@ import { default as swal } from 'sweetalert2';
 import ReactSelect from 'react-select';
 import 'react-select/dist/react-select.css';
 import {connect} from 'react-redux'
-import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPostEditor} from '../../actions'
+import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPostEditor,
+        setCategoryList, setTagList, setImageGalleryList, setConnectionValue, setContentFormValues,
+        toggleSaveImmediatelyMode, togglePermalinkEditingState, setVisibilityMode,
+        setPostTitle, setPostContent, setPostSummary, updateTitleTagLeftCharacter,
+        updateMetaDescriptionLeftCharacter, setPostPublishDate} from '../../actions'
 
 let NewContentType = React.createClass({
   getInitialState: function(){
@@ -75,11 +79,10 @@ let NewContentType = React.createClass({
     );
   },
   saveImmediately: function(event){
-    this.setState({immediatelyStatus: false});
     var hours = getValue("hours");
     var minute = getValue("minute");
     var time = this.state.publishDate + hours + minute;
-    this.setState({immediately: time});
+    this.props.dispatch(toggleSaveImmediatelyMode(false, time));
   },
   handleChangeStatus: function(event){
     this.props.dispatch(setPostStatus(document.querySelector('#statusSelect').value));
@@ -88,7 +91,7 @@ let NewContentType = React.createClass({
     this.props.dispatch(setPostStatus("Draft"));
   },
   saveVisibility: function(event){
-    this.setState({visibilityTxt: document.querySelector("input[name=visibilityRadio]:checked").value});
+    this.props.dispatch(setVisibilityMode(document.querySelector("input[name=visibilityRadio]:checked").value));
   },
   disableForm: function(isFormDisabled){
     disableForm(isFormDisabled, this.notification);
@@ -153,7 +156,7 @@ let NewContentType = React.createClass({
           }
         }
       });
-      this.setState({postCategoryList: _postCategoryList});
+      this.props.dispatch(setCategoryList(_postCategoryList));
     }
     var _postTagList = [];
     if (v.tag && v.tag.edges.length>0) {
@@ -162,7 +165,7 @@ let NewContentType = React.createClass({
           _postTagList.push({id: i.node.tag.id, value: i.node.tag.name, name: i.node.tag.name, label: i.node.tag.name, connectionId: i.node.id});
         }
       });
-      this.setState({postTagList: _postTagList, postTagListInit: _postTagList});
+      this.props.dispatch(setTagList(_postTagList, _postTagList));
     }
 
     var _imageGalleryList = [];
@@ -173,7 +176,7 @@ let NewContentType = React.createClass({
           _imageGalleryList.push({id: i.node.id, value: i.node.value});
         }
       });
-      this.setState({imageGallery: _imageGalleryList});
+      this.props.dispatch(setImageGalleryList(_imageGalleryList));
     }
 
     var pubDate = v.publishDate? new Date(v.publishDate) : new Date();
@@ -186,24 +189,23 @@ let NewContentType = React.createClass({
     setValue("minutes", pubDate.getMinutes());
     document.getElementsByName("visibilityRadio")[v.visibility==="Public"?0:1].checked = true;
 
+    var _connectionValue = this.state.connectionValue;
     _.forEach(meta, function(item){
       setValue(item.item, item.value);
       var el = document.getElementsByName(item.item);
       if (el && el.length>0) {
         el[0].id = item.id
       }
-      
       var isConnItem = item.item.split("~");
       if (isConnItem.length > 1) {
-        var _connectionValue = me.state.connectionValue;
         _connectionValue[isConnItem[1]] = item.value; 
-        me.setState({connectionValue: _connectionValue})
       }
-    })
+    });
+    this.props.dispatch(setConnectionValue(_connectionValue));
 
-    this.setState({title: v.title, content: v.content, summary: v.summary, 
-      status: v.status, visibilityTxt: v.visibility, 
-      publishDate: pubDate, publishDateReset: pubDate, slug: v.slug, featuredImage: v.featuredImage});
+    v.publishDate = pubDate;
+    v.publishDateReset = pubDate;
+    this.props.dispatch(setContentFormValues(v));
     this.handleTitleChange();
     this.handleTitleTagChange();
     this.handleMetaDescriptionChange();
@@ -222,7 +224,7 @@ let NewContentType = React.createClass({
   handlePermalinkBtn: function(event) {
     var slug = this.state.slug;
     setValue("slugcontent", slug);
-    this.setState({permalinkEditing: true});
+    this.props.dispatch(togglePermalinkEditingState(true));
   },
   handleTitleBlur: function(event) {
     var title = getValue("titlePost");
@@ -235,31 +237,31 @@ let NewContentType = React.createClass({
   },
   handleTitleChange: function(event){
     var title = getValue("titlePost");
-    this.setState({title: title});
+    this.props.dispatch(setPostTitle(title));
     this.notifyUnsavedData(true);
   },
   handleContentChange: function(event){
     var content = window.CKEDITOR.instances['content'].getData();
-    this.setState({content: content})
+    this.props.dispatch(setPostContent(content));
     this.notifyUnsavedData(true);
   },
   handleSummaryChange: function(event){
     var summary = getValue("summary");
-    this.setState({summary: summary});
+    this.props.dispatch(setPostSummary(summary));
     this.notifyUnsavedData(true);
   },
   handleTitleTagChange: function(event){
     var titleTag = getValue("titleTag");
-    this.setState({titleTagLeftCharacter: 65-(titleTag.length)});
+    this.props.dispatch(updateTitleTagLeftCharacter(65-(titleTag.length)));
     this.notifyUnsavedData(true);
   },
   handleMetaDescriptionChange: function(event){
     var metaDescription = getValue("metaDescription");
-    this.setState({metaDescriptionLeftCharacter: 160-(metaDescription.length)});
+    this.props.dispatch(updateMetaDescriptionLeftCharacter(160-(metaDescription.length)));
     this.notifyUnsavedData(true);
   },
   handleDateChange: function(date){
-    this.setState({immediatelyStatus: false, publishDate: new Date(date)});
+    this.props.dispatch(setPostPublishDate(new Date(date), false));
     this.notifyUnsavedData(true);
   },
   handleTimeChange: function(event){
@@ -268,12 +270,12 @@ let NewContentType = React.createClass({
     var d = this.state.publishDate;
     d.setHours(parseInt(hours, 10));
     d.setMinutes(parseInt(minutes, 10));
-    this.setState({publishDate: d});
+    this.props.dispatch(setPostPublishDate(d, false));
     this.notifyUnsavedData(true);
   },
   handlePublishDateCancel: function(event){
     var resetDate = this.state.publishDateReset;
-    this.setState({publishDate: resetDate});
+    this.props.dispatch(setPostPublishDate(resetDate, false));
   },
   handleAddNewBtn: function(event) {
     this.resetForm();
