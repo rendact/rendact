@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import settings from './Settings'
+import settings from './settings'
 import contentType from './ContentType'
 import contentTypeNew from './ContentTypeNew'
 
