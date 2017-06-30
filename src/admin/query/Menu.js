@@ -27,13 +27,20 @@ const getAllMenu = {
         edges {
           node {
             id,
-            name
+            name,
+            items
           }
         }
       }
     }
   }`
 }
+
+const getMenuQry = function(menuId) {
+  return{"query": 
+    `{getMenu(id: "`+menuId+`"){items}}`
+    }
+};
 
 const getAllCategory = {
   "query": `query getCategories{
@@ -79,7 +86,7 @@ const deleteMenuQry = function(idList) {
   }
 };
 
-const updateMenu = function(postId, name, menuSortableTree){
+const updateMenu = function(menuId, name, menuSortableTree){
   return {
       "query": `
     mutation UpdateMenu($input: UpdateMenuInput!) {
@@ -94,7 +101,7 @@ const updateMenu = function(postId, name, menuSortableTree){
     `,
       "variables": {
         "input": {
-          "id": postId,
+          "id": menuId,
           "name": name,
           "items": menuSortableTree,
         }
@@ -110,6 +117,7 @@ const queries = {
   getAllPage: getAllPage,
   getAllPost: getAllPost,
   getAllCategory: getAllCategory,
+  getMenuQry: getMenuQry
 }
 
 module.exports = queries;
