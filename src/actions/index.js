@@ -122,3 +122,38 @@ export const setPostPublishDate = (date, immediatelyState) => ({
   date,
   immediatelyState
 })
+
+export const setFeaturedImage = (featuredImage) => ({
+  type: 'SET_FEATURED_IMAGE',
+  featuredImage
+})
+
+export const setEditorMode = (mode) => ({
+  type: 'SET_EDITOR_MODE',
+  mode
+})
+
+export const toggleImageGalleyBinded = (state) => ({
+  type: 'TOGGLE_IMAGE_GALLERY_BINDED',
+  state
+})
+
+export const setPageList = (pageList) => ({
+  type: 'SET_PAGE_LIST',
+  pageList
+})
+
+export const setAllCategoryList = (catList) => ({
+  type: 'SET_ALL_CATEGORY_LIST',
+  catList
+})
+
+export const setTagMap = (tagMap) => ({
+  type: 'SET_TAG_MAP',
+  tagMap
+})
+
+export const setOptions = (options) => ({
+  type: 'SET_OPTIONS',
+  options
+})

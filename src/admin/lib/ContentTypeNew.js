@@ -16,7 +16,9 @@ import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPost
         setCategoryList, setTagList, setImageGalleryList, setConnectionValue, setContentFormValues,
         toggleSaveImmediatelyMode, togglePermalinkEditingState, setVisibilityMode,
         setPostTitle, setPostContent, setPostSummary, updateTitleTagLeftCharacter,
-        updateMetaDescriptionLeftCharacter, setPostPublishDate} from '../../actions'
+        updateMetaDescriptionLeftCharacter, setPostPublishDate, setFeaturedImage,
+        setEditorMode, toggleImageGalleyBinded, setPageList, setAllCategoryList,
+        setOptions, setTagMap} from '../../actions'
 
 let NewContentType = React.createClass({
   getInitialState: function(){
@@ -34,7 +36,7 @@ let NewContentType = React.createClass({
       permalinkEditing: false,
       mode: this.props.postId?"update":"create",
       pageList: null,
-      categoryList: null,
+      allCategoryList: null,
       postCategoryList: [],
       postTagListInit: [],
       postTagList: [],
@@ -393,7 +395,7 @@ let NewContentType = React.createClass({
 
           // do these when post data succesfully saved
           here._successNotif(noticeTxt);
-          here.setState({mode: "update"});
+          here.props.dispatch(setEditorMode("update"));
           here.disableForm(false);
           here.notifyUnsavedData(false);
           here.bindPostToImageGallery(postId);
@@ -425,26 +427,26 @@ let NewContentType = React.createClass({
     var me = this;
     var reader = new FileReader();
     reader.onload = function(){
-      me.setState({featuredImage: reader.result})
+      me.props.dispatch(setFeaturedImage(reader.result));
     };
     reader.readAsDataURL(e.target.files[0]);
   },
   handleFeaturedImageRemove: function(e){
-    this.setState({featuredImage: null})
+    this.props.dispatch(setFeaturedImage(null));
   },
   imageGalleryChange: function(e){
     var me = this;
     this.disableForm(true);
     var reader = new FileReader();
     reader.onload = function(){
-      if (!me.props.postId) me.setState({imageGalleryUnbinded: true});
+      if (!me.props.postId) me.props.dispatch(toggleImageGalleyBinded(true));
       riques(Query.addImageGallery(reader.result, me.props.postId), 
         function(error, response, body){
           if (!error && !body.errors && response.statusCode === 200) {
             var data = body.data.createFile.changedFile;
             var imageGallery = me.state.imageGallery;
             imageGallery.push({id: data.id, value:data.value});
-            me.setState({imageGallery: imageGallery});
+            me.props.dispatch(setImageGalleryList(imageGallery));
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null, "Image Gallery");
           }
@@ -475,7 +477,7 @@ let NewContentType = React.createClass({
       riques(qry, 
         function(error, response, body){
           if (!error && !body.errors && response.statusCode === 200) {
-            me.setState({imageGalleryUnbinded: false})
+            me.props.dispatch(toggleImageGalleyBinded(false));
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null, "Bind To Image Galley");
           }
@@ -496,7 +498,7 @@ let NewContentType = React.createClass({
         if (!error && !body.errors && response.statusCode === 200) {
           var imageGallery = me.state.imageGallery;
           _.pull(imageGallery, _.nth(imageGallery, index));
-          me.setState({imageGallery: imageGallery});
+          me.props.dispatch(setImageGalleryList(imageGallery));
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
@@ -527,7 +529,7 @@ let NewContentType = React.createClass({
     var handleSelectConnectionChange = function(newValue) {
       var _connectionValue = me.state.connectionValue;
       _connectionValue[contentId] = newValue
-      me.setState({connectionValue: _connectionValue})
+      me.props.dispatch(setConnectionValue(_connectionValue));
     }
 
     return (
@@ -541,7 +543,7 @@ let NewContentType = React.createClass({
     )
   },
   handleTagChange: function(value) {
-    this.setState({postTagList: value});
+    this.props.dispatch(setTagList(this.state.postTagListInit, value));
   },
   componentWillMount: function(){
     var me = this;
@@ -555,7 +557,7 @@ let NewContentType = React.createClass({
               pageList.push((<option key={item.node.id} value={item.node.id} checked={me.state.parent=item.node.id}>
                 {item.node.title}</option>));
             })
-            me.setState({pageList: pageList});
+            me.props.dispatch(setPageList(pageList));
           }
       });
     }
@@ -569,7 +571,7 @@ let NewContentType = React.createClass({
               categoryList.push((<div key={item.node.id}><input id={item.node.id}
               name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
             })
-            me.setState({categoryList: categoryList});
+            me.props.dispatch(setAllCategoryList(categoryList))
           }
         }
       );
@@ -583,14 +585,11 @@ let NewContentType = React.createClass({
             var options = [];
             
             _.forEach(body.data.viewer.allTags.edges, function(item){
-              
                 _tagMap[item.node.name] = {id: item.node.id, name: item.node.name}
-              
                 options.push({id: item.node.id, value: item.node.name, label: item.node.name});
-                me.setState({options: options});
             })
-            me.setState({tagMap: _tagMap});
-            
+            me.props.dispatch(setOptions(options));
+            me.props.dispatch(setTagMap(_tagMap));
           }
         }
       );
@@ -903,7 +902,7 @@ let NewContentType = React.createClass({
                     <div className="box-body pad">
                       <div>
                       <div className="form-group">
-                          {this.state.categoryList}
+                          {this.state.allCategoryList}
                       </div>
                       </div>                  
                     </div>

@@ -133,6 +133,55 @@ const contentTypeNew = (state = [], action) => {
           publishDate: action.date
         }
       ]
+    case 'SET_FEATURED_IMAGE':
+      return [
+        ...state,
+        {
+          featuredImage: action.featuredImage
+        }
+      ]
+    case 'SET_EDITOR_MODE':
+      return [
+        ...state,
+        {
+          mode: action.mode
+        }
+      ]
+    case 'TOGGLE_IMAGE_GALLERY_BINDED':
+      return [
+        ...state,
+        {
+          imageGalleryUnbinded: action.state,
+        }
+      ]
+    case 'SET_PAGE_LIST':
+      return [
+        ...state,
+        {
+          pageList: action.pageList
+        }
+      ]
+    case 'SET_ALL_CATEGORY_LIST':
+      return [
+        ...state,
+        {
+          allCategoryList: action.catList
+        }
+      ]
+    case 'SET_TAG_MAP':
+      return [
+        ...state,
+        {
+          tagMap: action.tagMap
+        }
+      ]
+    case 'SET_OPTIONS':
+      return [
+        ...state,
+        {
+          options: action.options
+        }
+      ]
     default:
       return state
   }
