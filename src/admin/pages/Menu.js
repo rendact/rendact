@@ -44,32 +44,34 @@ var Menu = React.createClass({
   handleMenuName: function(event){
     this.setState({menu: document.querySelector('#menuSelect').value});
     var menuId = event.target.value.split("-")[0];
-	var selectedMenuName = event.target.value.split("-")[1];
-	setValue("selectedMenuName", selectedMenuName); 
-	this.setState({menuId:menuId});
-	var me = this;
-	  riques(Query.getMenuQry(menuId), 
-        function(error, response, body) {
-          if (!error) {
-          	var items = [];
-            items = body.data.getMenu.items;
-            debugger;
-			me.setState({treeData: items});
-          }
+  	var selectedMenuName = event.target.value.split("-")[1];
+  	setValue("selectedMenuName", selectedMenuName); 
+  	this.setState({menuId:menuId});
+  	var me = this;
+    var qry = Query.getMenuQry(menuId);
+	  riques(qry, 
+      function(error, response, body) {
+        if (!error) {
+        	var items = [];
+          items = body.data.getMenu.items;
+		      me.setState({treeData: items});
         }
-      );
+      }
+    );
   },
   disableForm: function(state){
     disableForm(state, this.notif)
   },
   addToMenu: function(event){
+    var _treeData = this.state.treeData;
     var menuFiltered = _.filter(document.getElementsByName("itemsChecked[]"), function(item){
-      		return item.checked
-    	});
-	var menuValues = [];
-	menuValues = _.map(menuFiltered, function(item){{return {title: item.value}}})
-
-    this.setState ({treeData: menuValues });
+    	return item.checked
+    });
+	  var menuValues = [];
+	  menuValues = _.map(menuFiltered, function(item){{return {title: item.value}}});
+    if (menuValues.length>0) {
+      this.setState ({treeData: _.concat(_treeData, menuValues) });
+    }
   },
   resetForm: function(){
     document.getElementById("menu").reset();
@@ -334,7 +336,7 @@ var Menu = React.createClass({
 				                    	</div>
 				                    	<div className="col-md-7">
 										  <div className="form-group">
-										    <select id="menuSelect" onClick={this.handleMenuName} name="menuSelect" className="form-control btn select" >
+										    <select id="menuSelect" onChange={this.handleMenuName} name="menuSelect" className="form-control btn select" >
 											  {this.state.pageList}
 											</select>
 										  </div>
