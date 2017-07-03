@@ -38,7 +38,7 @@ const getAllMenu = {
 
 const getMenuQry = function(menuId) {
   return{"query": 
-    `{getMenu(id: "`+menuId+`"){items}}`
+    `{getMenu(id: "`+menuId+`"){items, id, name}}`
     }
 };
 
