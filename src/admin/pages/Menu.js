@@ -68,10 +68,13 @@ var Menu = React.createClass({
     	return item.checked
     });
 	  var menuValues = [];
-	  menuValues = _.map(menuFiltered, function(item){{return {title: item.value}}});
-    if (menuValues.length>0) {
-      this.setState ({treeData: _.concat(_treeData, menuValues) });
+	  menuValues = _.map(menuFiltered, function(item){{return {title: item.value}}})
+    if (_treeData===null) {
+      this.setState ({treeData: menuValues });
     }
+    else if (menuValues.length>0) {
+      this.setState ({treeData: _.concat(_treeData, menuValues) });
+    } 
   },
   resetForm: function(){
     document.getElementById("menu").reset();
