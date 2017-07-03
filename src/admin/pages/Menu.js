@@ -44,17 +44,17 @@ var Menu = React.createClass({
   handleMenuName: function(event){
     this.setState({menu: document.querySelector('#menuSelect').value});
     var menuId = event.target.value.split("-")[0];
-    var selectedMenuName = event.target.value.split("-")[1];
-    setValue("selectedMenuName", selectedMenuName); 
-    this.setState({menuId:menuId});
-    var me = this;
+  	var selectedMenuName = event.target.value.split("-")[1];
+  	setValue("selectedMenuName", selectedMenuName); 
+  	this.setState({menuId:menuId});
+  	var me = this;
     var qry = Query.getMenuQry(menuId);
-    riques(qry, 
+	  riques(qry, 
       function(error, response, body) {
         if (!error) {
-          var items = [];
+        	var items = [];
           items = body.data.getMenu.items;
-          me.setState({treeData: items});
+		      me.setState({treeData: items});
         }
       }
     );
@@ -65,10 +65,10 @@ var Menu = React.createClass({
   addToMenu: function(event){
     var _treeData = this.state.treeData;
     var menuFiltered = _.filter(document.getElementsByName("itemsChecked[]"), function(item){
-      return item.checked
+    	return item.checked
     });
-    var menuValues = [];
-    menuValues = _.map(menuFiltered, function(item){{return {title: item.value}}});
+	  var menuValues = [];
+	  menuValues = _.map(menuFiltered, function(item){{return {title: item.value}}});
     if (menuValues.length>0) {
       this.setState ({treeData: _.concat(_treeData, menuValues) });
     }
@@ -217,222 +217,222 @@ var Menu = React.createClass({
       );
     })
   },
-  
-  render: function(){
-    return (
-      <div className="content-wrapper">
-            <div className="container-fluid">
-        <section className="content-header">
-            <h1>
-                Menus
-                </h1>
-                <ol className="breadcrumb">
-                <li><a href="#"><i className="fa fa-dashboard"></i>Home</a></li>
-                <li className="active">Menus</li>
-                </ol>
-                <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
-          </section>
-            <Notification ref="notificationSystem" />     
-            <div className="row">
-              <div className="col-md-3">
-                <div className="box box-default">
-                <div className="box-header with-border attachment-block clearfix">
-                  <div className="form-group">
-                    <h4>Create A New Menu :</h4>
-                  </div>
-                  <div>
-                    <input type="text" name="newMenuName" id="newMenuName" className="form-control" onChange={this.handleNewMenuChange}/>
-                  </div>
-                  <div className="pull-right" style={{marginTop: 10}}>
-                    <button type="submit" id="submit" disabled={this.state.newMenuName===""} className="btn btn-flat btn-success">Create Menu</button>
-                  </div>
-                </div>
-              </div>
-              <div className="box box-default collapsed-box box-solid">
-                <div className="box-header with-border">
-                  <h3 className="box-title">Pages</h3>
-                  <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
-                      </button>
-                  </div>
-                </div>
-                <div className="box-body pad">
-                  <div id="IDpageList">
-                      {this.state.allPageList}
-                    </div>
-                    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
-                    <div className="box-tools pull-right">
-                      <button className="btn btn-flat btn-default" type="button" onClick={this.addToMenu} 
-                                    style={{marginRight: 10}} data-target="#IDpageList">Add to Menu</button>
-                    </div>
-                </div>
-              </div>
-              <div className="box box-default collapsed-box box-solid">
-                <div className="box-header with-border">
-                  <h3 className="box-title">Posts</h3>
-                  <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
-                      </button>
-                  </div>
-                </div>
-                <div className="box-body pad">
-                  <div id="IDpostList">
-                      {this.state.allPostList}
-                    </div>
-                    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
-                    <div className="box-tools pull-right">
-                      <button className="btn btn-flat btn-default" type="button" onClick={this.addToMenu} 
-                                    style={{marginRight: 10}} data-target="#IDpostList">Add to Menu</button>
-                    </div>
-                </div>
-              </div>
-              <div className="box box-default collapsed-box box-solid">
-                <div className="box-header with-border">
-                  <h3 className="box-title">Custom Links</h3>
-                  <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
-                      </button>
-                  </div>
-                </div>
-                <div className="box-body pad">
-                  <div>
-                      .................
-                    </div>
-                    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
-                    <div className="box-tools pull-right">
-                      <button className="btn btn-flat btn-default">Add to Menu</button>
-                    </div>
-                </div>
-              </div>
-              <div className="box box-default collapsed-box box-solid">
-                <div className="box-header with-border">
-                  <h3 className="box-title">Categories</h3>
-                  <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
-                      </button>
-                  </div>
-                </div>
-                <div className="box-body pad">
-                  <div id="IDcategorytList">
-                      {this.state.categoryList}
-                    </div>
-                    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
-                    <div className="box-tools pull-right">
-                      <button className="btn btn-flat btn-default" type="button" onClick={this.addToMenu} 
-                                    style={{marginRight: 10}} data-target="#IDcategorytList">Add to Menu</button>
-                    </div>
-                </div>
-              </div>
-            </div>
-                    <div className="col-md-9">
-                      <div className="box box-default">
-                      <div className="box-header with-border attachment-block clearfix">
-                        <div className="container-fluid">
-                          <div className="row">
-                            <div className="col-xs-12">
-                              <div className="row">
-                              <div className="col-xs-3">
-                                <h5><b>Select a menu to edit :</b></h5>
-                              </div>
-                              <div className="col-md-7">
-                      <div className="form-group">
-                        <select id="menuSelect" onChange={this.handleMenuName} name="menuSelect" className="form-control btn select" >
-                        {this.state.pageList}
-                      </select>
-                      </div>
-                    </div>
-                              </div>
-                            </div>
-                          </div>
-                  </div>
-                  </div>
-                </div>
-                <form onSubmit={this.handleUpdateMenu} id="menuName" method="get">
-                  <div className="box box-default">
-                <div className="box-header with-border attachment-block clearfix">
-                  <div className="form-group">
-                    <div className="col-md-3">
-                      <h4>Menu Name :</h4>
-                    </div>
-                  <div className="col-md-9">
-                    <input type="text" name="selectedMenuName" id="selectedMenuName" className="form-control" required="true" onChange={this.handleNameChange}/>
-                    </div>
-                  </div>
-                </div>
-                <div class="box-body">
-                    <section className="content">
-                    <h4>Menu Structure</h4>
-                    <p>Drag each item into the order you prefer. Click the arrow on the right of the item to reveal additional configuration options.</p>
-                            <div className="row">
-                        <div style={{ height: 400 }}>
-                                <SortableTree
-                                  id="treeData"
-                                  treeData={this.state.treeData}
-                                  onChange={treeData => this.setState({ treeData })}
-                                  generateNodeProps={rowInfo => ({
-                                buttons: [
-                                  <button onClick={(event) => this.removeNodeMenu(rowInfo)}>Delete</button>
-                                ],
-                              })}
-                                />
-                            </div>
-                        </div>
-                      <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}></div>
-                    <h4>Menu Settings</h4>
-                    <div className="row">
-                      <div className="col-md-3">
-                        <i>Auto add pages</i>
-                      </div>
-                      <div className="col-md-9">
-                        <div className="checkbox">
-                                    <label>
-                                      <input type="checkbox"/>
-                                      Automatically add new top-level pages to this menu
-                                    </label>
-                                </div>
-                      </div>
-                    </div>
-                    <div className="row">
-                      <div className="col-md-3">
-                        <i>Display location</i>
-                      </div>
-                      <div className="col-md-9">
-                        <div className="checkbox">
-                                    <label>
-                                      <input type="checkbox"/>
-                                      Top Menu
-                                    </label>
-                                </div>
-                                <div className="checkbox">
-                                    <label>
-                                      <input type="checkbox"/>
-                                      Social Links Menu
-                                    </label>
-                                </div>
-                      </div>
-                    </div>
-                  </section>
-                </div>
-                <div className="box-header with-border attachment-block clearfix">
-                  <div className="form-group">
-                    <div className="col-md-6">
-                      <button className="btn btn-flat btn-danger" id="deleteBtn" onClick={this.handleDelete}>Delete Menu</button>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="box-tools pull-right">
-                      <button type="submit" id="submit" name="submit" className="btn btn-flat btn-primary" >Update Menu</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                </div>
-              </form>
-                    </div>
-                </div>
-              </div>
-        </div>
-    )
-  }
+ 
+	render: function(){
+		return (
+			<div className="content-wrapper">
+        	  <div className="container-fluid">
+				<section className="content-header">
+			      <h1>
+            		Menus
+          		  </h1>
+          		  <ol className="breadcrumb">
+            		<li><a href="#"><i className="fa fa-dashboard"></i>Home</a></li>
+            		<li className="active">Menus</li>
+          		  </ol>
+          		  <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+			    </section>
+		        <Notification ref="notificationSystem" />     
+			    	<div className="row">
+				     	<div className="col-md-3">
+					     	<div className="box box-default">
+								<div className="box-header with-border attachment-block clearfix">
+									<div className="form-group">
+										<h4>Create A New Menu :</h4>
+									</div>
+									<div>
+										<input type="text" name="newMenuName" id="newMenuName" className="form-control" onChange={this.handleNewMenuChange}/>
+									</div>
+									<div className="pull-right" style={{marginTop: 10}}>
+										<button type="submit" id="submit" disabled={this.state.newMenuName===""} className="btn btn-flat btn-success">Create Menu</button>
+									</div>
+								</div>
+							</div>
+							<div className="box box-default collapsed-box box-solid">
+								<div className="box-header with-border">
+									<h3 className="box-title">Pages</h3>
+									<div className="box-tools pull-right">
+									    <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+									    </button>
+									</div>
+								</div>
+								<div className="box-body pad">
+									<div id="IDpageList">
+								  		{this.state.allPageList}
+								  	</div>
+								  	<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+								  	<div className="box-tools pull-right">
+								  		<button className="btn btn-flat btn-default" type="button" onClick={this.addToMenu} 
+                              			style={{marginRight: 10}} data-target="#IDpageList">Add to Menu</button>
+								  	</div>
+								</div>
+							</div>
+							<div className="box box-default collapsed-box box-solid">
+								<div className="box-header with-border">
+									<h3 className="box-title">Posts</h3>
+									<div className="box-tools pull-right">
+									    <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+									    </button>
+									</div>
+								</div>
+								<div className="box-body pad">
+									<div id="IDpostList">
+								  		{this.state.allPostList}
+								  	</div>
+								  	<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+								  	<div className="box-tools pull-right">
+								  		<button className="btn btn-flat btn-default" type="button" onClick={this.addToMenu} 
+                              			style={{marginRight: 10}} data-target="#IDpostList">Add to Menu</button>
+								  	</div>
+								</div>
+							</div>
+							<div className="box box-default collapsed-box box-solid">
+								<div className="box-header with-border">
+									<h3 className="box-title">Custom Links</h3>
+									<div className="box-tools pull-right">
+									    <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+									    </button>
+									</div>
+								</div>
+								<div className="box-body pad">
+									<div>
+								  		.................
+								  	</div>
+								  	<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+								  	<div className="box-tools pull-right">
+								  		<button className="btn btn-flat btn-default">Add to Menu</button>
+								  	</div>
+								</div>
+							</div>
+							<div className="box box-default collapsed-box box-solid">
+								<div className="box-header with-border">
+									<h3 className="box-title">Categories</h3>
+									<div className="box-tools pull-right">
+									    <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+									    </button>
+									</div>
+								</div>
+								<div className="box-body pad">
+									<div id="IDcategorytList">
+								  		{this.state.categoryList}
+								  	</div>
+								  	<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+								  	<div className="box-tools pull-right">
+								  		<button className="btn btn-flat btn-default" type="button" onClick={this.addToMenu} 
+                              			style={{marginRight: 10}} data-target="#IDcategorytList">Add to Menu</button>
+								  	</div>
+								</div>
+							</div>
+						</div>
+		                <div className="col-md-9">
+		                  <div className="box box-default">
+				              <div className="box-header with-border attachment-block clearfix">
+				                <div className="container-fluid">
+				                  <div className="row">
+				                    <div className="col-xs-12">
+				                      <div className="row">
+				                    	<div className="col-xs-3">
+				                    		<h5><b>Select a menu to edit :</b></h5>
+				                    	</div>
+				                    	<div className="col-md-7">
+										  <div className="form-group">
+										    <select id="menuSelect" onChange={this.handleMenuName} name="menuSelect" className="form-control btn select" >
+											  {this.state.pageList}
+											</select>
+										  </div>
+										</div>
+				                  	  </div>
+				                    </div>
+				                  </div>
+					    		</div>
+					    	  </div>
+					      </div>
+					      <form onSubmit={this.handleUpdateMenu} id="menuName" method="get">
+					        <div className="box box-default">
+								<div className="box-header with-border attachment-block clearfix">
+								  <div className="form-group">
+								  	<div className="col-md-3">
+								  	  <h4>Menu Name :</h4>
+								  	</div>
+									<div className="col-md-9">
+									  <input type="text" name="selectedMenuName" id="selectedMenuName" className="form-control" required="true" onChange={this.handleNameChange}/>
+								  	</div>
+								  </div>
+								</div>
+								<div class="box-body">
+								  	<section className="content">
+										<h4>Menu Structure</h4>
+										<p>Drag each item into the order you prefer. Click the arrow on the right of the item to reveal additional configuration options.</p>
+									          <div className="row">
+												<div style={{ height: 400 }}>
+										            <SortableTree
+										              id="treeData"
+										              treeData={this.state.treeData}
+										              onChange={treeData => this.setState({ treeData })}
+										              generateNodeProps={rowInfo => ({
+												        buttons: [
+												          <button onClick={(event) => this.removeNodeMenu(rowInfo)}>Delete</button>
+												        ],
+												      })}
+										            />
+										        </div>
+											  </div>
+									    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}></div>
+										<h4>Menu Settings</h4>
+										<div className="row">
+											<div className="col-md-3">
+												<i>Auto add pages</i>
+											</div>
+											<div className="col-md-9">
+												<div className="checkbox">
+								                    <label>
+								                      <input type="checkbox"/>
+								                      Automatically add new top-level pages to this menu
+								                    </label>
+								                </div>
+											</div>
+										</div>
+										<div className="row">
+											<div className="col-md-3">
+												<i>Display location</i>
+											</div>
+											<div className="col-md-9">
+												<div className="checkbox">
+								                    <label>
+								                      <input type="checkbox"/>
+								                      Top Menu
+								                    </label>
+								                </div>
+								                <div className="checkbox">
+								                    <label>
+								                      <input type="checkbox"/>
+								                      Social Links Menu
+								                    </label>
+								                </div>
+											</div>
+										</div>
+									</section>
+								</div>
+								<div className="box-header with-border attachment-block clearfix">
+									<div className="form-group">
+										<div className="col-md-6">
+											<button className="btn btn-flat btn-danger" id="deleteBtn" onClick={this.handleDelete}>Delete Menu</button>
+										</div>
+										<div className="col-md-6">
+											<div className="box-tools pull-right">
+											<button type="submit" id="submit" name="submit" className="btn btn-flat btn-primary" >Update Menu</button>
+											</div>
+										</div>
+									</div>
+								</div>
+						    </div>
+						  </form>
+		                </div>
+		            </div>
+          	  </div>
+		    </div>
+		)
+	}
 });
 
 export default Menu;
