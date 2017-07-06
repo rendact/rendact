@@ -1,5 +1,6 @@
 import React from 'react';
 import SortableTree from 'react-sortable-tree';
+import removeNodeAtPath from 'react-sortable-tree';
 import Query from '../query';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
@@ -27,19 +28,6 @@ var Menu = React.createClass({
         items: [],
         menuSortableTree:[],
       }
-  },
-  removeNodeMenu: function(rowInfo) {
-    let {node, treeIndex, path} = rowInfo;
-    var removeNodeMenuAtPath="";
-    removeNodeMenuAtPath({
-                   treeData: this.state.treeData,
-                   path: path,   // You can use path from here
-                   getNodeKey: ({node: TreeNode, treeIndex: number}) => {
-                       console.log(number);
-                       return number;
-                   },
-              ignoreCollapsed: false,
-           })
   },
   handleMenuName: function(event){
     this.setState({menu: document.querySelector('#menuSelect').value});
@@ -69,12 +57,14 @@ var Menu = React.createClass({
     });
 	  var menuValues = [];
 	  menuValues = _.map(menuFiltered, function(item){{return {title: item.value}}})
+    
+    var treeData = "";
     if (_treeData===null) {
-      this.setState ({treeData: menuValues });
+      treeData = menuValues;
+    }else if (menuValues.length>0) {
+      treeData = _.concat(_treeData, menuValues);
     }
-    else if (menuValues.length>0) {
-      this.setState ({treeData: _.concat(_treeData, menuValues) });
-    } 
+    this.setState ({treeData: treeData});
   },
   resetForm: function(){
     document.getElementById("menu").reset();
@@ -83,6 +73,14 @@ var Menu = React.createClass({
     this.handleNameChange();
     this.handleNewMenuChange();
     window.history.pushState("", "", '/admin/menu');
+  },
+  removeNodeMenu: function(rowInfo) {
+    var _tree_Data = this.state.treeData;
+    var node2 = rowInfo;
+    var node = node2.node;
+    var _tree_Data = _tree_Data.filter(function(item) {
+    return item !== node    });
+    this.setState ({treeData: _tree_Data});
   },
   handleNewMenuChange: function(event){
     var newMenuName = getValue("newMenuName");
@@ -327,8 +325,8 @@ var Menu = React.createClass({
 								</div>
 							</div>
 						</div>
-		                <div className="col-md-9">
-		                  <div className="box box-default">
+		              <div className="col-md-9">
+		                <div className="box box-default">
 				              <div className="box-header with-border attachment-block clearfix">
 				                <div className="container-fluid">
 				                  <div className="row">
@@ -338,16 +336,16 @@ var Menu = React.createClass({
 				                    		<h5><b>Select a menu to edit :</b></h5>
 				                    	</div>
 				                    	<div className="col-md-7">
-										  <div className="form-group">
-										    <select id="menuSelect" onChange={this.handleMenuName} name="menuSelect" className="form-control btn select" >
-											  {this.state.pageList}
-											</select>
-										  </div>
-										</div>
-				                  	  </div>
-				                    </div>
+      										      <div className="form-group">
+      										      <select id="menuSelect" onChange={this.handleMenuName} name="menuSelect" className="form-control btn select" >
+      											     {this.state.pageList}
+      											     </select>
+      										    </div>
+      										  </div>
 				                  </div>
-					    		</div>
+				                </div>
+				              </div>
+					    		  </div>
 					    	  </div>
 					      </div>
 					      <form onSubmit={this.handleUpdateMenu} id="menuName" method="get">
@@ -363,22 +361,22 @@ var Menu = React.createClass({
 								  </div>
 								</div>
 								<div class="box-body">
-								  	<section className="content">
+								  <section className="content">
 										<h4>Menu Structure</h4>
-										<p>Drag each item into the order you prefer. Click the arrow on the right of the item to reveal additional configuration options.</p>
-									          <div className="row">
-												<div style={{ height: 400 }}>
-										            <SortableTree
-										              id="treeData"
-										              treeData={this.state.treeData}
-										              onChange={treeData => this.setState({ treeData })}
-										              generateNodeProps={rowInfo => ({
+										  <p>Drag each item into the order you prefer. Click the arrow on the right of the item to reveal additional configuration options.</p>
+									      <div className="row">
+												  <div style={{ height: 400 }}>
+										        <SortableTree
+										          id="treeDatas"
+										          treeData={this.state.treeData}
+										          onChange={treeData => this.setState({ treeData })}
+										          generateNodeProps={rowInfo => ({
 												        buttons: [
-												          <button onClick={(event) => this.removeNodeMenu(rowInfo)}>Delete</button>
-												        ],
+												          <button onClick={(event) => this.removeNodeMenu(rowInfo)}>Remove</button>,
+                                ],
 												      })}
-										            />
-										        </div>
+										        />
+										      </div>
 											  </div>
 									    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}></div>
 										<h4>Menu Settings</h4>
