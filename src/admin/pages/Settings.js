@@ -116,16 +116,21 @@ SettingsForm = reduxForm({
 })(SettingsForm)
 
 var Settings = React.createClass({
-	getInitialState: function(){
-		return {
+	propTypes: {
+		isProcessing: React.PropTypes.bool.isRequired,
+		opacity: React.PropTypes.number.isRequired,
+		doMaskArea: React.PropTypes.func.isRequired
+	},
+	getDefaultProps: function() {
+  	return {
 			isProcessing: false,
       opacity: 1
 		}
-	},
+ 	},
 	loadData: function(){
 		var qry = Query.loadSettingsQry;
 		var me = this;
-		this.props.dispatch(maskArea(true))
+		this.props.doMaskArea(true)
 		riques(qry, 
 			function(error, response, body){
 				if(!error && !body.errors) {
@@ -136,7 +141,7 @@ var Settings = React.createClass({
 							_el[0].id = item.node.id;
 						}
 					});
-					me.props.dispatch(maskArea(false))
+					me.props.doMaskArea(false)
 				} else {
 					errorCallback(error, body.errors?body.errors[0].message:null);
 				}
@@ -145,10 +150,10 @@ var Settings = React.createClass({
 	},
 	disableForm: function(state){
     disableForm(state, this.notification);
-    this.props.dispatch(maskArea(state))
+    this.props.doMaskArea(state)
   },
   handleMask: function(e){
-  	this.props.dispatch(maskArea(true))
+  	this.props.doMaskArea(true)
   },
 	handleSubmitBtn: function(event){
 		event.preventDefault();
@@ -172,6 +177,7 @@ var Settings = React.createClass({
 		this.loadData();
 	},
 	render: function(){
+		debugger;
 		return (
 			<div className="content-wrapper">
 				<div className="container-fluid">
@@ -184,7 +190,7 @@ var Settings = React.createClass({
 			        <li className="active">Settings</li>
 			      </ol>
 			      <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
-			      { this.state.isProcessing &&
+			      { this.props.isProcessing &&
             <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
             }
 			    </section>
@@ -195,7 +201,7 @@ var Settings = React.createClass({
 					  	<div className="col-md-8">
 					  	<section className="content">
 					  		<input type="button" value="Mask" onClick={this.handleMask} className="btn btn-primary btn-sm" />
-			    			<SettingsForm onSubmit={this.handleSubmitBtn} style={{opacity: this.state.opacity}}/>
+			    			<SettingsForm onSubmit={this.handleSubmitBtn} style={{opacity: this.props.opacity}}/>
 							</section>
 							</div>
 						</div>
@@ -206,5 +212,22 @@ var Settings = React.createClass({
 	}
 });
 
-Settings = connect()(Settings)
+const mapStateToProps = function(state){
+	debugger;
+	if (state.settings.length>0) {
+		return {
+	  	isProcessing: state.settings[0].isProcessing,
+	  	opacity: state.settings[0].opacity
+	  }
+	} else return []
+}
+
+const mapDispatchToProps = {
+  doMaskArea: maskArea
+}
+
+Settings = connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(Settings)
 export default Settings;

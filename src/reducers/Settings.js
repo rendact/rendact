@@ -6,9 +6,9 @@ const settings = (state = [], action) => {
       return [...state]
     case 'MASK_AREA':
       return [
-        ...state,
         {
-          isProcessing: action.isMasked, opacity: action.isMasked?0.4:1
+          isProcessing: action.isMasked,
+          opacity: action.isMasked?0.4:1
         }
       ]
     default:
