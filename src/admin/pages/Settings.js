@@ -147,6 +147,9 @@ var Settings = React.createClass({
     disableForm(state, this.notification);
     this.props.dispatch(maskArea(state))
   },
+  handleMask: function(e){
+  	this.props.dispatch(maskArea(true))
+  },
 	handleSubmitBtn: function(event){
 		event.preventDefault();
 		var me = this;
@@ -191,6 +194,7 @@ var Settings = React.createClass({
 			    	<div className="row">
 					  	<div className="col-md-8">
 					  	<section className="content">
+					  		<input type="button" value="Mask" onClick={this.handleMask} className="btn btn-primary btn-sm" />
 			    			<SettingsForm onSubmit={this.handleSubmitBtn} style={{opacity: this.state.opacity}}/>
 							</section>
 							</div>
