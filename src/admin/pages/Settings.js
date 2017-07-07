@@ -152,9 +152,6 @@ var Settings = React.createClass({
     disableForm(state, this.notification);
     this.props.doMaskArea(state)
   },
-  handleMask: function(e){
-  	this.props.doMaskArea(true)
-  },
 	handleSubmitBtn: function(event){
 		event.preventDefault();
 		var me = this;
@@ -177,7 +174,6 @@ var Settings = React.createClass({
 		this.loadData();
 	},
 	render: function(){
-		debugger;
 		return (
 			<div className="content-wrapper">
 				<div className="container-fluid">
@@ -200,7 +196,6 @@ var Settings = React.createClass({
 			    	<div className="row">
 					  	<div className="col-md-8">
 					  	<section className="content">
-					  		<input type="button" value="Mask" onClick={this.handleMask} className="btn btn-primary btn-sm" />
 			    			<SettingsForm onSubmit={this.handleSubmitBtn} style={{opacity: this.props.opacity}}/>
 							</section>
 							</div>
@@ -213,7 +208,6 @@ var Settings = React.createClass({
 });
 
 const mapStateToProps = function(state){
-	debugger;
 	if (state.settings.length>0) {
 		return {
 	  	isProcessing: state.settings[0].isProcessing,

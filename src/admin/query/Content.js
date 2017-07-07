@@ -178,4 +178,4 @@ const queries = {
   updateContentMtn: updateContentMtn
 }
 
-module.exports = queries;
+export default queries;

@@ -6,4 +6,4 @@ const config = {
 	adminMode: true
 }
 
-module.exports = config;
+export default config;

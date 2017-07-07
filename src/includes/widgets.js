@@ -1,6 +1,6 @@
 import React from 'react';
 
-const searchWidget = 
+export const searchWidget = 
 		<div key="sidebar" className="sidebar-box">
 			<h3><span>Search</span></h3>
 			<p>
@@ -8,7 +8,7 @@ const searchWidget =
 			</p>
 		</div>
 
-const topPostWidget = 
+export const topPostWidget = 
 		<div key="topPost" className="sidebar-box">
 		<h3><span>Top Posts</span></h3>
 		<ul className="posts-list">
@@ -25,7 +25,7 @@ const topPostWidget =
 		</ul>
 		</div>
 
-const categoriesWidget = 
+export const categoriesWidget = 
 		<div key="category" className="sidebar-box">
 			<h3><span>Categories</span></h3>
 			<ul className="category">
@@ -36,7 +36,7 @@ const categoriesWidget =
 			</ul>
 		</div>
 
-const archiveWidget = 
+export const archiveWidget = 
 		<div key="archive" className="sidebar-box">
 			<h3><span>Archives</span></h3>
 				<ul>
@@ -49,7 +49,7 @@ const archiveWidget =
 				</ul>
 		</div>
 
-const recentPostWidget = 
+export const recentPostWidget = 
 		<div key="recentPost" className="col-md-4 footer-grid">
 			<h3>Recent<span className="opening">Posts</span></h3>
 			<a href="#"><h5>Lorem ipsum dolor sit amet</h5></a>
@@ -60,14 +60,14 @@ const recentPostWidget =
 			<p className="month">April 1, 2014 , By Robert Louise</p>
 		</div>
 
-const aboutUsWidget = 
+export const aboutUsWidget = 
 		<div key="aboutUs" className="col-md-4 footer-grid">
 			<h3>About<span className="opening">Us</span></h3>
 		  <a href="#"><h5>Lorem ipsum dolor sit amet</h5></a>
 		  <p>Sed rhoncus nulla turpis, vitae rutrum velit iaculis et. Curabitur vestibulum, erat non im</p>
 		</div>
 
-const contactUsWidget = 
+export const contactUsWidget = 
 		<div key="contactUs" className="col-md-4 footer-grid">
 			<h3>contact<span className="opening">info</span></h3>
 			<ul className="address">
@@ -81,13 +81,3 @@ const contactUsWidget =
 				<p>Lorem ipsum dolor sit amet conse aliqua. Ut enim ad minim veniam Lorem ctetur adipisicing .</p>
 			</div>
 		</div>
-
-module.exports = {
-	searchWidget: searchWidget,
-	topPostWidget: topPostWidget,
-	categoriesWidget: categoriesWidget,
-	archiveWidget: archiveWidget,
-	aboutUsWidget: aboutUsWidget,
-	recentPostWidget: recentPostWidget,
-	contactUsWidget: contactUsWidget
-}

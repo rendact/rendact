@@ -5,7 +5,7 @@ import {riques, errorCallback} from '../utils';
 import _ from 'lodash';
 import { default as swal } from 'sweetalert2';
 
-const latestPosts = function(){
+export const latestPosts = function(){
     riques(Query.getPostListQry("Full"), 
       function(error, response, body) { 
         if (!error && !body.errors && response.statusCode === 200) {
@@ -21,7 +21,3 @@ const latestPosts = function(){
       }
     );
 }
-
-module.exports = {
-	latestPosts: latestPosts
-};

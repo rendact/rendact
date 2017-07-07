@@ -19,4 +19,4 @@ let Pages = React.createClass({
   }
 });
 
-module.exports = Pages;
+export default Pages;

@@ -2,16 +2,18 @@ import React from 'react';
 import request from 'request';
 import Auth0Lock from 'auth0-lock'
 import {browserHistory, Match, Redirect } from 'react-router'
-window.browserHistory = browserHistory;
-window.Redirect = Redirect;
 import Config from './config';
 import AdminConfig from './admin/AdminConfig';
 import Query from './admin/query';
 import {riques, getConfig} from './utils';
 import _ from 'lodash';
-import {setLogged} from './actions'
+import {setLogged} from './actions';
 
-function AuthService(){
+window.browserHistory = browserHistory;
+window.Redirect = Redirect;
+
+
+export function AuthService(){
   var me = this;
   this.lock = new Auth0Lock(Config.auth0ClientId, Config.auth0Domain, {
     auth: {
@@ -198,7 +200,7 @@ function AuthService(){
   //this.checkAuth();
 }
 
-const MatchWhenAuthorized = ({ component: Component, logged: Logged, authService: AuthService, onlogin: OnLogin, ...rest }) => (
+export const MatchWhenAuthorized = ({ component: Component, logged: Logged, authService: AuthService, onlogin: OnLogin, ...rest }) => (
   <Match {...rest} render={props => (
     Logged ? (
       <Component AuthService={AuthService} onlogin={setLogged} logged={Logged} {...props}/>
@@ -210,8 +212,3 @@ const MatchWhenAuthorized = ({ component: Component, logged: Logged, authService
     )
   )}/>
 )
-
-module.exports = {
-  "AuthService": AuthService,
-  "MatchWhenAuthorized": MatchWhenAuthorized
-};

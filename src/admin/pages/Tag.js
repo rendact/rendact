@@ -11,4 +11,4 @@ let TagPost = React.createClass({
   }
 });
 
-module.exports = TagPost;
+export default TagPost;

@@ -72,4 +72,4 @@ const queries = {
   createUpdateSettingsMtn: createUpdateSettingsMtn
 }
 
-module.exports = queries;
+export default queries;

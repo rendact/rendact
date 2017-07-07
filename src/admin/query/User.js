@@ -462,4 +462,4 @@ const queries = {
   setAsOwner: setAsOwner
 }
 
-module.exports = queries;
+export default queries;
