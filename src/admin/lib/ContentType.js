@@ -479,7 +479,7 @@ let ContentType = React.createClass({
 const mapStateToProps = function(state){
   if (!_.isEmpty(state.contentType)) {
     return _.head(state.contentType)
-  } else return []
+  } else return {}
 }
 
 ContentType = connect(mapStateToProps)(ContentType)

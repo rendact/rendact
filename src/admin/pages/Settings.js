@@ -210,7 +210,7 @@ var Settings = React.createClass({
 const mapStateToProps = function(state){
 	if (!_.isEmpty(state.settings)) {
 		return _.head(state.settings)
-	} else return []
+	} else return {}
 }
 
 const mapDispatchToProps = {
