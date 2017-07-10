@@ -2,14 +2,12 @@ const contentType = (state = [], action) => {
   switch (action.type) {
     case 'UPDATE_STATUS_COUNTER':
       return [
-        ...state,
         {
           statusCount: action.count
         }
       ]
     case 'INIT_CONTENT_LIST':
       return [
-        ...state,
         {
           monthList: action.monthList, 
           allPostId: action.allPostId
@@ -17,7 +15,6 @@ const contentType = (state = [], action) => {
       ]
     case 'TOGGLE_DELETE_MODE':
       return [
-        ...state,
         {
           activeStatus: action.status,
           deleteMode: action.state,
@@ -25,9 +22,15 @@ const contentType = (state = [], action) => {
       ]
     case 'TOGGLE_SELECTED_ITEM':
       return [
-        ...state,
         {
           itemSelected: action.isSelected
+        }
+      ]
+    case 'MASK_AREA':
+      return [
+        {
+          isProcessing: action.isMasked,
+          opacity: action.isMasked?0.4:1
         }
       ]
     default:

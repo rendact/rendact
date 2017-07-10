@@ -10,38 +10,45 @@ import {connect} from 'react-redux'
 import {setStatusCounter, initContentList, maskArea, toggleDeleteMode, toggleSelectedItemState} from '../../actions'
 
 let ContentType = React.createClass({
-  getInitialState: function(){
-      require ('../pages/Posts.css');
-      
-      return {
-        errorMsg: null,
-        loadingMsg: null,
-        monthList: [],
-        deleteMode: false,
-        statusList: this.props.statusList,
-        statusCount: {},
-        dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
-        activeStatus: "All",
-        itemSelected: false,
-        isProcessing: false,
-        opacity: 1,
-        fields: this.props.fields,
-        allPostId: [],
-        replaceStatusWithRole: this.props.replaceStatusWithRole?true:false
-      }
+  propTypes: {
+    isProcessing: React.PropTypes.bool.isRequired,
+    opacity: React.PropTypes.number.isRequired,
+    errorMsg: React.PropTypes.string,
+    loadingMsg: React.PropTypes.string,
+    monthList: React.PropTypes.arrayOf(React.PropTypes.string),
+    deleteMode: React.PropTypes.bool,
+    statusList: React.PropTypes.arrayOf(React.PropTypes.string),
+    statusCount: React.PropTypes.object,
+    dynamicStateBtnList: React.PropTypes.arrayOf(React.PropTypes.string),
+    activeStatus: React.PropTypes.string,
+    itemSelected: React.PropTypes.bool,
+    isProcessing: React.PropTypes.bool,
+    fields: React.PropTypes.array,
+    allPostId: React.PropTypes.array,
+    replaceStatusWithRole: React.PropTypes.bool
+    
+  },
+  getDefaultProps: function() {
+    return {
+      isProcessing: false,
+      opacity: 1,
+      monthList: [],
+      statusCount: {},
+      dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
+      replaceStatusWithRole: false
+    }
   },
   dt: null,
   loadData: function(status, callback) {
     var me = this;
     var metaItemList = _.map(this.props.customFields, function(item) { return item.id });
-
     riques(this.props.listQuery("Full", this.props.postType, this.props.tagId, this.props.cateId), 
       function(error, response, body) { 
         var nodeName = "all"+me.props.tableName+"s";
         var _postArr = body.data.viewer[nodeName].edges;
-        var _statusCount = me.state.statusCount;
+        var _statusCount = me.props.statusCount;
 
-        if (me.state.replaceStatusWithRole){
+        if (me.props.replaceStatusWithRole){
           var _postArr0 = _postArr;
           _.forEach(_postArr0, function(item, index){
             var role = "";
@@ -51,13 +58,12 @@ let ContentType = React.createClass({
             _postArr[index].node.status = role;
           })
         }
-        
-        _.forEach(me.state.statusList, function(status){
+        _.forEach(me.props.statusList, function(status){
           var found = _.filter(_postArr, {node: {status: status}});
           _statusCount[status] = found?found.length:0;
         });
         
-        if (me.state.replaceStatusWithRole){
+        if (me.props.replaceStatusWithRole){
           _statusCount["All"] = _postArr.length;
         } else {
           _statusCount["All"] = _postArr.length-_statusCount["Trash"];
@@ -67,7 +73,7 @@ let ContentType = React.createClass({
     );
 
     var qry = this.props.listQuery(status, this.props.postType, this.props.tagId, this.props.cateId);
-    var fields = _.map(this.state.fields, function(item){
+    var fields = _.map(this.props.fields, function(item){
       return item.id
     });
     
@@ -173,7 +179,7 @@ let ContentType = React.createClass({
     var me = this;
     _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = isDisabled;})
     _.forEach(document.getElementsByTagName('button'), function(el){ 
-      if (_.indexOf(me.state.dynamicStateBtnList, el.id) < 0)
+      if (_.indexOf(me.props.dynamicStateBtnList, el.id) < 0)
         el.disabled = isDisabled;
     })
     _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = isDisabled;})
@@ -229,7 +235,7 @@ let ContentType = React.createClass({
     swalert('warning','Sure want to empty trash?','You might lost some data forever!',
       function () {
         me.disableForm(true);
-        riques(Query.deletePostPermanentQry(me.state.allPostId), 
+        riques(Query.deletePostPermanentQry(me.props.allPostId), 
           function(error, response, body) {
             if (!error && !body.errors && response.statusCode === 200) {
               var here = me;
@@ -286,7 +292,7 @@ let ContentType = React.createClass({
   },
   handleDateFilter: function(event){
     this.disableForm(true);
-    var status = this.state.activeStatus;
+    var status = this.props.activeStatus;
     if (status==='Trash'){
       var me = this;
       this.loadData("Trash", function(){
@@ -316,7 +322,7 @@ let ContentType = React.createClass({
 
     this.disableForm(true);
     var selectedId = checkedRow[0].id.split("-")[1];
-    var qry = Query.setAsOwner(selectedId, this.state.allPostId, "admin");
+    var qry = Query.setAsOwner(selectedId, this.props.allPostId, "admin");
     var me = this;
     
     riques(qry, 
@@ -366,7 +372,8 @@ let ContentType = React.createClass({
     });
   },
   getStatusCount: function(status){
-    if (this.state.statusCount[status]) return this.state.statusCount[status]
+    if (this.props.statusCount && this.props.statusCount[status])
+      return this.props.statusCount[status]
     else return 0;
   },
   componentDidMount: function(){
@@ -376,6 +383,7 @@ let ContentType = React.createClass({
     this.refs.rendactSearchBoxPost.bindToTable(datatable);
     this.dt=datatable;
     this.loadData("All");
+    this.props.dispatch(maskArea(true))
   },
   render: function(){
     return (
@@ -405,7 +413,7 @@ let ContentType = React.createClass({
                     <div className="col-xs-12">
                       <div style={{marginTop: 10, marginBottom: 20}}>
                           <select className="btn select" id="dateFilter" name="dateFilter" onChange={this.handleDateFilter} style={{marginRight:10,height:35}}>
-                            {this.state.monthList.map(function(item){
+                            {this.props.monthList.map(function(item){
                               if (item==="all")
                                 return (<option key="0" value="">Show all months</option>);
                               var s = item.split("/");
@@ -416,8 +424,8 @@ let ContentType = React.createClass({
                             })}
                           </select>     
                           <DeleteButtons 
-                            deleteMode={this.state.deleteMode}
-                            itemSelected={this.state.itemSelected}
+                            deleteMode={this.props.deleteMode}
+                            itemSelected={this.props.itemSelected}
                             onDelete={this.handleDeleteBtn}
                             onRecover={this.handleRecover}
                             onDeletePermanent={this.handleDeletePermanent}
@@ -425,37 +433,37 @@ let ContentType = React.createClass({
                           />  
                           {
                             (this.isWidgetActive("ownerButton") /* && this.isOwner() */ ) && 
-                            <button className="btn btn-default" onClick={this.handleSetOwnerButton} disabled={!this.state.itemSelected}>Set as owner</button>
+                            <button className="btn btn-default" onClick={this.handleSetOwnerButton} disabled={!this.props.itemSelected}>Set as owner</button>
                           }                
                         <div className="box-tools pull-right">
                           <SearchBoxPost datatable={this.table} ref="rendactSearchBoxPost"/>
                         </div>
                         <div className="box-tools" style={{marginTop: 10}}>
-                          <b>Status:</b> {this.state.statusList.map(function(item, index, array){
+                          <b>Status:</b> {this.props.statusList.map(function(item, index, array){
                             var first = (index===0);
                             var border = first?"":"1px solid";
                             var count = this.getStatusCount(item);
                             if (count===0) return null;
 
-                            var color = item===this.state.activeStatus?{color: "black", fontWeight: "bold"}:{};
+                            var color = item===this.props.activeStatus?{color: "black", fontWeight: "bold"}:{};
                             return <span key={index} style={{paddingRight: 7, paddingLeft: 7, borderLeft: border}}>
                                     <a href="#" onClick={this.handleStatusFilter} style={color}>{item}</a> ({count})
                                    </span>
                           }.bind(this))}
                         </div>
                       </div>
-                      { this.state.isProcessing &&
+                      { this.props.isProcessing &&
                       <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
                       }
                       <Table 
                           id={this.props.slug+"List"}
-                          columns={this.state.fields}
+                          columns={this.props.fields}
                           checkBoxAtFirstColumn="true"
                           ref="rendactTable"
                           onSelectAll={this.checkDynamicButtonState}
                           onCheckBoxClick={this.checkDynamicButtonState}
                           onAfterLoad={this.onAfterTableLoad}
-                          style={{opacity: this.state.opacity}}
+                          style={{opacity: this.props.opacity}}
                         />
                   </div>
                 </div>
@@ -468,5 +476,11 @@ let ContentType = React.createClass({
     )},
 });
 
-ContentType = connect()(ContentType)
+const mapStateToProps = function(state){
+  if (!_.isEmpty(state.contentType)) {
+    return _.head(state.contentType)
+  } else return []
+}
+
+ContentType = connect(mapStateToProps)(ContentType)
 export default ContentType;

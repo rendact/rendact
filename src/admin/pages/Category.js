@@ -13,4 +13,4 @@ let CategoryPost = React.createClass({
   }
 });
 
-module.exports = CategoryPost;
+export default CategoryPost;
