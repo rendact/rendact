@@ -3,8 +3,9 @@ import SortableTree from 'react-sortable-tree';
 import removeNodeAtPath from 'react-sortable-tree';
 import Query from '../query';
 import _ from 'lodash';
+import Halogen from 'halogen';
 import Notification from 'react-notification-system';
-import {swalert, riques, errorCallback, setValue, getValue, disableForm} from '../../utils';
+import {swalert, riques, errorCallback, setValue, getValue, disableForm, defaultHalogenStyle} from '../../utils';
 
 var Menu = React.createClass({
   getInitialState: function(){
@@ -27,7 +28,16 @@ var Menu = React.createClass({
         coba: null,
         items: [],
         menuSortableTree:[],
+        isProcessing: false,
+        opacity: 1
       }
+  },
+  maskArea: function(state){
+    this.setState({isProcessing: state, opacity: state?0.4:1});
+  },
+  disableForm: function(state){
+    disableForm(state, this.notif);
+    this.maskArea(state);
   },
   handleMenuName: function(event){
     this.setState({menu: document.querySelector('#menuSelect').value});
@@ -39,16 +49,30 @@ var Menu = React.createClass({
     var qry = Query.getMenuQry(menuId);
 	  riques(qry, 
       function(error, response, body) {
-        if (!error) {
+        me.disableForm(true);
+        if (!error && !body.errors && response.statusCode === 200) {
         	var items = [];
           items = body.data.getMenu.items;
 		      me.setState({treeData: items});
+          me.disableForm(false);
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
         }
+        me.disableForm(false);
       }
     );
   },
-  disableForm: function(state){
-    disableForm(state, this.notif)
+  addUrlToMenu: function(event){
+    var _treeData = this.state.treeData;
+    var url = getValue("url");
+    var _url = [{title: url}];
+    var treeData = "";
+    if (_treeData===null) {
+      treeData = _url;
+    }else if (_url.length>0) {
+      treeData = _.concat(_treeData, _url);
+    }
+    this.setState ({treeData: treeData});
   },
   addToMenu: function(event){
     var _treeData = this.state.treeData;
@@ -65,6 +89,7 @@ var Menu = React.createClass({
       treeData = _.concat(_treeData, menuValues);
     }
     this.setState ({treeData: treeData});
+    debugger;
   },
   resetForm: function(){
     document.getElementById("menu").reset();
@@ -79,7 +104,7 @@ var Menu = React.createClass({
     var node2 = rowInfo;
     var node = node2.node;
     var _tree_Data = _tree_Data.filter(function(item) {
-    return item !== node    });
+      return item !== node    });
     this.setState ({treeData: _tree_Data});
   },
   handleNewMenuChange: function(event){
@@ -97,7 +122,6 @@ var Menu = React.createClass({
     this.disableForm(true);
     var qry = Query.createMenu(newMenuName);
     var noticeTxt = "Menu Saved";
-
     riques(qry, 
       function(error, response, body) { 
         if (!error && !body.errors && response.statusCode === 200) {
@@ -222,33 +246,35 @@ var Menu = React.createClass({
 	render: function(){
 		return (
 			<div className="content-wrapper">
-        	  <div className="container-fluid">
-				<section className="content-header">
+        <div className="container-fluid">
+				  <section className="content-header">
 			      <h1>
-            		Menus
-          		  </h1>
-          		  <ol className="breadcrumb">
+            	Menus
+          	</h1>
+          		<ol className="breadcrumb">
             		<li><a href="#"><i className="fa fa-dashboard"></i>Home</a></li>
             		<li className="active">Menus</li>
-          		  </ol>
-          		  <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+          		</ol>
+          		<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
 			    </section>
 		        <Notification ref="notificationSystem" />     
 			    	<div className="row">
-				     	<div className="col-md-3">
-					     	<div className="box box-default">
-								<div className="box-header with-border attachment-block clearfix">
-									<div className="form-group">
-										<h4>Create A New Menu :</h4>
-									</div>
-									<div>
-										<input type="text" name="newMenuName" id="newMenuName" className="form-control" onChange={this.handleNewMenuChange}/>
-									</div>
-									<div className="pull-right" style={{marginTop: 10}}>
-										<button type="submit" id="submit" disabled={this.state.newMenuName===""} className="btn btn-flat btn-success">Create Menu</button>
-									</div>
-								</div>
-							</div>
+              <div className="col-md-3">
+                <form onSubmit={this.handleSubmit} id="menu" method="get">
+    					    <div className="box box-default">
+    								<div className="box-header with-border attachment-block clearfix">
+    									<div className="form-group">
+    										<h4>Create A New Menu :</h4>
+    									</div>
+    									<div>
+    										<input type="text" name="newMenuName" id="newMenuName" className="form-control" onChange={this.handleNewMenuChange}/>
+    									</div>
+    									<div className="pull-right" style={{marginTop: 10}}>
+    										<button type="submit" id="submit" disabled={this.state.newMenuName===""} className="btn btn-flat btn-success">Create Menu</button>
+    									</div>
+    								</div>
+    							</div>
+                </form>
 							<div className="box box-default collapsed-box box-solid">
 								<div className="box-header with-border">
 									<h3 className="box-title">Pages</h3>
@@ -279,8 +305,8 @@ var Menu = React.createClass({
 								<div className="box-body pad">
 									<div id="IDpostList">
 								  		{this.state.allPostList}
-								  	</div>
-								  	<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+								  </div>
+								  <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
 								  	<div className="box-tools pull-right">
 								  		<button className="btn btn-flat btn-default" type="button" onClick={this.addToMenu} 
                               			style={{marginRight: 10}} data-target="#IDpostList">Add to Menu</button>
@@ -296,12 +322,18 @@ var Menu = React.createClass({
 									</div>
 								</div>
 								<div className="box-body pad">
-									<div>
-								  		.................
-								  	</div>
-								  	<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+									<div className="row">
+								  	<div className="col-md-3">	
+                      <h5>URL</h5>
+                    </div>
+                    <div className="col-md-9">  
+                      <input type="text" name="url" id="url" className="form-control" required="true"/>
+                    </div>
+								  </div>
+								  <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
 								  	<div className="box-tools pull-right">
-								  		<button className="btn btn-flat btn-default">Add to Menu</button>
+								  		<button className="btn btn-flat btn-default" type="button" onClick={this.addUrlToMenu} 
+                                    style={{marginRight: 10}} data-target="#url">Add to Menu</button>
 								  	</div>
 								</div>
 							</div>
@@ -349,23 +381,26 @@ var Menu = React.createClass({
 					    	  </div>
 					      </div>
 					      <form onSubmit={this.handleUpdateMenu} id="menuName" method="get">
-					        <div className="box box-default">
-								<div className="box-header with-border attachment-block clearfix">
-								  <div className="form-group">
-								  	<div className="col-md-3">
-								  	  <h4>Menu Name :</h4>
-								  	</div>
-									<div className="col-md-9">
-									  <input type="text" name="selectedMenuName" id="selectedMenuName" className="form-control" required="true" onChange={this.handleNameChange}/>
-								  	</div>
-								  </div>
-								</div>
+					      <div className="box box-default">
+  								<div className="box-header with-border attachment-block clearfix">
+  								  <div className="form-group">
+  								  	<div className="col-md-3">
+  								  	  <h4>Menu Name :</h4>
+  								  	</div>
+  									  <div className="col-md-9">
+  									    <input type="text" name="selectedMenuName" id="selectedMenuName" className="form-control" required="true" onChange={this.handleNameChange}/>
+  								  	</div>
+  								  </div>
+  								</div>
 								<div class="box-body">
 								  <section className="content">
 										<h4>Menu Structure</h4>
 										  <p>Drag each item into the order you prefer. Click the arrow on the right of the item to reveal additional configuration options.</p>
 									      <div className="row">
 												  <div style={{ height: 400 }}>
+                            { this.state.isProcessing &&
+                              <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
+                            }
 										        <SortableTree
 										          id="treeDatas"
 										          treeData={this.state.treeData}
@@ -414,6 +449,7 @@ var Menu = React.createClass({
 										</div>
 									</section>
 								</div>
+
 								<div className="box-header with-border attachment-block clearfix">
 									<div className="form-group">
 										<div className="col-md-6">
@@ -428,9 +464,9 @@ var Menu = React.createClass({
 								</div>
 						    </div>
 						  </form>
-		                </div>
-		            </div>
-          	  </div>
+		          </div>
+		        </div>
+          </div>
 		    </div>
 		)
 	}
