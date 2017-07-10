@@ -22,4 +22,4 @@ let NewPage = React.createClass({
   }
 });
 
-module.exports = NewPage;
+export default NewPage;

@@ -5,7 +5,7 @@ import Query from './admin/query';
 import _ from 'lodash';
 import { default as swal } from 'sweetalert2';
 
-const swalert = function(type, title, body, callback, rgba){
+export const swalert = function(type, title, body, callback, rgba){
   var background = '#fff';
   var buttonColor = '#357ca5';
   var showCancelButton = true;
@@ -51,7 +51,7 @@ const swalert = function(type, title, body, callback, rgba){
     }).then(callback)
 }
 
-const riques = function(query, callback, isadmin){
+export const riques = function(query, callback, isadmin){
   var token = localStorage.getItem("token");
   if (isadmin || Config.adminMode){
     token = Config.adminToken
@@ -69,23 +69,23 @@ const riques = function(query, callback, isadmin){
     }, callback);
 }
 
-const setValue = function(element, value) {
+export const setValue = function(element, value) {
   if (document.getElementById(element))
 	 document.getElementById(element).value = value;
 }
 
-let getValue = function(element) {
+export const getValue = function(element) {
   if (document.getElementById(element))
 	  return document.getElementById(element).value;
   else 
     return null;
 }
 
-let getValueName = function(element){
+export const getValueName = function(element){
   return document.getElementsByName(element);
 }
 
-let getMaxRole = function(){
+export const getMaxRole = function(){
   var p = JSON.parse(localStorage.getItem("profile"));
   var roleValueList = _.map(p.roles, function(item){ return AdminConfig.roleValue[item] });
   var maxRole = _.max(roleValueList);
@@ -94,7 +94,7 @@ let getMaxRole = function(){
   return maxRole;
 }
 
-const getConfig = function(name){
+export const getConfig = function(name){
   var config = JSON.parse(localStorage.getItem('config'));
   if (config && config[name])
     return config[name]
@@ -102,7 +102,7 @@ const getConfig = function(name){
     return null;
 }
 
-let hasRole = function(roleId){
+export const hasRole = function(roleId){
   if (roleId==="all") return true;
   var p = JSON.parse(localStorage.getItem("profile"));
   
@@ -115,7 +115,7 @@ let hasRole = function(roleId){
   return (_.indexOf(roleIdList, roleId)>-1)
 }
 
-let errorCallback = function(msg1, msg2, module){
+export const errorCallback = function(msg1, msg2, module){
   var moduleTxt = ""
   if (module) {
     moduleTxt = " ("+module+")";
@@ -125,7 +125,7 @@ let errorCallback = function(msg1, msg2, module){
   else swalert('error','Failed!', 'Unknown error'+moduleTxt)
 }
 
-let sendMail = function(to, title, message, callback){
+export const sendMail = function(to, title, message, callback){
   request({
       url: getConfig('mailUrl'),
       method: "POST",
@@ -150,7 +150,7 @@ let sendMail = function(to, title, message, callback){
     });
 }
 
-let getFormData = function(className, output){
+export const getFormData = function(className, output){
   var _objData;
   if (!output) output = "list";
 
@@ -177,7 +177,7 @@ let getFormData = function(className, output){
   }
 }
 
-let disableForm = function(state, notif, excludeClass){
+export const disableForm = function(state, notif, excludeClass){
   //var me = this;
   _.forEach(document.getElementsByTagName('input'), function(el){ if (_.indexOf(excludeClass, el.getAttribute("class"))<0) el.disabled = state;});
   _.forEach(document.getElementsByTagName('button'), function(el){ if (_.indexOf(excludeClass, el.getAttribute("class"))<0) el.disabled = state;});
@@ -206,7 +206,7 @@ let disableForm = function(state, notif, excludeClass){
   */
 }
 
-const _saveConfig = function(name, value){
+export const _saveConfig = function(name, value){
   var config = JSON.parse(localStorage.getItem('config'));
   if (config === null ){
     config = {}
@@ -215,7 +215,7 @@ const _saveConfig = function(name, value){
   localStorage.setItem('config', JSON.stringify(config));
 }
 
-const loadConfig = function(callback){
+export const loadConfig = function(callback){
   var qry = Query.getContentListQry("active");
   riques(qry, 
     function(error, response, body) { 
@@ -262,7 +262,7 @@ const loadConfig = function(callback){
   );
 }
 
-const defaultHalogenStyle = {
+export const defaultHalogenStyle = {
     display: '-webkit-flex',
     WebkitFlex: '0 1 auto',
     flex: '0 1 auto',
@@ -286,32 +286,13 @@ const defaultHalogenStyle = {
     zIndex: 100
 };
 
-const removeTags = function(txt){
+export const removeTags = function(txt){
     var rex = /(<([^>]+)>)/ig;
     return txt.replace(rex , "");
 }
 
-const toHTMLObject = function(text){
+export const toHTMLObject = function(text){
   var parser=new DOMParser();
   var htmlDoc=parser.parseFromString(text, "text/html");
   return htmlDoc;
 }
-
-module.exports = {
-	riques: riques,
-	setValue: setValue,
-	getValue: getValue,
-  getValueName: getValueName,
-  getMaxRole: getMaxRole,
-  hasRole: hasRole,
-  errorCallback: errorCallback,
-  sendMail: sendMail,
-  getFormData: getFormData,
-  disableForm: disableForm,
-  loadConfig: loadConfig,
-  getConfig: getConfig,
-  defaultHalogenStyle: defaultHalogenStyle,
-  swalert: swalert,
-  removeTags:removeTags,
-  toHTMLObject: toHTMLObject
-};

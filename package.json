@@ -27,6 +27,7 @@
     "react-apollo": "^1.0.0",
     "react-bootstrap": "^0.30.2",
     "react-bootstrap-timezone-picker": ">=1.0.10",
+    "react-bootstrap-date-picker": ">=5.0.1",
     "rc-color-picker": ">=1.1.4",
     "react-datetime": ">=2.8.8",
     "react-dom": "^15.0.0",

@@ -120,4 +120,4 @@ const queries = {
   getMenuQry: getMenuQry
 }
 
-module.exports = queries;
+export default queries;

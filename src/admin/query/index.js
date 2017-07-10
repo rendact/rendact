@@ -88,4 +88,4 @@ const queries = {
   getMenuQry: Menu.getMenuQry
 }
 
-module.exports = queries;
+export default queries;

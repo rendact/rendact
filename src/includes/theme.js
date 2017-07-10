@@ -1,6 +1,5 @@
 import React from 'react';
 import AdminConfig from '../admin/AdminConfig';
-window.config = AdminConfig;
 import NotFound from '../admin/NotFound';
 import Query from '../admin/query';
 import {riques, errorCallback, loadConfig} from '../utils';
@@ -9,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import Loading from '../admin/Loading';
 import _ from 'lodash';
 import {searchWidget, topPostWidget, categoriesWidget, archiveWidget, aboutUsWidget, contactUsWidget, recentPostWidget} from './widgets';
+window.config = AdminConfig;
 
 const InvalidTheme = React.createClass({
 	componentDidMount: function(){
@@ -60,7 +60,7 @@ function getTemplateComponent(type){
 	}
 }
 
-const ThemeHome = React.createClass({
+export const ThemeHome = React.createClass({
 	getInitialState: function(){
 		return {
 			loadDone: false,
@@ -209,7 +209,7 @@ const ThemeHome = React.createClass({
 	}
 });
 
-const ThemeBlog = React.createClass({
+export const ThemeBlog = React.createClass({
 	getInitialState: function(){
 		return {
 			loadDone: false,
@@ -293,7 +293,7 @@ const ThemeBlog = React.createClass({
 	}
 });
 
-const ThemeSingle = React.createClass({
+export const ThemeSingle = React.createClass({
 	getInitialState: function(){
 		return {
 			loadDone: false,
@@ -382,7 +382,7 @@ const ThemeSingle = React.createClass({
 	}
 });
 
-const getTemplates = function(){
+export const getTemplates = function(){
 	var template = [{
 			id: "default",
 			name: "Default Template"
@@ -398,11 +398,4 @@ const getTemplates = function(){
 		
 	}
 	return template;
-}
-
-module.exports = {
-	ThemeHome: ThemeHome,
-	ThemeSingle: ThemeSingle,
-	ThemeBlog: ThemeBlog,
-	getTemplates: getTemplates
 }

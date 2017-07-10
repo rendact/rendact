@@ -185,4 +185,4 @@ const AdminConfig = {
 	roleValue: roleValue
 }
 
-module.exports = AdminConfig;
+export default AdminConfig;

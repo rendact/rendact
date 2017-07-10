@@ -22,4 +22,4 @@ let NewPost = React.createClass({
   }
 });
 
-module.exports = NewPost;
+export default NewPost;

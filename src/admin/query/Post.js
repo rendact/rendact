@@ -564,4 +564,4 @@ const queries = {
   bindImageGallery: bindImageGallery
 }
 
-module.exports = queries;
+export default queries;

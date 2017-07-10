@@ -150,4 +150,4 @@ const queries = {
   recoverPostQry: recoverPostQry
 }
 
-module.exports = queries;
+export default queries;

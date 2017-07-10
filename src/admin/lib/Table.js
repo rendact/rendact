@@ -3,7 +3,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 import {hasRole} from '../../utils';
 
-const SearchBox = React.createClass({
+export const SearchBox = React.createClass({
 	bindToTable: function(datatable){
     this.datatable = datatable;
     this.datatable.columns(1).every( function () {
@@ -31,7 +31,7 @@ const SearchBox = React.createClass({
 	}
 });
 
-const SearchBoxPost = React.createClass({
+export const SearchBoxPost = React.createClass({
   bindToTable: function(datatable){
     this.datatable = datatable;
     this.datatable.columns(2).every( function () {
@@ -59,7 +59,7 @@ const SearchBoxPost = React.createClass({
   }
 });
 
-const DeleteButtons = React.createClass({
+export const DeleteButtons = React.createClass({
 	render: function(){
 		return (
 			<span>
@@ -79,7 +79,7 @@ const DeleteButtons = React.createClass({
 	}
 });
 
-const Table = React.createClass({
+export const Table = React.createClass({
 	getInitialState: function(){
     require ('datatables');
     require ('datatables/media/css/jquery.dataTables.min.css');
@@ -186,7 +186,7 @@ const Table = React.createClass({
   }
 });
 
-const TableTag = React.createClass({
+export const TableTag = React.createClass({
   getInitialState: function(){
     require ('datatables');
     require ('datatables/media/css/jquery.dataTables.min.css');
@@ -289,11 +289,3 @@ const TableTag = React.createClass({
     )
   }
 });
-
-module.exports = {
-	Table: Table,
-  TableTag: TableTag,
-	SearchBox: SearchBox,
-  SearchBoxPost: SearchBoxPost,
-	DeleteButtons: DeleteButtons
-};

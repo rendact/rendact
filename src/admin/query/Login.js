@@ -1,4 +1,4 @@
-const getLoginAuth0Mtn = function(identities, token, clientId){
+export const getLoginAuth0Mtn = function(identities, token, clientId){
     return {
         "query": `mutation LoginUserWithAuth0Lock ($input: LoginUserWithAuth0LockInput!) {
           loginUserWithAuth0Lock(input: $input) {
@@ -28,7 +28,7 @@ const getLoginAuth0Mtn = function(identities, token, clientId){
         }
 }
 
-const loginUserQry = function(username, password){
+export const loginUserQry = function(username, password){
     return {
       "query": `mutation LoginUserQuery ($input: LoginUserInput!) {
         loginUser(input: $input) {
@@ -64,4 +64,4 @@ const queries = {
   loginUserQry: loginUserQry
 }
 
-module.exports = queries;
+export default queries;
