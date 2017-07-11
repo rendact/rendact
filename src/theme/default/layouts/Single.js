@@ -1,12 +1,11 @@
 import React from 'react'
-import $ from 'jquery';
 import Header from '../includes/Header'
 import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
 import Notification from 'react-notification-system';
 import moment from 'moment'
 import Query from '../../../admin/query';
-import {riques, getValue, setValue, getFormData, errorCallback, disableForm, swalert} from '../../../utils';
+import {riques, getValue, setValue, errorCallback} from '../../../utils';
 
 const Single = React.createClass({
 	componentDidMount: function() {
