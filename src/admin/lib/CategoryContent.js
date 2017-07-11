@@ -66,7 +66,7 @@ let CategoryContent = React.createClass({
   },
   handleDeleteBtn: function(event){;
     var me = this;
-    var checkedRow = document.querySelectorAll("input.category-postsCb:checked");
+    var checkedRow = document.querySelectorAll("input.category-"+this.props.slug+"Cb:checked");
     var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
     swalert('warning','Sure want to delete?',"You might lost some data!",
       function () {
@@ -89,7 +89,7 @@ let CategoryContent = React.createClass({
     this.props.dispatch(maskArea(state));
   },
   checkDynamicButtonState: function(){
-    var checkedRow = document.querySelectorAll("input.category-postsCb:checked");
+    var checkedRow = document.querySelectorAll("input.category-"+this.props.slug+"Cb:checked");
     this.props.dispatch(toggleSelectedItemState(checkedRow.length>0));
   },
   handleViewPage: function(categoryId){
