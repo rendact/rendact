@@ -157,3 +157,8 @@ export const setOptions = (options) => ({
   type: 'SET_OPTIONS',
   options
 })
+
+export const setNameValue = (name)  => ({
+  type: 'SET_NAME_VALUE',
+  name
+})

@@ -3,29 +3,47 @@ import $ from 'jquery';
 import Query from '../query';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
-import {swalert, riques, hasRole, errorCallback, setValue, getValue, removeTags, disableForm} from '../../utils';
-import { Table, SearchBox, DeleteButtons} from '../lib/Table';
+import Halogen from 'halogen'
+import {swalert, riques, hasRole, errorCallback, setValue, getValue, removeTags, disableForm, defaultHalogenStyle} from '../../utils';
+import {Table, SearchBox, DeleteButtons} from '../lib/Table';
+import {connect} from 'react-redux'
+import {initContentList, maskArea, setEditorMode, toggleSelectedItemState, setNameValue} from '../../actions'
 
-const TagContent = React.createClass({
-  getInitialState: function(){
-      require ('../pages/Posts.css');
-
-      return {
-        name:"",
-        postId:"",
-        tagId:"",
-        dt: null,
-        errorMsg: null,
-        loadingMsg: null,
-        monthList: [],
-        deleteMode: false,
-        statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
-        dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
-        activeStatus: "All",
-        itemSelected: false,
-        mode: "create",
-      }
+let TagContent = React.createClass({
+  propTypes: {
+    isProcessing: React.PropTypes.bool.isRequired,
+    opacity: React.PropTypes.number.isRequired,
+    errorMsg: React.PropTypes.string,
+    loadingMsg: React.PropTypes.string,
+    postId: React.PropTypes.string,
+    mode: React.PropTypes.string,
+    deleteMode: React.PropTypes.bool,
+    statusList: React.PropTypes.arrayOf(React.PropTypes.string),
+    dynamicStateBtnList: React.PropTypes.arrayOf(React.PropTypes.string),
+    activeStatus: React.PropTypes.string,
+    itemSelected: React.PropTypes.bool,
+    name:React.PropTypes.string,
+    slug:React.PropTypes.string,
+    tagId:React.PropTypes.string,
   },
+  getDefaultProps: function() {
+    return {
+      isProcessing: false,
+      opacity: 1,
+      name:"",
+      slug:"",
+      postId:"",
+      tagId:"",
+      monthList: [],
+      deleteMode: false,
+      statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
+      dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
+      activeStatus: "All",
+      itemSelected: false,
+      mode: "create",
+    }
+  },
+  dt: null,
   loadData: function(postId, callback) {
     var me = this;
     var qry = Query.getAllTagQry(this.props.postType);
@@ -45,7 +63,7 @@ const TagContent = React.createClass({
 
           var bEdit = hasRole('modify-tag');
           me.table.loadData(_dataArr, bEdit);
-          me.setState({monthList: monthList});
+          me.props.dispatch(initContentList(monthList))
 
           if (callback) callback.call();
         } else {
@@ -56,7 +74,7 @@ const TagContent = React.createClass({
   },
   handleDeleteBtn: function(event){
     var me = this;
-    var checkedRow = $("input.tagCb:checked");
+    var checkedRow = $("input.tag"+this.props.slug+"Cb:checked");
     var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
     
     swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
@@ -76,21 +94,23 @@ const TagContent = React.createClass({
       );
   })},
   disableForm: function(state){
-    disableForm(state, this.notif)
+    disableForm(state, this.notif);
+    this.props.dispatch(maskArea(state));
   },
   resetForm: function(){
     document.getElementById("tagForm").reset();
-    this.setState({name:"", mode: "create"});
+    this.props.dispatch(setEditorMode("create"))
     this.handleNameChange();
+    setValue("name", "");
     window.history.pushState("", "", '/admin/tag');
   },
   checkDynamicButtonState: function(){
-    var checkedRow = $("input.tagCb:checked");
-    this.setState({itemSelected: checkedRow.length>0})
+    var checkedRow = document.querySelectorAll("input.tag-"+this.props.slug+"Cb:checked");
+    this.props.dispatch(toggleSelectedItemState(checkedRow.length>0));
   },
   handleNameChange: function(event){
     var name = $("#name").val();
-    this.setState({name: name})
+    this.props.dispatch(setNameValue(name));
   },
   handleViewPage: function(tagId){
     this.props.handleNav(this.props.slug,'bytag', tagId);
@@ -104,8 +124,7 @@ const TagContent = React.createClass({
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
       setValue("name", name);
-      me.setState({postId: postId});
-      me.setState({mode: "update"});
+      me.props.dispatch(setEditorMode("update", postId))
     });
 
      var postLink = function(event){
@@ -123,12 +142,12 @@ const TagContent = React.createClass({
     event.preventDefault();
     var me = this;
     var name = getValue("name");
-    var postId = this.state.postId;
-    var type = me.props.postType;
+    var postId = this.props.postId;
+    var type = this.props.postType;
     this.disableForm(true);
     var qry = "", noticeTxt = "";
 
-    if (this.state.mode==="create"){
+    if (this.props.mode==="create"){
       qry = Query.createTag(name, type);
       noticeTxt = 'Tag Published!';
     }else{
@@ -160,7 +179,7 @@ const TagContent = React.createClass({
     this.table = this.refs.rendactTable;
     var datatable = this.table.datatable;
     this.refs.rendactSearchBox.bindToTable(datatable);
-    this.setState({dt: datatable});
+    this.dt = datatable;
     this.loadData("All");
   },
 
@@ -187,7 +206,7 @@ const TagContent = React.createClass({
                     <div className="col-xs-4" style={{marginTop: 40}}>
                     <form onSubmit={this.handleSubmit} id="tagForm" method="get">
                       <div className="form-group">
-                        <h4><b>{this.state.mode==="create"?"Add New Tag":"Edit Tag"}</b></h4>
+                        <h4><b>{this.props.mode==="create"?"Add New Tag":"Edit Tag"}</b></h4>
                       </div>
                       <div className="form-group">
                           <label htmlFor="name" >Name</label>
@@ -198,15 +217,15 @@ const TagContent = React.createClass({
                       </div>
                        <div className="form-group">
                           <button type="submit" id="submit" className="btn btn-primary btn-flat" 
-                          disabled={this.state.name===""}>{this.state.mode==="update"?"Save Changes":"Add New Tag"}</button>
+                          disabled={this.props.name===""}>{this.props.mode==="update"?"Save Changes":"Add New Tag"}</button>
                       </div>
                     </form>
                     </div>
                     <div className="col-xs-8">
                       <div style={{marginTop: 10, marginBottom: 20}}>
                           <DeleteButtons 
-                            deleteMode={this.state.deleteMode}
-                            itemSelected={this.state.itemSelected}
+                            deleteMode={this.props.deleteMode}
+                            itemSelected={this.props.itemSelected}
                             onDelete={this.handleDeleteBtn}
                             onRecover={this.handleRecover}
                             onDeletePermanent={this.handleDeletePermanent}
@@ -215,7 +234,10 @@ const TagContent = React.createClass({
                         <div className="box-tools pull-right">
                           <SearchBox datatable={this.table} ref="rendactSearchBox"/>
                         </div>
-                      </div>                   
+                      </div>      
+                      { this.props.isProcessing &&
+                      <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
+                      }                            
                       <Table
                           id={"tag-"+this.props.slug}
                           columns={[
@@ -239,4 +261,11 @@ const TagContent = React.createClass({
     )},
 });
 
+const mapStateToProps = function(state){
+  if (!_.isEmpty(state.tagContent)) {
+    return _.head(state.tagContent)
+  } else return {}
+}
+
+TagContent = connect(mapStateToProps)(TagContent);
 export default TagContent;
