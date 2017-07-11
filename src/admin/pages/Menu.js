@@ -47,6 +47,14 @@ var Menu = React.createClass({
   resetForm: function(){
     document.getElementById("menu").reset();
     document.getElementById("menuName").reset();
+    this.setState({newMenuName:"", selectedMenuName:""});
+    this.handleNameChange();
+    this.handleNewMenuChange();
+    window.history.pushState("", "", '/admin/menu');
+  },
+  resetFormDelete: function(){
+    document.getElementById("menu").reset();
+    document.getElementById("menuName").reset();
     this.setState({newMenuName:"", selectedMenuName:"", treeData:""});
     this.handleNameChange();
     this.handleNewMenuChange();
@@ -234,7 +242,7 @@ var Menu = React.createClass({
       riques(Query.deleteMenuQry(idList), 
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
-            me.resetForm();
+            me.resetFormDelete();
             var here = me;
             var cb = function(){here.disableForm(false)}
             me.componentWillMount("All", cb);
@@ -407,7 +415,7 @@ var Menu = React.createClass({
 										<h4>Menu Structure</h4>
 										  <p>Drag each item into the order you prefer. Click the arrow on the right of the item to reveal additional configuration options.</p>
 									      <div className="row">
-												  <div style={{height: 400}}>
+												  <div style={this.state.treeData===null?{height: 50}:{height: 400}}>
                             { this.state.isProcessing &&
                               <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
                             }
