@@ -21,8 +21,68 @@ import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPost
         setOptions, setTagMap} from '../../actions'
 
 let NewContentType = React.createClass({
-  getInitialState: function(){
+  propTypes: {
+    isProcessing: React.PropTypes.bool.isRequired,
+    opacity: React.PropTypes.number.isRequired,
+    errorMsg: React.PropTypes.string,
+    loadingMsg: React.PropTypes.string,
+    title: React.PropTypes.string,
+    slug: React.PropTypes.string,
+    content: React.PropTypes.string,
+    category: React.PropTypes.string,
+    summary: React.PropTypes.string,
+    status: React.PropTypes.string,
+    immediately: React.PropTypes.string,
+    immediatelyStatus: React.PropTypes.bool,
+    visibilityTxt: React.PropTypes.string,
+    permalinkEditing: React.PropTypes.bool,
+    mode: React.PropTypes.string,
+    pageList: React.PropTypes.array,
+    allCategoryList: React.PropTypes.array,
+    postCategoryList: React.PropTypes.array,
+    postTagListInit: React.PropTypes.array,
+    postTagList: React.PropTypes.array,
+    titleTagLeftCharacter: React.PropTypes.number,
+    metaDescriptionLeftCharacter: React.PropTypes.number,
+    publishDate: React.PropTypes.instanceOf(Date),
+    publishDateReset: React.PropTypes.instanceOf(Date),
+    titleTag: React.PropTypes.string,
+    metaKeyword: React.PropTypes.string,
+    metaDescription: React.PropTypes.string,
+    permalinkInProcess: React.PropTypes.bool,
+    isProcessing: React.PropTypes.bool,
+    opacity: React.PropTypes.number,
+    featuredImage: React.PropTypes.string,
+    imageGallery: React.PropTypes.array,
+    tagMap: React.PropTypes.object,
+    connectionValue: React.PropTypes.object
     
+  },
+  getDefaultProps: function() {
+    return {
+      isProcessing: false,
+      opacity: 1,
+      status:"Draft",
+      immediatelyStatus:true,
+      visibilityTxt:"Public",
+      permalinkEditing: false,
+      mode: "create",
+      postCategoryList: [],
+      postTagListInit: [],
+      postTagList: [],
+      titleTagLeftCharacter: 65,
+      metaDescriptionLeftCharacter: 160,
+      publishDate: new Date(),
+      publishDateReset: new Date(),
+      permalinkInProcess: false,
+      isProcessing: false,
+      opacity: 1,
+      imageGallery: [],
+      tagMap: {},
+      connectionValue: {}
+    }
+  },
+  getInitialState: function(){
     return {
       title:"",
       slug:"",
@@ -1022,5 +1082,11 @@ let NewContentType = React.createClass({
 }
 });
 
-NewContentType = connect()(NewContentType);
+const mapStateToProps = function(state){
+  if (!_.isEmpty(state.contentTypeNew)) {
+    return _.head(state.contentTypeNew)
+  } else return {}
+}
+
+NewContentType = connect(mapStateToProps)(NewContentType);
 export default NewContentType;

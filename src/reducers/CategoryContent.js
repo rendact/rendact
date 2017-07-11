@@ -1,16 +1,9 @@
-const contentType = (state = [], action) => {
+const categoryContent = (state = [], action) => {
   switch (action.type) {
-    case 'UPDATE_STATUS_COUNTER':
-      return [
-        {
-          statusCount: action.count
-        }
-      ]
     case 'INIT_CONTENT_LIST':
       return [
         {
-          monthList: action.monthList, 
-          allPostId: action.allPostId
+          monthList: action.monthList
         }
       ]
     case 'TOGGLE_DELETE_MODE':
@@ -33,9 +26,16 @@ const contentType = (state = [], action) => {
           opacity: action.isMasked?0.4:1
         }
       ]
+    case 'SET_EDITOR_MODE':
+      return [
+        ...state,
+        {
+          mode: action.mode
+        }
+      ]
     default:
       return state
   }
 }
 
-export default contentType
+export default categoryContent

@@ -1,29 +1,41 @@
 import React from 'react';
-import $ from 'jquery';
 import Query from '../query';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
-import {riques, hasRole, errorCallback, getValue, setValue, removeTags, swalert, disableForm} from '../../utils';
+import Halogen from 'halogen'
+import {riques, hasRole, errorCallback, getValue, setValue, removeTags, swalert, disableForm, defaultHalogenStyle} from '../../utils';
 import {Table, SearchBox, DeleteButtons} from '../lib/Table';
+import {connect} from 'react-redux'
+import {initContentList, maskArea, setEditorMode, toggleSelectedItemState} from '../../actions'
 
-const CategoryContent = React.createClass({
-  getInitialState: function(){
-      require ('../pages/Posts.css');
-
-      return {
-        dt: null,
-        errorMsg: null,
-        loadingMsg: null,
-        monthList: [],
-        postId:"",
-        deleteMode: false,
-        mode: "create",
-        statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
-        dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
-        activeStatus: "All",
-        itemSelected: false
-      }
+let CategoryContent = React.createClass({
+  propTypes: {
+    isProcessing: React.PropTypes.bool.isRequired,
+    opacity: React.PropTypes.number.isRequired,
+    errorMsg: React.PropTypes.string,
+    loadingMsg: React.PropTypes.string,
+    postId: React.PropTypes.string,
+    mode: React.PropTypes.string,
+    deleteMode: React.PropTypes.bool,
+    statusList: React.PropTypes.arrayOf(React.PropTypes.string),
+    dynamicStateBtnList: React.PropTypes.arrayOf(React.PropTypes.string),
+    activeStatus: React.PropTypes.string,
+    itemSelected: React.PropTypes.bool
   },
+  getDefaultProps: function() {
+    return {
+      isProcessing: false,
+      opacity: 1,
+      monthList: [],
+      deleteMode: false,
+      mode: "create",
+      statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
+      dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
+      activeStatus: "All",
+      itemSelected: false
+    }
+  },
+  dt: null,
   loadData: function(type, callback) {
     var me = this;
     var qry = Query.getAllCategoryQry(this.props.postType);
@@ -44,8 +56,7 @@ const CategoryContent = React.createClass({
 
           var bEdit = hasRole('modify-category');
           me.table.loadData(_dataArr, bEdit);
-          me.setState({monthList: monthList});
-
+          me.props.dispatch(initContentList(monthList))
           if (callback) callback.call();
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
@@ -55,7 +66,7 @@ const CategoryContent = React.createClass({
   },
   handleDeleteBtn: function(event){;
     var me = this;
-    var checkedRow = $("input.categoryCb:checked");
+    var checkedRow = document.querySelectorAll("input.category-postsCb:checked");
     var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
     swalert('warning','Sure want to delete?',"You might lost some data!",
       function () {
@@ -73,30 +84,32 @@ const CategoryContent = React.createClass({
           }
         );
   })},
-  handleNameChange: function(event){
-    var name = $("#name").val();
-    this.setState({name: name})
-  },
   disableForm: function(state){
     disableForm(state, this.notif);
+    this.props.dispatch(maskArea(state));
   },
   checkDynamicButtonState: function(){
-    var checkedRow = $("input.categoryCb:checked");
-    this.setState({itemSelected: checkedRow.length>0})
+    var checkedRow = document.querySelectorAll("input.category-postsCb:checked");
+    this.props.dispatch(toggleSelectedItemState(checkedRow.length>0));
   },
   handleViewPage: function(categoryId){
     this.props.handleNav(this.props.slug,'bycategory', categoryId);
   },
   onAfterTableLoad: function(){
     var me = this;
-    $(".nameText").click(function(event){
+    var nameLink = function(event){
       event.preventDefault();
       var index = this.id.split("-")[0];
       var row = me.table.datatable.data()[index];
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
       setValue("name", name);
-      me.setState({mode: "update", postId: postId});
+      me.props.dispatch(setEditorMode("update", postId))
+    }
+
+    var names = document.getElementsByClassName('nameText');
+    _.forEach(names, function(item){
+      item.addEventListener('click',nameLink);
     });
 
     var postLink = function(event){
@@ -111,11 +124,12 @@ const CategoryContent = React.createClass({
     });
   },
   componentDidMount: function(){
+    require ('../pages/Posts.css');
     this.notif = this.refs.notificationSystem;
     this.table = this.refs.rendactTable;
     var datatable = this.table.datatable;
     this.refs.rendactSearchBox.bindToTable(datatable);
-    this.setState({dt: datatable});
+    this.dt = datatable;
     this.loadData("All");
   },
   handleSubmit: function(event){
@@ -126,11 +140,11 @@ const CategoryContent = React.createClass({
     var qry = "", noticeTxt = "";
     
     me.disableForm(true);
-    if (this.state.mode==="create") {
+    if (this.props.mode==="create") {
       qry = Query.createCategory(name, type);
       noticeTxt = 'Category Published!';
     } else {
-      qry = Query.updateCategory(this.state.postId, name, type);
+      qry = Query.updateCategory(this.props.postId, name, type);
       noticeTxt = 'Category Updated!';
     }
     riques(qry, 
@@ -154,7 +168,7 @@ const CategoryContent = React.createClass({
   resetForm: function(){
     document.getElementById("pageForm").reset();
     setValue("name", "");
-    this.setState({mode: "create"});
+    this.props.dispatch(setEditorMode("create"))
     window.history.pushState("", "", '/admin/category');
   },
 
@@ -181,12 +195,12 @@ const CategoryContent = React.createClass({
                     <div className="col-xs-4" style={{marginTop: 40}}>
                     <form onSubmit={this.handleSubmit} id="pageForm" method="get">
                       <div className="form-group">
-                        <h4><b>{this.state.mode==="create"?"Add New Category":"Edit Category"}</b></h4>
+                        <h4><b>{this.props.mode==="create"?"Add New Category":"Edit Category"}</b></h4>
                       </div>
                       <div className="form-group">
-                          <label htmlFor="name" >Name</label>
+                          <label htmlFor="name" >Category name</label>
                           <div >
-                            <input type="text" name="name" id="name" className="form-control" required="true" onChange={this.handleNameChange}/>
+                            <input type="text" name="name" id="name" className="form-control name" required="true"/>
                             <p className="help-block">The name appears on your site</p>
                           </div>
                       </div>
@@ -199,7 +213,7 @@ const CategoryContent = React.createClass({
                       </div>
                        <div className="form-group">
                           
-                            <input type="submit" name="submit" id="submit" value={this.state.mode==="create"?"Add New Category":"Edit Category"} className="btn btn-primary btn-sm" />
+                            <input type="submit" name="submit" id="submit" value={this.props.mode==="create"?"Add New Category":"Edit Category"} className="btn btn-primary btn-sm" />
                             <input type="button" value="Reset" style={{marginLeft: 10}} onClick={this.resetForm} className="btn btn-primary btn-sm"/>
                             
                       </div>
@@ -208,8 +222,8 @@ const CategoryContent = React.createClass({
                     <div className="col-xs-8">
                       <div style={{marginTop: 10, marginBottom: 20}}>
                           <DeleteButtons 
-                            deleteMode={this.state.deleteMode}
-                            itemSelected={this.state.itemSelected}
+                            deleteMode={this.props.deleteMode}
+                            itemSelected={this.props.itemSelected}
                             onDelete={this.handleDeleteBtn}
                             onRecover={this.handleRecover}
                             onDeletePermanent={this.handleDeletePermanent}
@@ -218,7 +232,10 @@ const CategoryContent = React.createClass({
                         <div className="box-tools pull-right">
                           <SearchBox datatable={this.table} ref="rendactSearchBox"/>
                         </div>
-                      </div>                   
+                      </div>    
+                      { this.props.isProcessing &&
+                      <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
+                      }               
                       <Table 
                           id={"category-"+this.props.slug}
                           columns={[
@@ -231,6 +248,7 @@ const CategoryContent = React.createClass({
                           onSelectAll={this.checkDynamicButtonState}
                           onCheckBoxClick={this.checkDynamicButtonState}
                           onAfterLoad={this.onAfterTableLoad}
+                          style={{opacity: this.props.opacity}}
                         />
                   </div>
                 </div>
@@ -243,4 +261,11 @@ const CategoryContent = React.createClass({
     )},
 });
 
+const mapStateToProps = function(state){
+  if (!_.isEmpty(state.categoryContent)) {
+    return _.head(state.categoryContent)
+  } else return {}
+}
+
+CategoryContent = connect(mapStateToProps)(CategoryContent)
 export default CategoryContent;

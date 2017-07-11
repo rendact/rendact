@@ -208,12 +208,9 @@ var Settings = React.createClass({
 });
 
 const mapStateToProps = function(state){
-	if (state.settings.length>0) {
-		return {
-	  	isProcessing: state.settings[0].isProcessing,
-	  	opacity: state.settings[0].opacity
-	  }
-	} else return []
+	if (!_.isEmpty(state.settings)) {
+		return _.head(state.settings)
+	} else return {}
 }
 
 const mapDispatchToProps = {

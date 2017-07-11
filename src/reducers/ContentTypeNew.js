@@ -1,5 +1,12 @@
 const contentTypeNew = (state = [], action) => {
   switch (action.type) {
+    case 'MASK_AREA':
+      return [
+        {
+          isProcessing: action.isMasked,
+          opacity: action.isMasked?0.4:1
+        }
+      ]
     case 'UPDATE_SLUG':
       return [
         ...state,
