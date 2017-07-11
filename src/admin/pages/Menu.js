@@ -29,7 +29,8 @@ var Menu = React.createClass({
         items: [],
         menuSortableTree:[],
         isProcessing: false,
-        opacity: 1
+        opacity: 1,
+        treeData: null
       }
   },
   maskArea: function(state){
@@ -38,6 +39,26 @@ var Menu = React.createClass({
   disableForm: function(state){
     disableForm(state, this.notif);
     this.maskArea(state);
+  },
+  resetUrl: function (){
+    document.getElementsByName("#url").reset();
+    //this.addUrlToMenu();
+  },
+  resetForm: function(){
+    document.getElementById("menu").reset();
+    document.getElementById("menuName").reset();
+    this.setState({newMenuName:"", selectedMenuName:""});
+    this.handleNameChange();
+    this.handleNewMenuChange();
+    window.history.pushState("", "", '/admin/menu');
+  },
+  resetFormDelete: function(){
+    document.getElementById("menu").reset();
+    document.getElementById("menuName").reset();
+    this.setState({newMenuName:"", selectedMenuName:"", treeData:""});
+    this.handleNameChange();
+    this.handleNewMenuChange();
+    window.history.pushState("", "", '/admin/menu');
   },
   handleMenuName: function(event){
     this.setState({menu: document.querySelector('#menuSelect').value});
@@ -89,15 +110,6 @@ var Menu = React.createClass({
       treeData = _.concat(_treeData, menuValues);
     }
     this.setState ({treeData: treeData});
-    debugger;
-  },
-  resetForm: function(){
-    document.getElementById("menu").reset();
-    document.getElementById("menuName").reset();
-    this.setState({newMenuName:"", selectedMenuName:""});
-    this.handleNameChange();
-    this.handleNewMenuChange();
-    window.history.pushState("", "", '/admin/menu');
   },
   removeNodeMenu: function(rowInfo) {
     var _tree_Data = this.state.treeData;
@@ -230,10 +242,10 @@ var Menu = React.createClass({
       riques(Query.deleteMenuQry(idList), 
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
-            me.resetForm();
-          var here = me;
-          var cb = function(){here.disableForm(false)}
-          me.componentWillMount("All", cb);
+            me.resetFormDelete();
+            var here = me;
+            var cb = function(){here.disableForm(false)}
+            me.componentWillMount("All", cb);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
           }
@@ -380,24 +392,30 @@ var Menu = React.createClass({
 					    		  </div>
 					    	  </div>
 					      </div>
-					      <form onSubmit={this.handleUpdateMenu} id="menuName" method="get">
+					      
 					      <div className="box box-default">
+                 <form onSubmit={this.handleUpdateMenu} id="menuName" method="get">
   								<div className="box-header with-border attachment-block clearfix">
   								  <div className="form-group">
   								  	<div className="col-md-3">
   								  	  <h4>Menu Name :</h4>
   								  	</div>
-  									  <div className="col-md-9">
+  									  <div className="col-md-6">
   									    <input type="text" name="selectedMenuName" id="selectedMenuName" className="form-control" required="true" onChange={this.handleNameChange}/>
   								  	</div>
+                      <div className="col-md-3">
+                        <div className="box-tools pull-right">
+                          <button type="submit" id="submit" name="submit" className="btn btn-flat btn-primary" >Update Menu</button>
+                        </div>
+                      </div>
   								  </div>
   								</div>
-								<div class="box-body">
+								  <div className="box-body">
 								  <section className="content">
 										<h4>Menu Structure</h4>
 										  <p>Drag each item into the order you prefer. Click the arrow on the right of the item to reveal additional configuration options.</p>
 									      <div className="row">
-												  <div style={{ height: 400 }}>
+												  <div style={this.state.treeData===null?{height: 50}:{height: 400}}>
                             { this.state.isProcessing &&
                               <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
                             }
@@ -421,11 +439,11 @@ var Menu = React.createClass({
 											</div>
 											<div className="col-md-9">
 												<div className="checkbox">
-								                    <label>
-								                      <input type="checkbox"/>
-								                      Automatically add new top-level pages to this menu
-								                    </label>
-								                </div>
+								          <label>
+								            <input type="checkbox"/>
+								            Automatically add new top-level pages to this menu
+								          </label>
+								        </div>
 											</div>
 										</div>
 										<div className="row">
@@ -434,40 +452,30 @@ var Menu = React.createClass({
 											</div>
 											<div className="col-md-9">
 												<div className="checkbox">
-								                    <label>
-								                      <input type="checkbox"/>
-								                      Top Menu
-								                    </label>
-								                </div>
-								                <div className="checkbox">
-								                    <label>
-								                      <input type="checkbox"/>
-								                      Social Links Menu
-								                    </label>
-								                </div>
+								          <label>
+								            <input type="checkbox"/>
+								            Top Menu
+								          </label>
+								        </div>
+								        <div className="checkbox">
+								          <label>
+								            <input type="checkbox"/>
+								            Social Links Menu
+								          </label>
+								        </div>
 											</div>
 										</div>
 									</section>
 								</div>
-
-								<div className="box-header with-border attachment-block clearfix">
-									<div className="form-group">
-										<div className="col-md-6">
-											<button className="btn btn-flat btn-danger" id="deleteBtn" onClick={this.handleDelete}>Delete Menu</button>
-										</div>
-										<div className="col-md-6">
-											<div className="box-tools pull-right">
-											<button type="submit" id="submit" name="submit" className="btn btn-flat btn-primary" >Update Menu</button>
-											</div>
-										</div>
-									</div>
-								</div>
-						    </div>
-						  </form>
-		          </div>
+              </form>
+              <div className="box-header with-border attachment-block clearfix">
+                <button className="btn btn-flat btn-danger pull-right" id="deleteBtn" data-target="menuName" onClick={this.handleDelete}>Delete Menu</button>
+              </div>
+						  </div>
 		        </div>
-          </div>
-		    </div>
+		      </div>
+        </div>
+		  </div>
 		)
 	}
 });
