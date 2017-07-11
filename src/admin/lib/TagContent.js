@@ -1,5 +1,4 @@
 import React from 'react';
-import $ from 'jquery';
 import Query from '../query';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
@@ -74,7 +73,7 @@ let TagContent = React.createClass({
   },
   handleDeleteBtn: function(event){
     var me = this;
-    var checkedRow = $("input.tag"+this.props.slug+"Cb:checked");
+    var checkedRow = document.querySelectorAll("input.tag-"+this.props.slug+"Cb:checked");
     var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
     
     swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
@@ -109,7 +108,7 @@ let TagContent = React.createClass({
     this.props.dispatch(toggleSelectedItemState(checkedRow.length>0));
   },
   handleNameChange: function(event){
-    var name = $("#name").val();
+    var name = getValue("name");
     this.props.dispatch(setNameValue(name));
   },
   handleViewPage: function(tagId){
@@ -117,7 +116,8 @@ let TagContent = React.createClass({
   },
   onAfterTableLoad: function(){
     var me = this;
-    $(".nameText").click(function(event){
+
+    var nameLink = function(event){
       event.preventDefault();
       var index = this.id.split("-")[0];
       var row = me.table.datatable.data()[index];
@@ -125,9 +125,14 @@ let TagContent = React.createClass({
       var name = removeTags(row[1]);
       setValue("name", name);
       me.props.dispatch(setEditorMode("update", postId))
+    }
+
+    var titles = document.getElementsByClassName('nameText');
+    _.forEach(titles, function(item){
+      item.addEventListener('click',nameLink);
     });
 
-     var postLink = function(event){
+    var postLink = function(event){
       event.preventDefault();
       var tagId = this.id.split("-")[1];
       me.handleViewPage(tagId);
