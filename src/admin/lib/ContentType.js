@@ -22,7 +22,7 @@ let ContentType = React.createClass({
     dynamicStateBtnList: React.PropTypes.arrayOf(React.PropTypes.string),
     activeStatus: React.PropTypes.string,
     itemSelected: React.PropTypes.bool,
-    isProcessing: React.PropTypes.bool,
+    //isProcessing: React.PropTypes.bool,
     fields: React.PropTypes.array,
     allPostId: React.PropTypes.array,
     replaceStatusWithRole: React.PropTypes.bool

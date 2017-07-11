@@ -50,8 +50,8 @@ let NewContentType = React.createClass({
     metaKeyword: React.PropTypes.string,
     metaDescription: React.PropTypes.string,
     permalinkInProcess: React.PropTypes.bool,
-    isProcessing: React.PropTypes.bool,
-    opacity: React.PropTypes.number,
+    //isProcessing: React.PropTypes.bool,
+    //opacity: React.PropTypes.number,
     featuredImage: React.PropTypes.string,
     imageGallery: React.PropTypes.array,
     tagMap: React.PropTypes.object,
@@ -75,8 +75,8 @@ let NewContentType = React.createClass({
       publishDate: new Date(),
       publishDateReset: new Date(),
       permalinkInProcess: false,
-      isProcessing: false,
-      opacity: 1,
+      //isProcessing: false,
+      //opacity: 1,
       imageGallery: [],
       tagMap: {},
       connectionValue: {}
@@ -200,7 +200,6 @@ let NewContentType = React.createClass({
     return out;
   },
   setFormValues: function(v){
-    var me = this;
     var meta = [];
     if (v.meta.edges.length>0) {
       _.forEach(v.meta.edges, function(i){

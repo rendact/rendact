@@ -1,6 +1,5 @@
 import React from 'react';
 import SortableTree from 'react-sortable-tree';
-import removeNodeAtPath from 'react-sortable-tree';
 import Query from '../query';
 import _ from 'lodash';
 import Halogen from 'halogen';
@@ -101,8 +100,7 @@ var Menu = React.createClass({
     	return item.checked
     });
 	  var menuValues = [];
-	  menuValues = _.map(menuFiltered, function(item){{return {title: item.value}}})
-    
+	  menuValues = _.map(menuFiltered, function(item){return {title: item.value}});
     var treeData = "";
     if (_treeData===null) {
       treeData = menuValues;
@@ -115,9 +113,9 @@ var Menu = React.createClass({
     var _tree_Data = this.state.treeData;
     var node2 = rowInfo;
     var node = node2.node;
-    var _tree_Data = _tree_Data.filter(function(item) {
+    var _treeData = _tree_Data.filter(function(item) {
       return item !== node    });
-    this.setState ({treeData: _tree_Data});
+    this.setState ({treeData: _treeData});
   },
   handleNewMenuChange: function(event){
     var newMenuName = getValue("newMenuName");

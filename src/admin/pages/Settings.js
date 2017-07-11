@@ -6,10 +6,10 @@ import Query from '../query'
 import {riques, errorCallback, getFormData, disableForm, defaultHalogenStyle} from '../../utils'
 import {connect} from 'react-redux'
 import {maskArea} from '../../actions'
-import { Field, reduxForm } from 'redux-form'
+import { reduxForm } from 'redux-form'
 
 let SettingsForm = (props) => {
-  const { handleSubmitBtn, style, pristine, reset, submitting } = props
+  const { handleSubmitBtn, style } = props
   return (
   	<form onSubmit={handleSubmitBtn} className="form-horizontal" style={style} >
 			    			

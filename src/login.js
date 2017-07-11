@@ -2,7 +2,7 @@ import React from 'react'
 import AdminLTEinit from './admin/lib/app.js'
 import 'bootstrap/dist/css/bootstrap.css'
 import '../public/css/Login.css'
-import {setLogged} from './actions'
+//import {setLogged} from './actions'
 import {connect} from 'react-redux'
 
 let Login = React.createClass({
