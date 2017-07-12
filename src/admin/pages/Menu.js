@@ -14,6 +14,7 @@ var Menu = React.createClass({
         name:"",
         selectedMenuName:"",
         newMenuName:"",
+        urlMenu: "",
         menuId:"",
         tagId:"",
         dt: null,
@@ -29,7 +30,8 @@ var Menu = React.createClass({
         menuSortableTree:[],
         isProcessing: false,
         opacity: 1,
-        treeData: null
+        treeData: null,
+        itemsChecked: false
       }
   },
   maskArea: function(state){
@@ -39,9 +41,15 @@ var Menu = React.createClass({
     disableForm(state, this.notif);
     this.maskArea(state);
   },
+  resetFormCheckbox: function(){
+    _.filter(document.getElementsByName("itemsChecked[]"), function(item){
+      return item.checked = false
+    });
+  },
   resetFormUrl: function (){
     document.getElementsById("urlSabmit").reset();
-    this.setState({urlSabmit:""});
+    this.setState({urlMenu:""});
+    this.handleUrl();
     window.history.pushState("", "", '/admin/menu');
   },
   resetForm: function(){
@@ -100,8 +108,6 @@ var Menu = React.createClass({
     }
     this.setState ({treeData: treeData});
     this.resetFormUrl();
-
-    debugger;
   },
   addToMenu: function(event){
     var _treeData = this.state.treeData;
@@ -117,6 +123,8 @@ var Menu = React.createClass({
       treeData = _.concat(_treeData, menuValues);
     }
     this.setState ({treeData: treeData});
+
+    this.resetFormCheckbox();
   },
   removeNodeMenu: function(rowInfo) {
     var _tree_Data = this.state.treeData;
