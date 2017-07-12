@@ -178,3 +178,25 @@ export const setAvatar = (avatar)  => ({
   type: 'SET_AVATAR',
   avatar
 })
+
+export const toggleConfigLoad = (state)  => ({
+  type: 'TOGGLE_CONFIG_LOAD',
+  state
+})
+
+export const toggleControlSidebar = (state)  => ({
+  type: 'TOGGLE_CONTROL_SIDEBAR',
+  state
+})
+
+export const toggleUnsavedDataState = (state)  => ({
+  type: 'TOGGLE_UNSAVED_DATA',
+  state
+})
+
+export const setActivePage = (pageId, actioId, postId)  => ({
+  type: 'SET_ACTIVE_PAGE',
+  pageId,
+  actioId,
+  postId
+})

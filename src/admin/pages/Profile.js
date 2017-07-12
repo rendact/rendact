@@ -38,12 +38,19 @@ let Profile = React.createClass({
   getDefaultProps: function() {
   	var p = JSON.parse(localStorage.getItem("profile"));
 		var dateOfBirth = "";
-		if (p.dateOfBirth && p.dateOfBirth!=="") 
-			dateOfBirth = new Date(p.dateOfBirth)
+		var image = "";
+		var timezone = "";
 
-		var image = getConfig('rootUrl')+"/images/avatar-default.png";
-		if (JSON.parse(localStorage.getItem("profile")).image)
-			image = JSON.parse(localStorage.getItem("profile")).image;
+		if (p) {
+			if (p.dateOfBirth && p.dateOfBirth!=="") 
+				dateOfBirth = new Date(p.dateOfBirth)
+
+			var image = getConfig('rootUrl')+"/images/avatar-default.png";
+			if (JSON.parse(localStorage.getItem("profile")).image)
+				image = JSON.parse(localStorage.getItem("profile")).image;
+
+			timezone = p.timezone;
+		}
 
     return {
       isProcessing: false,
@@ -51,7 +58,7 @@ let Profile = React.createClass({
       avatar: image,
 			passwordActive: false,
 			userMetaList: AdminConfig.userMetaList,
-			timezone: p.timezone,
+			timezone: timezone,
 			country: "",
 			dateOfBirth: dateOfBirth,
 			metaFields: ['bio','website','facebook','twitter','linkedin','timezone','phone']
