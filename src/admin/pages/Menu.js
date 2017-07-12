@@ -33,15 +33,16 @@ var Menu = React.createClass({
       }
   },
   maskArea: function(state){
-    this.setState({isProcessing: state, opacity: state?0.4:1});
+    this.setState({isProcessing: state, opacity: state?0.1:1});
   },
   disableForm: function(state){
     disableForm(state, this.notif);
     this.maskArea(state);
   },
-  resetUrl: function (){
-    document.getElementsByName("#url").reset();
-    //this.addUrlToMenu();
+  resetFormUrl: function (){
+    document.getElementsById("urlSabmit").reset();
+    this.setState({urlSabmit:""});
+    window.history.pushState("", "", '/admin/menu');
   },
   resetForm: function(){
     document.getElementById("menu").reset();
@@ -67,9 +68,9 @@ var Menu = React.createClass({
   	this.setState({menuId:menuId});
   	var me = this;
     var qry = Query.getMenuQry(menuId);
+        me.disableForm(true);
 	  riques(qry, 
       function(error, response, body) {
-        me.disableForm(true);
         if (!error && !body.errors && response.statusCode === 200) {
         	var items = [];
           items = body.data.getMenu.items;
@@ -82,9 +83,14 @@ var Menu = React.createClass({
       }
     );
   },
-  addUrlToMenu: function(event){
+  handleUrl: function(event){
+    var urlMenu = getValue("urlMenu");
+    this.setState({urlMenu: urlMenu})
+  },
+  handleUrlSubmit: function(event){
+    event.preventDefault();
     var _treeData = this.state.treeData;
-    var url = getValue("url");
+    var url = getValue("urlMenu");
     var _url = [{title: url}];
     var treeData = "";
     if (_treeData===null) {
@@ -93,6 +99,9 @@ var Menu = React.createClass({
       treeData = _.concat(_treeData, _url);
     }
     this.setState ({treeData: treeData});
+    this.resetFormUrl();
+
+    debugger;
   },
   addToMenu: function(event){
     var _treeData = this.state.treeData;
@@ -332,21 +341,22 @@ var Menu = React.createClass({
 									</div>
 								</div>
 								<div className="box-body pad">
-									<div className="row">
-								  	<div className="col-md-3">	
-                      <h5>URL</h5>
+                  <form onSubmit={this.handleUrlSubmit} id="urlSabmit" method="get">
+  									<div className="row">
+                      <div className="col-md-3">
+                        <h5>URL</h5>
+                      </div>
+                      <div className="col-md-9">
+                        <input type="text" name="urlMenu" id="urlMenu" className="form-control" onChange={this.handleUrl}/>
+                      </div>
                     </div>
-                    <div className="col-md-9">  
-                      <input type="text" name="url" id="url" className="form-control" required="true"/>
+                    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+                    <div className="box-tools pull-right">
+                      <button type="submit" id="submit" disabled={this.state.newMenuName===""} className="btn btn-flat btn-default">Add to Menu</button>
                     </div>
-								  </div>
-								  <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
-								  	<div className="box-tools pull-right">
-								  		<button className="btn btn-flat btn-default" type="button" onClick={this.addUrlToMenu} 
-                                    style={{marginRight: 10}} data-target="#url">Add to Menu</button>
-								  	</div>
-								</div>
-							</div>
+                  </form>
+							  </div>
+              </div>  
 							<div className="box box-default collapsed-box box-solid">
 								<div className="box-header with-border">
 									<h3 className="box-title">Categories</h3>
