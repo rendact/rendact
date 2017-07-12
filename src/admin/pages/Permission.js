@@ -3,26 +3,35 @@ import $ from 'jquery';
 window.jQuery = $;
 import _ from 'lodash';
 import Notification from 'react-notification-system';
+import Halogen from 'halogen'
 import Query from '../query';
-import {riques, disableForm, errorCallback} from '../../utils';
+import {riques, disableForm, errorCallback, defaultHalogenStyle} from '../../utils';
 import AdminConfig from '../AdminConfig';
+import {connect} from 'react-redux'
+import {maskArea, setOptionId} from '../../actions'
 
-const Permission = React.createClass({
-  getInitialState: function(){
-    require ('datatables');
-    require ('datatables/media/css/jquery.dataTables.min.css');
-
+let Permission = React.createClass({
+  propTypes: {
+    isProcessing: React.PropTypes.bool.isRequired,
+    opacity: React.PropTypes.number.isRequired,
+    errorMsg: React.PropTypes.string,
+    loadingMsg: React.PropTypes.string,
+    itemSelected: React.PropTypes.bool,
+    itemList: React.PropTypes.array,
+    optionId: React.PropTypes.string
+  },
+  getDefaultProps: function() {
     return {
-      dt: null,
-      itemSelected: false,
-      notification: null,
+      isProcessing: false,
+      opacity: 1,
       itemList: [],
-      optionId: null
+      itemSelected: false
     }
   },
-  loadData: function(datatable) {
-    datatable.clear();
-    var here = this;
+  dt: null,
+  loadData: function() {
+    this.dt.clear();
+    var me = this;
     var qry = Query.getPermissionConfigQry;
 
     this.disableForm(true);
@@ -33,7 +42,7 @@ const Permission = React.createClass({
 
           if (body.data.viewer.allOptions.edges.length>0) {
             var item = body.data.viewer.allOptions.edges[0];
-            here.setState({optionId: item.node.id});
+            me.props.dispatch(setOptionId(item.node.id))
             var permissionConfig = JSON.parse(item.node.value);
 
             _.forEach(AdminConfig.PermissionList, function(item){
@@ -52,10 +61,10 @@ const Permission = React.createClass({
 
               });
 
-              datatable.row.add(row);
+              me.dt.row.add(row);
             });
-            datatable.draw();
-            here.disableForm(false); 
+            me.dt.draw();
+            me.disableForm(false); 
           }
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
@@ -86,7 +95,7 @@ const Permission = React.createClass({
       item: "permissionConfig",
       value: isi
     };
-    if (this.state.optionId) _objData["id"] = this.state.optionId;
+    if (this.props.optionId) _objData["id"] = this.props.optionId;
     var qry = Query.createUpdateSettingsMtn([_objData]);
 
     riques(qry, 
@@ -106,16 +115,20 @@ const Permission = React.createClass({
   },
   disableForm: function(state){
     disableForm(state, this.notification, ["permissionChk"]);
+    this.props.dispatch(maskArea(state));
   },
   componentDidMount: function(){
-    var datatable = $('#pageListTbl').DataTable({
+    require ('datatables');
+    require ('datatables/media/css/jquery.dataTables.min.css');
+    
+    this.dt = $('#pageListTbl').DataTable({
         "paging"  : false,
         "searching": false,
         "ordering": false,
         "info"    : false
       }); 
     this.notification = this.refs.notificationSystem;
-    this.loadData(datatable);
+    this.loadData();
   },
   render: function(){
     return (
@@ -144,8 +157,11 @@ const Permission = React.createClass({
                         </div>
                         <div className="box-tools" style={{marginTop: 10}}>
                         </div>
-                      </div>                   
-                      <table id="pageListTbl" className="display">
+                      </div>       
+                      { this.props.isProcessing &&
+                      <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
+                      }                           
+                      <table id="pageListTbl" className="display" style={{opacity: this.props.opacity}}>
                         <thead>
                           <tr>
                             <th style={{width: 500, color: 'blue'}}>Functionality</th>
@@ -181,4 +197,12 @@ const Permission = React.createClass({
     )},
 });
 
+
+const mapStateToProps = function(state){
+  if (!_.isEmpty(state.permission)) {
+    return _.head(state.permission)
+  } else return {}
+}
+
+Permission = connect(mapStateToProps)(Permission)
 export default Permission;

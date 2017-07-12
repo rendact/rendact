@@ -4,6 +4,8 @@ import contentType from './ContentType'
 import contentTypeNew from './ContentTypeNew'
 import categoryContent from './CategoryContent'
 import tagContent from './TagContent'
+import content from './Content'
+import permission from './Permission'
 
 const main = (state = [], action) => {
   switch (action.type) {
@@ -26,7 +28,9 @@ const rendactApp = combineReducers({
   contentType,
   contentTypeNew,
   categoryContent,
-  tagContent
+  tagContent,
+  content,
+  permission
 })
 
 export default rendactApp

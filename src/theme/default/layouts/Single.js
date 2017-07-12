@@ -5,45 +5,13 @@ import Footer from '../includes/Footer'
 import Notification from 'react-notification-system';
 import moment from 'moment'
 import Query from '../../../admin/query';
+import {CommentForm} from '../../../includes/theme';
 import {riques, getValue, setValue, errorCallback} from '../../../utils';
 
 const Single = React.createClass({
 	componentDidMount: function() {
-    	this.notification = this.refs.notificationSystem;
-  	},
-
-
-	handleSubmitBtn: function(event){
-		event.preventDefault();
-		var me = this;
-		var author = getValue("author");
-		var email = getValue("email");
-		var comment = getValue("comment");
-
-		var qry = "";
-
-	    qry = Query.createComment(author,email,comment,this.props.postId);
-	    
-	  
-		riques(qry, 
-			function(error, response, body){
-				if(!error && !body.errors) {
-					me.notification.addNotification({
-							message: 'Comment has been sent',
-							level: 'success',
-							position: 'tr',
-							autoDismiss: 5
-						});
-					author=setValue("author","");
-					email=setValue("email","");
-					comment=setValue("comment","");
-				} else {
-					errorCallback(error, body.errors?body.errors[0].message:null);
-				}
-			}
-		);
-		debugger;	
-	}, 
+  	this.notification = this.refs.notificationSystem;
+	},
 	render: function() {
 		return (
 			<div className="application">
@@ -110,21 +78,7 @@ const Single = React.createClass({
 								<div className="leave">
 									<h4>Leave a comment</h4>
 								</div>
-								<form onSubmit={this.handleSubmitBtn} id="commentform">
-									 <p className="comment-form-author-name"><label htmlFor="author">Name</label>
-										<input id="author" className="form-control" name="author" type="text" size="30" />
-									 </p>
-									 <p className="comment-form-email">
-										<label htmlFor="email">Email</label>
-										<input id="email" className="form-control" name="email" type="text" size="30" />
-									 </p>
-									 <p className="comment-form-comment">
-										<label htmlFor="comment">Comment</label>
-										<textarea id="comment" className="form-control"></textarea>
-									 </p>
-									 <div className="clearfix"></div>
-									<input type="submit" value="send" className="btn btn-primary btn-sm" />
-								</form>
+								<CommentForm postId={this.props.postId}/>
 						</div>
 						
 					  </div>

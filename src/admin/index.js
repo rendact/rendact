@@ -205,7 +205,7 @@ const PageLoader = React.createClass({
 			'themes' : <Themes handleNav={hn}/>,
 			'menu': <Menu handleNav={hn}/>,
 			'themes-customize': <Customize handleNav={hn}/>,
-			'permission' : <Permission handleNav={hn}/>,
+			'users-permissions' : <Permission handleNav={hn}/>,
 			'plugins' : <Plugins handleNav={hn}/>,
 			'users': <Users handleNav={hn}/>,
 			'posts-new' : <NewPost handleNav={hn} handleUnsavedData={hud}/>,
@@ -224,7 +224,7 @@ const PageLoader = React.createClass({
 		} else if (this.isContentType(page) && !hasRole("view-content")){
 			return <NotPermissible/>
 		}
-
+		
 		if (map[page+action]) {
 			return map[page+action]
 		} else if (this.isContentType(page)) {

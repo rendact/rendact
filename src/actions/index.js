@@ -162,3 +162,8 @@ export const setNameValue = (name)  => ({
   type: 'SET_NAME_VALUE',
   name
 })
+
+export const setOptionId = (optionId)  => ({
+  type: 'SET_OPTION_ID',
+  optionId
+})

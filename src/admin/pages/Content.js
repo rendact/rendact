@@ -1,36 +1,49 @@
 import React from 'react';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
+import Halogen from 'halogen'
 import Query from '../query';
 import {riques, hasRole, errorCallback, disableForm, swalert} from '../../utils';
 import AdminConfig from '../AdminConfig';
 import {Table, SearchBoxPost, DeleteButtons} from '../lib/Table';
+import {connect} from 'react-redux'
+import {initContentList, maskArea, toggleSelectedItemState} from '../../actions'
 
-const Content = React.createClass({
-  getInitialState: function(){
-
+let Content = React.createClass({
+  propTypes: {
+    isProcessing: React.PropTypes.bool.isRequired,
+    opacity: React.PropTypes.number.isRequired,
+    errorMsg: React.PropTypes.string,
+    loadingMsg: React.PropTypes.string,
+    deleteMode: React.PropTypes.bool,
+    activeStatus: React.PropTypes.string,
+    itemSelected: React.PropTypes.bool
+  },
+  getDefaultProps: function() {
     return {
+      isProcessing: false,
+      opacity: 1,
       deleteMode: false,
       activeStatus: "All",
-      itemSelected: false,
-      fixedContent: {
-        "postId": "fixed",
-        "name": "Posts",
-        "slug": "post",
-        "fields": this._fieldTemplate(AdminConfig.PostFields),
-        "status": "active",
-        "createdAt": null
-      }
+      itemSelected: false
     }
   },
   loadData: function(type, callback) {
     var me = this;
     var qry = Query.getContentListQry();
-    
+    var fixedContent = {
+      "postId": "fixed",
+      "name": "Posts",
+      "slug": "post",
+      "fields": this._fieldTemplate(AdminConfig.PostFields),
+      "status": "active",
+      "createdAt": null
+    }
+
     riques(qry, 
       function(error, response, body) { 
         if (body.data) { 
-          var _dataArr = [me.state.fixedContent];
+          var _dataArr = [fixedContent];
 
           _.forEach(body.data.viewer.allContents.edges, function(item){
             var dt = new Date(item.node.createdAt);
@@ -67,11 +80,12 @@ const Content = React.createClass({
     return fields;
   },
   disableForm: function(state){
-    disableForm(state, this.notification)
+    disableForm(state, this.notification);
+    this.props.dispatch(maskArea(state));
   },
   checkDynamicButtonState: function(){
     var checkedRow = document.querySelectorAll("input.contentListCb:checked");
-    this.setState({itemSelected: checkedRow.length>0})
+    this.props.dispatch(toggleSelectedItemState(checkedRow.length>0));
   },
   handleDeleteBtn: function(event){
     var me = this;
@@ -147,8 +161,8 @@ const Content = React.createClass({
                     <div className="col-xs-12">
                       <div style={{marginTop: 10, marginBottom: 20}}>
                         <DeleteButtons 
-                          deleteMode={this.state.deleteMode}
-                          itemSelected={this.state.itemSelected}
+                          deleteMode={this.props.deleteMode}
+                          itemSelected={this.props.itemSelected}
                           onDelete={this.handleDeleteBtn}
                         />                                          
                         <div className="box-tools pull-right">
@@ -183,4 +197,11 @@ const Content = React.createClass({
     )},
 });
 
+const mapStateToProps = function(state){
+  if (!_.isEmpty(state.content)) {
+    return _.head(state.content)
+  } else return {}
+}
+
+Content = connect(mapStateToProps)(Content)
 export default Content;
