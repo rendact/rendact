@@ -167,3 +167,14 @@ export const setOptionId = (optionId)  => ({
   type: 'SET_OPTION_ID',
   optionId
 })
+
+export const setDateBirthAndTimezone = (dateOfBirth, timeZone) => ({
+  type: 'SET_DATEBIRTH_TIMEZONE',
+  dateOfBirth,
+  timeZone
+})
+
+export const setAvatar = (avatar)  => ({
+  type: 'SET_AVATAR',
+  avatar
+})

@@ -45,7 +45,7 @@ let Customize = React.createClass({
 	},
 	disableForm: function(state){
     disableForm(state, this.notification);
-    this.maskArea(state);
+    this.props.dispatch(maskArea(state));
   },
 	handleSubmitBtn: function(event){
 		event.preventDefault();
@@ -85,7 +85,7 @@ let Customize = React.createClass({
 			        <li className="active">Settings</li>
 			      </ol>
 			      <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
-			      { this.state.isProcessing &&
+			      { this.props.isProcessing &&
             <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
             }
 			    </section>
@@ -95,7 +95,7 @@ let Customize = React.createClass({
 			    	<div className="row">
 					  	<div className="col-md-3" style={{width: "20%"}}>
 						  	<section className="content">
-				    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" style={{opacity: this.state.opacity}}>
+				    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" style={{opacity: this.props.opacity}}>
 				    				
 				    				<div className="form-group">
 									  	<label htmlFor="name">Website name</label>
