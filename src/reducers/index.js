@@ -6,6 +6,7 @@ import categoryContent from './CategoryContent'
 import tagContent from './TagContent'
 import content from './Content'
 import permission from './Permission'
+import customize from './Customize'
 
 const main = (state = [], action) => {
   switch (action.type) {
@@ -30,7 +31,8 @@ const rendactApp = combineReducers({
   categoryContent,
   tagContent,
   content,
-  permission
+  permission,
+  customize
 })
 
 export default rendactApp

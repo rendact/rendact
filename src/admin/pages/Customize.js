@@ -5,17 +5,23 @@ import Halogen from 'halogen';
 import Query from '../query';
 import {riques, errorCallback, getFormData, disableForm, defaultHalogenStyle} from '../../utils';
 import $ from 'jquery';
-window.$ = $;
 import ColorPicker from 'rc-color-picker';
 import 'rc-color-picker/assets/index.css';
+import {connect} from 'react-redux'
+import {maskArea} from '../../actions'
+window.$ = $;
 
-var Customize = React.createClass({
-	getInitialState: function(){
-		return {
-			isProcessing: false,
+let Customize = React.createClass({
+	propTypes: {
+    isProcessing: React.PropTypes.bool.isRequired,
+    opacity: React.PropTypes.number.isRequired,
+  },
+  getDefaultProps: function() {
+    return {
+      isProcessing: false,
       opacity: 1
-		}
-	},
+    }
+  },
 	loadData: function(){
 		var qry = Query.loadSettingsQry;
 		var me = this;
@@ -40,9 +46,6 @@ var Customize = React.createClass({
 	disableForm: function(state){
     disableForm(state, this.notification);
     this.maskArea(state);
-  },
-  maskArea: function(state){
-  	this.setState({isProcessing: state, opacity: state?0.4:1});
   },
 	handleSubmitBtn: function(event){
 		event.preventDefault();
@@ -144,4 +147,11 @@ var Customize = React.createClass({
 	}
 });
 
+const mapStateToProps = function(state){
+  if (!_.isEmpty(state.customize)) {
+    return _.head(state.customize)
+  } else return {}
+}
+
+Customize = connect(mapStateToProps)(Customize)
 export default Customize;
