@@ -4,9 +4,7 @@ import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
 import Notification from 'react-notification-system';
 import moment from 'moment'
-import Query from '../../../admin/query';
 import {CommentForm} from '../../../includes/theme';
-import {riques, getValue, setValue, errorCallback} from '../../../utils';
 
 const Single = React.createClass({
 	componentDidMount: function() {

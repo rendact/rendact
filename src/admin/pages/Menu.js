@@ -213,7 +213,6 @@ var Menu = React.createClass({
     var selectedMenuName = newMenuName;
     setValue("selectedMenuName", selectedMenuName); 
     this.setState({menuId:menuId});
-    var me = this;
     var qry = Query.getMenuQry(menuId);
         me.disableForm(true);
     riques(qry, 

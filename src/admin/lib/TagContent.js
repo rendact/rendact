@@ -138,8 +138,8 @@ let TagContent = React.createClass({
       me.handleViewPage(tagId);
     }
 
-    var titles = document.getElementsByClassName('tagText');
-    _.forEach(titles, function(item){
+    var title = document.getElementsByClassName('tagText');
+    _.forEach(title, function(item){
       item.addEventListener('click',postLink);
     });
   },

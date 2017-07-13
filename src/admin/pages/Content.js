@@ -1,13 +1,12 @@
 import React from 'react';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
-import Halogen from 'halogen'
 import Query from '../query';
 import {riques, hasRole, errorCallback, disableForm, swalert} from '../../utils';
 import AdminConfig from '../AdminConfig';
 import {Table, SearchBoxPost, DeleteButtons} from '../lib/Table';
 import {connect} from 'react-redux'
-import {initContentList, maskArea, toggleSelectedItemState} from '../../actions'
+import {maskArea, toggleSelectedItemState} from '../../actions'
 
 let Content = React.createClass({
   propTypes: {
