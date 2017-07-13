@@ -45,7 +45,7 @@ let Profile = React.createClass({
 			if (p.dateOfBirth && p.dateOfBirth!=="") 
 				dateOfBirth = new Date(p.dateOfBirth)
 
-			var image = getConfig('rootUrl')+"/images/avatar-default.png";
+			image = getConfig('rootUrl')+"/images/avatar-default.png";
 			if (JSON.parse(localStorage.getItem("profile")).image)
 				image = JSON.parse(localStorage.getItem("profile")).image;
 

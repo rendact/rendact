@@ -36,7 +36,7 @@ import {riques, hasRole, errorCallback, getConfig, swalert} from '../utils';
 import Query from './query';
 import {loadConfig} from '../utils';
 import {connect} from 'react-redux'
-import {maskArea, toggleConfigLoad, toggleControlSidebar, toggleUnsavedDataState, setActivePage} from '../actions'
+import { toggleConfigLoad, toggleControlSidebar, toggleUnsavedDataState, setActivePage} from '../actions'
 
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
