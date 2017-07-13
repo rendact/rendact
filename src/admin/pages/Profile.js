@@ -6,10 +6,12 @@ import DateTime from 'react-datetime';
 import TimezonePicker from 'react-bootstrap-timezone-picker';
 import CountrySelect from '../lib/CountrySelect';
 import Notification from 'react-notification-system';
-
+import Halogen from 'halogen';
 import Query from '../query';
 import AdminConfig from '../AdminConfig';
-import {riques, getValue, setValue, errorCallback, getFormData, disableForm, getConfig, swalert} from '../../utils';
+import {riques, getValue, setValue, errorCallback, getFormData, disableForm, getConfig, swalert, defaultHalogenStyle} from '../../utils';
+import {connect} from 'react-redux'
+import {maskArea, setDateBirthAndTimezone, setAvatar} from '../../actions'
 
 window.getBase64Image = function(img) {
   var canvas = document.createElement("canvas");
@@ -21,29 +23,50 @@ window.getBase64Image = function(img) {
   return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
 }
 
-var Profile = React.createClass({
-	getInitialState: function(){
-		var p = JSON.parse(localStorage.getItem("profile"));
+let Profile = React.createClass({
+	propTypes: {
+    isProcessing: React.PropTypes.bool.isRequired,
+    opacity: React.PropTypes.number.isRequired,
+    avatar: React.PropTypes.string,
+		passwordActive: React.PropTypes.bool,
+		userMetaList: React.PropTypes.array,
+		timezone: React.PropTypes.string,
+		country: React.PropTypes.string,
+		dateOfBirth: React.PropTypes.string,
+		metaFields: React.PropTypes.array
+  },
+  getDefaultProps: function() {
+  	var p = JSON.parse(localStorage.getItem("profile"));
 		var dateOfBirth = "";
-		if (p.dateOfBirth && p.dateOfBirth!=="") 
-			dateOfBirth = new Date(p.dateOfBirth)
+		var image = "";
+		var timezone = "";
 
-		var image = getConfig('rootUrl')+"/images/avatar-default.png";
-		if (JSON.parse(localStorage.getItem("profile")).image)
-			image = JSON.parse(localStorage.getItem("profile")).image;
-		return {
-			avatar: image,
+		if (p) {
+			if (p.dateOfBirth && p.dateOfBirth!=="") 
+				dateOfBirth = new Date(p.dateOfBirth)
+
+			var image = getConfig('rootUrl')+"/images/avatar-default.png";
+			if (JSON.parse(localStorage.getItem("profile")).image)
+				image = JSON.parse(localStorage.getItem("profile")).image;
+
+			timezone = p.timezone;
+		}
+
+    return {
+      isProcessing: false,
+      opacity: 1,
+      avatar: image,
 			passwordActive: false,
 			userMetaList: AdminConfig.userMetaList,
-			timezone: p.timezone,
+			timezone: timezone,
 			country: "",
 			dateOfBirth: dateOfBirth,
 			metaFields: ['bio','website','facebook','twitter','linkedin','timezone','phone']
-		}
-	},
+    }
+  },
 	setProfile: function(p) {
 		var meta = {}
-		_.forEach(this.state.userMetaList, function(item){
+		_.forEach(this.props.userMetaList, function(item){
 			meta[item] = _.find(p.meta.edges, {"node": {"item": item}});
 		})
 	  
@@ -66,17 +89,17 @@ var Profile = React.createClass({
 	      linkedin: meta["linkedin"]?meta["linkedin"].node.value:"",
 	      userPrefConfig: meta["userPrefConfig"]?meta["userPrefConfig"].node.value:""
 	  }
-	  this.setState({dateOfBirth: profile.dateOfBirth, timezone: profile.timezone})
+	  this.props.dispatch(setDateBirthAndTimezone(profile.dateOfBirth, profile.timezone));
 	  localStorage.setItem('profile', JSON.stringify(profile));
 	},
 	setUserMeta: function(metaList){
 		var me = this;
   		var profile = JSON.parse(localStorage.getItem("profile"));
-		_.forEach(this.state.userMetaList, function(item){
+		_.forEach(this.props.userMetaList, function(item){
 			var i = _.find(metaList, {"item": item});
 			if (i){
 				if (item==="timezone"){
-					me.setState({timezone: i.value});
+					me.props.dispatch(setDateBirthAndTimezone(me.props.dateOfBirth, i.value))
 				} else {
 					profile[i.item] = i.value;
 				}
@@ -86,6 +109,7 @@ var Profile = React.createClass({
 	},
 	disableForm: function(state){
 		disableForm(state, this.notification);
+		this.props.dispatch(maskArea(state))
 	},
 	handleSubmitBtn: function(event){
 		event.preventDefault();
@@ -93,12 +117,12 @@ var Profile = React.createClass({
 		var me = this;
 		var _data = getFormData("rdt-input-form");
 		_data["userId"] = localStorage.getItem("userId");
-		_data["image"] = this.state.avatar;
-		_data["dateOfBirth"] = this.state.dateOfBirth;
-		_data["timezone"] = this.state.timezone;
+		_data["image"] = this.props.avatar;
+		_data["dateOfBirth"] = this.props.dateOfBirth;
+		_data["timezone"] = this.props.timezone;
 
 		var isMetaEmpty = true;
-		_.forEach(this.state.metaFields, function(item) { if (_data[item]!==null) isMetaEmpty = false } );
+		_.forEach(this.props.metaFields, function(item) { if (_data[item]!==null) isMetaEmpty = false } );
 
 		// Change password
 		var oldPassword = getValue("old-password");
@@ -124,7 +148,7 @@ var Profile = React.createClass({
 			function(error, response, body){
 				if(!error && !body.errors) {
 					var p = body.data.updateUser.changedUser;
-					me.setState({avatar: p.image});
+					me.props.dispatch(setAvatar(p.image))
           me.setProfile(p);
           var here = me;
 
@@ -190,7 +214,7 @@ var Profile = React.createClass({
 		var reader = new FileReader();
 	    reader.onloadend = function(res) {
 	      var imageBase64 = res.target.result;
-	      me.setState({avatar: imageBase64});
+	      me.props.dispatch(setAvatar(imageBase64));
 	    }
 	    reader.readAsDataURL(accepted[0]);
 	},
@@ -203,7 +227,7 @@ var Profile = React.createClass({
 		}
 	},
 	handleBirthDateChange: function(date){
-	 	this.setState({dateOfBirth: date.toISOString()});
+		this.props.dispatch(setDateBirthAndTimezone(date.toISOString(), this.props.timezone))
 	},
 	handleGeneratePassword: function(event){
 		event.preventDefault();
@@ -223,13 +247,12 @@ var Profile = React.createClass({
 			document.getElementById("new-password").setAttribute("type","password")
 	},
 	handleTimezoneChange: function(tz){
-		this.setState({timezone: tz});
+		this.props.dispatch(setDateBirthAndTimezone(this.props.dateOfBirth, tz));
 	},
 	componentDidMount: function(){
 		require ('react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css');
 		require ('react-datetime/css/react-datetime.css');
 		this.notification = this.refs.notificationSystem;
-
 	},
 	render: function(){ 
 		let p = JSON.parse(localStorage.getItem("profile"));
@@ -254,6 +277,9 @@ var Profile = React.createClass({
 			    	<div className="row">
 					  	<div className="col-md-8">
 						  	<section className="content">
+						  		{ this.props.isProcessing &&
+                  <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
+                  }
 				    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" id="profileForm">
 				    			
 						  			<div className="form-group">
@@ -269,7 +295,7 @@ var Profile = React.createClass({
 								  	<div className="col-md-9">
 										<Dropzone onDrop={this.handleImageDrop}>
 											<div className="avatar-container">
-					              			  <img src={this.state.avatar} alt='' id="avatar"/> 
+					              			  <img src={this.props.avatar} alt='' id="avatar"/> 
 											  <div className="avatar-overlay"></div>
 											  <div className="avatar-button"><a href="#"> Change </a></div>
 											</div>
@@ -425,7 +451,7 @@ var Profile = React.createClass({
 									<div className="form-group">
 									 	<label htmlFor="new-password-2" className="col-md-3">Re-type new password</label>
 									 	<div className="col-md-9">
-											<input type="password" name="new-password-2" id="new-password-2" className="form-control" style={{width:300}} disabled={!this.state.passwordActive}/>
+											<input type="password" name="new-password-2" id="new-password-2" className="form-control" style={{width:300}} disabled={!this.props.passwordActive}/>
 										</div>
 									</div>
 																
@@ -449,4 +475,11 @@ var Profile = React.createClass({
 	}
 });
 
+const mapStateToProps = function(state){
+  if (!_.isEmpty(state.profile)) {
+    return _.head(state.profile)
+  } else return {}
+}
+
+Profile = connect(mapStateToProps)(Profile)
 export default Profile;

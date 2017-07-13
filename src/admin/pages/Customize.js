@@ -5,17 +5,23 @@ import Halogen from 'halogen';
 import Query from '../query';
 import {riques, errorCallback, getFormData, disableForm, defaultHalogenStyle} from '../../utils';
 import $ from 'jquery';
-window.$ = $;
 import ColorPicker from 'rc-color-picker';
 import 'rc-color-picker/assets/index.css';
+import {connect} from 'react-redux'
+import {maskArea} from '../../actions'
+window.$ = $;
 
-var Customize = React.createClass({
-	getInitialState: function(){
-		return {
-			isProcessing: false,
+let Customize = React.createClass({
+	propTypes: {
+    isProcessing: React.PropTypes.bool.isRequired,
+    opacity: React.PropTypes.number.isRequired,
+  },
+  getDefaultProps: function() {
+    return {
+      isProcessing: false,
       opacity: 1
-		}
-	},
+    }
+  },
 	loadData: function(){
 		var qry = Query.loadSettingsQry;
 		var me = this;
@@ -39,10 +45,7 @@ var Customize = React.createClass({
 	},
 	disableForm: function(state){
     disableForm(state, this.notification);
-    this.maskArea(state);
-  },
-  maskArea: function(state){
-  	this.setState({isProcessing: state, opacity: state?0.4:1});
+    this.props.dispatch(maskArea(state));
   },
 	handleSubmitBtn: function(event){
 		event.preventDefault();
@@ -82,7 +85,7 @@ var Customize = React.createClass({
 			        <li className="active">Settings</li>
 			      </ol>
 			      <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
-			      { this.state.isProcessing &&
+			      { this.props.isProcessing &&
             <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
             }
 			    </section>
@@ -92,7 +95,7 @@ var Customize = React.createClass({
 			    	<div className="row">
 					  	<div className="col-md-3" style={{width: "20%"}}>
 						  	<section className="content">
-				    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" style={{opacity: this.state.opacity}}>
+				    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" style={{opacity: this.props.opacity}}>
 				    				
 				    				<div className="form-group">
 									  	<label htmlFor="name">Website name</label>
@@ -144,4 +147,11 @@ var Customize = React.createClass({
 	}
 });
 
+const mapStateToProps = function(state){
+  if (!_.isEmpty(state.customize)) {
+    return _.head(state.customize)
+  } else return {}
+}
+
+Customize = connect(mapStateToProps)(Customize)
 export default Customize;
