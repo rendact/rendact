@@ -52,14 +52,6 @@ var Menu = React.createClass({
     this.handleUrl();
     window.history.pushState("", "", '/admin/menu');
   },
-  resetForm: function(){
-    document.getElementById("menu").reset();
-    document.getElementById("menuName").reset();
-    this.setState({newMenuName:"", selectedMenuName:""});
-    this.handleNameChange();
-    this.handleNewMenuChange();
-    window.history.pushState("", "", '/admin/menu');
-  },
   resetFormDelete: function(){
     document.getElementById("menu").reset();
     document.getElementById("menuName").reset();
@@ -150,7 +142,9 @@ var Menu = React.createClass({
     var qry = Query.createMenu(newMenuName);
     var noticeTxt = "Menu Saved";
     riques(qry, 
-      function(error, response, body) { 
+      function(error, response, body) {
+        var newMenuId = body.data.createMenu.changedMenu.id;
+        me.setState({newMenuId: newMenuId}); 
         if (!error && !body.errors && response.statusCode === 200) {
           me.notif.addNotification({
                   message: noticeTxt,
@@ -158,7 +152,7 @@ var Menu = React.createClass({
                   position: 'tr',
                   autoDismiss: 2
           });
-          me.resetForm();
+          me.resetFormNewMenu();
           var here = me;
           var cb = function(){here.disableForm(false)}
           me.componentWillMount("All", cb);
@@ -197,6 +191,48 @@ var Menu = React.createClass({
         }
         me.disableForm(false);
       });
+  },
+  resetFormNewMenu: function(){
+    var me = this;
+      riques(Query.getAllMenu, 
+        function(error, response, body) {
+          if (!error) {
+            var pageList = [(<option key="0" value="">--select menu--</option>)];
+            _.forEach(body.data.viewer.allMenus.edges, function(item){
+              pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
+            })
+            me.setState({pageList: pageList});
+            _.filter(document.getElementsByName("menuSelect"), function(item){
+            return item.selectedIndex = "1"
+            });
+          }
+        }
+      );
+    var menuId = this.state.newMenuId;
+    var newMenuName = getValue("newMenuName");
+    var selectedMenuName = newMenuName;
+    setValue("selectedMenuName", selectedMenuName); 
+    this.setState({menuId:menuId});
+    var me = this;
+    var qry = Query.getMenuQry(menuId);
+        me.disableForm(true);
+    riques(qry, 
+      function(error, response, body) {
+        if (!error && !body.errors && response.statusCode === 200) {
+          var items = [];
+          items = body.data.getMenu.items;
+          me.setState({treeData: items});
+          me.disableForm(false);
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+        me.disableForm(false);
+      }
+    );
+    _.filter(document.getElementsByName("menuSelect"), function(item){
+    return item.selectedIndex = "1"
+    });
+    document.getElementById("menu").reset();
   },
   componentWillMount: function(){
     var me = this;
