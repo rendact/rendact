@@ -228,9 +228,6 @@ var Menu = React.createClass({
         me.disableForm(false);
       }
     );
-    _.filter(document.getElementsByName("menuSelect"), function(item){
-    return item.selectedIndex = "1"
-    });
     document.getElementById("menu").reset();
   },
   componentWillMount: function(){
