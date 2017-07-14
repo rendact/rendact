@@ -35,8 +35,6 @@ import AdminLTEinit from './lib/app.js';
 import {riques, hasRole, errorCallback, getConfig, swalert} from '../utils';
 import Query from './query';
 import {loadConfig} from '../utils';
-import {connect} from 'react-redux'
-import { toggleConfigLoad, toggleControlSidebar, toggleUnsavedDataState, setActivePage} from '../actions'
 
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -317,37 +315,30 @@ const PageLoader = React.createClass({
 });
 
 
-let Admin = React.createClass({
-	propTypes: {
-    isProcessing: React.PropTypes.bool.isRequired,
-    opacity: React.PropTypes.number.isRequired,
-    page: React.PropTypes.string,
-		action: React.PropTypes.string,
-		postId: React.PropTypes.string,
-		tagId: React.PropTypes.string,
-		configLoaded: React.PropTypes.bool,
-		hasUnsavedData: React.PropTypes.bool,
-		showCtrlSidebar: React.PropTypes.bool
-  },
-  getDefaultProps: function() {
-    return {
-      isProcessing: false,
-      opacity: 1,
-      page: 'dashboard',
-			action: '',
+const Admin = React.createClass({
+	getInitialState: function() {
+		return {
+			page: this.props.params['page']?this.props.params['page']:'dashboard',
+			action: this.props.params['action']?this.props.params['action']:'',
+			postId: this.props.params['postId']?this.props.params['postId']:null,
+			tagId: this.props.params['tagId']?this.props.params['tagId']:null,
 			configLoaded: false,
 			hasUnsavedData: false,
-			showCtrlSidebar: true,
+			showCtrlSidebar: true
+		}
+	},
+	getDefaultProps: function() {
+		return { 
 			params: {
 				page: 'dashboard',
 				action: ''
 			}
-    }
-  },
+		}
+	},
 	componentDidMount: function(){
 		var me = this;
 		loadConfig(function(){
-			me.props.dispatch(toggleConfigLoad(true))
+			me.setState({configLoaded: true})
 
 			require ('jquery-ui/themes/base/theme.css');
 			require ('jquery-ui/themes/base/tooltip.css');
@@ -360,10 +351,10 @@ let Admin = React.createClass({
 			AdminLTEinit();
 		});
 
-		if (this.props.page==="themes" && this.props.action==="customize") {
-			me.props.dispatch(toggleControlSidebar(false))
+		if (this.state.page==="themes" && this.state.action==="customize") {
+			this.setState({showCtrlSidebar: false})
 		} else {
-			me.props.dispatch(toggleControlSidebar(true))
+			this.setState({showCtrlSidebar: true})
 		}
 
 		window.onpopstate = this.onBackButtonEvent;
@@ -373,7 +364,7 @@ let Admin = React.createClass({
 	 	this._reactInternalInstance._context.history.go(0);
 	},
 	setUnsavedDataState: function(state){
-		this.props.dispatch(toggleUnsavedDataState(state))
+		this.setState({hasUnsavedData: state});
 	},
 	confirmUnsavedData: function(callback){
 		var state = true;
@@ -406,10 +397,17 @@ let Admin = React.createClass({
 		this.confirmUnsavedData(
 			function() {
 			if (postId) {
-				me.props.dispatch(setActivePage(pageId, actionId, postId))
+				me.setState({
+					page: pageId,
+					action: actionId,
+					postId: postId
+				})
 				window.history.pushState("", "", '/admin/'+pageId+'/'+actionId+'/'+postId);
 			} else {
-				me.props.dispatch(setActivePage(pageId, actionId))
+				me.setState({
+					page: pageId,
+					action: actionId
+				})
 				if (actionId)
 					window.history.pushState("", "", '/admin/'+pageId+'/'+actionId);
 				else 
@@ -422,7 +420,7 @@ let Admin = React.createClass({
 		this.confirmUnsavedData(
 			function(){
 				var pg = pageId.split("-");
-				me.props.dispatch(setActivePage(pg[0], pg[1]?pg[1]:''))
+				me.setState({page: pg[0], action: pg[1]?pg[1]:''});
 				callback.call();
 			}
 		);
@@ -432,21 +430,21 @@ let Admin = React.createClass({
 		this.props.onlogin(false);
 	},
 	render: function() {
-		if (this.props.AuthService.loggedIn() && this.props.configLoaded) {
+		if (this.props.AuthService.loggedIn() && this.state.configLoaded) {
 			return (
 				<div className="wrapper">
 	        		
 	        <AdminHeader authService={this.props.AuthService} handleSignout={this.handleSignout} onProfileClick={this.handleProfileClick} />
-	  			<SideMenu onClick={this.handleMenuClick} activeMenu={this.props.page+(this.props.action?'-':'')+this.props.action}/>
+	  			<SideMenu onClick={this.handleMenuClick} activeMenu={this.state.page+(this.state.action?'-':'')+this.state.action}/>
 					<PageLoader 
-						pageId={this.props.page} 
-						actionId={this.props.action} 
-						postId={this.props.postId} 
+						pageId={this.state.page} 
+						actionId={this.state.action} 
+						postId={this.state.postId} 
 						handleNav={this.redirectToPage}
 						handleUnsavedData={this.setUnsavedDataState}
 					/>
 					<Footer/>
-					{ this.props.showCtrlSidebar && 
+					{ this.state.showCtrlSidebar && 
 						<ControlSidebar/>
 					}
 					<div className="control-sidebar-bg"></div>
@@ -460,11 +458,4 @@ let Admin = React.createClass({
 	}
 });
 
-const mapStateToProps = function(state){
-  if (!_.isEmpty(state.admin)) {
-    return _.head(state.admin)
-  } else return {}
-}
-
-Admin = connect(mapStateToProps)(Admin)
 export default Admin
