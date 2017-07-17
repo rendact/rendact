@@ -30,7 +30,7 @@ var Menu = React.createClass({
         isProcessing: false,
         opacity: 1,
         treeData: null,
-        itemsChecked: false
+        itemsChecked: false,
       }
   },
   maskArea: function(state){
@@ -390,7 +390,7 @@ var Menu = React.createClass({
                     </div>
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
                     <div className="box-tools pull-right">
-                      <button type="submit" id="submit" disabled={this.state.newMenuName===""} className="btn btn-flat btn-default">Add to Menu</button>
+                      <button type="submit" id="submit" disabled={this.state.urlMenu===""} className="btn btn-flat btn-default">Add to Menu</button>
                     </div>
                   </form>
 							  </div>
