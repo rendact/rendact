@@ -9,7 +9,6 @@ import {swalert, riques, errorCallback, setValue, getValue, disableForm, default
 var Menu = React.createClass({
   getInitialState: function(){
       require ('../pages/Posts.css');
-
       return {
         name:"",
         selectedMenuName:"",
@@ -31,7 +30,7 @@ var Menu = React.createClass({
         isProcessing: false,
         opacity: 1,
         treeData: null,
-        itemsChecked: false
+        itemsChecked: false,
       }
   },
   maskArea: function(state){
@@ -47,10 +46,7 @@ var Menu = React.createClass({
     });
   },
   resetFormUrl: function (){
-    document.getElementsById("urlSabmit").reset();
-    this.setState({urlMenu:""});
-    this.handleUrl();
-    window.history.pushState("", "", '/admin/menu');
+    document.getElementById("urlSabmit").reset();
   },
   resetFormDelete: function(){
     document.getElementById("menu").reset();
@@ -99,7 +95,9 @@ var Menu = React.createClass({
       treeData = _.concat(_treeData, _url);
     }
     this.setState ({treeData: treeData});
-    this.resetFormUrl();
+    var me = this;
+    me.resetFormUrl();
+    debugger;
   },
   addToMenu: function(event){
     var _treeData = this.state.treeData;
@@ -392,7 +390,7 @@ var Menu = React.createClass({
                     </div>
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
                     <div className="box-tools pull-right">
-                      <button type="submit" id="submit" disabled={this.state.newMenuName===""} className="btn btn-flat btn-default">Add to Menu</button>
+                      <button type="submit" id="submit" disabled={this.state.urlMenu===""} className="btn btn-flat btn-default">Add to Menu</button>
                     </div>
                   </form>
 							  </div>
@@ -463,10 +461,10 @@ var Menu = React.createClass({
 										<h4>Menu Structure</h4>
 										  <p>Drag each item into the order you prefer. Click the arrow on the right of the item to reveal additional configuration options.</p>
 									      <div className="row">
-												  <div style={this.state.treeData===null?{height: 50}:{height: 400}}>
                             { this.state.isProcessing &&
                               <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
                             }
+												  <div style={{height:300}}>
 										        <SortableTree
 										          id="treeDatas"
 										          treeData={this.state.treeData}
