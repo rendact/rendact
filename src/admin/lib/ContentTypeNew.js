@@ -82,40 +82,6 @@ let NewContentType = React.createClass({
       connectionValue: {}
     }
   },
-  getInitialState: function(){
-    return {
-      title:"",
-      slug:"",
-      content:"",
-      category: "",
-      summary:"",
-      status:"Draft",
-      immediately:"",
-      immediatelyStatus:this.props.postId?false:true,
-      visibilityTxt:"Public",
-      permalinkEditing: false,
-      mode: this.props.postId?"update":"create",
-      pageList: null,
-      allCategoryList: null,
-      postCategoryList: [],
-      postTagListInit: [],
-      postTagList: [],
-      titleTagLeftCharacter: 65,
-      metaDescriptionLeftCharacter: 160,
-      publishDate: new Date(),
-      publishDateReset: new Date(),
-      titleTag: "",
-      metaKeyword: "",
-      metaDescription: "",
-      permalinkInProcess: false,
-      isProcessing: false,
-      opacity: 1,
-      featuredImage: null,
-      imageGallery: [],
-      tagMap: {},
-      connectionValue: {}
-    }
-  },
   isWidgetActive: function(name){
     return _.indexOf(this.props.widgets, name) > -1;
   },

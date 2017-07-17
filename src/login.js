@@ -40,7 +40,6 @@ let Login = React.createClass({
 
 		function successFn(){
 			me.disableForm(false);
-			debugger;
 			//this.props.dispatch(setLogged(true, pathname))
 			me.props.onlogin(true, pathname);
 		}
