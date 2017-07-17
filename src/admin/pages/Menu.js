@@ -427,7 +427,7 @@ var Menu = React.createClass({
 				                    	</div>
 				                    	<div className="col-md-7">
       										      <div className="form-group">
-      										      <select id="menuSelect" onChange={this.handleMenuName} name="menuSelect" className="form-control btn select" >
+      										      <select id="menuSelect" onChange={this.handleMenuName} name="menuSelect" className="form-control select" >
       											     {this.state.pageList}
       											     </select>
       										    </div>
