@@ -200,3 +200,8 @@ export const setActivePage = (pageId, actioId, postId)  => ({
   actioId,
   postId
 })
+
+export const loadFormData = (data)  => ({
+  type: 'LOAD_FORM_DATA',
+  data
+})

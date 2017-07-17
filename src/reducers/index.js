@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux'
+import { reducer as reduxFormReducer } from 'redux-form';
 import settings from './Settings'
 import contentType from './ContentType'
 import contentTypeNew from './ContentTypeNew'
@@ -26,6 +27,7 @@ const main = (state = [], action) => {
 
 
 const rendactApp = combineReducers({
+  form: reduxFormReducer,
 	main,
   settings,
   contentType,

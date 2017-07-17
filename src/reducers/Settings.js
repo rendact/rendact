@@ -11,6 +11,12 @@ const settings = (state = [], action) => {
           opacity: action.isMasked?0.4:1
         }
       ]
+    case 'LOAD_FORM_DATA':
+      return [
+        {
+          data: action.data
+        }
+      ]
     default:
       return state
   }
