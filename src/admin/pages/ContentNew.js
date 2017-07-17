@@ -3,8 +3,11 @@ import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Query from '../query';
 import {riques, getValue, setValue, getFormData, errorCallback, disableForm, swalert} from '../../utils';
+import {connect} from 'react-redux'
+import {maskArea, loadFormData} from '../../actions'
+import {reduxForm, Field} from 'redux-form'
 
-const Field = React.createClass({
+const ContentField = React.createClass({
 	render: function(){
 		return (
 			<div className="form-inline" >
@@ -17,7 +20,7 @@ const Field = React.createClass({
 	}
 });
 
-var ContentNew = React.createClass({
+let ContentNew = React.createClass({
 	defaultFields: [
 		{id:"title", label: "Title", type: "link", deletable: false},
 		{id:"slug", label: "Slug", type: "text", deletable: false}
@@ -57,14 +60,7 @@ var ContentNew = React.createClass({
 		);
 	},
 	setFormValues: function(data){
-		setValue("name", data.name);
-		setValue("slug", data.slug);
-		setValue("description", data.description);
-		setValue("menuIcon", data.menuIcon);
-		setValue("label", data.label);
-		setValue("labelSingular", data.labelSingular);
-		setValue("labelAddNew", data.labelAddNew);
-		setValue("labelEdit", data.labelEdit);
+		this.props.dispatch(loadFormData(data));
 		document.getElementById("status").checked = data.status==="active"?true:false;
 		
 		this.setState({providedFields: data.fields});
@@ -289,7 +285,7 @@ var ContentNew = React.createClass({
 					  		<div className="form-group">
 								 	<label htmlFor="name" className="col-md-3">Name</label>
 								 	<div className="col-md-9">
-										<input type="text" name="name" id="name" className="form-control rdt-input-form" onBlur={this.handleNameBlur} style={{width: 'auto'}} required/>
+										<Field name="name" component="input" type="text" className="form-control" onBlur={this.handleNameBlur} style={{width: 'auto'}}/>
 										<p className="help-block">The new post type system name ( max. 20 characters ). Min 2 letters. Once added the post type system name cannot be changed.</p>
 									</div>
 								</div>
@@ -298,7 +294,7 @@ var ContentNew = React.createClass({
 								 	<label htmlFor="slug" className="col-md-3">Slug</label>
 							  	<div className="col-md-9">
 							  		<div className="form-inline">
-											<input type="text" name="slug" id="slug" className="form-control rdt-input-form" onBlur={this.handleSlugBlur} required/>
+							  			<Field name="slug" component="input" type="text" className="form-control" onBlur={this.handleNameBlur} />
 											{ this.state.checkingSlug && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
 											<p className="help-block">ID for the custom content type ( max. 20 characters ). Alphanumeric lower-case characters and underscores only. Min 2 letters. Once added the post type system name cannot be changed.</p>
 										</div>
@@ -309,7 +305,7 @@ var ContentNew = React.createClass({
 								 	<label htmlFor="description" className="col-md-3">Description</label>
 							  	<div className="col-md-9">
 							  		<div className="form-inline">
-											<input type="text" name="description" id="description" className="form-control rdt-input-form"/>
+											<Field name="description" component="input" type="text" className="form-control"/>
 											<p className="help-block">A short descriptive summary of what the post type is.</p>
 										</div>
 									</div>
@@ -318,7 +314,7 @@ var ContentNew = React.createClass({
 								<div className="form-group">
 								 	<label htmlFor="name" className="col-md-3">Menu icon</label>
 								 	<div className="col-md-9">
-										<input type="text" name="menuIcon" id="menuIcon" className="form-control rdt-input-form" style={{width: 'auto'}}/>
+										<Field name="menuIcon" component="input" type="text" className="form-control" style={{width: 'auto'}} />
 										<p className="help-block">Font awesome icon class for menu icon</p>
 									</div>
 								</div>
@@ -429,7 +425,7 @@ var ContentNew = React.createClass({
 										<h4>Current fields</h4>
 										{
 											this.state.fields.map(function(item){
-												return <Field 
+												return <ContentField 
 																key={item.label}
 																name={item.label} 
 																type={item.type} 
@@ -449,28 +445,28 @@ var ContentNew = React.createClass({
 		            	<div className="form-group">
 									 	<label htmlFor="label" className="col-md-3">Name</label>
 									 	<div className="col-md-9">
-											<input type="text" name="label" id="label" placeholder={this.state.label} className="form-control rdt-input-form" style={{width: 'auto'}} />
+											<Field name="label" component="input" type="text" placeholder={this.state.label} className="form-control" style={{width: 'auto'}} />
 										</div>
 									</div>
 
 									<div className="form-group">
 									 	<label htmlFor="label-singular" className="col-md-3">Singular Name</label>
 									 	<div className="col-md-9">
-											<input type="text" name="labelSingular" id="labelSingular" placeholder={this.state.labelSingular} className="form-control rdt-input-form" style={{width: 'auto'}} />
+											<Field name="labelSingular" component="input" type="text" placeholder={this.state.labelSingular} className="form-control" style={{width: 'auto'}} />
 										</div>
 									</div>
 
 									<div className="form-group">
 									 	<label htmlFor="label-add-new" className="col-md-3">Add New</label>
 									 	<div className="col-md-9">
-											<input type="text" name="labelAddNew" id="labelAddNew" placeholder={this.state.labelAddNew} className="form-control rdt-input-form" style={{width: 'auto'}} />
+											<Field name="labelAddNew" component="input" type="text" placeholder={this.state.labelAddNew} className="form-control" style={{width: 'auto'}} />
 										</div>
 									</div>
 
 									<div className="form-group">
 									 	<label htmlFor="label-edit" className="col-md-3">Edit</label>
 									 	<div className="col-md-9">
-											<input type="text" name="labelEdit" id="labelEdit" placeholder={this.state.labelEdit} className="form-control rdt-input-form" style={{width: 'auto'}} />
+											<Field name="labelEdit" component="input" type="text" placeholder={this.state.labelEdit} className="form-control" style={{width: 'auto'}} />
 										</div>
 									</div>
 		            </div>
@@ -494,4 +490,16 @@ var ContentNew = React.createClass({
 	}
 });
 
+const mapStateToProps = function(state){
+	if (!_.isEmpty(state.contentNew)) {
+		var out = _.head(state.contentNew);
+		out["initialValues"] = out.data;
+		return out;
+	} else return {}
+}
+
+ContentNew = reduxForm({
+  form: 'newContentForm'
+})(ContentNew);
+ContentNew = connect(mapStateToProps)(ContentNew);
 export default ContentNew;
