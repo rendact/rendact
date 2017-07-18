@@ -189,6 +189,12 @@ const contentTypeNew = (state = [], action) => {
           options: action.options
         }
       ]
+    case 'LOAD_FORM_DATA':
+      return [
+        {
+          data: action.data
+        }
+      ]
     default:
       return state
   }

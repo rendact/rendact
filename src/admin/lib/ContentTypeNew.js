@@ -11,14 +11,15 @@ import Halogen from 'halogen';
 import { default as swal } from 'sweetalert2';
 import ReactSelect from 'react-select';
 import 'react-select/dist/react-select.css';
-import {connect} from 'react-redux'
+import {connect} from 'react-redux';
 import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPostEditor,
         setCategoryList, setTagList, setImageGalleryList, setConnectionValue, setContentFormValues,
         toggleSaveImmediatelyMode, togglePermalinkEditingState, setVisibilityMode,
         setPostTitle, setPostContent, setPostSummary, updateTitleTagLeftCharacter,
         updateMetaDescriptionLeftCharacter, setPostPublishDate, setFeaturedImage,
         setEditorMode, toggleImageGalleyBinded, setPageList, setAllCategoryList,
-        setOptions, setTagMap} from '../../actions'
+        setOptions, setTagMap, loadFormData} from '../../actions'
+import {reduxForm, Field, formValueSelector} from 'redux-form';
 
 let NewContentType = React.createClass({
   propTypes: {
@@ -50,18 +51,19 @@ let NewContentType = React.createClass({
     metaKeyword: React.PropTypes.string,
     metaDescription: React.PropTypes.string,
     permalinkInProcess: React.PropTypes.bool,
-    //isProcessing: React.PropTypes.bool,
-    //opacity: React.PropTypes.number,
     featuredImage: React.PropTypes.string,
     imageGallery: React.PropTypes.array,
     tagMap: React.PropTypes.object,
-    connectionValue: React.PropTypes.object
-    
+    connectionValue: React.PropTypes.object,
+    data: React.PropTypes.object,
+    parent: React.PropTypes.string,
   },
   getDefaultProps: function() {
     return {
       isProcessing: false,
       opacity: 1,
+      title: "",
+      content: "",
       status:"Draft",
       immediatelyStatus:true,
       visibilityTxt:"Public",
@@ -75,11 +77,11 @@ let NewContentType = React.createClass({
       publishDate: new Date(),
       publishDateReset: new Date(),
       permalinkInProcess: false,
-      //isProcessing: false,
-      //opacity: 1,
       imageGallery: [],
       tagMap: {},
-      connectionValue: {}
+      connectionValue: {},
+      data: {},
+      parent: ""
     }
   },
   isWidgetActive: function(name){
@@ -92,7 +94,7 @@ let NewContentType = React.createClass({
       function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
           var slugCount = body.data.viewer.allPosts.edges.length;
-          if (me.state.mode==="create") {
+          if (me.props.mode==="create") {
             if (slugCount > 0) me.props.dispatch(setSlug(slug+"-"+slugCount, false));
             else me.props.dispatch(setSlug(slug, false));
           } else {
@@ -109,7 +111,7 @@ let NewContentType = React.createClass({
   saveImmediately: function(event){
     var hours = getValue("hours");
     var minute = getValue("minute");
-    var time = this.state.publishDate + hours + minute;
+    var time = this.props.publishDate + hours + minute;
     this.props.dispatch(toggleSaveImmediatelyMode(false, time));
   },
   handleChangeStatus: function(event){
@@ -140,23 +142,23 @@ let NewContentType = React.createClass({
     return {
       title: getValue("titlePost"),
       content: window.CKEDITOR.instances['content'].getData(),
-      status: this.state.status,
+      status: this.props.status,
       titleTag: getValue("titleTag"),
       metaKeyword: getValue("metaKeyword"),
       metaDescription: getValue("metaDescription"),
       passwordPage: "",
       summary: getValue("summary"),
       visibility: document.querySelector("input[name=visibilityRadio]:checked").value,
-      publishDate: this.state.publishDate,
+      publishDate: this.props.publishDate,
       type: this.props.slug,
-      featuredImage: this.state.featuredImage,
+      featuredImage: this.props.featuredImage,
       categories: _.map(categories, function(item){return item.value})
     }
   },
   getMetaFormValues: function(){
     var out = getFormData("metaField");
 
-    _.forEach(this.state.connectionValue, function(item, key){
+    _.forEach(this.props.connectionValue, function(item, key){
       out.push({
         item: "conn~"+key,
         value: item.value
@@ -207,18 +209,16 @@ let NewContentType = React.createClass({
     }
 
     var pubDate = v.publishDate? new Date(v.publishDate) : new Date();
-    setValue("titlePost", v.title);
-    setValue("content", v.content);
     window.CKEDITOR.instances['content'].setData(v.content);
-    setValue("summary", v.summary);
-    setValue("statusSelect", v.status);
     setValue("hours", pubDate.getHours());
     setValue("minutes", pubDate.getMinutes());
     document.getElementsByName("visibilityRadio")[v.visibility==="Public"?0:1].checked = true;
 
-    var _connectionValue = this.state.connectionValue;
+    var _connectionValue = this.props.connectionValue;
+    var metaValues = {}
     _.forEach(meta, function(item){
-      setValue(item.item, item.value);
+      //setValue(item.item, item.value);
+      metaValues[item.item] = item.value;
       var el = document.getElementsByName(item.item);
       if (el && el.length>0) {
         el[0].id = item.id
@@ -229,6 +229,7 @@ let NewContentType = React.createClass({
       }
     });
     this.props.dispatch(setConnectionValue(_connectionValue));
+    this.props.dispatch(loadFormData(_.merge(v, metaValues)));
 
     v.publishDate = pubDate;
     v.publishDateReset = pubDate;
@@ -249,7 +250,7 @@ let NewContentType = React.createClass({
     }
   },
   handlePermalinkBtn: function(event) {
-    var slug = this.state.slug;
+    var slug = this.props.slug;
     setValue("slugcontent", slug);
     this.props.dispatch(togglePermalinkEditingState(true));
   },
@@ -278,7 +279,7 @@ let NewContentType = React.createClass({
     this.notifyUnsavedData(true);
   },
   handleTitleTagChange: function(event){
-    var titleTag = getValue("titleTag");
+    var titleTag = this.props.titleTag;
     this.props.dispatch(updateTitleTagLeftCharacter(65-(titleTag.length)));
     this.notifyUnsavedData(true);
   },
@@ -294,14 +295,14 @@ let NewContentType = React.createClass({
   handleTimeChange: function(event){
     var hours = getValue("hours");
     var minutes = getValue("minutes");
-    var d = this.state.publishDate;
+    var d = this.props.publishDate;
     d.setHours(parseInt(hours, 10));
     d.setMinutes(parseInt(minutes, 10));
     this.props.dispatch(setPostPublishDate(d, false));
     this.notifyUnsavedData(true);
   },
   handlePublishDateCancel: function(event){
-    var resetDate = this.state.publishDateReset;
+    var resetDate = this.props.publishDateReset;
     this.props.dispatch(setPostPublishDate(resetDate, false));
   },
   handleAddNewBtn: function(event) {
@@ -317,7 +318,7 @@ let NewContentType = React.createClass({
       "publishDate": v.publishDate,
       "type": this.props.postType,
       "authorId": localStorage.getItem('userId'),
-      "slug": this.state.slug,
+      "slug": this.props.slug,
       "summary": v.summary,
       "parent": v.parentPage,
       "order": v.pageOrder,
@@ -343,7 +344,7 @@ let NewContentType = React.createClass({
     
     var _objData = this._emulateDataForSaving(v);
     var qry = "", noticeTxt = "";
-    if (this.state.mode==="create"){
+    if (this.props.mode==="create"){
       qry = this.props.createQuery(_objData);
       noticeTxt = this.props.name+' Published!';
     }else{
@@ -361,7 +362,7 @@ let NewContentType = React.createClass({
           
           var metaDataList = me.getMetaFormValues();
  
-          if (me.state.mode==="create"){
+          if (me.props.mode==="create"){
             postId = body.data.createPost.changedPost.id;
           } else {
             postId = body.data.updatePost.changedPost.id;
@@ -384,7 +385,7 @@ let NewContentType = React.createClass({
           }
           
           if (me.isWidgetActive("category")) {
-            var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.state.postCategoryList, v.categories);
+            var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.props.postCategoryList, v.categories);
             if (catQry)
               riques(catQry,
                 function(error, response, body) {
@@ -401,8 +402,7 @@ let NewContentType = React.createClass({
           }
 
           if (me.isWidgetActive("tag")) {
-            var tagQry = Query.createUpdateTagOfPostMtn(postId, me.state.postTagListInit, me.state.postTagList, me.state.tagMap);
-            debugger;
+            var tagQry = Query.createUpdateTagOfPostMtn(postId, me.props.postTagListInit, me.props.postTagList, me.props.tagMap);
             if (tagQry)
               riques(tagQry,
                 function(error, response, body) {
@@ -469,7 +469,7 @@ let NewContentType = React.createClass({
         function(error, response, body){
           if (!error && !body.errors && response.statusCode === 200) {
             var data = body.data.createFile.changedFile;
-            var imageGallery = me.state.imageGallery;
+            var imageGallery = me.props.imageGallery;
             imageGallery.push({id: data.id, value:data.value});
             me.props.dispatch(setImageGalleryList(imageGallery));
           } else {
@@ -496,8 +496,8 @@ let NewContentType = React.createClass({
   },
   bindPostToImageGallery: function(postId){
     var me = this;
-    if (this.state.imageGallery.length>0 && this.state.imageGalleryUnbinded) {
-      var qry = Query.bindImageGallery(this.state.imageGallery, postId);
+    if (this.props.imageGallery.length>0 && this.props.imageGalleryUnbinded) {
+      var qry = Query.bindImageGallery(this.props.imageGallery, postId);
       
       riques(qry, 
         function(error, response, body){
@@ -521,7 +521,7 @@ let NewContentType = React.createClass({
     riques(qry, 
       function(error, response, body){
         if (!error && !body.errors && response.statusCode === 200) {
-          var imageGallery = me.state.imageGallery;
+          var imageGallery = me.props.imageGallery;
           _.pull(imageGallery, _.nth(imageGallery, index));
           me.props.dispatch(setImageGalleryList(imageGallery));
         } else {
@@ -552,7 +552,7 @@ let NewContentType = React.createClass({
     }
 
     var handleSelectConnectionChange = function(newValue) {
-      var _connectionValue = me.state.connectionValue;
+      var _connectionValue = me.props.connectionValue;
       _connectionValue[contentId] = newValue
       me.props.dispatch(setConnectionValue(_connectionValue));
     }
@@ -560,7 +560,7 @@ let NewContentType = React.createClass({
     return (
       <ReactSelect.Async
         name={contentId}
-        value={this.state.connectionValue[contentId]}
+        value={this.props.connectionValue[contentId]}
         loadOptions={getConnectionOptions}
         onChange={handleSelectConnectionChange}
         connectedContent={contentId}
@@ -568,7 +568,7 @@ let NewContentType = React.createClass({
     )
   },
   handleTagChange: function(value) {
-    this.props.dispatch(setTagList(this.state.postTagListInit, value));
+    this.props.dispatch(setTagList(this.props.postTagListInit, value));
   },
   componentWillMount: function(){
     var me = this;
@@ -579,7 +579,7 @@ let NewContentType = React.createClass({
           if (!error) {
             var pageList = [(<option key="0" value="">(no parent)</option>)];
             _.forEach(body.data.viewer.allPosts.edges, function(item){
-              pageList.push((<option key={item.node.id} value={item.node.id} checked={me.state.parent=item.node.id}>
+              pageList.push((<option key={item.node.id} value={item.node.id} checked={me.props.parent===item.node.id}>
                 {item.node.title}</option>));
             })
             me.props.dispatch(setPageList(pageList));
@@ -634,36 +634,36 @@ let NewContentType = React.createClass({
         if (window.CKEDITOR.instances.hasOwnProperty(i))
           window.CKEDITOR.instances[i].on('change', me.handleContentChange);
       }
+
+      if (me.props.postId) {
+        riques(me.props.loadQuery(me.props.postId), 
+          function(error, response, body) {
+            if (!error ) {
+              var values = body.data.getPost;
+              me.setFormValues(values);
+            }
+          }
+        );
+      }
     });
 
-    if (this.state.visibilityTxt==="Public") 
+    if (this.props.visibilityTxt==="Public") 
       document.getElementById("public").setAttribute('checked', true);
     else
       document.getElementById("private").setAttribute('checked', true);
 
     this.notification = this.refs.notificationSystem;
-    
-    if (this.props.postId) {
-      riques(this.props.loadQuery(this.props.postId), 
-        function(error, response, body) {
-          if (!error ) {
-            var values = body.data.getPost;
-            me.setFormValues(values);
-          }
-        }
-      );
-    }
   },
   render: function(){
     var rootUrl = getConfig('rootUrl');
     var templates = getTemplates();
-
+    
     const newPost=(
       <div className="content-wrapper">
         <div className="container-fluid">
           <section className="content-header"  style={{marginBottom:20}}>
-              <h1>{this.state.mode==="update"?"Edit Current "+this.props.name:"Add New "+this.props.name}
-              { this.state.mode==="update" &&
+              <h1>{this.props.mode==="update"?"Edit Current "+this.props.name:"Add New "+this.props.name}
+              { this.props.mode==="update" &&
                 <small style={{marginLeft: 5}}>
                   <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
                 </small>
@@ -673,48 +673,48 @@ let NewContentType = React.createClass({
                   <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
                   <li><a href="#" onClick={function(){this.props.handleNav(this.props.slug)}.bind(this)}>
                     {this.props.name}</a></li>
-                  <li className="active">{this.state.mode==="update"?"Edit "+this.props.name:"Add New"}</li>
+                  <li className="active">{this.props.mode==="update"?"Edit "+this.props.name:"Add New"}</li>
                 </ol>
                <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
           </section>
           <Notification ref="notificationSystem" />
 
-          <form onSubmit={this.handleSubmit} id="postForm" method="get" style={{opacity: this.state.opacity}}>
-          { this.state.isProcessing &&
+          <form onSubmit={this.handleSubmit} id="postForm" method="get" style={{opacity: this.props.opacity}}>
+          { this.props.isProcessing &&
           <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
           }
           <div className="col-md-8">
             <div className="form-group"  style={{marginBottom:30}}>
               <div>
-                <input id="titlePost" style={{marginBottom: 20}} type="text" className="form-control" 
-                  placeholder="Input Title Here" onChange={this.handleTitleChange} onBlur={this.handleTitleBlur}/>
+                <Field id="titlePost" name="title" component="input" type="text" className="form-control"
+                  placeholder="Input Title Here" onChange={this.handleTitleChange} onBlur={this.handleTitleBlur} style={{marginBottom: 20}}/>
                   <div className="form-inline">
-                    { !this.state.permalinkEditing ? 
+                    { !this.props.permalinkEditing ? 
                       ( <p>Permalink: &nbsp;
-                        {this.state.mode==="update"?(
-                          <a id="permalink" href={rootUrl+'/'+this.state.slug}>{rootUrl}/{this.state.slug}</a>
+                        {this.props.mode==="update"?(
+                          <a id="permalink" href={rootUrl+'/'+this.props.slug}>{rootUrl}/{this.props.slug}</a>
                           ) : (
-                          <a id="permalink" href="#">{rootUrl}/{this.state.slug}</a>
+                          <a id="permalink" href="#">{rootUrl}/{this.props.slug}</a>
                           )
                         }
                         <button type="button" onClick={this.handlePermalinkBtn} id="editBtn" className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
                           <span style={{fontSize: 12}}>Edit</span>
                         </button> 
-                        { this.state.permalinkInProcess && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
+                        { this.props.permalinkInProcess && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
                         </p>
                       ) : (
                         <p>Permalink: 
                         <div className="form-group" id="permalinkcontent">
                           <a id="permalink" href="#">{rootUrl}/</a>
-                          <input id="slugcontent" defaultValue={this.state.slug}/>
+                          <input id="slugcontent" defaultValue={this.props.slug}/>
                           <button type="button" className="btn btn-default" onClick={this.handleSavePermalinkBtn}>OK</button>
                         </div>
-                        { this.state.permalinkInProcess && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
+                        { this.props.permalinkInProcess && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
                         </p>
                       )
                     }
                   </div>
-                  <textarea id="content" name="content" rows="25" style={{width: "100%"}} wrap="hard"></textarea>
+                  <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="text" className="form-control" />
                   <div id="trackingDiv"></div>
               </div>
             </div>
@@ -728,8 +728,7 @@ let NewContentType = React.createClass({
                 </div>
               </div>
               <div className="box-body pad">
-              <textarea id="summary" name="summary" wrap="hard" rows="3" style={{width: '100%'}} onChange={this.handleSummaryChange}>
-              </textarea>                 
+              <Field id="summary" name="summary" rows="3" component="textarea" wrap="hard" type="text" style={{width: '100%'}} onChange={this.handleSummaryChange} />
               </div>
             </div>
 
@@ -746,33 +745,34 @@ let NewContentType = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4">Preview</div>
                     <div className="col-md-8">
-                      <p><a href="#">{this.state.title===""?"No Title":this.state.title.substring(0,71)}</a></p>
-                      <p>{this.state.content===""?"":this.state.content.substring(0,100).replace(/(<([^>]+)>)/ig,"")}</p>
-                      <p><span className="help-block"><a style={{color: 'green'}}>{rootUrl}/{this.state.slug}</a> - <a>Cache</a> - <a>Similar</a></span></p>
+                      <p><a href="#">{this.props.title===""?"No Title":this.props.title.substring(0,71)}</a></p>
+                      <p>{this.props.content===""?"":this.props.content.substring(0,100).replace(/(<([^>]+)>)/ig,"")}</p>
+                      <p><span className="help-block"><a style={{color: 'green'}}>{rootUrl}/{this.props.slug}</a> - <a>Cache</a> - <a>Similar</a></span></p>
                     </div>
                   </div>
                   <div className="form-group">
                     <div className="col-md-4"><p>Title Tag</p></div>
                     <div className="col-md-8">
-                      <input id="titleTag" className="metaField" type="text" style={{width: '100%'}} placeholder={this.state.title} onChange={this.handleTitleTagChange}/>
+                      <Field id="titleTag" name="titleTag" component="input" type="text" className="form-control metaField" 
+                        style={{width: '100%'}} placeholder={this.props.title} onChange={this.handleTitleTagChange} />
                         <span className="help-block">Up to 65 characters recommended<br/>
-                        {this.state.titleTagLeftCharacter} characters left</span>                     
+                        {this.props.titleTagLeftCharacter} characters left</span>                     
                     </div>
                   </div>
                   <div className="form-group">
                     <div className="col-md-4"><p>Meta Description</p></div>
                     <div className="col-md-8">
-                      <textarea id="metaDescription" className="metaField" rows='2' style={{width:'100%'}} placeholder={this.state.summary} 
-                      onChange={this.handleMetaDescriptionChange}></textarea>
+                      <Field id="metaDescription" name="metaDescription" component="textarea" type="text" className="form-control metaField" 
+                        rows='2' style={{width:'100%'}} placeholder={this.props.summary} onChange={this.handleMetaDescriptionChange} />
                       <span className="help-block">160 characters maximum<br/>
-                      {this.state.metaDescriptionLeftCharacter} characters left</span>
+                      {this.props.metaDescriptionLeftCharacter} characters left</span>
                     </div>
                   </div>
                   <div className="form-group">
                     <div className="col-md-4"><p>Meta Keywords</p></div>
                     <div className="col-md-8">
                       <div className="form-group">
-                        <input id="metaKeyword" className="metaField" type="text" style={{width: '100%'}}/>
+                        <Field id="metaKeyword" name="metaKeyword" component="input" type="text" className="form-control metaField" style={{width: '100%'}} />
                         <span className="help-block"><b>News keywords </b><a>(?)</a></span>
                       </div>
                     </div>
@@ -798,14 +798,14 @@ let NewContentType = React.createClass({
                       
                        <div className="form-group">
                           <p style={{fontSize: 14}}><span className="glyphicon glyphicon-pushpin" style={{marginRight:10}}></span>
-                          Status: <b>{this.state.status} </b>
+                          Status: <b>{this.props.status} </b>
                           <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption"> Edit </button></p>
                           <div id="statusOption" className="collapse">
                             <div className="form-group">
-                                <select id="statusSelect" style={{marginRight: 10, height: 30}}>
+                                <Field id="statusSelect" name="statusSelect" component="select" style={{marginRight: 10, height: 30}}>
                                   <option>Published</option>
                                   <option>Reviewing</option>
-                                </select>
+                                </Field>
                                 <button type="button" onClick={this.handleChangeStatus} className="btn btn-flat btn-xs btn-primary" 
                                 style={{marginRight: 10}} data-toggle="collapse" data-target="#statusOption">OK</button>
                                 <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption">Cancel</button>
@@ -814,7 +814,7 @@ let NewContentType = React.createClass({
                         </div>
 
                         <div className="form-group">
-                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>{this.state.visibilityTxt} </b>
+                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>{this.props.visibilityTxt} </b>
                           <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#visibilityOption"> Edit </button></p>
                           <div id="visibilityOption" className="collapse">
                             <div className="radio">
@@ -838,15 +838,15 @@ let NewContentType = React.createClass({
                         </div>
 
                         <div className="form-group">
-                          <p><span className="glyphicon glyphicon-calendar" style={{marginRight: 10}}></span>{this.state.immediatelyStatus===true?
-                            (<span>Publish <b>Immediately </b></span>):<span>Published at <b>{this.formatDate(this.state.publishDate)}</b> </span>} 
+                          <p><span className="glyphicon glyphicon-calendar" style={{marginRight: 10}}></span>{this.props.immediatelyStatus===true?
+                            (<span>Publish <b>Immediately </b></span>):<span>Published at <b>{this.formatDate(this.props.publishDate)}</b> </span>} 
                           <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#scheduleOption"> Edit </button></p>
 
                           <div id="scheduleOption" className="collapse">
                             <div className="form-group">
                               <div className="row">
                                 <div className="col-md-6">
-                                  <DatePicker id="datepicker" style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.state.publishDate.toISOString()} onChange={this.handleDateChange}/>
+                                  <DatePicker id="datepicker" style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.props.publishDate.toISOString()} onChange={this.handleDateChange}/>
                                 </div>
                                 <div className="col-md-6">
                                   <input type="text" id="hours" style={{width: 30, height: 34, textAlign: "center"}} defaultValue={new Date().getHours()} onChange={this.handleTimeChange}/> : 
@@ -866,13 +866,13 @@ let NewContentType = React.createClass({
                       <div className="form-group pull-right">
                         <button type="button" className="btn btn-default btn-flat disabled" style={{marginRight: 5}}>Preview</button> 
                           <div className="btn-group">
-                            <button type="submit" id="publishBtn" className="btn btn-primary btn-flat">{this.state.mode==="update"?"Save":"Publish"}</button>
+                            <button type="submit" id="publishBtn" className="btn btn-primary btn-flat">{this.props.mode==="update"?"Save":"Publish"}</button>
                             <button type="button" className="btn btn-primary btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                               <span className="caret"></span>
                               <span className="sr-only">Toggle Dropdown</span>
                             </button>
                             <ul className="dropdown-menu" role="menu">
-                              <li><button onClick={this.saveDraft} className="btn btn-default btn-flat">{this.state.status==="Draft"?"Save As Draft":""}</button></li>
+                              <li><button onClick={this.saveDraft} className="btn btn-default btn-flat">{this.props.status==="Draft"?"Save As Draft":""}</button></li>
                             </ul>
                           </div>
                       </div>        
@@ -893,7 +893,7 @@ let NewContentType = React.createClass({
                       <div className="form-group">
                         <p><b>Parent</b></p>
                         <select id="parentPage" style={{width: 250}}>
-                          {this.state.pageList}
+                          {this.props.pageList}
                         </select>
                       </div>
                       <div className="form-group">
@@ -927,7 +927,7 @@ let NewContentType = React.createClass({
                     <div className="box-body pad">
                       <div>
                       <div className="form-group">
-                          {this.state.allCategoryList}
+                          {this.props.allCategoryList}
                       </div>
                       </div>                  
                     </div>
@@ -948,8 +948,8 @@ let NewContentType = React.createClass({
                           <ReactSelect.Creatable
                             id="tag"
                             name="form-field-name"
-                            value={this.state.postTagList}
-                            options={this.state.options}
+                            value={this.props.postTagList}
+                            options={this.props.options}
                             onChange={this.handleTagChange}
                             multi={true}
                           />
@@ -970,13 +970,13 @@ let NewContentType = React.createClass({
                     </div>
                     <div className="box-body pad">
                       <div>
-                        { this.state.featuredImage &&
+                        { this.props.featuredImage &&
                           <div style={{position: "relative"}}>
-                            <img src={this.state.featuredImage} style={{width: "100%"}} alt={this.state.title}/>
+                            <img src={this.props.featuredImage} style={{width: "100%"}} alt={this.props.title}/>
                             <button onClick={this.handleFeaturedImageRemove} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
                           </div>
                         }
-                        { !this.state.featuredImage &&
+                        { !this.props.featuredImage &&
                           <input type="file" name="featuredImage" onChange={this.featuredImageChange}/>
                         }
                       </div>                  
@@ -997,7 +997,7 @@ let NewContentType = React.createClass({
                       <div>
                         <input type="file" id="imageGallery" name="imageGallery" onChange={this.imageGalleryChange}/>
                         {
-                          _.map(this.state.imageGallery, function(item, index){
+                          _.map(this.props.imageGallery, function(item, index){
                             return <div key={index} className="margin" style={{width: 150, float: "left", position: "relative"}}>
                             <a href="" onClick={this.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue"}} alt={"gallery"+index}/></a>
                             <button id={item.id+"-"+index} onClick={this.handleImageRemove} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
@@ -1015,7 +1015,7 @@ let NewContentType = React.createClass({
                       if (item.type === "text" || item.type === "number")
                         form = (<input id={item.id} name={item.id} className="metaField" type="text" style={{width: '100%'}}/>)
                       if (item.type === "date")
-                        form = (<DatePicker id={item.id} name={item.id} style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.state.publishDate.toISOString()} onChange={this.handleDateChange}/>)
+                        form = (<DatePicker id={item.id} name={item.id} style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.props.publishDate.toISOString()} onChange={this.handleDateChange}/>)
                       if (item.type === "connection") {
                         form = this._genReactSelect(item.connection)
                       }
@@ -1048,10 +1048,19 @@ let NewContentType = React.createClass({
 });
 
 const mapStateToProps = function(state){
+  const selector = formValueSelector('newContentForm');
+  const titleTag = selector(state, 'titleTag');
+
   if (!_.isEmpty(state.contentTypeNew)) {
-    return _.head(state.contentTypeNew)
-  } else return {}
+    var out = _.head(state.contentTypeNew);
+    out["initialValues"] = out.data;
+    out["titleTag"] = titleTag;
+    return out;
+  } else return {titleTag: titleTag}
 }
 
+NewContentType = reduxForm({
+  form: 'newContentForm'
+})(NewContentType)
 NewContentType = connect(mapStateToProps)(NewContentType);
 export default NewContentType;
