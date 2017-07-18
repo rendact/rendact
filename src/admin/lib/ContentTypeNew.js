@@ -636,6 +636,7 @@ let NewContentType = React.createClass({
       }
 
       if (me.props.postId) {
+        me.props.dispatch(setEditorMode("update"));
         riques(me.props.loadQuery(me.props.postId), 
           function(error, response, body) {
             if (!error ) {

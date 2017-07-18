@@ -389,7 +389,8 @@ const Admin = React.createClass({
 		}
 		return state;
 	},
-	handleProfileClick: function(){
+	handleProfileClick: function(e){
+		e.preventDefault();
 		this.redirectToPage('profile');
 	},
 	redirectToPage: function(pageId, actionId, postId, tagId){
