@@ -5122,3 +5122,23 @@ div.passwordTester > span.ReactPasswordStrength-strength-desc {
     display: inherit;
   }
 }
+#draggablePanelList .box-header {
+    cursor: move;
+}
+#draggablePanelList .box {
+    border: 1px #ccc solid;
+    background: aliceblue;
+    border-radius: 0.2em;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+#draggablePanelList .box-body {
+  background: white;
+}
+body.dragging, body.dragging * {
+  cursor: move !important;
+}
+.dragged {
+  position: absolute;
+  opacity: 0.5;
+  z-index: 2000;
+}

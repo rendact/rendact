@@ -1,6 +1,6 @@
 import React from 'react';
-import SortableTree from 'react-sortable-tree';
 import Query from '../query';
+import $ from 'jquery';
 import _ from 'lodash';
 import Halogen from 'halogen';
 import Notification from 'react-notification-system';
@@ -29,7 +29,7 @@ var Menu = React.createClass({
         menuSortableTree:[],
         isProcessing: false,
         opacity: 1,
-        treeData: null,
+        treeData: [],
         itemsChecked: false,
       }
   },
@@ -51,7 +51,7 @@ var Menu = React.createClass({
   resetFormDelete: function(){
     document.getElementById("menu").reset();
     document.getElementById("menuName").reset();
-    this.setState({newMenuName:"", selectedMenuName:"", treeData:""});
+    this.setState({newMenuName:"", selectedMenuName:"", treeData:[]});
     this.handleNameChange();
     this.handleNewMenuChange();
     window.history.pushState("", "", '/admin/menu');
@@ -70,7 +70,8 @@ var Menu = React.createClass({
         if (!error && !body.errors && response.statusCode === 200) {
         	var items = [];
           items = body.data.getMenu.items;
-		      me.setState({treeData: items});
+          if (items)
+		        me.setState({treeData: items});
           me.disableForm(false);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
@@ -88,7 +89,7 @@ var Menu = React.createClass({
     var _treeData = this.state.treeData;
     var url = getValue("urlMenu");
     var _url = [{title: url}];
-    var treeData = "";
+    var treeData = [];
     if (_treeData===null) {
       treeData = _url;
     }else if (_url.length>0) {
@@ -97,7 +98,6 @@ var Menu = React.createClass({
     this.setState ({treeData: treeData});
     var me = this;
     me.resetFormUrl();
-    debugger;
   },
   addToMenu: function(event){
     var _treeData = this.state.treeData;
@@ -106,7 +106,7 @@ var Menu = React.createClass({
     });
 	  var menuValues = [];
 	  menuValues = _.map(menuFiltered, function(item){return {title: item.value}});
-    var treeData = "";
+    var treeData = [];
     if (_treeData===null) {
       treeData = menuValues;
     }else if (menuValues.length>0) {
@@ -161,7 +161,24 @@ var Menu = React.createClass({
       });
   },
   componentDidMount: function(){
+    require ('jquery-ui/themes/base/theme.css');
+    require ('../lib/jquery-sortable.js');
+    require ('../../../public/css/AdminLTE.css');
+    require ('../../../public/css/skins/_all-skins.css');
+
     this.notif = this.refs.notificationSystem;
+    
+    var panelList = $('#draggablePanelList');
+    panelList.sortable({
+        group: 'nested',
+        handle: '.box-header',
+        onDragStart: function ($item, container, _super) {
+          // Duplicate items of the no drop area
+          if(!container.options.drop)
+            $item.clone().insertAfter($item);
+          _super($item, container);
+        }
+    });
   },
   handleUpdateMenu: function(event){
     event.preventDefault();
@@ -246,7 +263,7 @@ var Menu = React.createClass({
           if (!error) {
             var allPageList = [];
             _.forEach(body.data.viewer.allPosts.edges, function(item){
-              allPageList.push((<div key={item.node.id}><input class="pageMenu" id={item.node.id}
+              allPageList.push((<div key={item.node.id}><input className="pageMenu" id={item.node.id}
               name="itemsChecked[]" type="checkbox" value={item.node.title} /> {item.node.title}</div>));
             })
             me.setState({allPageList: allPageList});
@@ -427,7 +444,7 @@ var Menu = React.createClass({
 				                    	</div>
 				                    	<div className="col-md-7">
       										      <div className="form-group">
-      										      <select id="menuSelect" onChange={this.handleMenuName} name="menuSelect" className="form-control btn select" >
+      										      <select id="menuSelect" onChange={this.handleMenuName} name="menuSelect" className="form-control select" >
       											     {this.state.pageList}
       											     </select>
       										    </div>
@@ -464,18 +481,45 @@ var Menu = React.createClass({
                             { this.state.isProcessing &&
                               <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
                             }
-												  <div style={{height:300}}>
-										        <SortableTree
-										          id="treeDatas"
-										          treeData={this.state.treeData}
-										          onChange={treeData => this.setState({ treeData })}
-										          generateNodeProps={rowInfo => ({
-												        buttons: [
-												          <button onClick={(event) => this.removeNodeMenu(rowInfo)}>Remove</button>,
-                                ],
-												      })}
-										        />
-										      </div>
+                          <div className="col-md-4">
+												  <ul id="draggablePanelList" className="list-unstyled">
+                            {
+                              this.state.treeData.map(function(item){
+                                return (
+                                  <li key={item.id}>
+                                    <div className="box collapsed-box">
+                                      <div className="box-header with-border">
+                                        <h3 className="box-title">{item.title}</h3>
+                                        <div className="box-tools pull-right">
+                                          <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+                                          </button>
+                                        </div>
+                                      </div>
+                                      <div className="box-body" style={{display: "none"}}>The body of the box</div>
+                                    </div>
+
+                                    <ul style={{marginLeft: 20}} className="list-unstyled">
+                                      {item.children && item.children.map(function(child){
+                                      return (
+                                        <li key={child.id} className="box collapsed-box">
+                                          <div className="box-header with-border">
+                                            <h3 className="box-title">{child.title}</h3>
+                                            <div className="box-tools pull-right">
+                                              <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+                                              </button>
+                                            </div>
+                                          </div>
+                                          <div className="box-body" style={{display: "none"}}>The body of the box</div>
+                                        </li>
+                                      )
+                                    })}
+                                    </ul>
+                                  </li>
+                                )
+                              })
+                            }
+                          </ul>
+                          </div>
 											  </div>
 									    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}></div>
 										<h4>Menu Settings</h4>

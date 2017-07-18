@@ -6,6 +6,7 @@ import contentTypeNew from './ContentTypeNew'
 import categoryContent from './CategoryContent'
 import tagContent from './TagContent'
 import content from './Content'
+import contentNew from './ContentNew'
 import permission from './Permission'
 import customize from './Customize'
 import profile from './Profile'
@@ -30,6 +31,7 @@ const rendactApp = combineReducers({
   form: reduxFormReducer,
 	main,
   settings,
+  contentNew,
   contentType,
   contentTypeNew,
   categoryContent,
