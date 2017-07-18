@@ -410,7 +410,7 @@ var Menu = React.createClass({
 								  	<div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
 								  	<div className="box-tools pull-right">
 								  		<button className="btn btn-flat btn-default" type="button" onClick={this.addToMenu} 
-                              			style={{marginRight: 10}} data-target="#IDcategorytList">Add to Menu</button>
+                      style={{marginRight: 10}} data-target="#IDcategorytList">Add to Menu</button>
 								  	</div>
 								</div>
 							</div>
