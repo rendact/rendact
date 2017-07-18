@@ -31,6 +31,7 @@ var Menu = React.createClass({
         opacity: 1,
         treeData: [],
         itemsChecked: false,
+        type: ""
       }
   },
   maskArea: function(state){
@@ -88,7 +89,7 @@ var Menu = React.createClass({
     event.preventDefault();
     var _treeData = this.state.treeData;
     var url = getValue("urlMenu");
-    var _url = [{title: url}];
+    var _url = [{title: url, type: "url"}];
     var treeData = [];
     if (_treeData===null) {
       treeData = _url;
@@ -105,7 +106,7 @@ var Menu = React.createClass({
     	return item.checked
     });
 	  var menuValues = [];
-	  menuValues = _.map(menuFiltered, function(item){return {title: item.value}});
+	  menuValues = _.map(menuFiltered, function(item){return {title: item.value, type: "post"}});
     var treeData = [];
     if (_treeData===null) {
       treeData = menuValues;
@@ -191,6 +192,7 @@ var Menu = React.createClass({
     var noticeTxt = "Menu Updated";
     riques(qry, 
       function(error, response, body) { 
+        debugger;
         if (!error && !body.errors && response.statusCode === 200) {
           me.notif.addNotification({
                   message: noticeTxt,
@@ -485,6 +487,7 @@ var Menu = React.createClass({
 												  <ul id="draggablePanelList" className="list-unstyled">
                             {
                               this.state.treeData.map(function(item){
+                                if(item.type==="url"){
                                 return (
                                   <li key={item.id}>
                                     <div className="box collapsed-box">
@@ -495,9 +498,29 @@ var Menu = React.createClass({
                                           </button>
                                         </div>
                                       </div>
-                                      <div className="box-body" style={{display: "none"}}>The body of the box</div>
+                                        <div className="box-body" style={{display: "none"}}>
+                                          <div className="form-group">
+                                            <i htmlFor="name" >Label</i>
+                                            <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
+                                          </div>
+                                          <div className="form-group">
+                                            <i htmlFor="name" >Tooltip</i>
+                                            <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
+                                          </div>
+                                          <div className="form-group">
+                                            <i htmlFor="name" >URL</i>
+                                            <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
+                                          </div>
+                                          <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}>
+                                          </div>
+                                          <div className="col-md-6">
+                                            <button className="btn btn-flat btn-danger btn-xs" id="" data-target="">Remove</button>
+                                          </div>
+                                          <div className="col-md-6">
+                                            <button className="btn btn-flat btn-default btn-xs pull-right" id="" data-target="">Cancel</button>
+                                          </div>
+                                        </div>
                                     </div>
-
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
@@ -509,13 +532,95 @@ var Menu = React.createClass({
                                               </button>
                                             </div>
                                           </div>
-                                          <div className="box-body" style={{display: "none"}}>The body of the box</div>
+                                          <div className="box-body" style={{display: "none"}}>
+                                            <div className="form-group">
+                                              <i htmlFor="name" >Label</i>
+                                              <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
+                                            </div>
+                                            <div className="form-group">
+                                              <i htmlFor="name" >Tooltip</i>
+                                              <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
+                                            </div>
+                                            <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}>
+                                            </div>
+                                            <div className="col-md-6">
+                                              <button className="btn btn-flat btn-danger btn-xs" id="" data-target="">Remove</button>
+                                            </div>
+                                            <div className="col-md-6">
+                                              <button className="btn btn-flat btn-default btn-xs pull-right" id="" data-target="">Cancel</button>
+                                            </div>
+                                          </div>
                                         </li>
                                       )
                                     })}
                                     </ul>
                                   </li>
-                                )
+                                )}
+                                if(item.type==="post"){
+                                return (
+                                  <li key={item.id}>
+                                    <div className="box collapsed-box">
+                                      <div className="box-header with-border">
+                                        <h3 className="box-title">{item.title}</h3>
+                                        <div className="box-tools pull-right">
+                                          <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+                                          </button>
+                                        </div>
+                                      </div>
+                                        <div className="box-body" style={{display: "none"}}>
+                                          <div className="form-group">
+                                            <i htmlFor="name" >Label</i>
+                                            <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
+                                          </div>
+                                          <div className="form-group">
+                                            <i htmlFor="name" >Tooltip</i>
+                                            <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
+                                          </div>
+                                          <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}>
+                                          </div>
+                                          <div className="col-md-6">
+                                            <button className="btn btn-flat btn-danger btn-xs" id="" data-target="">Remove</button>
+                                          </div>
+                                          <div className="col-md-6">
+                                            <button className="btn btn-flat btn-default btn-xs pull-right" id="" data-target="">Cancel</button>
+                                          </div>
+                                        </div>
+                                    </div>
+                                    <ul style={{marginLeft: 20}} className="list-unstyled">
+                                      {item.children && item.children.map(function(child){
+                                      return (
+                                        <li key={child.id} className="box collapsed-box">
+                                          <div className="box-header with-border">
+                                            <h3 className="box-title">{child.title}</h3>
+                                            <div className="box-tools pull-right">
+                                              <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+                                              </button>
+                                            </div>
+                                          </div>
+                                          <div className="box-body" style={{display: "none"}}>
+                                            <div className="form-group">
+                                              <i htmlFor="name" >Label</i>
+                                              <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
+                                            </div>
+                                            <div className="form-group">
+                                              <i htmlFor="name" >Tooltip</i>
+                                              <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
+                                            </div>
+                                            <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}>
+                                            </div>
+                                            <div className="col-md-6">
+                                              <button className="btn btn-flat btn-danger btn-xs" id="" data-target="">Remove</button>
+                                            </div>
+                                            <div className="col-md-6">
+                                              <button className="btn btn-flat btn-default btn-xs pull-right" id="" data-target="">Cancel</button>
+                                            </div>
+                                          </div>
+                                        </li>
+                                      )
+                                    })}
+                                    </ul>
+                                  </li>
+                                )}
                               })
                             }
                           </ul>
