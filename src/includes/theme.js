@@ -92,10 +92,26 @@ export const ThemeHome = React.createClass({
 	},
 	theMenu: function(){
         var menuItems = this.state.menuItems.map(function(item, index){
-                            return <li key={index}><a href={item.target}>{item.title}</a></li>
-                        })
-		return <ul className="cl-effect-16">
-						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
+            var child = item.children;
+
+            if (child){
+                var childMenu = child.map(function(item, index){
+                    return <a className="dropdown-item" href={item.target} key={index.toString()}>{item.title}</a>
+                });
+                return <li className="dropdown" key={index}>
+                        <a className="dropdown-toggle" data-toggle="dropdown" href={item.target}>{item.title}</a>
+                        <div className="dropdown-menu" aria-labelledby="dropdown-menu-link">
+                            {childMenu}
+                            </div>
+                        </li>
+            } else {
+                return <li key={index}>
+                        <a href={item.target}>{item.title}</a>
+                    </li>
+            }
+                            })
+            return <ul className="cl-effect-16">
+                            <li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
 						<li><a href="blogs">Blogs</a></li>
                         {menuItems}
 					</ul>
