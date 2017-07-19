@@ -73,7 +73,6 @@ export const ThemeHome = React.createClass({
 			postPerPage: 5,
 			pageCount: 1,
 			activePage: 1,
-            menuItems: []
 		}
 	},
 	goHome: function(e) {
@@ -169,18 +168,6 @@ export const ThemeHome = React.createClass({
 		    );
 	    }
 		);
-
-        riques(Query.getMenuQry('TWVudToxMzA='),
-            (error, response, body) => {
-                if (!error & !body.errors && response.statusCode === 200){
-                    var menuItems = body.data.getMenu.items;
-                    me.setState({menuItems: menuItems});
-                } else {
-                    errorCallback(error, body.errors?body.errors[0].message:null);
-                }
-                me.setState({loadDone: true});
-            }
-        );
 	},
 	componentDidMount: function(){
 		var c = window.config.theme;
@@ -224,7 +211,6 @@ export const ThemeBlog = React.createClass({
 			isSlugExist: false,
 			slug: this.props.location.pathname.replace("/",""),
 			latestPosts: [],
-            menuItems: []
 		}
 	},
 	handlePostClick: function(e){
@@ -271,18 +257,6 @@ export const ThemeBlog = React.createClass({
 		    );
 	    }
 		);
-
-        riques(Query.getMenuQry('TWVudToxMzA='),
-            (error, response, body) => {
-                if (!error & !body.errors && response.statusCode === 200){
-                    var menuItems = body.data.getMenu.items;
-                    me.setState({menuItems: menuItems});
-                } else {
-                    errorCallback(error, body.errors?body.errors[0].message:null);
-                }
-                me.setState({loadDone: true});
-            }
-        );
 	},
 	componentDidMount: function(){
 		var c = window.config.theme;
@@ -313,7 +287,6 @@ export const ThemeSingle = React.createClass({
 			loadDone: false,
 			postData: false,
 			config: null,
-            menuItems: []
 		}
 	},
 	goHome: function(e) {
@@ -348,17 +321,6 @@ export const ThemeSingle = React.createClass({
         me.setState({loadDone: true});
       }
     );
-        riques(Query.getMenuQry('TWVudToxMzA='),
-            (error, response, body) => {
-                if (!error & !body.errors && response.statusCode === 200){
-                    var menuItems = body.data.getMenu.items;
-                    me.setState({menuItems: menuItems});
-                } else {
-                    errorCallback(error, body.errors?body.errors[0].message:null);
-                }
-                me.setState({loadDone: true});
-            }
-        );
 	},
 	componentDidMount: function(){
 		var c = window.config.theme;

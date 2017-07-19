@@ -6,8 +6,12 @@ const ChildMenuComponent = (props) => {
     var childMenuItem=  props.child.map((item, index) => (
         <a className="dropdown-item" href={item.target} key={index.toString()}>{item.title}</a>
     ))
+    var dropdownStyle = {
+        backgroundColor: '#333',
+        borderColor: ''
+    }
 
-    return <div className="dropdown-menu" aria-labelledby="dropdown-menu-link">
+    return <div className="dropdown-menu" aria-labelledby="dropdown-menu-link" style={dropdownStyle}>
             {childMenuItem}
             </div>
 
@@ -18,7 +22,7 @@ const ParentMenuComponent = (props) => {
 
     if (item.children) {
         return <li className="dropdown" key={props.parentIndex}>
-                <a className="dropdown-toggle" data-toggle="dropdown" href={item.target}>{item.title}</a>
+                <a className="dropdown-toggle" data-toggle="dropdown"  href={item.target}>{item.title}</a>
                 <ChildMenuComponent child={item.children} />
                 </li>
 
