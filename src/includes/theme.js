@@ -3,6 +3,7 @@ import AdminConfig from '../admin/AdminConfig';
 import NotFound from '../admin/NotFound';
 import Query from '../admin/query';
 import {riques, errorCallback, getValue, setValue, loadConfig} from '../utils';
+import {MenuComponent} from './Menu.js';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
 import Loading from '../admin/Loading';
@@ -91,30 +92,7 @@ export const ThemeHome = React.createClass({
 		return <div dangerouslySetInnerHTML={{__html: content}} />
 	},
 	theMenu: function(){
-        var menuItems = this.state.menuItems.map(function(item, index){
-            var child = item.children;
-
-            if (child){
-                var childMenu = child.map(function(item, index){
-                    return <a className="dropdown-item" href={item.target} key={index.toString()}>{item.title}</a>
-                });
-                return <li className="dropdown" key={index}>
-                        <a className="dropdown-toggle" data-toggle="dropdown" href={item.target}>{item.title}</a>
-                        <div className="dropdown-menu" aria-labelledby="dropdown-menu-link">
-                            {childMenu}
-                            </div>
-                        </li>
-            } else {
-                return <li key={index}>
-                        <a href={item.target}>{item.title}</a>
-                    </li>
-            }
-                            })
-            return <ul className="cl-effect-16">
-                            <li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
-						<li><a href="blogs">Blogs</a></li>
-                        {menuItems}
-					</ul>
+        return <MenuComponent goHome={this.goHome} menuItems={this.state.menuItems}/>
 	},
 	theLogo: function(){
 		return <div className="logo">
@@ -261,14 +239,7 @@ export const ThemeBlog = React.createClass({
 		return <div dangerouslySetInnerHTML={{__html: content}} />
 	},
 	theMenu: function(){
-        var menuItems = this.state.menuItems.map(function(item, index){
-                            return <li key={index}><a href={item.target}>{item.title}</a></li>
-                        })
-		return <ul className="cl-effect-16">
-						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
-						<li><a href="blogs">Blogs</a></li>
-                        {menuItems}
-					</ul>
+        return <MenuComponent goHome={this.goHome} menuItems={this.state.menuItems}/>
 	},
 	componentWillMount: function(){
 		var me = this;
@@ -350,14 +321,7 @@ export const ThemeSingle = React.createClass({
 		this._reactInternalInstance._context.history.push('/')
 	},
 	theMenu: function(){
-        var menuItems = this.state.menuItems.map(function(item, index){
-                            return <li key={index}><a href={item.target}>{item.title}</a></li>
-                        })
-		return <ul className="cl-effect-16">
-						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
-						<li><a href="blogs">Blogs</a></li>
-                        {menuItems}
-					</ul>
+        return <MenuComponent goHome={this.goHome} menuItems={this.state.menuItems}/>
 	},
 	theBreadcrumb: function(){
 		return <h2><a href="#" onClick={this.goHome}><h5>Home </h5></a> / PAGE</h2>
