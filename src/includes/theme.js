@@ -3,7 +3,7 @@ import AdminConfig from '../admin/AdminConfig';
 import NotFound from '../admin/NotFound';
 import Query from '../admin/query';
 import {riques, errorCallback, getValue, setValue, loadConfig} from '../utils';
-import {MenuComponent} from './Menu.js';
+import {Menu} from './Menu.js';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
 import Loading from '../admin/Loading';
@@ -92,7 +92,7 @@ export const ThemeHome = React.createClass({
 		return <div dangerouslySetInnerHTML={{__html: content}} />
 	},
 	theMenu: function(){
-        return <MenuComponent goHome={this.goHome} menuItems={this.state.menuItems}/>
+        return <Menu goHome={this.goHome}/>
 	},
 	theLogo: function(){
 		return <div className="logo">
@@ -239,7 +239,7 @@ export const ThemeBlog = React.createClass({
 		return <div dangerouslySetInnerHTML={{__html: content}} />
 	},
 	theMenu: function(){
-        return <MenuComponent goHome={this.goHome} menuItems={this.state.menuItems}/>
+        return <Menu goHome={this.goHome}/>
 	},
 	componentWillMount: function(){
 		var me = this;
@@ -321,7 +321,7 @@ export const ThemeSingle = React.createClass({
 		this._reactInternalInstance._context.history.push('/')
 	},
 	theMenu: function(){
-        return <MenuComponent goHome={this.goHome} menuItems={this.state.menuItems}/>
+        return <Menu goHome={this.goHome}/>
 	},
 	theBreadcrumb: function(){
 		return <h2><a href="#" onClick={this.goHome}><h5>Home </h5></a> / PAGE</h2>

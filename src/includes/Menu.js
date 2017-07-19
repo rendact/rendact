@@ -1,4 +1,6 @@
 import React from 'react';
+import Query from '../admin/query';
+import {riques, errorCallback} from '../utils';
 
 const ChildMenuComponent = (props) => {
     var childMenuItem=  props.child.map((item, index) => (
@@ -25,7 +27,7 @@ const ParentMenuComponent = (props) => {
     }
 }
 
-export const MenuComponent = (props) => {
+const MenuComponent = (props) => {
     var menuItems = props.menuItems.map((parentItem, parentIndex)=>(
         <ParentMenuComponent menuItem={parentItem} parentIndex={parentIndex} key={parentIndex.toString()}/>
     ))
@@ -37,5 +39,33 @@ export const MenuComponent = (props) => {
     </ul>
 }
 
+export const Menu = React.createClass({
+    getInitialState : function(){
+        return {
+            loadDone: false,
+            menuItems: [],
+        }
+    },
 
+    componentWillMount : function(){
+        var me = this;
+
+        riques(Query.getMenuQry('TWVudToxMzA='),
+            (error, response, body) => {
+                if (!error & !body.errors && response.statusCode === 200){
+                    var menuItems = body.data.getMenu.items;
+                    me.setState({menuItems: menuItems});
+                } else {
+                    errorCallback(error, body.errors?body.errors[0].message:null);
+                }
+                me.setState({loadDone: true});
+            }
+        );
+    },
+
+    render : function(){
+        return <MenuComponent goHome={this.props.goHome} menuItems={this.state.menuItems}/>
+    }
+
+});
 
