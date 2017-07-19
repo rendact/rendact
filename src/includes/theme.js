@@ -92,7 +92,7 @@ export const ThemeHome = React.createClass({
 	},
 	theMenu: function(){
         var menuItems = this.state.menuItems.map(function(item, index){
-                            return <li key={index}><a href="#">{item.title}</a></li>
+                            return <li key={index}><a href={item.target}>{item.title}</a></li>
                         })
 		return <ul className="cl-effect-16">
 						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
@@ -246,7 +246,7 @@ export const ThemeBlog = React.createClass({
 	},
 	theMenu: function(){
         var menuItems = this.state.menuItems.map(function(item, index){
-                            return <li key={index}><a href="#">{item.title}</a></li>
+                            return <li key={index}><a href={item.target}>{item.title}</a></li>
                         })
 		return <ul className="cl-effect-16">
 						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
@@ -335,7 +335,7 @@ export const ThemeSingle = React.createClass({
 	},
 	theMenu: function(){
         var menuItems = this.state.menuItems.map(function(item, index){
-                            return <li key={index}><a href="#">{item.title}</a></li>
+                            return <li key={index}><a href={item.target}>{item.title}</a></li>
                         })
 		return <ul className="cl-effect-16">
 						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
