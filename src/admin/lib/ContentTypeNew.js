@@ -109,8 +109,8 @@ let NewContentType = React.createClass({
     );
   },
   saveImmediately: function(event){
-    var hours = getValue("hours");
-    var minute = getValue("minute");
+    var hours = this.props.hours;
+    var minute = this.props.minutes;
     var time = this.props.publishDate + hours + minute;
     this.props.dispatch(toggleSaveImmediatelyMode(false, time));
   },
@@ -140,14 +140,14 @@ let NewContentType = React.createClass({
     });
     
     return {
-      title: getValue("titlePost"),
+      title: this.props.title,
       content: window.CKEDITOR.instances['content'].getData(),
       status: this.props.status,
-      titleTag: getValue("titleTag"),
-      metaKeyword: getValue("metaKeyword"),
-      metaDescription: getValue("metaDescription"),
+      titleTag: this.props.title,
+      metaKeyword: this.props.metaKeyword,
+      metaDescription: this.props.metaDescription,
       passwordPage: "",
-      summary: getValue("summary"),
+      summary: this.props.summary,
       visibility: document.querySelector("input[name=visibilityRadio]:checked").value,
       publishDate: this.props.publishDate,
       type: this.props.slug,
@@ -169,12 +169,24 @@ let NewContentType = React.createClass({
   },
   setFormValues: function(v){
     var meta = [];
+    var metaValues = {}
     if (v.meta.edges.length>0) {
       _.forEach(v.meta.edges, function(i){
         meta.push(i.node);
       });
     }
     
+    var pubDate = v.publishDate? new Date(v.publishDate) : new Date();
+    window.CKEDITOR.instances['content'].setData(v.content);
+    v["hours"] = pubDate.getHours();
+    v["minutes"] = pubDate.getMinutes();
+    v["publishDate"] = pubDate;
+    v["publishDateReset"] = pubDate;
+    v["visibilityRadio"] = v.visibility;
+
+    this.props.dispatch(loadFormData(_.merge(v, metaValues)));
+    //this.props.dispatch(setContentFormValues(v));
+
     var _postCategoryList = [];
     if (v.category.edges.length>0) {
       _.forEach(v.category.edges, function(i){
@@ -208,16 +220,8 @@ let NewContentType = React.createClass({
       this.props.dispatch(setImageGalleryList(_imageGalleryList));
     }
 
-    var pubDate = v.publishDate? new Date(v.publishDate) : new Date();
-    window.CKEDITOR.instances['content'].setData(v.content);
-    setValue("hours", pubDate.getHours());
-    setValue("minutes", pubDate.getMinutes());
-    document.getElementsByName("visibilityRadio")[v.visibility==="Public"?0:1].checked = true;
-
     var _connectionValue = this.props.connectionValue;
-    var metaValues = {}
     _.forEach(meta, function(item){
-      //setValue(item.item, item.value);
       metaValues[item.item] = item.value;
       var el = document.getElementsByName(item.item);
       if (el && el.length>0) {
@@ -228,12 +232,9 @@ let NewContentType = React.createClass({
         _connectionValue[isConnItem[1]] = item.value; 
       }
     });
-    this.props.dispatch(setConnectionValue(_connectionValue));
-    this.props.dispatch(loadFormData(_.merge(v, metaValues)));
 
-    v.publishDate = pubDate;
-    v.publishDateReset = pubDate;
-    this.props.dispatch(setContentFormValues(v));
+    this.props.dispatch(setConnectionValue(_connectionValue));
+
     this.handleTitleChange();
     this.handleTitleTagChange();
     this.handleMetaDescriptionChange();
@@ -255,7 +256,7 @@ let NewContentType = React.createClass({
     this.props.dispatch(togglePermalinkEditingState(true));
   },
   handleTitleBlur: function(event) {
-    var title = getValue("titlePost");
+    var title = this.props.title;
     var slug = title.split(" ").join("-").toLowerCase();
     this.checkSlug(slug);
   },
@@ -264,8 +265,6 @@ let NewContentType = React.createClass({
     this.checkSlug(slug);
   },
   handleTitleChange: function(event){
-    var title = getValue("titlePost");
-    this.props.dispatch(setPostTitle(title));
     this.notifyUnsavedData(true);
   },
   handleContentChange: function(event){
@@ -274,8 +273,6 @@ let NewContentType = React.createClass({
     this.notifyUnsavedData(true);
   },
   handleSummaryChange: function(event){
-    var summary = getValue("summary");
-    this.props.dispatch(setPostSummary(summary));
     this.notifyUnsavedData(true);
   },
   handleTitleTagChange: function(event){
@@ -284,7 +281,7 @@ let NewContentType = React.createClass({
     this.notifyUnsavedData(true);
   },
   handleMetaDescriptionChange: function(event){
-    var metaDescription = getValue("metaDescription");
+    var metaDescription = this.props.metaDescription;
     this.props.dispatch(updateMetaDescriptionLeftCharacter(160-(metaDescription.length)));
     this.notifyUnsavedData(true);
   },
@@ -327,6 +324,7 @@ let NewContentType = React.createClass({
   },
   handleSubmit: function(event) {
     event.preventDefault();
+    debugger;
     var me = this;
     var v = this.getFormValues();
 
@@ -687,7 +685,7 @@ let NewContentType = React.createClass({
           <div className="col-md-8">
             <div className="form-group"  style={{marginBottom:30}}>
               <div>
-                <Field id="titlePost" name="title" component="input" type="text" className="form-control"
+                <Field name="title" component="input" type="text" className="form-control"
                   placeholder="Input Title Here" onChange={this.handleTitleChange} onBlur={this.handleTitleBlur} style={{marginBottom: 20}}/>
                   <div className="form-inline">
                     { !this.props.permalinkEditing ? 
@@ -820,13 +818,13 @@ let NewContentType = React.createClass({
                           <div id="visibilityOption" className="collapse">
                             <div className="radio">
                               <label>
-                                <input type="radio" name="visibilityRadio" id="public" value="Public"/>
+                                <Field id="public" name="visibilityRadio" component="input" type="radio" value="Public" />
                                 Public
                               </label>
                             </div>
                             <div className="radio">
                               <label>
-                                <input type="radio" name="visibilityRadio" id="private" value="Private"/>
+                                <Field id="private" name="visibilityRadio" component="input" type="radio" value="Private" />
                                 Private
                               </label>
                             </div>
@@ -850,8 +848,8 @@ let NewContentType = React.createClass({
                                   <DatePicker id="datepicker" style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.props.publishDate.toISOString()} onChange={this.handleDateChange}/>
                                 </div>
                                 <div className="col-md-6">
-                                  <input type="text" id="hours" style={{width: 30, height: 34, textAlign: "center"}} defaultValue={new Date().getHours()} onChange={this.handleTimeChange}/> : 
-                                  <input type="text" id="minutes" style={{width: 30, height: 34, textAlign: "center"}} defaultValue={new Date().getMinutes()} onChange={this.handleTimeChange}/>
+                                  <Field name="hours" component="input" type="text" className="form-control" style={{width: 30, height: 34, textAlign: "center"}} defaultValue={new Date().getHours()} onChange={this.handleTimeChange} />
+                                  <Field name="minutes" component="input" type="text" className="form-control" style={{width: 30, height: 34, textAlign: "center"}} defaultValue={new Date().getMinutes()} onChange={this.handleTimeChange} />
                                 </div>
                               </div>
                               <div className="form-inline" style={{marginTop: 10}}>
@@ -1048,16 +1046,24 @@ let NewContentType = React.createClass({
 }
 });
 
+const selector = formValueSelector('newContentForm');
+
 const mapStateToProps = function(state){
-  const selector = formValueSelector('newContentForm');
-  const titleTag = selector(state, 'titleTag');
+  var customStates = {
+    title: selector(state, 'title'),
+    hours: selector(state, 'hours'),
+    minutes: selector(state, 'minutes'),
+    summary: selector(state, 'summary'),
+    titleTag: selector(state, 'titleTag'),
+    metaKeyword: selector(state, 'metaKeyword'),
+    metaDescription: selector(state'metaDescription')
+  }
 
   if (!_.isEmpty(state.contentTypeNew)) {
     var out = _.head(state.contentTypeNew);
     out["initialValues"] = out.data;
-    out["titleTag"] = titleTag;
-    return out;
-  } else return {titleTag: titleTag}
+    return _.merge(out, customStates);
+  } else return customStates;
 }
 
 NewContentType = reduxForm({
