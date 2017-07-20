@@ -1,10 +1,23 @@
 import React from 'react';
+import {Link} from 'react-router';
 import Query from '../admin/query';
 import {riques, errorCallback} from '../utils';
 
+const LinkMenu = (props) => {
+    var item = props.item
+    if (item.type === "url") {
+        return <a href={item.target}>{item.title}</a>
+    } else {
+        return <Link to={"/post/"+item.target}>{item.title}</Link>
+    }
+    console.log(item)
+    return null
+
+}
+
 const ChildMenuComponent = (props) => {
     var childMenuItem=  props.child.map((item, index) => (
-        <a className="dropdown-item" href={item.target} key={index.toString()}>{item.title}</a>
+            <Link to={"/post/"+item.target} key={index.toString()}>{item.title}</Link>
     ))
     var dropdownStyle = {
         backgroundColor: '#333',
@@ -21,19 +34,32 @@ const ParentMenuComponent = (props) => {
     var item = props.menuItem;
 
     if (item.children) {
+        /*
         return <li className="dropdown" key={props.parentIndex}>
-                <a className="dropdown-toggle" data-toggle="dropdown"  href={item.target}>{item.title}</a>
-                <ChildMenuComponent child={item.children} />
+                <a className="dropdown-toggle" onClick={props.onClick} href="#">{item.title}</a>
+                <ChildMenuComponent onClick={props.onClick} child={item.children} />
                 </li>
+        */
+        return <li className="dropdown" key={props.parentIndex}>
+            <Link to={"/post/"+item.target}>{item.title}</Link>
+            <ChildMenuComponent onClick={props.onClick} child={item.children} />
+            </li>
 
     } else {
-        return <li key={props.parentIndex}><a href={item.target}>{item.title}</a></li>
+        /*
+        console.log(item);
+        return <li key={props.parentindex}><a onClick={props.onClick} target={item.target} href={item.target}>{item.title}</a></li>
+        */
+
+        return <li key={props.parentIndex}>
+            <LinkMenu item={item} />
+            </li>
     }
 }
 
 const MenuComponent = (props) => {
     var menuItems = props.menuItems.map((parentItem, parentIndex)=>(
-        <ParentMenuComponent menuItem={parentItem} parentIndex={parentIndex} key={parentIndex.toString()}/>
+        <ParentMenuComponent onClick={props.onClick} menuItem={parentItem} parentIndex={parentIndex} key={parentIndex.toString()}/>
     ))
     
     return <ul className="cl-effect-16">
@@ -50,6 +76,15 @@ export const Menu = React.createClass({
         }
     },
 
+	handlePostClick: function(e){
+		e.preventDefault();
+		var target = e.currentTarget.target;
+        console.log(window.history);
+        console.log(this.context.router)
+        window.history.pushState("", "", "/"+target);
+//		this._reactInternalInstance._context.history.push("/hello")
+	},
+
     componentWillMount : function(){
         var me = this;
 
@@ -64,10 +99,27 @@ export const Menu = React.createClass({
                 me.setState({loadDone: true});
             }
         );
+/*
+        riques(Query.updateMenu('TWVudToxMzA=', 'Demo', [
+            {title: "Post", type: "post", target:"UG9zdDoxNDE=", children:[
+                {title: "Page", type: "page", target:"UG9zdDoxNDI="},
+                {title: "Page", type: "page", target:"UG9zdDoxNDI="},
+                {title: "Page", type: "page", target:"UG9zdDoxNDI="},
+                {title: "Page", type: "page", target:"UG9zdDoxNDI="}
+            ]},
+            {title: "Page", type: "page", target:"UG9zdDoxNDI="},
+            {title: "Category", type: "category", target:"Q2F0ZWdvcnk6NA=="},
+            {title: "Google.com", type: "url", target:"https://google.com"}
+        ]),
+        (error, response, body) => {
+            console.log(body.data);
+        }
+        );
+                */
     },
 
     render : function(){
-        return <MenuComponent goHome={this.props.goHome} menuItems={this.state.menuItems}/>
+        return <MenuComponent goHome={this.props.goHome} menuItems={this.state.menuItems} onClick={this.handlePostClick}/>
     }
 
 });
