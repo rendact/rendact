@@ -105,6 +105,7 @@ var Menu = React.createClass({
     var menuFiltered = _.filter(document.getElementsByName("itemsChecked[]"), function(item){
     	return item.checked
     });
+    debugger;
 	  var menuValues = [];
 	  menuValues = _.map(menuFiltered, function(item){return {title: item.value, type: "post"}});
     var treeData = [];
@@ -117,12 +118,25 @@ var Menu = React.createClass({
 
     this.resetFormCheckbox();
   },
-  removeNodeMenu: function(rowInfo) {
+  /*removeNodeMenu: function(rowInfo) {
     var _tree_Data = this.state.treeData;
     var node2 = rowInfo;
     var node = node2.node;
     var _treeData = _tree_Data.filter(function(item) {
       return item !== node    });
+    this.setState ({treeData: _treeData});
+  },*/
+  removePanel: function(event){
+    var _tree_Data = this.state.treeData;
+
+    var panelFiltered = _.filter(document.getElementsByName("removePanel"), function(item){
+      return item
+    });
+    var panelRemoved = _.map(panelFiltered, function(item){return item.value});
+    //var panelRemoved = "Art";
+    debugger;
+    var _treeData = _tree_Data.filter(function(item) {return item.title !== panelRemoved});
+    
     this.setState ({treeData: _treeData});
   },
   handleNewMenuChange: function(event){
@@ -192,7 +206,6 @@ var Menu = React.createClass({
     var noticeTxt = "Menu Updated";
     riques(qry, 
       function(error, response, body) { 
-        debugger;
         if (!error && !body.errors && response.statusCode === 200) {
           me.notif.addNotification({
                   message: noticeTxt,
@@ -320,6 +333,7 @@ var Menu = React.createClass({
   },
  
 	render: function(){
+    var me = this;
 		return (
 			<div className="content-wrapper">
         <div className="container-fluid">
@@ -485,8 +499,9 @@ var Menu = React.createClass({
                             }
                           <div className="col-md-4">
 												  <ul id="draggablePanelList" className="list-unstyled">
-                            {
+                            { 
                               this.state.treeData.map(function(item){
+
                                 if(item.type==="url"){
                                 return (
                                   <li key={item.id}>
@@ -556,8 +571,10 @@ var Menu = React.createClass({
                                     </ul>
                                   </li>
                                 )}
+
                                 if(item.type==="post"){
                                 return (
+                                  <form id={item.title} method="get">
                                   <li key={item.id}>
                                     <div className="box collapsed-box">
                                       <div className="box-header with-border">
@@ -568,36 +585,6 @@ var Menu = React.createClass({
                                         </div>
                                       </div>
                                         <div className="box-body" style={{display: "none"}}>
-                                          <div className="form-group">
-                                            <i htmlFor="name" >Label</i>
-                                            <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
-                                          </div>
-                                          <div className="form-group">
-                                            <i htmlFor="name" >Tooltip</i>
-                                            <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
-                                          </div>
-                                          <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}>
-                                          </div>
-                                          <div className="col-md-6">
-                                            <button className="btn btn-flat btn-danger btn-xs" id="" data-target="">Remove</button>
-                                          </div>
-                                          <div className="col-md-6">
-                                            <button className="btn btn-flat btn-default btn-xs pull-right" id="" data-target="">Cancel</button>
-                                          </div>
-                                        </div>
-                                    </div>
-                                    <ul style={{marginLeft: 20}} className="list-unstyled">
-                                      {item.children && item.children.map(function(child){
-                                      return (
-                                        <li key={child.id} className="box collapsed-box">
-                                          <div className="box-header with-border">
-                                            <h3 className="box-title">{child.title}</h3>
-                                            <div className="box-tools pull-right">
-                                              <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
-                                              </button>
-                                            </div>
-                                          </div>
-                                          <div className="box-body" style={{display: "none"}}>
                                             <div className="form-group">
                                               <i htmlFor="name" >Label</i>
                                               <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
@@ -606,20 +593,19 @@ var Menu = React.createClass({
                                               <i htmlFor="name" >Tooltip</i>
                                               <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
                                             </div>
-                                            <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}>
-                                            </div>
-                                            <div className="col-md-6">
-                                              <button className="btn btn-flat btn-danger btn-xs" id="" data-target="">Remove</button>
-                                            </div>
-                                            <div className="col-md-6">
-                                              <button className="btn btn-flat btn-default btn-xs pull-right" id="" data-target="">Cancel</button>
-                                            </div>
+                                          <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}>
                                           </div>
-                                        </li>
-                                      )
-                                    })}
-                                    </ul>
+                                          <div className="col-md-6">
+                                            <button type="submit" className="btn btn-flat btn-danger btn-xs" id={item.title}
+                                            value={item.title} name="removePanel" onClick={me.removePanel}>Remove</button>
+                                          </div>
+                                          <div className="col-md-6">
+                                            <button className="btn btn-flat btn-default btn-xs pull-right" id="" data-target="">Cancel</button>
+                                          </div>
+                                        </div>
+                                    </div>
                                   </li>
+                                  </form>
                                 )}
                               })
                             }
