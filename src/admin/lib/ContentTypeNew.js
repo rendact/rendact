@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import $ from 'jquery';
 import Query from '../query';
-import {riques, setValue, getValue, disableForm, errorCallback, 
+import {riques, disableForm, errorCallback, 
         getConfig, defaultHalogenStyle, getFormData} from '../../utils';
 import {getTemplates} from '../../includes/theme';
 import DatePicker from 'react-bootstrap-date-picker';
@@ -251,8 +251,6 @@ let NewContentType = React.createClass({
     }
   },
   handlePermalinkBtn: function(event) {
-    var slug = this.props.slug;
-    setValue("slugcontent", slug);
     this.props.dispatch(togglePermalinkEditingState(true));
   },
   handleTitleBlur: function(event) {
@@ -261,7 +259,7 @@ let NewContentType = React.createClass({
     this.checkSlug(slug);
   },
   handleSavePermalinkBtn: function(event) {
-    var slug = getValue("slugcontent");
+    var slug = this.props.slug;
     this.checkSlug(slug);
   },
   handleTitleChange: function(event){
@@ -290,8 +288,8 @@ let NewContentType = React.createClass({
     this.notifyUnsavedData(true);
   },
   handleTimeChange: function(event){
-    var hours = getValue("hours");
-    var minutes = getValue("minutes");
+    var hours = this.props.hours;
+    var minutes = this.props.minutes;
     var d = this.props.publishDate;
     d.setHours(parseInt(hours, 10));
     d.setMinutes(parseInt(minutes, 10));
@@ -705,7 +703,7 @@ let NewContentType = React.createClass({
                         <p>Permalink: 
                         <div className="form-group" id="permalinkcontent">
                           <a id="permalink" href="#">{rootUrl}/</a>
-                          <input id="slugcontent" defaultValue={this.props.slug}/>
+                          <Field id="slugcontent" defaultValue={this.props.slug} component="input"type="text" className="form-control" />
                           <button type="button" className="btn btn-default" onClick={this.handleSavePermalinkBtn}>OK</button>
                         </div>
                         { this.props.permalinkInProcess && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
@@ -1056,7 +1054,8 @@ const mapStateToProps = function(state){
     summary: selector(state, 'summary'),
     titleTag: selector(state, 'titleTag'),
     metaKeyword: selector(state, 'metaKeyword'),
-    metaDescription: selector(state'metaDescription')
+    metaDescription: selector(state, 'metaDescription')
+    slug: selector(state, 'slug')
   }
 
   if (!_.isEmpty(state.contentTypeNew)) {
