@@ -38,7 +38,6 @@ const MenuComponent = (props) => {
     
     return <ul className="cl-effect-16">
         <li><a className="active" href="#" onClick={props.goHome}>Home</a></li>
-        <li><a href="blogs">Blogs</a></li>
         { menuItems }
     </ul>
 }
