@@ -1056,7 +1056,7 @@ const mapStateToProps = function(state){
     summary: selector(state, 'summary'),
     titleTag: selector(state, 'titleTag'),
     metaKeyword: selector(state, 'metaKeyword'),
-    metaDescription: selector(state'metaDescription')
+    metaDescription: selector(state, 'metaDescription')
   }
 
   if (!_.isEmpty(state.contentTypeNew)) {
