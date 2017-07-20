@@ -3,6 +3,7 @@ import AdminConfig from '../admin/AdminConfig';
 import NotFound from '../admin/NotFound';
 import Query from '../admin/query';
 import {riques, errorCallback, getValue, setValue, loadConfig} from '../utils';
+import {Menu} from './Menu.js';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
 import Loading from '../admin/Loading';
@@ -71,7 +72,7 @@ export const ThemeHome = React.createClass({
 			config: null,
 			postPerPage: 5,
 			pageCount: 1,
-			activePage: 1
+			activePage: 1,
 		}
 	},
 	goHome: function(e) {
@@ -90,14 +91,7 @@ export const ThemeHome = React.createClass({
 		return <div dangerouslySetInnerHTML={{__html: content}} />
 	},
 	theMenu: function(){
-		return <ul className="cl-effect-16">
-						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
-						<li><a href="blogs">Blogs</a></li>
-						<li><a href="#">Menu 2</a></li>
-						<li><a href="#">Menu 3</a></li>
-						<li><a href="#">Menu 4</a></li>
-						<li><a href="#">Menu 5</a></li>
-					</ul>
+        return <Menu goHome={this.goHome}/>
 	},
 	theLogo: function(){
 		return <div className="logo">
@@ -216,7 +210,7 @@ export const ThemeBlog = React.createClass({
 			loadDone: false,
 			isSlugExist: false,
 			slug: this.props.location.pathname.replace("/",""),
-			latestPosts: []
+			latestPosts: [],
 		}
 	},
 	handlePostClick: function(e){
@@ -231,14 +225,7 @@ export const ThemeBlog = React.createClass({
 		return <div dangerouslySetInnerHTML={{__html: content}} />
 	},
 	theMenu: function(){
-		return <ul className="cl-effect-16">
-						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
-						<li><a href="blogs">Blogs</a></li>
-						<li><a href="#">Menu 2</a></li>
-						<li><a href="#">Menu 3</a></li>
-						<li><a href="#">Menu 4</a></li>
-						<li><a href="#">Menu 5</a></li>
-					</ul>
+        return <Menu goHome={this.goHome}/>
 	},
 	componentWillMount: function(){
 		var me = this;
@@ -299,7 +286,7 @@ export const ThemeSingle = React.createClass({
 		return {
 			loadDone: false,
 			postData: false,
-			config: null
+			config: null,
 		}
 	},
 	goHome: function(e) {
@@ -307,14 +294,7 @@ export const ThemeSingle = React.createClass({
 		this._reactInternalInstance._context.history.push('/')
 	},
 	theMenu: function(){
-		return <ul className="cl-effect-16">
-						<li><a className="active" href="#" onClick={this.goHome}>Home</a></li>
-						<li><a href="blogs">Blogs</a></li>
-						<li><a href="#">Menu 2</a></li>
-						<li><a href="#">Menu 3</a></li>
-						<li><a href="#">Menu 4</a></li>
-						<li><a href="#">Menu 5</a></li>
-					</ul>
+        return <Menu goHome={this.goHome}/>
 	},
 	theBreadcrumb: function(){
 		return <h2><a href="#" onClick={this.goHome}><h5>Home </h5></a> / PAGE</h2>
