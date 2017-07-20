@@ -109,6 +109,7 @@ small {
   -ms-transition:0.5s all;
    background-color: rgba(39, 40, 40, 0.74);
 }
+
 .top-menu {
   float: right;
   margin-top: 1em;
@@ -128,6 +129,26 @@ nav.navigation a:hover,
 nav.navigation a:focus {
   outline: none;
 }
+
+/* dropdown menu slide down 1 */
+
+.dropdown:hover .dropdown-menu{
+    height: 100%;
+}
+
+.dropdown-menu {
+    display:block;
+    padding:0;
+    border:none;
+    overflow: hidden;
+    height: 0;
+    -webkit-transition: height 200ms ease-in;
+    -moz-transition: height 200ms ease-in;
+    -o-transition: height 200ms ease-in;
+    transition: height 200ms ease-in;
+    margin: 0;
+}
+
 /*-- sticky-nav --*/
 @media screen and (max-width: 700px) {
     span.menu{
