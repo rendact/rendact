@@ -6,18 +6,25 @@ import {riques, errorCallback} from '../utils';
 const LinkMenu = (props) => {
     var item = props.item
     if (item.type === "url") {
-        return <a href={item.target}>{item.title}</a>
+        return <a href={item.target} target="_blank">{item.title}</a>
     } else {
-        return <Link to={"/post/"+item.target}>{item.title}</Link>
+        if (item.type === "post") {
+            return <Link to={"/post/"+item.target}>{item.title}</Link>
+        } else if (item.type === "page"){
+            return <Link to={"/page/"+item.target}>{item.title}</Link>
+        } else if (item.type === "category") {
+            return <Link to={"/category/"+item.target}>{item.title}</Link>
+        }
     }
-    console.log(item)
     return null
 
 }
 
 const ChildMenuComponent = (props) => {
     var childMenuItem=  props.child.map((item, index) => (
-            <Link to={"/post/"+item.target} key={index.toString()}>{item.title}</Link>
+        <div className="dropdown-item" key={index.toString()}>
+            <LinkMenu item={item}/>
+        </div>
     ))
     var dropdownStyle = {
         backgroundColor: '#333',
@@ -34,25 +41,15 @@ const ParentMenuComponent = (props) => {
     var item = props.menuItem;
 
     if (item.children) {
-        /*
-        return <li className="dropdown" key={props.parentIndex}>
-                <a className="dropdown-toggle" onClick={props.onClick} href="#">{item.title}</a>
-                <ChildMenuComponent onClick={props.onClick} child={item.children} />
-                </li>
-        */
         return <li className="dropdown" key={props.parentIndex}>
             <Link to={"/post/"+item.target}>{item.title}</Link>
             <ChildMenuComponent onClick={props.onClick} child={item.children} />
             </li>
 
     } else {
-        /*
-        console.log(item);
-        return <li key={props.parentindex}><a onClick={props.onClick} target={item.target} href={item.target}>{item.title}</a></li>
-        */
 
         return <li key={props.parentIndex}>
-            <LinkMenu item={item} />
+            <LinkMenu item={item} onClick={props.onClick}/>
             </li>
     }
 }
@@ -76,14 +73,6 @@ export const Menu = React.createClass({
         }
     },
 
-	handlePostClick: function(e){
-		e.preventDefault();
-		var target = e.currentTarget.target;
-        console.log(window.history);
-        console.log(this.context.router)
-        window.history.pushState("", "", "/"+target);
-//		this._reactInternalInstance._context.history.push("/hello")
-	},
 
     componentWillMount : function(){
         var me = this;
@@ -99,23 +88,6 @@ export const Menu = React.createClass({
                 me.setState({loadDone: true});
             }
         );
-/*
-        riques(Query.updateMenu('TWVudToxMzA=', 'Demo', [
-            {title: "Post", type: "post", target:"UG9zdDoxNDE=", children:[
-                {title: "Page", type: "page", target:"UG9zdDoxNDI="},
-                {title: "Page", type: "page", target:"UG9zdDoxNDI="},
-                {title: "Page", type: "page", target:"UG9zdDoxNDI="},
-                {title: "Page", type: "page", target:"UG9zdDoxNDI="}
-            ]},
-            {title: "Page", type: "page", target:"UG9zdDoxNDI="},
-            {title: "Category", type: "category", target:"Q2F0ZWdvcnk6NA=="},
-            {title: "Google.com", type: "url", target:"https://google.com"}
-        ]),
-        (error, response, body) => {
-            console.log(body.data);
-        }
-        );
-                */
     },
 
     render : function(){
