@@ -320,12 +320,9 @@ let NewContentType = React.createClass({
       "featuredImage": v.featuredImage
     }
   },
-  handleSubmit: function(event) {
-    event.preventDefault();
-    debugger;
+  onSubmit: function(v) {
     var me = this;
-    var v = this.getFormValues();
-
+    
     if (v.status === "Published" || v.status === "Draft" || v.status === "Reviewing") {
       if (v.title === null || v.title.length<=3) {
         this._errorNotif('Title is too short');
@@ -676,7 +673,7 @@ let NewContentType = React.createClass({
           </section>
           <Notification ref="notificationSystem" />
 
-          <form onSubmit={this.handleSubmit} id="postForm" method="get" style={{opacity: this.props.opacity}}>
+          <form onSubmit={this.props.handleSubmit(this.onSubmit)} id="postForm" method="get" style={{opacity: this.props.opacity}}>
           { this.props.isProcessing &&
           <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
           }
