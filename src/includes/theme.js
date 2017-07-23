@@ -199,7 +199,7 @@ export const ThemeHome = React.createClass({
 								widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 								footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 							/>
-			}
+	}
 		}
 	}
 });
