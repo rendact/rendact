@@ -22,7 +22,7 @@ const LinkMenu = (props) => {
 
 const ChildMenuComponent = (props) => {
     var childMenuItem=  props.child.map((item, index) => (
-        <div className="dropdown-item" key={index.toString()}>
+        <div className="dropdown-item"  onClick={props.onClick} key={index.toString()}>
             <LinkMenu item={item}/>
         </div>
     ))
@@ -41,7 +41,7 @@ const ParentMenuComponent = (props) => {
     var item = props.menuItem;
 
     if (item.children) {
-        return <li className="dropdown" key={props.parentIndex}>
+        return <li className="dropdown" onClick={props.onClick} key={props.parentIndex}>
             <Link to={"/post/"+item.target}>{item.title}</Link>
             <ChildMenuComponent onClick={props.onClick} child={item.children} />
             </li>
@@ -73,6 +73,10 @@ export const Menu = React.createClass({
         }
     },
 
+    handlePostClick: function(){
+        console.log(this.props);
+    },
+
 
     componentWillMount : function(){
         var me = this;
@@ -91,7 +95,7 @@ export const Menu = React.createClass({
     },
 
     render : function(){
-        return <MenuComponent goHome={this.props.goHome} menuItems={this.state.menuItems} onClick={this.handlePostClick}/>
+        return <MenuComponent goHome={this.props.goHome} menuItems={this.state.menuItems} onClick={this.props.getPost}/>
     }
 
 });

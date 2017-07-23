@@ -293,8 +293,28 @@ export const ThemeSingle = React.createClass({
 		e.preventDefault();
 		this._reactInternalInstance._context.history.push('/')
 	},
+
+    getPost: function(){
+        this.setState({loadDone: false, postData: false})
+        var me = this;
+        console.log(this.props);
+        var postId = this.props.params.postId;
+		riques(Query.getPostQry(postId), 
+      function(error, response, body) { 
+        if (!error && !body.errors && response.statusCode === 200) {
+          var data = body.data.getPost;
+          me.setState({postData: data});
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+        me.setState({loadDone: true});
+      }
+    );
+    },
+
+
 	theMenu: function(){
-        return <Menu goHome={this.goHome}/>
+        return <Menu goHome={this.goHome} getPost={this.getPost}/>
 	},
 	theBreadcrumb: function(){
 		return <h2><a href="#" onClick={this.goHome}><h5>Home </h5></a> / PAGE</h2>
