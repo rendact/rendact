@@ -1038,4 +1038,4 @@ NewContentType = reduxForm({
   form: 'newContentForm'
 })(NewContentType)
 NewContentType = connect(mapStateToProps)(NewContentType);
-export default NewContentType;form
+export default NewContentType;
