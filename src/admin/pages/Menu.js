@@ -2,6 +2,7 @@ import React from 'react';
 import Query from '../query';
 import $ from 'jquery';
 import _ from 'lodash';
+import uuid from 'uuid';
 import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {swalert, riques, errorCallback, setValue, getValue, disableForm, defaultHalogenStyle} from '../../utils';
@@ -89,7 +90,7 @@ var Menu = React.createClass({
     event.preventDefault();
     var _treeData = this.state.treeData;
     var url = getValue("urlMenu");
-    var _url = [{title: url, type: "url"}];
+    var _url = [{title: url, type: "url", id: uuid()}];
     var treeData = [];
     if (_treeData===null) {
       treeData = _url;
@@ -105,9 +106,9 @@ var Menu = React.createClass({
     var menuFiltered = _.filter(document.getElementsByName("itemsChecked[]"), function(item){
     	return item.checked
     });
-    debugger;
 	  var menuValues = [];
-	  menuValues = _.map(menuFiltered, function(item){return {title: item.value, type: "post"}});
+	  menuValues = _.map(menuFiltered, function(item){return {title: item.value, type: "post", id: uuid()}});
+    debugger;
     var treeData = [];
     if (_treeData===null) {
       treeData = menuValues;
@@ -118,25 +119,13 @@ var Menu = React.createClass({
 
     this.resetFormCheckbox();
   },
-  /*removeNodeMenu: function(rowInfo) {
+  removePanel: function(e){
     var _tree_Data = this.state.treeData;
-    var node2 = rowInfo;
-    var node = node2.node;
-    var _treeData = _tree_Data.filter(function(item) {
-      return item !== node    });
-    this.setState ({treeData: _treeData});
-  },*/
-  removePanel: function(event){
-    var _tree_Data = this.state.treeData;
-
-    var panelFiltered = _.filter(document.getElementsByName("removePanel"), function(item){
-      return item
-    });
-    var panelRemoved = _.map(panelFiltered, function(item){return item.value});
+    var panelRemoved = e.target.id;
+    //var panelRemoved = e.target.value;
     //var panelRemoved = "Art";
+    var _treeData = _tree_Data.filter(function(item) {return item.id !== panelRemoved});
     debugger;
-    var _treeData = _tree_Data.filter(function(item) {return item.title !== panelRemoved});
-    
     this.setState ({treeData: _treeData});
   },
   handleNewMenuChange: function(event){
@@ -462,7 +451,7 @@ var Menu = React.createClass({
       										      <div className="form-group">
       										      <select id="menuSelect" onChange={this.handleMenuName} name="menuSelect" className="form-control select" >
       											     {this.state.pageList}
-      											     </select>
+      											    </select>
       										    </div>
       										  </div>
 				                  </div>
@@ -498,13 +487,13 @@ var Menu = React.createClass({
                               <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
                             }
                           <div className="col-md-4">
-												  <ul id="draggablePanelList" className="list-unstyled">
+                            <ul id="draggablePanelList" className="list-unstyled" name="draggablePanelList">
                             { 
                               this.state.treeData.map(function(item){
 
                                 if(item.type==="url"){
                                 return (
-                                  <li key={item.id}>
+                                  <li key={item.id} id={item.id} name="removePanel">
                                     <div className="box collapsed-box">
                                       <div className="box-header with-border">
                                         <h3 className="box-title">{item.title}</h3>
@@ -529,7 +518,7 @@ var Menu = React.createClass({
                                           <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}>
                                           </div>
                                           <div className="col-md-6">
-                                            <button className="btn btn-flat btn-danger btn-xs" id="" data-target="">Remove</button>
+                                            <button value={item.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={item.id} onClick={me.removePanel}>Remove</button>
                                           </div>
                                           <div className="col-md-6">
                                             <button className="btn btn-flat btn-default btn-xs pull-right" id="" data-target="">Cancel</button>
@@ -574,38 +563,35 @@ var Menu = React.createClass({
 
                                 if(item.type==="post"){
                                 return (
-                                  <form id={item.title} method="get">
-                                  <li key={item.id}>
-                                    <div className="box collapsed-box">
-                                      <div className="box-header with-border">
-                                        <h3 className="box-title">{item.title}</h3>
-                                        <div className="box-tools pull-right">
-                                          <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
-                                          </button>
+                                    <li key={item.id} id={item.id} name="removePanel">
+                                      <div className="box collapsed-box">
+                                        <div className="box-header with-border">
+                                          <h3 className="box-title">{item.title}</h3>
+                                          <div className="box-tools pull-right">
+                                            <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+                                            </button>
+                                          </div>
                                         </div>
+                                          <div className="box-body" style={{display: "none"}}>
+                                              <div className="form-group">
+                                                <i htmlFor="name" >Label</i>
+                                                <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
+                                              </div>
+                                              <div className="form-group">
+                                                <i htmlFor="name" >Tooltip</i>
+                                                <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
+                                              </div>
+                                            <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}>
+                                            </div>
+                                            <div className="col-md-6">
+                                              <button value={item.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={item.id} onClick={me.removePanel}>Remove</button>
+                                            </div>
+                                            <div className="col-md-6">
+                                              <button className="btn btn-flat btn-default btn-xs pull-right" id="" data-target="">Cancel</button>
+                                            </div>
+                                          </div>
                                       </div>
-                                        <div className="box-body" style={{display: "none"}}>
-                                            <div className="form-group">
-                                              <i htmlFor="name" >Label</i>
-                                              <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
-                                            </div>
-                                            <div className="form-group">
-                                              <i htmlFor="name" >Tooltip</i>
-                                              <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
-                                            </div>
-                                          <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}>
-                                          </div>
-                                          <div className="col-md-6">
-                                            <button type="submit" className="btn btn-flat btn-danger btn-xs" id={item.title}
-                                            value={item.title} name="removePanel" onClick={me.removePanel}>Remove</button>
-                                          </div>
-                                          <div className="col-md-6">
-                                            <button className="btn btn-flat btn-default btn-xs pull-right" id="" data-target="">Cancel</button>
-                                          </div>
-                                        </div>
-                                    </div>
-                                  </li>
-                                  </form>
+                                    </li>
                                 )}
                               })
                             }
