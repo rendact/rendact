@@ -133,20 +133,36 @@ nav.navigation a:focus {
 /* dropdown menu slide down 1 */
 
 .dropdown:hover .dropdown-menu{
-    height: 100%;
+    -webkit-transform:scale(1, 1);
+    -moz-transform: scale(1, 1);
+    -o-transform:scale(1, 1);
+    transform:scale(1, 1);
 }
 
 .dropdown-menu {
-    display:block;
     padding:0;
     border:none;
-    overflow: hidden;
-    height: 0;
-    -webkit-transition: height 200ms ease-in;
-    -moz-transition: height 200ms ease-in;
-    -o-transition: height 200ms ease-in;
-    transition: height 200ms ease-in;
+    -webkit-transform:scale(1, 0);
+    -moz-transform: scale(1, 0);
+    -o-transform:scale(1, 0);
+    transform:scale(1, 0);
+
+    -webkit-transform-origin: top;
+    -moz-transform-origin: top;
+    -o-transform-origin: top;
+    transform-origin: top;
+
+    -webkit-animation-fill-mode: forwards;  
+    -moz-transform-origin: forwards;
+    -o-transform-origin: forwards;
+    animation-fill-mode: forwards; 
+
+    -webkit-transition: all 200ms ease-in;
+    -moz-transition: all 200ms ease-in;
+    -o-transition: all 200ms ease-in;
+    transition: all 200ms ease-in;
     margin: 0;
+    display: block;
 }
 
 /*-- sticky-nav --*/
