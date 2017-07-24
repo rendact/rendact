@@ -134,27 +134,6 @@ let NewContentType = React.createClass({
     this.handleTitleChange();
     window.history.pushState("", "", '/admin/'+this.props.slug+'/new');
   },
-  getFormValues: function(){
-    var categories = _.filter(document.getElementsByName("categoryCheckbox[]"), function(item){
-      return item.checked
-    });
-    
-    return {
-      title: this.props.title,
-      content: window.CKEDITOR.instances['content'].getData(),
-      status: this.props.status,
-      titleTag: this.props.title,
-      metaKeyword: this.props.metaKeyword,
-      metaDescription: this.props.metaDescription,
-      passwordPage: "",
-      summary: this.props.summary,
-      visibility: document.querySelector("input[name=visibilityRadio]:checked").value,
-      publishDate: this.props.publishDate,
-      type: this.props.slug,
-      featuredImage: this.props.featuredImage,
-      categories: _.map(categories, function(item){return item.value})
-    }
-  },
   getMetaFormValues: function(){
     var out = getFormData("metaField");
 
@@ -170,12 +149,13 @@ let NewContentType = React.createClass({
   setFormValues: function(v){
     var meta = [];
     var metaValues = {}
+
+    // prepare post meta values
     if (v.meta.edges.length>0) {
-      _.forEach(v.meta.edges, function(i){
-        meta.push(i.node);
-      });
+      _.forEach(v.meta.edges, function(i){ meta.push(i.node) });
     }
     
+    // prepare main post values
     var pubDate = v.publishDate? new Date(v.publishDate) : new Date();
     window.CKEDITOR.instances['content'].setData(v.content);
     v["hours"] = pubDate.getHours();
@@ -187,18 +167,15 @@ let NewContentType = React.createClass({
     this.props.dispatch(loadFormData(_.merge(v, metaValues)));
     //this.props.dispatch(setContentFormValues(v));
 
+    // set categories value to state
     var _postCategoryList = [];
     if (v.category.edges.length>0) {
       _.forEach(v.category.edges, function(i){
-        if (i.node.category){
-          _postCategoryList.push(i.node.category.id);
-          if (document.getElementById(i.node.category.id)){
-            document.getElementById(i.node.category.id).checked = true;
-          }
-        }
+        if (i.node.category){ _postCategoryList.push(i.node.category.id) }
       });
       this.props.dispatch(setCategoryList(_postCategoryList));
     }
+    // set tags value to state
     var _postTagList = [];
     if (v.tag && v.tag.edges.length>0) {
       _.forEach(v.tag.edges, function(i){
@@ -209,8 +186,8 @@ let NewContentType = React.createClass({
       this.props.dispatch(setTagList(_postTagList, _postTagList));
     }
 
-    var _imageGalleryList = [];
-    
+    // set gallery values to state
+    var _imageGalleryList = [];    
     if (v.tag && v.file.edges.length>0) {
       _.forEach(v.file.edges, function(i){
         if (i.node.value){
@@ -220,6 +197,7 @@ let NewContentType = React.createClass({
       this.props.dispatch(setImageGalleryList(_imageGalleryList));
     }
 
+    // set additional field values to state
     var _connectionValue = this.props.connectionValue;
     _.forEach(meta, function(item){
       metaValues[item.item] = item.value;
@@ -232,13 +210,7 @@ let NewContentType = React.createClass({
         _connectionValue[isConnItem[1]] = item.value; 
       }
     });
-
     this.props.dispatch(setConnectionValue(_connectionValue));
-
-    this.handleTitleChange();
-    this.handleTitleTagChange();
-    this.handleMetaDescriptionChange();
-    this.handleSummaryChange();
   },
   formatDate: function(date){
     var min = date.getMinutes();
