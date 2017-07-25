@@ -13,9 +13,9 @@ import ReactSelect from 'react-select';
 import 'react-select/dist/react-select.css';
 import {connect} from 'react-redux';
 import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPostEditor,
-        setCategoryList, setTagList, setImageGalleryList, setConnectionValue, setContentFormValues,
+        setCategoryList, setTagList, setImageGalleryList, setConnectionValue, 
         toggleSaveImmediatelyMode, togglePermalinkEditingState, setVisibilityMode,
-        setPostTitle, setPostContent, setPostSummary, updateTitleTagLeftCharacter,
+        setPostContent, updateTitleTagLeftCharacter,
         updateMetaDescriptionLeftCharacter, setPostPublishDate, setFeaturedImage,
         setEditorMode, toggleImageGalleyBinded, setPageList, setAllCategoryList,
         setOptions, setTagMap, loadFormData} from '../../actions'

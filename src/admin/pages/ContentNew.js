@@ -4,7 +4,7 @@ import Notification from 'react-notification-system';
 import Query from '../query';
 import {riques, getValue, setValue, getFormData, errorCallback, disableForm, swalert} from '../../utils';
 import {connect} from 'react-redux'
-import {maskArea, loadFormData} from '../../actions'
+import {loadFormData} from '../../actions'
 import {reduxForm, Field} from 'redux-form'
 
 const ContentField = React.createClass({
