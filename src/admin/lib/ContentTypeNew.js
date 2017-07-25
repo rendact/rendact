@@ -21,6 +21,37 @@ import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPost
         setOptions, setTagMap, loadFormData} from '../../actions'
 import {reduxForm, Field, formValueSelector} from 'redux-form';
 
+const PermalinkEditor = (props) => {
+  return (
+    <div className="form-inline">
+      { !props.permalinkEditing ? 
+        ( <p>Permalink: &nbsp;
+          {props.mode==="update"?(
+            <a id="permalink" href={props.rootUrl+'/'+props.permalink}>{props.rootUrl}/{props.permalink}</a>
+            ) : (
+            <a id="permalink" href="#">{props.rootUrl}/{props.permalink}</a>
+            )
+          }
+          <button type="button" onClick={() => {props.dispatch(togglePermalinkEditingState(true))}} id="editBtn" className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
+            <span style={{fontSize: 12}}>Edit</span>
+          </button> 
+          { props.permalinkInProcess && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
+          </p>
+        ) : (
+          <p>Permalink: 
+          <div className="form-group" id="permalinkcontent">
+            <a id="permalink" href="#">{props.rootUrl}/</a>
+            <input id="slugcontent" defaultValue={props.permalink} type="text" className="form-control" />
+            <button type="button" className="btn btn-default" onClick={()=>{props.onCheckSlug(props.permalink)}}>OK</button>
+          </div>
+          { props.permalinkInProcess && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
+          </p>
+        )
+      }
+    </div>
+  )
+}
+
 let NewContentType = React.createClass({
   propTypes: {
     isProcessing: React.PropTypes.bool.isRequired,
@@ -28,7 +59,7 @@ let NewContentType = React.createClass({
     errorMsg: React.PropTypes.string,
     loadingMsg: React.PropTypes.string,
     title: React.PropTypes.string,
-    slug: React.PropTypes.string,
+    permalink: React.PropTypes.string,
     content: React.PropTypes.string,
     category: React.PropTypes.string,
     summary: React.PropTypes.string,
@@ -81,30 +112,27 @@ let NewContentType = React.createClass({
       tagMap: {},
       connectionValue: {},
       data: {},
-      parent: ""
+      parent: "",
+      permalink: ""
     }
   },
   isWidgetActive: function(name){
     return _.indexOf(this.props.widgets, name) > -1;
   },
-  checkSlug: function(slug){
+  checkSlug: function(permalink){
     var me = this;
-    me.props.dispatch(togglePermalinkProcessState(true));
-    riques( Query.checkSlugQry(slug),
+    
+    this.props.dispatch(togglePermalinkProcessState(true));
+    riques( Query.checkSlugQry(permalink),
       function(error, response, body) {
+        me.props.dispatch(togglePermalinkProcessState(false));
         if (!error && !body.errors && response.statusCode === 200) {
           var slugCount = body.data.viewer.allPosts.edges.length;
-          if (me.props.mode==="create") {
-            if (slugCount > 0) me.props.dispatch(setSlug(slug+"-"+slugCount, false));
-            else me.props.dispatch(setSlug(slug, false));
-          } else {
-            if (slugCount > 1) me.props.dispatch(setSlug(slug+"-"+slugCount, false));
-            else me.props.dispatch(setSlug(slug, false));
-          }
+          if (slugCount > 0) me.props.dispatch(setSlug(permalink+"-"+slugCount, false));
+          else me.props.dispatch(setSlug(permalink, false));
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null, "Check Slug");
         }
-        me.props.dispatch(togglePermalinkProcessState(false));
       }
     );
   },
@@ -113,15 +141,6 @@ let NewContentType = React.createClass({
     var minute = this.props.minutes;
     var time = this.props.publishDate + hours + minute;
     this.props.dispatch(toggleSaveImmediatelyMode(false, time));
-  },
-  handleChangeStatus: function(event){
-    this.props.dispatch(setPostStatus(document.querySelector('#statusSelect').value));
-  },
-  saveDraft: function(event){
-    this.props.dispatch(setPostStatus("Draft"));
-  },
-  saveVisibility: function(event){
-    this.props.dispatch(setVisibilityMode(document.querySelector("input[name=visibilityRadio]:checked").value));
   },
   disableForm: function(isFormDisabled){
     disableForm(isFormDisabled, this.notification);
@@ -132,7 +151,7 @@ let NewContentType = React.createClass({
     window.CKEDITOR.instances['content'].setData(null);
     this.props.dispatch(resetPostEditor());
     this.handleTitleChange();
-    window.history.pushState("", "", '/admin/'+this.props.slug+'/new');
+    window.history.pushState("", "", '/admin/'+this.props.permalink+'/new');
   },
   getMetaFormValues: function(){
     var out = getFormData("metaField");
@@ -222,27 +241,12 @@ let NewContentType = React.createClass({
       this.props.handleUnsavedData(state)
     }
   },
-  handlePermalinkBtn: function(event) {
-    this.props.dispatch(togglePermalinkEditingState(true));
-  },
-  handleTitleBlur: function(event) {
-    var title = this.props.title;
-    var slug = title.split(" ").join("-").toLowerCase();
-    this.checkSlug(slug);
-  },
-  handleSavePermalinkBtn: function(event) {
-    var slug = this.props.slug;
-    this.checkSlug(slug);
-  },
   handleTitleChange: function(event){
     this.notifyUnsavedData(true);
   },
   handleContentChange: function(event){
     var content = window.CKEDITOR.instances['content'].getData();
     this.props.dispatch(setPostContent(content));
-    this.notifyUnsavedData(true);
-  },
-  handleSummaryChange: function(event){
     this.notifyUnsavedData(true);
   },
   handleTitleTagChange: function(event){
@@ -272,9 +276,6 @@ let NewContentType = React.createClass({
     var resetDate = this.props.publishDateReset;
     this.props.dispatch(setPostPublishDate(resetDate, false));
   },
-  handleAddNewBtn: function(event) {
-    this.resetForm();
-  },
   _emulateDataForSaving: function(v){
     return {
       "title": v.title,
@@ -285,7 +286,7 @@ let NewContentType = React.createClass({
       "publishDate": v.publishDate,
       "type": this.props.postType,
       "authorId": localStorage.getItem('userId'),
-      "slug": this.props.slug,
+      "slug": this.props.permalink,
       "summary": v.summary,
       "parent": v.parentPage,
       "order": v.pageOrder,
@@ -389,7 +390,7 @@ let NewContentType = React.createClass({
           here.disableForm(false);
           here.notifyUnsavedData(false);
           here.bindPostToImageGallery(postId);
-          here.props.handleNav(me.props.slug,"edit",postId);
+          here.props.handleNav(me.props.permalink,"edit",postId);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null, "Save Post");
           here.disableForm(false);
@@ -420,9 +421,6 @@ let NewContentType = React.createClass({
       me.props.dispatch(setFeaturedImage(reader.result));
     };
     reader.readAsDataURL(e.target.files[0]);
-  },
-  handleFeaturedImageRemove: function(e){
-    this.props.dispatch(setFeaturedImage(null));
   },
   imageGalleryChange: function(e){
     var me = this;
@@ -532,9 +530,6 @@ let NewContentType = React.createClass({
       />
     )
   },
-  handleTagChange: function(value) {
-    this.props.dispatch(setTagList(this.props.postTagListInit, value));
-  },
   componentWillMount: function(){
     var me = this;
 
@@ -631,13 +626,13 @@ let NewContentType = React.createClass({
               <h1>{this.props.mode==="update"?"Edit Current "+this.props.name:"Add New "+this.props.name}
               { this.props.mode==="update" &&
                 <small style={{marginLeft: 5}}>
-                  <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
+                  <button className="btn btn-default btn-primary add-new-post-btn" onClick={()=>{this.resetForm()}}>Add new</button>
                 </small>
               }
               </h1>
                 <ol className="breadcrumb">
                   <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-                  <li><a href="#" onClick={function(){this.props.handleNav(this.props.slug)}.bind(this)}>
+                  <li><a href="#" onClick={function(){this.props.handleNav(this.props.permalink)}.bind(this)}>
                     {this.props.name}</a></li>
                   <li className="active">{this.props.mode==="update"?"Edit "+this.props.name:"Add New"}</li>
                 </ol>
@@ -653,33 +648,8 @@ let NewContentType = React.createClass({
             <div className="form-group"  style={{marginBottom:30}}>
               <div>
                 <Field name="title" component="input" type="text" className="form-control"
-                  placeholder="Input Title Here" onChange={this.handleTitleChange} onBlur={this.handleTitleBlur} style={{marginBottom: 20}}/>
-                  <div className="form-inline">
-                    { !this.props.permalinkEditing ? 
-                      ( <p>Permalink: &nbsp;
-                        {this.props.mode==="update"?(
-                          <a id="permalink" href={rootUrl+'/'+this.props.slug}>{rootUrl}/{this.props.slug}</a>
-                          ) : (
-                          <a id="permalink" href="#">{rootUrl}/{this.props.slug}</a>
-                          )
-                        }
-                        <button type="button" onClick={this.handlePermalinkBtn} id="editBtn" className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
-                          <span style={{fontSize: 12}}>Edit</span>
-                        </button> 
-                        { this.props.permalinkInProcess && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
-                        </p>
-                      ) : (
-                        <p>Permalink: 
-                        <div className="form-group" id="permalinkcontent">
-                          <a id="permalink" href="#">{rootUrl}/</a>
-                          <Field id="slugcontent" defaultValue={this.props.slug} component="input"type="text" className="form-control" />
-                          <button type="button" className="btn btn-default" onClick={this.handleSavePermalinkBtn}>OK</button>
-                        </div>
-                        { this.props.permalinkInProcess && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
-                        </p>
-                      )
-                    }
-                  </div>
+                  placeholder="Input Title Here" onChange={this.handleTitleChange} onBlur={() => {this.checkSlug(this.props.title.split(" ").join("-").toLowerCase())}} style={{marginBottom: 20}}/>
+                  <PermalinkEditor rootUrl={rootUrl} onCheckSlug={this.checkSlug} {...this.props} />
                   <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="text" className="form-control" />
                   <div id="trackingDiv"></div>
               </div>
@@ -694,7 +664,7 @@ let NewContentType = React.createClass({
                 </div>
               </div>
               <div className="box-body pad">
-              <Field id="summary" name="summary" rows="3" component="textarea" wrap="hard" type="text" style={{width: '100%'}} onChange={this.handleSummaryChange} />
+              <Field id="summary" name="summary" rows="3" component="textarea" wrap="hard" type="text" style={{width: '100%'}} onChange={()=>{this.notifyUnsavedData(true)}} />
               </div>
             </div>
 
@@ -713,7 +683,7 @@ let NewContentType = React.createClass({
                     <div className="col-md-8">
                       <p><a href="#">{this.props.title===""?"No Title":this.props.title.substring(0,71)}</a></p>
                       <p>{this.props.content===""?"":this.props.content.substring(0,100).replace(/(<([^>]+)>)/ig,"")}</p>
-                      <p><span className="help-block"><a style={{color: 'green'}}>{rootUrl}/{this.props.slug}</a> - <a>Cache</a> - <a>Similar</a></span></p>
+                      <p><span className="help-block"><a style={{color: 'green'}}>{rootUrl}/{this.props.permalink}</a> - <a>Cache</a> - <a>Similar</a></span></p>
                     </div>
                   </div>
                   <div className="form-group">
@@ -838,7 +808,7 @@ let NewContentType = React.createClass({
                               <span className="sr-only">Toggle Dropdown</span>
                             </button>
                             <ul className="dropdown-menu" role="menu">
-                              <li><button onClick={this.saveDraft} className="btn btn-default btn-flat">{this.props.status==="Draft"?"Save As Draft":""}</button></li>
+                              <li><button onClick={()=>{this.props.dispatch(setPostStatus("Draft"))}} className="btn btn-default btn-flat">{this.props.status==="Draft"?"Save As Draft":""}</button></li>
                             </ul>
                           </div>
                       </div>        
@@ -916,7 +886,7 @@ let NewContentType = React.createClass({
                             name="form-field-name"
                             value={this.props.postTagList}
                             options={this.props.options}
-                            onChange={this.handleTagChange}
+                            onChange={(value)=>{this.props.dispatch(setTagList(this.props.postTagListInit, value))}}
                             multi={true}
                           />
                           <p><span className="help-block">Press enter after inputting tag</span></p>
@@ -939,7 +909,7 @@ let NewContentType = React.createClass({
                         { this.props.featuredImage &&
                           <div style={{position: "relative"}}>
                             <img src={this.props.featuredImage} style={{width: "100%"}} alt={this.props.title}/>
-                            <button onClick={this.handleFeaturedImageRemove} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
+                            <button onClick={()=>{this.props.dispatch(setFeaturedImage(null))}} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
                           </div>
                         }
                         { !this.props.featuredImage &&
@@ -1024,7 +994,8 @@ const mapStateToProps = function(state){
     titleTag: selector(state, 'titleTag'),
     metaKeyword: selector(state, 'metaKeyword'),
     metaDescription: selector(state, 'metaDescription'),
-    slug: selector(state, 'slug')
+    status: selector(state, 'statusSelect'),
+    visibilityTxt: selector(state, 'visibilityRadio')
   }
 
   if (!_.isEmpty(state.contentTypeNew)) {

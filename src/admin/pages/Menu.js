@@ -7,6 +7,42 @@ import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {swalert, riques, errorCallback, setValue, getValue, disableForm, defaultHalogenStyle} from '../../utils';
 
+const MenuPanel = (props) => {
+  return (
+    <div className="box collapsed-box">
+      <div className="box-header with-border">
+        <h3 className="box-title">{props.title}</h3>
+        <div className="box-tools pull-right">
+          <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+          </button>
+        </div>
+      </div>
+        <div className="box-body" style={{display: "none"}}>
+          <div className="form-group">
+            <i htmlFor="name" >Label</i>
+            <input type="text" name="name" id="name" className="form-control" required="true" value={props.title}/>
+          </div>
+          <div className="form-group">
+            <i htmlFor="name" >Tooltip</i>
+            <input type="text" name="name" id="name" className="form-control" value={props.tooltip}/>
+          </div>
+          { props.type==="url" &&
+          <div className="form-group">
+            <i htmlFor="name" >URL</i>
+            <input type="text" name="name" id="name" className="form-control" required="true" value={props.url}/>
+          </div>
+          }
+          <div className="col-md-6">
+            <button value={props.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.title} onClick={props.onRemovePanel}>Remove</button>
+          </div>
+          <div className="col-md-6">
+            <button className="btn btn-flat btn-default btn-xs pull-right" id="" data-target="">Cancel</button>
+          </div>
+        </div>
+    </div>
+  )
+}
+
 var Menu = React.createClass({
   getInitialState: function(){
       require ('../pages/Posts.css');
@@ -32,7 +68,8 @@ var Menu = React.createClass({
         opacity: 1,
         treeData: [],
         itemsChecked: false,
-        type: ""
+        type: "",
+        tooltip: ""
       }
   },
   maskArea: function(state){
@@ -86,11 +123,25 @@ var Menu = React.createClass({
     var urlMenu = getValue("urlMenu");
     this.setState({urlMenu: urlMenu})
   },
+  handleTooltip:function(event){
+    var idPanel = event.target.name.split("+")[0];
+    var titlePanel = event.target.name.split("+")[1];
+    var typePanel = event.target.name.split("+")[2];
+    var tooltipPanel = event.target.name.split("+")[3]; 
+
+    this.setState({idPanel: idPanel})
+    this.setState({titlePanel: titlePanel})
+    this.setState({typePanel: typePanel})
+    this.setState({tooltipPanel: tooltipPanel})
+
+    var tooltip = getValue("idPanel");
+    this.setState({tooltip: tooltip})
+  },
   handleUrlSubmit: function(event){
     event.preventDefault();
     var _treeData = this.state.treeData;
     var url = getValue("urlMenu");
-    var _url = [{title: url, type: "url", id: uuid()}];
+    var _url = [{title: url, tooltip: "", type: "url", id: uuid()}];
     var treeData = [];
     if (_treeData===null) {
       treeData = _url;
@@ -107,8 +158,7 @@ var Menu = React.createClass({
     	return item.checked
     });
 	  var menuValues = [];
-	  menuValues = _.map(menuFiltered, function(item){return {title: item.value.split("-")[0], type: item.value.split("-")[1], id: uuid()}});
-    debugger;
+	  menuValues = _.map(menuFiltered, function(item){return {title: item.value.split("-")[0], tooltip: "", type: item.value.split("-")[1], id: uuid()}});
     var treeData = [];
     if (_treeData===null) {
       treeData = menuValues;
@@ -122,11 +172,7 @@ var Menu = React.createClass({
   removePanel: function(e){
     var _tree_Data = this.state.treeData;
     var panelRemoved = e.target.id;
-    //var panelRemoved = e.target.value;
-    //var panelRemoved = "Art";
-    var _treeData = _tree_Data.filter(function(item) {return item.id !== panelRemoved});
-    debugger;
-    this.setState ({treeData: _treeData});
+    this.setState({treeData: _.dropWhile(this.state.treeData, {title: panelRemoved})});
   },
   handleNewMenuChange: function(event){
     var newMenuName = getValue("newMenuName");
@@ -188,7 +234,26 @@ var Menu = React.createClass({
     event.preventDefault();
     var me = this;
     var name = getValue("selectedMenuName");
-    var menuSortableTree = this.state.treeData;
+    var _tree_Data = this.state.treeData;
+
+    var idPanel = this.state.idPanel;
+    var titlePanel = this.state.titlePanel;
+    var typePanel = this.state.typePanel;
+    var tooltip = getValue("idPanel");
+
+    var _treeDataNotUpdated = _tree_Data.filter(function(item) {return item.id !== idPanel});
+
+    var _treeDataUpdated = _tree_Data.filter(function(item) {return item.id === idPanel});
+    var treeDataUpdated = [{title: titlePanel, tooltip: tooltip, type: typePanel, id: idPanel}];
+
+
+    var menuSortableTree = [];
+    if (idPanel===null) {
+      menuSortableTree = _tree_Data;
+    }else if (idPanel.length>0) {
+      menuSortableTree = _.concat(_treeDataNotUpdated, treeDataUpdated);
+    }
+    
     var menuId = this.state.menuId;
     this.disableForm(true);
     var qry = Query.updateMenu(menuId, name, menuSortableTree);
@@ -489,71 +554,17 @@ var Menu = React.createClass({
                           <div className="col-md-4">
                             <ul id="draggablePanelList" className="list-unstyled" name="draggablePanelList">
                             { 
-                              this.state.treeData.map(function(item){
+                              this.state.treeData.map(function(item, index){
 
                                 if(item.type==="url"){
                                 return (
                                   <li key={item.id} id={item.id} name="removePanel">
-                                    <div className="box collapsed-box">
-                                      <div className="box-header with-border">
-                                        <h3 className="box-title">{item.title}</h3>
-                                        <div className="box-tools pull-right">
-                                          <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
-                                          </button>
-                                        </div>
-                                      </div>
-                                        <div className="box-body" style={{display: "none"}}>
-                                          <div className="form-group">
-                                            <i htmlFor="name" >Label</i>
-                                            <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
-                                          </div>
-                                          <div className="form-group">
-                                            <i htmlFor="name" >Tooltip</i>
-                                            <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
-                                          </div>
-                                          <div className="form-group">
-                                            <i htmlFor="name" >URL</i>
-                                            <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
-                                          </div>
-                                          <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}>
-                                          </div>
-                                          <div className="col-md-6">
-                                            <button value={item.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={item.id} onClick={me.removePanel}>Remove</button>
-                                          </div>
-                                          <div className="col-md-6">
-                                            <button className="btn btn-flat btn-default btn-xs pull-right" id="" data-target="">Cancel</button>
-                                          </div>
-                                        </div>
-                                    </div>
+                                    <MenuPanel type={item.type} title={item.title} tooltip={item.tooltip} url={item.url} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
                                         <li key={child.id} className="box collapsed-box">
-                                          <div className="box-header with-border">
-                                            <h3 className="box-title">{child.title}</h3>
-                                            <div className="box-tools pull-right">
-                                              <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
-                                              </button>
-                                            </div>
-                                          </div>
-                                          <div className="box-body" style={{display: "none"}}>
-                                            <div className="form-group">
-                                              <i htmlFor="name" >Label</i>
-                                              <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
-                                            </div>
-                                            <div className="form-group">
-                                              <i htmlFor="name" >Tooltip</i>
-                                              <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
-                                            </div>
-                                            <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}>
-                                            </div>
-                                            <div className="col-md-6">
-                                              <button className="btn btn-flat btn-danger btn-xs" id="" data-target="">Remove</button>
-                                            </div>
-                                            <div className="col-md-6">
-                                              <button className="btn btn-flat btn-default btn-xs pull-right" id="" data-target="">Cancel</button>
-                                            </div>
-                                          </div>
+                                          <MenuPanel type={item.type} title={child.title} tooltip={child.tooltip} url={child.url} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
                                     })}
@@ -564,33 +575,7 @@ var Menu = React.createClass({
                                 if(item.type!=="url"){
                                 return (
                                     <li key={item.id} id={item.id} name="removePanel">
-                                      <div className="box collapsed-box">
-                                        <div className="box-header with-border">
-                                          <h3 className="box-title">{item.title}</h3>
-                                          <div className="box-tools pull-right">
-                                            <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
-                                            </button>
-                                          </div>
-                                        </div>
-                                          <div className="box-body" style={{display: "none"}}>
-                                              <div className="form-group">
-                                                <i htmlFor="name" >Label</i>
-                                                <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
-                                              </div>
-                                              <div className="form-group">
-                                                <i htmlFor="name" >Tooltip</i>
-                                                <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
-                                              </div>
-                                            <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}>
-                                            </div>
-                                            <div className="col-md-6">
-                                              <button value={item.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={item.id} onClick={me.removePanel}>Remove</button>
-                                            </div>
-                                            <div className="col-md-6">
-                                              <button className="btn btn-flat btn-default btn-xs pull-right" id="" data-target="">Cancel</button>
-                                            </div>
-                                          </div>
-                                      </div>
+                                      <MenuPanel type={item.type} title={item.title} tooltip={item.tooltip} url={item.url} onRemovePanel={me.removePanel} />
                                     </li>
                                 )}
 
