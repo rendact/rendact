@@ -294,12 +294,6 @@ export const ThemeSingle = React.createClass({
 		this._reactInternalInstance._context.history.push('/')
 	},
 
-
-    componentWillReceiveProps: function(newProps){
-        console.log(newProps);
-    },
-
-
 	theMenu: function(){
         return <Menu goHome={this.goHome}/>
 	},
