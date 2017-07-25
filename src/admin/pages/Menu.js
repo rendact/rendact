@@ -32,7 +32,8 @@ var Menu = React.createClass({
         opacity: 1,
         treeData: [],
         itemsChecked: false,
-        type: ""
+        type: "",
+        tooltip: ""
       }
   },
   maskArea: function(state){
@@ -86,11 +87,25 @@ var Menu = React.createClass({
     var urlMenu = getValue("urlMenu");
     this.setState({urlMenu: urlMenu})
   },
+  handleTooltip:function(event){
+    var idPanel = event.target.name.split("+")[0];
+    var titlePanel = event.target.name.split("+")[1];
+    var typePanel = event.target.name.split("+")[2];
+    var tooltipPanel = event.target.name.split("+")[3]; 
+
+    this.setState({idPanel: idPanel})
+    this.setState({titlePanel: titlePanel})
+    this.setState({typePanel: typePanel})
+    this.setState({tooltipPanel: tooltipPanel})
+
+    var tooltip = getValue("idPanel");
+    this.setState({tooltip: tooltip})
+  },
   handleUrlSubmit: function(event){
     event.preventDefault();
     var _treeData = this.state.treeData;
     var url = getValue("urlMenu");
-    var _url = [{title: url, type: "url", id: uuid()}];
+    var _url = [{title: url, tooltip: "", type: "url", id: uuid()}];
     var treeData = [];
     if (_treeData===null) {
       treeData = _url;
@@ -107,8 +122,7 @@ var Menu = React.createClass({
     	return item.checked
     });
 	  var menuValues = [];
-	  menuValues = _.map(menuFiltered, function(item){return {title: item.value.split("-")[0], type: item.value.split("-")[1], id: uuid()}});
-    debugger;
+	  menuValues = _.map(menuFiltered, function(item){return {title: item.value.split("-")[0], tooltip: "", type: item.value.split("-")[1], id: uuid()}});
     var treeData = [];
     if (_treeData===null) {
       treeData = menuValues;
@@ -125,7 +139,6 @@ var Menu = React.createClass({
     //var panelRemoved = e.target.value;
     //var panelRemoved = "Art";
     var _treeData = _tree_Data.filter(function(item) {return item.id !== panelRemoved});
-    debugger;
     this.setState ({treeData: _treeData});
   },
   handleNewMenuChange: function(event){
@@ -188,7 +201,28 @@ var Menu = React.createClass({
     event.preventDefault();
     var me = this;
     var name = getValue("selectedMenuName");
-    var menuSortableTree = this.state.treeData;
+    var _tree_Data = this.state.treeData;
+
+    var idPanel = this.state.idPanel;
+    var titlePanel = this.state.titlePanel;
+    var typePanel = this.state.typePanel;
+    var tooltip = getValue("idPanel");
+
+    var _treeDataNotUpdated = _tree_Data.filter(function(item) {return item.id !== idPanel});
+
+    var _treeDataUpdated = _tree_Data.filter(function(item) {return item.id === idPanel});
+    var treeDataUpdated = [{title: titlePanel, tooltip: tooltip, type: typePanel, id: idPanel}];
+
+
+    var menuSortableTree = [];
+    if (idPanel===null) {
+      menuSortableTree = _tree_Data;
+    }else if (idPanel.length>0) {
+      menuSortableTree = _.concat(_treeDataNotUpdated, treeDataUpdated);
+    }
+    
+    debugger;
+    
     var menuId = this.state.menuId;
     this.disableForm(true);
     var qry = Query.updateMenu(menuId, name, menuSortableTree);
@@ -509,7 +543,7 @@ var Menu = React.createClass({
                                           </div>
                                           <div className="form-group">
                                             <i htmlFor="name" >Tooltip</i>
-                                            <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
+                                            <input type="text" name={item.id+"+"+item.title+"+"+item.type+"+"+item.tooltip} id="idPanel" className="form-control" required="true" onChange={me.handleTooltip}/>
                                           </div>
                                           <div className="form-group">
                                             <i htmlFor="name" >URL</i>
@@ -543,7 +577,7 @@ var Menu = React.createClass({
                                             </div>
                                             <div className="form-group">
                                               <i htmlFor="name" >Tooltip</i>
-                                              <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
+                                              <input type="text" name={item.id+"+"+item.title+"+"+item.type+"+"+item.tooltip} id="idPanel" className="form-control" required="true" onChange={me.handleTooltip}/>
                                             </div>
                                             <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}>
                                             </div>
@@ -579,7 +613,7 @@ var Menu = React.createClass({
                                               </div>
                                               <div className="form-group">
                                                 <i htmlFor="name" >Tooltip</i>
-                                                <input type="text" name="name" id="name" className="form-control" required="true" value={item.title}/>
+                                                <input type="text" name={item.id+"+"+item.title+"+"+item.type+"+"+item.tooltip} id="idPanel" className="form-control" required="true" onChange={me.handleTooltip}/>
                                               </div>
                                             <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}>
                                             </div>
