@@ -22,7 +22,7 @@ const LinkMenu = (props) => {
 
 const ChildMenuComponent = (props) => {
     var childMenuItem=  props.child.map((item, index) => (
-        <div className="dropdown-item"  onClick={props.onClick} key={index.toString()}>
+        <div className="dropdown-item"  key={index.toString()}>
             <LinkMenu item={item}/>
         </div>
     ))
@@ -41,22 +41,22 @@ const ParentMenuComponent = (props) => {
     var item = props.menuItem;
 
     if (item.children) {
-        return <li className="dropdown" onClick={props.onClick} key={props.parentIndex}>
+        return <li className="dropdown"  key={props.parentIndex}>
             <Link to={"/post/"+item.target}>{item.title}</Link>
-            <ChildMenuComponent onClick={props.onClick} child={item.children} />
+            <ChildMenuComponent  child={item.children} />
             </li>
 
     } else {
 
         return <li key={props.parentIndex}>
-            <LinkMenu item={item} onClick={props.onClick}/>
+            <LinkMenu item={item} />
             </li>
     }
 }
 
 const MenuComponent = (props) => {
     var menuItems = props.menuItems.map((parentItem, parentIndex)=>(
-        <ParentMenuComponent onClick={props.onClick} menuItem={parentItem} parentIndex={parentIndex} key={parentIndex.toString()}/>
+        <ParentMenuComponent  menuItem={parentItem} parentIndex={parentIndex} key={parentIndex.toString()}/>
     ))
     
     return <ul className="cl-effect-16">
@@ -71,10 +71,6 @@ export const Menu = React.createClass({
             loadDone: false,
             menuItems: [],
         }
-    },
-
-    handlePostClick: function(){
-        console.log(this.props);
     },
 
 
@@ -95,7 +91,7 @@ export const Menu = React.createClass({
     },
 
     render : function(){
-        return <MenuComponent goHome={this.props.goHome} menuItems={this.state.menuItems} onClick={this.props.getPost}/>
+        return <MenuComponent goHome={this.props.goHome} menuItems={this.state.menuItems} />
     }
 
 });
