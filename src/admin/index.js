@@ -225,7 +225,8 @@ class PageLoader extends React.Component{
                                     'users-new' : <NewUser handleNav={hn}/>,
                                     'posts-edit' : <NewPost postId={pid} handleNav={hn} handleUnsavedData={hud}/>,
                                     'pages-edit' : <NewPage postId={pid} handleNav={hn} handleUnsavedData={hud}/>,
-                                    'users-edit' : <NewUser userId={pid} handleNav={hn}/>
+                                    'users-edit' : <NewUser userId={pid} handleNav={hn}/>,
+                                    'widget': <h1>This is widget management page</h1>
                                     }
                     
                     var requiredRole = AdminConfig.MenuRoleValue[page+action];

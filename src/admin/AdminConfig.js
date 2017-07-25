@@ -109,7 +109,8 @@ const MenuJson = [
 		elements: [
 			{id: 'themes', label: 'Themes', icon: 'fa-image', open: true, url: '/admin/themes', role: 10, roleId: 'view-themes'},
 			{id: 'themes-customize', label: 'Customize', icon: 'fa-gears', open: false, url: '/admin/themes/customize', role: 10, roleId: 'modify-themes'},
-			{id: 'menu', label: 'Menu', icon: 'fa-pencil-square-o', open: true, url: '/admin/menu', role: 5, roleId: 'view-themes'}
+			{id: 'menu', label: 'Menu', icon: 'fa-pencil-square-o', open: true, url: '/admin/menu', role: 5, roleId: 'view-themes'},
+			{id: 'widget', label: 'Widget', icon: 'fa-cog', open: true, url: '/admin/widget', role: 10, roleId: 'view-themes'}
 		]
 	},
 	{id: 'plugins', label: 'Plugins', icon: 'fa-plug', open: false, role: 10, roleId: 'view-plugins',
