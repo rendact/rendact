@@ -325,7 +325,7 @@ let Profile = React.createClass({
 									<div className="form-group">
 									 	<label htmlFor="homeUrl" className="col-md-3">Gender</label>
 									 	<div className="col-md-9">
-											<select id="gender" name="gender" class="rdt-input-form" defaultValue={p.gender} style={{width: 150}}>
+											<select id="gender" name="gender" className="rdt-input-form" defaultValue={p.gender} style={{width: 150}}>
 												<option key="male" value="male" >Male</option>
 												<option key="female" value="female" >Female</option>
 											</select> 
@@ -349,7 +349,7 @@ let Profile = React.createClass({
 						  			<div className="form-group">
 									 	<label htmlFor="homeUrl" className="col-md-3">Biography</label>
 									 	<div className="col-md-9">
-											<textarea name="bio" id="bio" className="form-control rdt-input-form">{p.biography}</textarea>
+											<textarea name="bio" id="bio" className="form-control rdt-input-form" defaultValue={p.biography}></textarea>
 										</div>
 									</div>
 
