@@ -14,7 +14,7 @@ import 'react-select/dist/react-select.css';
 import {connect} from 'react-redux';
 import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPostEditor,
         setCategoryList, setTagList, setImageGalleryList, setConnectionValue, 
-        toggleSaveImmediatelyMode, togglePermalinkEditingState, setVisibilityMode,
+        toggleSaveImmediatelyMode, togglePermalinkEditingState,
         setPostContent, updateTitleTagLeftCharacter,
         updateMetaDescriptionLeftCharacter, setPostPublishDate, setFeaturedImage,
         setEditorMode, toggleImageGalleyBinded, setPageList, setAllCategoryList,
