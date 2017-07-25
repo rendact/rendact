@@ -1,10 +1,30 @@
 import React from 'react';
+import {Link} from 'react-router';
 import Query from '../admin/query';
 import {riques, errorCallback} from '../utils';
 
+const LinkMenu = (props) => {
+    var item = props.item
+    if (item.type === "url") {
+        return <a href={item.target} target="_blank">{item.title}</a>
+    } else {
+        if (item.type === "post") {
+            return <Link to={"/post/"+item.target}>{item.title}</Link>
+        } else if (item.type === "page"){
+            return <Link to={"/page/"+item.target}>{item.title}</Link>
+        } else if (item.type === "category") {
+            return <Link to={"/category/"+item.target}>{item.title}</Link>
+        }
+    }
+    return null
+
+}
+
 const ChildMenuComponent = (props) => {
     var childMenuItem=  props.child.map((item, index) => (
-        <a className="dropdown-item" href={item.target} key={index.toString()}>{item.title}</a>
+        <div className="dropdown-item"  key={index.toString()}>
+            <LinkMenu item={item}/>
+        </div>
     ))
     var dropdownStyle = {
         backgroundColor: '#333',
@@ -21,19 +41,22 @@ const ParentMenuComponent = (props) => {
     var item = props.menuItem;
 
     if (item.children) {
-        return <li className="dropdown" key={props.parentIndex}>
-                <a className="dropdown-toggle" data-toggle="dropdown"  href={item.target}>{item.title}</a>
-                <ChildMenuComponent child={item.children} />
-                </li>
+        return <li className="dropdown"  key={props.parentIndex}>
+            <Link to={"/post/"+item.target}>{item.title}</Link>
+            <ChildMenuComponent  child={item.children} />
+            </li>
 
     } else {
-        return <li key={props.parentIndex}><a href={item.target}>{item.title}</a></li>
+
+        return <li key={props.parentIndex}>
+            <LinkMenu item={item} />
+            </li>
     }
 }
 
 const MenuComponent = (props) => {
     var menuItems = props.menuItems.map((parentItem, parentIndex)=>(
-        <ParentMenuComponent menuItem={parentItem} parentIndex={parentIndex} key={parentIndex.toString()}/>
+        <ParentMenuComponent  menuItem={parentItem} parentIndex={parentIndex} key={parentIndex.toString()}/>
     ))
     
     return <ul className="cl-effect-16">
@@ -49,6 +72,7 @@ export const Menu = React.createClass({
             menuItems: [],
         }
     },
+
 
     componentWillMount : function(){
         var me = this;
@@ -67,7 +91,7 @@ export const Menu = React.createClass({
     },
 
     render : function(){
-        return <MenuComponent goHome={this.props.goHome} menuItems={this.state.menuItems}/>
+        return <MenuComponent goHome={this.props.goHome} menuItems={this.state.menuItems} />
     }
 
 });

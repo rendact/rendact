@@ -13,6 +13,7 @@
     "bootstrap": "^3.3.6",
     "datatables": ">=1.10.13",
     "font-awesome": ">=4.7.0",
+    "fsevents": "1.1.2",
     "graphql": ">=0.7.0",
     "graphql-tag": "^0.1.11",
     "halogen": ">=0.2.0",
@@ -26,7 +27,7 @@
     "rc-color-picker": ">=1.1.4",
     "react": "^15.6.1",
     "react-apollo": "^1.0.0",
-    "react-bootstrap": "^0.30.2",
+    "react-bootstrap": "^0.30.8",
     "react-bootstrap-date-picker": ">=5.0.1",
     "react-bootstrap-timezone-picker": ">=1.0.10",
     "react-datetime": ">=2.8.8",
@@ -45,7 +46,8 @@
     "redux-form": ">=6.8.0",
     "request": "^2.81.0",
     "subscriptions-transport-ws": ">=0.6.0",
-    "sweetalert2": ">=6.4.0"
+    "sweetalert2": ">=6.4.0",
+    "uuid": ">=3.0.0"
   },
   "scripts": {
     "start": "react-scripts start",

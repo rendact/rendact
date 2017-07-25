@@ -199,7 +199,7 @@ export const ThemeHome = React.createClass({
 								widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 								footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 							/>
-			}
+	}
 		}
 	}
 });
@@ -293,6 +293,13 @@ export const ThemeSingle = React.createClass({
 		e.preventDefault();
 		this._reactInternalInstance._context.history.push('/')
 	},
+
+
+    componentWillReceiveProps: function(newProps){
+        console.log(newProps);
+    },
+
+
 	theMenu: function(){
         return <Menu goHome={this.goHome}/>
 	},
@@ -304,24 +311,59 @@ export const ThemeSingle = React.createClass({
 							<a href="#" onClick={this.goHome}><h1>Rend<span>act</span></h1></a>
 						</div>
 	},
+
+    handleSingleRequest: function(type, id){
+        var map = {
+            post: 'getPostQry',
+            page: 'getPageQry',
+            category: 'getCategoryQry'
+        }
+        var me = this
+
+        riques(Query[map[type]](id),
+            (error, response, body) => {
+                if (!error && !body.errors && response.statusCode === 200){
+                    var data = body.data.getPost;
+                    me.setState({postData: data});
+                } else {
+                    errorCallback(error, body.errors?body.errors[0].message:null)
+                }
+                me.setState({loadDone: true});
+            }
+        );
+    },
+
+    componentWillReceiveProps: function(newProps){
+        var me = this;
+        me.setState({loadDone: false})
+
+        if (newProps.params.postId) {
+            me.handleSingleRequest('post', newProps.params.postId);
+        } else if (newProps.params.pageId) {
+            me.handleSingleRequest('page', newProps.params.pageId);
+        } else if (newProps.params.categoryId){
+            alert("Category page not implemented");
+            me.setState({loadDone: true});
+        }
+    },
+
 	componentWillMount: function() {
 		var me = this;
 		loadConfig(function(){
 			var config = JSON.parse(localStorage.getItem('config'));
 			me.setState({config: config});
 		});
-		riques(Query.getPostQry(this.props.params.postId), 
-      function(error, response, body) { 
-        if (!error && !body.errors && response.statusCode === 200) {
-          var data = body.data.getPost;
-          me.setState({postData: data});
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-        me.setState({loadDone: true});
+
+        if(this.props.params.postId){
+            me.handleSingleRequest('post', this.props.params.postId);
+      } else if (this.props.params.pageId){
+          me.handleSingleRequest('page', this.props.params.pageId);
+      } else if(this.props.params.categoryId){
+          alert("Category not implemented error");
+          me.setState({loadDone: true});
       }
-    );
 	},
+
 	componentDidMount: function(){
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
@@ -344,7 +386,7 @@ export const ThemeSingle = React.createClass({
 									theBreadcrumb={this.theBreadcrumb}
 									theConfig={this.state.config}
 								/>;
-			} else if (this.params.pageId){
+			} else if (this.props.params.pageId){
 				let Single = getTemplateComponent('single');
 				return <Single 
 									postId={this.props.params.postId} 

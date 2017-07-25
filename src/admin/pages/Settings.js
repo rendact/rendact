@@ -30,7 +30,6 @@ var Settings = React.createClass({
 				if(!error && !body.errors) {
 					var _data = {}
 					_.forEach(body.data.viewer.allOptions.edges, function(item){
-						var _el = document.getElementsByName(item.node.item);
 						_data[item.node.item] = item.node.value;
 					});
 					me.props.dispatch(loadFormData(_data));
