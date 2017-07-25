@@ -22,7 +22,9 @@ function addGraphQLSubscriptions(networkInterface, wsClient) {
 const scapholdUrl = 'us-west-2.api.scaphold.io/graphql/rendact-fork';
 const graphqlUrl = `https://${scapholdUrl}`;
 const websocketUrl = `wss://${scapholdUrl}`;
-const networkInterface = createNetworkInterface(graphqlUrl);
+const networkInterface = createNetworkInterface({
+    uri: graphqlUrl
+});
 networkInterface.use([{
   applyMiddleware(req, next) {
     // Easy way to add authorization headers for every request
