@@ -61,6 +61,7 @@ const Main = React.createClass({
 						<Match pattern="/page/:pageId?/:param1?/:param2?" component={ThemeSingle}/>
 						<Match pattern="/post/:postId?/:param1?/:param2?" component={ThemeSingle}/>
 						<Match pattern="/blog/:postId?/:param1?/:param2?" component={ThemeBlog}/>
+						<Match pattern="/category/:categoryId?/:param1?/:param2?" component={ThemeSingle}/>
 						<Match pattern="/register/:param1?" component={Register}/>
 						<Match pattern="/login/:param1?" render={props => (
 					    this.state.logged ? (
