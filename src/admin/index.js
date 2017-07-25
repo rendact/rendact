@@ -24,6 +24,7 @@ import NewPage from './pages/PagesNew';
 import NewTheme from './pages/ThemesNew';
 import NewUser from './pages/UsersNew';
 import Profile from './pages/Profile';
+import Widgets from './pages/Widgets';
 import NotFound from './NotFound';
 import NotPermissible from './NotPermissible';
 import ContentType from './lib/ContentType';
@@ -226,7 +227,7 @@ class PageLoader extends React.Component{
                                     'posts-edit' : <NewPost postId={pid} handleNav={hn} handleUnsavedData={hud}/>,
                                     'pages-edit' : <NewPage postId={pid} handleNav={hn} handleUnsavedData={hud}/>,
                                     'users-edit' : <NewUser userId={pid} handleNav={hn}/>,
-                                    'widget': <h1>This is widget management page</h1>
+                                    'widget': <Widgets handleNav={hn}/>
                                     }
                     
                     var requiredRole = AdminConfig.MenuRoleValue[page+action];
