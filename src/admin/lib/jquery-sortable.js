@@ -1,3 +1,4 @@
+/* eslint-disable */
 /* ===================================================
  *  jquery-sortable.js v0.9.13
  *  http://johnny.github.com/jquery-sortable/
@@ -30,7 +31,7 @@ import $ from 'jquery';
 const jQuery = $;
 window.jQuery = $;
 
-!function ( $, window, pluginName, undefined){
+!function ( $, window, pluginName, undefined){ 
   var containerDefaults = {
     // If true, items can be dragged from this container
     drag: true,
