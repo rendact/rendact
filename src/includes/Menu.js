@@ -65,16 +65,16 @@ const MenuComponent = (props) => {
     </ul>
 }
 
-export const Menu = React.createClass({
-    getInitialState : function(){
-        return {
+export class Menu extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {
             loadDone: false,
             menuItems: [],
         }
-    },
+    }
 
-
-    componentWillMount : function(){
+    componentWillMount (){
         var me = this;
 
         riques(Query.getMenuQry('TWVudToxMzA='),
@@ -88,11 +88,12 @@ export const Menu = React.createClass({
                 me.setState({loadDone: true});
             }
         );
-    },
+    }
 
-    render : function(){
+
+    render (){
         return <MenuComponent goHome={this.props.goHome} menuItems={this.state.menuItems} />
     }
 
-});
+}
 

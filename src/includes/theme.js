@@ -12,14 +12,14 @@ import {searchWidget, topPostWidget, categoriesWidget, archiveWidget, aboutUsWid
 import Notification from 'react-notification-system';
 window.config = AdminConfig;
 
-const InvalidTheme = React.createClass({
-	componentDidMount: function(){
+class InvalidTheme extends React.Component{
+	componentDidMount(){
 		require ('../../public/css/AdminLTE.css');
 		require ('../../public/css/skins/_all-skins.css');	
 		require ('font-awesome/css/font-awesome.css');
 		require ('../../public/css/ionicons.min.css');
-	},
-	render: function() {
+	}
+	render() {
 		return (
 			<div className="content-wrapper" style={{minHeight: 1126}}>
 			    <section className="content-header">
@@ -37,7 +37,7 @@ const InvalidTheme = React.createClass({
 			  </div>
 		)
 	}
-});
+}
 
 function getTemplateComponent(type){
 	var c = window.config.theme;
@@ -62,9 +62,10 @@ function getTemplateComponent(type){
 	}
 }
 
-export const ThemeHome = React.createClass({
-	getInitialState: function(){
-		return {
+export class ThemeHome extends React.Component {
+	constructor(props){
+        super(props);
+		this.state =  {
 			loadDone: false,
 			isSlugExist: false,
 			slug: this.props.location.pathname.replace("/",""),
@@ -73,32 +74,42 @@ export const ThemeHome = React.createClass({
 			postPerPage: 5,
 			pageCount: 1,
 			activePage: 1,
-		}
-	},
-	goHome: function(e) {
+		};
+        this.handlePostClick = this.handlePostClick.bind(this);
+        this.goHome = this.goHome.bind(this);
+        this.thePagination = this.thePagination.bind(this);
+	}
+
+	goHome(e) {
 		e.preventDefault();
 		this._reactInternalInstance._context.history.push('/')
-	},
-	handlePostClick: function(e){
+	}
+
+	handlePostClick(e){
 		e.preventDefault();
 		var id = e.currentTarget.id;
 		this._reactInternalInstance._context.history.push('/post/'+id)
-	},
-	theTitle: function(id, title){
+	}
+
+	theTitle(id, title){
 		return <a href={"/post/"+id} onClick={this.handlePostClick} id={id}><h4>{title}</h4></a>
-	},
-	theContent: function(content){
+	}
+
+	theContent(content){
 		return <div dangerouslySetInnerHTML={{__html: content}} />
-	},
-	theMenu: function(){
+	}
+
+	theMenu(){
         return <Menu goHome={this.goHome}/>
-	},
-	theLogo: function(){
+	}
+
+	theLogo(){
 		return <div className="logo">
 							<a href="#" onClick={this.goHome}><h1>Rend<span>act</span></h1></a>
 						</div>
-	},
-	theImage: function(image){
+	}
+
+	theImage(image){
 		var fImage="";
 		if(image!=null){
    			fImage=image;
@@ -107,8 +118,9 @@ export const ThemeHome = React.createClass({
    			fImage=require('../theme/default/images/logo.png');
    		}
 		return <a href="article" className="mask"><img src={fImage} alt="" className="img-responsive img-thumbnail" /></a>
-	},
-	thePagination: function(){
+	}
+
+	thePagination(){
 		let pages = [<li key="998" ><a href="#" onClick={this.handlePageClick}>«</a></li>];
 		for(var i=0;i<this.state.pageCount;i++){
 			if (this.state.activePage===i+1)
@@ -122,8 +134,9 @@ export const ThemeHome = React.createClass({
                 {pages}  
                 </ul>
               </div>
-	},
-	handlePageClick: function(e){
+	}
+
+	handlePageClick(e){
 		var page = 1;
 		if (e.target.text==="«")
 			page = this.state.activePage - 1;
@@ -133,8 +146,9 @@ export const ThemeHome = React.createClass({
 			page = parseInt(e.target.text, 10);
 		var start = (this.state.postPerPage * page) - this.state.postPerPage;
 		this.setState({latestPosts: _.slice(this.state.allPosts, start, start+this.state.postPerPage), activePage: page});
-	},
-	componentWillMount: function(){
+	}
+
+	componentWillMount(){
 		var me = this;
 		loadConfig(function(){
 			var config = JSON.parse(localStorage.getItem('config'));
@@ -168,14 +182,16 @@ export const ThemeHome = React.createClass({
 		    );
 	    }
 		);
-	},
-	componentDidMount: function(){
+	}
+
+	componentDidMount(){
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
 		require('../theme/'+c.path+'/css/style.css');
 		require('../theme/'+c.path+'/functions.js');
-	},
-	render: function() {
+	}
+
+	render(){
 		if (!this.state.loadDone && !this.state.slug) {
 			return <Loading/>
 		} else {
@@ -199,35 +215,48 @@ export const ThemeHome = React.createClass({
 								widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 								footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 							/>
-	}
+            }
 		}
 	}
-});
+}
 
-export const ThemeBlog = React.createClass({
-	getInitialState: function(){
-		return {
+export class ThemeBlog extends React.Component{
+	constructor(props){
+        super(props);
+		this.state = {
 			loadDone: false,
 			isSlugExist: false,
 			slug: this.props.location.pathname.replace("/",""),
 			latestPosts: [],
-		}
-	},
-	handlePostClick: function(e){
+		};
+        this.handlePostClick = this.handlePostClick.bind(this);
+        this.goHome = this.goHome.bind(this);
+	}
+    
+	goHome(e){
+		e.preventDefault();
+		this._reactInternalInstance._context.history.push('/')
+	}
+
+	handlePostClick(e){
 		e.preventDefault();
 		var id = e.currentTarget.id;
 		this._reactInternalInstance._context.history.push('/post/'+id)
-	},
-	theTitle: function(id, title){
+	}
+
+	theTitle(id, title){
 		return <a href={"/post/"+id} onClick={this.handlePostClick} id={id}><h4>{title}</h4></a>
-	},
-	theContent: function(content){
+	}
+
+	theContent(content){
 		return <div dangerouslySetInnerHTML={{__html: content}} />
-	},
-	theMenu: function(){
+	}
+
+	theMenu(){
         return <Menu goHome={this.goHome}/>
-	},
-	componentWillMount: function(){
+	}
+
+	componentWillMount(){
 		var me = this;
 
 		riques(Query.checkSlugQry(this.state.slug), 
@@ -257,14 +286,16 @@ export const ThemeBlog = React.createClass({
 		    );
 	    }
 		);
-	},
-	componentDidMount: function(){
+	}
+
+	componentDidMount(){
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
 		require('../theme/'+c.path+'/css/style.css');
 		require('../theme/'+c.path+'/functions.js');
-	},
-	render: function() {
+	}
+
+	render() {
 		if (!this.state.loadDone && this.state.slug) {
 			return <Loading/>
 		} else {
@@ -279,34 +310,47 @@ export const ThemeBlog = React.createClass({
 						/>
 		}
 	}
-});
+}
 
-export const ThemeSingle = React.createClass({
-	getInitialState: function(){
-		return {
+export class ThemeSingle extends React.Component{
+	constructor(props){
+        super(props);
+		this.state =  {
 			loadDone: false,
 			postData: false,
 			config: null,
 		}
-	},
-	goHome: function(e) {
+
+        this.goHome = this.goHome.bind(this);
+        this.handleSingleRequest = this.handleSingleRequest.bind(this);
+        this.theMenu = this.theMenu.bind(this);
+        this.theBreadcrumb = this.theBreadcrumb.bind(this);
+        this.theLogo = this.theLogo.bind(this);
+
+	}
+
+	goHome(e) {
 		e.preventDefault();
 		this._reactInternalInstance._context.history.push('/')
-	},
+	}
 
-	theMenu: function(){
+
+	theMenu(){
         return <Menu goHome={this.goHome}/>
-	},
-	theBreadcrumb: function(){
+	}
+
+	theBreadcrumb(){
 		return <h2><a href="#" onClick={this.goHome}><h5>Home </h5></a> / PAGE</h2>
-	},
-	theLogo: function(){
+	}
+
+	theLogo(){
 		return <div className="logo">
 							<a href="#" onClick={this.goHome}><h1>Rend<span>act</span></h1></a>
 						</div>
-	},
+	}
 
-    handleSingleRequest: function(type, id){
+
+    handleSingleRequest(type, id){
         var map = {
             post: 'getPostQry',
             page: 'getPageQry',
@@ -325,9 +369,10 @@ export const ThemeSingle = React.createClass({
                 me.setState({loadDone: true});
             }
         );
-    },
+    }
 
-    componentWillReceiveProps: function(newProps){
+
+    componentWillReceiveProps(newProps){
         var me = this;
         me.setState({loadDone: false})
 
@@ -339,9 +384,10 @@ export const ThemeSingle = React.createClass({
             alert("Category page not implemented");
             me.setState({loadDone: true});
         }
-    },
+    }
 
-	componentWillMount: function() {
+
+	componentWillMount() {
 		var me = this;
 		loadConfig(function(){
 			var config = JSON.parse(localStorage.getItem('config'));
@@ -356,15 +402,17 @@ export const ThemeSingle = React.createClass({
           alert("Category not implemented error");
           me.setState({loadDone: true});
       }
-	},
+	}
 
-	componentDidMount: function(){
+
+	componentDidMount(){
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
 		require('../theme/'+c.path+'/css/style.css');
 		require('../theme/'+c.path+'/functions.js');
-	},
-	render: function() {
+	}
+
+	render() {
 		if (!this.state.loadDone) {
 			return <Loading/>
 		} else {
@@ -397,7 +445,7 @@ export const ThemeSingle = React.createClass({
 			}
 		}
 	}
-});
+}
 
 export const getTemplates = function(){
 	var template = [{
@@ -417,11 +465,12 @@ export const getTemplates = function(){
 	return template;
 }
 
-export const CommentForm = React.createClass({
-	componentDidMount: function() {
+export class CommentForm extends React.Component{
+	componentDidMount() {
   	this.notification = this.refs.notificationSystem;
-	},
-	handleSubmitBtn: function(event){
+	}
+
+	handleSubmitBtn(event){
 		event.preventDefault();
 		var me = this;
 		var author = getValue("author");
@@ -446,8 +495,9 @@ export const CommentForm = React.createClass({
 				}
 			}
 		)
-	}, 
-	render: function() {
+	} 
+
+	render() {
 		return (
 			<form onSubmit={this.handleSubmitBtn} id="commentform">
 				<Notification ref="notificationSystem" />
@@ -467,4 +517,4 @@ export const CommentForm = React.createClass({
 			</form>
 		)
 	}
-});
+}

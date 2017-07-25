@@ -7,14 +7,22 @@ import 'bootstrap/dist/css/bootstrap.css';
 import '../public/css/Login.css';
 import { sendMail } from './utils'
 
-const Register = React.createClass({
-	getInitialState: function(){
-		return {
+class Register extends React.Component{
+	constructor(props){
+        super(props);
+		this.state = {
 			errorMsg:null,
 			loadingMsg:null
 		}
-	},
-	disableForm: function(state){
+
+        this.disableForm = this.disableForm.bind(this);
+        this.setProfile = this.setProfile.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.auth0LoginHandle = this.auth0LoginHandle.bind(this);
+
+	}
+
+	disableForm(state){
 		document.getElementById("username").attributes.disabled = state;
 		document.getElementById("fullname").attributes.disabled = state;
 		document.getElementById("email").attributes.disabled = state;
@@ -22,15 +30,17 @@ const Register = React.createClass({
 		document.getElementById("repassword").attributes.disabled = state;
 		document.getElementById("registerBtn").attributes.disabled = state;
 		this.setState({loadingMsg: state?"Sending...":null});
-	},
-	componentDidMount: function(){
+	}
+
+	componentDidMount(){
 		require ('font-awesome/css/font-awesome.css');
 		require ('../public/css/ionicons.min.css');
 		require ('../public/css/AdminLTE.css');
 
 		AdminLTEinit();
-	},
-	setProfile: function(p) {
+	}
+
+	setProfile(p) {
     var profile = {
       name: p.fullName?p.fullName:p.username,
       username: p.username,
@@ -42,8 +52,9 @@ const Register = React.createClass({
     localStorage.setItem("userId", p.id);
     localStorage.setItem('profile', JSON.stringify(profile));
     console.log("set profile: "+JSON.stringify(profile));
-  },
-	handleSubmit: function(event) {
+  }
+
+	handleSubmit(event) {
 		event.preventDefault();
 		
 		var fullname = document.getElementById("fullname").value;
@@ -98,11 +109,13 @@ const Register = React.createClass({
         console.log("doLogin FAILED");
       }
     });
-	},
-	auth0LoginHandle: function(){
+	}
+
+	auth0LoginHandle(){
 		//this.props.authService.showPopup()
-	},
-	render: function(){
+	}
+
+	render(){
 		const redirect = (
 			<div>
 			<h2 style={{marginTop:100,width:"100%",textAlign:"center"}}>Redirecting...</h2>
@@ -180,6 +193,6 @@ const Register = React.createClass({
 		
 			return registerPage;
 	}
-})
+}
 
 export default Register;

@@ -13,27 +13,28 @@ import { createStore } from 'redux'
 window.AuthService = AuthService
 const store = createStore(reducer)
 
-const Main = React.createClass({
-	getInitialState: function(){
-		
-		return {
+class Main extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
 			logged: localStorage.getItem("token")?true:false,
 			pathname: 'admin'
 		};
-	},
-	setLogged: function(state, pathname){
+        this.setLogged = this.setLogged.bind(this);
+	}
+	setLogged(state, pathname){
 		var _obj = {logged: state};
 		if (pathname) _obj['pathname'] = pathname;
 		this.setState(_obj);
-	},
-	componentWillMount: function(){
+	}
+	componentWillMount(){
 		this.AuthService = new AuthService(this);
 		this.AuthService.checkAuth(this.onlogin);
-	},
+	}
 	/*
-	componentDidMount: function(){
+	componentDidMount(){
 		this.subscribe();
-	},
+	}
 	
 	subscribe(repoName, updateQuery){
 	  this.subscriptionObserver = this.refs.provider.props.client.subscribe({
@@ -46,9 +47,9 @@ const Main = React.createClass({
 	    	console.log(err); 
 	    },
 	  });
-	},
+	}
 	*/
-	render: function(){
+	render(){
 		return (
 			<ApolloProvider client={client} ref="provider" store={store}>
 				<BrowserRouter>
@@ -83,6 +84,6 @@ const Main = React.createClass({
 			</ApolloProvider>
 		)
 	}
-});
+}
 
 render(<Main/>, document.getElementById('root'));

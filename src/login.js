@@ -5,27 +5,36 @@ import '../public/css/Login.css'
 //import {setLogged} from './actions'
 import {connect} from 'react-redux'
 
-let Login = React.createClass({
-	getInitialState: function(){
-		return {
+class Login extends React.Component{
+	constructor(props){
+        super(props);
+		this.state = {
 			errorMsg:null,
 			loadingMsg:null
 		}
-	},
-	disableForm: function(state){
+
+        this.disableForm = this.disableForm.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.auth0LoginHandle = this.auth0LoginHandle.bind(this);
+        this.handleErrorMsgClose = this.handleErrorMsgClose.bind(this);
+	}
+
+	disableForm(state){
 		document.getElementById("username").attributes.disabled = state;
     document.getElementById("password").attributes.disabled = state;
     document.getElementById("loginBtn").attributes.disabled = state;
 		this.setState({loadingMsg: state?"Signing in...":null});
-	},
-	componentDidMount: function(){
+	}
+
+	componentDidMount(){
 		require ('font-awesome/css/font-awesome.css');
 		require ('../public/css/ionicons.min.css');
 		require ('../public/css/AdminLTE.css');
 		
 		AdminLTEinit();
-	},
-	handleSubmit: function(event) {
+	}
+
+	handleSubmit(event) {
 		event.preventDefault();
 		this.disableForm(true);
 
@@ -48,14 +57,17 @@ let Login = React.createClass({
 	  	me.disableForm(false);
 		}
 		this.props.authService.doLogin(username, password, successFn, failedFn);
-	},
-	auth0LoginHandle: function(){
+	}
+
+	auth0LoginHandle(){
 		this.props.authService.showPopup()
-	},
-	handleErrorMsgClose: function(){
+	}
+
+	handleErrorMsgClose(){
 		this.setState({errorMsg: ""});
-	},
-	render: function(){
+	}
+
+	render(){
 		const redirect = (
 			<div>
 			<h2 style={{marginTop:100,width:"100%",textAlign:"center"}}>Redirecting...</h2>
@@ -112,7 +124,7 @@ let Login = React.createClass({
 		
 			return loginPage;
 	}
-})
+}
 
 Login = connect()(Login);
 export default Login;
