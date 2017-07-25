@@ -268,7 +268,7 @@ var Menu = React.createClass({
             var allPageList = [];
             _.forEach(body.data.viewer.allPosts.edges, function(item){
               allPageList.push((<div key={item.node.id}><input className="pageMenu" id={item.node.id}
-              name="itemsChecked[]" type="checkbox" value={item.node.title+"-"+"Page"} /> {item.node.title}</div>));
+              name="itemsChecked[]" type="checkbox" value={item.node.title+"-Page"} /> {item.node.title}</div>));
             })
             me.setState({allPageList: allPageList});
           }
@@ -280,7 +280,7 @@ var Menu = React.createClass({
             var allPostList = [];
             _.forEach(body.data.viewer.allPosts.edges, function(item){
               allPostList.push((<div key={item.node.id}><input id={item.node.id}
-              name="itemsChecked[]" type="checkbox" value={item.node.title+"-"+"Post"} /> {item.node.title}</div>));
+              name="itemsChecked[]" type="checkbox" value={item.node.title+"-Post"} /> {item.node.title}</div>));
             })
             me.setState({allPostList: allPostList});
           }
@@ -292,7 +292,7 @@ var Menu = React.createClass({
             var categoryList = [];
             _.forEach(body.data.viewer.allCategories.edges, function(item){
               categoryList.push((<div key={item.node.id}><input id={item.node.id}
-              name="itemsChecked[]" type="checkbox" value={item.node.name+"-"+"Category"} /> {item.node.name}</div>));
+              name="itemsChecked[]" type="checkbox" value={item.node.name+"-Category"} /> {item.node.name}</div>));
             })
             me.setState({categoryList: categoryList});
           }
@@ -593,6 +593,10 @@ var Menu = React.createClass({
                                       </div>
                                     </li>
                                 )}
+
+                                  else {
+                                      return false;
+                                  }
                               })
                             }
                           </ul>
