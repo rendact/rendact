@@ -1,6 +1,7 @@
 import React from 'react';
 import AdminConfig from '../admin/AdminConfig';
 import NotFound from '../admin/NotFound';
+import LostConnection from '../admin/LostConnection';
 import Query from '../admin/query';
 import {riques, errorCallback, getValue, setValue, loadConfig} from '../utils';
 import {Menu} from './Menu.js';
@@ -64,7 +65,7 @@ function getTemplateComponent(type){
 
 export class ThemeHome extends React.Component {
 	constructor(props){
-        super(props);
+    super(props);
 		this.state =  {
 			loadDone: false,
 			isSlugExist: false,
@@ -74,10 +75,11 @@ export class ThemeHome extends React.Component {
 			postPerPage: 5,
 			pageCount: 1,
 			activePage: 1,
+			isNoConnection: false
 		};
-        this.handlePostClick = this.handlePostClick.bind(this);
-        this.goHome = this.goHome.bind(this);
-        this.thePagination = this.thePagination.bind(this);
+    this.handlePostClick = this.handlePostClick.bind(this);
+    this.goHome = this.goHome.bind(this);
+    this.thePagination = this.thePagination.bind(this);
 	}
 
 	goHome(e) {
@@ -100,7 +102,7 @@ export class ThemeHome extends React.Component {
 	}
 
 	theMenu(){
-        return <Menu goHome={this.goHome}/>
+    return <Menu goHome={this.goHome}/>
 	}
 
 	theLogo(){
@@ -157,6 +159,10 @@ export class ThemeHome extends React.Component {
 
 		riques(Query.checkSlugQry(this.state.slug), 
 			(error, response, body) => {
+				if (!response) {
+					me.setState({isNoConnection: true});
+					return;
+				}
 	      if (!error && !body.errors && response.statusCode === 200) {
 	        var slugCount = body.data.viewer.allPosts.edges.length;
 	        if (slugCount > 0) {
@@ -192,9 +198,9 @@ export class ThemeHome extends React.Component {
 	}
 
 	render(){
-		if (!this.state.loadDone && !this.state.slug) {
+		if (!this.state.isNoConnection && !this.state.loadDone && !this.state.slug) {
 			return <Loading/>
-		} else {
+		} else if (!this.state.isNoConnection){
 			if (this.state.slug){
 				let Single = getTemplateComponent('single');
 				if (this.state.isSlugExist)
@@ -216,6 +222,8 @@ export class ThemeHome extends React.Component {
 								footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 							/>
             }
+		} else {
+			return <LostConnection />
 		}
 	}
 }
