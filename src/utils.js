@@ -219,7 +219,7 @@ export const loadConfig = function(callback){
   var qry = Query.getContentListQry("active");
   riques(qry, 
     function(error, response, body) { 
-      if (body.data) { 
+      if (!error && !body.errors && response.statusCode === 200) {
         var _dataArr = [];
 
         _.forEach(body.data.viewer.allContents.edges, function(item){
@@ -241,7 +241,7 @@ export const loadConfig = function(callback){
         _saveConfig("contentList", _dataArr);
 
       } else {
-        errorCallback(error, body.errors?body.errors[0].message:null);
+        errorCallback(error);
       }
     }
   );
@@ -249,14 +249,14 @@ export const loadConfig = function(callback){
   qry = Query.loadSettingsQry;
   riques(qry, 
     function(error, response, body) { 
-      if (body.data) { 
+      if (!error && !body.errors && response.statusCode === 200) {
         _.forEach(body.data.viewer.allOptions.edges, function(item){
           _saveConfig(item.node.item, item.node.value);
         });
         if (callback) 
           callback.call();
       } else {
-        errorCallback(error, body.errors?body.errors[0].message:null);
+        errorCallback(error);
       }
     }
   );
