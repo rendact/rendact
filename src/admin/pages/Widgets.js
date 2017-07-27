@@ -211,15 +211,6 @@ class Widgets extends React.Component {
 
     handleAddToWidgetArea(id, widget){
         // params id => widgetAreaId
-        /*
-        e.preventDefault();
-        var type = e.target.id
-        this.setState(state => {
-            var sbWidgets = state.sbWidgets;
-            sbWidgets.push(<BoxItemSidebar widget={widgetMap[type]} uuid={uuid()} removeSingleWidget={this.handleRemoveSingleWidget}/>);
-            return {sbWidgets: sbWidgets}
-        });
-        */
 
         this.setState(prevState => {
             var widgetContainers = _.cloneDeep(prevState.sbWidgets);
