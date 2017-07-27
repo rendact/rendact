@@ -33,6 +33,7 @@ class BoxItemSidebar extends React.Component {
     handleRemoveButton(e){
         this.props.removeSingleWidget(this.props.uuid)
     }
+
     
    render() {
       return (<div className="box box-default collapsed-box box-solid" style={{borderRadius: 0}}>
@@ -84,11 +85,24 @@ const BoxItemAvailable = (props) => (<div className="box box-info box-solid">
 </div>
 )
 
-const WidgetAreaContainer = (props) => (
-    <div id={props.id} className="col-md-6">
+class WidgetAreaContainer extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.handleClearAll = this.handleClearAll.bind(this);
+    }
+
+    handleClearAll(e){
+        e.preventDefault();
+        this.props.clearAllWidget(this.props.id);
+    }
+
+    render(){
+
+    return <div id={this.props.id} className="col-md-6">
                 <div className="box box-default collapsed-box">
                     <div className="box-header with-border">
-                        <h3 className="box-title">{props.title}</h3>
+                        <h3 className="box-title">{this.props.title}</h3>
                         <div className="box-tools pull-right">
                             <button className="btn btn-box-tool btn-primary" data-widget="collapse">
                                 <i className="fa fa-plus"></i>
@@ -98,7 +112,7 @@ const WidgetAreaContainer = (props) => (
                     <div className="box-body">
                         <p>Drag each widget item into the order you prefer. Click the arrow on the right of the widget item to reveal additional configuration options. Click the close on the right of the widget item to remove widget.</p>
                         <ul id="dragablePanelList" className="widgets list-unstyled">
-                        {_.map(props.sbWidgets, (widget, index) => (
+                        {_.map(this.props.sbWidgets, (widget, index) => (
                                                                 <li key={index}>
                                                                         {widget}
                                                                 </li>
@@ -106,12 +120,14 @@ const WidgetAreaContainer = (props) => (
                     </ul>
                     </div>
                     <div className="box-footer">
-                        <button onClick={props.handleClearAll} className="btn btn-danger">Clear All</button>
+                        <button onClick={this.handleClearAll} className="btn btn-danger">Clear All</button>
                         <button className="btn btn-success pull-right">Save</button>
                     </div>
                 </div>
             </div>
-)
+    }
+}
+
 
 
 class Widgets extends React.Component {
@@ -119,8 +135,11 @@ class Widgets extends React.Component {
         super(props);
 
         this.state = {
-            sbWidgets : []
-        }
+            sbWidgets : {
+                'sidebar-1': [<BoxItemSidebar widget={widgetMap['search']} uuid={uuid()} removeSingleWidget={this.handleRemoveSingleWidget}/>],
+                'footer-1': [<BoxItemSidebar widget={widgetMap['custom-html']} uuid={uuid()} removeSingleWidget={this.handleRemoveSingleWidget}/>],
+            }
+        } 
 
         this.handleAddToSidebar = this.handleAddToSidebar.bind(this);
         this.handleClearAll = this.handleClearAll.bind(this);
@@ -166,9 +185,12 @@ class Widgets extends React.Component {
         });
     }
 
-    handleClearAll(e){
-        e.preventDefault();
-        this.setState({sbWidgets: []});
+    handleClearAll(id){
+        this.setState(prevState => {
+            var widgetContainers = _.cloneDeep(prevState.sbWidgets);
+            widgetContainers[id] = [];
+            return {sbWidgets: widgetContainers}
+        });
     }
 
     handleRemoveSingleWidget(id){
@@ -198,8 +220,8 @@ class Widgets extends React.Component {
                 <div className="row">
 
                 <div className="col-md-8">
-                    <WidgetAreaContainer id="sidebar-1" title='Sidebar #1' sbWidgets={this.state.sbWidgets} handleClearAll={this.handleClearAll} />
-                    <WidgetAreaContainer id="footer-1" title='Footer #1' sbWidgets={this.state.sbWidgets} handleClearAll={this.handleClearAll} />
+                    <WidgetAreaContainer id="sidebar-1" title='Sidebar #1' sbWidgets={this.state.sbWidgets['sidebar-1']} clearAllWidget={this.handleClearAll} />
+                    <WidgetAreaContainer id="footer-1" title='Footer #1' sbWidgets={this.state.sbWidgets['footer-1']} clearAllWidget={this.handleClearAll} />
                 </div>
 
 
