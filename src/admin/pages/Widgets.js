@@ -72,13 +72,20 @@ const BoxItemAvailable = (props) => (<div className="box box-info box-solid">
         <p>{props.widget.description}</p>
     </div>
     <div className="box-footer text-center">
-        <button id={props.widget.type} className="btn btn-default btn-xs" onClick={props.addToSidebar}>Add to Sidebar</button>
+        <div className="input-group">
+        <span className="input-group-addon">Select a widget area</span>
+        <select className="form-control select">
+        <option>---widget area---</option>
+        <option value="sidebar-1">Sidebar 1</option>
+        <option value="footer-2">Footer 1</option>
+        </select>
+        </div>
     </div>
 </div>
 )
 
 const WidgetAreaContainer = (props) => (
-    <div className="col-md-4">
+    <div id={props.id} className="col-md-6">
                 <div className="box box-default collapsed-box">
                     <div className="box-header with-border">
                         <h3 className="box-title">{props.title}</h3>
@@ -125,9 +132,20 @@ class Widgets extends React.Component {
         require ('jquery-ui/themes/base/theme.css');
         require ('../../../public/css/AdminLTE.css');
         require ('../../../public/css/skins/_all-skins.css');
-    var panelList = $('#dragablePanelList');
+    var panelList = $('#sidebar-1 #dragablePanelList');
     panelList.sortable({
-        group: 'nested',
+        group: 'sidebar-1',
+        handle: '.box-header',
+        onDragStart: function ($item, container, _super) {
+          // Duplicate items of the no drop area
+          if(!container.options.drop)
+            $item.clone().insertAfter($item);
+          _super($item, container);
+        }
+    });
+    var panelListFooter = $('#footer-1 #dragablePanelList');
+    panelListFooter.sortable({
+        group: 'footer-1',
         handle: '.box-header',
         onDragStart: function ($item, container, _super) {
           // Duplicate items of the no drop area
@@ -179,7 +197,11 @@ class Widgets extends React.Component {
 
                 <div className="row">
 
-                <WidgetAreaContainer title='Sidebar #1' sbWidgets={this.state.sbWidgets} handleClearAll={this.handleClearAll} />
+                <div className="col-md-8">
+                    <WidgetAreaContainer id="sidebar-1" title='Sidebar #1' sbWidgets={this.state.sbWidgets} handleClearAll={this.handleClearAll} />
+                    <WidgetAreaContainer id="footer-1" title='Footer #1' sbWidgets={this.state.sbWidgets} handleClearAll={this.handleClearAll} />
+                </div>
+
 
                     <div className="col-md-4 pull-right">
                         <div className="box box-primary">
