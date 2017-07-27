@@ -149,7 +149,7 @@ class Widgets extends React.Component {
 			    </section>
 
                 <div className="row">
-                    <div className="col-md-3">
+                    <div className="col-md-4">
                         <div className="box box-default">
                             <div className="box-header with-border">
                                 <h3 className="box-title">Sidebar</h3>
@@ -170,7 +170,7 @@ class Widgets extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <div className="col-md-9">
+                    <div className="col-md-4 pull-right">
                         <div className="box box-primary">
                             <div className="box-header with-border">
                                 <h3 className="box-title">Available widgets</h3>
@@ -180,10 +180,8 @@ class Widgets extends React.Component {
                                 <ul  className="widgets no-drop list-unstyled">
 
                                     {_.map(_.keys(widgetMap), (key, index) => (
-                                        <div className="col-md-4" key={index}>
-                                            <li>
+                                        <div className="col-md-12" key={index}>
                                             <BoxItemAvailable widget={widgetMap[key]} addToSidebar={this.handleAddToSidebar}/>
-                                            </li>
                                         </div>
                                     ))}
 
