@@ -144,7 +144,6 @@ class WidgetAreaContainer extends React.Component {
                         </div>
                     </div>
                     <div className="box-body">
-                        <p>Drag each widget item into the order you prefer. Click the arrow on the right of the widget item to reveal additional configuration options. Click the close on the right of the widget item to remove widget.</p>
                         <ul id="dragablePanelList" className="widgets list-unstyled">
                         {_.map(this.props.sbWidgets, (widget, index) => (
                                                                 <li key={index}>
@@ -241,7 +240,7 @@ class Widgets extends React.Component {
 
 	render(){
 		return (
-			<div className="content-wrapper" style={{height: '100%'}}>
+			<div className="content-wrapper">
 			<div className="container-fluid">
                 
 				<section className="content-header">
@@ -254,8 +253,12 @@ class Widgets extends React.Component {
 			      </ol>
 			      <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
 			    </section>
+                <div className="notifications-wrapper"></div>
 
                 <div className="row">
+                <div style={{paddingRight: 60, paddingLeft: 60}}>
+                <p className="lead">To active the widget click Add to button after selecting a widget area. To deactivate a widget and its settings you can click Clear All button in each widget area or click the close button in each widget. Also, you can drag-n-drop widget to reorder position</p>
+                </div>
 
                 <div className="col-md-8">
                     <WidgetAreaContainer id="sidebar-1" title='Sidebar #1' sbWidgets={this.state.sbWidgets['sidebar-1']} clearAllWidget={this.handleClearAll} />
