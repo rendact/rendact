@@ -65,25 +65,59 @@ class BoxItemSidebar extends React.Component {
    }
 }
 
-const BoxItemAvailable = (props) => (<div className="box box-info box-solid">
-    <div className="box-header with-border">
-        <h3 className="box-title">{props.widget.title}</h3>
-    </div>
-    <div className="box-body">
-        <p>{props.widget.description}</p>
-    </div>
-    <div className="box-footer text-center">
-        <div className="input-group">
-        <span className="input-group-addon">Select a widget area</span>
-        <select className="form-control select">
-        <option>---widget area---</option>
-        <option value="sidebar-1">Sidebar 1</option>
-        <option value="footer-2">Footer 1</option>
-        </select>
+class BoxItemAvailable extends React.Component {
+
+    constructor(props){
+        super(props);
+
+        this.state = {
+            widgetAreaId: ''
+        }
+
+        this.handleWidgetAreaChange = this.handleWidgetAreaChange.bind(this);
+        this.handleWidgetAreaSubmit = this.handleWidgetAreaSubmit.bind(this);
+    }
+
+    handleWidgetAreaChange(e){
+        e.preventDefault();
+        this.setState({widgetAreaId: e.currentTarget.value})
+    }
+
+    handleWidgetAreaSubmit(e){
+        e.preventDefault();
+        if (this.state.widgetAreaId === "" || this.state.widgetAreaId === "---widget area---"){
+            return null
+        }
+        this.props.handleAddToWidgetArea(this.state.widgetAreaId, this.props.widget);
+    }
+
+    render(){
+
+        var widget = this.props.widget;
+    
+        return <div className="box box-info box-solid">
+        <div className="box-header with-border">
+            <h3 className="box-title">{widget.title}</h3>
+        </div>
+        <div className="box-body">
+            <p>{widget.description}</p>
+        </div>
+        <div className="box-footer text-center">
+            <div className="input-group">
+            <span className="input-group-btn">
+                <button className="btn btn-default" onClick={this.handleWidgetAreaSubmit}>Add to</button>
+            </span>
+            <select onChange={this.handleWidgetAreaChange} className="form-control select">
+            <option>---widget area---</option>
+            <option value="sidebar-1">Sidebar 1</option>
+            <option value="footer-1">Footer 1</option>
+            </select>
+            </div>
         </div>
     </div>
-</div>
-)
+    }
+
+}
 
 class WidgetAreaContainer extends React.Component {
     constructor(props) {
@@ -141,7 +175,7 @@ class Widgets extends React.Component {
             }
         } 
 
-        this.handleAddToSidebar = this.handleAddToSidebar.bind(this);
+        this.handleAddToWidgetArea = this.handleAddToWidgetArea.bind(this);
         this.handleClearAll = this.handleClearAll.bind(this);
         this.handleRemoveSingleWidget = this.handleRemoveSingleWidget.bind(this);
     }
@@ -175,13 +209,21 @@ class Widgets extends React.Component {
     });
     }
 
-    handleAddToSidebar(e){
+    handleAddToWidgetArea(id, widget){
+        /*
         e.preventDefault();
         var type = e.target.id
         this.setState(state => {
             var sbWidgets = state.sbWidgets;
             sbWidgets.push(<BoxItemSidebar widget={widgetMap[type]} uuid={uuid()} removeSingleWidget={this.handleRemoveSingleWidget}/>);
             return {sbWidgets: sbWidgets}
+        });
+        */
+
+        this.setState(prevState => {
+            var widgetContainers = _.cloneDeep(prevState.sbWidgets);
+            widgetContainers[id].push(<BoxItemSidebar widget={widgetMap[widget.type]} uuid={uuid()} removeSingleWidget={this.handleRemoveSingleWidget}/>);
+            return {sbWidgets: widgetContainers}
         });
     }
 
@@ -236,7 +278,7 @@ class Widgets extends React.Component {
 
                                     {_.map(_.keys(widgetMap), (key, index) => (
                                         <div className="col-md-12" key={index}>
-                                            <BoxItemAvailable widget={widgetMap[key]} addToSidebar={this.handleAddToSidebar}/>
+                                            <BoxItemAvailable widget={widgetMap[key]} handleAddToWidgetArea={this.handleAddToWidgetArea}/>
                                         </div>
                                     ))}
 
