@@ -24,12 +24,12 @@ const MenuPanel = (props) => {
           </div>
           <div className="form-group">
             <i htmlFor="name" >Tooltip</i>
-            <input type="text" name="name" id="name" className="form-control" value={props.tooltip}/>
+            <input type="text" name="tooltipValue" id="tooltipValue" className="form-control" required="true" onChange={props.onHandleTooltip}/>
           </div>
           { props.type==="url" &&
           <div className="form-group">
             <i htmlFor="name" >URL</i>
-            <input type="text" name="name" id="name" className="form-control" required="true" value={props.url}/>
+            <input type="text" name="name" id="name" className="form-control" value={props.type}/>
           </div>
           }
           <div className="col-md-6">
@@ -99,7 +99,7 @@ var Menu = React.createClass({
     this.setState({menu: document.querySelector('#menuSelect').value});
     var menuId = event.target.value.split("-")[0];
   	var selectedMenuName = event.target.value.split("-")[1];
-  	setValue("selectedMenuName", selectedMenuName); 
+  	setValue("selectedMenuName", selectedMenuName);
   	this.setState({menuId:menuId});
   	var me = this;
     var qry = Query.getMenuQry(menuId);
@@ -122,20 +122,6 @@ var Menu = React.createClass({
   handleUrl: function(event){
     var urlMenu = getValue("urlMenu");
     this.setState({urlMenu: urlMenu})
-  },
-  handleTooltip:function(event){
-    var idPanel = event.target.name.split("+")[0];
-    var titlePanel = event.target.name.split("+")[1];
-    var typePanel = event.target.name.split("+")[2];
-    var tooltipPanel = event.target.name.split("+")[3]; 
-
-    this.setState({idPanel: idPanel})
-    this.setState({titlePanel: titlePanel})
-    this.setState({typePanel: typePanel})
-    this.setState({tooltipPanel: tooltipPanel})
-
-    var tooltip = getValue("idPanel");
-    this.setState({tooltip: tooltip})
   },
   handleUrlSubmit: function(event){
     event.preventDefault();
@@ -236,23 +222,34 @@ var Menu = React.createClass({
     var name = getValue("selectedMenuName");
     var _tree_Data = this.state.treeData;
 
-    var idPanel = this.state.idPanel;
+    var tooltip = getValue("tooltipValue");
+    this.setState({tooltip: tooltip})
+
+    var c = _.filter(document.getElementsByName("panel"), function(item){return item });
+    var b = _.map(c, function(item){return {title: item.title, tooltip: getValue("tooltipValue"), type: item.type, id: item.id}});
+    var a = _.forEach(c, function(item){return item.title})
+    debugger;
+    
+            
+
+    /*var tooltipValue = this.state.tooltipValue;
     var titlePanel = this.state.titlePanel;
     var typePanel = this.state.typePanel;
-    var tooltip = getValue("idPanel");
+    var tooltip = getValue("tooltipValue");
 
-    var _treeDataNotUpdated = _tree_Data.filter(function(item) {return item.id !== idPanel});
+    var _treeDataNotUpdated = _tree_Data.filter(function(item) {return item.id !== tooltipValue});
 
-    var _treeDataUpdated = _tree_Data.filter(function(item) {return item.id === idPanel});
-    var treeDataUpdated = [{title: titlePanel, tooltip: tooltip, type: typePanel, id: idPanel}];
-
+    var _treeDataUpdated = _tree_Data.filter(function(item) {return item.id === tooltipValue});
+    var treeDataUpdated = [{title: titlePanel, tooltip: tooltip, type: typePanel, id: tooltipValue}];
 
     var menuSortableTree = [];
-    if (idPanel===null) {
+    if (tooltipValue===null) {
       menuSortableTree = _tree_Data;
-    }else if (idPanel.length>0) {
+    }else if (tooltipValue.length>0) {
       menuSortableTree = _.concat(_treeDataNotUpdated, treeDataUpdated);
-    }
+    }*/
+
+    var menuSortableTree = b;
     
     var menuId = this.state.menuId;
     this.disableForm(true);
@@ -555,28 +552,36 @@ var Menu = React.createClass({
                             <ul id="draggablePanelList" className="list-unstyled" name="draggablePanelList">
                             { 
                               this.state.treeData.map(function(item, index){
-
+                                var tooltip = me.state.tooltip;
                                 if(item.type==="url"){
                                 return (
-                                  <li key={item.id} id={item.id} name="removePanel">
-                                    <MenuPanel type={item.type} title={item.title} tooltip={item.tooltip} url={item.url} onRemovePanel={me.removePanel} />
+                                  <li key={item.id} id={item.id} title={item.title} type={item.type} tooltip={tooltip} name="panel">
+                                    <MenuPanel type={item.type} id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
                                         <li key={child.id} className="box collapsed-box">
-                                          <MenuPanel type={item.type} title={child.title} tooltip={child.tooltip} url={child.url} onRemovePanel={me.removePanel} />
+                                          <MenuPanel type={item.type} id={child.id} title={child.title} tooltip={child.tooltip} type={child.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
                                     })}
                                     </ul>
                                   </li>
                                 )}
-
                                 if(item.type!=="url"){
                                 return (
-                                    <li key={item.id} id={item.id} name="removePanel">
-                                      <MenuPanel type={item.type} title={item.title} tooltip={item.tooltip} url={item.url} onRemovePanel={me.removePanel} />
-                                    </li>
+                                  <li key={item.id} id={item.id} title={item.title} type={item.type} tooltip={item.tooltip} name="panel">
+                                    <MenuPanel type={item.type} id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                    <ul style={{marginLeft: 20}} className="list-unstyled">
+                                      {item.children && item.children.map(function(child){
+                                      return (
+                                        <li key={child.id} className="box collapsed-box">
+                                          <MenuPanel type={item.type} title={child.title} tooltip={child.tooltip} type={child.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                        </li>
+                                      )
+                                    })}
+                                    </ul>
+                                  </li>
                                 )}
 
                                   else {
