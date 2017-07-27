@@ -22,33 +22,47 @@ const widgetMap = {
     }
 }
 
-const BoxItemSidebar = (props) => (<div className="box box-default collapsed-box box-solid" style={{borderRadius: 0}}>
+
+class BoxItemSidebar extends React.Component {
+
+    constructor(props){
+        super(props);
+        this.handleRemoveButton = this.handleRemoveButton.bind(this);
+    }
+
+    handleRemoveButton(e){
+        this.props.removeSingleWidget(this.props.uuid)
+    }
+    
+   render() {
+      return (<div className="box box-default collapsed-box box-solid" style={{borderRadius: 0}}>
 <div className="box-header with-border">
-    <h3 className="box-title">{props.widget.title}</h3>
+    <h3 className="box-title">{this.props.widget.title}</h3>
     <div className="box-tools pull-right">
         <button type="button" className="btn btn-box-tool btn-info" data-widget="collapse" title="Expand to setting widget">
             <i className="fa fa-plus"></i>
         </button>
-        <button type="button" className="btn btn-box-tool btn-danger" onClick={props.removeSingleWidget} id={props.uuid} >
-        Remove
+        <button type="button" className="btn btn-box-tool btn-danger"  onClick={this.handleRemoveButton} >
             <i className="fa fa-times"></i>
         </button>
     </div>
 </div>
 <div className="box-body" style={{display: "none"}}>
     <div className="form-group">
-        <label for="title">Title</label>
+        <label htmlFor="title">Title</label>
         <input type="text" className="form-control"/>
     </div>
     <div className="form-group">
-        <label for="title">Text</label>
+        <label htmlFor="title">Text</label>
         <textarea className="form-control" id="" name="" cols="30" rows="10"></textarea>
     </div>
-    <button onClick={props.handleRemove} className="btn btn-danger btn-xs">Remove</button>
+    <button onClick={this.handleRemoveButton} className="btn btn-danger btn-xs">Remove</button>
     <button className="btn btn-success btn-xs pull-right">Save</button>
 </div>
 </div>
-);
+)
+   }
+}
 
 const BoxItemAvailable = (props) => (<div className="box box-info box-solid">
     <div className="box-header with-border">
@@ -110,12 +124,11 @@ class Widgets extends React.Component {
         this.setState({sbWidgets: []});
     }
 
-    handleRemoveSingleWidget(e){
-        e.preventDefault();
-        var id = e.target.id
-        var sbWidgets = this.state.sbWidgets;
-
-        this.setState({sbWidgets: _.dropWhile(sbWidgets, el => ( el.props.uuid === id))})
+    handleRemoveSingleWidget(id){
+            this.setState((prevState) => ({
+                sbWidgets: _.filter(prevState.sbWidgets, (widget) => (widget.props.uuid !== id))
+            })
+        );
     
     }
 
@@ -142,6 +155,7 @@ class Widgets extends React.Component {
                                 <h3 className="box-title">Sidebar</h3>
                             </div>
                             <div className="box-body">
+                                <p>Drag each widget item into the order you prefer. Click the arrow on the right of the widget item to reveal additional configuration options. Click the close on the right of the widget item to remove widget.</p>
                                 <ul id="dragablePanelList" className="widgets list-unstyled">
                                 {_.map(this.state.sbWidgets, (widget, index) => (
                                     <li key={index}>
@@ -162,24 +176,17 @@ class Widgets extends React.Component {
                                 <h3 className="box-title">Available widgets</h3>
                             </div>
                             <div className="box-body">
-                                <p className="lead">Click the plus sign to add widget into sidebar</p>
                                 <div className="row">
                                 <ul  className="widgets no-drop list-unstyled">
-                                    <div className="col-md-4">
-                                    <li>
-                                        <BoxItemAvailable widget={widgetMap['search']} addToSidebar={this.handleAddToSidebar}/>
-                                    </li>
-                                     </div>
-                                    <div className="col-md-4">
-                                    <li>
-                                        <BoxItemAvailable widget={widgetMap['recent-post']} addToSidebar={this.handleAddToSidebar}/>
-                                    </li>
-                                    </div>
-                                    <div className="col-md-4">
-                                    <li>
-                                        <BoxItemAvailable widget={widgetMap['custom-html']} addToSidebar={this.handleAddToSidebar}/>
-                                    </li>
-                                    </div>
+
+                                    {_.map(_.keys(widgetMap), (key, index) => (
+                                        <div className="col-md-4" key={index}>
+                                            <li>
+                                            <BoxItemAvailable widget={widgetMap[key]} addToSidebar={this.handleAddToSidebar}/>
+                                            </li>
+                                        </div>
+                                    ))}
+
                                 </ul>
                                                 
                                 </div>
