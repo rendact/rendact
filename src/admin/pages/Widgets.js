@@ -79,9 +79,14 @@ const BoxItemAvailable = (props) => (<div className="box box-info box-solid">
 
 const WidgetAreaContainer = (props) => (
     <div className="col-md-4">
-                <div className="box box-default">
+                <div className="box box-default collapsed-box">
                     <div className="box-header with-border">
                         <h3 className="box-title">{props.title}</h3>
+                        <div className="box-tools pull-right">
+                            <button className="btn btn-box-tool btn-primary" data-widget="collapse">
+                                <i className="fa fa-plus"></i>
+                            </button>
+                        </div>
                     </div>
                     <div className="box-body">
                         <p>Drag each widget item into the order you prefer. Click the arrow on the right of the widget item to reveal additional configuration options. Click the close on the right of the widget item to remove widget.</p>
