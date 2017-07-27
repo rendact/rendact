@@ -31,7 +31,7 @@ class BoxItemSidebar extends React.Component {
     }
 
     handleRemoveButton(e){
-        this.props.removeSingleWidget(this.props.uuid)
+        this.props.removeSingleWidget(this.props.uuid, this.props.widgetAreaId)
     }
 
     
@@ -170,8 +170,8 @@ class Widgets extends React.Component {
 
         this.state = {
             sbWidgets : {
-                'sidebar-1': [<BoxItemSidebar widget={widgetMap['search']} uuid={uuid()} removeSingleWidget={this.handleRemoveSingleWidget}/>],
-                'footer-1': [<BoxItemSidebar widget={widgetMap['custom-html']} uuid={uuid()} removeSingleWidget={this.handleRemoveSingleWidget}/>],
+                'sidebar-1': [],
+                'footer-1': [],
             }
         } 
 
@@ -210,6 +210,7 @@ class Widgets extends React.Component {
     }
 
     handleAddToWidgetArea(id, widget){
+        // params id => widgetAreaId
         /*
         e.preventDefault();
         var type = e.target.id
@@ -222,7 +223,7 @@ class Widgets extends React.Component {
 
         this.setState(prevState => {
             var widgetContainers = _.cloneDeep(prevState.sbWidgets);
-            widgetContainers[id].push(<BoxItemSidebar widget={widgetMap[widget.type]} uuid={uuid()} removeSingleWidget={this.handleRemoveSingleWidget}/>);
+            widgetContainers[id].push(<BoxItemSidebar widgetAreaId={id} widget={widgetMap[widget.type]} uuid={uuid()} removeSingleWidget={this.handleRemoveSingleWidget}/>);
             return {sbWidgets: widgetContainers}
         });
     }
@@ -235,10 +236,14 @@ class Widgets extends React.Component {
         });
     }
 
-    handleRemoveSingleWidget(id){
-            this.setState((prevState) => ({
-                sbWidgets: _.filter(prevState.sbWidgets, (widget) => (widget.props.uuid !== id))
-            })
+    handleRemoveSingleWidget(id, widgetAreaId){
+            this.setState((prevState) => {
+                var widgetContainers = _.cloneDeep(prevState.sbWidgets);
+                widgetContainers[widgetAreaId] = _.filter(widgetContainers[widgetAreaId], (widget) => (widget.props.uuid !== id))
+                return {
+                    sbWidgets: widgetContainers
+                }
+            }
         );
     
     }
