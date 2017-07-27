@@ -77,6 +77,30 @@ const BoxItemAvailable = (props) => (<div className="box box-info box-solid">
 </div>
 )
 
+const WidgetAreaContainer = (props) => (
+    <div className="col-md-4">
+                <div className="box box-default">
+                    <div className="box-header with-border">
+                        <h3 className="box-title">{props.title}</h3>
+                    </div>
+                    <div className="box-body">
+                        <p>Drag each widget item into the order you prefer. Click the arrow on the right of the widget item to reveal additional configuration options. Click the close on the right of the widget item to remove widget.</p>
+                        <ul id="dragablePanelList" className="widgets list-unstyled">
+                        {_.map(props.sbWidgets, (widget, index) => (
+                                                                <li key={index}>
+                                                                        {widget}
+                                                                </li>
+                                                                ))}
+                    </ul>
+                    </div>
+                    <div className="box-footer">
+                        <button onClick={props.handleClearAll} className="btn btn-danger">Clear All</button>
+                        <button className="btn btn-success pull-right">Save</button>
+                    </div>
+                </div>
+            </div>
+)
+
 
 class Widgets extends React.Component {
     constructor(props){
@@ -149,27 +173,9 @@ class Widgets extends React.Component {
 			    </section>
 
                 <div className="row">
-                    <div className="col-md-4">
-                        <div className="box box-default">
-                            <div className="box-header with-border">
-                                <h3 className="box-title">Sidebar</h3>
-                            </div>
-                            <div className="box-body">
-                                <p>Drag each widget item into the order you prefer. Click the arrow on the right of the widget item to reveal additional configuration options. Click the close on the right of the widget item to remove widget.</p>
-                                <ul id="dragablePanelList" className="widgets list-unstyled">
-                                {_.map(this.state.sbWidgets, (widget, index) => (
-                                    <li key={index}>
-                                        {widget}
-                                    </li>
-                                ))}
-                                </ul>
-                            </div>
-                            <div className="box-footer">
-                                <button onClick={this.handleClearAll} className="btn btn-danger">Clear All</button>
-                                <button className="btn btn-success pull-right">Save</button>
-                            </div>
-                        </div>
-                    </div>
+
+                <WidgetAreaContainer title='Sidebar #1' sbWidgets={this.state.sbWidgets} handleClearAll={this.handleClearAll} />
+
                     <div className="col-md-4 pull-right">
                         <div className="box box-primary">
                             <div className="box-header with-border">
