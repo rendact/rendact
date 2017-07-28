@@ -219,6 +219,7 @@ class Widgets extends React.Component {
     }
 
     handleRemoveSingleWidget(id, widgetAreaId){
+        swalert("warning", "Sure want to remove this widget?", "", () => {
             this.setState((prevState) => {
                 var widgetContainers = _.cloneDeep(prevState.sbWidgets);
                 widgetContainers[widgetAreaId] = _.filter(widgetContainers[widgetAreaId], (widget) => (widget.props.uuid !== id))
@@ -227,6 +228,7 @@ class Widgets extends React.Component {
                 }
             }
         );
+        });
     
     }
 
