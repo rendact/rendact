@@ -2,6 +2,8 @@ import React from 'react';
 import $ from 'jquery';
 import _ from 'lodash';
 import uuid from 'uuid';
+import {riques} from '../../utils';
+import Query from '../query';
 
 
 const widgetMap = {
@@ -171,7 +173,8 @@ class Widgets extends React.Component {
             sbWidgets : {
                 'sidebar-1': [],
                 'footer-1': [],
-            }
+            },
+            availableWidgets: [],
         } 
 
         this.handleAddToWidgetArea = this.handleAddToWidgetArea.bind(this);
@@ -236,6 +239,22 @@ class Widgets extends React.Component {
             }
         );
     
+    }
+
+    componentWillMount(){
+        /*
+         * all registered widget
+         */
+        riques(Query.getAllWidgets,
+            (error, response, data) => {
+                if (!error && !data.errors && response.statusCode === 200){
+                    this.setState({availableWidgets: data.data.viewer.allOptions.edges});
+                }
+                // nanti pakai callback error
+                console.log(data.errors);
+            }
+        )
+
     }
 
 	render(){

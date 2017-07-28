@@ -22,9 +22,28 @@ const createWidget = (item, value) => {
 
 }
 
+const getAllWidgets = {
+    "query": `
+    query getAllWidgets {
+          viewer {
+                  allOptions(where: {item: {like: "widget_%"}}) {
+                            edges {
+                                        node {
+                                                      id
+                                                      item
+                                                      value
+                                                    }
+                                      }
+                          }
+                }
+    }
+    `
+}
+
 
 const queries = {
-    createWidget: createWidget
+    createWidget: createWidget,
+    getAllWidgets: getAllWidgets,
 }
 
 export default queries;

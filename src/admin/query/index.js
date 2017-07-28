@@ -88,6 +88,7 @@ const queries = {
   getAllCategory: Menu.getAllCategory,
   getMenuQry: Menu.getMenuQry,
   createWidget: Widget.createWidget,
+  getAllWidgets: Widget.getAllWidgets,
 }
 
 export default queries;
