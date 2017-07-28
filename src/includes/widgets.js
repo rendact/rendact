@@ -1,4 +1,24 @@
 import React from 'react';
+import {riques} from '../utils';
+import uuid from 'uuid';
+import Query from '../admin/query';
+
+
+export const registerWidget = (type, title, value) => {
+    let item = "widget_" + type + uuid();
+    let values = Object.assign({}, value, {
+        title: title
+    });
+
+    riques(Query.createWidget(item, values),
+        (error, response, data) => {
+            if (!error && !data.errors && response.statusCode === 200){
+                return data
+            }
+            console.log(data.errors)
+        })
+}
+
 
 export const searchWidget = 
 		<div key="sidebar" className="sidebar-box">
