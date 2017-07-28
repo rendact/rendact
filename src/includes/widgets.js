@@ -5,12 +5,12 @@ import Query from '../admin/query';
 
 
 export const registerWidget = (type, title, value) => {
-    let item = "widget_" + type + uuid();
+    let item = "widget_" + type + "_" + uuid();
     let values = Object.assign({}, value, {
         title: title
     });
 
-    riques(Query.createWidget(item, values),
+    riques(Query.createWidget(item, JSON.stringify(values)),
         (error, response, data) => {
             if (!error && !data.errors && response.statusCode === 200){
                 return data
