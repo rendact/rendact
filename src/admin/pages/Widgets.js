@@ -2,25 +2,8 @@ import React from 'react';
 import $ from 'jquery';
 import _ from 'lodash';
 import uuid from 'uuid';
-
-
-const widgetMap = {
-    'search': {
-        title: 'Search',
-        description: 'A simple search widget',
-        type: 'search'
-    },
-    'recent-post': {
-        title: 'Recent Post',
-        description: 'Show your latest post with this widget',
-        type: 'recent-post'
-    },
-    'custom-html': {
-        title: 'Custom HTML',
-        description: 'Create your own widget using html tags + css + javascript',
-        type: 'custom-html'
-    }
-}
+import {riques} from '../../utils';
+import Query from '../query';
 
 
 class BoxItemSidebar extends React.Component {
@@ -36,9 +19,12 @@ class BoxItemSidebar extends React.Component {
 
     
    render() {
+        let widget = this.props.widget;
+        let widgetValue = JSON.parse(widget.value);
+
       return (<div className="box box-default collapsed-box box-solid" style={{borderRadius: 0}}>
 <div className="box-header with-border">
-    <h3 className="box-title">{this.props.widget.title}</h3>
+    <h3 className="box-title">{widgetValue.title}</h3>
     <div className="box-tools pull-right">
         <button type="button" className="btn btn-box-tool btn-info" data-widget="collapse" title="Expand to setting widget">
             <i className="fa fa-plus"></i>
@@ -94,13 +80,14 @@ class BoxItemAvailable extends React.Component {
     render(){
 
         var widget = this.props.widget;
+        var widgetValue = JSON.parse(widget.value);
     
-        return <div className="box box-info box-solid">
+        return <div className="box box-info box-solid" id={widget.item}>
         <div className="box-header with-border">
-            <h3 className="box-title">{widget.title}</h3>
+            <h3 className="box-title">{widgetValue.title}</h3>
         </div>
         <div className="box-body">
-            <p>{widget.description}</p>
+            <p>{widgetValue.help}</p>
         </div>
         <div className="box-footer text-center">
             <div className="input-group">
@@ -171,7 +158,8 @@ class Widgets extends React.Component {
             sbWidgets : {
                 'sidebar-1': [],
                 'footer-1': [],
-            }
+            },
+            availableWidgets: [],
         } 
 
         this.handleAddToWidgetArea = this.handleAddToWidgetArea.bind(this);
@@ -212,8 +200,9 @@ class Widgets extends React.Component {
         // params id => widgetAreaId
 
         this.setState(prevState => {
-            var widgetContainers = _.cloneDeep(prevState.sbWidgets);
-            widgetContainers[id].push(<BoxItemSidebar widgetAreaId={id} widget={widgetMap[widget.type]} uuid={uuid()} removeSingleWidget={this.handleRemoveSingleWidget}/>);
+            let widgetContainers = _.cloneDeep(prevState.sbWidgets);
+            let widgetFound = _.find(prevState.availableWidgets, w => (w.node.id === widget.id));
+            widgetContainers[id].push(<BoxItemSidebar widgetAreaId={id} widget={widgetFound.node} uuid={uuid()} removeSingleWidget={this.handleRemoveSingleWidget}/>);
             return {sbWidgets: widgetContainers}
         });
     }
@@ -236,6 +225,22 @@ class Widgets extends React.Component {
             }
         );
     
+    }
+
+    componentWillMount(){
+        /*
+         * all registered widget
+         */
+        riques(Query.getAllWidgets,
+            (error, response, data) => {
+                if (!error && !data.errors && response.statusCode === 200){
+                    this.setState({availableWidgets: data.data.viewer.allOptions.edges});
+                }
+                // nanti pakai callback error
+                console.log(data.errors);
+            }
+        )
+
     }
 
 	render(){
@@ -274,10 +279,10 @@ class Widgets extends React.Component {
                             <div className="box-body">
                                 <div className="row">
                                 <ul  className="widgets no-drop list-unstyled">
-
-                                    {_.map(_.keys(widgetMap), (key, index) => (
+                                    
+                                    {_.map(this.state.availableWidgets, (widget, index) => (
                                         <div className="col-md-12" key={index}>
-                                            <BoxItemAvailable widget={widgetMap[key]} handleAddToWidgetArea={this.handleAddToWidgetArea}/>
+                                            <BoxItemAvailable widget={widget.node} handleAddToWidgetArea={this.handleAddToWidgetArea}/>
                                         </div>
                                     ))}
 
