@@ -2,7 +2,7 @@ import React from 'react';
 import $ from 'jquery';
 import _ from 'lodash';
 import uuid from 'uuid';
-import {riques} from '../../utils';
+import {riques, swalert} from '../../utils';
 import Query from '../query';
 
 
@@ -208,11 +208,14 @@ class Widgets extends React.Component {
     }
 
     handleClearAll(id){
-        this.setState(prevState => {
-            var widgetContainers = _.cloneDeep(prevState.sbWidgets);
-            widgetContainers[id] = [];
-            return {sbWidgets: widgetContainers}
-        });
+        swalert("warning", "Sure want to remove all widgets?", "You might lost some data",
+            () => {
+                    this.setState(prevState => {
+                        var widgetContainers = _.cloneDeep(prevState.sbWidgets);
+                        widgetContainers[id] = [];
+                        return {sbWidgets: widgetContainers}
+                    });
+            });
     }
 
     handleRemoveSingleWidget(id, widgetAreaId){
