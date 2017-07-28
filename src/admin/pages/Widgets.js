@@ -2,7 +2,7 @@ import React from 'react';
 import $ from 'jquery';
 import _ from 'lodash';
 import uuid from 'uuid';
-import {riques} from '../../utils';
+import {riques, errorCallback} from '../../utils';
 import Query from '../query';
 
 
@@ -234,10 +234,10 @@ class Widgets extends React.Component {
         riques(Query.getAllWidgets,
             (error, response, data) => {
                 if (!error && !data.errors && response.statusCode === 200){
-                    this.setState({availableWidgets: data.data.viewer.allOptions.edges});
-                }
-                // nanti pakai callback error
-                console.log(data.errors);
+                   this.setState({availableWidgets: data.data.viewer.allOptions.edges});
+                } else {
+              errorCallback(error, data.errors?data.errors[0].message:null);
+            }
             }
         )
 
