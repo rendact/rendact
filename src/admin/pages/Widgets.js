@@ -6,25 +6,6 @@ import {riques} from '../../utils';
 import Query from '../query';
 
 
-const widgetMap = {
-    'search': {
-        title: 'Search',
-        description: 'A simple search widget',
-        type: 'search'
-    },
-    'recent-post': {
-        title: 'Recent Post',
-        description: 'Show your latest post with this widget',
-        type: 'recent-post'
-    },
-    'custom-html': {
-        title: 'Custom HTML',
-        description: 'Create your own widget using html tags + css + javascript',
-        type: 'custom-html'
-    }
-}
-
-
 class BoxItemSidebar extends React.Component {
 
     constructor(props){
@@ -38,9 +19,12 @@ class BoxItemSidebar extends React.Component {
 
     
    render() {
+        let widget = this.props.widget;
+        let widgetValue = JSON.parse(widget.value);
+
       return (<div className="box box-default collapsed-box box-solid" style={{borderRadius: 0}}>
 <div className="box-header with-border">
-    <h3 className="box-title">{this.props.widget.title}</h3>
+    <h3 className="box-title">{widgetValue.title}</h3>
     <div className="box-tools pull-right">
         <button type="button" className="btn btn-box-tool btn-info" data-widget="collapse" title="Expand to setting widget">
             <i className="fa fa-plus"></i>
@@ -216,8 +200,9 @@ class Widgets extends React.Component {
         // params id => widgetAreaId
 
         this.setState(prevState => {
-            var widgetContainers = _.cloneDeep(prevState.sbWidgets);
-            widgetContainers[id].push(<BoxItemSidebar widgetAreaId={id} widget={widgetMap[widget.type]} uuid={uuid()} removeSingleWidget={this.handleRemoveSingleWidget}/>);
+            let widgetContainers = _.cloneDeep(prevState.sbWidgets);
+            let widgetFound = _.find(prevState.availableWidgets, w => (w.node.id === widget.id));
+            widgetContainers[id].push(<BoxItemSidebar widgetAreaId={id} widget={widgetFound.node} uuid={uuid()} removeSingleWidget={this.handleRemoveSingleWidget}/>);
             return {sbWidgets: widgetContainers}
         });
     }
