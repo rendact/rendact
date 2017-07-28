@@ -2,7 +2,7 @@ import React from 'react';
 import $ from 'jquery';
 import _ from 'lodash';
 import uuid from 'uuid';
-import {riques, errorCallback} from '../../utils';
+import {riques, swalert, errorCallback} from '../../utils';
 import Query from '../query';
 
 
@@ -73,8 +73,7 @@ class BoxItemAvailable extends React.Component {
         e.preventDefault();
         if (this.state.widgetAreaId === "" || this.state.widgetAreaId === "---widget area---"){
             return null
-        }
-        this.props.handleAddToWidgetArea(this.state.widgetAreaId, this.props.widget);
+        } this.props.handleAddToWidgetArea(this.state.widgetAreaId, this.props.widget);
     }
 
     render(){
@@ -132,7 +131,7 @@ class WidgetAreaContainer extends React.Component {
                     </div>
                     <div className="box-body">
                         <ul id="dragablePanelList" className="widgets list-unstyled">
-                        {_.map(this.props.sbWidgets, (widget, index) => (
+                        {_.map(this.props.widgetAreas, (widget, index) => (
                                                                 <li key={index}>
                                                                         {widget}
                                                                 </li>
@@ -155,7 +154,7 @@ class Widgets extends React.Component {
         super(props);
 
         this.state = {
-            sbWidgets : {
+            widgetAreas : {
                 'sidebar-1': [],
                 'footer-1': [],
             },
@@ -200,30 +199,35 @@ class Widgets extends React.Component {
         // params id => widgetAreaId
 
         this.setState(prevState => {
-            let widgetContainers = _.cloneDeep(prevState.sbWidgets);
+            let widgetContainers = _.cloneDeep(prevState.widgetAreas);
             let widgetFound = _.find(prevState.availableWidgets, w => (w.node.id === widget.id));
             widgetContainers[id].push(<BoxItemSidebar widgetAreaId={id} widget={widgetFound.node} uuid={uuid()} removeSingleWidget={this.handleRemoveSingleWidget}/>);
-            return {sbWidgets: widgetContainers}
+            return {widgetAreas: widgetContainers}
         });
     }
 
     handleClearAll(id){
-        this.setState(prevState => {
-            var widgetContainers = _.cloneDeep(prevState.sbWidgets);
-            widgetContainers[id] = [];
-            return {sbWidgets: widgetContainers}
-        });
+        swalert("warning", "Sure want to remove all widgets?", "You might lost some data",
+            () => {
+                    this.setState(prevState => {
+                        var widgetContainers = _.cloneDeep(prevState.widgetAreas);
+                        widgetContainers[id] = [];
+                        return {widgetAreas: widgetContainers}
+                    });
+            });
     }
 
     handleRemoveSingleWidget(id, widgetAreaId){
+        swalert("warning", "Sure want to remove this widget?", "", () => {
             this.setState((prevState) => {
-                var widgetContainers = _.cloneDeep(prevState.sbWidgets);
+                var widgetContainers = _.cloneDeep(prevState.widgetAreas);
                 widgetContainers[widgetAreaId] = _.filter(widgetContainers[widgetAreaId], (widget) => (widget.props.uuid !== id))
                 return {
-                    sbWidgets: widgetContainers
+                    widgetAreas: widgetContainers
                 }
             }
         );
+        });
     
     }
 
@@ -266,8 +270,8 @@ class Widgets extends React.Component {
                 </div>
 
                 <div className="col-md-8">
-                    <WidgetAreaContainer id="sidebar-1" title='Sidebar #1' sbWidgets={this.state.sbWidgets['sidebar-1']} clearAllWidget={this.handleClearAll} />
-                    <WidgetAreaContainer id="footer-1" title='Footer #1' sbWidgets={this.state.sbWidgets['footer-1']} clearAllWidget={this.handleClearAll} />
+                    <WidgetAreaContainer id="sidebar-1" title='Sidebar #1' widgetAreas={this.state.widgetAreas['sidebar-1']} clearAllWidget={this.handleClearAll} />
+                    <WidgetAreaContainer id="footer-1" title='Footer #1' widgetAreas={this.state.widgetAreas['footer-1']} clearAllWidget={this.handleClearAll} />
                 </div>
 
 
