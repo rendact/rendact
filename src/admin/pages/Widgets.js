@@ -96,13 +96,14 @@ class BoxItemAvailable extends React.Component {
     render(){
 
         var widget = this.props.widget;
+        var widgetValue = JSON.parse(widget.value);
     
-        return <div className="box box-info box-solid">
+        return <div className="box box-info box-solid" id={widget.item}>
         <div className="box-header with-border">
-            <h3 className="box-title">{widget.title}</h3>
+            <h3 className="box-title">{widgetValue.title}</h3>
         </div>
         <div className="box-body">
-            <p>{widget.description}</p>
+            <p>{widgetValue.help}</p>
         </div>
         <div className="box-footer text-center">
             <div className="input-group">
@@ -293,10 +294,10 @@ class Widgets extends React.Component {
                             <div className="box-body">
                                 <div className="row">
                                 <ul  className="widgets no-drop list-unstyled">
-
-                                    {_.map(_.keys(widgetMap), (key, index) => (
+                                    
+                                    {_.map(this.state.availableWidgets, (widget, index) => (
                                         <div className="col-md-12" key={index}>
-                                            <BoxItemAvailable widget={widgetMap[key]} handleAddToWidgetArea={this.handleAddToWidgetArea}/>
+                                            <BoxItemAvailable widget={widget.node} handleAddToWidgetArea={this.handleAddToWidgetArea}/>
                                         </div>
                                     ))}
 
