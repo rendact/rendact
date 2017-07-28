@@ -38,7 +38,7 @@ const getAllMenu = {
 
 const getMenuQry = function(menuId) {
   return{"query": 
-    `{getMenu(id: "`+menuId+`"){items, id, name}}`
+    `{getMenu(id: "`+menuId+`"){items, id, name, position}}`
     }
 };
 
@@ -86,7 +86,7 @@ const deleteMenuQry = function(idList) {
   }
 };
 
-const updateMenu = function(menuId, name, menuSortableTree){
+const updateMenu = function(menuId, name, menuSortableTree, positionValues){
   return {
       "query": `
     mutation UpdateMenu($input: UpdateMenuInput!) {
@@ -94,7 +94,8 @@ const updateMenu = function(menuId, name, menuSortableTree){
           changedMenu{
             id,
             name,
-            items
+            items,
+            position
         }
       }
     }
@@ -104,6 +105,7 @@ const updateMenu = function(menuId, name, menuSortableTree){
           "id": menuId,
           "name": name,
           "items": menuSortableTree,
+          "position": positionValues
         }
       }
     }

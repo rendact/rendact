@@ -69,7 +69,8 @@ var Menu = React.createClass({
         treeData: [],
         itemsChecked: false,
         type: "",
-        tooltip: ""
+        tooltip: "",
+        position: false
       }
   },
   maskArea: function(state){
@@ -103,14 +104,17 @@ var Menu = React.createClass({
   	this.setState({menuId:menuId});
   	var me = this;
     var qry = Query.getMenuQry(menuId);
-        me.disableForm(true);
+    me.disableForm(true);
 	  riques(qry, 
       function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
         	var items = [];
           items = body.data.getMenu.items;
           if (items)
-		        me.setState({treeData: items});
+		      me.setState({treeData: items});
+          var position = body.data.getMenu.position;
+          me.setState({position: position});
+          debugger;
           me.disableForm(false);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
@@ -118,6 +122,7 @@ var Menu = React.createClass({
         me.disableForm(false);
       }
     );
+
   },
   handleUrl: function(event){
     var urlMenu = getValue("urlMenu");
@@ -216,6 +221,12 @@ var Menu = React.createClass({
         }
     });
   },
+  onChangeMainMenu: function(event){
+    const target = event.target;
+    const position = target.checked === true ? target.value : "";
+    debugger;
+    this.setState({position: position});
+  },
   handleUpdateMenu: function(event){
     event.preventDefault();
     var me = this;
@@ -227,33 +238,11 @@ var Menu = React.createClass({
 
     var c = _.filter(document.getElementsByName("panel"), function(item){return item });
     var b = _.map(c, function(item){return {title: item.title, tooltip: getValue("tooltipValue"), type: item.type, id: item.id}});
-    var a = _.forEach(c, function(item){return item.title})
-    debugger;
-    
-            
-
-    /*var tooltipValue = this.state.tooltipValue;
-    var titlePanel = this.state.titlePanel;
-    var typePanel = this.state.typePanel;
-    var tooltip = getValue("tooltipValue");
-
-    var _treeDataNotUpdated = _tree_Data.filter(function(item) {return item.id !== tooltipValue});
-
-    var _treeDataUpdated = _tree_Data.filter(function(item) {return item.id === tooltipValue});
-    var treeDataUpdated = [{title: titlePanel, tooltip: tooltip, type: typePanel, id: tooltipValue}];
-
-    var menuSortableTree = [];
-    if (tooltipValue===null) {
-      menuSortableTree = _tree_Data;
-    }else if (tooltipValue.length>0) {
-      menuSortableTree = _.concat(_treeDataNotUpdated, treeDataUpdated);
-    }*/
-
     var menuSortableTree = b;
-    
+    var positionValues = this.state.position;
     var menuId = this.state.menuId;
     this.disableForm(true);
-    var qry = Query.updateMenu(menuId, name, menuSortableTree);
+    var qry = Query.updateMenu(menuId, name, menuSortableTree, positionValues);
     var noticeTxt = "Menu Updated";
     riques(qry, 
       function(error, response, body) { 
@@ -592,40 +581,22 @@ var Menu = React.createClass({
                           </ul>
                           </div>
 											  </div>
-									    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}></div>
+									  <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}></div>
 										<h4>Menu Settings</h4>
 										<div className="row">
 											<div className="col-md-3">
-												<i>Auto add pages</i>
+												<h5><i>Display location</i></h5>
 											</div>
 											<div className="col-md-9">
 												<div className="checkbox">
-								          <label>
-								            <input type="checkbox"/>
-								            Automatically add new top-level pages to this menu
+								          <label key="Main Menu">
+								            <input type="checkbox" id="Main Menu" value="Main Menu" name="position" checked={this.state.position==="Main Menu"} onChange={this.onChangeMainMenu}/>
+								            <i>Main Menu</i>
 								          </label>
 								        </div>
 											</div>
 										</div>
-										<div className="row">
-											<div className="col-md-3">
-												<i>Display location</i>
-											</div>
-											<div className="col-md-9">
-												<div className="checkbox">
-								          <label>
-								            <input type="checkbox"/>
-								            Top Menu
-								          </label>
-								        </div>
-								        <div className="checkbox">
-								          <label>
-								            <input type="checkbox"/>
-								            Social Links Menu
-								          </label>
-								        </div>
-											</div>
-										</div>
+
 									</section>
 								</div>
               </form>
