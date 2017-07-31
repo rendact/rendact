@@ -228,9 +228,16 @@ class Widgets extends React.Component {
         swalert("warning", "Sure want to remove all widgets?", "You might lost some data",
             () => {
                     this.setState(prevState => {
-                        var widgetContainers = _.cloneDeep(prevState.widgetAreas);
-                        widgetContainers[id] = [];
-                        return {widgetAreas: widgetContainers}
+                        let newState = prevState.widgetAreas.map(wa => {
+                            if (wa.id === id) {
+                                wa.widgets = [];
+                                return wa
+                            } else {
+                                return wa
+                            }
+                        });
+
+                        return {widgetAreas: newState}
                     });
             });
     }
