@@ -243,13 +243,21 @@ class Widgets extends React.Component {
     }
 
     handleRemoveSingleWidget(id, widgetAreaId){
+        // params id === id or uuid the widget
         swalert("warning", "Sure want to remove this widget?", "", () => {
             this.setState((prevState) => {
-                var widgetContainers = _.cloneDeep(prevState.widgetAreas);
-                widgetContainers[widgetAreaId] = _.filter(widgetContainers[widgetAreaId], (widget) => (widget.props.uuid !== id))
-                return {
-                    widgetAreas: widgetContainers
-                }
+                let widgetAreas = prevState.widgetAreas.map(wa => {
+                    if (wa.id === widgetAreaId) {
+                        // remove single
+                        wa.widgets = _.filter(wa.widgets, (w) => (w.props.uuid !== id));
+                        return wa
+                    } else {
+                        return wa
+                    }
+                });
+
+                return {widgetAreas: widgetAreas}
+
             }
         );
         });
