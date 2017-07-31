@@ -227,57 +227,60 @@ var Menu = React.createClass({
     debugger;
     this.setState({position: position});
   },
+
   handleUpdateMenu: function(event){
-    event.preventDefault();
-      debugger
-    var me = this;
-    var name = getValue("selectedMenuName");
-    var _tree_Data = this.state.treeData;
-      let new_tree_data = document.getElementById("draggablePanelList").querySelectorAll("li")
-      new_tree_data = _.map(new_tree_data, td => {
+      event.preventDefault();
+      var me = this;
+      var name = getValue("selectedMenuName");
+      let treeData = document.querySelectorAll("#draggablePanelList > li")
+      treeData = _.map(treeData, td => {
           let id = td.id;
           let type = td.type;
           let tooltip = td.querySelector("#tooltipValue").value;
           let title = td.querySelector("#name").value;
 
+          let children = td.querySelectorAll("li")
+          children = _.map(children, c => ({
+              id: c.id,
+              type: c.type,
+              tooltip: c.querySelector("#tooltipValue").value,
+              title: c.querySelector("#name").value
+          }));
+
+
           return {
               id: id,
               type: type,
               tooltip: tooltip,
-              title: title
+              title: title,
+              children: children
           }
       });
-      console.log(new_tree_data);
 
-    var tooltip = getValue("tooltipValue");
-    this.setState({tooltip: tooltip})
-
-    var c = _.filter(document.getElementsByName("panel"), function(item){return item });
-    var b = _.map(c, function(item){return {title: item.title, tooltip: getValue("tooltipValue"), type: item.type, id: item.id}});
-    var menuSortableTree = b;
-    var positionValues = this.state.position;
-    var menuId = this.state.menuId;
-    this.disableForm(true);
-    var qry = Query.updateMenu(menuId, name, menuSortableTree, positionValues);
-    var noticeTxt = "Menu Updated";
-    riques(qry, 
-      function(error, response, body) { 
-        if (!error && !body.errors && response.statusCode === 200) {
-          me.notif.addNotification({
-                  message: noticeTxt,
-                  level: 'success',
-                  position: 'tr',
-                  autoDismiss: 2
-          });
-          var here = me;
-          var cb = function(){here.disableForm(false)}
-          me.componentWillMount("All", cb);
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-        me.disableForm(false);
-      });
+      let positionValues = this.state.position;
+      let menuId = this.state.menuId;
+      let qry = Query.updateMenu(menuId, name, treeData, positionValues);
+      this.disableForm(true);
+      let noticeTxt = "Menu Successfully Updated";
+      riques(qry, 
+        function(error, response, body) { 
+            if (!error && !body.errors && response.statusCode === 200) {
+            me.notif.addNotification({
+                    message: noticeTxt,
+                    level: 'success',
+                    position: 'tr',
+                    autoDismiss: 2
+            });
+            var here = me;
+            var cb = function(){here.disableForm(false)}
+            me.componentWillMount("All", cb);
+            } else {
+            errorCallback(error, body.errors?body.errors[0].message:null);
+            }
+            me.disableForm(false);
+        });
   },
+
   resetFormNewMenu: function(){
     var me = this;
       riques(Query.getAllMenu, 
