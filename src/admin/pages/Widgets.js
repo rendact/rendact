@@ -117,10 +117,6 @@ class WidgetAreaContainer extends React.Component {
         this.props.clearAllWidget(this.props.id);
     }
 
-    componentDidMount(){
-        console.log(this.props);
-    }
-
     render(){
 
     return <div id={this.props.id} className="col-md-6">
