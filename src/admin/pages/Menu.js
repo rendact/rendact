@@ -564,12 +564,12 @@ var Menu = React.createClass({
                                 if(item.type==="url"){
                                 return (
                                   <li key={item.id} id={item.id} title={item.title} type={item.type} tooltip={tooltip} name="panel">
-                                    <MenuPanel type={item.type} id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                    <MenuPanel  id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li key={child.id} className="box collapsed-box">
-                                          <MenuPanel type={item.type} id={child.id} title={child.title} tooltip={child.tooltip} type={child.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                        <li key={child.id} id={child.id}className="box collapsed-box">
+                                          <MenuPanel id={child.id} title={child.title} tooltip={child.tooltip} type={child.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
                                     })}
@@ -579,12 +579,12 @@ var Menu = React.createClass({
                                 if(item.type!=="url"){
                                 return (
                                   <li key={item.id} id={item.id} title={item.title} type={item.type} tooltip={item.tooltip} name="panel">
-                                    <MenuPanel type={item.type} id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                    <MenuPanel id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li key={child.id} className="box collapsed-box">
-                                          <MenuPanel type={item.type} title={child.title} tooltip={child.tooltip} type={child.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                        <li key={child.id} id={child.id} className="box collapsed-box">
+                                          <MenuPanel title={child.title} tooltip={child.tooltip} type={child.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
                                     })}
