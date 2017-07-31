@@ -24,7 +24,7 @@ const MenuPanel = (props) => {
           </div>
           <div className="form-group">
             <i htmlFor="name" >Tooltip</i>
-            <input type="text" name="tooltipValue" id="tooltipValue" className="form-control" required="true" onChange={props.onHandleTooltip}/>
+            <input type="text" name="tooltipValue" id="tooltipValue" className="form-control" onChange={props.onHandleTooltip}/>
           </div>
           { props.type==="url" &&
           <div className="form-group">
@@ -229,9 +229,25 @@ var Menu = React.createClass({
   },
   handleUpdateMenu: function(event){
     event.preventDefault();
+      debugger
     var me = this;
     var name = getValue("selectedMenuName");
     var _tree_Data = this.state.treeData;
+      let new_tree_data = document.getElementById("draggablePanelList").querySelectorAll("li")
+      new_tree_data = _.map(new_tree_data, td => {
+          let id = td.id;
+          let type = td.type;
+          let tooltip = td.querySelector("#tooltipValue").value;
+          let title = td.querySelector("#name").value;
+
+          return {
+              id: id,
+              type: type,
+              tooltip: tooltip,
+              title: title
+          }
+      });
+      console.log(new_tree_data);
 
     var tooltip = getValue("tooltipValue");
     this.setState({tooltip: tooltip})
