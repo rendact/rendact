@@ -117,6 +117,10 @@ class WidgetAreaContainer extends React.Component {
         this.props.clearAllWidget(this.props.id);
     }
 
+    componentDidMount(){
+        console.log(this.props);
+    }
+
     render(){
 
     return <div id={this.props.id} className="col-md-6">
@@ -131,7 +135,7 @@ class WidgetAreaContainer extends React.Component {
                     </div>
                     <div className="box-body">
                         <ul id="dragablePanelList" className="widgets list-unstyled">
-                        {_.map(this.props.widgetAreas, (widget, index) => (
+                        {_.map(this.props.widgetAreas.widgets, (widget, index) => (
                                                                 <li key={index}>
                                                                         {widget}
                                                                 </li>
@@ -154,12 +158,18 @@ class Widgets extends React.Component {
         super(props);
 
         this.state = {
-            widgetAreas : {
-                'sidebar-1': [],
-                'footer-1': [],
-            },
-            availableWidgets: [],
-        } 
+            widgetAreas: [
+                {
+                    id: 'sidebar-1',
+                    widgets: []
+                },
+                { 
+                    id: 'footer-1',
+                    widgets: []
+                }
+            ],
+            availableWidgets: []
+        }
 
         this.handleAddToWidgetArea = this.handleAddToWidgetArea.bind(this);
         this.handleClearAll = this.handleClearAll.bind(this);
@@ -199,10 +209,18 @@ class Widgets extends React.Component {
         // params id => widgetAreaId
 
         this.setState(prevState => {
-            let widgetContainers = _.cloneDeep(prevState.widgetAreas);
             let widgetFound = _.find(prevState.availableWidgets, w => (w.node.id === widget.id));
-            widgetContainers[id].push(<BoxItemSidebar widgetAreaId={id} widget={widgetFound.node} uuid={uuid()} removeSingleWidget={this.handleRemoveSingleWidget}/>);
-            return {widgetAreas: widgetContainers}
+
+            let newState = prevState.widgetAreas.map(wa => {
+                if (wa.id === id) {
+                    wa.widgets.push(<BoxItemSidebar widgetAreaId={id} widget={widgetFound.node} uuid={uuid()} removeSingleWidget={this.handleRemoveSingleWidget}/>);
+                    return wa
+                } else {
+                    return wa
+                }
+            })
+
+            return {widgetAreas: newState}
         });
     }
 
@@ -270,8 +288,8 @@ class Widgets extends React.Component {
                 </div>
 
                 <div className="col-md-8">
-                    <WidgetAreaContainer id="sidebar-1" title='Sidebar #1' widgetAreas={this.state.widgetAreas['sidebar-1']} clearAllWidget={this.handleClearAll} />
-                    <WidgetAreaContainer id="footer-1" title='Footer #1' widgetAreas={this.state.widgetAreas['footer-1']} clearAllWidget={this.handleClearAll} />
+                    <WidgetAreaContainer id="sidebar-1" title='Sidebar #1' widgetAreas={this.state.widgetAreas[0]} clearAllWidget={this.handleClearAll} />
+                    <WidgetAreaContainer id="footer-1" title='Footer #1' widgetAreas={this.state.widgetAreas[1]} clearAllWidget={this.handleClearAll} />
                 </div>
 
 
