@@ -101,6 +101,10 @@ export class ThemeHome extends React.Component {
 		return <div dangerouslySetInnerHTML={{__html: content}} />
 	}
 
+	theExcerpt(content){
+		return <div dangerouslySetInnerHTML={{__html: _.truncate(content,{"length": 100})}} />
+	}
+
 	theMenu(){
     return <Menu goHome={this.goHome}/>
 	}
@@ -213,6 +217,7 @@ export class ThemeHome extends React.Component {
 								latestPosts={this.state.latestPosts}
 								theTitle={this.theTitle}
 								theContent={this.theContent}
+								theExcerpt={this.theExcerpt}
 								theMenu={this.theMenu}
 								theLogo={this.theLogo}
 								theImage={this.theImage}
@@ -258,6 +263,10 @@ export class ThemeBlog extends React.Component{
 
 	theContent(content){
 		return <div dangerouslySetInnerHTML={{__html: content}} />
+	}
+
+	theExcerpt(content){
+		return <div dangerouslySetInnerHTML={{__html: _.truncate(content,{"length": 100})}} />
 	}
 
 	theMenu(){
@@ -312,6 +321,7 @@ export class ThemeBlog extends React.Component{
 							latestPosts={this.state.latestPosts}
 							theTitle={this.theTitle}
 							theContent={this.theContent}
+							theExcerpt={this.theExcerpt}
 							theMenu={this.theMenu}
 							widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 							footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
