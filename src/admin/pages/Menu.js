@@ -73,6 +73,7 @@ var Menu = React.createClass({
         itemsChecked: false,
         type: "",
         tooltip: "",
+        urlData: {},
         position: false
       }
   },
@@ -126,15 +127,30 @@ var Menu = React.createClass({
     );
 
   },
-  handleUrl: function(event){
-    var urlMenu = getValue("urlMenu");
-    this.setState({urlMenu: urlMenu})
+
+  handleCustomUrlTitle(e){
+    this.setState(prevState => {
+      let urlTitle = getValue("urlTitle");
+      let url = prevState.urlData;
+      url.title = urlTitle
+      return {url: url}
+    });
+  },
+
+  handleCustomUrlUrl: function(event){
+    this.setState(prevState => {
+      let urlUrl = getValue("urlUrl");
+      let url = prevState.urlData;
+      url.url = urlUrl
+      debugger
+      return {url: url}
+    });
   },
   handleUrlSubmit: function(event){
     event.preventDefault();
     var _treeData = this.state.treeData;
-    var url = getValue("urlMenu");
-    var _url = [{title: url, tooltip: "", type: "url", id: uuid()}];
+    var url = this.state.urlData;
+    var _url = [{title: url.title, url: url.url, tooltip: "", type: "url", id: uuid()}];
     var treeData = [];
     if (_treeData===null) {
       treeData = _url;
@@ -488,6 +504,8 @@ var Menu = React.createClass({
                     </div>
                 </div>
               </div>
+
+
               <div className="box box-default collapsed-box box-solid">
                 <div className="box-header with-border">
                   <h3 className="box-title">Custom Links</h3>
@@ -498,14 +516,25 @@ var Menu = React.createClass({
                 </div>
                 <div className="box-body pad">
                   <form onSubmit={this.handleUrlSubmit} id="urlSabmit" method="get">
+
+                    <div className="row">
+                      <div className="col-md-3">
+                        <h5>TITLE</h5>
+                      </div>
+                      <div className="col-md-9">
+                        <input type="text" name="urlTitle" id="urlTitle" className="form-control" onChange={this.handleCustomUrlTitle}/>
+                      </div>
+                    </div>
+
                     <div className="row">
                       <div className="col-md-3">
                         <h5>URL</h5>
                       </div>
                       <div className="col-md-9">
-                        <input type="text" name="urlMenu" id="urlMenu" className="form-control" onChange={this.handleUrl}/>
+                        <input type="text" name="urlUrl" id="urlUrl" className="form-control" onChange={this.handleCustomUrlUrl}/>
                       </div>
                     </div>
+
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
                     <div className="box-tools pull-right">
                       <button type="submit" id="submit" disabled={this.state.urlMenu===""} className="btn btn-flat btn-default">Add to Menu</button>
@@ -513,6 +542,8 @@ var Menu = React.createClass({
                   </form>
                 </div>
               </div>  
+
+
               <div className="box box-default collapsed-box box-solid">
                 <div className="box-header with-border">
                   <h3 className="box-title">Categories</h3>
