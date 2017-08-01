@@ -9,37 +9,41 @@ import {swalert, riques, errorCallback, setValue, getValue, disableForm, default
 
 const MenuPanel = (props) => {
   return (
-    <div id={props.title} className="box collapsed-box">
+    <div id={props.itemData.id} className="box collapsed-box">
       <div className="box-header with-border">
-        <h3 className="box-title">{props.title}</h3>
+        <h3 className="box-title">{props.itemData.title}</h3>
         <div className="box-tools pull-right">
-          <button type="button" className="btn btn-box-tool" data-widget="collapse"><i id={"icon-"+props.title} className="fa fa-plus"></i>
+          <button type="button" className="btn btn-box-tool" data-widget="collapse"><i id={"icon-"+props.itemData.title} className="fa fa-plus"></i>
           </button>
         </div>
       </div>
         <div className="box-body" style={{display: "none"}}>
           <div className="form-group">
             <i htmlFor="name" >Label</i>
-            <input type="text" name="name" id="name" className="form-control" required="true" defaultValue={props.title}/>
+            <input type="text" name="name" id="name" className="form-control" required="true" defaultValue={props.itemData.title}/>
           </div>
           <div className="form-group">
             <i htmlFor="name" >Tooltip</i>
-            <input type="text" name="tooltipValue" defaultValue={props.tooltip} id="tooltipValue" className="form-control" onChange={props.onHandleTooltip}/>
+            <input type="text" name="tooltipValue" defaultValue={props.itemData.tooltip} id="tooltipValue" className="form-control" onChange={props.onHandleTooltip}/>
           </div>
-          { props.type==="url" &&
+          { props.itemData.type==="url" &&
           <div className="form-group">
             <i htmlFor="name" >URL</i>
-            <input type="text" name="name" id="name" className="form-control" defaultValue={props.type}/>
+            <input type="text" name="name" id="name" className="form-control" defaultValue={props.itemData.url}/>
           </div>
           }
+          <div className="form-group">
+            <i htmlFor="typeValue" >Type</i>
+            <input type="text" name="type" defaultValue={props.itemData.type} id="typeValue" className="form-control" readOnly={true}/>
+          </div>
           <div className="col-md-6">
-            <button type="button" value={props.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.title} onClick={props.onRemovePanel}>Remove</button>
+            <button type="button" value={props.itemData.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.itemData.title} onClick={props.onRemovePanel}>Remove</button>
           </div>
           <div className="col-md-6">
             <button type="button" 
               className="btn btn-flat btn-default btn-xs pull-right" 
               data-widget="collapse" 
-              onClick={(e)=>{document.getElementById("icon-"+props.title).className="fa fa-plus"}} >Cancel</button>
+              onClick={(e)=>{document.getElementById("icon-"+props.itemData.title).className="fa fa-plus"}} >Cancel</button>
           </div>
         </div>
     </div>
@@ -620,12 +624,12 @@ var Menu = React.createClass({
                                 if(item.type==="url"){
                                 return (
                                   <li key={item.id} id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} name="panel">
-                                    <MenuPanel  id={item.id} title={item.title} type={item.type} tooltip={item.tooltip} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                    <MenuPanel itemData={item} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
                                         <li key={child.id} id={child.id}>
-                                          <MenuPanel id={child.id} title={child.title} type={child.type} tooltip={item.tooltip} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                          <MenuPanel itemData={child} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
                                     })}
@@ -635,12 +639,12 @@ var Menu = React.createClass({
                                 if(item.type!=="url"){
                                 return (
                                   <li key={item.id} id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} name="panel">
-                                    <MenuPanel id={item.id} title={item.title} type={item.type} tooltip={item.tooltip} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                    <MenuPanel itemData={item} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
                                         <li key={child.id} id={child.id}>
-                                          <MenuPanel title={child.title} type={child.type} tooltip={item.tooltip} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                          <MenuPanel itemData={child} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
                                     })}
