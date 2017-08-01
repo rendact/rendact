@@ -29,7 +29,7 @@ const MenuPanel = (props) => {
           { props.itemData.type==="url" &&
           <div className="form-group">
             <i htmlFor="name" >URL</i>
-            <input type="text" name="name" id="name" className="form-control" defaultValue={props.itemData.url}/>
+            <input type="text" name="urlValue" id="urlValue" className="form-control" defaultValue={props.itemData.url}/>
           </div>
           }
           <div className="form-group">
@@ -303,27 +303,55 @@ var Menu = React.createClass({
 
       let treeData = document.querySelectorAll("#draggablePanelList > li")
       treeData = _.map(treeData, td => {
-          let id = td.id;
-          let type = td.type;
-          let tooltip = td.querySelector("#tooltipValue").value;
-          let title = td.querySelector("#name").value;
-
-          let children = td.querySelectorAll("li")
-          children = _.map(children, c => ({
-              id: c.id,
-              type: c.type,
-              tooltip: c.querySelector("#tooltipValue").value,
-              title: c.querySelector("#name").value
-          }));
+        let data;
+        let id = td.id;
+        let type = td.type;
+        let tooltip = td.querySelector("#tooltipValue").value;
+        let title = td.querySelector("#name").value;
 
 
-          return {
-              id: id,
-              type: type,
-              tooltip: tooltip,
-              title: title,
-              children: children
+        
+
+        let children = td.querySelectorAll("li")
+        children = _.map(children, c => {
+        let data;
+        let id = c.id;
+        let type = c.type;
+        let tooltip = c.querySelector("#tooltipValue").value
+        let title = c.querySelector("#name").value
+
+          data = {
+            id: id,
+            type: type,
+            tooltip: tooltip,
+            title: title
           }
+
+          if (c.type === "url") {
+            let url = c.querySelector("#urlValue");
+            data.url = url
+          }
+
+          return data
+          
+        });
+
+
+        data = {
+          id: id,
+          type: type,
+          tooltip: tooltip,
+          title: title,
+          children: children
+        }
+
+        if (type === "url") {
+          let url = td.querySelector("#urlValue").value;
+          data.url = url;
+        }
+
+        return data
+          
       });
 
       let menuId = this.state.menuId;
