@@ -111,15 +111,43 @@ const updateMenu = function(menuId, name, menuSortableTree, positionValues){
     }
   };
 
+  const updateMainMenu = function(IdMainMenu){
+  return {
+      "query": `
+    mutation UpdateMenu($input: UpdateMenuInput!) {
+        updateMenu(input: $input) {
+          changedMenu{
+            id,
+            position
+        }
+      }
+    }
+    `,
+      "variables": {
+        "input": {
+          "id": IdMainMenu,
+          "position": ""
+        }
+      }
+    }
+  };
+
+const getMainMenu = {
+  "query": 
+      'query getMenus{viewer {allMenus(where: {position: {eq: "Main Menu"}}) { edges { node { id,name}}}}}'
+}
+
 const queries = {
   createMenu: createMenu,
   getAllMenu: getAllMenu,
   deleteMenuQry: deleteMenuQry,
   updateMenu: updateMenu,
+  updateMainMenu: updateMainMenu,
   getAllPage: getAllPage,
   getAllPost: getAllPost,
   getAllCategory: getAllCategory,
-  getMenuQry: getMenuQry
+  getMenuQry: getMenuQry,
+  getMainMenu: getMainMenu
 }
 
 export default queries;
