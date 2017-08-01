@@ -188,8 +188,8 @@ export function AuthService(){
   }
 
   this.logout = function() {
-		var val = ["token","userId","profile","loginType","auth0_profile","config"];
-		for(var i = 0; i < val.length; i++)
+    var val = ["token","userId","profile","loginType","auth0_profile","config"];
+    for(var i = 0; i < val.length; i++)
       localStorage.removeItem(val[i]);
 		
     request({url: 'https://rendact.auth0.com/v2/logout'});
