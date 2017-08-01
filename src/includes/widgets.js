@@ -2,6 +2,7 @@ import React from 'react';
 import {riques} from '../utils';
 import uuid from 'uuid';
 import Query from '../admin/query';
+import _ from 'lodash';
 
 
 export const registerWidget = (type, title, value) => {
@@ -19,6 +20,26 @@ export const registerWidget = (type, title, value) => {
         })
 }
 
+export const registerWidgetArea = (widgetId) => {
+	var activeWidgetArea = localStorage.getItem("activeWidgetArea");
+	
+	if (activeWidgetArea===null){
+		activeWidgetArea = [widgetId]
+	} else {
+		activeWidgetArea = activeWidgetArea.split(",");
+		if (_.isArray(activeWidgetArea)) {
+			var index = _.indexOf(activeWidgetArea, widgetId);
+
+			if (index===-1) {
+				activeWidgetArea.push(widgetId)
+			}
+		} else {
+			activeWidgetArea = [widgetId]
+		}
+	}
+
+	localStorage.setItem("activeWidgetArea", activeWidgetArea.join(","));
+}
 
 export const searchWidget = 
 		<div key="sidebar" className="sidebar-box">

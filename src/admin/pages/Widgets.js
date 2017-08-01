@@ -4,7 +4,7 @@ import _ from 'lodash';
 import uuid from 'uuid';
 import {riques, swalert, errorCallback} from '../../utils';
 import Query from '../query';
-
+import AdminConfig from '../AdminConfig';
 
 class BoxItemSidebar extends React.Component {
 
@@ -131,11 +131,13 @@ class WidgetAreaContainer extends React.Component {
                     </div>
                     <div className="box-body">
                         <ul id="dragablePanelList" className="widgets list-unstyled">
-                        {_.map(this.props.widgetAreas.widgets, (widget, index) => (
+                        {this.props.widgetAreas && 
+                            _.map(this.props.widgets, (widget, index) => (
                                                                 <li key={index}>
                                                                         {widget}
                                                                 </li>
-                                                                ))}
+                                                                ))
+                        }
                     </ul>
                     </div>
                     <div className="box-footer">
@@ -154,22 +156,16 @@ class Widgets extends React.Component {
         super(props);
 
         this.state = {
-            widgetAreas: [
-                {
-                    id: 'sidebar-1',
-                    widgets: []
-                },
-                { 
-                    id: 'footer-1',
-                    widgets: []
-                }
-            ],
+            widgetAreas: [],
             availableWidgets: []
         }
 
         this.handleAddToWidgetArea = this.handleAddToWidgetArea.bind(this);
         this.handleClearAll = this.handleClearAll.bind(this);
         this.handleRemoveSingleWidget = this.handleRemoveSingleWidget.bind(this);
+
+        var themeFunctions = require('../../theme/default/functions.js');
+        themeFunctions.default();
     }
 
     componentDidMount(){
@@ -199,6 +195,19 @@ class Widgets extends React.Component {
           _super($item, container);
         }
     });
+        var activeWidgetArea = localStorage.getItem("activeWidgetArea");
+        activeWidgetArea = activeWidgetArea.split(",");
+
+        this.setState(prevState => { 
+            var _newWidgetArea = []
+            _.forEach(activeWidgetArea, function(item){
+                _newWidgetArea.push({
+                    id: item,
+                    widgets: []
+                })
+            });
+            return {widgetAreas: _newWidgetArea}
+        });
     }
 
     handleAddToWidgetArea(id, widget){
@@ -299,8 +308,11 @@ class Widgets extends React.Component {
                 </div>
 
                 <div className="col-md-8">
-                    <WidgetAreaContainer id="sidebar-1" title='Sidebar #1' widgetAreas={this.state.widgetAreas[0]} clearAllWidget={this.handleClearAll} />
-                    <WidgetAreaContainer id="footer-1" title='Footer #1' widgetAreas={this.state.widgetAreas[1]} clearAllWidget={this.handleClearAll} />
+                {
+                    _.map(this.state.widgetAreas, function(item){
+                        return <WidgetAreaContainer id={item.id} title={item.id} widgets={item.widgets} clearAllWidget={this.handleClearAll} />
+                    }.bind(this))
+                }
                 </div>
 
 
