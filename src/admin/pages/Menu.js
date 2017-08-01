@@ -9,37 +9,41 @@ import {swalert, riques, errorCallback, setValue, getValue, disableForm, default
 
 const MenuPanel = (props) => {
   return (
-    <div id={props.title} className="box collapsed-box">
+    <div id={props.itemData.id} className="box collapsed-box">
       <div className="box-header with-border">
-        <h3 className="box-title">{props.title}</h3>
+        <h3 className="box-title">{props.itemData.title}</h3>
         <div className="box-tools pull-right">
-          <button type="button" className="btn btn-box-tool" data-widget="collapse"><i id={"icon-"+props.title} className="fa fa-plus"></i>
+          <button type="button" className="btn btn-box-tool" data-widget="collapse"><i id={"icon-"+props.itemData.title} className="fa fa-plus"></i>
           </button>
         </div>
       </div>
         <div className="box-body" style={{display: "none"}}>
           <div className="form-group">
             <i htmlFor="name" >Label</i>
-            <input type="text" name="name" id="name" className="form-control" required="true" defaultValue={props.title}/>
+            <input type="text" name="name" id="name" className="form-control" required="true" defaultValue={props.itemData.title}/>
           </div>
           <div className="form-group">
             <i htmlFor="name" >Tooltip</i>
-            <input type="text" name="tooltipValue" defaultValue={props.tooltip} id="tooltipValue" className="form-control" />
+            <input type="text" name="tooltipValue" defaultValue={props.itemData.tooltip} id="tooltipValue" className="form-control" />
           </div>
-          { props.type==="url" &&
+          { props.itemData.type==="url" &&
           <div className="form-group">
             <i htmlFor="name" >URL</i>
-            <input type="text" name="name" id="name" className="form-control" defaultValue={props.type}/>
+            <input type="text" name="name" id="name" className="form-control" defaultValue={props.itemData.url}/>
           </div>
           }
+          <div className="form-group">
+            <i htmlFor="typeValue" >Type</i>
+            <input type="text" name="type" defaultValue={props.itemData.type} id="typeValue" className="form-control" readOnly={true}/>
+          </div>
           <div className="col-md-6">
-            <button type="button" value={props.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.title} onClick={props.onRemovePanel}>Remove</button>
+            <button type="button" value={props.itemData.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.itemData.title} onClick={props.onRemovePanel}>Remove</button>
           </div>
           <div className="col-md-6">
             <button type="button" 
               className="btn btn-flat btn-default btn-xs pull-right" 
               data-widget="collapse" 
-              onClick={(e)=>{document.getElementById("icon-"+props.title).className="fa fa-plus"}} >Cancel</button>
+              onClick={(e)=>{document.getElementById("icon-"+props.itemData.title).className="fa fa-plus"}} >Cancel</button>
           </div>
         </div>
     </div>
@@ -73,6 +77,7 @@ var Menu = React.createClass({
         itemsChecked: false,
         type: "",
         tooltip: "",
+        urlData: {},
         position: false
       }
   },
@@ -126,15 +131,30 @@ var Menu = React.createClass({
     );
 
   },
-  handleUrl: function(event){
-    var urlMenu = getValue("urlMenu");
-    this.setState({urlMenu: urlMenu})
+
+  handleCustomUrlTitle(e){
+    this.setState(prevState => {
+      let urlTitle = getValue("urlTitle");
+      let url = prevState.urlData;
+      url.title = urlTitle
+      return {url: url}
+    });
+  },
+
+  handleCustomUrlUrl: function(event){
+    this.setState(prevState => {
+      let urlUrl = getValue("urlUrl");
+      let url = prevState.urlData;
+      url.url = urlUrl
+      debugger
+      return {url: url}
+    });
   },
   handleUrlSubmit: function(event){
     event.preventDefault();
     var _treeData = this.state.treeData;
-    var url = getValue("urlMenu");
-    var _url = [{title: url, tooltip: "", type: "url", id: uuid()}];
+    var url = this.state.urlData;
+    var _url = [{title: url.title, url: url.url, tooltip: "", type: "url", id: uuid()}];
     var treeData = [];
     if (_treeData===null) {
       treeData = _url;
@@ -513,6 +533,8 @@ var Menu = React.createClass({
                     </div>
                 </div>
               </div>
+
+
               <div className="box box-default collapsed-box box-solid">
                 <div className="box-header with-border">
                   <h3 className="box-title">Custom Links</h3>
@@ -523,14 +545,25 @@ var Menu = React.createClass({
                 </div>
                 <div className="box-body pad">
                   <form onSubmit={this.handleUrlSubmit} id="urlSabmit" method="get">
+
+                    <div className="row">
+                      <div className="col-md-3">
+                        <h5>TITLE</h5>
+                      </div>
+                      <div className="col-md-9">
+                        <input type="text" name="urlTitle" id="urlTitle" className="form-control" onChange={this.handleCustomUrlTitle}/>
+                      </div>
+                    </div>
+
                     <div className="row">
                       <div className="col-md-3">
                         <h5>URL</h5>
                       </div>
                       <div className="col-md-9">
-                        <input type="text" name="urlMenu" id="urlMenu" className="form-control" onChange={this.handleUrl}/>
+                        <input type="text" name="urlUrl" id="urlUrl" className="form-control" onChange={this.handleCustomUrlUrl}/>
                       </div>
                     </div>
+
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
                     <div className="box-tools pull-right">
                       <button type="submit" id="submit" disabled={this.state.urlMenu===""} className="btn btn-flat btn-default">Add to Menu</button>
@@ -538,6 +571,8 @@ var Menu = React.createClass({
                   </form>
                 </div>
               </div>  
+
+
               <div className="box box-default collapsed-box box-solid">
                 <div className="box-header with-border">
                   <h3 className="box-title">Categories</h3>
@@ -614,12 +649,12 @@ var Menu = React.createClass({
                                 if(item.type==="url"){
                                 return (
                                   <li key={item.id} id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} name="panel">
-                                    <MenuPanel  id={item.id} title={item.title} type={item.type} tooltip={item.tooltip}  onRemovePanel={me.removePanel} />
+                                    <MenuPanel itemData={item} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
                                         <li key={child.id} id={child.id}>
-                                          <MenuPanel id={child.id} title={child.title} type={child.type} tooltip={item.tooltip}  onRemovePanel={me.removePanel} />
+                                          <MenuPanel itemData={child} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
                                     })}
@@ -629,12 +664,12 @@ var Menu = React.createClass({
                                 if(item.type!=="url"){
                                 return (
                                   <li key={item.id} id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} name="panel">
-                                    <MenuPanel id={item.id} title={item.title} type={item.type} tooltip={item.tooltip}  onRemovePanel={me.removePanel} />
+                                    <MenuPanel itemData={item} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
                                         <li key={child.id} id={child.id}>
-                                          <MenuPanel title={child.title} type={child.type} tooltip={item.tooltip}  onRemovePanel={me.removePanel} />
+                                          <MenuPanel itemData={child} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
                                     })}
@@ -668,8 +703,7 @@ var Menu = React.createClass({
 
                   </section>
                 </div>
-              </form>
-              <div className="box-header with-border attachment-block clearfix">
+              </form> <div className="box-header with-border attachment-block clearfix">
                 <button className="btn btn-flat btn-danger pull-right" id="deleteBtn" data-target="menuName" onClick={this.handleDelete}>Delete Menu</button>
               </div>
               </div>
