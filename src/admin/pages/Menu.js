@@ -146,7 +146,6 @@ var Menu = React.createClass({
       let urlUrl = getValue("urlUrl");
       let url = prevState.urlData;
       url.url = urlUrl
-      debugger
       return {url: url}
     });
   },
@@ -214,6 +213,7 @@ var Menu = React.createClass({
                   autoDismiss: 2
           });
           me.resetFormNewMenu();
+          me.setState({treeData:[]});
           var here = me;
           var cb = function(){here.disableForm(false)}
           me.componentWillMount("All", cb);
@@ -274,7 +274,6 @@ var Menu = React.createClass({
           if (!error) {
             var mainMenu = _.forEach(body.data.viewer.allMenus.edges, function(item){ return item })
             let IdMainMenu = _.map(mainMenu, function(item){return  item.node.id });
-            //debugger;
             me.setState({IdMainMenu: IdMainMenu});
           }
         }
@@ -298,11 +297,9 @@ var Menu = React.createClass({
       if (positionValues==="Main Menu") {
         riques(Query.updateMainMenu(IdMainMenu), 
           function(error, response, body) {
-            debugger;
           }
         );
       }
-
 
       let treeData = document.querySelectorAll("#draggablePanelList > li")
       treeData = _.map(treeData, td => {
@@ -365,6 +362,7 @@ var Menu = React.createClass({
             _.filter(document.getElementsByName("menuSelect"), function(item){
             return item.selectedIndex = "1"
             });
+            debugger;
           }
         }
       );
@@ -372,22 +370,7 @@ var Menu = React.createClass({
     var newMenuName = getValue("newMenuName");
     var selectedMenuName = newMenuName;
     setValue("selectedMenuName", selectedMenuName);
-    this.setState({menuId:menuId, treeData:[]});
-    var qry = Query.getMenuQry(menuId);
-        me.disableForm(true);
-    riques(qry, 
-      function(error, response, body) {
-        if (!error && !body.errors && response.statusCode === 200) {
-          var items = [];
-          items = body.data.getMenu.items;
-          me.setState({treeData: items});
-          me.disableForm(false);
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-        me.disableForm(false);
-      }
-    );
+    this.setState({menuId:menuId});
     document.getElementById("menu").reset();
   },
   componentWillMount: function(){
