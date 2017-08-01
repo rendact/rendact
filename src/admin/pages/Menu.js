@@ -20,16 +20,16 @@ const MenuPanel = (props) => {
         <div className="box-body" style={{display: "none"}}>
           <div className="form-group">
             <i htmlFor="name" >Label</i>
-            <input type="text" name="name" id="name" className="form-control" required="true" value={props.title}/>
+            <input type="text" name="name" id="name" className="form-control" required="true" defaultValue={props.title}/>
           </div>
           <div className="form-group">
             <i htmlFor="name" >Tooltip</i>
-            <input type="text" name="tooltipValue" id="tooltipValue" className="form-control" onChange={props.onHandleTooltip}/>
+            <input type="text" name="tooltipValue" defaultValue={props.tooltip} id="tooltipValue" className="form-control" onChange={props.onHandleTooltip}/>
           </div>
           { props.type==="url" &&
           <div className="form-group">
             <i htmlFor="name" >URL</i>
-            <input type="text" name="name" id="name" className="form-control" value={props.type}/>
+            <input type="text" name="name" id="name" className="form-control" defaultValue={props.type}/>
           </div>
           }
           <div className="col-md-6">
