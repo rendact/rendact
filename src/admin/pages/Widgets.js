@@ -4,7 +4,7 @@ import _ from 'lodash';
 import uuid from 'uuid';
 import {riques, swalert, errorCallback} from '../../utils';
 import Query from '../query';
-import AdminConfig from '../AdminConfig';
+//import AdminConfig from '../AdminConfig';
 
 class BoxItemSidebar extends React.Component {
 
