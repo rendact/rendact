@@ -109,7 +109,7 @@ var Menu = React.createClass({
     var menuId = event.target.value.split("-")[0];
     var selectedMenuName = event.target.value.split("-")[1];
     setValue("selectedMenuName", selectedMenuName);
-    this.setState({menuId:menuId});
+    this.setState({menuId:menuId, treeData:[]});
     var me = this;
     var qry = Query.getMenuQry(menuId);
     me.disableForm(true);
