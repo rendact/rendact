@@ -9,11 +9,11 @@ import {swalert, riques, errorCallback, setValue, getValue, disableForm, default
 
 const MenuPanel = (props) => {
   return (
-    <div className="box collapsed-box">
+    <div id={props.title} className="box collapsed-box">
       <div className="box-header with-border">
         <h3 className="box-title">{props.title}</h3>
         <div className="box-tools pull-right">
-          <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+          <button type="button" className="btn btn-box-tool" data-widget="collapse"><i id={"icon-"+props.title} className="fa fa-plus"></i>
           </button>
         </div>
       </div>
@@ -33,10 +33,13 @@ const MenuPanel = (props) => {
           </div>
           }
           <div className="col-md-6">
-            <button value={props.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.title} onClick={props.onRemovePanel}>Remove</button>
+            <button type="button" value={props.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.title} onClick={props.onRemovePanel}>Remove</button>
           </div>
           <div className="col-md-6">
-            <button className="btn btn-flat btn-default btn-xs pull-right" id="" data-target="">Cancel</button>
+            <button type="button" 
+              className="btn btn-flat btn-default btn-xs pull-right" 
+              data-widget="collapse" 
+              onClick={(e)=>{document.getElementById("icon-"+props.title).className="fa fa-plus"}} >Cancel</button>
           </div>
         </div>
     </div>
@@ -114,7 +117,6 @@ var Menu = React.createClass({
 		      me.setState({treeData: items});
           var position = body.data.getMenu.position;
           me.setState({position: position});
-          debugger;
           me.disableForm(false);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
@@ -208,23 +210,47 @@ var Menu = React.createClass({
     require ('../../../public/css/skins/_all-skins.css');
 
     this.notif = this.refs.notificationSystem;
-    
+    var adjustment;
     var panelList = $('#draggablePanelList');
     panelList.sortable({
         group: 'nested',
         handle: '.box-header',
+        pullPlaceholder: false,
+        // animation on drop
+        onDrop: function  ($item, container, _super) {
+          var $clonedItem = $('<li/>').css({height: 0});
+          $item.before($clonedItem);
+          $clonedItem.animate({'height': $item.height()});
+
+          $item.animate($clonedItem.position(), function  () {
+            $clonedItem.detach();
+            _super($item, container);
+          });
+        },
+
+        // set $item relative to cursor position
         onDragStart: function ($item, container, _super) {
-          // Duplicate items of the no drop area
-          if(!container.options.drop)
-            $item.clone().insertAfter($item);
+          var offset = $item.offset(),
+              pointer = container.rootGroup.pointer;
+
+          adjustment = {
+            left: pointer.left - offset.left,
+            top: pointer.top - offset.top
+          };
+
           _super($item, container);
+        },
+        onDrag: function ($item, position) {
+          $item.css({
+            left: position.left - adjustment.left,
+            top: position.top - adjustment.top
+          });
         }
     });
   },
   onChangeMainMenu: function(event){
     const target = event.target;
     const position = target.checked === true ? target.value : "";
-    debugger;
     this.setState({position: position});
   },
 
@@ -563,13 +589,13 @@ var Menu = React.createClass({
                                 var tooltip = me.state.tooltip;
                                 if(item.type==="url"){
                                 return (
-                                  <li key={item.id} id={item.id} title={item.title} type={item.type} tooltip={tooltip} name="panel">
-                                    <MenuPanel  id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                  <li key={item.id} id={item.id} title={item.title} type={item.type} name="panel">
+                                    <MenuPanel  id={item.id} title={item.title} type={item.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li key={child.id} id={child.id}className="box collapsed-box">
-                                          <MenuPanel id={child.id} title={child.title} tooltip={child.tooltip} type={child.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                        <li key={child.id} id={child.id}>
+                                          <MenuPanel id={child.id} title={child.title} type={child.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
                                     })}
@@ -578,13 +604,13 @@ var Menu = React.createClass({
                                 )}
                                 if(item.type!=="url"){
                                 return (
-                                  <li key={item.id} id={item.id} title={item.title} type={item.type} tooltip={item.tooltip} name="panel">
-                                    <MenuPanel id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                  <li key={item.id} id={item.id} title={item.title} type={item.type} name="panel">
+                                    <MenuPanel id={item.id} title={item.title} type={item.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li key={child.id} id={child.id} className="box collapsed-box">
-                                          <MenuPanel title={child.title} tooltip={child.tooltip} type={child.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                        <li key={child.id} id={child.id}>
+                                          <MenuPanel title={child.title} type={child.type} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
                                     })}
