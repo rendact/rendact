@@ -19,7 +19,7 @@ const Home = React.createClass({
 													{this.props.theTitle(item.id, item.title)}
 													<small>{moment(item.createdAt).format("MMMM Do YY, h:mm:ss a")}</small>
 													<section className="content-body">
-														{this.props.theContent(item.content)}
+														{this.props.theExcerpt(item.content)}
 													</section>
 												</div>
 												<div className="col-md-6 welcome-img">
