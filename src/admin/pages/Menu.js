@@ -24,7 +24,7 @@ const MenuPanel = (props) => {
           </div>
           <div className="form-group">
             <i htmlFor="name" >Tooltip</i>
-            <input type="text" name="tooltipValue" defaultValue={props.tooltip} id="tooltipValue" className="form-control" onChange={props.onHandleTooltip}/>
+            <input type="text" name="tooltipValue" defaultValue={props.tooltip} id="tooltipValue" className="form-control" />
           </div>
           { props.type==="url" &&
           <div className="form-group">
@@ -247,17 +247,43 @@ var Menu = React.createClass({
           });
         }
     });
+
+    var me = this;
+      riques(Query.getMainMenu, 
+        function(error, response, body) {
+          if (!error) {
+            var mainMenu = _.forEach(body.data.viewer.allMenus.edges, function(item){ return item })
+            let IdMainMenu = _.map(mainMenu, function(item){return  item.node.id });
+            //debugger;
+            me.setState({IdMainMenu: IdMainMenu});
+          }
+        }
+      );
   },
   onChangeMainMenu: function(event){
     const target = event.target;
     const position = target.checked === true ? target.value : "";
-    this.setState({position: position});
+    this.setState({position: position});      
   },
 
   handleUpdateMenu: function(event){
       event.preventDefault();
       var me = this;
       var name = getValue("selectedMenuName");
+
+      let positionValues = this.state.position;
+      let _IdMainMenu = this.state.IdMainMenu;
+      let IdMainMenu = _IdMainMenu.toString();
+
+      if (positionValues==="Main Menu") {
+        riques(Query.updateMainMenu(IdMainMenu), 
+          function(error, response, body) {
+            debugger;
+          }
+        );
+      }
+
+
       let treeData = document.querySelectorAll("#draggablePanelList > li")
       treeData = _.map(treeData, td => {
           let id = td.id;
@@ -283,7 +309,6 @@ var Menu = React.createClass({
           }
       });
 
-      let positionValues = this.state.position;
       let menuId = this.state.menuId;
       let qry = Query.updateMenu(menuId, name, treeData, positionValues);
       this.disableForm(true);
@@ -589,12 +614,12 @@ var Menu = React.createClass({
                                 if(item.type==="url"){
                                 return (
                                   <li key={item.id} id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} name="panel">
-                                    <MenuPanel  id={item.id} title={item.title} type={item.type} tooltip={item.tooltip} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                    <MenuPanel  id={item.id} title={item.title} type={item.type} tooltip={item.tooltip}  onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
                                         <li key={child.id} id={child.id}>
-                                          <MenuPanel id={child.id} title={child.title} type={child.type} tooltip={item.tooltip} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                          <MenuPanel id={child.id} title={child.title} type={child.type} tooltip={item.tooltip}  onRemovePanel={me.removePanel} />
                                         </li>
                                       )
                                     })}
@@ -604,12 +629,12 @@ var Menu = React.createClass({
                                 if(item.type!=="url"){
                                 return (
                                   <li key={item.id} id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} name="panel">
-                                    <MenuPanel id={item.id} title={item.title} type={item.type} tooltip={item.tooltip} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                    <MenuPanel id={item.id} title={item.title} type={item.type} tooltip={item.tooltip}  onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
                                         <li key={child.id} id={child.id}>
-                                          <MenuPanel title={child.title} type={child.type} tooltip={item.tooltip} onHandleTooltip={me.handleTooltip} onRemovePanel={me.removePanel} />
+                                          <MenuPanel title={child.title} type={child.type} tooltip={item.tooltip}  onRemovePanel={me.removePanel} />
                                         </li>
                                       )
                                     })}

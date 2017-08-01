@@ -83,10 +83,12 @@ const queries = {
   getAllMenu: Menu.getAllMenu,
   deleteMenuQry: Menu.deleteMenuQry,
   updateMenu: Menu.updateMenu,
+  updateMainMenu: Menu.updateMainMenu,
   getAllPage: Menu.getAllPage,
   getAllPost: Menu.getAllPost,
   getAllCategory: Menu.getAllCategory,
   getMenuQry: Menu.getMenuQry,
+  getMainMenu: Menu.getMainMenu,
   createWidget: Widget.createWidget,
   getAllWidgets: Widget.getAllWidgets,
 }
