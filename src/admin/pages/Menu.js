@@ -57,13 +57,13 @@ var Menu = React.createClass({
         name:"",
         selectedMenuName:"",
         newMenuName:"",
-        urlMenu: "",
         menuId:"",
         tagId:"",
         dt: null,
         errorMsg: null,
         loadingMsg: null,
-        deleteMode: false,activeStatus: "All",
+        deleteMode: false,
+        activeStatus: "All",
         pageList: null,
         allPageList: null,
         allPostList: null,
@@ -577,7 +577,7 @@ var Menu = React.createClass({
 
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
                     <div className="box-tools pull-right">
-                      <button type="submit" id="submit" disabled={this.state.urlMenu===""} className="btn btn-flat btn-default">Add to Menu</button>
+                      <button type="submit" id="submit" disabled={this.state.urlData.url===""} className="btn btn-flat btn-default">Add to Menu</button>
                     </div>
                   </form>
                 </div>
