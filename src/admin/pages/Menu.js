@@ -676,12 +676,12 @@ var Menu = React.createClass({
                               this.state.treeData.map(function(item, index){
                                 if(item.type==="url"){
                                 return (
-                                  <li key={item.id} id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} name="panel">
+                                  <li key={item.id} id={item.id} title={item.title} type={item.type} name="panel">
                                     <MenuPanel itemData={item} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li key={child.id} id={child.id}>
+                                        <li key={child.id} id={child.id} title={child.title}>
                                           <MenuPanel itemData={child} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
@@ -691,12 +691,12 @@ var Menu = React.createClass({
                                 )}
                                 if(item.type!=="url"){
                                 return (
-                                  <li key={item.id} id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} name="panel">
+                                  <li key={item.id} id={item.id} title={item.title} type={item.type} name="panel">
                                     <MenuPanel itemData={item} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li key={child.id} id={child.id}>
+                                        <li key={child.id} id={child.id} title={child.title}>
                                           <MenuPanel itemData={child} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
