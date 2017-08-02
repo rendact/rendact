@@ -1,4 +1,7 @@
+import _ from 'lodash';
+
 const contentTypeNew = (state = [], action) => {
+  console.log(action.type)
   switch (action.type) {
     case 'MASK_AREA':
       return [
@@ -8,27 +11,14 @@ const contentTypeNew = (state = [], action) => {
         }
       ]
     case 'UPDATE_SLUG':
-      return [
-        {
-          permalink: action.slug,
-          permalinkEditing: action.isEditorEnabled
-        }
-      ]
+      return state.map(item =>  ({...item, permalink: action.slug, permalinkEditing: action.isEditorEnabled}))
     case 'TOGGLE_PERMALINK_PROCESS_STATE':
-      return [
-        {
-          permalinkInProcess: action.state
-        }
-      ]
+      return state.map(item =>  ({...item, permalinkInProcess: action.state}))
     case 'UPDATE_POST_STATUS':
-      return [
-        {
-          status: action.status
-        }
-      ]
+      return state.map(item =>  ({...item, status: action.status}))
     case 'RESET_POST_EDITOR':
       return [
-        {title:"", permalink:"", content:"", summary:"", featuredImage: null, imageGallery:"",
+        {title:"", content:"", summary:"", featuredImage: null, imageGallery:"",
         status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
         permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160}
       ]
@@ -39,46 +29,24 @@ const contentTypeNew = (state = [], action) => {
         }
       ]
     case 'SET_TAG_LIST':
-      return [
-        {
-          postTagListInit: action.tagListInit,
-          postTagList: action.tagList
-        }
-      ]
+      return state.map(item =>  ({...item, postTagListInit: action.tagListInit, postTagList: action.tagList}))
     case 'SET_IMAGE_GALLERY_LIST':
-      return [
-        {
-          imageGallery: action.imageList
-        }
-      ]
+      return state.map(item =>  ({...item, imageGallery: action.imageList}))
     case 'SET_CONNECTION_VALUE_LIST':
-      return [
-        {
-          connectionValue: action.connectionValueList
-        }
-      ]
+      return state.map(item =>  ({...item, connectionValue: action.connectionValueList}))
     case 'SET_CONTENT_FORM':
       return [
         {
           title: action.values.title, content: action.values.content, summary: action.values.summary, 
           status: action.values.status, visibilityTxt: action.values.visibility, 
           publishDate: action.values.pubDate, publishDateReset: action.values.pubDate, 
-          slug: action.values.slug, featuredImage: action.values.featuredImage
+          permalink: action.values.slug, featuredImage: action.values.featuredImage
         }
       ]
     case 'TOGGLE_SAVE_IMMEDIATELY_MODE':
-      return [
-        {
-          immediatelyStatus: action.state,
-          immediately: action.time
-        }
-      ]
+      return state.map(item =>  ({...item, immediatelyStatus: action.state, immediately: action.time}))
     case 'TOGGLE_PERMALINK_EDITING_STATE':
-      return [
-        {
-          permalinkEditing: action.state
-        }
-      ]
+      return state.map(item =>  ({...item, permalinkEditing: action.state}))
     case 'SET_VISIBILITY_MODE':
       return [
         {
@@ -92,11 +60,7 @@ const contentTypeNew = (state = [], action) => {
         }
       ]
     case 'SET_POST_CONTENT':
-      return [
-        {
-          content: action.content
-        }
-      ]
+      return state.map(item =>  ({...item, content: action.content}))
     case 'SET_POST_SUMMARY':
       return [
         {
@@ -104,24 +68,11 @@ const contentTypeNew = (state = [], action) => {
         }
       ]
     case 'UPDATE_TITLE_TAG_LEFT_CHAR':
-      return [
-        {
-          titleTagLeftCharacter: action.length
-        }
-      ]
+      return state.map(item =>  ({...item, titleTagLeftCharacter: action.length}))
     case 'UPDATE_META_DESCRIPTION_LEFT_CHAR':
-      return [
-        {
-          metaDescriptionLeftCharacter: action.length
-        }
-      ]
+      return state.map(item =>  ({...item, metaDescriptionLeftCharacter: action.length}))
     case 'SET_POST_PUBLISH_DATE':
-      return [
-        {
-          immediatelyStatus: action.immediatelyState,
-          publishDate: action.date
-        }
-      ]
+      return state.map(item =>  ({...item, immediatelyStatus: action.immediatelyState,publishDate: action.date}))
     case 'SET_FEATURED_IMAGE':
       return [
         {
@@ -129,29 +80,13 @@ const contentTypeNew = (state = [], action) => {
         }
       ]
     case 'SET_EDITOR_MODE':
-      return [
-        {
-          mode: action.mode
-        }
-      ]
+      return [{mode: action.mode}]
     case 'TOGGLE_IMAGE_GALLERY_BINDED':
-      return [
-        {
-          imageGalleryUnbinded: action.state,
-        }
-      ]
+      return state.map(item =>  ({...item, imageGalleryUnbinded: action.state}))
     case 'SET_PAGE_LIST':
-      return [
-        {
-          pageList: action.pageList
-        }
-      ]
+      return state.map(item =>  ({...item, pageList: action.pageList}))
     case 'SET_ALL_CATEGORY_LIST':
-      return [
-        {
-          allCategoryList: action.catList
-        }
-      ]
+      return state.map(item =>  ({...item, allCategoryList: action.catList}))
     case 'SET_TAG_MAP':
       return [
         {
@@ -165,11 +100,7 @@ const contentTypeNew = (state = [], action) => {
         }
       ]
     case 'LOAD_FORM_DATA':
-      return [
-        {
-          data: action.data
-        }
-      ]
+      return state.map(item =>  ({...item, data: action.data, permalink: action.data["slug"]}))
     default:
       return state
   }

@@ -95,7 +95,7 @@ let NewContentType = React.createClass({
       opacity: 1,
       title: "",
       content: "",
-      status:"Draft",
+      status:"Published",
       immediatelyStatus:true,
       visibilityTxt:"Public",
       permalinkEditing: false,
@@ -121,7 +121,7 @@ let NewContentType = React.createClass({
   },
   checkSlug: function(permalink){
     var me = this;
-    
+    if (permalink===this.props.permalink) return;
     this.props.dispatch(togglePermalinkProcessState(true));
     riques( Query.checkSlugQry(permalink),
       function(error, response, body) {
@@ -151,7 +151,7 @@ let NewContentType = React.createClass({
     window.CKEDITOR.instances['content'].setData(null);
     this.props.dispatch(resetPostEditor());
     this.handleTitleChange();
-    window.history.pushState("", "", '/admin/'+this.props.permalink+'/new');
+    window.history.pushState("", "", '/admin/'+this.props.slug+'/new');
   },
   getMetaFormValues: function(){
     var out = getFormData("metaField");
@@ -277,21 +277,15 @@ let NewContentType = React.createClass({
     this.props.dispatch(setPostPublishDate(resetDate, false));
   },
   _emulateDataForSaving: function(v){
-    return {
-      "title": v.title,
-      "content": v.content,
-      "status": v.status,
-      "visibility": v.visibility,
-      "passwordPage": v.passwordPage,
-      "publishDate": v.publishDate,
-      "type": this.props.postType,
-      "authorId": localStorage.getItem('userId'),
-      "slug": this.props.permalink,
-      "summary": v.summary,
-      "parent": v.parentPage,
-      "order": v.pageOrder,
-      "featuredImage": v.featuredImage
-    }
+    v["status"] = this.props.status;
+    v["content"] = this.props.content;
+    v["visibility"] = this.props.visibilityTxt;
+    v["type"] = this.props.postType;
+    v["authorId"] = localStorage.getItem('userId');
+    v["slug"] = this.props.permalink;
+    v["featuredImage"] = this.props.featuredImage
+
+    return v
   },
   onSubmit: function(v) {
     var me = this;
@@ -307,7 +301,6 @@ let NewContentType = React.createClass({
         return;
       }
     }
-    
     var _objData = this._emulateDataForSaving(v);
     var qry = "", noticeTxt = "";
     if (this.props.mode==="create"){
@@ -333,10 +326,9 @@ let NewContentType = React.createClass({
           } else {
             postId = body.data.updatePost.changedPost.id;
           }
-
+          
           if (metaDataList.length>0) {
             pmQry = Query.createUpdatePostMetaMtn(postId, metaDataList);
-            
             riques(pmQry, 
               function(error, response, body) {
                 if (!error && !body.errors && response.statusCode === 200) {
@@ -390,7 +382,7 @@ let NewContentType = React.createClass({
           here.disableForm(false);
           here.notifyUnsavedData(false);
           here.bindPostToImageGallery(postId);
-          here.props.handleNav(me.props.permalink,"edit",postId);
+          here.props.handleNav(me.props.slug,"edit",postId);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null, "Save Post");
           here.disableForm(false);
@@ -632,7 +624,7 @@ let NewContentType = React.createClass({
               </h1>
                 <ol className="breadcrumb">
                   <li><a href="#"><i className="fa fa-dashboard"></i> Home</a></li>
-                  <li><a href="#" onClick={function(){this.props.handleNav(this.props.permalink)}.bind(this)}>
+                  <li><a href="#" onClick={function(){this.props.handleNav(this.props.slug)}.bind(this)}>
                     {this.props.name}</a></li>
                   <li className="active">{this.props.mode==="update"?"Edit "+this.props.name:"Add New"}</li>
                 </ol>
@@ -689,7 +681,7 @@ let NewContentType = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4"><p>Title Tag</p></div>
                     <div className="col-md-8">
-                      <Field id="titleTag" name="titleTag" component="input" type="text" className="form-control metaField" 
+                      <Field name="titleTag" component="input" type="text" className="form-control metaField" 
                         style={{width: '100%'}} placeholder={this.props.title} onChange={this.handleTitleTagChange} />
                         <span className="help-block">Up to 65 characters recommended<br/>
                         {this.props.titleTagLeftCharacter} characters left</span>                     
@@ -698,7 +690,7 @@ let NewContentType = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4"><p>Meta Description</p></div>
                     <div className="col-md-8">
-                      <Field id="metaDescription" name="metaDescription" component="textarea" type="text" className="form-control metaField" 
+                      <Field name="metaDescription" component="textarea" type="text" className="form-control metaField" 
                         rows='2' style={{width:'100%'}} placeholder={this.props.summary} onChange={this.handleMetaDescriptionChange} />
                       <span className="help-block">160 characters maximum<br/>
                       {this.props.metaDescriptionLeftCharacter} characters left</span>
@@ -708,7 +700,7 @@ let NewContentType = React.createClass({
                     <div className="col-md-4"><p>Meta Keywords</p></div>
                     <div className="col-md-8">
                       <div className="form-group">
-                        <Field id="metaKeyword" name="metaKeyword" component="input" type="text" className="form-control metaField" style={{width: '100%'}} />
+                        <Field name="metaKeyword" component="input" type="text" className="form-control metaField" style={{width: '100%'}} />
                         <span className="help-block"><b>News keywords </b><a>(?)</a></span>
                       </div>
                     </div>
@@ -828,19 +820,19 @@ let NewContentType = React.createClass({
                       <div>
                       <div className="form-group">
                         <p><b>Parent</b></p>
-                        <select id="parentPage" style={{width: 250}}>
+                        <Field id="parentPage" name="parentPage" component="select" style={{widht: 250}}>
                           {this.props.pageList}
-                        </select>
+                        </Field>
                       </div>
                       <div className="form-group">
                         <p><b>Page  Template</b></p>
-                        <select id="pageTemplate" className="metaField" style={{width: 250}} defaultValue={templates?templates[0].item:null}>
+                        <Field name="pageTemplate" component="select" className="metaField" style={{width: 250}} defaultValue={templates?templates[0].item:null}>
                         { templates ?
                           templates.map(function(item, index){
                             return (<option key={item.id}>{item.name}</option>)
                           }) : ""
                         }
-                        </select>
+                        </Field>
                       </div>
                       <div className="form-group">
                         <p><b>Order</b></p>

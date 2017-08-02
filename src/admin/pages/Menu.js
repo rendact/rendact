@@ -215,7 +215,7 @@ var Menu = React.createClass({
     panelList.sortable({
         group: 'nested',
         handle: '.box-header',
-        pullPlaceholder: false,
+        pullPlaceholder: true,
         // animation on drop
         onDrop: function  ($item, container, _super) {
           var $clonedItem = $('<li/>').css({height: 0});
