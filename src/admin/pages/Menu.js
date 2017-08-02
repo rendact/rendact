@@ -36,6 +36,10 @@ const MenuPanel = (props) => {
             <i htmlFor="typeValue" >Type</i>
             <input type="text" name="type" defaultValue={props.itemData.type} id="typeValue" className="form-control" readOnly={true}/>
           </div>
+          <div className="form-group">
+            <i htmlFor="targetValue" >Target</i>
+            <input type="text" name="target" defaultValue={props.itemData.target} id="targetValue" className="form-control" readOnly={true}/>
+          </div>
           <div className="col-md-6">
             <button type="button" value={props.itemData.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.itemData.title} onClick={props.onRemovePanel}>Remove</button>
           </div>
@@ -76,6 +80,7 @@ var Menu = React.createClass({
         treeData: [],
         itemsChecked: false,
         type: "",
+        target: "",
         tooltip: "",
         urlData: {},
         position: false
@@ -153,7 +158,7 @@ var Menu = React.createClass({
     event.preventDefault();
     var _treeData = this.state.treeData;
     var url = this.state.urlData;
-    var _url = [{title: url.title, url: url.url, tooltip: "", type: "url", id: uuid()}];
+    var _url = [{title: url.title, url: url.url, tooltip: "", type: "url", id: uuid(), target: "url"}];
     var treeData = [];
     if (_treeData===null) {
       treeData = _url;
@@ -170,7 +175,8 @@ var Menu = React.createClass({
       return item.checked
     });
     var menuValues = [];
-    menuValues = _.map(menuFiltered, function(item){return {title: item.value.split("-")[0], tooltip: "", type: item.value.split("-")[1], id: uuid()}});
+    menuValues = _.map(menuFiltered, function(item){return {title: item.value.split("-")[0], tooltip: "", type: item.value.split("-")[1], 
+      id: uuid(), target: "http://localhost:3000/"+item.value.split("-")[1]+"/"+item.id}});
     var treeData = [];
     if (_treeData===null) {
       treeData = menuValues;
@@ -304,56 +310,47 @@ var Menu = React.createClass({
       let treeData = document.querySelectorAll("#draggablePanelList > li")
       treeData = _.map(treeData, td => {
         let data;
+        let target = td.getAttribute('target');
         let id = td.id;
         let type = td.type;
         let tooltip = td.querySelector("#tooltipValue").value;
         let title = td.querySelector("#name").value;
 
-
-        
-
         let children = td.querySelectorAll("li")
         children = _.map(children, c => {
         let data;
+        let target = c.getAttribute('target');
         let id = c.id;
         let type = c.type;
-        let tooltip = c.querySelector("#tooltipValue").value
-        let title = c.querySelector("#name").value
-
+        let tooltip = c.querySelector("#tooltipValue").value;
+        let title = c.querySelector("#name").value;
           data = {
+            target: target,
             id: id,
             type: type,
             tooltip: tooltip,
             title: title
           }
-
           if (c.type === "url") {
             let url = c.querySelector("#urlValue");
             data.url = url
           }
-
           return data
-          
         });
-
-
         data = {
           id: id,
           type: type,
+          target: target,
           tooltip: tooltip,
           title: title,
           children: children
         }
-
         if (type === "url") {
           let url = td.querySelector("#urlValue").value;
           data.url = url;
         }
-
         return data
-          
       });
-
       let menuId = this.state.menuId;
       let qry = Query.updateMenu(menuId, name, treeData, positionValues);
       this.disableForm(true);
@@ -390,7 +387,6 @@ var Menu = React.createClass({
             _.filter(document.getElementsByName("menuSelect"), function(item){
             return item.selectedIndex = "1"
             });
-            debugger;
           }
         }
       );
@@ -420,7 +416,7 @@ var Menu = React.createClass({
             var allPageList = [];
             _.forEach(body.data.viewer.allPosts.edges, function(item){
               allPageList.push((<div key={item.node.id}><input className="pageMenu" id={item.node.id}
-              name="itemsChecked[]" type="checkbox" value={item.node.title+"-Page"} /> {item.node.title}</div>));
+              name="itemsChecked[]" type="checkbox" value={item.node.title+"-page"} /> {item.node.title}</div>));
             })
             me.setState({allPageList: allPageList});
           }
@@ -432,7 +428,7 @@ var Menu = React.createClass({
             var allPostList = [];
             _.forEach(body.data.viewer.allPosts.edges, function(item){
               allPostList.push((<div key={item.node.id}><input id={item.node.id}
-              name="itemsChecked[]" type="checkbox" value={item.node.title+"-Post"} /> {item.node.title}</div>));
+              name="itemsChecked[]" type="checkbox" value={item.node.title+"-post"} /> {item.node.title}</div>));
             })
             me.setState({allPostList: allPostList});
           }
@@ -444,7 +440,7 @@ var Menu = React.createClass({
             var categoryList = [];
             _.forEach(body.data.viewer.allCategories.edges, function(item){
               categoryList.push((<div key={item.node.id}><input id={item.node.id}
-              name="itemsChecked[]" type="checkbox" value={item.node.name+"-Category"} /> {item.node.name}</div>));
+              name="itemsChecked[]" type="checkbox" value={item.node.name+"-category"} /> {item.node.name}</div>));
             })
             me.setState({categoryList: categoryList});
           }
@@ -659,7 +655,7 @@ var Menu = React.createClass({
                               this.state.treeData.map(function(item, index){
                                 if(item.type==="url"){
                                 return (
-                                  <li key={item.id} id={item.id} title={item.title} type={item.type} name="panel">
+                                  <li key={item.id} id={item.id} title={item.title} type={item.type} target={item.target} name="panel">
                                     <MenuPanel itemData={item} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
@@ -674,7 +670,7 @@ var Menu = React.createClass({
                                 )}
                                 if(item.type!=="url"){
                                 return (
-                                  <li key={item.id} id={item.id} title={item.title} type={item.type} name="panel">
+                                  <li key={item.id} id={item.id} title={item.title} type={item.type} target={item.target} name="panel">
                                     <MenuPanel itemData={item} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
