@@ -21,7 +21,7 @@ export class Menu extends React.Component{
     }
 
     return <ul className="cl-effec-16">
-      {this.props.menuItems.map((item, index) => {
+      {this.props.menuItems && this.props.menuItems.map((item, index) => {
         if (item.children[0]) {
           return (
             <li key={index} className="dropdown">
