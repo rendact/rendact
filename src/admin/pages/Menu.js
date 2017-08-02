@@ -9,37 +9,45 @@ import {swalert, riques, errorCallback, setValue, getValue, disableForm, default
 
 const MenuPanel = (props) => {
   return (
-    <div id={props.title} className="box collapsed-box">
+    <div id={props.itemData.id} className="box collapsed-box">
       <div className="box-header with-border">
-        <h3 className="box-title">{props.title}</h3>
+        <h3 className="box-title">{props.itemData.title}</h3>
         <div className="box-tools pull-right">
-          <button type="button" className="btn btn-box-tool" data-widget="collapse"><i id={"icon-"+props.title} className="fa fa-plus"></i>
+          <button type="button" className="btn btn-box-tool" data-widget="collapse"><i id={"icon-"+props.itemData.title} className="fa fa-plus"></i>
           </button>
         </div>
       </div>
         <div className="box-body" style={{display: "none"}}>
           <div className="form-group">
             <i htmlFor="name" >Label</i>
-            <input type="text" name="name" id="name" className="form-control" required="true" defaultValue={props.title}/>
+            <input type="text" name="name" id="name" className="form-control" required="true" defaultValue={props.itemData.title}/>
           </div>
           <div className="form-group">
             <i htmlFor="name" >Tooltip</i>
-            <input type="text" name="tooltipValue" defaultValue={props.tooltip} id="tooltipValue" className="form-control" />
+            <input type="text" name="tooltipValue" defaultValue={props.itemData.tooltip} id="tooltipValue" className="form-control" />
           </div>
-          { props.type==="url" &&
+          { props.itemData.type==="url" &&
           <div className="form-group">
             <i htmlFor="name" >URL</i>
-            <input type="text" name="name" id="name" className="form-control" defaultValue={props.type}/>
+            <input type="text" name="urlValue" id="urlValue" className="form-control" defaultValue={props.itemData.url}/>
           </div>
           }
+          <div className="form-group">
+            <i htmlFor="typeValue" >Type</i>
+            <input type="text" name="type" defaultValue={props.itemData.type} id="typeValue" className="form-control" readOnly={true}/>
+          </div>
+          <div className="form-group">
+            <i htmlFor="targetValue" >Target</i>
+            <input type="text" name="target" defaultValue={props.itemData.target} id="targetValue" className="form-control" readOnly={true}/>
+          </div>
           <div className="col-md-6">
-            <button type="button" value={props.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.title} onClick={props.onRemovePanel}>Remove</button>
+            <button type="button" value={props.itemData.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.itemData.id} onClick={props.onRemovePanel}>Remove</button>
           </div>
           <div className="col-md-6">
             <button type="button" 
               className="btn btn-flat btn-default btn-xs pull-right" 
               data-widget="collapse" 
-              onClick={(e)=>{document.getElementById("icon-"+props.title).className="fa fa-plus"}} >Cancel</button>
+              onClick={(e)=>{document.getElementById("icon-"+props.itemData.title).className="fa fa-plus"}} >Cancel</button>
           </div>
         </div>
     </div>
@@ -53,13 +61,13 @@ var Menu = React.createClass({
         name:"",
         selectedMenuName:"",
         newMenuName:"",
-        urlMenu: "",
         menuId:"",
         tagId:"",
         dt: null,
         errorMsg: null,
         loadingMsg: null,
-        deleteMode: false,activeStatus: "All",
+        deleteMode: false,
+        activeStatus: "All",
         pageList: null,
         allPageList: null,
         allPostList: null,
@@ -72,7 +80,9 @@ var Menu = React.createClass({
         treeData: [],
         itemsChecked: false,
         type: "",
+        target: "",
         tooltip: "",
+        urlData: {},
         position: false
       }
   },
@@ -104,7 +114,7 @@ var Menu = React.createClass({
     var menuId = event.target.value.split("-")[0];
     var selectedMenuName = event.target.value.split("-")[1];
     setValue("selectedMenuName", selectedMenuName);
-    this.setState({menuId:menuId});
+    this.setState({menuId:menuId, treeData:[]});
     var me = this;
     var qry = Query.getMenuQry(menuId);
     me.disableForm(true);
@@ -126,15 +136,29 @@ var Menu = React.createClass({
     );
 
   },
-  handleUrl: function(event){
-    var urlMenu = getValue("urlMenu");
-    this.setState({urlMenu: urlMenu})
+
+  handleCustomUrlTitle(e){
+    this.setState(prevState => {
+      let urlTitle = getValue("urlTitle");
+      let url = prevState.urlData;
+      url.title = urlTitle
+      return {url: url}
+    });
+  },
+
+  handleCustomUrlUrl: function(event){
+    this.setState(prevState => {
+      let urlUrl = getValue("urlUrl");
+      let url = prevState.urlData;
+      url.url = urlUrl
+      return {url: url}
+    });
   },
   handleUrlSubmit: function(event){
     event.preventDefault();
     var _treeData = this.state.treeData;
-    var url = getValue("urlMenu");
-    var _url = [{title: url, tooltip: "", type: "url", id: uuid()}];
+    var url = this.state.urlData;
+    var _url = [{title: url.title, url: url.url, tooltip: "", type: "url", id: uuid(), target: "url"}];
     var treeData = [];
     if (_treeData===null) {
       treeData = _url;
@@ -151,7 +175,8 @@ var Menu = React.createClass({
       return item.checked
     });
     var menuValues = [];
-    menuValues = _.map(menuFiltered, function(item){return {title: item.value.split("-")[0], tooltip: "", type: item.value.split("-")[1], id: uuid()}});
+    menuValues = _.map(menuFiltered, function(item){return {title: item.value.split("-")[0], tooltip: "", type: item.value.split("-")[1], 
+      id: uuid(), target: "http://localhost:3000/"+item.value.split("-")[1]+"/"+item.id}});
     var treeData = [];
     if (_treeData===null) {
       treeData = menuValues;
@@ -162,11 +187,22 @@ var Menu = React.createClass({
 
     this.resetFormCheckbox();
   },
+
   removePanel: function(e){
-    var _tree_Data = this.state.treeData;
     var panelRemoved = e.target.id;
-    this.setState({treeData: _.dropWhile(this.state.treeData, {title: panelRemoved})});
+    swalert("warning", "Are you sure want to delete this menu", "", () => {
+      var _treeData = this.state.treeData;
+      _treeData = _.filter(_treeData, data => {
+        if (data.children) {
+          data.children = _.filter(data.children, child => (child.id !== panelRemoved));
+        }
+        return data.id !== panelRemoved
+      });
+      this.setState({treeData: _treeData});
+    });
   },
+
+
   handleNewMenuChange: function(event){
     var newMenuName = getValue("newMenuName");
     this.setState({newMenuName: newMenuName})
@@ -194,6 +230,7 @@ var Menu = React.createClass({
                   autoDismiss: 2
           });
           me.resetFormNewMenu();
+          me.setState({treeData:[]});
           var here = me;
           var cb = function(){here.disableForm(false)}
           me.componentWillMount("All", cb);
@@ -254,7 +291,6 @@ var Menu = React.createClass({
           if (!error) {
             var mainMenu = _.forEach(body.data.viewer.allMenus.edges, function(item){ return item })
             let IdMainMenu = _.map(mainMenu, function(item){return  item.node.id });
-            //debugger;
             me.setState({IdMainMenu: IdMainMenu});
           }
         }
@@ -278,37 +314,54 @@ var Menu = React.createClass({
       if (positionValues==="Main Menu") {
         riques(Query.updateMainMenu(IdMainMenu), 
           function(error, response, body) {
-            debugger;
           }
         );
       }
 
-
       let treeData = document.querySelectorAll("#draggablePanelList > li")
       treeData = _.map(treeData, td => {
-          let id = td.id;
-          let type = td.type;
-          let tooltip = td.querySelector("#tooltipValue").value;
-          let title = td.querySelector("#name").value;
+        let data;
+        let target = td.getAttribute('target');
+        let id = td.id;
+        let type = td.type;
+        let tooltip = td.querySelector("#tooltipValue").value;
+        let title = td.querySelector("#name").value;
 
-          let children = td.querySelectorAll("li")
-          children = _.map(children, c => ({
-              id: c.id,
-              type: c.type,
-              tooltip: c.querySelector("#tooltipValue").value,
-              title: c.querySelector("#name").value
-          }));
-
-
-          return {
-              id: id,
-              type: type,
-              tooltip: tooltip,
-              title: title,
-              children: children
+        let children = td.querySelectorAll("li")
+        children = _.map(children, c => {
+        let data;
+        let target = c.getAttribute('target');
+        let id = c.id;
+        let type = c.type;
+        let tooltip = c.querySelector("#tooltipValue").value;
+        let title = c.querySelector("#name").value;
+          data = {
+            target: target,
+            id: id,
+            type: type,
+            tooltip: tooltip,
+            title: title
           }
+          if (c.type === "url") {
+            let url = c.querySelector("#urlValue");
+            data.url = url
+          }
+          return data
+        });
+        data = {
+          id: id,
+          type: type,
+          target: target,
+          tooltip: tooltip,
+          title: title,
+          children: children
+        }
+        if (type === "url") {
+          let url = td.querySelector("#urlValue").value;
+          data.url = url;
+        }
+        return data
       });
-
       let menuId = this.state.menuId;
       let qry = Query.updateMenu(menuId, name, treeData, positionValues);
       this.disableForm(true);
@@ -352,22 +405,7 @@ var Menu = React.createClass({
     var newMenuName = getValue("newMenuName");
     var selectedMenuName = newMenuName;
     setValue("selectedMenuName", selectedMenuName);
-    this.setState({menuId:menuId, treeData:[]});
-    var qry = Query.getMenuQry(menuId);
-        me.disableForm(true);
-    riques(qry, 
-      function(error, response, body) {
-        if (!error && !body.errors && response.statusCode === 200) {
-          var items = [];
-          items = body.data.getMenu.items;
-          me.setState({treeData: items});
-          me.disableForm(false);
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-        me.disableForm(false);
-      }
-    );
+    this.setState({menuId:menuId});
     document.getElementById("menu").reset();
   },
   componentWillMount: function(){
@@ -389,7 +427,7 @@ var Menu = React.createClass({
             var allPageList = [];
             _.forEach(body.data.viewer.allPosts.edges, function(item){
               allPageList.push((<div key={item.node.id}><input className="pageMenu" id={item.node.id}
-              name="itemsChecked[]" type="checkbox" value={item.node.title+"-Page"} /> {item.node.title}</div>));
+              name="itemsChecked[]" type="checkbox" value={item.node.title+"-page"} /> {item.node.title}</div>));
             })
             me.setState({allPageList: allPageList});
           }
@@ -401,7 +439,7 @@ var Menu = React.createClass({
             var allPostList = [];
             _.forEach(body.data.viewer.allPosts.edges, function(item){
               allPostList.push((<div key={item.node.id}><input id={item.node.id}
-              name="itemsChecked[]" type="checkbox" value={item.node.title+"-Post"} /> {item.node.title}</div>));
+              name="itemsChecked[]" type="checkbox" value={item.node.title+"-post"} /> {item.node.title}</div>));
             })
             me.setState({allPostList: allPostList});
           }
@@ -413,7 +451,7 @@ var Menu = React.createClass({
             var categoryList = [];
             _.forEach(body.data.viewer.allCategories.edges, function(item){
               categoryList.push((<div key={item.node.id}><input id={item.node.id}
-              name="itemsChecked[]" type="checkbox" value={item.node.name+"-Category"} /> {item.node.name}</div>));
+              name="itemsChecked[]" type="checkbox" value={item.node.name+"-category"} /> {item.node.name}</div>));
             })
             me.setState({categoryList: categoryList});
           }
@@ -479,7 +517,7 @@ var Menu = React.createClass({
                 <div className="box-header with-border">
                   <h3 className="box-title">Pages</h3>
                   <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+                      <button type="button" className="btn btn-box-tool" disabled={this.state.newMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
                       </button>
                   </div>
                 </div>
@@ -498,7 +536,7 @@ var Menu = React.createClass({
                 <div className="box-header with-border">
                   <h3 className="box-title">Posts</h3>
                   <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+                      <button type="button" className="btn btn-box-tool" disabled={this.state.newMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
                       </button>
                   </div>
                 </div>
@@ -513,36 +551,51 @@ var Menu = React.createClass({
                     </div>
                 </div>
               </div>
+
+
               <div className="box box-default collapsed-box box-solid">
                 <div className="box-header with-border">
                   <h3 className="box-title">Custom Links</h3>
                   <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+                      <button type="button" className="btn btn-box-tool" disabled={this.state.newMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
                       </button>
                   </div>
                 </div>
                 <div className="box-body pad">
                   <form onSubmit={this.handleUrlSubmit} id="urlSabmit" method="get">
+
+                    <div className="row">
+                      <div className="col-md-3">
+                        <h5>TITLE</h5>
+                      </div>
+                      <div className="col-md-9">
+                        <input type="text" name="urlTitle" id="urlTitle" className="form-control" onChange={this.handleCustomUrlTitle}/>
+                      </div>
+                    </div>
+
                     <div className="row">
                       <div className="col-md-3">
                         <h5>URL</h5>
                       </div>
                       <div className="col-md-9">
-                        <input type="text" name="urlMenu" id="urlMenu" className="form-control" onChange={this.handleUrl}/>
+                        <input type="text" name="urlUrl" id="urlUrl" className="form-control" onChange={this.handleCustomUrlUrl}/>
                       </div>
                     </div>
+
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
                     <div className="box-tools pull-right">
-                      <button type="submit" id="submit" disabled={this.state.urlMenu===""} className="btn btn-flat btn-default">Add to Menu</button>
+                      <button type="submit" id="submit" disabled={this.state.urlData.url===""} className="btn btn-flat btn-default">Add to Menu</button>
                     </div>
                   </form>
                 </div>
               </div>  
+
+
               <div className="box box-default collapsed-box box-solid">
                 <div className="box-header with-border">
                   <h3 className="box-title">Categories</h3>
                   <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+                      <button type="button" className="btn btn-box-tool" disabled={this.state.newMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
                       </button>
                   </div>
                 </div>
@@ -594,7 +647,7 @@ var Menu = React.createClass({
                       </div>
                       <div className="col-md-3">
                         <div className="box-tools pull-right">
-                          <button type="submit" id="submit" name="submit" className="btn btn-flat btn-primary" >Update Menu</button>
+                          <button type="submit" id="submit" name="submit" disabled={this.state.newMenuName===""} className="btn btn-flat btn-primary" >Update Menu</button>
                         </div>
                       </div>
                     </div>
@@ -613,13 +666,13 @@ var Menu = React.createClass({
                               this.state.treeData.map(function(item, index){
                                 if(item.type==="url"){
                                 return (
-                                  <li key={item.id} id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} name="panel">
-                                    <MenuPanel  id={item.id} title={item.title} type={item.type} tooltip={item.tooltip}  onRemovePanel={me.removePanel} />
+                                  <li key={item.id} id={item.id} title={item.title} type={item.type} target={item.target} name="panel">
+                                    <MenuPanel itemData={item} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li key={child.id} id={child.id}>
-                                          <MenuPanel id={child.id} title={child.title} type={child.type} tooltip={item.tooltip}  onRemovePanel={me.removePanel} />
+                                        <li key={child.id} id={child.id} title={child.title}>
+                                          <MenuPanel itemData={child} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
                                     })}
@@ -628,13 +681,13 @@ var Menu = React.createClass({
                                 )}
                                 if(item.type!=="url"){
                                 return (
-                                  <li key={item.id} id={item.id} title={item.title} tooltip={item.tooltip} type={item.type} name="panel">
-                                    <MenuPanel id={item.id} title={item.title} type={item.type} tooltip={item.tooltip}  onRemovePanel={me.removePanel} />
+                                  <li key={item.id} id={item.id} title={item.title} type={item.type} target={item.target} name="panel">
+                                    <MenuPanel itemData={item} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li key={child.id} id={child.id}>
-                                          <MenuPanel title={child.title} type={child.type} tooltip={item.tooltip}  onRemovePanel={me.removePanel} />
+                                        <li key={child.id} id={child.id} title={child.title}>
+                                          <MenuPanel itemData={child} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
                                     })}
@@ -668,9 +721,8 @@ var Menu = React.createClass({
 
                   </section>
                 </div>
-              </form>
-              <div className="box-header with-border attachment-block clearfix">
-                <button className="btn btn-flat btn-danger pull-right" id="deleteBtn" data-target="menuName" onClick={this.handleDelete}>Delete Menu</button>
+              </form> <div className="box-header with-border attachment-block clearfix">
+                <button className="btn btn-flat btn-danger pull-right" id="deleteBtn" disabled={this.state.newMenuName===""} data-target="menuName" onClick={this.handleDelete}>Delete Menu</button>
               </div>
               </div>
             </div>
