@@ -192,7 +192,12 @@ var Menu = React.createClass({
     var panelRemoved = e.target.id;
     swalert("warning", "Are you sure want to delete this menu", "", () => {
       var _treeData = this.state.treeData;
-      _treeData = _.filter(_treeData, data => (data.id !== panelRemoved));
+      _treeData = _.filter(_treeData, data => {
+        if (data.children) {
+          data.children = _.filter(data.children, child => (child.id !== panelRemoved));
+        }
+        return data.id !== panelRemoved
+      });
       this.setState({treeData: _treeData});
     });
   },
