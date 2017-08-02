@@ -41,7 +41,7 @@ const MenuPanel = (props) => {
             <input type="text" name="target" defaultValue={props.itemData.target} id="targetValue" className="form-control" readOnly={true}/>
           </div>
           <div className="col-md-6">
-            <button type="button" value={props.itemData.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.itemData.title} onClick={props.onRemovePanel}>Remove</button>
+            <button type="button" value={props.itemData.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.itemData.id} onClick={props.onRemovePanel}>Remove</button>
           </div>
           <div className="col-md-6">
             <button type="button" 
@@ -61,13 +61,13 @@ var Menu = React.createClass({
         name:"",
         selectedMenuName:"",
         newMenuName:"",
-        urlMenu: "",
         menuId:"",
         tagId:"",
         dt: null,
         errorMsg: null,
         loadingMsg: null,
-        deleteMode: false,activeStatus: "All",
+        deleteMode: false,
+        activeStatus: "All",
         pageList: null,
         allPageList: null,
         allPostList: null,
@@ -187,11 +187,17 @@ var Menu = React.createClass({
 
     this.resetFormCheckbox();
   },
+
   removePanel: function(e){
-    var _tree_Data = this.state.treeData;
     var panelRemoved = e.target.id;
-    this.setState({treeData: _.dropWhile(this.state.treeData, {title: panelRemoved})});
+    swalert("warning", "Are you sure want to delete this menu", "", () => {
+      var _treeData = this.state.treeData;
+      _treeData = _.filter(_treeData, data => (data.id !== panelRemoved));
+      this.setState({treeData: _treeData});
+    });
   },
+
+
   handleNewMenuChange: function(event){
     var newMenuName = getValue("newMenuName");
     this.setState({newMenuName: newMenuName})
@@ -573,7 +579,7 @@ var Menu = React.createClass({
 
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
                     <div className="box-tools pull-right">
-                      <button type="submit" id="submit" disabled={this.state.urlMenu===""} className="btn btn-flat btn-default">Add to Menu</button>
+                      <button type="submit" id="submit" disabled={this.state.urlData.url===""} className="btn btn-flat btn-default">Add to Menu</button>
                     </div>
                   </form>
                 </div>
