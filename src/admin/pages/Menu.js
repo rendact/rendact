@@ -642,7 +642,7 @@ var Menu = React.createClass({
                       </div>
                       <div className="col-md-3">
                         <div className="box-tools pull-right">
-                          <button type="submit" id="submit" name="submit" className="btn btn-flat btn-primary" >Update Menu</button>
+                          <button type="submit" id="submit" name="submit" disabled={this.state.newMenuName===""} className="btn btn-flat btn-primary" >Update Menu</button>
                         </div>
                       </div>
                     </div>
@@ -717,7 +717,7 @@ var Menu = React.createClass({
                   </section>
                 </div>
               </form> <div className="box-header with-border attachment-block clearfix">
-                <button className="btn btn-flat btn-danger pull-right" id="deleteBtn" data-target="menuName" onClick={this.handleDelete}>Delete Menu</button>
+                <button className="btn btn-flat btn-danger pull-right" id="deleteBtn" disabled={this.state.newMenuName===""} data-target="menuName" onClick={this.handleDelete}>Delete Menu</button>
               </div>
               </div>
             </div>
