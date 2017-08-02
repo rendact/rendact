@@ -36,10 +36,7 @@ const MenuPanel = (props) => {
             <i htmlFor="typeValue" >Type</i>
             <input type="text" name="type" defaultValue={props.itemData.type} id="typeValue" className="form-control" readOnly={true}/>
           </div>
-          <div className="form-group">
-            <i htmlFor="targetValue" >Target</i>
-            <input type="text" name="target" defaultValue={props.itemData.target} id="targetValue" className="form-control" readOnly={true}/>
-          </div>
+          
           <div className="col-md-6">
             <button type="button" value={props.itemData.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.itemData.id} onClick={props.onRemovePanel}>Remove</button>
           </div>
