@@ -134,7 +134,19 @@ const updateMenu = function(menuId, name, menuSortableTree, positionValues){
 
 const getMainMenu = {
   "query": 
-      'query getMenus{viewer {allMenus(where: {position: {eq: "Main Menu"}}) { edges { node { id,name}}}}}'
+    `query getMenus{
+      viewer {
+        allMenus(where: {position: {eq: "Main Menu"}}) { 
+          edges {
+            node { 
+              id,
+              name, 
+              items
+              }
+            }
+          }
+        }
+    }`
 }
 
 const queries = {

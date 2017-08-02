@@ -75,17 +75,24 @@ export class ThemeHome extends React.Component {
 			postPerPage: 5,
 			pageCount: 1,
 			activePage: 1,
-			isNoConnection: false
+			isNoConnection: false,
+      mainMenu: null
 		};
     this.handlePostClick = this.handlePostClick.bind(this);
-    this.goHome = this.goHome.bind(this);
+    this.theMenu = this.theMenu.bind(this);
     this.thePagination = this.thePagination.bind(this);
+    this.loadMainMenu = this.loadMainMenu.bind(this);
 	}
 
-	goHome(e) {
-		e.preventDefault();
-		this._reactInternalInstance._context.history.push('/')
-	}
+  loadMainMenu(){
+    riques(Query.getMainMenu, 
+      (error, response, body) => {
+        if (!error && !body.errors && response.statusCode === 200){
+          let allMenus = body.data.viewer.allMenus.edges[0];
+          this.setState({mainMenu: allMenus ? allMenus.node : []})
+        }
+      })
+  }
 
 	handlePostClick(e){
 		e.preventDefault();
@@ -106,7 +113,8 @@ export class ThemeHome extends React.Component {
 	}
 
 	theMenu(){
-    return <Menu goHome={this.goHome}/>
+    let items = this.state.mainMenu
+    return <Menu menuItems={items.items?items.items:[]}/>
 	}
 
 	theLogo(){
@@ -156,6 +164,9 @@ export class ThemeHome extends React.Component {
 
 	componentWillMount(){
 		var me = this;
+
+    this.loadMainMenu();
+
 		loadConfig(function(){
 			var config = JSON.parse(localStorage.getItem('config'));
 			me.setState({config: config});
