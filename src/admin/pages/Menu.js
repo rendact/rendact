@@ -37,7 +37,7 @@ const MenuPanel = (props) => {
             <input type="text" name="type" defaultValue={props.itemData.type} id="typeValue" className="form-control" readOnly={true}/>
           </div>
           <div className="col-md-6">
-            <button type="button" value={props.itemData.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.itemData.title} onClick={props.onRemovePanel}>Remove</button>
+            <button type="button" value={props.itemData.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.itemData.id} onClick={props.onRemovePanel}>Remove</button>
           </div>
           <div className="col-md-6">
             <button type="button" 
@@ -181,11 +181,17 @@ var Menu = React.createClass({
 
     this.resetFormCheckbox();
   },
+
   removePanel: function(e){
-    var _tree_Data = this.state.treeData;
     var panelRemoved = e.target.id;
-    this.setState({treeData: _.dropWhile(this.state.treeData, {title: panelRemoved})});
+    swalert("warning", "Are you sure want to delete this menu", "", () => {
+      var _treeData = this.state.treeData;
+      _treeData = _.filter(_treeData, data => (data.id !== panelRemoved));
+      this.setState({treeData: _treeData});
+    });
   },
+
+
   handleNewMenuChange: function(event){
     var newMenuName = getValue("newMenuName");
     this.setState({newMenuName: newMenuName})
