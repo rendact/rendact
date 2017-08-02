@@ -1,7 +1,5 @@
 import React from 'react';
 import {Link} from 'react-router';
-import Query from '../admin/query';
-import {riques, errorCallback} from '../utils';
 
 const LinkMenu = (props) => {
     var item = props.item
@@ -60,7 +58,6 @@ const MenuComponent = (props) => {
     ))
     
     return <ul className="cl-effect-16">
-        <li><a className="active" href="#" onClick={props.goHome}>Home</a></li>
         { menuItems }
     </ul>
 }
@@ -74,25 +71,9 @@ export class Menu extends React.Component{
         }
     }
 
-    componentWillMount (){
-        var me = this;
-
-        riques(Query.getMenuQry('TWVudToxMzA='),
-            (error, response, body) => {
-                if (!error & !body.errors && response.statusCode === 200){
-                    var menuItems = body.data.getMenu.items;
-                    me.setState({menuItems: menuItems});
-                } else {
-                    errorCallback(error, body.errors?body.errors[0].message:null);
-                }
-                me.setState({loadDone: true});
-            }
-        );
-    }
-
 
     render (){
-        return <MenuComponent goHome={this.props.goHome} menuItems={this.state.menuItems} />
+        return <MenuComponent goHome={this.props.goHome} menuItems={this.props.menuItems} />
     }
 
 }
