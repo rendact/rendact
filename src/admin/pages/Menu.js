@@ -176,7 +176,7 @@ var Menu = React.createClass({
     });
     var menuValues = [];
     menuValues = _.map(menuFiltered, function(item){return {title: item.value.split("-")[0], tooltip: "", type: item.value.split("-")[1], 
-      id: uuid(), target: "http://localhost:3000/"+item.value.split("-")[1]+"/"+item.id}});
+      id: uuid(), target: item.id}});
     var treeData = [];
     if (_treeData===null) {
       treeData = menuValues;
