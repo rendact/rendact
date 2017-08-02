@@ -719,7 +719,9 @@ var Menu = React.createClass({
                   </section>
                 </div>
               </form> <div className="box-header with-border attachment-block clearfix">
-                <button className="btn btn-flat btn-danger pull-right" id="deleteBtn" disabled={this.state.newMenuName===""} data-target="menuName" onClick={this.handleDelete}>Delete Menu</button>
+              <div onClick={this.handleDelete}>
+                <button className="btn btn-flat btn-danger pull-right" id="deleteBtn" disabled={this.state.newMenuName===""} data-target="menuName">Delete Menu</button>
+              </div>
               </div>
               </div>
             </div>
