@@ -512,7 +512,7 @@ var Menu = React.createClass({
                 <div className="box-header with-border">
                   <h3 className="box-title">Pages</h3>
                   <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+                      <button type="button" className="btn btn-box-tool" disabled={this.state.newMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
                       </button>
                   </div>
                 </div>
@@ -531,7 +531,7 @@ var Menu = React.createClass({
                 <div className="box-header with-border">
                   <h3 className="box-title">Posts</h3>
                   <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+                      <button type="button" className="btn btn-box-tool" disabled={this.state.newMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
                       </button>
                   </div>
                 </div>
@@ -552,7 +552,7 @@ var Menu = React.createClass({
                 <div className="box-header with-border">
                   <h3 className="box-title">Custom Links</h3>
                   <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+                      <button type="button" className="btn btn-box-tool" disabled={this.state.newMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
                       </button>
                   </div>
                 </div>
@@ -590,7 +590,7 @@ var Menu = React.createClass({
                 <div className="box-header with-border">
                   <h3 className="box-title">Categories</h3>
                   <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-plus"></i>
+                      <button type="button" className="btn btn-box-tool" disabled={this.state.newMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
                       </button>
                   </div>
                 </div>
