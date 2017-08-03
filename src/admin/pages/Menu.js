@@ -13,6 +13,9 @@ const MenuPanel = (props) => {
       <div className="box-header with-border">
         <h3 className="box-title">{props.itemData.title}</h3>
         <div className="box-tools pull-right">
+          <span className="label label-default" id="typeValue">
+            {props.itemData.type}
+          </span>
           <button type="button" className="btn btn-box-tool" data-widget="collapse"><i id={"icon-"+props.itemData.title} className="fa fa-plus"></i>
           </button>
         </div>
