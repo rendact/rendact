@@ -11,24 +11,24 @@ const MenuPanel = (props) => {
   return (
     <div id={props.itemData.id} className="box collapsed-box">
       <div className="box-header with-border">
-        <h3 className="box-title" style={{paddingRight: 50}}>{props.itemData.title}</h3>
+        <h3 className="box-title" style={{paddingRight: 50}}>{props.itemData.titlePanel}</h3>
         <div className="box-tools pull-right">
           <span className="label label-default" id="typeValue">
             {props.itemData.type}
           </span>
-          <button type="button" className="btn btn-box-tool" data-widget="collapse"><i id={"icon-"+props.itemData.title} className="fa fa-plus"></i>
+          <button type="button" className="btn btn-box-tool" data-widget="collapse"><i id={"icon-"+props.itemData.titlePanel} className="fa fa-plus"></i>
           </button>
         </div>
       </div>
         <div className="box-body" style={{display: "none"}}>
 
           <div style={{margin: "15px 0", border: "solid 1px #ccc", padding: "10px 5px"}}>
-            <em>Original</em> : <a className="card-link" href={props.itemData.type === "url"? props.itemData.target : "/" + props.itemData.type + "/" + props.itemData.target}> {props.itemData.title} </a>
+            <em>Original</em> : <a className="card-link" href={props.itemData.type === "url"? props.itemData.target : "/" + props.itemData.type + "/" + props.itemData.target}> {props.itemData.titlePanel} </a>
           </div>
 
           <div className="form-group">
             <i htmlFor="name" >Label</i>
-            <input type="text" name="name" id="name" className="form-control" required="true" defaultValue={props.itemData.title}/>
+            <input type="text" name="name" id="name" className="form-control" required="true" defaultValue={props.itemData.titlePanel}/>
           </div>
           <div className="form-group">
             <i htmlFor="name" >Tooltip</i>
@@ -42,13 +42,13 @@ const MenuPanel = (props) => {
           }
           
           <div className="col-md-6">
-            <button type="button" value={props.itemData.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.itemData.id} onClick={props.onRemovePanel}>Remove</button>
+            <button type="button" value={props.itemData.titlePanel} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.itemData.id} onClick={props.onRemovePanel}>Remove</button>
           </div>
           <div className="col-md-6">
             <button type="button" 
               className="btn btn-flat btn-default btn-xs pull-right" 
               data-widget="collapse" 
-              onClick={(e)=>{document.getElementById("icon-"+props.itemData.title).className="fa fa-plus"}} >Cancel</button>
+              onClick={(e)=>{document.getElementById("icon-"+props.itemData.titlePanel).className="fa fa-plus"}} >Cancel</button>
           </div>
         </div>
     </div>
@@ -159,7 +159,7 @@ var Menu = React.createClass({
     event.preventDefault();
     var _treeData = this.state.treeData;
     var url = this.state.urlData;
-    var _url = [{title: url.title, url: url.url, tooltip: "", type: "url", id: uuid(), target: url.url}];
+    var _url = [{titlePanel: url.title, url: url.url, tooltip: "", type: "url", id: uuid(), target: url.url}];
     var treeData = [];
     if (_treeData===null) {
       treeData = _url;
@@ -176,7 +176,7 @@ var Menu = React.createClass({
       return item.checked
     });
     var menuValues = [];
-    menuValues = _.map(menuFiltered, function(item){return {title: item.value.split("-")[0], tooltip: "", type: item.value.split("-")[1], 
+    menuValues = _.map(menuFiltered, function(item){return {titlePanel: item.value.split("-")[0], tooltip: "", type: item.value.split("-")[1], 
       id: uuid(), target: item.id}});
     var treeData = [];
     if (_treeData===null) {
@@ -326,7 +326,7 @@ var Menu = React.createClass({
         let id = td.id;
         let type = td.type;
         let tooltip = td.querySelector("#tooltipValue").value;
-        let title = td.querySelector("#name").value;
+        let titlePanel = td.querySelector("#name").value;
 
         let children = td.querySelectorAll("li")
         children = _.map(children, c => {
@@ -335,13 +335,13 @@ var Menu = React.createClass({
         let id = c.id;
         let type = c.type;
         let tooltip = c.querySelector("#tooltipValue").value;
-        let title = c.querySelector("#name").value;
+        let titlePanel = c.querySelector("#name").value;
           data = {
             target: target,
             id: id,
             type: type,
             tooltip: tooltip,
-            title: title
+            titlePanel: titlePanel
           }
           if (c.type === "url") {
             let url = c.querySelector("#urlValue");
@@ -355,7 +355,7 @@ var Menu = React.createClass({
           type: type,
           target: target,
           tooltip: tooltip,
-          title: title,
+          titlePanel: titlePanel,
           children: children
         }
         if (type === "url") {
@@ -669,12 +669,12 @@ var Menu = React.createClass({
                               this.state.treeData.map(function(item, index){
                                 if(item.type==="url"){
                                 return (
-                                  <li key={item.id} id={item.id} title={item.title} type={item.type} target={item.target} name="panel">
+                                  <li key={item.id} id={item.id} titlePanel={item.titlePanel} type={item.type} target={item.target} name="panel">
                                     <MenuPanel itemData={item} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li key={child.id} id={child.id} title={child.title}>
+                                        <li key={child.id} id={child.id} titlePanel={child.titlePanel}>
                                           <MenuPanel itemData={child} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
@@ -684,12 +684,12 @@ var Menu = React.createClass({
                                 )}
                                 if(item.type!=="url"){
                                 return (
-                                  <li key={item.id} id={item.id} title={item.title} type={item.type} target={item.target} name="panel">
+                                  <li key={item.id} id={item.id} titlePanel={item.titlePanel} type={item.type} target={item.target} name="panel">
                                     <MenuPanel itemData={item} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li key={child.id} id={child.id} title={child.title}>
+                                        <li key={child.id} id={child.id} titlePanel={child.titlePanel}>
                                           <MenuPanel itemData={child} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
