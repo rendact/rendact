@@ -177,6 +177,23 @@ export const getFormData = function(className, output){
   }
 }
 
+export const disableBySelector = (state, selectors) => {
+  /* 
+   * utils to disable all items that match with selectors
+   * selectors = array with css selector inside
+   * state = disabled state, true or false
+   */
+
+    // select all items with selector
+    // each selector, add disabled property === state
+  _.forEach(selectors, (selector, index) => {
+    _.forEach(document.querySelectorAll(selector), (element, index) => {
+      element.disabled = state;
+    });
+
+  });
+}
+
 export const disableForm = function(state, notif, excludeClass){
   //var me = this;
   _.forEach(document.getElementsByTagName('input'), function(el){ if (_.indexOf(excludeClass, el.getAttribute("class"))<0) el.disabled = state;});
