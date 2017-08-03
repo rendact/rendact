@@ -105,7 +105,7 @@ var Menu = React.createClass({
   resetFormDelete: function(){
     document.getElementById("menu").reset();
     document.getElementById("menuName").reset();
-    this.setState({newMenuName:"", selectedMenuName:"", treeData:[]});
+    this.setState({newMenuName:"", selectedMenuName:"", treeData:[], position:""});
     this.handleNameChange();
     this.handleNewMenuChange();
     window.history.pushState("", "", '/admin/menu');
@@ -114,27 +114,31 @@ var Menu = React.createClass({
     this.setState({menu: document.querySelector('#menuSelect').value});
     var menuId = event.target.value.split("-")[0];
     var selectedMenuName = event.target.value.split("-")[1];
-    setValue("selectedMenuName", selectedMenuName);
-    this.setState({menuId:menuId, treeData:[]});
     var me = this;
-    var qry = Query.getMenuQry(menuId);
-    me.disableForm(true);
-    riques(qry, 
-      function(error, response, body) {
-        if (!error && !body.errors && response.statusCode === 200) {
-          var items = [];
-          items = body.data.getMenu.items;
-          if (items)
-          me.setState({treeData: items});
-          var position = body.data.getMenu.position;
-          me.setState({position: position});
+    if (menuId!=="") {
+      setValue("selectedMenuName", selectedMenuName);
+      this.setState({menuId:menuId, treeData:[]});
+      var qry = Query.getMenuQry(menuId);
+      me.disableForm(true);
+      riques(qry, 
+        function(error, response, body) {
+          if (!error && !body.errors && response.statusCode === 200) {
+            var items = [];
+            items = body.data.getMenu.items;
+            if (items)
+            me.setState({treeData: items});
+            var position = body.data.getMenu.position;
+            me.setState({position: position});
+            me.disableForm(false);
+          } else {
+            errorCallback(error, body.errors?body.errors[0].message:null);
+          }
           me.disableForm(false);
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
         }
-        me.disableForm(false);
-      }
-    );
+      );
+    } else if(menuId==="") {
+      me.resetFormDelete();
+    }
 
   },
 
@@ -176,8 +180,8 @@ var Menu = React.createClass({
       return item.checked
     });
     var menuValues = [];
-    menuValues = _.map(menuFiltered, function(item){return {titlePanel: item.value.split("-")[0], tooltip: "", type: item.value.split("-")[1], 
-      id: uuid(), target: item.id}});
+    menuValues = _.map(menuFiltered, function(item){return {titlePanel: item.value.split("-")[0], tooltip: "", 
+      type: item.value.split("-")[1], id: uuid(), target: item.id}});
     var treeData = [];
     if (_treeData===null) {
       treeData = menuValues;
@@ -417,7 +421,7 @@ var Menu = React.createClass({
       riques(Query.getAllMenu, 
         function(error, response, body) {
           if (!error) {
-            var pageList = [(<option key="0" value="">--select menu--</option>)];
+            var pageList = [(<option key="0" value={""+"-"+""}>--select menu--</option>)];
             _.forEach(body.data.viewer.allMenus.edges, function(item){
               pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
             })
