@@ -36,10 +36,7 @@ const MenuPanel = (props) => {
             <i htmlFor="typeValue" >Type</i>
             <input type="text" name="type" defaultValue={props.itemData.type} id="typeValue" className="form-control" readOnly={true}/>
           </div>
-          <div className="form-group">
-            <i htmlFor="targetValue" >Target</i>
-            <input type="text" name="target" defaultValue={props.itemData.target} id="targetValue" className="form-control" readOnly={true}/>
-          </div>
+          
           <div className="col-md-6">
             <button type="button" value={props.itemData.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.itemData.id} onClick={props.onRemovePanel}>Remove</button>
           </div>
@@ -158,7 +155,7 @@ var Menu = React.createClass({
     event.preventDefault();
     var _treeData = this.state.treeData;
     var url = this.state.urlData;
-    var _url = [{title: url.title, url: url.url, tooltip: "", type: "url", id: uuid(), target: "url"}];
+    var _url = [{title: url.title, url: url.url, tooltip: "", type: "url", id: uuid(), target: url.url}];
     var treeData = [];
     if (_treeData===null) {
       treeData = _url;
@@ -176,7 +173,8 @@ var Menu = React.createClass({
     });
     var menuValues = [];
     menuValues = _.map(menuFiltered, function(item){return {title: item.value.split("-")[0], tooltip: "", type: item.value.split("-")[1], 
-      id: uuid(), target: "/"+item.value.split("-")[1]+"/"+item.id}});
+      id: uuid(), target: item.id}});
+
     var treeData = [];
     if (_treeData===null) {
       treeData = menuValues;
@@ -346,7 +344,8 @@ var Menu = React.createClass({
           }
           if (c.type === "url") {
             let url = c.querySelector("#urlValue");
-            data.url = url
+            data.url = url;
+            data.target = url;
           }
           return data
         });
@@ -361,6 +360,7 @@ var Menu = React.createClass({
         if (type === "url") {
           let url = td.querySelector("#urlValue").value;
           data.url = url;
+          data.target = url;
         }
         return data
       });
@@ -724,7 +724,9 @@ var Menu = React.createClass({
                   </section>
                 </div>
               </form> <div className="box-header with-border attachment-block clearfix">
-                <button className="btn btn-flat btn-danger pull-right" id="deleteBtn" disabled={this.state.newMenuName===""} data-target="menuName" onClick={this.handleDelete}>Delete Menu</button>
+              <div onClick={this.handleDelete}>
+                <button className="btn btn-flat btn-danger pull-right" id="deleteBtn" disabled={this.state.newMenuName===""} data-target="menuName">Delete Menu</button>
+              </div>
               </div>
               </div>
             </div>
