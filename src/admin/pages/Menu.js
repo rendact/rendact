@@ -11,7 +11,7 @@ const MenuPanel = (props) => {
   return (
     <div id={props.itemData.id} className="box collapsed-box">
       <div className="box-header with-border">
-        <h3 className="box-title" style={{paddingRight: 15}}>{props.itemData.title}</h3>
+        <h3 className="box-title" style={{paddingRight: 50}}>{props.itemData.title}</h3>
         <div className="box-tools pull-right">
           <span className="label label-default" id="typeValue">
             {props.itemData.type}
