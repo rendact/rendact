@@ -168,38 +168,19 @@ class Widgets extends React.Component {
         this.handleAddToWidgetArea = this.handleAddToWidgetArea.bind(this);
         this.handleClearAll = this.handleClearAll.bind(this);
         this.handleRemoveSingleWidget = this.handleRemoveSingleWidget.bind(this);
+        this.registerWidgetAreasSortable = this.registerWidgetAreasSortable.bind(this);
 
         var themeFunctions = require('../../theme/default/functions.js');
         themeFunctions.default();
     }
 
     componentDidMount(){
+
         require ('../lib/jquery-sortable.js');
         require ('jquery-ui/themes/base/theme.css');
         require ('../../../public/css/AdminLTE.css');
         require ('../../../public/css/skins/_all-skins.css');
-    var panelList = $('#sidebar-1 #dragablePanelList');
-    panelList.sortable({
-        group: 'sidebar-1',
-        handle: '.box-header',
-        onDragStart: function ($item, container, _super) {
-          // Duplicate items of the no drop area
-          if(!container.options.drop)
-            $item.clone().insertAfter($item);
-          _super($item, container);
-        }
-    });
-    var panelListFooter = $('#footer-1 #dragablePanelList');
-    panelListFooter.sortable({
-        group: 'footer-1',
-        handle: '.box-header',
-        onDragStart: function ($item, container, _super) {
-          // Duplicate items of the no drop area
-          if(!container.options.drop)
-            $item.clone().insertAfter($item);
-          _super($item, container);
-        }
-    });
+
         var activeWidgetArea = localStorage.getItem("activeWidgetArea");
         activeWidgetArea = activeWidgetArea.split(",");
 
@@ -213,6 +194,21 @@ class Widgets extends React.Component {
             });
             return {widgetAreas: _newWidgetArea}
         });
+
+
+      $("#widgetAvailables").sortable({
+        itemSelector: '.col-md-12',
+        group: 'widget',
+        handler: '.box',
+        drop: false,
+        onDragStart: (item, container, _super) => {
+          if (!container.options.drop) {
+            item.clone().insertAfter(item)
+            _super(item, container)
+          }
+        }
+      });
+
     }
 
     handleAddToWidgetArea(id, widget){
@@ -290,7 +286,19 @@ class Widgets extends React.Component {
 
     }
 
+  registerWidgetAreasSortable(){
+    _.forEach(this.state.widgetAreas, (widgetArea) => {
+      var sortableWidgetArea = $("#" + widgetArea.id + " #dragablePanelList");
+      sortableWidgetArea.sortable({
+        group: 'widget',
+        handle: '.box',
+    });
+    });
+  }
+
 	render(){
+    this.registerWidgetAreasSortable();
+
 		return (
 			<div className="content-wrapper">
 			<div className="container-fluid">
@@ -328,12 +336,12 @@ class Widgets extends React.Component {
                             </div>
                             <div className="box-body">
                                 <div className="row">
-                                <ul  className="widgets no-drop list-unstyled">
+                                <ul id="widgetAvailables" className="widgets no-drop list-unstyled">
                                     
                                     {_.map(this.state.availableWidgets, (widget, index) => (
-                                        <div className="col-md-12" key={index}>
+                                          <div className='col-md-12' key={index}>
                                             <BoxItemAvailable widget={widget.node} widgetAreas={this.state.widgetAreas} handleAddToWidgetArea={this.handleAddToWidgetArea}/>
-                                        </div>
+                                          </div>
                                     ))}
 
                                 </ul>
