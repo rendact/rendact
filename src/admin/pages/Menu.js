@@ -674,7 +674,7 @@ var Menu = React.createClass({
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li key={child.id} id={child.id} title={child.title}>
+                                        <li target={child.target} key={child.id} type={child.type} id={child.id} title={child.title}>
                                           <MenuPanel itemData={child} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
@@ -689,7 +689,7 @@ var Menu = React.createClass({
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li key={child.id} id={child.id} title={child.title}>
+                                        <li target={child.target} key={child.id} id={child.id} type={child.type} title={child.title}>
                                           <MenuPanel itemData={child} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
