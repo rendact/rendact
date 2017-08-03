@@ -1,4 +1,5 @@
 import React from 'react';
+import {Link} from 'react-router';
 import Query from '../query';
 import $ from 'jquery';
 import _ from 'lodash';
@@ -23,7 +24,7 @@ const MenuPanel = (props) => {
         <div className="box-body" style={{display: "none"}}>
 
           <div style={{margin: "15px 0", border: "solid 1px #ccc", padding: "10px 5px"}}>
-            <em>Original</em> : <a className="card-link" href={props.itemData.type === "url"? props.itemData.target : "/" + props.itemData.type + "/" + props.itemData.target}> {props.itemData.titlePanel} </a>
+            <em>Original</em> : <Link to={props.itemData.type === "url"? props.itemData.target : "/" + props.itemData.type + "/" + props.itemData.target}>{props.itemData.titlePanel} </Link>
           </div>
 
           <div className="form-group">
