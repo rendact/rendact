@@ -21,6 +21,11 @@ const MenuPanel = (props) => {
         </div>
       </div>
         <div className="box-body" style={{display: "none"}}>
+
+          <div style={{margin: "15px 0", border: "solid 1px #ccc", padding: "10px 5px"}}>
+            <em>Original</em> : <a className="card-link" href={props.itemData.type === "url"? props.itemData.target : "/" + props.itemData.type + "/" + props.itemData.target}> {props.itemData.title} </a>
+          </div>
+
           <div className="form-group">
             <i htmlFor="name" >Label</i>
             <input type="text" name="name" id="name" className="form-control" required="true" defaultValue={props.itemData.title}/>
