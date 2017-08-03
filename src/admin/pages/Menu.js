@@ -344,7 +344,7 @@ var Menu = React.createClass({
             title: title
           }
           if (c.type === "url") {
-            let url = c.querySelector("#urlValue");
+            let url = c.querySelector("#urlValue").value;
             data.url = url;
             data.target = url;
           }
@@ -371,6 +371,7 @@ var Menu = React.createClass({
       let noticeTxt = "Menu Successfully Updated";
       riques(qry, 
         function(error, response, body) { 
+
             if (!error && !body.errors && response.statusCode === 200) {
             me.notif.addNotification({
                     message: noticeTxt,
