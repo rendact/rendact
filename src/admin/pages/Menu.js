@@ -6,7 +6,7 @@ import _ from 'lodash';
 import uuid from 'uuid';
 import Halogen from 'halogen';
 import Notification from 'react-notification-system';
-import {swalert, riques, errorCallback, setValue, getValue, disableForm, defaultHalogenStyle} from '../../utils';
+import {swalert, riques, errorCallback, setValue, getValue, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 
 const MenuPanel = (props) => {
   return (
@@ -60,6 +60,7 @@ var Menu = React.createClass({
   getInitialState: function(){
       require ('../pages/Posts.css');
       return {
+        disabled: true,
         name:"",
         selectedMenuName:"",
         newMenuName:"",
@@ -88,6 +89,9 @@ var Menu = React.createClass({
         position: false
       }
   },
+
+  disabledSelectors : ["#menuName #submit", "#deleteBtn", "#menu ~ .box > .box-header > .box-tools > button", "#menu button"],
+
   maskArea: function(state){
     this.setState({isProcessing: state, opacity: state?0.1:1});
   },
@@ -135,10 +139,12 @@ var Menu = React.createClass({
             errorCallback(error, body.errors?body.errors[0].message:null);
           }
           me.disableForm(false);
+          me.setState({disabled: false})
         }
       );
     } else if(menuId==="") {
       me.resetFormDelete();
+      disableBySelector(true, me.disabledSelectors);
     }
 
   },
@@ -484,6 +490,7 @@ var Menu = React.createClass({
             errorCallback(error, body.errors?body.errors[0].message:null);
           }
           me.disableForm(false);
+          disableBySelector(true, me.disabledSelectors);
         }
       );
     })
