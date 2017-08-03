@@ -428,7 +428,7 @@ var Menu = React.createClass({
       riques(Query.getAllMenu, 
         function(error, response, body) {
           if (!error) {
-            var pageList = [(<option key="0" value={""+"-"+""}>--select menu--</option>)];
+            var pageList = [(<option key="0" value="">--select menu--</option>)];
             _.forEach(body.data.viewer.allMenus.edges, function(item){
               pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
             })
