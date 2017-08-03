@@ -4,9 +4,9 @@ import {Link} from 'react-router';
 const LinkMenu = (props) => {
     var item = props.item
     if (item.type === "url") {
-      return <a href={item.url} target="_blank">{item.title}</a>
+      return <a href={item.url} target="_blank">{item.titlePanel}</a>
     } else {
-      return <Link to={ "/" + item.type + "/" + item.target }>{item.title}</Link>
+      return <Link to={ "/" + item.type + "/" + item.target }>{item.titlePanel}</Link>
     }
 
 }
