@@ -344,7 +344,7 @@ var Menu = React.createClass({
             titlePanel: titlePanel
           }
           if (c.type === "url") {
-            let url = c.querySelector("#urlValue");
+            let url = c.querySelector("#urlValue").value;
             data.url = url;
             data.target = url;
           }
@@ -371,6 +371,7 @@ var Menu = React.createClass({
       let noticeTxt = "Menu Successfully Updated";
       riques(qry, 
         function(error, response, body) { 
+
             if (!error && !body.errors && response.statusCode === 200) {
             me.notif.addNotification({
                     message: noticeTxt,
@@ -674,7 +675,7 @@ var Menu = React.createClass({
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li key={child.id} id={child.id} titlePanel={child.titlePanel}>
+                                        <li target={child.target} key={child.id} type={child.type} id={child.id} titlePanel={child.titlePanel}>
                                           <MenuPanel itemData={child} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
@@ -689,7 +690,7 @@ var Menu = React.createClass({
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li key={child.id} id={child.id} titlePanel={child.titlePanel}>
+                                        <li target={child.target} key={child.id} id={child.id} type={child.type} titlePanel={child.titlePanel}>
                                           <MenuPanel itemData={child} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
