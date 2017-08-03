@@ -35,10 +35,6 @@ const MenuPanel = (props) => {
             <input type="text" name="urlValue" id="urlValue" className="form-control" defaultValue={props.itemData.url}/>
           </div>
           }
-          <div className="form-group">
-            <i htmlFor="typeValue" >Type</i>
-            <input type="text" name="type" defaultValue={props.itemData.type} id="typeValue" className="form-control" readOnly={true}/>
-          </div>
           
           <div className="col-md-6">
             <button type="button" value={props.itemData.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.itemData.id} onClick={props.onRemovePanel}>Remove</button>
