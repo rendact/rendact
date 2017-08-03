@@ -11,7 +11,7 @@ const MenuPanel = (props) => {
   return (
     <div id={props.itemData.id} className="box collapsed-box">
       <div className="box-header with-border">
-        <h3 className="box-title">{props.itemData.title}</h3>
+        <h3 className="box-title" style={{paddingRight: 15}}>{props.itemData.title}</h3>
         <div className="box-tools pull-right">
           <button type="button" className="btn btn-box-tool" data-widget="collapse"><i id={"icon-"+props.itemData.title} className="fa fa-plus"></i>
           </button>
@@ -174,16 +174,14 @@ var Menu = React.createClass({
     var menuValues = [];
     menuValues = _.map(menuFiltered, function(item){return {title: item.value.split("-")[0], tooltip: "", type: item.value.split("-")[1], 
       id: uuid(), target: item.id}});
-
     var treeData = [];
     if (_treeData===null) {
       treeData = menuValues;
     }else if (menuValues.length>0) {
       treeData = _.concat(_treeData, menuValues);
     }
-    
-    this.menuStructurePanel.sortable('refresh');
     this.setState ({treeData: treeData});
+
     this.resetFormCheckbox();
   },
 
@@ -247,10 +245,9 @@ var Menu = React.createClass({
 
     this.notif = this.refs.notificationSystem;
     var adjustment;
-    this.menuStructurePanel = $('#draggablePanelList');
-    this.menuStructurePanel.sortable({
+    var panelList = $('#draggablePanelList');
+    panelList.sortable({
         group: 'nested',
-        nested: true,
         handle: '.box-header',
         pullPlaceholder: true,
         // animation on drop
