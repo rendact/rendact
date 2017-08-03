@@ -13,6 +13,9 @@ const MenuPanel = (props) => {
       <div className="box-header with-border">
         <h3 className="box-title" style={{paddingRight: 15}}>{props.itemData.title}</h3>
         <div className="box-tools pull-right">
+          <span className="label label-default" id="typeValue">
+            {props.itemData.type}
+          </span>
           <button type="button" className="btn btn-box-tool" data-widget="collapse"><i id={"icon-"+props.itemData.title} className="fa fa-plus"></i>
           </button>
         </div>
@@ -32,10 +35,6 @@ const MenuPanel = (props) => {
             <input type="text" name="urlValue" id="urlValue" className="form-control" defaultValue={props.itemData.url}/>
           </div>
           }
-          <div className="form-group">
-            <i htmlFor="typeValue" >Type</i>
-            <input type="text" name="type" defaultValue={props.itemData.type} id="typeValue" className="form-control" readOnly={true}/>
-          </div>
           
           <div className="col-md-6">
             <button type="button" value={props.itemData.title} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.itemData.id} onClick={props.onRemovePanel}>Remove</button>
