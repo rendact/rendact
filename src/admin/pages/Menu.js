@@ -682,12 +682,12 @@ var Menu = React.createClass({
                               this.state.treeData.map(function(item, index){
                                 if(item.type==="url"){
                                 return (
-                                  <li key={item.id} id={item.id} titlePanel={item.titlePanel} type={item.type} target={item.target} name="panel">
+                                  <li key={item.id} id={item.id}  type={item.type} target={item.target} name="panel">
                                     <MenuPanel itemData={item} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li target={child.target} key={child.id} type={child.type} id={child.id} titlePanel={child.titlePanel}>
+                                        <li target={child.target} key={child.id} type={child.type} id={child.id} >
                                           <MenuPanel itemData={child} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
@@ -697,12 +697,12 @@ var Menu = React.createClass({
                                 )}
                                 if(item.type!=="url"){
                                 return (
-                                  <li key={item.id} id={item.id} titlePanel={item.titlePanel} type={item.type} target={item.target} name="panel">
+                                  <li key={item.id} id={item.id}  type={item.type} target={item.target} name="panel">
                                     <MenuPanel itemData={item} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li target={child.target} key={child.id} id={child.id} type={child.type} titlePanel={child.titlePanel}>
+                                        <li target={child.target} key={child.id} id={child.id} type={child.type} >
                                           <MenuPanel itemData={child} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
