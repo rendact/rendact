@@ -314,8 +314,8 @@ class Widgets extends React.Component {
 
                 <div className="col-md-8">
                 {
-                    _.map(this.state.widgetAreas, function(item){
-                        return <WidgetAreaContainer id={item.id} title={item.id} widgets={item.widgets} clearAllWidget={this.handleClearAll} />
+                    _.map(this.state.widgetAreas, function(item, index){
+                        return <WidgetAreaContainer id={item.id} key={index} title={item.id} widgets={item.widgets} clearAllWidget={this.handleClearAll} />
                     }.bind(this))
                 }
                 </div>
