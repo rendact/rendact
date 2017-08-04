@@ -382,12 +382,11 @@ var Menu = React.createClass({
 
         let children = td.querySelectorAll("li")
         children = _.map(children, c => {
-          let data = _.assing({}, c.dataset, {children: []});
+          let data = _.assign({}, c.dataset, {children: []});
           
           if (data.type === "url") {
-            let url = c.querySelector("#urlValue").value;
-            data.url = url;
-            data.target = url;
+            data.url = c.querySelector("#urlValue").value
+            data.target = data.url;
             data.label = c.querySelector("#labelValue").value;
           }
 
