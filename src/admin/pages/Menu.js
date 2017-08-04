@@ -24,7 +24,7 @@ const MenuPanel = React.createClass({
   return (
     <div id={itemData.id} className="box collapsed-box">
       <div className="box-header with-border">
-        <h3 className="box-title" style={{paddingRight : itemData.type === "category"? 75 : 50}}>{itemData.titlePanel}</h3>
+        <h3 className="box-title" style={{paddingRight : itemData.type === "category"? 75 : 50}}>{itemData.label? itemData.label : itemData.titlePanel}</h3>
         <div className="box-tools pull-right">
           <span className="label label-default" id="typeValue">
             {itemData.type}
@@ -41,7 +41,7 @@ const MenuPanel = React.createClass({
 
           <div className="form-group">
             <i htmlFor="name" >Label</i>
-            <input type="text" name="name" id="labelValue" className="form-control" required="true" defaultValue={itemData.titlePanel}/>
+            <input type="text" name="name" id="labelValue" className="form-control" required="true" defaultValue={itemData.label? itemData.label: itemData.titlePanel}/>
           </div>
           <div className="form-group">
             <i htmlFor="name" >Tooltip</i>
