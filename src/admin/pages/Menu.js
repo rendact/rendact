@@ -21,6 +21,14 @@ const MenuPanel = React.createClass({
 
   render: function() {
     var itemData = this.props.itemData;
+    var originalLink;
+
+    if(itemData.type === 'url') {
+      originalLink = <a href={itemData.target} target="_blank">{itemData.titlePanel}</a>
+    } else {
+      originalLink = <Link to={"/" + itemData.type + "/" + itemData.target}>{itemData.titlePanel} </Link>
+    }
+
   return (
     <div id={itemData.id} className="box collapsed-box">
       <div className="box-header with-border">
@@ -36,7 +44,7 @@ const MenuPanel = React.createClass({
         <div className="box-body" style={{display: "none"}}>
 
           <div style={{margin: "15px 0", border: "solid 1px #ccc", padding: "10px 5px"}}>
-            <em>Original</em> : <Link to={itemData.type === "url"? itemData.target : "/" + itemData.type + "/" + itemData.target}>{itemData.titlePanel} </Link>
+            <em>Original</em> : {originalLink}
           </div>
 
           <div className="form-group">
