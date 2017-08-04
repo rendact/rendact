@@ -115,16 +115,11 @@ var Menu = React.createClass({
     this.handleNewMenuChange();
     window.history.pushState("", "", '/admin/menu');
   },
-  handleMenuName: function(event){
-    this.setState({menu: document.querySelector('#menuSelect').value});
-    var menuId = event.target.value.split("-")[0];
-    var selectedMenuName = event.target.value.split("-")[1];
+
+  loadMenuItems: function(menuId){
+    var qry = Query.getMenuQry(menuId);
     var me = this;
-    if (menuId!=="") {
-      setValue("selectedMenuName", selectedMenuName);
-      this.setState({menuId:menuId, treeData:[]});
-      var qry = Query.getMenuQry(menuId);
-      me.disableForm(true);
+    me.disableForm(true)
       riques(qry, 
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
@@ -142,6 +137,17 @@ var Menu = React.createClass({
           me.setState({disabled: false})
         }
       );
+  },
+
+  handleMenuName: function(event){
+    this.setState({menu: document.querySelector('#menuSelect').value});
+    var menuId = event.target.value.split("-")[0];
+    var selectedMenuName = event.target.value.split("-")[1];
+    var me = this;
+    if (menuId!=="") {
+      setValue("selectedMenuName", selectedMenuName);
+      this.setState({menuId:menuId, treeData:[]});
+      this.loadMenuItems(menuId);
     } else if(menuId==="") {
       me.resetFormDelete();
       disableBySelector(true, me.disabledSelectors);
@@ -391,7 +397,10 @@ var Menu = React.createClass({
                     autoDismiss: 2
             });
             var here = me;
-            var cb = function(){here.disableForm(false)}
+              var cb = function(){
+                here.disableForm(false)
+              }
+            me.loadMenuItems(menuId)
             me.componentWillMount("All", cb);
             } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
