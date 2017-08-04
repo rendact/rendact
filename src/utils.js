@@ -313,3 +313,8 @@ export const toHTMLObject = function(text){
   var htmlDoc=parser.parseFromString(text, "text/html");
   return htmlDoc;
 }
+
+export const objectToDataset = (obj) => {
+  // source https://github.com/holidayextras/react-data-attributes-mixin
+  return _.mapKeys(obj, (value, key) => ('data-' + _.kebabCase(key)))
+}
