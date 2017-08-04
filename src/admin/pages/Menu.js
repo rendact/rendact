@@ -8,53 +8,65 @@ import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {swalert, riques, errorCallback, setValue, getValue, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 
-const MenuPanel = (props) => {
+const MenuPanel = React.createClass({
+
+  componentDidMount: function(){
+    let inputsText = document.querySelectorAll("input[type='text']");
+    _.forEach(inputsText, input => {
+      input.onchange = (e) => {
+        this.props.notifyUnsavedData(true)
+      }
+    });
+  },
+
+  render: function() {
+    var itemData = this.props.itemData;
   return (
-    <div id={props.itemData.id} className="box collapsed-box">
+    <div id={itemData.id} className="box collapsed-box">
       <div className="box-header with-border">
-        <h3 className="box-title" style={{paddingRight : props.itemData.type === "category"? 75 : 50}}>{props.itemData.titlePanel}</h3>
+        <h3 className="box-title" style={{paddingRight : itemData.type === "category"? 75 : 50}}>{itemData.titlePanel}</h3>
         <div className="box-tools pull-right">
           <span className="label label-default" id="typeValue">
-            {props.itemData.type}
+            {itemData.type}
           </span>
-          <button type="button" className="btn btn-box-tool" data-widget="collapse"><i id={"icon-"+props.itemData.titlePanel} className="fa fa-plus"></i>
+          <button type="button" className="btn btn-box-tool" data-widget="collapse"><i id={"icon-"+itemData.titlePanel} className="fa fa-plus"></i>
           </button>
         </div>
       </div>
         <div className="box-body" style={{display: "none"}}>
 
           <div style={{margin: "15px 0", border: "solid 1px #ccc", padding: "10px 5px"}}>
-            <em>Original</em> : <Link to={props.itemData.type === "url"? props.itemData.target : "/" + props.itemData.type + "/" + props.itemData.target}>{props.itemData.titlePanel} </Link>
+            <em>Original</em> : <Link to={itemData.type === "url"? itemData.target : "/" + itemData.type + "/" + itemData.target}>{itemData.titlePanel} </Link>
           </div>
 
           <div className="form-group">
             <i htmlFor="name" >Label</i>
-            <input type="text" name="name" id="name" className="form-control" required="true" defaultValue={props.itemData.titlePanel}/>
+            <input type="text" name="name" id="name" className="form-control" required="true" defaultValue={itemData.titlePanel}/>
           </div>
           <div className="form-group">
             <i htmlFor="name" >Tooltip</i>
-            <input type="text" name="tooltipValue" defaultValue={props.itemData.tooltip} id="tooltipValue" className="form-control" />
+            <input type="text" name="tooltipValue" defaultValue={itemData.tooltip} id="tooltipValue" className="form-control" />
           </div>
-          { props.itemData.type==="url" &&
+          { itemData.type==="url" &&
           <div className="form-group">
             <i htmlFor="name" >URL</i>
-            <input type="text" name="urlValue" id="urlValue" className="form-control" defaultValue={props.itemData.url}/>
+            <input type="text" name="urlValue" id="urlValue" className="form-control" defaultValue={itemData.url}/>
           </div>
           }
           
           <div className="col-md-6">
-            <button type="button" value={props.itemData.titlePanel} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={props.itemData.id} onClick={props.onRemovePanel}>Remove</button>
+            <button type="button" value={itemData.titlePanel} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={itemData.id} onClick={this.props.onRemovePanel}>Remove</button>
           </div>
           <div className="col-md-6">
             <button type="button" 
               className="btn btn-flat btn-default btn-xs pull-right" 
               data-widget="collapse" 
-              onClick={(e)=>{document.getElementById("icon-"+props.itemData.titlePanel).className="fa fa-plus"}} >Cancel</button>
+              onClick={(e)=>{document.getElementById("icon-"+itemData.titlePanel).className="fa fa-plus"}} >Cancel</button>
           </div>
         </div>
     </div>
-  )
-}
+  )}
+})
 
 var Menu = React.createClass({
   getInitialState: function(){
@@ -713,12 +725,12 @@ var Menu = React.createClass({
                                 if(item.type==="url"){
                                 return (
                                   <li key={item.id} id={item.id}  type={item.type} target={item.target} name="panel">
-                                    <MenuPanel itemData={item} onRemovePanel={me.removePanel} />
+                                    <MenuPanel itemData={item} onRemovePanel={me.removePanel} notifyUnsavedData={me.notifyUnsavedData} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
                                         <li target={child.target} key={child.id} type={child.type} id={child.id} >
-                                          <MenuPanel itemData={child} onRemovePanel={me.removePanel} />
+                                          <MenuPanel itemData={child} onRemovePanel={me.removePanel} notifyUnsavedData={me.notifyUnsavedData}/>
                                         </li>
                                       )
                                     })}
@@ -728,12 +740,12 @@ var Menu = React.createClass({
                                 if(item.type!=="url"){
                                 return (
                                   <li key={item.id} id={item.id}  type={item.type} target={item.target} name="panel">
-                                    <MenuPanel itemData={item} onRemovePanel={me.removePanel} />
+                                    <MenuPanel itemData={item} notifyUnsavedData={me.notifyUnsavedData} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
                                         <li target={child.target} key={child.id} id={child.id} type={child.type} >
-                                          <MenuPanel itemData={child} onRemovePanel={me.removePanel} />
+                                          <MenuPanel notifyUnsavedData={me.notifyUnsavedData} itemData={child} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
                                     })}
