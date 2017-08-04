@@ -6,7 +6,7 @@ import _ from 'lodash';
 import uuid from 'uuid';
 import Halogen from 'halogen';
 import Notification from 'react-notification-system';
-import {swalert, riques, errorCallback, setValue, getValue, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
+import {objectToDataset, swalert, riques, errorCallback, setValue, getValue, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 
 const MenuPanel = React.createClass({
 
@@ -369,48 +369,28 @@ var Menu = React.createClass({
 
       let treeData = document.querySelectorAll("#draggablePanelList > li")
       treeData = _.map(treeData, td => {
-        let data;
-        let target = td.getAttribute('target');
-        let id = td.id;
-        let type = td.type;
-        let tooltip = td.querySelector("#tooltipValue").value;
-        let titlePanel = td.querySelector("#name").value;
+        let data = _.assign({}, td.dataset, {children: []});
 
         let children = td.querySelectorAll("li")
         children = _.map(children, c => {
-        let data;
-        let target = c.getAttribute('target');
-        let id = c.id;
-        let type = c.type;
-        let tooltip = c.querySelector("#tooltipValue").value;
-        let titlePanel = c.querySelector("#name").value;
-          data = {
-            target: target,
-            id: id,
-            type: type,
-            tooltip: tooltip,
-            titlePanel: titlePanel
-          }
-          if (c.type === "url") {
+          let data = _.assing({}, c.dataset, {children: []});
+          
+          if (data.type === "url") {
             let url = c.querySelector("#urlValue").value;
             data.url = url;
             data.target = url;
           }
+
+
           return data
+
         });
-        data = {
-          id: id,
-          type: type,
-          target: target,
-          tooltip: tooltip,
-          titlePanel: titlePanel,
-          children: children
-        }
-        if (type === "url") {
+        if (data.type === "url") {
           let url = td.querySelector("#urlValue").value;
           data.url = url;
           data.target = url;
         }
+        data.children = children
         return data
       });
       let menuId = this.state.menuId;
@@ -724,12 +704,12 @@ var Menu = React.createClass({
                               this.state.treeData.map(function(item, index){
                                 if(item.type==="url"){
                                 return (
-                                  <li key={item.id} id={item.id}  type={item.type} target={item.target} name="panel">
+                                  <li key={item.id} id={item.id} {...objectToDataset(item)} name="panel">
                                     <MenuPanel itemData={item} onRemovePanel={me.removePanel} notifyUnsavedData={me.notifyUnsavedData} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li target={child.target} key={child.id} type={child.type} id={child.id} >
+                                        <li key={child.id} id={child.id} {...objectToDataset(item)}>
                                           <MenuPanel itemData={child} onRemovePanel={me.removePanel} notifyUnsavedData={me.notifyUnsavedData}/>
                                         </li>
                                       )
@@ -739,12 +719,12 @@ var Menu = React.createClass({
                                 )}
                                 if(item.type!=="url"){
                                 return (
-                                  <li key={item.id} id={item.id}  type={item.type} target={item.target} name="panel">
+                                  <li key={item.id} {...objectToDataset(item)} id={item.id} name="panel">
                                     <MenuPanel itemData={item} notifyUnsavedData={me.notifyUnsavedData} onRemovePanel={me.removePanel} />
                                     <ul style={{marginLeft: 20}} className="list-unstyled">
                                       {item.children && item.children.map(function(child){
                                       return (
-                                        <li target={child.target} key={child.id} id={child.id} type={child.type} >
+                                        <li key={child.id} id={child.id} {...objectToDataset(child)} >
                                           <MenuPanel notifyUnsavedData={me.notifyUnsavedData} itemData={child} onRemovePanel={me.removePanel} />
                                         </li>
                                       )
