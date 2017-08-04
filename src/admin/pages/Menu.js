@@ -99,6 +99,13 @@ var Menu = React.createClass({
     "#mainMenu",
   ],
 
+  notifyUnsavedData: function(state){
+    let me = this;
+    if (me.props.handleUnsavedData) {
+      me.props.handleUnsavedData(state)
+    }
+  },
+
   maskArea: function(state){
     this.setState({isProcessing: state, opacity: state?0.1:1});
   },
@@ -155,6 +162,7 @@ var Menu = React.createClass({
       setValue("selectedMenuName", selectedMenuName);
       this.setState({menuId:menuId, treeData:[]});
       this.loadMenuItems(menuId);
+      this.notifyUnsavedData(true);
     } else if(menuId==="") {
       me.resetFormDelete();
       disableBySelector(true, me.disabledSelectors);
@@ -209,6 +217,7 @@ var Menu = React.createClass({
       treeData = _.concat(_treeData, menuValues);
     }
     this.setState ({treeData: treeData});
+    this.notifyUnsavedData(true)
 
     this.resetFormCheckbox();
   },
@@ -235,6 +244,7 @@ var Menu = React.createClass({
   handleNameChange: function(event){
     var selectedMenuName = getValue("selectedMenuName");
     this.setState({selectedMenuName: selectedMenuName})
+    this.notifyUnsavedData(true);
   },
   handleSubmit: function(event){
     event.preventDefault();
@@ -271,6 +281,7 @@ var Menu = React.createClass({
     require ('../../../public/css/AdminLTE.css');
     require ('../../../public/css/skins/_all-skins.css');
 
+    var me = this;
     this.notif = this.refs.notificationSystem;
     var adjustment;
     var panelList = $('#draggablePanelList');
@@ -283,6 +294,7 @@ var Menu = React.createClass({
           var $clonedItem = $('<li/>').css({height: 0});
           $item.before($clonedItem);
           $clonedItem.animate({'height': $item.height()});
+          me.notifyUnsavedData(true)
 
           $item.animate($clonedItem.position(), function  () {
             $clonedItem.detach();
@@ -310,7 +322,6 @@ var Menu = React.createClass({
         }
     });
 
-    var me = this;
       riques(Query.getMainMenu, 
         function(error, response, body) {
           if (!error) {
@@ -325,6 +336,7 @@ var Menu = React.createClass({
     const target = event.target;
     const position = target.checked === true ? target.value : "";
     this.setState({position: position});      
+    this.notifyUnsavedData(true);
   },
 
   handleUpdateMenu: function(event){
@@ -409,6 +421,7 @@ var Menu = React.createClass({
               }
             me.loadMenuItems(menuId)
             me.componentWillMount("All", cb);
+            me.notifyUnsavedData(false);
             } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
             }
@@ -502,6 +515,7 @@ var Menu = React.createClass({
             var here = me;
             var cb = function(){here.disableForm(false)}
             me.componentWillMount("All", cb);
+            me.notifyUnsavedData(false)
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
           }

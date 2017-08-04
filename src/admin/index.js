@@ -215,7 +215,7 @@ class PageLoader extends React.Component{
                                     'posts-category' : <CategoryPost handleNav={hn}/>,
                                     'posts-tag' : <TagPost handleNav={hn}/>,
                                     'themes' : <Themes handleNav={hn}/>,
-                                    'menu': <Menu handleNav={hn}/>,
+                                    'menu': <Menu handleNav={hn} handleUnsavedData={hud}/>,
                                     'themes-customize': <Customize handleNav={hn}/>,
                                     'users-permissions' : <Permission handleNav={hn}/>,
                                     'plugins' : <Plugins handleNav={hn}/>,
