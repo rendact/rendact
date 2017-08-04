@@ -41,7 +41,7 @@ const MenuPanel = React.createClass({
 
           <div className="form-group">
             <i htmlFor="name" >Label</i>
-            <input type="text" name="name" id="name" className="form-control" required="true" defaultValue={itemData.titlePanel}/>
+            <input type="text" name="name" id="labelValue" className="form-control" required="true" defaultValue={itemData.titlePanel}/>
           </div>
           <div className="form-group">
             <i htmlFor="name" >Tooltip</i>
@@ -370,6 +370,7 @@ var Menu = React.createClass({
       let treeData = document.querySelectorAll("#draggablePanelList > li")
       treeData = _.map(treeData, td => {
         let data = _.assign({}, td.dataset, {children: []});
+        data.label = td.querySelector("#labelValue").value;
 
         let children = td.querySelectorAll("li")
         children = _.map(children, c => {
@@ -379,6 +380,7 @@ var Menu = React.createClass({
             let url = c.querySelector("#urlValue").value;
             data.url = url;
             data.target = url;
+            data.label = c.querySelector("#labelValue").value;
           }
 
 
