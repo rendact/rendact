@@ -90,7 +90,14 @@ var Menu = React.createClass({
       }
   },
 
-  disabledSelectors : ["#menuName #submit", "#deleteBtn", "#menu ~ .box > .box-header > .box-tools > button", "#menu button"],
+  disabledSelectors : [
+    "#menuName #submit",
+    "#deleteBtn", 
+    "#menu ~ .box > .box-header > .box-tools > button",
+    "#menu button",
+    "#selectedMenuName",
+    "#mainMenu",
+  ],
 
   maskArea: function(state){
     this.setState({isProcessing: state, opacity: state?0.1:1});
@@ -542,7 +549,7 @@ var Menu = React.createClass({
                 <div className="box-header with-border">
                   <h3 className="box-title">Pages</h3>
                   <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" disabled={this.state.newMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
+                      <button type="button" className="btn btn-box-tool" disabled={this.state.selectedMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
                       </button>
                   </div>
                 </div>
@@ -561,7 +568,7 @@ var Menu = React.createClass({
                 <div className="box-header with-border">
                   <h3 className="box-title">Posts</h3>
                   <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" disabled={this.state.newMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
+                      <button type="button" className="btn btn-box-tool" disabled={this.state.selectedMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
                       </button>
                   </div>
                 </div>
@@ -582,7 +589,7 @@ var Menu = React.createClass({
                 <div className="box-header with-border">
                   <h3 className="box-title">Custom Links</h3>
                   <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" disabled={this.state.newMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
+                      <button type="button" className="btn btn-box-tool" disabled={this.state.selectedMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
                       </button>
                   </div>
                 </div>
@@ -620,7 +627,7 @@ var Menu = React.createClass({
                 <div className="box-header with-border">
                   <h3 className="box-title">Categories</h3>
                   <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" disabled={this.state.newMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
+                      <button type="button" className="btn btn-box-tool" disabled={this.state.selectedMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
                       </button>
                   </div>
                 </div>
@@ -668,11 +675,11 @@ var Menu = React.createClass({
                         <h4>Menu Name :</h4>
                       </div>
                       <div className="col-md-6">
-                        <input type="text" name="selectedMenuName" id="selectedMenuName" className="form-control" required="true" onChange={this.handleNameChange}/>
+                        <input type="text" name="selectedMenuName" id="selectedMenuName" disabled={this.state.selectedMenuName===""} className="form-control" required="true" onChange={this.handleNameChange}/>
                       </div>
                       <div className="col-md-3">
                         <div className="box-tools pull-right">
-                          <button type="submit" id="submit" name="submit" disabled={this.state.newMenuName===""} className="btn btn-flat btn-primary" >Update Menu</button>
+                          <button type="submit" id="submit" name="submit" disabled={this.state.selectedMenuName===""} className="btn btn-flat btn-primary" >Update Menu</button>
                         </div>
                       </div>
                     </div>
@@ -737,7 +744,7 @@ var Menu = React.createClass({
                       <div className="col-md-9">
                         <div className="checkbox">
                           <label key="Main Menu">
-                            <input type="checkbox" id="Main Menu" value="Main Menu" name="position" checked={this.state.position==="Main Menu"} onChange={this.onChangeMainMenu}/>
+                            <input type="checkbox" id="mainMenu" value="Main Menu" disabled={this.state.selectedMenuName===""} name="position" checked={this.state.position==="Main Menu"} onChange={this.onChangeMainMenu}/>
                             <i>Main Menu</i>
                           </label>
                         </div>
@@ -748,7 +755,7 @@ var Menu = React.createClass({
                 </div>
               </form> <div className="box-header with-border attachment-block clearfix">
               <div onClick={this.handleDelete}>
-                <button className="btn btn-flat btn-danger pull-right" id="deleteBtn" disabled={this.state.newMenuName===""} data-target="menuName">Delete Menu</button>
+                <button className="btn btn-flat btn-danger pull-right" id="deleteBtn" disabled={this.state.selectedMenuName===""} data-target="menuName">Delete Menu</button>
               </div>
               </div>
               </div>
