@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import {Link} from 'react-router';
 import Query from '../query';
 import $ from 'jquery';
@@ -106,7 +107,8 @@ var Menu = React.createClass({
         target: "",
         tooltip: "",
         urlData: {},
-        position: false
+        position: false,
+        menuStructure: ""
       }
   },
 
@@ -161,6 +163,7 @@ var Menu = React.createClass({
             items = body.data.getMenu.items;
             if (items)
             me.setState({treeData: items});
+            me.drawMenuStructure(items);
             var position = body.data.getMenu.position;
             me.setState({position: position});
             me.disableForm(false);
@@ -223,22 +226,25 @@ var Menu = React.createClass({
     me.resetFormUrl();
   },
   addToMenu: function(event){
+    var me = this;
     var _treeData = this.state.treeData;
     var menuFiltered = _.filter(document.getElementsByName("itemsChecked[]"), function(item){
       return item.checked
     });
+    
     var menuValues = [];
     menuValues = _.map(menuFiltered, function(item){return {titlePanel: item.value.split("-")[0], tooltip: "", 
       type: item.value.split("-")[1], id: uuid(), target: item.id}});
+    
     var treeData = [];
     if (_treeData===null) {
       treeData = menuValues;
     }else if (menuValues.length>0) {
       treeData = _.concat(_treeData, menuValues);
     }
-    this.setState ({treeData: treeData});
-    this.notifyUnsavedData(true)
 
+    this.drawMenuStructure(treeData);
+    this.notifyUnsavedData(true)
     this.resetFormCheckbox();
   },
 
@@ -252,7 +258,8 @@ var Menu = React.createClass({
         }
         return data.id !== panelRemoved
       });
-      this.setState({treeData: _treeData});
+      this.drawMenuStructure(_treeData);
+      //this.setState({treeData: _treeData});
     });
   },
 
@@ -285,7 +292,8 @@ var Menu = React.createClass({
                   autoDismiss: 2
           });
           me.resetFormNewMenu();
-          me.setState({treeData:[]});
+          //me.setState({treeData:[]});
+          me.drawMenuStructure([]);
           var here = me;
           var cb = function(){here.disableForm(false)}
           me.componentWillMount("All", cb);
@@ -295,17 +303,11 @@ var Menu = React.createClass({
         me.disableForm(false);
       });
   },
-  componentDidMount: function(){
-    require ('jquery-ui/themes/base/theme.css');
-    require ('../lib/jquery-sortable.js');
-    require ('../../../public/css/AdminLTE.css');
-    require ('../../../public/css/skins/_all-skins.css');
-
+  initSortable: function(){
     var me = this;
-    this.notif = this.refs.notificationSystem;
     var adjustment;
     var panelList = $('#draggablePanelList');
-    panelList.sortable({
+    var group = panelList.sortable({
         group: 'nested',
         handle: '.box-header',
         pullPlaceholder: true,
@@ -314,8 +316,7 @@ var Menu = React.createClass({
           var $clonedItem = $('<li/>').css({height: 0});
           $item.before($clonedItem);
           $clonedItem.animate({'height': $item.height()});
-          me.notifyUnsavedData(true)
-
+          
           $item.animate($clonedItem.position(), function  () {
             $clonedItem.detach();
             _super($item, container);
@@ -341,16 +342,26 @@ var Menu = React.createClass({
           });
         }
     });
+  },
+  componentDidMount: function(){
+    require ('jquery-ui/themes/base/theme.css');
+    require ('../lib/jquery-sortable.js');
+    require ('../../../public/css/AdminLTE.css');
+    require ('../../../public/css/skins/_all-skins.css');
 
-      riques(Query.getMainMenu, 
-        function(error, response, body) {
-          if (!error) {
-            var mainMenu = _.forEach(body.data.viewer.allMenus.edges, function(item){ return item })
-            let IdMainMenu = _.map(mainMenu, function(item){return  item.node.id });
-            me.setState({IdMainMenu: IdMainMenu});
-          }
+    var me = this;
+    this.notif = this.refs.notificationSystem;
+    this.initSortable();    
+
+    riques(Query.getMainMenu, 
+      function(error, response, body) {
+        if (!error) {
+          var mainMenu = _.forEach(body.data.viewer.allMenus.edges, function(item){ return item })
+          let IdMainMenu = _.map(mainMenu, function(item){return  item.node.id });
+          me.setState({IdMainMenu: IdMainMenu});
         }
-      );
+      }
+    );
   },
   onChangeMainMenu: function(event){
     const target = event.target;
@@ -429,7 +440,44 @@ var Menu = React.createClass({
             me.disableForm(false);
         });
   },
-
+  drawMenuStructure: function(treeData){
+    var me = this;
+    var elementArr = [];
+    _.map(treeData, function(item, index){
+      if(item.type==="url"){
+        var el = 
+        <li key={item.id} id={item.id} {...objectToDataset(item)} name="panel">
+          <MenuPanel itemData={item} onRemovePanel={me.removePanel} notifyUnsavedData={me.notifyUnsavedData}/>
+          <ul style={{marginLeft: 20}} className="list-unstyled">
+            {item.children && item.children.map(function(child){
+            return (
+              <li key={child.id} id={child.id} {...objectToDataset(item)}>
+                <MenuPanel itemData={child} onRemovePanel={me.removePanel} notifyUnsavedData={me.notifyUnsavedData}/>
+              </li>
+            )
+          })}
+          </ul>
+        </li>
+      }
+      if(item.type!=="url"){
+        var el = 
+        <li key={item.id} {...objectToDataset(item)} id={item.id} name="panel">
+          <MenuPanel itemData={item} notifyUnsavedData={me.notifyUnsavedData} onRemovePanel={me.removePanel}/>
+          <ul style={{marginLeft: 20}} className="list-unstyled">
+            {item.children && item.children.map(function(child){
+            return (
+              <li key={child.id} id={child.id} {...objectToDataset(child)} >
+                <MenuPanel notifyUnsavedData={me.notifyUnsavedData} itemData={child} onRemovePanel={me.removePanel}/>
+              </li>
+            )
+          })}
+          </ul>
+        </li>
+      }
+      elementArr.push(el);
+    });
+    this.setState({menuStructure: elementArr});
+  },
   resetFormNewMenu: function(){
     var me = this;
       riques(Query.getAllMenu, 
@@ -709,45 +757,8 @@ var Menu = React.createClass({
                             }
                           <div className="col-md-4">
                             <ul id="draggablePanelList" className="list-unstyled" name="draggablePanelList">
-                            { 
-                              this.state.treeData.map(function(item, index){
-                                if(item.type==="url"){
-                                return (
-                                  <li key={item.id} id={item.id} {...objectToDataset(item)} name="panel">
-                                    <MenuPanel itemData={item} onRemovePanel={me.removePanel} notifyUnsavedData={me.notifyUnsavedData} />
-                                    <ul style={{marginLeft: 20}} className="list-unstyled">
-                                      {item.children && item.children.map(function(child){
-                                      return (
-                                        <li key={child.id} id={child.id} {...objectToDataset(item)}>
-                                          <MenuPanel itemData={child} onRemovePanel={me.removePanel} notifyUnsavedData={me.notifyUnsavedData}/>
-                                        </li>
-                                      )
-                                    })}
-                                    </ul>
-                                  </li>
-                                )}
-                                if(item.type!=="url"){
-                                return (
-                                  <li key={item.id} {...objectToDataset(item)} id={item.id} name="panel">
-                                    <MenuPanel itemData={item} notifyUnsavedData={me.notifyUnsavedData} onRemovePanel={me.removePanel} />
-                                    <ul style={{marginLeft: 20}} className="list-unstyled">
-                                      {item.children && item.children.map(function(child){
-                                      return (
-                                        <li key={child.id} id={child.id} {...objectToDataset(child)} >
-                                          <MenuPanel notifyUnsavedData={me.notifyUnsavedData} itemData={child} onRemovePanel={me.removePanel} />
-                                        </li>
-                                      )
-                                    })}
-                                    </ul>
-                                  </li>
-                                )}
-
-                                  else {
-                                      return false;
-                                  }
-                              })
-                            }
-                          </ul>
+                            {this.state.menuStructure}
+                            </ul>
                           </div>
                         </div>
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}></div>
