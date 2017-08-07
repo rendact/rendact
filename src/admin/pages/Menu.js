@@ -442,6 +442,7 @@ var Menu = React.createClass({
   },
   drawMenuStructure: function(treeData){
     var me = this;
+    $("draggablePanelList").empty();
     var elementArr = [];
     _.map(treeData, function(item, index){
       if(item.type==="url"){
