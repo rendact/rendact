@@ -215,3 +215,9 @@ export const loadWidgetAreasSuccess = (widgetAreas) => ({
   type: 'LOAD_WIDGET_AREAS_SUCCESS',
   widgetAreas
 })
+
+export const addWidgetToWidgetArea = (widgetAreaId, widget) => ({
+  type: 'ADD_WIDGET_TO_WIDGET_AREA',
+  widgetAreaId,
+  widget
+})

@@ -6,7 +6,7 @@ import Query from '../../query';
 import BoxItemAvailable from './BoxItemAvailable';
 import WidgetAreaContainer from './WidgetAreaContainer';
 import {connect} from 'react-redux';
-import {loadWidgetAreasSuccess} from '../../../actions'
+import {loadWidgetAreasSuccess, addWidgetToWidgetArea} from '../../../actions'
 
 
 class Widgets extends React.Component {
@@ -54,6 +54,7 @@ class Widgets extends React.Component {
 
     handleAddToWidgetArea(id, widget){
       // params id => widgetAreaId
+      this.props.dispatch(addWidgetToWidgetArea(id, widget))
       
       this.setState(prevState => {
         let was = prevState.widgetAreas;
