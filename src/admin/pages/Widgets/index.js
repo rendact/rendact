@@ -20,6 +20,7 @@ class Widgets extends React.Component {
         this.handleAddToWidgetArea = this.handleAddToWidgetArea.bind(this);
         this.handleClearAll = this.handleClearAll.bind(this);
         this.handleRemoveSingleWidget = this.handleRemoveSingleWidget.bind(this);
+      this.handleWidgetSort = this.handleWidgetSort.bind(this);
 
       var themeFunctions = require('../../../theme/default/functions.js');
         themeFunctions.default();
@@ -45,7 +46,6 @@ class Widgets extends React.Component {
             return {widgetAreas: _newWidgetArea}
         });
     }
-
 
 
     handleAddToWidgetArea(id, widget){
@@ -108,6 +108,20 @@ class Widgets extends React.Component {
     
     }
 
+  handleWidgetSort(widgetAreaId, widgets){
+    this.setState(prevState => {
+      let widgetAreas = prevState.widgetAreas.map(wa => {
+        if (wa.id === widgetAreaId){
+          wa.widgets = widgets
+        }
+
+        return wa
+      });
+
+      return {widgetAreas: widgetAreas}
+    });
+  }
+
     componentWillMount(){
         /*
          * all registered widget
@@ -151,7 +165,15 @@ class Widgets extends React.Component {
                 <div className="col-md-8">
                 {
                     _.map(this.state.widgetAreas, function(item, index){
-                        return <WidgetAreaContainer id={item.id} key={index} title={item.id} widgets={item.widgets} clearAllWidget={this.handleClearAll} addToWidgetArea={this.handleAddToWidgetArea} />
+                      return <WidgetAreaContainer 
+                        id={item.id}
+                        key={index} 
+                        title={item.id}
+                        widgets={item.widgets}
+                        clearAllWidget={this.handleClearAll}
+                        addToWidgetArea={this.handleAddToWidgetArea}
+                        sortWidgets={this.handleWidgetSort}
+                        />
                     }.bind(this))
                 }
                 </div>

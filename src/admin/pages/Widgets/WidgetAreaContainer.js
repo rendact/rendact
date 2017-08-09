@@ -26,6 +26,7 @@ class WidgetAreaContainer extends React.Component {
 
       this.handleClearAll = this.handleClearAll.bind(this);
       this.renderItem = this.renderItem.bind(this);
+      this.onUpdate = this.onUpdate.bind(this);
     }
 
     handleClearAll(e){
@@ -34,6 +35,10 @@ class WidgetAreaContainer extends React.Component {
     }
   renderItem(props){
     return  <BoxItem widget={props.item.widget} uuid={props.item.id}/>
+  }
+
+  onUpdate(newItems){
+    this.props.sortWidgets(this.props.id, newItems);
   }
 
   render(){
@@ -54,6 +59,7 @@ class WidgetAreaContainer extends React.Component {
                           items={this.props.widgets}
                           renderItem={this.renderItem}
                           maxDepth={ 1 }
+                          onUpdate={this.onUpdate}
                         />
                     </div>
                     <div className="box-footer">
