@@ -31,6 +31,7 @@ class Widgets extends React.Component {
         require ('jquery-ui/themes/base/theme.css');
       require ('../../../../public/css/AdminLTE.css');
       require ('../../../../public/css/skins/_all-skins.css');
+      require('./custom.css')
 
         var activeWidgetArea = localStorage.getItem("activeWidgetArea");
         activeWidgetArea = activeWidgetArea.split(",");
