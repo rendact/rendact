@@ -1,7 +1,7 @@
 import React from 'react'
 import _ from 'lodash';
-import {DropTarget} from 'react-dnd'
-import {BoxItem} from './index'
+import {DropTarget} from 'react-dnd';
+import BoxItem from './BoxItem';
 
 
 const dropTarget = {
