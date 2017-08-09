@@ -2,9 +2,8 @@ import React from 'react';
 import $ from 'jquery';
 import _ from 'lodash';
 import uuid from 'uuid';
-import {riques, swalert, errorCallback} from '../../utils';
-import Query from '../query';
-//import AdminConfig from '../AdminConfig';
+import {riques, swalert, errorCallback} from '../../../utils';
+import Query from '../../query';
 
 class BoxItemSidebar extends React.Component {
 
@@ -168,18 +167,16 @@ class Widgets extends React.Component {
         this.handleAddToWidgetArea = this.handleAddToWidgetArea.bind(this);
         this.handleClearAll = this.handleClearAll.bind(this);
         this.handleRemoveSingleWidget = this.handleRemoveSingleWidget.bind(this);
-        this.registerWidgetAreasSortable = this.registerWidgetAreasSortable.bind(this);
 
-        var themeFunctions = require('../../theme/default/functions.js');
+      var themeFunctions = require('../../../theme/default/functions.js');
         themeFunctions.default();
     }
 
     componentDidMount(){
 
-        require ('../lib/jquery-sortable.js');
         require ('jquery-ui/themes/base/theme.css');
-        require ('../../../public/css/AdminLTE.css');
-        require ('../../../public/css/skins/_all-skins.css');
+      require ('../../../../public/css/AdminLTE.css');
+      require ('../../../../public/css/skins/_all-skins.css');
 
         var activeWidgetArea = localStorage.getItem("activeWidgetArea");
         activeWidgetArea = activeWidgetArea.split(",");
@@ -194,22 +191,9 @@ class Widgets extends React.Component {
             });
             return {widgetAreas: _newWidgetArea}
         });
-
-
-      $("#widgetAvailables").sortable({
-        itemSelector: '.col-md-12',
-        group: 'widget',
-        handler: '.box',
-        drop: false,
-        onDragStart: (item, container, _super) => {
-          if (!container.options.drop) {
-            item.clone().insertAfter(item)
-            _super(item, container)
-          }
-        }
-      });
-
     }
+
+
 
     handleAddToWidgetArea(id, widget){
         // params id => widgetAreaId
@@ -286,18 +270,8 @@ class Widgets extends React.Component {
 
     }
 
-  registerWidgetAreasSortable(){
-    _.forEach(this.state.widgetAreas, (widgetArea) => {
-      var sortableWidgetArea = $("#" + widgetArea.id + " #dragablePanelList");
-      sortableWidgetArea.sortable({
-        group: 'widget',
-        handle: '.box',
-    });
-    });
-  }
 
 	render(){
-    this.registerWidgetAreasSortable();
 
 		return (
 			<div className="content-wrapper">
