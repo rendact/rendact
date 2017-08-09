@@ -1,5 +1,4 @@
 import React from 'react';
-import $ from 'jquery';
 import _ from 'lodash';
 import uuid from 'uuid';
 import {riques, swalert, errorCallback} from '../../../utils';
@@ -17,9 +16,9 @@ class Widgets extends React.Component {
             availableWidgets: []
         }
 
-        this.handleAddToWidgetArea = this.handleAddToWidgetArea.bind(this);
-        this.handleClearAll = this.handleClearAll.bind(this);
-        this.handleRemoveSingleWidget = this.handleRemoveSingleWidget.bind(this);
+      this.handleAddToWidgetArea = this.handleAddToWidgetArea.bind(this);
+      this.handleClearAll = this.handleClearAll.bind(this);
+      this.handleRemoveSingleWidget = this.handleRemoveSingleWidget.bind(this);
       this.handleWidgetSort = this.handleWidgetSort.bind(this);
 
       var themeFunctions = require('../../../theme/default/functions.js');
@@ -51,7 +50,6 @@ class Widgets extends React.Component {
 
     handleAddToWidgetArea(id, widget){
       // params id => widgetAreaId
-      console.log(widget)
       
       this.setState(prevState => {
         let was = prevState.widgetAreas;
@@ -94,7 +92,7 @@ class Widgets extends React.Component {
                 let widgetAreas = prevState.widgetAreas.map(wa => {
                     if (wa.id === widgetAreaId) {
                         // remove single
-                        wa.widgets = _.filter(wa.widgets, (w) => (w.props.uuid !== id));
+                        wa.widgets = _.filter(wa.widgets, (w) => (w.id !== id));
                         return wa
                     } else {
                         return wa
@@ -174,6 +172,7 @@ class Widgets extends React.Component {
                         clearAllWidget={this.handleClearAll}
                         addToWidgetArea={this.handleAddToWidgetArea}
                         sortWidgets={this.handleWidgetSort}
+                        handleRemoveSingleWidget={this.handleRemoveSingleWidget}
                         />
                     }.bind(this))
                 }

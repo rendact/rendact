@@ -34,7 +34,12 @@ class WidgetAreaContainer extends React.Component {
         this.props.clearAllWidget(this.props.id);
     }
   renderItem(props){
-    return  <BoxItem widget={props.item.widget} uuid={props.item.id}/>
+    return  <BoxItem 
+      widget={props.item.widget} 
+      uuid={props.item.id}
+      removeSingleWidget={this.props.handleRemoveSingleWidget}
+      widgetAreaId={this.props.id}
+      />
   }
 
   onUpdate(newItems){
