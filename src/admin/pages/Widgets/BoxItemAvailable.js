@@ -4,7 +4,7 @@ import {DragSource} from 'react-dnd';
 
 const dragSource = {
   beginDrag(props, monitor, component){
-    return {widget: props.widgets}
+    return {widget: props.widget}
   },
 }
 

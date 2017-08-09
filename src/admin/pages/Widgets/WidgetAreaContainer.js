@@ -1,5 +1,19 @@
 import React from 'react'
 import _ from 'lodash';
+import {DropTarget} from 'react-dnd'
+
+
+const dropTarget = {
+  drop(props, monitor, container){
+    let droppedItem = monitor.getItem();
+    let widgetId = props.id;
+    window.alert("the " + droppedItem.widget.item + " dropped into " + widgetId);
+  }
+}
+
+const collectDrop = (connect, monitor) => ({
+  connectDropToDom: connect.dropTarget()
+});
 
 
 class WidgetAreaContainer extends React.Component {
@@ -15,7 +29,8 @@ class WidgetAreaContainer extends React.Component {
     }
   render(){
 
-    return <div id={this.props.id} className="col-md-6">
+    return this.props.connectDropToDom(
+      <div id={this.props.id} className="col-md-6">
                 <div className="box box-default collapsed-box">
                     <div className="box-header with-border">
                         <h3 className="box-title">{this.props.title}</h3>
@@ -42,8 +57,9 @@ class WidgetAreaContainer extends React.Component {
                     </div>
                 </div>
             </div>
+    )
     }
 }
 
-
+WidgetAreaContainer = DropTarget('available', dropTarget, collectDrop)(WidgetAreaContainer);
 export default WidgetAreaContainer;
