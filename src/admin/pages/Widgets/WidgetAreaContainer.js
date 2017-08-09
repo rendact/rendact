@@ -2,6 +2,7 @@ import React from 'react'
 import _ from 'lodash';
 import {DropTarget} from 'react-dnd';
 import BoxItem from './BoxItem';
+import { Nestable } from '../../lib/react-dnd-nestable/react-dnd-nestable'
 
 
 const dropTarget = {
@@ -22,17 +23,17 @@ class WidgetAreaContainer extends React.Component {
     constructor(props) {
         super(props);
 
+
       this.handleClearAll = this.handleClearAll.bind(this);
-      this.renderWidgetItem = this.renderWidgetItem.bind(this);
+      this.renderItem = this.renderItem.bind(this);
     }
 
     handleClearAll(e){
         e.preventDefault();
         this.props.clearAllWidget(this.props.id);
     }
-
-  renderWidgetItem(widget, index){
-    return <BoxItem widget={widget.widget} key={index} uuid={widget.uuid}/>
+  renderItem(props){
+    return  <BoxItem widget={props.item.widget} uuid={props.item.id}/>
   }
 
   render(){
@@ -49,11 +50,11 @@ class WidgetAreaContainer extends React.Component {
                         </div>
                     </div>
                     <div className="box-body">
-                      {
-                        _.map(this.props.widgets, (widget, index) => (
-                          this.renderWidgetItem(widget, index)
-                        ))
-                      }
+                        <Nestable
+                          items={this.props.widgets}
+                          renderItem={this.renderItem}
+                          maxDepth={ 1 }
+                        />
                     </div>
                     <div className="box-footer">
                         <button onClick={this.handleClearAll} className="btn btn-danger">Clear All</button>

@@ -37,7 +37,7 @@ class BoxItemAvailable extends React.Component {
       e.preventDefault();
       if (this.state.widgetAreaId === "" || this.state.widgetAreaId === "---widget area---"){
           return null
-      } this.props.handleAddToWidgetArea(this.state.widgetAreaId, this.props.widget);
+      } this.props.handleAddToWidgetArea(this.state.widgetAreaId, {widget: this.props.widget});
   }
 
   render(){

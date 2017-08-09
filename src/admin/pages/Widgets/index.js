@@ -50,12 +50,13 @@ class Widgets extends React.Component {
 
     handleAddToWidgetArea(id, widget){
       // params id => widgetAreaId
+      console.log(widget)
       
       this.setState(prevState => {
         let was = prevState.widgetAreas;
         was = _.map(was, wa => {
           if (wa.id === id) {
-            widget.uuid = uuid();
+            widget.id = uuid();
             wa.widgets.push(widget);
           }
 
