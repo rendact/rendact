@@ -205,3 +205,13 @@ export const loadFormData = (data)  => ({
   type: 'LOAD_FORM_DATA',
   data
 })
+
+
+/* 
+ * WIDGET MANAGEMENT PAGE ACTION
+ */
+
+export const loadWidgetAreasSuccess = (widgetAreas) => ({
+  type: 'LOAD_WIDGET_AREAS_SUCCESS',
+  widgetAreas
+})

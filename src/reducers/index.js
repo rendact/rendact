@@ -11,6 +11,7 @@ import permission from './Permission'
 import customize from './Customize'
 import profile from './Profile'
 import admin from './Admin'
+import widgets from './Widgets';
 
 const main = (state = [], action) => {
   switch (action.type) {
@@ -40,7 +41,8 @@ const rendactApp = combineReducers({
   permission,
   customize,
   profile,
-  admin
+  admin,
+  widgets,
 })
 
 export default rendactApp

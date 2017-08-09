@@ -5,6 +5,8 @@ import {riques, swalert, errorCallback} from '../../../utils';
 import Query from '../../query';
 import BoxItemAvailable from './BoxItemAvailable';
 import WidgetAreaContainer from './WidgetAreaContainer';
+import {connect} from 'react-redux';
+import {loadWidgetAreasSuccess} from '../../../actions'
 
 
 class Widgets extends React.Component {
@@ -27,6 +29,7 @@ class Widgets extends React.Component {
 
     componentDidMount(){
 
+
         require ('jquery-ui/themes/base/theme.css');
       require ('../../../../public/css/AdminLTE.css');
       require ('../../../../public/css/skins/_all-skins.css');
@@ -35,7 +38,6 @@ class Widgets extends React.Component {
         var activeWidgetArea = localStorage.getItem("activeWidgetArea");
         activeWidgetArea = activeWidgetArea.split(",");
 
-        this.setState(prevState => { 
             var _newWidgetArea = []
             _.forEach(activeWidgetArea, function(item){
                 _newWidgetArea.push({
@@ -43,6 +45,8 @@ class Widgets extends React.Component {
                     widgets: []
                 })
             });
+        this.props.dispatch(loadWidgetAreasSuccess(_newWidgetArea));
+        this.setState(prevState => { 
             return {widgetAreas: _newWidgetArea}
         });
     }
@@ -206,5 +210,14 @@ class Widgets extends React.Component {
 		)
 	}
 }
+
+const mapStateToProps = (state) => {
+  console.log(state);
+  return {
+    widgetAreas: state.widgets.widgetAreas
+  }
+}
+
+Widgets = connect(mapStateToProps)(Widgets);
 
 export default Widgets;
