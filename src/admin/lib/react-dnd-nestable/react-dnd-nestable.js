@@ -1,4 +1,3 @@
-'use strict';
 
 export { default as DragContainer } from './Container';
 export { default as DragItem } from './Item';

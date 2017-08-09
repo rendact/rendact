@@ -1,8 +1,5 @@
-'use strict';
-
 import React, { Component, PropTypes } from 'react';
 import update from 'react-addons-update';
-import pure from 'recompose/pure';
 
 import CustomDragLayer from './DragLayer';
 import Container from './Container';
