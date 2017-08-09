@@ -1,13 +1,15 @@
 import React from 'react'
 import _ from 'lodash';
 import {DropTarget} from 'react-dnd'
+import {BoxItem} from './index'
 
 
 const dropTarget = {
   drop(props, monitor, container){
     let droppedItem = monitor.getItem();
     let widgetId = props.id;
-    window.alert("the " + droppedItem.widget.item + " dropped into " + widgetId);
+    // add to widgetarea id
+    props.addToWidgetArea(widgetId, droppedItem);
   }
 }
 
@@ -20,13 +22,19 @@ class WidgetAreaContainer extends React.Component {
     constructor(props) {
         super(props);
 
-        this.handleClearAll = this.handleClearAll.bind(this);
+      this.handleClearAll = this.handleClearAll.bind(this);
+      this.renderWidgetItem = this.renderWidgetItem.bind(this);
     }
 
     handleClearAll(e){
         e.preventDefault();
         this.props.clearAllWidget(this.props.id);
     }
+
+  renderWidgetItem(widget, index){
+    return <BoxItem widget={widget.widget} key={index} uuid={widget.uuid}/>
+  }
+
   render(){
 
     return this.props.connectDropToDom(
@@ -41,15 +49,11 @@ class WidgetAreaContainer extends React.Component {
                         </div>
                     </div>
                     <div className="box-body">
-                        <ul id="dragablePanelList" className="widgets list-unstyled">
-                        {this.props.widgetAreas && 
-                            _.map(this.props.widgets, (widget, index) => (
-                                                                <li key={index}>
-                                                                        {widget}
-                                                                </li>
-                                                                ))
-                        }
-                    </ul>
+                      {
+                        _.map(this.props.widgets, (widget, index) => (
+                          this.renderWidgetItem(widget, index)
+                        ))
+                      }
                     </div>
                     <div className="box-footer">
                         <button onClick={this.handleClearAll} className="btn btn-danger">Clear All</button>

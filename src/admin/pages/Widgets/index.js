@@ -7,7 +7,7 @@ import Query from '../../query';
 import BoxItemAvailable from './BoxItemAvailable';
 import WidgetAreaContainer from './WidgetAreaContainer';
 
-class BoxItemSidebar extends React.Component {
+export class BoxItem extends React.Component {
 
     constructor(props){
         super(props);
@@ -21,6 +21,7 @@ class BoxItemSidebar extends React.Component {
     
    render() {
         let widget = this.props.widget;
+     debugger
         let widgetValue = JSON.parse(widget.value);
 
       return (<div className="box box-default collapsed-box box-solid" style={{borderRadius: 0}}>
@@ -93,8 +94,24 @@ class Widgets extends React.Component {
 
 
     handleAddToWidgetArea(id, widget){
-        // params id => widgetAreaId
+      // params id => widgetAreaId
+      
+      this.setState(prevState => {
+        let was = prevState.widgetAreas;
+        was = _.map(was, wa => {
+          if (wa.id === id) {
+            widget.uuid = uuid();
+            wa.widgets.push(widget);
+          }
 
+          return wa
+        });
+
+        return {widgetAreas: was}
+      })
+
+      console.log(this.state.widgetAreas);
+      /*
         this.setState(prevState => {
             let widgetFound = _.find(prevState.availableWidgets, w => (w.node.id === widget.id));
 
@@ -109,6 +126,7 @@ class Widgets extends React.Component {
 
             return {widgetAreas: newState}
         });
+        */
     }
 
     handleClearAll(id){
@@ -194,7 +212,7 @@ class Widgets extends React.Component {
                 <div className="col-md-8">
                 {
                     _.map(this.state.widgetAreas, function(item, index){
-                        return <WidgetAreaContainer id={item.id} key={index} title={item.id} widgets={item.widgets} clearAllWidget={this.handleClearAll} />
+                        return <WidgetAreaContainer id={item.id} key={index} title={item.id} widgets={item.widgets} clearAllWidget={this.handleClearAll} addToWidgetArea={this.handleAddToWidgetArea} />
                     }.bind(this))
                 }
                 </div>
