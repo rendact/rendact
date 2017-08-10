@@ -6,7 +6,12 @@ import Query from '../../query';
 import BoxItemAvailable from './BoxItemAvailable';
 import WidgetAreaContainer from './WidgetAreaContainer';
 import {connect} from 'react-redux';
-import {loadWidgetAreasSuccess, addWidgetToWidgetArea, removeAllWidgetsFromWidgetArea} from '../../../actions'
+import {
+  loadWidgetAreasSuccess, 
+  addWidgetToWidgetArea, 
+  removeAllWidgetsFromWidgetArea,
+  removeSingleWidgetFromWidgetArea
+} from '../../../actions'
 
 
 class Widgets extends React.Component {
@@ -68,22 +73,8 @@ class Widgets extends React.Component {
     handleRemoveSingleWidget(id, widgetAreaId){
         // params id === id or uuid the widget
         swalert("warning", "Sure want to remove this widget?", "", () => {
-            this.setState((prevState) => {
-                let widgetAreas = prevState.widgetAreas.map(wa => {
-                    if (wa.id === widgetAreaId) {
-                        // remove single
-                        wa.widgets = _.filter(wa.widgets, (w) => (w.id !== id));
-                        return wa
-                    } else {
-                        return wa
-                    }
-                });
-
-                return {widgetAreas: widgetAreas}
-
-            }
-        );
-        });
+          this.props.dispatch(removeSingleWidgetFromWidgetArea(id, widgetAreaId))
+        })
     
     }
 

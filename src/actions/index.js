@@ -226,3 +226,9 @@ export const removeAllWidgetsFromWidgetArea = (widgetAreaId) => ({
   type: 'REMOVE_ALL_WIDGETS_FROM_WIDGET_AREA',
   widgetAreaId
 })
+
+export const removeSingleWidgetFromWidgetArea = (widgetId, widgetAreaId) => ({
+  type: 'REMOVE_SINGLE_WIDGET_FROM_WIDGET_AREA',
+  widgetId,
+  widgetAreaId
+})

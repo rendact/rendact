@@ -34,6 +34,19 @@ const widgets = (state = {} , action) => {
         {widgetAreas: widgetAreas}
       );
 
+    case 'REMOVE_SINGLE_WIDGET_FROM_WIDGET_AREA':
+      widgetAreas = _.map(state.widgetAreas, wa => {
+        if (wa.id === action.widgetAreaId) {
+          // remove single using _.filter
+          wa.widgets = _.filter(wa.widgets, w => ( w.id !== action.widgetId ))
+        }
+        return wa
+      });
+
+      return Object.assign({}, state,
+        {widgetAreas: widgetAreas}
+      );
+
     default:
       return state
   }
