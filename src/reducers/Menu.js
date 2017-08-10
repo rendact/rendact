@@ -63,6 +63,31 @@ const menu = (state = [], action) => {
       
     case 'SET_EDITOR_MODE':
       return state.map(item =>  ({...item, mode: action.mode}))
+
+    case 'ASSIGN_VALUE_TO_MENU_ITEM':
+      return state.map(item=> {
+        let treeData = [...item.treeData]
+
+        const assignHelper = (items) => {
+
+          _.forEach(items, item => {
+            if (item.id === action.menuId) {
+              item[action.name] = action.value
+              return
+            }
+            if (item.children && item.children.length) {
+              assignHelper(item.children);
+              return
+            }
+
+          })
+        }
+
+        assignHelper(treeData);
+
+
+        return {...item, treeData: treeData}
+      });
       
     default:
       return state

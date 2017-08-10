@@ -287,6 +287,13 @@ export const setDisabled = (disabled)  => ({
   disabled
 })
 
+export const assignValueToMenuItem = (menuId, name, value) => ({
+  type: 'ASSIGN_VALUE_TO_MENU_ITEM',
+  menuId,
+  name,
+  value
+});
+
 /* 
  * WIDGET MANAGEMENT PAGE ACTION
  */

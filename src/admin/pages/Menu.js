@@ -9,7 +9,7 @@ import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
 import {maskArea, setMenuStructure, setResetDelete, setTreeData, setNewMenuName, setSelectedMenuName, setDisabled, setNewMenuId, 
-  setIdMainMenu, setPosition, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu} from '../../actions'
+  setIdMainMenu, setPosition, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
 import {objectToDataset, swalert, riques, errorCallback, setValue, getValue, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
 
@@ -54,16 +54,36 @@ const MenuPanel = React.createClass({
 
           <div className="form-group">
             <i htmlFor="name" >Label</i>
-            <input type="text" name="name" id="labelValue" className="form-control" required="true" defaultValue={itemData.label? itemData.label: itemData.titlePanel}/>
+            <input 
+              type="text" 
+              name="name" 
+              id="labelValue" 
+              className="form-control" 
+              required="true"
+              defaultValue={itemData.label? itemData.label: itemData.titlePanel} 
+              onChange={(e) => this.props.assignValueToMenuItem(itemData.id, 'label', e.currentTarget.value)}
+            />
           </div>
           <div className="form-group">
             <i htmlFor="name" >Tooltip</i>
-            <input type="text" name="tooltipValue" defaultValue={itemData.tooltip} id="tooltipValue" className="form-control" />
+            <input type="text" 
+              name="tooltipValue" 
+              defaultValue={itemData.tooltip} 
+              id="tooltipValue" 
+              className="form-control"
+              onChange={(e) => this.props.assignValueToMenuItem(itemData.id, 'tooltip', e.currentTarget.value)}
+            />
           </div>
           { itemData.type==="url" &&
           <div className="form-group">
             <i htmlFor="name" >URL</i>
-            <input type="text" name="urlValue" id="urlValue" className="form-control" defaultValue={itemData.url}/>
+            <input type="text"
+              name="urlValue" 
+              id="urlValue" 
+              className="form-control" 
+              defaultValue={itemData.url}
+              onChange={(e) => this.props.assignValueToMenuItem(itemData.id, 'url', e.currentTarget.value)}
+            />
           </div>
           }
           
@@ -146,6 +166,10 @@ const MenuPanel = React.createClass({
     "#selectedMenuName",
     "#mainMenu",
   ],
+
+  assignValueToMenuItem(menuId, name, value){
+    this.props.dispatch(assignValueToMenuItem(menuId, name, value))
+  },
 
   notifyUnsavedData: function(state){
     let me = this;
@@ -537,7 +561,12 @@ const MenuPanel = React.createClass({
 
   renderItem: function({item}){
     return <div {...objectToDataset(item)} id={item.id} name="panel">
-       <MenuPanel itemData={item} onRemovePanel={this.removePanel} notifyUnsavedData={this.notifyUnsavedData}/>
+      <MenuPanel 
+        itemData={item} 
+        onRemovePanel={this.removePanel} 
+        notifyUnsavedData={this.notifyUnsavedData}
+        assignValueToMenuItem={this.assignValueToMenuItem}
+      />
     </div>
   },
 
