@@ -3,7 +3,11 @@ import _ from 'lodash';
 import {DropTarget} from 'react-dnd';
 import BoxItem from './BoxItem';
 import { Nestable } from '../../lib/react-dnd-nestable/react-dnd-nestable'
-
+import { connect } from 'react-redux'
+import {
+  removeAllWidgetsFromWidgetArea
+} from '../../../actions'
+import {swalert} from '../../../utils';
 
 const dropTarget = {
   drop(props, monitor, container){
@@ -31,7 +35,11 @@ class WidgetAreaContainer extends React.Component {
 
     handleClearAll(e){
         e.preventDefault();
-        this.props.clearAllWidget(this.props.id);
+
+        swalert("warning", "Sure want to remove all widgets?", "You might lost some data",
+            () => {
+                this.props.removeAllWidgets(this.props.id);
+            });
     }
   renderItem(props){
     return  <BoxItem 
@@ -76,6 +84,18 @@ class WidgetAreaContainer extends React.Component {
     )
     }
 }
+
+const mapStateToProps = (props) => (
+  {props}
+);
+
+const mapDispatchToProps = (dispatch, ownProps) => ({
+  removeAllWidgets: function (widgetAreaId) {
+    dispatch(removeAllWidgetsFromWidgetArea(widgetAreaId))
+  }
+});
+
+WidgetAreaContainer = connect(mapStateToProps, mapDispatchToProps)(WidgetAreaContainer)
 
 WidgetAreaContainer = DropTarget('available', dropTarget, collectDrop)(WidgetAreaContainer);
 export default WidgetAreaContainer;

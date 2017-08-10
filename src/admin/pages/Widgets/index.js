@@ -20,7 +20,6 @@ class Widgets extends React.Component {
         super(props);
 
       this.handleAddToWidgetArea = this.handleAddToWidgetArea.bind(this);
-      this.handleClearAll = this.handleClearAll.bind(this);
       this.handleRemoveSingleWidget = this.handleRemoveSingleWidget.bind(this);
       this.handleWidgetSort = this.handleWidgetSort.bind(this);
 
@@ -54,13 +53,6 @@ class Widgets extends React.Component {
       // params id => widgetAreaId
       this.props.dispatch(addWidgetToWidgetArea(id, widget))
 
-    }
-
-    handleClearAll(id){
-        swalert("warning", "Sure want to remove all widgets?", "You might lost some data",
-            () => {
-              this.props.dispatch(removeAllWidgetsFromWidgetArea(id));
-            });
     }
 
     handleRemoveSingleWidget(id, widgetAreaId){
@@ -123,7 +115,6 @@ class Widgets extends React.Component {
                         key={index} 
                         title={item.id}
                         widgets={item.widgets}
-                        clearAllWidget={this.handleClearAll}
                         addToWidgetArea={this.handleAddToWidgetArea}
                         sortWidgets={this.handleWidgetSort}
                         handleRemoveSingleWidget={this.handleRemoveSingleWidget}
