@@ -40,17 +40,14 @@ class Widgets extends React.Component {
         var activeWidgetArea = localStorage.getItem("activeWidgetArea");
         activeWidgetArea = activeWidgetArea.split(",");
 
-            var _newWidgetArea = []
-            _.forEach(activeWidgetArea, function(item){
-                _newWidgetArea.push({
-                    id: item,
-                    widgets: []
-                })
-            });
-        this.props.dispatch(loadWidgetAreasSuccess(_newWidgetArea));
-        this.setState(prevState => { 
-            return {widgetAreas: _newWidgetArea}
+        var _newWidgetArea = []
+        _.forEach(activeWidgetArea, function(item){
+            _newWidgetArea.push({
+                id: item,
+                widgets: []
+            })
         });
+        this.props.dispatch(loadWidgetAreasSuccess(_newWidgetArea));
     }
 
 
