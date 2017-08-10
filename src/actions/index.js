@@ -257,6 +257,11 @@ export const setPageListMenu = (pageList)  => ({
   pageList
 })
 
+export const setMenuStructure = (menuStructure)  => ({
+  type: 'SET_MENU_STRUCTURE',
+  menuStructure
+})
+
 export const setMenuId = (menuId)  => ({
   type: 'SET_MENU_ID',
   menuId
@@ -281,3 +286,35 @@ export const setDisabled = (disabled)  => ({
   type: 'SET_DISABLED',
   disabled
 })
+
+/* 
+ * WIDGET MANAGEMENT PAGE ACTION
+ */
+
+export const loadWidgetAreasSuccess = (widgetAreas) => ({
+  type: 'LOAD_WIDGET_AREAS_SUCCESS',
+  widgetAreas
+})
+
+export const addWidgetToWidgetArea = (widgetAreaId, widget) => ({
+  type: 'ADD_WIDGET_TO_WIDGET_AREA',
+  widgetAreaId,
+  widget
+})
+
+export const removeAllWidgetsFromWidgetArea = (widgetAreaId) => ({
+  type: 'REMOVE_ALL_WIDGETS_FROM_WIDGET_AREA',
+  widgetAreaId
+})
+
+export const removeSingleWidgetFromWidgetArea = (widgetId, widgetAreaId) => ({
+  type: 'REMOVE_SINGLE_WIDGET_FROM_WIDGET_AREA',
+  widgetId,
+  widgetAreaId
+})
+
+export const updateWidgetsOrder = (widgetAreaId, widgets) => ({
+  type: 'UPDATE_WIDGETS_ORDER',
+  widgetAreaId,
+  widgets
+});

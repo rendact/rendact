@@ -9,6 +9,8 @@ import Admin from './admin'
 import Login from './login'
 import Register from './register'
 import reducer from './reducers'
+import {DragDropContext} from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 import { createStore } from 'redux'
 window.AuthService = AuthService
 const store = createStore(reducer)
@@ -85,5 +87,7 @@ class Main extends React.Component {
 		)
 	}
 }
+
+Main = DragDropContext(HTML5Backend)(Main);
 
 render(<Main/>, document.getElementById('root'));

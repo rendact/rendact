@@ -25,12 +25,7 @@ const menu = (state = [], action) => {
           treeData: action.treeData
         }
       ]
-    /*case 'SET_TREE_DATA':
-      return [
-        {
-          treeData: action.treeData
-        }
-      ]*/
+    
     case 'SET_TREE_DATA':
       return state.map(item =>  ({...item, treeData: action.treeData}))
 
@@ -46,30 +41,13 @@ const menu = (state = [], action) => {
           selectedMenuName: action.selectedMenuName
         }
       ]
-    /*case 'SET_NEW_MENU_ID':
-      return [
-        {
-          newMenuId: action.newMenuId
-        }
-      ]*/
+    
     case 'SET_NEW_MENU_ID':
       return state.map(item =>  ({...item, newMenuId: action.newMenuId}))
 
-    /*case 'SET_ID_MAIN_MENU':
-      return [
-        {
-          IdMainMenu: action.IdMainMenu
-        }
-      ]*/
     case 'SET_ID_MAIN_MENU':
       return state.map(item =>  ({...item, IdMainMenu: action.IdMainMenu}))
 
-    /*case 'SET_POSITION':
-      return [
-        {
-          position: action.position
-        }
-      ]*/
     case 'SET_POSITION':
       return state.map(item =>  ({...item, position: action.position}))
 
@@ -91,12 +69,9 @@ const menu = (state = [], action) => {
     case 'SET_CATEGORY_LIST':
       return state.map(item =>  ({...item, categoryList: action.categoryList}))
 
-    /*case 'SET_DISABLED':
-      return [
-        {
-          disabled: action.disabled
-        }
-      ]*/
+    case 'SET_MENU_STRUCTURE':
+      return state.map(item =>  ({...item, menuStructure: action.menuStructure}))
+
     case 'SET_DISABLED':
       return state.map(item =>  ({...item, disabled: action.disabled}))
 
