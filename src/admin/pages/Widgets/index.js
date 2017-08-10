@@ -162,6 +162,16 @@ class Widgets extends React.Component {
 	}
 }
 
+Widgets.propTypes = {
+  widgetAreas : React.PropTypes.array.isRequired,
+  widgetsAvailable: React.PropTypes.array.isRequired
+}
+
+Widgets.defaultProps = {
+  widgetAreas: [],
+  widgetsAvailable: []
+}
+
 const mapStateToProps = (state) => {
   return {
     widgetAreas: state.widgets.widgetAreas,
