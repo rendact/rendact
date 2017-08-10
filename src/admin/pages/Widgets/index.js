@@ -11,17 +11,14 @@ import {
   addWidgetToWidgetArea, 
   removeAllWidgetsFromWidgetArea,
   removeSingleWidgetFromWidgetArea,
-  updateWidgetsOrder
+  updateWidgetsOrder,
+  loadWidgetsAvailableSuccess
 } from '../../../actions'
 
 
 class Widgets extends React.Component {
     constructor(props){
         super(props);
-
-        this.state = {
-            availableWidgets: []
-        }
 
       this.handleAddToWidgetArea = this.handleAddToWidgetArea.bind(this);
       this.handleClearAll = this.handleClearAll.bind(this);
@@ -89,7 +86,7 @@ class Widgets extends React.Component {
         riques(Query.getAllWidgets,
             (error, response, data) => {
                 if (!error && !data.errors && response.statusCode === 200){
-                   this.setState({availableWidgets: data.data.viewer.allOptions.edges});
+                  this.props.dispatch(loadWidgetsAvailableSuccess(data.data.viewer.allOptions.edges))
                 } else {
               errorCallback(error, data.errors?data.errors[0].message:null);
             }
@@ -149,7 +146,7 @@ class Widgets extends React.Component {
                                 <div className="row">
                                 <ul id="widgetAvailables" className="widgets no-drop list-unstyled">
                                     
-                                    {_.map(this.state.availableWidgets, (widget, index) => (
+                                    {_.map(this.props.widgetsAvailable, (widget, index) => (
                                           <div className='col-md-12' key={index}>
                                             <BoxItemAvailable widget={widget.node} widgetAreas={this.props.widgetAreas} handleAddToWidgetArea={this.handleAddToWidgetArea}/>
                                           </div>
@@ -170,7 +167,8 @@ class Widgets extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    widgetAreas: state.widgets.widgetAreas
+    widgetAreas: state.widgets.widgetAreas,
+    widgetsAvailable: state.widgets.widgetsAvailable
   }
 }
 

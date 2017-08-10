@@ -318,3 +318,9 @@ export const updateWidgetsOrder = (widgetAreaId, widgets) => ({
   widgetAreaId,
   widgets
 });
+
+export const loadWidgetsAvailableSuccess = (widgets) => ({
+  type: 'LOAD_WIDGETS_AVAILABLE_SUCCESS',
+  widgets
+});
+
