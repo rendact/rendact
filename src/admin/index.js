@@ -276,20 +276,20 @@ class PageLoader extends React.Component{
       let EditorComponent = React.createClass({
         render: function() {
           return <NewContentType
-            name = { contentData.name }
-            slug = { contentData.slug }
-            postId = { me.props.postId }
-            postType = { page }
-            loadQuery = { Query.getPostQry }
-            createQuery = { Query.getCreatePostQry }
-            updateQuery = { Query.getUpdatePostQry }
-            customFields = { contentData.customFields }
-            tableName = "Post"
-            widgets = {
-                ["category", "featuredImage"] }
-            viewRole = "view-post"
-            modifyRole = "modify-post"
-            handleNav = { me.props.handleNav }
+            name={ contentData.name }
+            slug={ contentData.slug }
+            postId={ me.props.postId }
+            postType={ page }
+            loadQuery={ Query.getPostQry }
+            createQuery={ Query.getCreatePostQry }
+            updateQuery={ Query.getUpdatePostQry }
+            customFields={ contentData.customFields }
+            tableName="Post"
+            widgets={
+                ["ategoy", "featuredImage"] }
+            viewRole="view-post"
+            modifyRole="modify-post"
+            handleNav={ me.props.handleNav }
             />
         }
     });
@@ -298,9 +298,9 @@ class PageLoader extends React.Component{
       let CategoryComponent = React.createClass({
         render: function() {
           return <CategoryContent
-            postType = { page }
-            slug = { page }
-            handleNav = { me.props.handleNav }
+            postType={ page }
+            slug={ page }
+            handleNav={ me.props.handleNav }
             />
         }
       });

@@ -1,14 +1,12 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {Link} from 'react-router';
 import Query from '../query';
-import $ from 'jquery';
 import _ from 'lodash';
 import uuid from 'uuid';
 import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
-import {maskArea, setMenuStructure, setResetDelete, setTreeData, setNewMenuName, setSelectedMenuName, setDisabled, setNewMenuId, 
+import {maskArea, setResetDelete, setTreeData, setNewMenuName, setSelectedMenuName, setDisabled, setNewMenuId, 
   setIdMainMenu, setPosition, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
 import {objectToDataset, swalert, riques, errorCallback, setValue, getValue, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
@@ -119,7 +117,7 @@ const MenuPanel = React.createClass({
     type: React.PropTypes.string,
     target: React.PropTypes.string,
     tooltip: React.PropTypes.string,
-    urlData: React.PropTypes.string,
+    urlData: React.PropTypes.object,
     position: React.PropTypes.string,
     IdMainMenu: React.PropTypes.string,
     isProcessing: React.PropTypes.bool.isRequired,
@@ -272,7 +270,6 @@ const MenuPanel = React.createClass({
   },
   addToMenu: function(event){
     var _treeData = this.props.treeData;
-    var me = this;
     var menuFiltered = _.filter(document.getElementsByName("itemsChecked[]"), function(item){
       return item.checked
     });
@@ -337,53 +334,13 @@ const MenuPanel = React.createClass({
           });
           me.resetFormNewMenu();
           me.props.dispatch(setTreeData([]))
-          var here = me;
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
         me.disableForm(false);
       });
   },
-  initSortable: function(){
-    var me = this;
-    var adjustment;
-    var panelList = $('#draggablePanelList');
-    var group = panelList.sortable({
-        group: 'nested',
-        handle: '.box-header',
-        pullPlaceholder: true,
-        // animation on drop
-        onDrop: function  ($item, container, _super) {
-          var $clonedItem = $('<li/>').css({height: 0});
-          $item.before($clonedItem);
-          $clonedItem.animate({'height': $item.height()});
-          
-          $item.animate($clonedItem.position(), function  () {
-            $clonedItem.detach();
-            _super($item, container);
-          });
-        },
 
-        // set $item relative to cursor position
-        onDragStart: function ($item, container, _super) {
-          var offset = $item.offset(),
-              pointer = container.rootGroup.pointer;
-
-          adjustment = {
-            left: pointer.left - offset.left,
-            top: pointer.top - offset.top
-          };
-
-          _super($item, container);
-        },
-        onDrag: function ($item, position) {
-          $item.css({
-            left: position.left - adjustment.left,
-            top: position.top - adjustment.top
-          });
-        }
-    });
-  },
   componentDidMount: function(){
     require ('jquery-ui/themes/base/theme.css');
     require ('../lib/jquery-sortable.js');
@@ -394,7 +351,6 @@ const MenuPanel = React.createClass({
 
     var me = this;
     this.notif = this.refs.notificationSystem;
-    this.initSortable();    
 
     this.props.dispatch(setResetDelete())
     this.disableForm(true);
@@ -498,10 +454,6 @@ const MenuPanel = React.createClass({
                     position: 'tr',
                     autoDismiss: 2
             });
-            var here = me;
-              var cb = function(){
-                here.disableForm(false)
-              }
             me.loadMenuItems(menuId)
             me.notifyUnsavedData(false);
             } else {

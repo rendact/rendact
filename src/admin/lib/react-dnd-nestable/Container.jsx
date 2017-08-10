@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import pure from 'recompose/pure';
 
 import Item from './Item';
 
