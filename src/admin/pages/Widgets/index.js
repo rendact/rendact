@@ -1,6 +1,5 @@
 import React from 'react';
 import _ from 'lodash';
-import uuid from 'uuid';
 import {riques, swalert, errorCallback} from '../../../utils';
 import Query from '../../query';
 import BoxItemAvailable from './BoxItemAvailable';
