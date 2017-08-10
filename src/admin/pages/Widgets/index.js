@@ -10,7 +10,8 @@ import {
   loadWidgetAreasSuccess, 
   addWidgetToWidgetArea, 
   removeAllWidgetsFromWidgetArea,
-  removeSingleWidgetFromWidgetArea
+  removeSingleWidgetFromWidgetArea,
+  updateWidgetsOrder
 } from '../../../actions'
 
 
@@ -19,7 +20,6 @@ class Widgets extends React.Component {
         super(props);
 
         this.state = {
-            widgetAreas: [],
             availableWidgets: []
         }
 
@@ -79,17 +79,7 @@ class Widgets extends React.Component {
     }
 
   handleWidgetSort(widgetAreaId, widgets){
-    this.setState(prevState => {
-      let widgetAreas = prevState.widgetAreas.map(wa => {
-        if (wa.id === widgetAreaId){
-          wa.widgets = widgets
-        }
-
-        return wa
-      });
-
-      return {widgetAreas: widgetAreas}
-    });
+    this.props.dispatch(updateWidgetsOrder(widgetAreaId, widgets));
   }
 
     componentWillMount(){
@@ -179,7 +169,6 @@ class Widgets extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-  console.log(state);
   return {
     widgetAreas: state.widgets.widgetAreas
   }

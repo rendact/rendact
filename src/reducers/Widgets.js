@@ -47,6 +47,19 @@ const widgets = (state = {} , action) => {
         {widgetAreas: widgetAreas}
       );
 
+    case 'UPDATE_WIDGETS_ORDER':
+      widgetAreas = _.map(state.widgetAreas, wa => {
+        if(wa.id === action.widgetAreaId){
+          wa.widgets = action.widgets
+        }
+        return wa
+      });
+
+
+      return Object.assign({}, state, 
+        {widgetAreas: widgetAreas}
+      );
+
     default:
       return state
   }

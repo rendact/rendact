@@ -232,3 +232,9 @@ export const removeSingleWidgetFromWidgetArea = (widgetId, widgetAreaId) => ({
   widgetId,
   widgetAreaId
 })
+
+export const updateWidgetsOrder = (widgetAreaId, widgets) => ({
+  type: 'UPDATE_WIDGETS_ORDER',
+  widgetAreaId,
+  widgets
+});
