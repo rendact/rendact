@@ -85,55 +85,55 @@ const MenuPanel = React.createClass({
     disabled: React.PropTypes.bool,
     name: React.PropTypes.string,
     selectedMenuName:React.PropTypes.string,
-        newMenuName:React.PropTypes.string,
-        menuId:React.PropTypes.string,
-        pageList: React.PropTypes.array,
-        allPageList: React.PropTypes.array,
-        allPostList: React.PropTypes.array,
-        categoryList: React.PropTypes.array,
-        items: React.PropTypes.array,
-        menuSortableTree: React.PropTypes.array,
-        treeData: React.PropTypes.array,
-        itemsChecked: React.PropTypes.bool,
-        type: React.PropTypes.string,
-        target: React.PropTypes.string,
-        tooltip: React.PropTypes.string,
-        urlData: React.PropTypes.string,
-        position: React.PropTypes.string,
-        IdMainMenu: React.PropTypes.string,
+    newMenuName:React.PropTypes.string,
+    menuId:React.PropTypes.string,
+    pageList: React.PropTypes.array,
+    allPageList: React.PropTypes.array,
+    allPostList: React.PropTypes.array,
+    categoryList: React.PropTypes.array,
+    items: React.PropTypes.array,
+    menuSortableTree: React.PropTypes.array,
+    treeData: React.PropTypes.array,
+    itemsChecked: React.PropTypes.bool,
+    type: React.PropTypes.string,
+    target: React.PropTypes.string,
+    tooltip: React.PropTypes.string,
+    urlData: React.PropTypes.string,
+    position: React.PropTypes.string,
+    IdMainMenu: React.PropTypes.string,
     isProcessing: React.PropTypes.bool.isRequired,
     opacity: React.PropTypes.number.isRequired,
     errorMsg: React.PropTypes.string,
     loadingMsg: React.PropTypes.string,
     deleteMode: React.PropTypes.bool,
+    menuStructure: React.PropTypes.array
   },
   getDefaultProps: function() {
     return {
       isProcessing: false,
       opacity: 1,
       deleteMode: false,
-
-        disabled: true,
-        name:"",
-        selectedMenuName:"",
-        newMenuName:"",
-        menuId:"",
-        errorMsg: null,
-        loadingMsg: null,
-        pageList: [],
-        allPageList: null,
-        allPostList: null,
-        categoryList: null,
-        items: [],
-        menuSortableTree:[],
-        IdMainMenu: "",
-        treeData: [],
-        itemsChecked: false,
-        type: "",
-        target: "",
-        tooltip: "",
-        urlData: {},
-        menuStructure: ""
+      disabled: true,
+      name:"",
+      selectedMenuName:"",
+      newMenuName:"",
+      menuId:"",
+      errorMsg: null,
+      loadingMsg: null,
+      pageList: [],
+      allPageList: null,
+      allPostList: null,
+      categoryList: null,
+      items: [],
+      menuSortableTree:[],
+      IdMainMenu: "",
+      treeData: [],
+      itemsChecked: false,
+      type: "",
+      target: "",
+      tooltip: "",
+      urlData: {},
+      menuStructure: []
       }
   },
 
@@ -152,13 +152,8 @@ const MenuPanel = React.createClass({
       me.props.handleUnsavedData(state)
     }
   },
-
-  // maskArea: function(state){
-  //   this.setState({isProcessing: state, opacity: state?0.1:1});
-  // },
   disableForm: function(state){
     disableForm(state, this.notif);
-    //this.maskArea(state);
     this.props.dispatch(maskArea(state));
   },
   resetFormCheckbox: function(){
@@ -172,7 +167,6 @@ const MenuPanel = React.createClass({
   resetFormDelete: function(){
     document.getElementById("menu").reset();
     document.getElementById("menuName").reset();
-    //this.setState({newMenuName:"", selectedMenuName:"", treeData:[], position:""});
     this.props.dispatch(setResetDelete())
     this.handleNameChange();
     this.handleNewMenuChange();
@@ -191,8 +185,6 @@ const MenuPanel = React.createClass({
             if (items)
             me.drawMenuStructure(items);
             var position = body.data.getMenu.position;
-            // me.setState({treeData: items});
-            // me.setState({position: position});
             me.props.dispatch(setTreeData(items))
             me.props.dispatch(setPosition(position))
             me.disableForm(false);
@@ -200,20 +192,17 @@ const MenuPanel = React.createClass({
             errorCallback(error, body.errors?body.errors[0].message:null);
           }
           me.disableForm(false);
-          //me.setState({disabled: false})
           me.props.dispatch(setDisabled(false))
         }
       );
   },
 
   handleMenuName: function(event){
-    //this.setState({menu: document.querySelector('#menuSelect').value});
     var menuId = event.target.value.split("-")[0];
     var selectedMenuName = event.target.value.split("-")[1];
     var me = this;
     if (menuId!=="") {
       setValue("selectedMenuName", selectedMenuName);
-      //this.setState({menuId:menuId, treeData:[]});
       this.props.dispatch(setMenuId(menuId))
       this.props.dispatch(setTreeData([]))
       this.loadMenuItems(menuId);
@@ -274,7 +263,6 @@ const MenuPanel = React.createClass({
     }else if (menuValues.length>0) {
       treeData = _.concat(_treeData, menuValues);
     }
-    //this.setState ({treeData: treeData});
     this.props.dispatch(setTreeData(treeData))
     this.notifyUnsavedData(true)
 
@@ -293,7 +281,6 @@ const MenuPanel = React.createClass({
         }
         return data.id !== panelRemoved
       });
-      //this.setState({treeData: _treeData});
       this.props.dispatch(setTreeData(_treeData))
       this.drawMenuStructure(_treeData);
     });
@@ -301,12 +288,10 @@ const MenuPanel = React.createClass({
 
   handleNewMenuChange: function(event){
     var newMenuName = getValue("newMenuName");
-    //this.setState({newMenuName: newMenuName})
     this.props.dispatch(setNewMenuName(newMenuName))
   },
   handleNameChange: function(event){
     var selectedMenuName = getValue("selectedMenuName");
-    //this.setState({selectedMenuName: selectedMenuName})
     this.props.dispatch(setSelectedMenuName(selectedMenuName))
     this.notifyUnsavedData(true);
   },
@@ -320,7 +305,6 @@ const MenuPanel = React.createClass({
     riques(qry, 
       function(error, response, body) {
         var newMenuId = body.data.createMenu.changedMenu.id;
-        //me.setState({newMenuId: newMenuId}); 
         me.props.dispatch(setNewMenuId(newMenuId))
         if (!error && !body.errors && response.statusCode === 200) {
           me.notif.addNotification({
@@ -330,12 +314,9 @@ const MenuPanel = React.createClass({
                   autoDismiss: 2
           });
           me.resetFormNewMenu();
-          //me.setState({treeData:[]});
           me.props.dispatch(setTreeData([]))
           me.drawMenuStructure([]);
           var here = me;
-          var cb = function(){here.disableForm(false)}
-          me.componentWillMount("All", cb);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
@@ -393,20 +374,71 @@ const MenuPanel = React.createClass({
     this.notif = this.refs.notificationSystem;
     this.initSortable();    
 
+    this.props.dispatch(setResetDelete())
+    this.disableForm(true);
     riques(Query.getMainMenu, 
       function(error, response, body) {
         if (!error) {
-          var mainMenu = _.forEach(body.data.viewer.allMenus.edges, function(item){ return item })
-          let IdMainMenu = _.map(mainMenu, function(item){return  item.node.id });
-          me.props.dispatch(setIdMainMenu(IdMainMenu))
+          var mainMenu = _.forEach(body.data.viewer.allMenus.edges, function(item){ return item });
+          if (mainMenu.length>0)
+            me.props.dispatch(setIdMainMenu(_.head(mainMenu).node.id))
         }
+
+        riques(Query.getAllMenu, 
+          function(error, response, body) {
+            if (!error) {
+              var pageList = [(<option key="0" value="">--select menu--</option>)];
+              _.forEach(body.data.viewer.allMenus.edges, function(item){
+                pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
+              })
+              me.props.dispatch(setPageListMenu(pageList)) 
+            }
+          }
+        );
+        riques(Query.getAllPage, 
+          function(error, response, body) {
+            if (!error) {
+              var allPageList = [];
+              _.forEach(body.data.viewer.allPosts.edges, function(item){
+                allPageList.push((<div key={item.node.id}><input className="pageMenu" id={item.node.id}
+                name="itemsChecked[]" type="checkbox" value={item.node.title+"-page"} /> {item.node.title}</div>));
+              })
+              me.props.dispatch(setAllPageList(allPageList)) 
+            }
+          }
+        );
+        riques(Query.getAllPost, 
+          function(error, response, body) {
+            if (!error) {
+              var allPostList = [];
+              _.forEach(body.data.viewer.allPosts.edges, function(item){
+                allPostList.push((<div key={item.node.id}><input id={item.node.id}
+                name="itemsChecked[]" type="checkbox" value={item.node.title+"-post"} /> {item.node.title}</div>));
+              })
+              me.props.dispatch(setAllPostList(allPostList))
+            }
+          }
+        );
+        riques(Query.getAllCategory, 
+          function(error, response, body) {
+            if (!error) {
+              var categoryList = [];
+              _.forEach(body.data.viewer.allCategories.edges, function(item){
+                categoryList.push((<div key={item.node.id}><input id={item.node.id}
+                name="itemsChecked[]" type="checkbox" value={item.node.name+"-category"} /> {item.node.name}</div>));
+              })
+              me.props.dispatch(setCategoryMenu(categoryList))
+            }
+          }
+        );
+
+        me.disableForm(false);
       }
     );
   },
   onChangeMainMenu: function(event){
     const target = event.target;
     const position = target.checked === true ? target.value : "";
-    //this.setState({position: position});
     this.props.dispatch(setPosition(position))      
     this.notifyUnsavedData(true);
   },
@@ -455,7 +487,7 @@ const MenuPanel = React.createClass({
         return data
       });
       let menuId = this.props.menuId;
-      debugger;
+      
       let qry = Query.updateMenu(menuId, name, treeData, positionValues);
       this.disableForm(true);
       let noticeTxt = "Menu Successfully Updated";
@@ -474,7 +506,6 @@ const MenuPanel = React.createClass({
                 here.disableForm(false)
               }
             me.loadMenuItems(menuId)
-            me.componentWillMount("All", cb);
             me.notifyUnsavedData(false);
             } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
@@ -547,60 +578,6 @@ const MenuPanel = React.createClass({
     this.props.dispatch(setMenuId(menuId))
     document.getElementById("menu").reset();
   },
-  componentWillMount: function(){
-    var me = this;
-      riques(Query.getAllMenu, 
-        function(error, response, body) {
-          if (!error) {
-            var pageList = [(<option key="0" value="">--select menu--</option>)];
-            _.forEach(body.data.viewer.allMenus.edges, function(item){
-              pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
-            })
-            //me.setState({pageList: pageList});
-            me.props.dispatch(setPageListMenu(pageList)) 
-          }
-        }
-      );
-      riques(Query.getAllPage, 
-        function(error, response, body) {
-          if (!error) {
-            var allPageList = [];
-            _.forEach(body.data.viewer.allPosts.edges, function(item){
-              allPageList.push((<div key={item.node.id}><input className="pageMenu" id={item.node.id}
-              name="itemsChecked[]" type="checkbox" value={item.node.title+"-page"} /> {item.node.title}</div>));
-            })
-            //me.setState({allPageList: allPageList});
-            me.props.dispatch(setAllPageList(allPageList)) 
-          }
-        }
-      );
-      riques(Query.getAllPost, 
-        function(error, response, body) {
-          if (!error) {
-            var allPostList = [];
-            _.forEach(body.data.viewer.allPosts.edges, function(item){
-              allPostList.push((<div key={item.node.id}><input id={item.node.id}
-              name="itemsChecked[]" type="checkbox" value={item.node.title+"-post"} /> {item.node.title}</div>));
-            })
-            //me.setState({allPostList: allPostList});
-            me.props.dispatch(setAllPostList(allPostList))
-          }
-        }
-      );
-      riques(Query.getAllCategory, 
-        function(error, response, body) {
-          if (!error) {
-            var categoryList = [];
-            _.forEach(body.data.viewer.allCategories.edges, function(item){
-              categoryList.push((<div key={item.node.id}><input id={item.node.id}
-              name="itemsChecked[]" type="checkbox" value={item.node.name+"-category"} /> {item.node.name}</div>));
-            })
-            //me.setState({categoryList: categoryList});
-            me.props.dispatch(setCategoryMenu(categoryList))
-          }
-        }
-      );
-    },
   handleDelete: function(event){
     var me = this;
     var idList = this.props.menuId;
@@ -641,7 +618,7 @@ const MenuPanel = React.createClass({
               <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
           </section>
             <Notification ref="notificationSystem" />     
-            <div className="row">
+            <div className="row" style={{opacity: this.props.opacity}}>
               <div className="col-md-3">
                 <form onSubmit={this.handleSubmit} id="menu" method="get">
                   <div className="box box-default">

@@ -44,7 +44,7 @@ const rendactApp = combineReducers({
   profile,
   admin,
   menu,
-  widgets,
+  widgets
 })
 
 export default rendactApp
