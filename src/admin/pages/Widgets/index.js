@@ -1,13 +1,12 @@
 import React from 'react';
 import _ from 'lodash';
-import {riques, swalert, errorCallback} from '../../../utils';
+import {riques, errorCallback} from '../../../utils';
 import Query from '../../query';
 import BoxItemAvailable from './BoxItemAvailable';
 import WidgetAreaContainer from './WidgetAreaContainer';
 import {connect} from 'react-redux';
 import {
   loadWidgetAreasSuccess, 
-  removeSingleWidgetFromWidgetArea,
   loadWidgetsAvailableSuccess
 } from '../../../actions'
 
@@ -16,7 +15,6 @@ class Widgets extends React.Component {
     constructor(props){
         super(props);
 
-      this.handleRemoveSingleWidget = this.handleRemoveSingleWidget.bind(this);
 
       var themeFunctions = require('../../../theme/default/functions.js');
         themeFunctions.default();
@@ -41,14 +39,6 @@ class Widgets extends React.Component {
             })
         });
         this.props.dispatch(loadWidgetAreasSuccess(_newWidgetArea));
-    }
-
-    handleRemoveSingleWidget(id, widgetAreaId){
-        // params id === id or uuid the widget
-        swalert("warning", "Sure want to remove this widget?", "", () => {
-          this.props.dispatch(removeSingleWidgetFromWidgetArea(id, widgetAreaId))
-        })
-    
     }
 
     componentWillMount(){
@@ -99,9 +89,8 @@ class Widgets extends React.Component {
                         key={index} 
                         title={item.id}
                         widgets={item.widgets}
-                        handleRemoveSingleWidget={this.handleRemoveSingleWidget}
                         />
-                    }.bind(this))
+                    })
                 }
                 </div>
 

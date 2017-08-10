@@ -45,7 +45,6 @@ class WidgetAreaContainer extends React.Component {
     return  <BoxItem 
       widget={props.item.widget} 
       uuid={props.item.id}
-      removeSingleWidget={this.props.handleRemoveSingleWidget}
       widgetAreaId={this.props.id}
       />
   }
