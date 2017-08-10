@@ -5,6 +5,7 @@ import BoxItem from './BoxItem';
 import { Nestable } from '../../lib/react-dnd-nestable/react-dnd-nestable'
 import { connect } from 'react-redux'
 import {
+  updateWidgetsOrder,
   removeAllWidgetsFromWidgetArea
 } from '../../../actions'
 import {swalert} from '../../../utils';
@@ -30,7 +31,6 @@ class WidgetAreaContainer extends React.Component {
 
       this.handleClearAll = this.handleClearAll.bind(this);
       this.renderItem = this.renderItem.bind(this);
-      this.onUpdate = this.onUpdate.bind(this);
     }
 
     handleClearAll(e){
@@ -38,7 +38,7 @@ class WidgetAreaContainer extends React.Component {
 
         swalert("warning", "Sure want to remove all widgets?", "You might lost some data",
             () => {
-                this.props.removeAllWidgets(this.props.id);
+                this.props.removeAllWidgets();
             });
     }
   renderItem(props){
@@ -48,10 +48,6 @@ class WidgetAreaContainer extends React.Component {
       removeSingleWidget={this.props.handleRemoveSingleWidget}
       widgetAreaId={this.props.id}
       />
-  }
-
-  onUpdate(newItems){
-    this.props.sortWidgets(this.props.id, newItems);
   }
 
   render(){
@@ -72,7 +68,7 @@ class WidgetAreaContainer extends React.Component {
                           items={this.props.widgets}
                           renderItem={this.renderItem}
                           maxDepth={ 1 }
-                          onUpdate={this.onUpdate}
+                          onUpdate={this.props.orderWidgets}
                         />
                     </div>
                     <div className="box-footer">
@@ -90,12 +86,15 @@ const mapStateToProps = (props) => (
 );
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-  removeAllWidgets: function (widgetAreaId) {
-    dispatch(removeAllWidgetsFromWidgetArea(widgetAreaId))
+  removeAllWidgets: () => {
+    dispatch(removeAllWidgetsFromWidgetArea(ownProps.id))
+  },
+  orderWidgets: (items) => {
+    dispatch(updateWidgetsOrder(ownProps.id, items))
   }
 });
 
 WidgetAreaContainer = connect(mapStateToProps, mapDispatchToProps)(WidgetAreaContainer)
-
 WidgetAreaContainer = DropTarget('available', dropTarget, collectDrop)(WidgetAreaContainer);
+
 export default WidgetAreaContainer;

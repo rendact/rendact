@@ -8,9 +8,7 @@ import {connect} from 'react-redux';
 import {
   loadWidgetAreasSuccess, 
   addWidgetToWidgetArea, 
-  removeAllWidgetsFromWidgetArea,
   removeSingleWidgetFromWidgetArea,
-  updateWidgetsOrder,
   loadWidgetsAvailableSuccess
 } from '../../../actions'
 
@@ -21,7 +19,6 @@ class Widgets extends React.Component {
 
       this.handleAddToWidgetArea = this.handleAddToWidgetArea.bind(this);
       this.handleRemoveSingleWidget = this.handleRemoveSingleWidget.bind(this);
-      this.handleWidgetSort = this.handleWidgetSort.bind(this);
 
       var themeFunctions = require('../../../theme/default/functions.js');
         themeFunctions.default();
@@ -62,10 +59,6 @@ class Widgets extends React.Component {
         })
     
     }
-
-  handleWidgetSort(widgetAreaId, widgets){
-    this.props.dispatch(updateWidgetsOrder(widgetAreaId, widgets));
-  }
 
     componentWillMount(){
         /*
@@ -116,7 +109,6 @@ class Widgets extends React.Component {
                         title={item.id}
                         widgets={item.widgets}
                         addToWidgetArea={this.handleAddToWidgetArea}
-                        sortWidgets={this.handleWidgetSort}
                         handleRemoveSingleWidget={this.handleRemoveSingleWidget}
                         />
                     }.bind(this))
