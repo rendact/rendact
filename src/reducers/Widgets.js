@@ -9,6 +9,11 @@ const widgets = (state = {} , action) => {
         {widgetAreas: action.widgetAreas}
       )
 
+    case 'LOAD_WIDGETS_AVAILABLE_SUCCESS':
+      return Object.assign({}, state,
+        { widgetsAvailable: action.widgets }
+      );
+
     case 'ADD_WIDGET_TO_WIDGET_AREA':
       widgetAreas = _.map(state.widgetAreas, was => {
         if (was.id === action.widgetAreaId) {

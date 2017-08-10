@@ -1,5 +1,9 @@
 import React from 'react';
 import {DragSource} from 'react-dnd';
+import {connect} from 'react-redux';
+import {
+  addWidgetToWidgetArea,
+} from '../../../actions';
 
 
 const dragSource = {
@@ -37,7 +41,7 @@ class BoxItemAvailable extends React.Component {
       e.preventDefault();
       if (this.state.widgetAreaId === "" || this.state.widgetAreaId === "---widget area---"){
           return null
-      } this.props.handleAddToWidgetArea(this.state.widgetAreaId, {widget: this.props.widget});
+      } this.props.addToWidgetArea(this.state.widgetAreaId);
   }
 
   render(){
@@ -79,7 +83,18 @@ class BoxItemAvailable extends React.Component {
 
 }
 
+const mapStateToProps = (state) => ({
+  widgetAreas: state.widgets.widgetAreas
+});
+
+const mapDispatchToProps = (dispatch, ownProps) => ({
+  addToWidgetArea: (widgetAreaId) => {
+    dispatch(addWidgetToWidgetArea(widgetAreaId, {widget: ownProps.widget}))
+  },
+});
+
 BoxItemAvailable = DragSource('available', dragSource, dragCollect)(BoxItemAvailable);
+BoxItemAvailable = connect(mapStateToProps, mapDispatchToProps)(BoxItemAvailable)
 
 
 export default BoxItemAvailable;

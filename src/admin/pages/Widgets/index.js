@@ -1,17 +1,13 @@
 import React from 'react';
 import _ from 'lodash';
-import uuid from 'uuid';
-import {riques, swalert, errorCallback} from '../../../utils';
+import {riques, errorCallback} from '../../../utils';
 import Query from '../../query';
 import BoxItemAvailable from './BoxItemAvailable';
 import WidgetAreaContainer from './WidgetAreaContainer';
 import {connect} from 'react-redux';
 import {
   loadWidgetAreasSuccess, 
-  addWidgetToWidgetArea, 
-  removeAllWidgetsFromWidgetArea,
-  removeSingleWidgetFromWidgetArea,
-  updateWidgetsOrder
+  loadWidgetsAvailableSuccess
 } from '../../../actions'
 
 
@@ -19,14 +15,6 @@ class Widgets extends React.Component {
     constructor(props){
         super(props);
 
-        this.state = {
-            availableWidgets: []
-        }
-
-      this.handleAddToWidgetArea = this.handleAddToWidgetArea.bind(this);
-      this.handleClearAll = this.handleClearAll.bind(this);
-      this.handleRemoveSingleWidget = this.handleRemoveSingleWidget.bind(this);
-      this.handleWidgetSort = this.handleWidgetSort.bind(this);
 
       var themeFunctions = require('../../../theme/default/functions.js');
         themeFunctions.default();
@@ -43,44 +31,15 @@ class Widgets extends React.Component {
         var activeWidgetArea = localStorage.getItem("activeWidgetArea");
         activeWidgetArea = activeWidgetArea.split(",");
 
-            var _newWidgetArea = []
-            _.forEach(activeWidgetArea, function(item){
-                _newWidgetArea.push({
-                    id: item,
-                    widgets: []
-                })
-            });
-        this.props.dispatch(loadWidgetAreasSuccess(_newWidgetArea));
-        this.setState(prevState => { 
-            return {widgetAreas: _newWidgetArea}
+        var _newWidgetArea = []
+        _.forEach(activeWidgetArea, function(item){
+            _newWidgetArea.push({
+                id: item,
+                widgets: []
+            })
         });
+        this.props.dispatch(loadWidgetAreasSuccess(_newWidgetArea));
     }
-
-
-    handleAddToWidgetArea(id, widget){
-      // params id => widgetAreaId
-      this.props.dispatch(addWidgetToWidgetArea(id, widget))
-
-    }
-
-    handleClearAll(id){
-        swalert("warning", "Sure want to remove all widgets?", "You might lost some data",
-            () => {
-              this.props.dispatch(removeAllWidgetsFromWidgetArea(id));
-            });
-    }
-
-    handleRemoveSingleWidget(id, widgetAreaId){
-        // params id === id or uuid the widget
-        swalert("warning", "Sure want to remove this widget?", "", () => {
-          this.props.dispatch(removeSingleWidgetFromWidgetArea(id, widgetAreaId))
-        })
-    
-    }
-
-  handleWidgetSort(widgetAreaId, widgets){
-    this.props.dispatch(updateWidgetsOrder(widgetAreaId, widgets));
-  }
 
     componentWillMount(){
         /*
@@ -89,7 +48,7 @@ class Widgets extends React.Component {
         riques(Query.getAllWidgets,
             (error, response, data) => {
                 if (!error && !data.errors && response.statusCode === 200){
-                   this.setState({availableWidgets: data.data.viewer.allOptions.edges});
+                  this.props.dispatch(loadWidgetsAvailableSuccess(data.data.viewer.allOptions.edges))
                 } else {
               errorCallback(error, data.errors?data.errors[0].message:null);
             }
@@ -130,12 +89,8 @@ class Widgets extends React.Component {
                         key={index} 
                         title={item.id}
                         widgets={item.widgets}
-                        clearAllWidget={this.handleClearAll}
-                        addToWidgetArea={this.handleAddToWidgetArea}
-                        sortWidgets={this.handleWidgetSort}
-                        handleRemoveSingleWidget={this.handleRemoveSingleWidget}
                         />
-                    }.bind(this))
+                    })
                 }
                 </div>
 
@@ -149,9 +104,10 @@ class Widgets extends React.Component {
                                 <div className="row">
                                 <ul id="widgetAvailables" className="widgets no-drop list-unstyled">
                                     
-                                    {_.map(this.state.availableWidgets, (widget, index) => (
+                                    {_.map(this.props.widgetsAvailable, (widget, index) => (
                                           <div className='col-md-12' key={index}>
-                                            <BoxItemAvailable widget={widget.node} widgetAreas={this.props.widgetAreas} handleAddToWidgetArea={this.handleAddToWidgetArea}/>
+                                            <BoxItemAvailable widget={widget.node}/>
+
                                           </div>
                                     ))}
 
@@ -168,9 +124,20 @@ class Widgets extends React.Component {
 	}
 }
 
+Widgets.propTypes = {
+  widgetAreas : React.PropTypes.array.isRequired,
+  widgetsAvailable: React.PropTypes.array.isRequired
+}
+
+Widgets.defaultProps = {
+  widgetAreas: [],
+  widgetsAvailable: []
+}
+
 const mapStateToProps = (state) => {
   return {
-    widgetAreas: state.widgets.widgetAreas
+    widgetAreas: state.widgets.widgetAreas,
+    widgetsAvailable: state.widgets.widgetsAvailable
   }
 }
 
