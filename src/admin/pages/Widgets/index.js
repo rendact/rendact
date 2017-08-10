@@ -117,7 +117,8 @@ class Widgets extends React.Component {
                                     
                                     {_.map(this.props.widgetsAvailable, (widget, index) => (
                                           <div className='col-md-12' key={index}>
-                                            <BoxItemAvailable widget={widget.node} widgetAreas={this.props.widgetAreas} handleAddToWidgetArea={this.handleAddToWidgetArea}/>
+                                            <BoxItemAvailable widget={widget.node}/>
+
                                           </div>
                                     ))}
 
