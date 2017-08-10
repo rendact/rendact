@@ -205,3 +205,79 @@ export const loadFormData = (data)  => ({
   type: 'LOAD_FORM_DATA',
   data
 })
+
+export const setResetDelete = ()  => ({
+  type: 'SET_RESET_DELETE'
+})
+
+export const setLoadMenu = (treeData, position)  => ({
+  type: 'SET_LOAD_MENU',
+  treeData,
+  position
+})
+
+export const setHandleMenuName = (menuId, treeData)  => ({
+  type: 'SET_HANDLE_MENU_NAME',
+  menuId,
+  treeData
+})
+
+export const setTreeData = (treeData)  => ({
+  type: 'SET_TREE_DATA',
+  treeData
+})
+
+export const setNewMenuName = (newMenuName)  => ({
+  type: 'SET_NEW_MENU_NAME',
+  newMenuName
+})
+
+export const setSelectedMenuName = (selectedMenuName)  => ({
+  type: 'SET_SELECTED_MENU_NAME',
+  selectedMenuName
+})
+
+export const setNewMenuId = (newMenuId)  => ({
+  type: 'SET_NEW_MENU_ID',
+  newMenuId
+})
+
+export const setIdMainMenu = (IdMainMenu)  => ({
+  type: 'SET_ID_MAIN_MENU',
+  IdMainMenu
+})
+
+export const setPosition = (position)  => ({
+  type: 'SET_POSITION',
+  position
+})
+
+export const setPageListMenu = (pageList)  => ({
+  type: 'SET_PAGE_LIST_MENU',
+  pageList
+})
+
+export const setMenuId = (menuId)  => ({
+  type: 'SET_MENU_ID',
+  menuId
+})
+
+export const setAllPageList = (allPageList)  => ({
+  type: 'SET_ALL_PAGE_LIST',
+  allPageList
+})
+
+export const setAllPostList = (allPostList)  => ({
+  type: 'SET_ALL_POST_LIST',
+  allPostList
+})
+
+export const setCategoryMenu = (categoryList)  => ({
+  type: 'SET_CATEGORY_LIST',
+  categoryList
+})
+
+export const setDisabled = (disabled)  => ({
+  type: 'SET_DISABLED',
+  disabled
+})
