@@ -35,7 +35,7 @@ const MenuPanel = React.createClass({
     }
 
   return (
-    <div id={itemData.id} className="box box-collapsed">
+    <div id={itemData.id} className="box collapsed-box">
       <div className="box-header with-border">
         <h3 className="box-title" style={{paddingRight : itemData.type === "category"? 75 : 50}}>{itemData.label? itemData.label : itemData.titlePanel}</h3>
         <div className="box-tools pull-right">
