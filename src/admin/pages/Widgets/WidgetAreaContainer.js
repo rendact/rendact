@@ -6,6 +6,7 @@ import { Nestable } from '../../lib/react-dnd-nestable/react-dnd-nestable'
 import { connect } from 'react-redux'
 import {
   updateWidgetsOrder,
+  addWidgetToWidgetArea, 
   removeAllWidgetsFromWidgetArea
 } from '../../../actions'
 import {swalert} from '../../../utils';
@@ -13,9 +14,8 @@ import {swalert} from '../../../utils';
 const dropTarget = {
   drop(props, monitor, container){
     let droppedItem = monitor.getItem();
-    let widgetId = props.id;
     // add to widgetarea id
-    props.addToWidgetArea(widgetId, droppedItem);
+    props.addToWidgetArea(droppedItem);
   }
 }
 
@@ -91,10 +91,13 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   },
   orderWidgets: (items) => {
     dispatch(updateWidgetsOrder(ownProps.id, items))
+  },
+  addToWidgetArea: (widget) => {
+    dispatch(addWidgetToWidgetArea(ownProps.id, widget))
   }
 });
 
-WidgetAreaContainer = connect(mapStateToProps, mapDispatchToProps)(WidgetAreaContainer)
 WidgetAreaContainer = DropTarget('available', dropTarget, collectDrop)(WidgetAreaContainer);
+WidgetAreaContainer = connect(mapStateToProps, mapDispatchToProps)(WidgetAreaContainer)
 
 export default WidgetAreaContainer;

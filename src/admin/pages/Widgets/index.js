@@ -7,7 +7,6 @@ import WidgetAreaContainer from './WidgetAreaContainer';
 import {connect} from 'react-redux';
 import {
   loadWidgetAreasSuccess, 
-  addWidgetToWidgetArea, 
   removeSingleWidgetFromWidgetArea,
   loadWidgetsAvailableSuccess
 } from '../../../actions'
@@ -17,7 +16,6 @@ class Widgets extends React.Component {
     constructor(props){
         super(props);
 
-      this.handleAddToWidgetArea = this.handleAddToWidgetArea.bind(this);
       this.handleRemoveSingleWidget = this.handleRemoveSingleWidget.bind(this);
 
       var themeFunctions = require('../../../theme/default/functions.js');
@@ -43,13 +41,6 @@ class Widgets extends React.Component {
             })
         });
         this.props.dispatch(loadWidgetAreasSuccess(_newWidgetArea));
-    }
-
-
-    handleAddToWidgetArea(id, widget){
-      // params id => widgetAreaId
-      this.props.dispatch(addWidgetToWidgetArea(id, widget))
-
     }
 
     handleRemoveSingleWidget(id, widgetAreaId){
@@ -108,7 +99,6 @@ class Widgets extends React.Component {
                         key={index} 
                         title={item.id}
                         widgets={item.widgets}
-                        addToWidgetArea={this.handleAddToWidgetArea}
                         handleRemoveSingleWidget={this.handleRemoveSingleWidget}
                         />
                     }.bind(this))
