@@ -20,7 +20,9 @@ const dropTarget = {
 }
 
 const collectDrop = (connect, monitor) => ({
-  connectDropToDom: connect.dropTarget()
+  connectDropToDom: connect.dropTarget(),
+  isOver: monitor.isOver(),
+  canDrop: monitor.canDrop()
 });
 
 
@@ -51,11 +53,25 @@ class WidgetAreaContainer extends React.Component {
 
   render(){
 
+    let backgroundColor;
+    let isActive = this.props.canDrop && this.props.isOver
+
+    if (isActive) {
+      backgroundColor = 'darkgreen'
+    } else if (this.props.canDrop) {
+      backgroundColor = 'darkkhaki'
+    }
+
+    let text;
+    if (this.props.isOver) {
+      text = 'release here to drop'
+    }
+
     return this.props.connectDropToDom(
       <div id={this.props.id} className="col-md-6">
-                <div className="box box-default collapsed-box">
+                <div className="box box-default collapsed-box" style={{backgroundColor}}>
                     <div className="box-header with-border">
-                        <h3 className="box-title">{this.props.title}</h3>
+                        <h3 className="box-title">{text? text : this.props.title}</h3>
                         <div className="box-tools pull-right">
                             <button className="btn btn-box-tool btn-primary" data-widget="collapse">
                                 <i className="fa fa-plus"></i>
@@ -70,7 +86,7 @@ class WidgetAreaContainer extends React.Component {
                           onUpdate={this.props.orderWidgets}
                         />
                     </div>
-                    <div className="box-footer">
+                    <div className="box-footer" style={{backgroundColor}}>
                         <button onClick={this.handleClearAll} className="btn btn-danger">Clear All</button>
                         <button className="btn btn-success pull-right">Save</button>
                     </div>
