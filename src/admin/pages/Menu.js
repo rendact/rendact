@@ -11,6 +11,7 @@ import {connect} from 'react-redux'
 import {maskArea, setMenuStructure, setResetDelete, setTreeData, setNewMenuName, setSelectedMenuName, setDisabled, setNewMenuId, 
   setIdMainMenu, setPosition, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu} from '../../actions'
 import {objectToDataset, swalert, riques, errorCallback, setValue, getValue, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
+import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
 
 const MenuPanel = React.createClass({
 
@@ -34,7 +35,7 @@ const MenuPanel = React.createClass({
     }
 
   return (
-    <div id={itemData.id} className="box collapsed-box">
+    <div id={itemData.id} className="box box-collapsed">
       <div className="box-header with-border">
         <h3 className="box-title" style={{paddingRight : itemData.type === "category"? 75 : 50}}>{itemData.label? itemData.label : itemData.titlePanel}</h3>
         <div className="box-tools pull-right">
@@ -183,7 +184,6 @@ const MenuPanel = React.createClass({
             var items = [];
             items = body.data.getMenu.items;
             if (items)
-            me.drawMenuStructure(items);
             var position = body.data.getMenu.position;
             me.props.dispatch(setTreeData(items))
             me.props.dispatch(setPosition(position))
@@ -255,7 +255,7 @@ const MenuPanel = React.createClass({
     
     var menuValues = [];
     menuValues = _.map(menuFiltered, function(item){return {titlePanel: item.value.split("-")[0], tooltip: "", 
-      type: item.value.split("-")[1], id: uuid(), target: item.id}});
+      type: item.value.split("-")[1], id: uuid(), children:[], target: item.id}});
     
     var treeData = [];
     if (_treeData===null) {
@@ -266,7 +266,6 @@ const MenuPanel = React.createClass({
     this.props.dispatch(setTreeData(treeData))
     this.notifyUnsavedData(true)
 
-    this.drawMenuStructure(treeData);
     this.notifyUnsavedData(true)
     this.resetFormCheckbox();
   },
@@ -282,7 +281,6 @@ const MenuPanel = React.createClass({
         return data.id !== panelRemoved
       });
       this.props.dispatch(setTreeData(_treeData))
-      this.drawMenuStructure(_treeData);
     });
   },
 
@@ -315,7 +313,6 @@ const MenuPanel = React.createClass({
           });
           me.resetFormNewMenu();
           me.props.dispatch(setTreeData([]))
-          me.drawMenuStructure([]);
           var here = me;
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
@@ -368,6 +365,7 @@ const MenuPanel = React.createClass({
     require ('../lib/jquery-sortable.js');
     require ('../../../public/css/AdminLTE.css');
     require ('../../../public/css/skins/_all-skins.css');
+    require('./menucustom.css');
 
 
     var me = this;
@@ -459,33 +457,8 @@ const MenuPanel = React.createClass({
         );
       }
 
-      let treeData = document.querySelectorAll("#draggablePanelList > li")
-      treeData = _.map(treeData, td => {
-        let data = _.assign({}, td.dataset, {children: []});
-        data.label = td.querySelector("#labelValue").value;
+    let treeData = this.props.treeData
 
-        let children = td.querySelectorAll("li")
-        children = _.map(children, c => {
-          let data = _.assign({}, c.dataset, {children: []});
-          
-          if (data.type === "url") {
-            data.url = c.querySelector("#urlValue").value
-            data.target = data.url;
-            data.label = c.querySelector("#labelValue").value;
-          }
-
-
-          return data
-
-        });
-        if (data.type === "url") {
-          let url = td.querySelector("#urlValue").value;
-          data.url = url;
-          data.target = url;
-        }
-        data.children = children
-        return data
-      });
       let menuId = this.props.menuId;
       
       let qry = Query.updateMenu(menuId, name, treeData, positionValues);
@@ -512,46 +485,6 @@ const MenuPanel = React.createClass({
             }
             me.disableForm(false);
         });
-  },
-  drawMenuStructure: function(treeData){
-    var me = this;
-    $("draggablePanelList").empty();
-    var elementArr = [];
-    _.map(treeData, function(item, index){
-      if(item.type==="url"){
-        var el = 
-        <li key={item.id} id={item.id} {...objectToDataset(item)} name="panel">
-          <MenuPanel itemData={item} onRemovePanel={me.removePanel} notifyUnsavedData={me.notifyUnsavedData}/>
-          <ul style={{marginLeft: 20}} className="list-unstyled">
-            {item.children && item.children.map(function(child){
-            return (
-              <li key={child.id} id={child.id} {...objectToDataset(item)}>
-                <MenuPanel itemData={child} onRemovePanel={me.removePanel} notifyUnsavedData={me.notifyUnsavedData}/>
-              </li>
-            )
-          })}
-          </ul>
-        </li>
-      }
-      if(item.type!=="url"){
-        var el = 
-        <li key={item.id} {...objectToDataset(item)} id={item.id} name="panel">
-          <MenuPanel itemData={item} notifyUnsavedData={me.notifyUnsavedData} onRemovePanel={me.removePanel}/>
-          <ul style={{marginLeft: 20}} className="list-unstyled">
-            {item.children && item.children.map(function(child){
-            return (
-              <li key={child.id} id={child.id} {...objectToDataset(child)} >
-                <MenuPanel notifyUnsavedData={me.notifyUnsavedData} itemData={child} onRemovePanel={me.removePanel}/>
-              </li>
-            )
-          })}
-          </ul>
-        </li>
-      }
-      elementArr.push(el);
-    });
-    //this.setState({menuStructure: elementArr});
-    this.props.dispatch(setMenuStructure(elementArr)) 
   },
   resetFormNewMenu: function(){
     var me = this;
@@ -600,6 +533,16 @@ const MenuPanel = React.createClass({
         }
       );
     })
+  },
+
+  renderItem: function({item}){
+    return <div {...objectToDataset(item)} id={item.id} name="panel">
+       <MenuPanel itemData={item} onRemovePanel={this.removePanel} notifyUnsavedData={this.notifyUnsavedData}/>
+    </div>
+  },
+
+  onTreeDataUpdate: function(newItems){
+    this.props.dispatch(setTreeData(newItems))
   },
  
   render: function(){
@@ -783,9 +726,13 @@ const MenuPanel = React.createClass({
                               <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
                             }
                           <div className="col-md-4">
-                            <ul id="draggablePanelList" className="list-unstyled" name="draggablePanelList">
-                            {this.props.menuStructure}
-                            </ul>
+                            {/* nestable element here */}
+                            <Nestable
+                              items={this.props.treeData}
+                              renderItem={this.renderItem}
+                              onUpdate={this.onTreeDataUpdate}
+                              childrenStyle={{marginLeft: '2rem'}}
+                            />
                           </div>
                         </div>
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 5, marginBottom: 20}}></div>

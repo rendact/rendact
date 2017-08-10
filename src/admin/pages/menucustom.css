@@ -1,0 +1,17 @@
+ol, ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+li .box {
+border: 1px solid #ccc;
+    background: #f0f8ff;
+    border-radius: .2em;
+    -webkit-transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  }
+
+
+li .box-body {
+  background-color: white;
+}
