@@ -126,12 +126,15 @@ class Nestable extends Component {
     newItems = update(newItems, insertItem);
 
     this.setState({ items: newItems });
+    
+    // update each hover, not when dropping
+    this.props.onUpdate(this.state.items);
 
     return Promise.resolve(realNextPosition);
   };
 
   dropItem = () => {
-    this.props.onUpdate(this.state.items);
+    //this.props.onUpdate(this.state.items);
   };
 
   render() {

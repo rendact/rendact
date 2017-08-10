@@ -103,5 +103,4 @@ export default compose(
     currentOffset: monitor.getSourceClientOffset(),
     isDragging: monitor.isDragging()
   })),
-  pure
 )(CustomDragLayer);

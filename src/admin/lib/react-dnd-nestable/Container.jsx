@@ -63,6 +63,6 @@ class Container extends Component {
   }
 }
 
-var WrappedContainer = pure(Container);
+var WrappedContainer = Container;
 
 export default WrappedContainer;

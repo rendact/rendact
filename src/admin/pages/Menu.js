@@ -570,10 +570,6 @@ const MenuPanel = React.createClass({
     </div>
   },
 
-  onTreeDataUpdate: function(newItems){
-    this.props.dispatch(setTreeData(newItems))
-  },
- 
   render: function(){
     var me = this;
     return (
@@ -757,10 +753,11 @@ const MenuPanel = React.createClass({
                           <div className="col-md-4">
                             {/* nestable element here */}
                             <Nestable
-                              items={this.props.treeData}
+                              items={this.props.treeData||[]}
                               renderItem={this.renderItem}
-                              onUpdate={this.onTreeDataUpdate}
+                              onUpdate={(newItems) => (me.props.dispatch(setTreeData(newItems)))}
                               childrenStyle={{marginLeft: '2rem'}}
+                              treeshold={10}
                             />
                           </div>
                         </div>

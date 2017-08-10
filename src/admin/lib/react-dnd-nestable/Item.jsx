@@ -200,6 +200,7 @@ const cardTarget = {
       // generally it's better to avoid mutations,
       // but it's good here for the sake of performance
       // to avoid expensive index searches
+      
       item.position = nextPos;
       item.index = nextPos[nextPos.length - 1];
     });
