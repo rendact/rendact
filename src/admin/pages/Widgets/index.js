@@ -6,7 +6,7 @@ import Query from '../../query';
 import BoxItemAvailable from './BoxItemAvailable';
 import WidgetAreaContainer from './WidgetAreaContainer';
 import {connect} from 'react-redux';
-import {loadWidgetAreasSuccess, addWidgetToWidgetArea} from '../../../actions'
+import {loadWidgetAreasSuccess, addWidgetToWidgetArea, removeAllWidgetsFromWidgetArea} from '../../../actions'
 
 
 class Widgets extends React.Component {
@@ -55,38 +55,13 @@ class Widgets extends React.Component {
     handleAddToWidgetArea(id, widget){
       // params id => widgetAreaId
       this.props.dispatch(addWidgetToWidgetArea(id, widget))
-      
-      this.setState(prevState => {
-        let was = prevState.widgetAreas;
-        was = _.map(was, wa => {
-          if (wa.id === id) {
-            widget.id = uuid();
-            wa.widgets.push(widget);
-          }
-
-          return wa
-        });
-
-        return {widgetAreas: was}
-      })
 
     }
 
     handleClearAll(id){
         swalert("warning", "Sure want to remove all widgets?", "You might lost some data",
             () => {
-                    this.setState(prevState => {
-                        let newState = prevState.widgetAreas.map(wa => {
-                            if (wa.id === id) {
-                                wa.widgets = [];
-                                return wa
-                            } else {
-                                return wa
-                            }
-                        });
-
-                        return {widgetAreas: newState}
-                    });
+              this.props.dispatch(removeAllWidgetsFromWidgetArea(id));
             });
     }
 
@@ -168,7 +143,7 @@ class Widgets extends React.Component {
 
                 <div className="col-md-8">
                 {
-                    _.map(this.state.widgetAreas, function(item, index){
+                    _.map(this.props.widgetAreas, function(item, index){
                       return <WidgetAreaContainer 
                         id={item.id}
                         key={index} 
@@ -195,7 +170,7 @@ class Widgets extends React.Component {
                                     
                                     {_.map(this.state.availableWidgets, (widget, index) => (
                                           <div className='col-md-12' key={index}>
-                                            <BoxItemAvailable widget={widget.node} widgetAreas={this.state.widgetAreas} handleAddToWidgetArea={this.handleAddToWidgetArea}/>
+                                            <BoxItemAvailable widget={widget.node} widgetAreas={this.props.widgetAreas} handleAddToWidgetArea={this.handleAddToWidgetArea}/>
                                           </div>
                                     ))}
 
