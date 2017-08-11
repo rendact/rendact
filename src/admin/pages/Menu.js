@@ -530,13 +530,12 @@ const MenuPanel = React.createClass({
     })
   },
 
-  renderItem: function({item, didDrop, isDragging}){
+  renderItem: function({item, isDragging}){
     return <MenuPanel 
         itemData={item} 
         onRemovePanel={this.removePanel} 
         notifyUnsavedData={this.notifyUnsavedData}
         assignValueToMenuItem={this.assignValueToMenuItem}
-        didDrop={didDrop}
         isDragging={isDragging}
       />
   },
@@ -728,7 +727,7 @@ const MenuPanel = React.createClass({
                               renderItem={this.renderItem}
                               onUpdate={(newItems) => (me.props.dispatch(setTreeData(newItems)))}
                               childrenStyle={{marginLeft: '2rem', marginRight: '-2rem'}}
-                              treeshold={10}
+                              treeshold={40}
                             />
                           </div>
                         </div>

@@ -232,7 +232,6 @@ class Item extends Component {
       connectDropTarget,
       useDragHandle,
       renderItem,
-      didDrop
     } = this.props;
 
     // params passed to renderItem callback
@@ -241,7 +240,6 @@ class Item extends Component {
       isDragging,
       isPreview: false,
       depth: position.length,
-      didDrop: didDrop
     };
 
     if (useDragHandle) {
@@ -274,9 +272,6 @@ export default compose(
   }),
   DropTarget(itemTypes.nestedItem, cardTarget, (connect, monitor) => ({
     connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver(),
-    canDrop: monitor.canDrop(),
-    didDrop: monitor.didDrop(),
   })),
   DragSource(itemTypes.nestedItem, cardSource, (connect, monitor) => ({
     connectDragSource: connect.dragSource(),

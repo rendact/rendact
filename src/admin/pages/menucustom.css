@@ -25,6 +25,14 @@ div.box.box-default.box-solid.collapsed-box > div.box-header.with-border {
 	border-radius: 10px 10px 10px 10px;
 }
 
+.dnd-dragging #menuName .box {
+	border: 1px solid #ccc;
+    background: #f0f8ff;
+    border-radius: .2em;
+    -webkit-transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
 
 
 
