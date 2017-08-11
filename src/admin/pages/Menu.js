@@ -86,11 +86,11 @@ const MenuPanel = React.createClass({
           }
           
           <div className="col-md-6">
-            <button type="button" value={itemData.titlePanel} className="btn btn-flat btn-danger btn-xs" name="removePanel" id={itemData.id} onClick={this.props.onRemovePanel}>Remove</button>
+            <button type="button" value={itemData.titlePanel} className="btn  btn-danger btn-xs" name="removePanel" id={itemData.id} onClick={this.props.onRemovePanel}>Remove</button>
           </div>
           <div className="col-md-6">
             <button type="button" 
-              className="btn btn-flat btn-default btn-xs pull-right" 
+              className="btn  btn-default btn-xs pull-right" 
               data-widget="collapse" 
               onClick={(e)=>{document.getElementById("icon-"+itemData.titlePanel).className="fa fa-plus"}} >Cancel</button>
           </div>
@@ -226,7 +226,6 @@ const MenuPanel = React.createClass({
     if (menuId!=="") {
       setValue("selectedMenuName", selectedMenuName);
       this.props.dispatch(setMenuId(menuId))
-      this.props.dispatch(setTreeData([]))
       this.loadMenuItems(menuId);
       this.notifyUnsavedData(true);
     } else if(menuId==="") {
@@ -354,12 +353,16 @@ const MenuPanel = React.createClass({
 
     this.props.dispatch(setResetDelete())
     this.disableForm(true);
+    var mainMenuId, mainMenuName;
     riques(Query.getMainMenu, 
       function(error, response, body) {
         if (!error) {
           var mainMenu = _.forEach(body.data.viewer.allMenus.edges, function(item){ return item });
-          if (mainMenu.length>0)
+          if (mainMenu.length>0){
+            mainMenuId = _.head(mainMenu).node.id;
+            mainMenuName = _.head(mainMenu).node.name;
             me.props.dispatch(setIdMainMenu(_.head(mainMenu).node.id))
+          }
         }
 
         riques(Query.getAllMenu, 
@@ -370,6 +373,12 @@ const MenuPanel = React.createClass({
                 pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
               })
               me.props.dispatch(setPageListMenu(pageList)) 
+              if (mainMenuId && mainMenuName) {
+                me.props.dispatch(setMenuId(mainMenuId));
+                me.loadMenuItems(mainMenuId);
+                me.props.dispatch(setSelectedMenuName(mainMenuName));
+                setValue("menuSelect", mainMenuId+"-"+mainMenuName);
+              }
             }
           }
         );
@@ -549,13 +558,13 @@ const MenuPanel = React.createClass({
                       <div>
                         <input type="text" name="newMenuName" id="newMenuName" className="form-control" onChange={this.handleNewMenuChange}/>
                       </div>
-                      <div className="pull-right" style={{marginTop: 10}}>
-                        <button type="submit" id="submit" disabled={this.props.newMenuName===""} className="btn btn-flat btn-success">Create Menu</button>
+                      <div className="pull-right" style={{margin: "10px 0px"}}>
+                        <button type="submit" id="submit" disabled={this.props.newMenuName===""} className="btn  btn-success">Create Menu</button>
                       </div>
                     </div>
                   </div>
                 </form>
-              <div className="box box-default collapsed-box box-solid">
+              <div className="box box-default box-solid">
                 <div className="box-header with-border">
                   <h3 className="box-title">Pages</h3>
                   <div className="box-tools pull-right">
@@ -569,7 +578,7 @@ const MenuPanel = React.createClass({
                     </div>
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
                     <div className="box-tools pull-right">
-                      <button className="btn btn-flat btn-default" type="button" onClick={this.addToMenu} 
+                      <button className="btn  btn-default" type="button" onClick={this.addToMenu} 
                                     style={{marginRight: 10}} data-target="#IDpageList">Add to Menu</button>
                     </div>
                 </div>
@@ -588,7 +597,7 @@ const MenuPanel = React.createClass({
                   </div>
                   <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
                     <div className="box-tools pull-right">
-                      <button className="btn btn-flat btn-default" type="button" onClick={this.addToMenu} 
+                      <button className="btn  btn-default" type="button" onClick={this.addToMenu} 
                                     style={{marginRight: 10}} data-target="#IDpostList">Add to Menu</button>
                     </div>
                 </div>
@@ -626,7 +635,7 @@ const MenuPanel = React.createClass({
 
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
                     <div className="box-tools pull-right">
-                      <button type="submit" id="submit" disabled={this.props.urlData.url===""} className="btn btn-flat btn-default">Add to Menu</button>
+                      <button type="submit" id="submit" disabled={this.props.urlData.url===""} className="btn  btn-default">Add to Menu</button>
                     </div>
                   </form>
                 </div>
@@ -647,7 +656,7 @@ const MenuPanel = React.createClass({
                     </div>
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
                     <div className="box-tools pull-right">
-                      <button className="btn btn-flat btn-default" type="button" onClick={this.addToMenu} 
+                      <button className="btn  btn-default" type="button" onClick={this.addToMenu} 
                       style={{marginRight: 10}} data-target="#IDcategorytList">Add to Menu</button>
                     </div>
                 </div>
@@ -663,9 +672,9 @@ const MenuPanel = React.createClass({
                               <div className="col-xs-3">
                                 <h5><b>Select a menu to edit :</b></h5>
                               </div>
-                              <div className="col-md-7">
+                              <div className="col-md-3">
                                 <div className="form-group">
-                                <select id="menuSelect" onChange={this.handleMenuName} name="menuSelect" className="form-control select" >
+                                <select id="menuSelect" onChange={this.handleMenuName} name="menuSelect" className="form-control select">
                                  { this.props.pageList }
                                 </select>
                               </div>
@@ -679,17 +688,17 @@ const MenuPanel = React.createClass({
                 
                 <div className="box box-default">
                  <form onSubmit={this.handleUpdateMenu} id="menuName" method="get">
-                  <div className="box-header with-border attachment-block clearfix">
+                  <div className="box-header with-border attachment-block clearfix" style={{padding: "15px 10px"}}>
                     <div className="form-group">
                       <div className="col-md-3">
                         <h4>Menu Name :</h4>
                       </div>
                       <div className="col-md-6">
-                        <input type="text" name="selectedMenuName" id="selectedMenuName" disabled={this.props.selectedMenuName===""} className="form-control" required="true" onChange={this.handleNameChange}/>
+                        <input type="text" name="selectedMenuName" id="selectedMenuName" value={this.props.selectedMenuName} disabled={this.props.selectedMenuName===""} className="form-control" required="true" onChange={this.handleNameChange}/>
                       </div>
                       <div className="col-md-3">
                         <div className="box-tools pull-right">
-                          <button type="submit" id="submit" name="submit" disabled={this.props.selectedMenuName===""} className="btn btn-flat btn-primary" >Update Menu</button>
+                          <button type="submit" id="submit" name="submit" disabled={this.props.selectedMenuName===""} className="btn  btn-primary" >Update Menu</button>
                         </div>
                       </div>
                     </div>
@@ -708,7 +717,7 @@ const MenuPanel = React.createClass({
                               items={this.props.treeData||[]}
                               renderItem={this.renderItem}
                               onUpdate={(newItems) => (me.props.dispatch(setTreeData(newItems)))}
-                              childrenStyle={{marginLeft: '2rem'}}
+                              childrenStyle={{marginLeft: '2rem', marginRight: '-2rem'}}
                               treeshold={10}
                             />
                           </div>
@@ -733,7 +742,10 @@ const MenuPanel = React.createClass({
                 </div>
               </form> <div className="box-header with-border attachment-block clearfix">
               <div onClick={this.handleDelete}>
-                <button className="btn btn-flat btn-danger pull-right" id="deleteBtn" disabled={this.props.selectedMenuName===""} data-target="menuName">Delete Menu</button>
+                <button className="btn  btn-danger pull-right" id="deleteBtn" 
+                  disabled={this.props.selectedMenuName===""} 
+                  style={{marginTop: 15, marginBottom: 15, marginRight: 10}}
+                  data-target="menuName">Delete Menu</button>
               </div>
               </div>
               </div>

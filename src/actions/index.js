@@ -262,7 +262,7 @@ export const setMenuStructure = (menuStructure)  => ({
   menuStructure
 })
 
-export const setMenuId = (menuId)  => ({
+export const setMenuId = (menuId, treeData)  => ({
   type: 'SET_MENU_ID',
   menuId
 })
