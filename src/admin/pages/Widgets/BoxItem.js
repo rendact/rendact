@@ -16,12 +16,12 @@ class BoxItem extends React.Component {
 <div className="box-header with-border">
     <h3 className="box-title">{widgetValue.title}</h3>
     <div className="box-tools pull-right">
-        <button type="button" className="btn btn-box-tool btn-info" data-widget="collapse" title="Expand to setting widget">
+        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Expand to setting widget">
             <i className="fa fa-plus"></i>
         </button>
-        <button type="button" className="btn btn-box-tool btn-danger"  onClick={(e) => (this.props.removeWidget())} >
+        {/*<button type="button" className="btn btn-box-tool btn-danger"  onClick={(e) => (this.props.removeWidget())} >
             <i className="fa fa-times"></i>
-        </button>
+        </button>*/}
     </div>
 </div>
 <div className="box-body" style={{display: "none"}}>
@@ -34,7 +34,7 @@ class BoxItem extends React.Component {
         <textarea className="form-control" id="" name="" cols="30" rows="10"></textarea>
     </div>
     <button onClick={(e) => (this.props.removeWidget())} className="btn btn-danger btn-xs">Remove</button>
-    <button className="btn btn-success btn-xs pull-right">Save</button>
+    <button className="btn btn-primary btn-xs pull-right">Save</button>
 </div>
 </div>
 )

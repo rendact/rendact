@@ -73,7 +73,7 @@ class WidgetAreaContainer extends React.Component {
                     <div className="box-header with-border">
                         <h3 className="box-title">{text? text : this.props.title}</h3>
                         <div className="box-tools pull-right">
-                            <button className="btn btn-box-tool btn-primary" data-widget="collapse">
+                            <button className="btn btn-box-tool" data-widget="collapse">
                                 <i className="fa fa-minus"></i>
                             </button>
                         </div>
@@ -88,7 +88,7 @@ class WidgetAreaContainer extends React.Component {
                     </div>
                     <div className="box-footer" style={{backgroundColor}}>
                         <button onClick={this.handleClearAll} className="btn btn-danger">Clear All</button>
-                        <button className="btn btn-success pull-right">Save</button>
+                        <button className="btn btn-primary pull-right">Save</button>
                     </div>
                 </div>
             </div>
