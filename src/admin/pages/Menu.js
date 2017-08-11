@@ -553,7 +553,7 @@ const MenuPanel = React.createClass({
                   <div className="box box-default">
                     <div className="box-header with-border attachment-block clearfix">
                       <div className="form-group">
-                        <h4>Create A New Menu :</h4>
+                        <h4>Create a new menu :</h4>
                       </div>
                       <div>
                         <input type="text" name="newMenuName" id="newMenuName" className="form-control" onChange={this.handleNewMenuChange}/>
