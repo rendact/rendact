@@ -132,7 +132,7 @@ nav.navigation a:focus {
 
 /* dropdown menu slide down 1 */
 
-.dropdown:hover .dropdown-menu{
+.dropdown:hover >  .dropdown-menu{
     -webkit-transform:scale(1, 1);
     -moz-transform: scale(1, 1);
     -o-transform:scale(1, 1);
@@ -163,6 +163,10 @@ nav.navigation a:focus {
     transition: all 200ms ease-in;
     margin: 0;
     display: block;
+}
+
+.dropdown-menu .dropdown a {
+    white-space: normal;
 }
 
 /*-- sticky-nav --*/

@@ -11,46 +11,46 @@ const LinkMenu = (props) => {
 
 }
 
+const Item = (props) => {
+  return <li className="dropdown" >
+    <LinkMenu item={props.item} />
+    {props.children}
+  </li>
+}
 
-export class Menu extends React.Component{
-  render (){
+class List extends React.Component{
+  constructor(props){
+    super(props)
+    this.list = this.list.bind(this)
+  }
 
+  list(data){
     var dropdownStyle = {
         backgroundColor: '#333',
         borderColor: ''
     }
-
-    return <ul className="cl-effec-16">
-      {this.props.menuItems && this.props.menuItems.map((item, index) => {
-        if (item.children[0]) {
-          return (
-            <li key={index} className="dropdown">
-              <LinkMenu item={item} />
-              <div className="dropdown-menu" aria-labelledby="dropdown-menu-link" style={dropdownStyle}>
-              {item.children.map((child, index) => {
-                return(
-                <div className="dropdown-item" key={index}>
-                  <LinkMenu item={child}/>
-                </div>
-                )
-              })
-              }
-            </div>
-
-            </li>
-          )
-        } else {
-          return (
-          <li key={index}>
-            <LinkMenu item={item} />
-          </li>
-          )
-        }
-        })
+    const children = (items) => {
+      if(items && items.length){
+        return <ul className="dropdown-menu" style={dropdownStyle}>{ this.list(items) }</ul>
       }
-    </ul>
-
     }
 
+      return data.map((node, index) => {
+        return <Item item={node} key={index}>
+            { children(node.children) }
+        </Item>
+      });
+  }
+
+  render(){
+    return <ul className="cl-effec-16">
+      {this.list(this.props.items)}
+    </ul>
+  }
 }
+  
+
+export const Menu = ({menuItems}) => (
+  <List items={menuItems||[]}/>
+)
 
