@@ -34,7 +34,6 @@ class BoxItem extends React.Component {
         <textarea className="form-control" id="" name="" cols="30" rows="10"></textarea>
     </div>
     <button onClick={(e) => (this.props.removeWidget())} className="btn btn-danger btn-xs">Remove</button>
-    <button className="btn btn-primary btn-xs pull-right">Save</button>
 </div>
 </div>
 )

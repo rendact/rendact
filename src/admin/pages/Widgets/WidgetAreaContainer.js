@@ -87,7 +87,7 @@ class WidgetAreaContainer extends React.Component {
                         />
                     </div>
                     <div className="box-footer" style={{backgroundColor}}>
-                        <button onClick={this.handleClearAll} className="btn btn-danger">Clear All</button>
+                        {/*<button onClick={this.handleClearAll} className="btn btn-danger">Clear All</button>*/}
                         <button className="btn btn-primary pull-right">Save</button>
                     </div>
                 </div>
