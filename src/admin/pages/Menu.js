@@ -538,11 +538,11 @@ const MenuPanel = React.createClass({
         <div className="container-fluid">
           <section className="content-header">
             <h1>
-              Menus
+              Menu
             </h1>
               <ol className="breadcrumb">
                 <li><a href="#"><i className="fa fa-dashboard"></i>Home</a></li>
-                <li className="active">Menus</li>
+                <li className="active">Menu</li>
               </ol>
               <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
           </section>
