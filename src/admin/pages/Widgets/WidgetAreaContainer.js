@@ -69,12 +69,12 @@ class WidgetAreaContainer extends React.Component {
 
     return this.props.connectDropToDom(
       <div id={this.props.id} className="col-md-6">
-                <div className="box box-default collapsed-box" style={{backgroundColor}}>
+                <div className="box box-default" style={{backgroundColor}}>
                     <div className="box-header with-border">
                         <h3 className="box-title">{text? text : this.props.title}</h3>
                         <div className="box-tools pull-right">
                             <button className="btn btn-box-tool btn-primary" data-widget="collapse">
-                                <i className="fa fa-plus"></i>
+                                <i className="fa fa-minus"></i>
                             </button>
                         </div>
                     </div>
