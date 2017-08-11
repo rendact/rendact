@@ -31,6 +31,7 @@ const MenuPanel = React.createClass({
     } else {
       originalLink = <Link to={"/" + itemData.type + "/" + itemData.target}>{itemData.titlePanel} </Link>
     }
+    console.log(this.props.didDrop);
 
   return (
     <div id={itemData.id} className="box collapsed-box">
@@ -511,13 +512,14 @@ const MenuPanel = React.createClass({
     })
   },
 
-  renderItem: function({item}){
+  renderItem: function({item, didDrop, isDragging}){
     return <div {...objectToDataset(item)} id={item.id} name="panel">
       <MenuPanel 
         itemData={item} 
         onRemovePanel={this.removePanel} 
         notifyUnsavedData={this.notifyUnsavedData}
         assignValueToMenuItem={this.assignValueToMenuItem}
+        didDrop={didDrop}
       />
     </div>
   },
