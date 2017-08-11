@@ -9,7 +9,7 @@ const layerStyles = {
   pointerEvents: 'none',
   zIndex: 100,
   left: 0,
-  top: 0
+  top: 0,
 };
 
 function getItemStyles(props, clientRect) {

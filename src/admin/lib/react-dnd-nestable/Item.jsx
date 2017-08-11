@@ -231,7 +231,7 @@ class Item extends Component {
       connectDragSource,
       connectDropTarget,
       useDragHandle,
-      renderItem
+      renderItem,
     } = this.props;
 
     // params passed to renderItem callback
@@ -239,7 +239,7 @@ class Item extends Component {
       item,
       isDragging,
       isPreview: false,
-      depth: position.length
+      depth: position.length,
     };
 
     if (useDragHandle) {
@@ -270,8 +270,8 @@ export default compose(
     moveItem: PropTypes.func.isRequired,
     dropItem: PropTypes.func.isRequired
   }),
-  DropTarget(itemTypes.nestedItem, cardTarget, (connect) => ({
-    connectDropTarget: connect.dropTarget()
+  DropTarget(itemTypes.nestedItem, cardTarget, (connect, monitor) => ({
+    connectDropTarget: connect.dropTarget(),
   })),
   DragSource(itemTypes.nestedItem, cardSource, (connect, monitor) => ({
     connectDragSource: connect.dragSource(),

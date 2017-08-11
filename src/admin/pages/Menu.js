@@ -31,8 +31,16 @@ const MenuPanel = React.createClass({
     } else {
       originalLink = <Link to={"/" + itemData.type + "/" + itemData.target}>{itemData.titlePanel} </Link>
     }
+  let item;
 
-  return (
+    if (this.props.isDragging) {
+      item = <div id={itemData.id} className="box" style={{background:'white', border: '1px dashed gray'}}>
+        <div className="box-header with-border">&nbsp;</div>
+        </div>
+    } else {
+
+
+  item =  (
     <div id={itemData.id} className="box collapsed-box">
       <div className="box-header with-border">
         <h3 className="box-title" style={{paddingRight : itemData.type === "category"? 75 : 50}}>{itemData.label? itemData.label : itemData.titlePanel}</h3>
@@ -97,6 +105,8 @@ const MenuPanel = React.createClass({
         </div>
     </div>
   )}
+    return item
+  }
 })
 
   let Menu = React.createClass({
@@ -520,15 +530,14 @@ const MenuPanel = React.createClass({
     })
   },
 
-  renderItem: function({item}){
-    return <div {...objectToDataset(item)} id={item.id} name="panel">
-      <MenuPanel 
+  renderItem: function({item, isDragging}){
+    return <MenuPanel 
         itemData={item} 
         onRemovePanel={this.removePanel} 
         notifyUnsavedData={this.notifyUnsavedData}
         assignValueToMenuItem={this.assignValueToMenuItem}
+        isDragging={isDragging}
       />
-    </div>
   },
 
   render: function(){
@@ -718,7 +727,7 @@ const MenuPanel = React.createClass({
                               renderItem={this.renderItem}
                               onUpdate={(newItems) => (me.props.dispatch(setTreeData(newItems)))}
                               childrenStyle={{marginLeft: '2rem', marginRight: '-2rem'}}
-                              treeshold={10}
+                              treeshold={40}
                             />
                           </div>
                         </div>
