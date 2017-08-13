@@ -7,6 +7,7 @@ import getContext from 'recompose/getContext';
 import { DragSource, DropTarget } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import itemTypes from './itemTypes';
+import _ from 'lodash';
 
 // keep track of horizontal mouse movement
 const mouse = {
@@ -38,7 +39,18 @@ function decreaseHorizontalLevel(prevPosition) {
 
 const cardSource = {
   isDragging(props, monitor) {
-    return props.id === monitor.getItem().id;
+    let draggedItem = monitor.getItem();
+
+    if (props.id === monitor.getItem().id){
+      // return isDragging when the draggedItem.id is same with props.id
+      return true;
+    } else {
+      // return true when props.position is larger then draggedItem position length, and if props.position[0, len(draggedItem)] is same with 
+      // draggedItem.position
+      // this approach is leaving a bug. Thats when the draggedItem position value changed by hovering to other item. [FIX THIS]
+      return (draggedItem.position.length < props.position.length) && _.isEqual(props.position.slice(0, draggedItem.position.length), draggedItem.position)
+    }
+
   },
   beginDrag(props, monitor, component) {
     const node = findDOMNode(component);
