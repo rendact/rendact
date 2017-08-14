@@ -4,6 +4,44 @@ import {connect} from 'react-redux';
 import {
   addWidgetToWidgetArea,
 } from '../../../actions';
+import {reduxForm, Field} from 'redux-form';
+
+
+let AddToWidgetAreaForm = props => {
+  const {handleSubmit} = props;
+
+  return (
+    <form onSubmit={handleSubmit}>
+
+        <div className="input-group">
+        <span className="input-group-btn">
+            <button className="btn btn-default" type="submit">Add to</button>
+        </span>
+        <Field name="widgetAreaId" component="select" className="form-control select">
+        <option>---widget area---</option>
+        {
+          props.widgetAreas.map((widgetArea, index) => (
+            <option value={widgetArea.id} key={index}>{widgetArea.id}</option>
+          ))
+          }
+
+        </Field>
+      </div>
+    </form>
+    )
+}
+
+AddToWidgetAreaForm = reduxForm({form: 'addToWidgetAreaForm'})(AddToWidgetAreaForm)
+
+const mapStateToPropsAddToWidgetAreaForm = (state) => ({
+  widgetAreas: state.widgets.widgetAreas
+});
+
+const mapDispatchToPropsAddToWidgetAreaForm = (dispatch, ownProps) => ({
+  onSubmit: value => dispatch(addWidgetToWidgetArea(value.widgetAreaId, {widget: ownProps.widget})),
+})
+
+AddToWidgetAreaForm = connect(mapStateToPropsAddToWidgetAreaForm, mapDispatchToPropsAddToWidgetAreaForm)(AddToWidgetAreaForm)
 
 
 const dragSource = {
@@ -19,30 +57,6 @@ const dragCollect = (connect, monitor) => ({
 });
 
 class BoxItemAvailable extends React.Component {
-
-  constructor(props){
-      super(props);
-
-      this.state = {
-        widgetAreaId: '',
-      }
-
-    this.handleWidgetAreaChange = this.handleWidgetAreaChange.bind(this);
-    this.handleWidgetAreaSubmit = this.handleWidgetAreaSubmit.bind(this);
-
-  }
-
-  handleWidgetAreaChange(e){
-      e.preventDefault();
-      this.setState({widgetAreaId: e.currentTarget.value})
-  }
-
-  handleWidgetAreaSubmit(e){
-      e.preventDefault();
-      if (this.state.widgetAreaId === "" || this.state.widgetAreaId === "---widget area---"){
-          return null
-      } this.props.addToWidgetArea(this.state.widgetAreaId);
-  }
 
   render(){
 
@@ -66,20 +80,7 @@ class BoxItemAvailable extends React.Component {
         <p>{widgetValue.help}</p>
     </div>
     <div className="box-footer text-center">
-        <div className="input-group">
-        <span className="input-group-btn">
-            <button className="btn btn-default" onClick={this.handleWidgetAreaSubmit}>Add to</button>
-        </span>
-        <select onChange={this.handleWidgetAreaChange} className="form-control select">
-        <option>---widget area---</option>
-        {
-          widgetAreas.map((widgetArea, index) => (
-            <option value={widgetArea.id} key={index}>{widgetArea.id}</option>
-          ))
-        }
-
-        </select>
-        </div>
+      <AddToWidgetAreaForm widget={widget} />
     </div>
   </div>
     )
@@ -87,18 +88,8 @@ class BoxItemAvailable extends React.Component {
 
 }
 
-const mapStateToProps = (state) => ({
-  widgetAreas: state.widgets.widgetAreas
-});
-
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  addToWidgetArea: (widgetAreaId) => {
-    dispatch(addWidgetToWidgetArea(widgetAreaId, {widget: ownProps.widget}))
-  },
-});
 
 BoxItemAvailable = DragSource('available', dragSource, dragCollect)(BoxItemAvailable);
-BoxItemAvailable = connect(mapStateToProps, mapDispatchToProps)(BoxItemAvailable)
 
 
 export default BoxItemAvailable;
