@@ -7,10 +7,11 @@ import uuid from 'uuid';
 import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
-import {maskArea, setResetDelete, setTreeData, setNewMenuName, setSelectedMenuName, setDisabled, setNewMenuId, 
+import {maskArea, setResetDelete, setTreeData, setNewMenuName, setSelectedMenuName, setDisabled, setNewMenuId, loadselectedMenuName, loadmenuSelect,
   setIdMainMenu, setPosition, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
 import {swalert, riques, errorCallback, setValue, getValue, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
+import {reduxForm, Field} from 'redux-form'
 
 const MenuPanel = React.createClass({
 
@@ -235,7 +236,8 @@ const MenuPanel = React.createClass({
     var selectedMenuName = event.target.value.split("-")[1];
     var me = this;
     if (menuId!=="") {
-      setValue("selectedMenuName", selectedMenuName);
+      //setValue("selectedMenuName", selectedMenuName);
+      this.props.dispatch(loadselectedMenuName(selectedMenuName));
       this.props.dispatch(setMenuId(menuId))
       this.loadMenuItems(menuId);
       this.notifyUnsavedData(true);
@@ -409,7 +411,8 @@ const MenuPanel = React.createClass({
                 me.props.dispatch(setMenuId(mainMenuId));
                 me.loadMenuItems(mainMenuId);
                 me.props.dispatch(setSelectedMenuName(mainMenuName));
-                setValue("menuSelect", mainMenuId+"-"+mainMenuName);
+                //setValue("menuSelect", mainMenuId+"-"+mainMenuName);
+                me.props.dispatch(loadmenuSelect(mainMenuId+"-"+mainMenuName));
               }
             }
           }
@@ -523,8 +526,8 @@ const MenuPanel = React.createClass({
     var menuId = this.props.newMenuId;
     var newMenuName = getValue("newMenuName");
     var selectedMenuName = newMenuName;
-    setValue("selectedMenuName", selectedMenuName);
-    //this.setState({menuId:menuId});
+    //setValue("selectedMenuName", selectedMenuName);
+    this.props.dispatch(loadselectedMenuName(selectedMenuName));
     this.props.dispatch(setMenuId(menuId))
     document.getElementById("menu").reset();
   },
@@ -792,12 +795,15 @@ const MenuPanel = React.createClass({
   }
 });
 
-//export default Menu;
 const mapStateToProps = function(state){
   if (!_.isEmpty(state.menu)) {
-    return _.head(state.menu)
+    var out = _.head(state.menu);
+    out["initialValues"] = out.data;
+    return out;
   } else return {}
 }
-
+Menu = reduxForm({
+  form: 'menuForm'
+})(Menu)
 Menu = connect(mapStateToProps)(Menu);
 export default Menu;
