@@ -294,6 +294,16 @@ export const assignValueToMenuItem = (menuId, name, value) => ({
   value
 });
 
+export const loadselectedMenuName = (selectedMenuName)  => ({
+  type: 'LOAD_SELECTED_MENU',
+  selectedMenuName
+})
+
+export const loadmenuSelect = (menuSelect)  => ({
+  type: 'LOAD_MENU_SELECT',
+  menuSelect
+})
+
 /* 
  * WIDGET MANAGEMENT PAGE ACTION
  */
