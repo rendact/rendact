@@ -8,10 +8,10 @@ import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
 import {maskArea, setResetDelete, setTreeData, setNewMenuName, setSelectedMenuName, setDisabled, setNewMenuId, loadselectedMenuName, loadmenuSelect,
-  setIdMainMenu, setPosition, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
-import {swalert, riques, errorCallback, setValue, getValue, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
+  setIdMainMenu, setPosition, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem, setUrlMenu} from '../../actions'
+import {swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
-import {reduxForm, Field} from 'redux-form'
+import {reduxForm} from 'redux-form'
 
 const MenuPanel = React.createClass({
 
@@ -248,21 +248,17 @@ const MenuPanel = React.createClass({
   },
 
   handleCustomUrlTitle(e){
-    this.setState(prevState => {
       let urlTitle = this.props.urlTitle;
-      let url = prevState.urlData;
+      let url = this.props.urlData;
       url.title = urlTitle
-      return {url: url}
-    });
+      this.props.dispatch(setUrlMenu(url));
   },
 
   handleCustomUrlUrl: function(event){
-    this.setState(prevState => {
       let urlUrl = this.props.urlUrl;
-      let url = prevState.urlData;
+      let url = this.props.urlData;
       url.url = urlUrl
-      return {url: url}
-    });
+      this.props.dispatch(setUrlMenu(url));
   },
   handleUrlSubmit: function(event){
     event.preventDefault();

@@ -309,6 +309,11 @@ export const setprevState = (prevState)  => ({
   prevState
 })
 
+export const setUrlMenu = (url)  => ({
+  type: 'SET_URL_MENU',
+  url
+})
+
 /* 
  * WIDGET MANAGEMENT PAGE ACTION
  */
