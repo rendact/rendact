@@ -41,14 +41,21 @@ const cardSource = {
   isDragging(props, monitor) {
     let draggedItem = monitor.getItem();
 
-    if (props.id === monitor.getItem().id){
-      // return isDragging when the draggedItem.id is same with props.id
+    // helper to make list ids of items include childrens
+    let ids = [];
+    const flattenId = (item) => {
+      ids.push(item.id)
+
+      if (item.children && item.children.length) {
+        _.forEach(item.children, c => flattenId(c));
+      }
+    }
+
+    // calling the helper
+    flattenId(draggedItem.data)
+
+    if (_.indexOf(ids, props.id) > -1) {
       return true;
-    } else {
-      // return true when props.position is larger then draggedItem position length, and if props.position[0, len(draggedItem)] is same with 
-      // draggedItem.position
-      // this approach is leaving a bug. Thats when the draggedItem position value changed by hovering to other item. [FIX THIS]
-      return (draggedItem.position.length < props.position.length) && _.isEqual(props.position.slice(0, draggedItem.position.length), draggedItem.position)
     }
 
   },
