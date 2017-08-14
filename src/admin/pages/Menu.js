@@ -249,7 +249,7 @@ const MenuPanel = React.createClass({
 
   handleCustomUrlTitle(e){
     this.setState(prevState => {
-      let urlTitle = getValue("urlTitle");
+      let urlTitle = this.props.urlTitle;
       let url = prevState.urlData;
       url.title = urlTitle
       return {url: url}
@@ -258,7 +258,7 @@ const MenuPanel = React.createClass({
 
   handleCustomUrlUrl: function(event){
     this.setState(prevState => {
-      let urlUrl = getValue("urlUrl");
+      let urlUrl = this.props.urlUrl;
       let url = prevState.urlData;
       url.url = urlUrl
       return {url: url}
@@ -319,18 +319,18 @@ const MenuPanel = React.createClass({
   },
 
   handleNewMenuChange: function(event){
-    var newMenuName = getValue("newMenuName");
+    var newMenuName = this.props.newMenuName;
     this.props.dispatch(setNewMenuName(newMenuName))
   },
   handleNameChange: function(event){
-    var selectedMenuName = getValue("selectedMenuName");
+    var selectedMenuName = this.props.selectedMenuName;
     this.props.dispatch(setSelectedMenuName(selectedMenuName))
     this.notifyUnsavedData(true);
   },
   handleSubmit: function(event){
     event.preventDefault();
     var me = this;
-    var newMenuName = getValue("newMenuName");
+    var newMenuName = this.props.newMenuName;
     this.disableForm(true);
     var qry = Query.createMenu(newMenuName);
     var noticeTxt = "Menu Saved";
@@ -468,7 +468,7 @@ const MenuPanel = React.createClass({
   handleUpdateMenu: function(event){
       event.preventDefault();
       var me = this;
-      var name = getValue("selectedMenuName");
+      var name = this.props.selectedMenuName;
 
       let positionValues = this.props.position;
       let _IdMainMenu = this.props.IdMainMenu;
@@ -524,7 +524,7 @@ const MenuPanel = React.createClass({
         }
       );
     var menuId = this.props.newMenuId;
-    var newMenuName = getValue("newMenuName");
+    var newMenuName = this.props.newMenuName;
     var selectedMenuName = newMenuName;
     //setValue("selectedMenuName", selectedMenuName);
     this.props.dispatch(loadselectedMenuName(selectedMenuName));
@@ -798,7 +798,8 @@ const MenuPanel = React.createClass({
 const mapStateToProps = function(state){
   if (!_.isEmpty(state.menu)) {
     var out = _.head(state.menu);
-    out["initialValues"] = out.data;
+    out["initialValues"] = out.selectedMenuName;
+    out["initialValues"] = out.menuSelect;
     return out;
   } else return {}
 }

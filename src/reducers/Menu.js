@@ -70,6 +70,9 @@ const menu = (state = [], action) => {
     case 'LOAD_MENU_SELECT':
       return state.map(item =>  ({...item, menuSelect: action.menuSelect}))
 
+    case 'SET_PREV_STATE':
+      return state.map(item =>  ({...item, prevState: action.prevState}))
+
     case 'ASSIGN_VALUE_TO_MENU_ITEM':
       return state.map(item=> {
         let treeData = [...item.treeData]

@@ -304,6 +304,11 @@ export const loadmenuSelect = (menuSelect)  => ({
   menuSelect
 })
 
+export const setprevState = (prevState)  => ({
+  type: 'SET_PREV_STATE',
+  prevState
+})
+
 /* 
  * WIDGET MANAGEMENT PAGE ACTION
  */
