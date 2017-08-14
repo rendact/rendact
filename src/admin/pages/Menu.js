@@ -36,7 +36,7 @@ const MenuPanel = React.createClass({
 
     if (this.props.isDragging) {
       item = <div id={itemData.id} className="box" style={{background:'white', border: '1px dashed gray'}}>
-        <div className="box-header with-border">&nbsp;</div>
+        <div className="box-header with-border" style={{background:'white', color:'white'}}>{itemData.label? itemData.label : itemData.titlePanel}</div>
         </div>
     } else {
 

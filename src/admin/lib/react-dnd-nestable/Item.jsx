@@ -7,6 +7,7 @@ import getContext from 'recompose/getContext';
 import { DragSource, DropTarget } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import itemTypes from './itemTypes';
+import _ from 'lodash';
 
 // keep track of horizontal mouse movement
 const mouse = {
@@ -38,7 +39,25 @@ function decreaseHorizontalLevel(prevPosition) {
 
 const cardSource = {
   isDragging(props, monitor) {
-    return props.id === monitor.getItem().id;
+    let draggedItem = monitor.getItem();
+
+    // helper to make list ids of items include childrens
+    let ids = [];
+    const flattenId = (item) => {
+      ids.push(item.id)
+
+      if (item.children && item.children.length) {
+        _.forEach(item.children, c => flattenId(c));
+      }
+    }
+
+    // calling the helper
+    flattenId(draggedItem.data)
+
+    if (_.indexOf(ids, props.id) > -1) {
+      return true;
+    }
+
   },
   beginDrag(props, monitor, component) {
     const node = findDOMNode(component);
