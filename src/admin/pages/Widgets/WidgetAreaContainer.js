@@ -48,6 +48,7 @@ class WidgetAreaContainer extends React.Component {
       widget={props.item.widget} 
       uuid={props.item.id}
       widgetAreaId={this.props.id}
+      isDragging={props.isDragging}
       />
   }
 
@@ -55,12 +56,6 @@ class WidgetAreaContainer extends React.Component {
 
     let backgroundColor;
     let isActive = this.props.canDrop && this.props.isOver
-
-    if (isActive) {
-      backgroundColor = 'darkgreen'
-    } else if (this.props.canDrop) {
-      backgroundColor = 'darkkhaki'
-    }
 
     let text;
     if (this.props.isOver) {
@@ -85,7 +80,12 @@ class WidgetAreaContainer extends React.Component {
                           maxDepth={ 1 }
                           onUpdate={this.props.orderWidgets}
                         />
-                    </div>
+                    {isActive &&
+ <div className="box box-default" style={{borderRadius: 0, color: 'white', backgroundColor: 'white', border: '1px dashed gray'}}>
+         <div className="box-header with-border">&nbsp;</div>
+       </div>
+                    }</div>
+                    
                     <div className="box-footer" style={{backgroundColor}}>
                         {/*<button onClick={this.handleClearAll} className="btn btn-danger">Clear All</button>*/}
                         <button className="btn btn-primary pull-right">Save</button>
