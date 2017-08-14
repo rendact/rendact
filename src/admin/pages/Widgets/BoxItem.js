@@ -25,7 +25,7 @@ class BoxItem extends React.Component {
        </div>
      } else {
 
-      box =  (<div className="box box-default collapsed-box box-solid" style={{borderRadius: 0}}>
+      box =  (<div className="box box-default collapsed-box box-solid" style={{borderRadius: 0, cursor: 'move'}}>
 <div className="box-header with-border">
     <h3 className="box-title">{widgetValue.title}</h3>
     <div className="box-tools pull-right">

@@ -54,7 +54,7 @@ class BoxItemAvailable extends React.Component {
     let opacity = isDragging? 0.5 : 1;
 
     return connectDragToDom(
-    <div className="box box-default collapsed-box box-solid" style={{opacity}} id={widget.item}>
+    <div className="box box-default collapsed-box box-solid" style={{opacity, cursor: 'move'}} id={widget.item}>
       <div className="box-header with-border">
         <h3 className="box-title">{widgetValue.title}</h3>
         <div className="box-tools pull-right">
