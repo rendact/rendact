@@ -1,4 +1,5 @@
 import React from 'react';
+import $ from 'jquery';
 import {Link} from 'react-router';
 import Query from '../query';
 import _ from 'lodash';
@@ -267,6 +268,7 @@ const MenuPanel = React.createClass({
     var me = this;
     me.resetFormUrl();
   },
+
   addToMenu: function(event){
     var _treeData = this.props.treeData;
     var menuFiltered = _.filter(document.getElementsByName("itemsChecked[]"), function(item){
@@ -347,7 +349,27 @@ const MenuPanel = React.createClass({
     require ('../../../public/css/skins/_all-skins.css');
     require('./menucustom.css');
 
+    //Select All Pages
+    $('body').on('click', '#selectAllPages', function () {
+      if ($(this).hasClass('allChecked')) {
+          $('input[class="pageMenu"]').prop('checked', false);
+      } else {
+          $('input[class="pageMenu"]').prop('checked', true);
+      }
+      $(this).toggleClass('allChecked');
+    })
 
+    //Select All Posts
+    $('body').on('click', '#selectAllPosts', function () {
+      if ($(this).hasClass('allChecked')) {
+          $('input[class="postMenu"]').prop('checked', false);
+      } else {
+          $('input[class="postMenu"]').prop('checked', true);
+      }
+      $(this).toggleClass('allChecked');
+    })
+
+    //Load sidebar
     var me = this;
     this.notif = this.refs.notificationSystem;
 
@@ -399,7 +421,7 @@ const MenuPanel = React.createClass({
             if (!error) {
               var allPostList = [];
               _.forEach(body.data.viewer.allPosts.edges, function(item){
-                allPostList.push((<div key={item.node.id}><input id={item.node.id}
+                allPostList.push((<div key={item.node.id}><input className="postMenu" id={item.node.id}
                 name="itemsChecked[]" type="checkbox" value={item.node.title+"-post"} /> {item.node.title}</div>));
               })
               me.props.dispatch(setAllPostList(allPostList))
@@ -568,20 +590,22 @@ const MenuPanel = React.createClass({
                 <div className="box-header with-border">
                   <h3 className="box-title">Pages</h3>
                   <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" disabled={this.props.selectedMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
+                      <button type="button" className="btn btn-box-tool" disabled={this.props.selectedMenuName===""} data-widget="collapse"><i className="fa fa-minus"></i>
                       </button>
                   </div>
                 </div>
                 <div className="box-body pad">
                   <div id="IDpageList">
                       {this.props.allPageList}
-                    </div>
+                  </div>
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
-                    <div className="box-tools pull-right">
-                      <button className="btn  btn-default" type="button" onClick={this.addToMenu} 
+                      <button className="btn  btn-default" type="button" style={{marginRight: 10}} 
+                      data-target="#IDpageList" id="selectAllPages">Select All</button>
+                      <div className="box-tools pull-right">
+                        <button className="btn  btn-default" type="button" onClick={this.addToMenu} 
                                     style={{marginRight: 10}} data-target="#IDpageList">Add to Menu</button>
+                      </div>
                     </div>
-                </div>
               </div>
               <div className="box box-default collapsed-box box-solid">
                 <div className="box-header with-border">
@@ -596,6 +620,8 @@ const MenuPanel = React.createClass({
                       {this.props.allPostList}
                   </div>
                   <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+                    <button className="btn  btn-default" type="button" style={{marginRight: 10}} 
+                      data-target="#IDpageList" id="selectAllPosts">Select All</button>
                     <div className="box-tools pull-right">
                       <button className="btn  btn-default" type="button" onClick={this.addToMenu} 
                                     style={{marginRight: 10}} data-target="#IDpostList">Add to Menu</button>
