@@ -9,10 +9,23 @@ import {swalert} from '../../../utils'
 class BoxItem extends React.Component {
 
    render() {
-        let widget = this.props.widget;
-        let widgetValue = JSON.parse(widget.value);
+     let widget = this.props.widget;
+     let widgetValue = JSON.parse(widget.value);
+     let isDragging = this.props.isDragging
+     let backgroundColor = isDragging && 'white'
+     let border = isDragging && '1px dashed gray'
+     let color = isDragging && 'white'
+     let isDraggingStyle = {backgroundColor, border, color}
 
-      return (<div className="box box-default collapsed-box box-solid" style={{borderRadius: 0}}>
+     let box;
+
+     if (isDragging) {
+       box = <div className="box box-default" style={{borderRadius: 0, ...isDraggingStyle}}>
+         <div className="box-header with-border">&nbsp;</div>
+       </div>
+     } else {
+
+      box =  (<div className="box box-default collapsed-box box-solid" style={{borderRadius: 0}}>
 <div className="box-header with-border">
     <h3 className="box-title">{widgetValue.title}</h3>
     <div className="box-tools pull-right">
@@ -36,7 +49,8 @@ class BoxItem extends React.Component {
     <button onClick={(e) => (this.props.removeWidget())} className="btn btn-danger btn-xs">Remove</button>
 </div>
 </div>
-)
+      )}
+     return box;
    }
 }
 

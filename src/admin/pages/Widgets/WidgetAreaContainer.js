@@ -48,6 +48,7 @@ class WidgetAreaContainer extends React.Component {
       widget={props.item.widget} 
       uuid={props.item.id}
       widgetAreaId={this.props.id}
+      isDragging={props.isDragging}
       />
   }
 
