@@ -9,7 +9,7 @@ import {
   addWidgetToWidgetArea, 
   removeAllWidgetsFromWidgetArea
 } from '../../../actions'
-import {swalert, riques, errorCallback} from '../../../utils';
+import {swalert, riques, errorCallback, disableForm} from '../../../utils';
 import Query from '../../query'
 
 const dropTarget = {
@@ -69,9 +69,8 @@ class WidgetAreaContainer extends React.Component {
 
 
     // TODO: 
-    // 1. disable all before requesting
     // 3. using halogen when disable all
-    // 4. undesable all
+    disableForm(true)
     let value = JSON.stringify(toSavedData, null, 2);
     riques(Query.updateListOfWidget(value), 
       (error, response, data) => {
@@ -85,6 +84,8 @@ class WidgetAreaContainer extends React.Component {
         } else {
           errorCallback(error, data.errors?data.errors[0].message: null)
         }
+
+        disableForm(false);
       });
   }
 
