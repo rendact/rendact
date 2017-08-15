@@ -91,6 +91,7 @@ const queries = {
   getMainMenu: Menu.getMainMenu,
   createWidget: Widget.createWidget,
   getAllWidgets: Widget.getAllWidgets,
+  updateListOfWidget: Widget.updateListOfWidget
 }
 
 export default queries;

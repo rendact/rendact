@@ -60,8 +60,9 @@ const getAllWidgets = {
 
 
 const queries = {
-    createWidget: createWidget,
-    getAllWidgets: getAllWidgets,
+  createWidget: createWidget,
+  getAllWidgets: getAllWidgets,
+  updateListOfWidget: updateListOfWidget,
 }
 
 export default queries;
