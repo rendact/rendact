@@ -9,6 +9,7 @@ import {
   loadWidgetAreasSuccess, 
   loadWidgetsAvailableSuccess
 } from '../../../actions'
+import Notification from 'react-notification-system';
 
 
 class Widgets extends React.Component {
@@ -59,10 +60,12 @@ class Widgets extends React.Component {
 
 
 	render(){
+    let me = this;
 
 		return (
 			<div className="content-wrapper">
 			<div className="container-fluid">
+        <Notification ref="notificationSystem"/>
                 
 				<section className="content-header">
 			      <h1>
@@ -89,6 +92,7 @@ class Widgets extends React.Component {
                         key={index} 
                         title={item.id}
                         widgets={item.widgets}
+                        notif={me.refs.notificationSystem}
                         />
                     })
                 }

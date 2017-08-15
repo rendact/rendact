@@ -70,15 +70,18 @@ class WidgetAreaContainer extends React.Component {
 
     // TODO: 
     // 1. disable all before requesting
-    // 2. add notification if updated successfully
     // 3. using halogen when disable all
     // 4. undesable all
-    // 5. remove console.log
     let value = JSON.stringify(toSavedData, null, 2);
     riques(Query.updateListOfWidget(value), 
       (error, response, data) => {
         if (!error && response.statusCode === 200 && !data.errors){
-          console.log("updated")
+          this.props.notif.addNotification({
+            message: 'List of widgets updated successfully',
+            level: 'success',
+            position: 'tr',
+            autoDismiss: 2,
+          });
         } else {
           errorCallback(error, data.errors?data.errors[0].message: null)
         }
