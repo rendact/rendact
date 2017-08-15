@@ -58,17 +58,22 @@ class WidgetAreaContainer extends React.Component {
     e.preventDefault();
     let widgetAreas = _.cloneDeep(this.props.widgetAreas)
 
-    let toSavedData = _.map(widgetAreas, wa => {
-      let widgets = _.map(wa.widgets, widget => ({
+    let toSavedData = {}
+    _.forEach(widgetAreas, widgetArea => {
+      let widgets = _.map(widgetArea.widgets, widget => ({
         id: widget.id,
         widget: widget.widget.item
-      }))
-        return {
-          id: wa.id,
-          widgets: widgets
-        }
+      }));
+      toSavedData[widgetArea.id] = widgets
     })
 
+
+    // TODO: 
+    // 1. disable all before requesting
+    // 2. add notification if updated successfully
+    // 3. using halogen when disable all
+    // 4. undesable all
+    // 5. remove console.log
     let value = JSON.stringify(toSavedData, null, 2);
     riques(Query.updateListOfWidget(value), 
       (error, response, data) => {
