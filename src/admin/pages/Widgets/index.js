@@ -91,10 +91,10 @@ class Widgets extends React.Component {
                     <div className="row">
                       <ul id="widgetAvailables" className="widgets no-drop list-unstyled">
                           {_.map(this.props.widgetsAvailable, (widget, index) => (
-                                <div className='col-md-12' key={index}>
-                                  <BoxItemAvailable widget={widget.node}/>
+                            <div className='col-md-12' key={index}>
+                              <BoxItemAvailable widget={widget.node}/>
 
-                                </div>
+                            </div>
                           ))}
 
                       </ul>

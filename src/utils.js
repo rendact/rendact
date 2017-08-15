@@ -319,7 +319,7 @@ export const objectToDataset = (obj) => {
   return _.mapKeys(obj, (value, key) => ('data-' + _.kebabCase(key)))
 }
 
-export const getActiveWidgets = function(){
+export const getActiveWidgetArea = function(){
   var activeWidgetArea = localStorage.getItem("activeWidgetArea");
   activeWidgetArea = activeWidgetArea.split(",");
 
