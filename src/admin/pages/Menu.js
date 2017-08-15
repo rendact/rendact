@@ -11,7 +11,7 @@ import {maskArea, setResetDelete, setTreeData, setNewMenuName, setSelectedMenuNa
   setIdMainMenu, setPosition, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem, setUrlMenu} from '../../actions'
 import {swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
-import {reduxForm} from 'redux-form'
+import {reduxForm, formValueSelector} from 'redux-form'
 
 const MenuPanel = React.createClass({
 
@@ -791,7 +791,7 @@ const MenuPanel = React.createClass({
   }
 });
 
-const mapStateToProps = function(state){
+/*const mapStateToProps = function(state){
   if (!_.isEmpty(state.menu)) {
     var out = _.head(state.menu);
     out["initialValues"] = out.selectedMenuName;
@@ -802,5 +802,31 @@ const mapStateToProps = function(state){
 Menu = reduxForm({
   form: 'menuForm'
 })(Menu)
+Menu = connect(mapStateToProps)(Menu);
+export default Menu;*/
+
+//export default Menu;
+
+const selector = formValueSelector('menuForm');
+
+const mapStateToProps = function(state){  
+  var customStates = {    
+    name: selector(state, 'name'),  
+    urlTitle: selector(state, 'urlTitle'),
+    urlUrl: selector(state, 'urlUrl'),
+    newMenuName: selector(state, 'newMenuName'),
+    selectedMenuName: selector(state, 'selectedMenuName'),
+  }  
+  if (!_.isEmpty(state.menu)) {    
+    var out = _.head(state.menu);    
+    out["initialValues"] = out.selectedMenuName;
+    out["initialValues"] = out.menuSelect;
+    return _.merge(out, customStates);  
+  } else return customStates; 
+}
+Menu = reduxForm({
+  form: 'menuForm'
+})(Menu)
+
 Menu = connect(mapStateToProps)(Menu);
 export default Menu;
