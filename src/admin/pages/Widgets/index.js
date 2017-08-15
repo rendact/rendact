@@ -7,7 +7,8 @@ import WidgetAreaContainer from './WidgetAreaContainer';
 import {connect} from 'react-redux';
 import {
   loadWidgetAreasSuccess, 
-  loadWidgetsAvailableSuccess
+  loadWidgetsAvailableSuccess,
+  maskArea
 } from '../../../actions'
 import Notification from 'react-notification-system';
 import Halogen from 'halogen';
@@ -47,13 +48,15 @@ class Widgets extends React.Component {
         /*
          * all registered widget
          */
+      this.props.dispatch(maskArea(true));
         riques(Query.getAllWidgets,
             (error, response, data) => {
                 if (!error && !data.errors && response.statusCode === 200){
                   this.props.dispatch(loadWidgetsAvailableSuccess(data.data.viewer.allOptions.edges))
                 } else {
               errorCallback(error, data.errors?data.errors[0].message:null);
-            }
+                }
+              this.props.dispatch(maskArea(false))
             }
         )
 
