@@ -9,7 +9,8 @@ import {
   addWidgetToWidgetArea, 
   removeAllWidgetsFromWidgetArea
 } from '../../../actions'
-import {swalert} from '../../../utils';
+import {swalert, riques, errorCallback} from '../../../utils';
+import Query from '../../query'
 
 const dropTarget = {
   drop(props, monitor, container){
@@ -68,7 +69,15 @@ class WidgetAreaContainer extends React.Component {
         }
     })
 
-    console.log(JSON.stringify(toSavedData, null, 2));
+    let value = JSON.stringify(toSavedData, null, 2);
+    riques(Query.updateListOfWidget(value), 
+      (error, response, data) => {
+        if (!error && response.statusCode === 200 && !data.errors){
+          console.log("updated")
+        } else {
+          errorCallback(error, data.errors?data.errors[0].message: null)
+        }
+      });
   }
 
   render(){
