@@ -33,6 +33,7 @@ class WidgetAreaContainer extends React.Component {
 
       this.handleClearAll = this.handleClearAll.bind(this);
       this.renderItem = this.renderItem.bind(this);
+      this.handleSaveButton = this.handleSaveButton.bind(this);
     }
 
     handleClearAll(e){
@@ -50,6 +51,24 @@ class WidgetAreaContainer extends React.Component {
       widgetAreaId={this.props.id}
       isDragging={props.isDragging}
       />
+  }
+
+  handleSaveButton(e){
+    e.preventDefault();
+    let widgetAreas = _.cloneDeep(this.props.widgetAreas)
+
+    let toSavedData = _.map(widgetAreas, wa => {
+      let widgets = _.map(wa.widgets, widget => ({
+        id: widget.id,
+        widget: widget.widget.item
+      }))
+        return {
+          id: wa.id,
+          widgets: widgets
+        }
+    })
+
+    console.log(JSON.stringify(toSavedData, null, 2));
   }
 
   render(){
@@ -88,7 +107,7 @@ class WidgetAreaContainer extends React.Component {
                     
                     <div className="box-footer" style={{backgroundColor}}>
                         {/*<button onClick={this.handleClearAll} className="btn btn-danger">Clear All</button>*/}
-                        <button className="btn btn-primary pull-right">Save</button>
+                        <button onClick={this.handleSaveButton} className="btn btn-primary pull-right">Save</button>
                     </div>
                 </div>
             </div>
@@ -96,9 +115,9 @@ class WidgetAreaContainer extends React.Component {
     }
 }
 
-const mapStateToProps = (props) => (
-  {props}
-);
+const mapStateToProps = (state) => ({
+  widgetAreas: state.widgets.widgetAreas
+});
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   removeAllWidgets: () => {
