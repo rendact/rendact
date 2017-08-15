@@ -350,34 +350,7 @@ const MenuPanel = React.createClass({
       });
   },
 
-  componentDidMount: function(){
-    require ('jquery-ui/themes/base/theme.css');
-    require ('../lib/jquery-sortable.js');
-    require ('../../../public/css/AdminLTE.css');
-    require ('../../../public/css/skins/_all-skins.css');
-    require('./menucustom.css');
-
-    //Select All Pages
-    $('body').on('click', '#selectAllPages', function () {
-      if ($(this).hasClass('allChecked')) {
-          $('input[class="pageMenu"]').prop('checked', false);
-      } else {
-          $('input[class="pageMenu"]').prop('checked', true);
-      }
-      $(this).toggleClass('allChecked');
-    })
-
-    //Select All Posts
-    $('body').on('click', '#selectAllPosts', function () {
-      if ($(this).hasClass('allChecked')) {
-          $('input[class="postMenu"]').prop('checked', false);
-      } else {
-          $('input[class="postMenu"]').prop('checked', true);
-      }
-      $(this).toggleClass('allChecked');
-    })
-
-    //Load sidebar
+  loadData: function(){
     var me = this;
     this.notif = this.refs.notificationSystem;
 
@@ -453,6 +426,37 @@ const MenuPanel = React.createClass({
         me.disableForm(false);
       }
     );
+  },
+
+  componentDidMount: function(){
+    require ('jquery-ui/themes/base/theme.css');
+    require ('../lib/jquery-sortable.js');
+    require ('../../../public/css/AdminLTE.css');
+    require ('../../../public/css/skins/_all-skins.css');
+    require('./menucustom.css');
+
+    //Select All Pages
+    $('body').on('click', '#selectAllPages', function () {
+      if ($(this).hasClass('allChecked')) {
+          $('input[class="pageMenu"]').prop('checked', false);
+      } else {
+          $('input[class="pageMenu"]').prop('checked', true);
+      }
+      $(this).toggleClass('allChecked');
+    })
+
+    //Select All Posts
+    $('body').on('click', '#selectAllPosts', function () {
+      if ($(this).hasClass('allChecked')) {
+          $('input[class="postMenu"]').prop('checked', false);
+      } else {
+          $('input[class="postMenu"]').prop('checked', true);
+      }
+      $(this).toggleClass('allChecked');
+    })
+
+    //Load sidebar
+    this.loadData();
   },
   onChangeMainMenu: function(event){
     const target = event.target;
@@ -536,10 +540,10 @@ const MenuPanel = React.createClass({
       riques(Query.deleteMenuQry(idList), 
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
-            me.resetFormDelete();
             var here = me;
-            var cb = function(){here.disableForm(false)}
-            me.componentWillMount("All", cb);
+            //var cb = function(){here.disableForm(false)}
+            me.loadData()
+            me.resetFormDelete();
             me.notifyUnsavedData(false)
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
