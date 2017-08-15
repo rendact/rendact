@@ -8,10 +8,57 @@ import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
 import {maskArea, setResetDelete, setTreeData, setNewMenuName, setSelectedMenuName, setDisabled, setNewMenuId, loadselectedMenuName, loadmenuSelect,
-  setIdMainMenu, setPosition, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem, setUrlMenu} from '../../actions'
+  setIdMainMenu, setPosition, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
 import {swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
-import {reduxForm} from 'redux-form'
+import {reduxForm, Field} from 'redux-form'
+
+
+let CustomUrlForm = (props) => (
+ <div className="box box-default collapsed-box box-solid">
+                <div className="box-header with-border">
+                  <h3 className="box-title">Custom Links</h3>
+                  <div className="box-tools pull-right">
+                      <button type="button" className="btn btn-box-tool"  data-widget="collapse"><i className="fa fa-plus"></i>
+                      </button>
+                  </div>
+                </div>
+                <div className="box-body pad">
+                  <form onSubmit={props.handleSubmit(value => props.handleUrlSubmit(value, props.reset))} id="urlSabmit" method="get">
+
+                    <div className="row">
+                      <div className="col-md-3">
+                        <h5>TITLE</h5>
+                      </div>
+                      <div className="col-md-9">
+                        <Field name="title" component="input" type="text" className="form-control"/>
+                      </div>
+                    </div>
+
+                    <div className="row">
+                      <div className="col-md-3">
+                        <h5>URL</h5>
+                      </div>
+                      <div className="col-md-9">
+                        <Field name="url" component="input" type="text" className="form-control"/>
+                      </div>
+                    </div>
+
+                    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+                    <div className="box-tools pull-right">
+                      <button type="submit" id="submit" className="btn  btn-default">Add to Menu</button>
+                    </div>
+                  </form>
+                </div>
+              </div>  
+)
+
+CustomUrlForm = connect(
+  state => ({
+    state
+  }),
+)(CustomUrlForm)
+CustomUrlForm = reduxForm({form: 'customUrlForm'})(CustomUrlForm)
 
 const MenuPanel = React.createClass({
 
@@ -196,9 +243,6 @@ const MenuPanel = React.createClass({
       return item.checked = false
     });
   },
-  resetFormUrl: function (){
-    document.getElementById("urlSabmit").reset();
-  },
   resetFormDelete: function(){
     document.getElementById("menu").reset();
     document.getElementById("menuName").reset();
@@ -247,24 +291,9 @@ const MenuPanel = React.createClass({
     }
   },
 
-  handleCustomUrlTitle(e){
-      let urlTitle = this.props.urlTitle;
-      let url = this.props.urlData;
-      url.title = urlTitle
-      this.props.dispatch(setUrlMenu(url));
-  },
-
-  handleCustomUrlUrl: function(event){
-      let urlUrl = this.props.urlUrl;
-      let url = this.props.urlData;
-      url.url = urlUrl
-      this.props.dispatch(setUrlMenu(url));
-  },
-  handleUrlSubmit: function(event){
-    event.preventDefault();
+    handleUrlSubmit: function(urlData, reset){
     var _treeData = this.props.treeData;
-    var url = this.props.urlData;
-    var _url = [{titlePanel: url.title, url: url.url, tooltip: "", type: "url", id: uuid(), target: url.url}];
+    var _url = [{titlePanel: urlData.title, url: urlData.url, tooltip: "", type: "url", id: uuid(), target: urlData.url}];
     var treeData = [];
     if (_treeData===null) {
       treeData = _url;
@@ -273,8 +302,7 @@ const MenuPanel = React.createClass({
     }
     //this.setState ({treeData: treeData});
     this.props.dispatch(setTreeData(treeData))
-    var me = this;
-    me.resetFormUrl();
+    reset()
   },
 
   addToMenu: function(event){
@@ -540,8 +568,6 @@ const MenuPanel = React.createClass({
       riques(Query.deleteMenuQry(idList), 
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
-            var here = me;
-            //var cb = function(){here.disableForm(false)}
             me.loadData()
             me.resetFormDelete();
             me.notifyUnsavedData(false)
@@ -641,43 +667,8 @@ const MenuPanel = React.createClass({
                 </div>
               </div>
 
-
-              <div className="box box-default collapsed-box box-solid">
-                <div className="box-header with-border">
-                  <h3 className="box-title">Custom Links</h3>
-                  <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" disabled={this.props.selectedMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
-                      </button>
-                  </div>
-                </div>
-                <div className="box-body pad">
-                  <form onSubmit={this.handleUrlSubmit} id="urlSabmit" method="get">
-
-                    <div className="row">
-                      <div className="col-md-3">
-                        <h5>TITLE</h5>
-                      </div>
-                      <div className="col-md-9">
-                        <input type="text" name="urlTitle" id="urlTitle" className="form-control" onChange={this.handleCustomUrlTitle}/>
-                      </div>
-                    </div>
-
-                    <div className="row">
-                      <div className="col-md-3">
-                        <h5>URL</h5>
-                      </div>
-                      <div className="col-md-9">
-                        <input type="text" name="urlUrl" id="urlUrl" className="form-control" onChange={this.handleCustomUrlUrl}/>
-                      </div>
-                    </div>
-
-                    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
-                    <div className="box-tools pull-right">
-                      <button type="submit" id="submit" disabled={this.props.urlData.url===""} className="btn  btn-default">Add to Menu</button>
-                    </div>
-                  </form>
-                </div>
-              </div>  
+              <CustomUrlForm handleUrlSubmit={this.handleUrlSubmit} />
+                
 
 
               <div className="box box-default collapsed-box box-solid">
