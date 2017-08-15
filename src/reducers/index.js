@@ -13,6 +13,7 @@ import profile from './Profile'
 import admin from './Admin'
 import menu from './Menu'
 import widgets from './Widgets';
+import maskArea from './MaskArea';
 
 const main = (state = [], action) => {
   switch (action.type) {
@@ -44,7 +45,8 @@ const rendactApp = combineReducers({
   profile,
   admin,
   menu,
-  widgets
+  widgets,
+  maskArea
 })
 
 export default rendactApp
