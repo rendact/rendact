@@ -222,6 +222,9 @@ const MenuPanel = React.createClass({
     "#menu button",
     "#selectedMenuName",
     "#mainMenu",
+    "#IDpageList > div > input.pageMenu",
+    "#selectAllPages",
+    "#menu ~ .box > .box-body.pad > .box-tools > button",
   ],
 
   assignValueToMenuItem(menuId, name, value){
@@ -429,6 +432,8 @@ const MenuPanel = React.createClass({
               })
               me.props.dispatch(setAllPageList(allPageList)) 
             }
+            
+            disableIfNoIdMenu();
           }
         );
         riques(Query.getAllPost, 
@@ -634,7 +639,7 @@ const MenuPanel = React.createClass({
                 <div className="box-header with-border">
                   <h3 className="box-title">Pages</h3>
                   <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" disabled={this.props.selectedMenuName===""} data-widget="collapse"><i className="fa fa-minus"></i>
+                      <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-minus"></i>
                       </button>
                   </div>
                 </div>
