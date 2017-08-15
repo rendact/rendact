@@ -318,3 +318,15 @@ export const objectToDataset = (obj) => {
   // source https://github.com/holidayextras/react-data-attributes-mixin
   return _.mapKeys(obj, (value, key) => ('data-' + _.kebabCase(key)))
 }
+
+export const getActiveWidgets = function(){
+  var activeWidgetArea = localStorage.getItem("activeWidgetArea");
+  activeWidgetArea = activeWidgetArea.split(",");
+
+  return _.map(activeWidgetArea, function(item){
+      return {
+        id: item,
+        widgets: []
+      }
+  });
+}
