@@ -63,7 +63,7 @@ class WidgetAreaContainer extends React.Component {
     }
 
     return this.props.connectDropToDom(
-      <div id={this.props.id} className="col-md-6">
+      <div id={this.props.id} className="item">
                 <div className="box box-default" style={{backgroundColor}}>
                     <div className="box-header with-border">
                         <h3 className="box-title">{text? text : this.props.title}</h3>

@@ -81,7 +81,7 @@ class Widgets extends React.Component {
                 <p className="lead">To active the widget click Add to button after selecting a widget area. To deactivate a widget and its settings you can click Clear All button in each widget area or click the close button in each widget. Also, you can drag-n-drop widget to reorder position</p>
                 </div>
 
-                <div className="col-md-8">
+                <div className="col-md-8 masonry">
                 {
                     _.map(this.props.widgetAreas, function(item, index){
                       return <WidgetAreaContainer 
