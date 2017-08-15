@@ -69,8 +69,6 @@ class WidgetAreaContainer extends React.Component {
     })
 
 
-    // TODO: 
-    // 3. using halogen when disable all
     disableForm(true)
     this.props.maskArea(true)
     let value = JSON.stringify(toSavedData, null, 2);

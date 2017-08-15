@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import {riques, errorCallback} from '../../../utils';
+import {riques, errorCallback, defaultHalogenStyle} from '../../../utils';
 import Query from '../../query';
 import BoxItemAvailable from './BoxItemAvailable';
 import WidgetAreaContainer from './WidgetAreaContainer';
@@ -10,6 +10,7 @@ import {
   loadWidgetsAvailableSuccess
 } from '../../../actions'
 import Notification from 'react-notification-system';
+import Halogen from 'halogen';
 
 
 class Widgets extends React.Component {
@@ -80,6 +81,9 @@ class Widgets extends React.Component {
                 <div className="notifications-wrapper"></div>
 
                 <div className="row" style={{opacity: this.props.opacity}}>
+                  {this.props.isProcessing &&
+                    <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>
+                  }
                 <div style={{paddingRight: 60, paddingLeft: 60}}>
                 <p className="lead">To active the widget click Add to button after selecting a widget area. To deactivate a widget and its settings you can click Clear All button in each widget area or click the close button in each widget. Also, you can drag-n-drop widget to reorder position</p>
                 </div>
