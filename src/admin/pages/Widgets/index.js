@@ -79,7 +79,7 @@ class Widgets extends React.Component {
 			    </section>
                 <div className="notifications-wrapper"></div>
 
-                <div className="row">
+                <div className="row" style={{opacity: this.props.opacity}}>
                 <div style={{paddingRight: 60, paddingLeft: 60}}>
                 <p className="lead">To active the widget click Add to button after selecting a widget area. To deactivate a widget and its settings you can click Clear All button in each widget area or click the close button in each widget. Also, you can drag-n-drop widget to reorder position</p>
                 </div>
@@ -141,7 +141,9 @@ Widgets.defaultProps = {
 const mapStateToProps = (state) => {
   return {
     widgetAreas: state.widgets.widgetAreas,
-    widgetsAvailable: state.widgets.widgetsAvailable
+    widgetsAvailable: state.widgets.widgetsAvailable,
+    opacity: state.maskArea.opacity,
+    isProcessing: state.maskArea.isProcessing
   }
 }
 

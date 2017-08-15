@@ -7,7 +7,8 @@ import { connect } from 'react-redux'
 import {
   updateWidgetsOrder,
   addWidgetToWidgetArea, 
-  removeAllWidgetsFromWidgetArea
+  removeAllWidgetsFromWidgetArea,
+  maskArea
 } from '../../../actions'
 import {swalert, riques, errorCallback, disableForm} from '../../../utils';
 import Query from '../../query'
@@ -71,6 +72,7 @@ class WidgetAreaContainer extends React.Component {
     // TODO: 
     // 3. using halogen when disable all
     disableForm(true)
+    this.props.maskArea(true)
     let value = JSON.stringify(toSavedData, null, 2);
     riques(Query.updateListOfWidget(value), 
       (error, response, data) => {
@@ -86,6 +88,7 @@ class WidgetAreaContainer extends React.Component {
         }
 
         disableForm(false);
+        this.props.maskArea(false)
       });
   }
 
@@ -146,7 +149,10 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   },
   addToWidgetArea: (widget) => {
     dispatch(addWidgetToWidgetArea(ownProps.id, widget))
-  }
+  },
+  maskArea: (state) => {
+    dispatch(maskArea(state))
+  },
 });
 
 WidgetAreaContainer = DropTarget('available', dropTarget, collectDrop)(WidgetAreaContainer);
