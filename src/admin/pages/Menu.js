@@ -385,15 +385,20 @@ const MenuPanel = React.createClass({
     this.props.dispatch(setResetDelete())
     this.disableForm(true);
     var mainMenuId, mainMenuName;
+    const disableIfNoIdMenu = () => {
+      if (!this.props.IdMainMenu){
+        disableBySelector(true, me.disabledSelectors);
+      }
+    }
     riques(Query.getMainMenu, 
       function(error, response, body) {
         if (!error) {
           var mainMenu = _.forEach(body.data.viewer.allMenus.edges, function(item){ return item });
-          if (mainMenu.length>0){
+          if (mainMenu.length>=1){
             mainMenuId = _.head(mainMenu).node.id;
             mainMenuName = _.head(mainMenu).node.name;
             me.props.dispatch(setIdMainMenu(_.head(mainMenu).node.id))
-          }
+          } 
         }
 
         riques(Query.getAllMenu, 
@@ -452,6 +457,7 @@ const MenuPanel = React.createClass({
         );
 
         me.disableForm(false);
+        disableIfNoIdMenu();
       }
     );
   },
