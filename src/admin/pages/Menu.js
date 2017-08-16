@@ -11,7 +11,7 @@ import {maskArea, setResetDelete, setTreeData, setNewMenuName, setSelectedMenuNa
   setIdMainMenu, setPosition, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
 import {swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
-import {reduxForm, Field} from 'redux-form'
+import {reduxForm, Field, formValueSelector} from 'redux-form'
 
 
 let CustomUrlForm = (props) => (
@@ -52,13 +52,25 @@ let CustomUrlForm = (props) => (
                 </div>
               </div>  
 )
+            CustomUrlForm = connect(
+              state => ({
+                state
+              }),
+            )(CustomUrlForm)
+            CustomUrlForm = reduxForm({form: 'customUrlForm'})(CustomUrlForm)
 
-CustomUrlForm = connect(
-  state => ({
-    state
-  }),
-)(CustomUrlForm)
-CustomUrlForm = reduxForm({form: 'customUrlForm'})(CustomUrlForm)
+let MenuName = (props) => (
+  <div className="col-md-6">
+    <Field component="input" type="text" name="selectedMenuName" id="selectedMenuName" disabled={props.selectedMenuName===""} 
+    defaultValue={props.selectedMenuName} className="form-control" required="true" onChange={props.handleNameChange}/>
+  </div>
+)
+            MenuName = connect(
+              state => ({
+                state
+              }),
+            )(MenuName)
+            MenuName = reduxForm({form: 'menuNameForm'})(MenuName)
 
 const MenuPanel = React.createClass({
 
@@ -158,7 +170,8 @@ const MenuPanel = React.createClass({
   }
 })
 
-  let Menu = React.createClass({
+
+let Menu = React.createClass({
   propTypes: {
     disabled: React.PropTypes.bool,
     name: React.PropTypes.string,
@@ -350,6 +363,8 @@ const MenuPanel = React.createClass({
     this.props.dispatch(setNewMenuName(newMenuName))
   },
   handleNameChange: function(event){
+    debugger;
+    //let selectedMenuName = getValue("selectedMenuName");
     var selectedMenuName = this.props.selectedMenuName;
     this.props.dispatch(setSelectedMenuName(selectedMenuName))
     this.notifyUnsavedData(true);
@@ -680,8 +695,6 @@ const MenuPanel = React.createClass({
 
               <CustomUrlForm handleUrlSubmit={this.handleUrlSubmit} />
                 
-
-
               <div className="box box-default collapsed-box box-solid">
                 <div className="box-header with-border">
                   <h3 className="box-title">Categories</h3>
@@ -733,9 +746,9 @@ const MenuPanel = React.createClass({
                       <div className="col-md-3">
                         <h4>Menu Name :</h4>
                       </div>
-                      <div className="col-md-6">
-                        <input type="text" name="selectedMenuName" id="selectedMenuName" value={this.props.selectedMenuName} disabled={this.props.selectedMenuName===""} className="form-control" required="true" onChange={this.handleNameChange}/>
-                      </div>
+
+                       <MenuName handleNameChange={this.handleNameChange} />
+                      
                       <div className="col-md-3">
                         <div className="box-tools pull-right">
                           <button type="submit" id="submit" name="submit" disabled={this.props.selectedMenuName===""} className="btn  btn-primary" >Update Menu</button>
@@ -797,16 +810,34 @@ const MenuPanel = React.createClass({
   }
 });
 
-const mapStateToProps = function(state){
-  if (!_.isEmpty(state.menu)) {
-    var out = _.head(state.menu);
-    out["initialValues"] = out.selectedMenuName;
-    out["initialValues"] = out.menuSelect;
-    return out;
-  } else return {}
-}
+// const mapStateToProps = function(state){
+//   if (!_.isEmpty(state.menu)) {
+//     var out = _.head(state.menu);
+//     out["initialValues"] = out.selectedMenuName;
+//     out["initialValues"] = out.menuSelect;
+//     return out;
+//   } else return {}
+// }
+// Menu = reduxForm({
+//   form: 'menuForm'
+// })(Menu)
+// Menu = connect(mapStateToProps)(Menu);
+// export default Menu;
+
 Menu = reduxForm({
   form: 'menuForm'
 })(Menu)
+const selector = formValueSelector('menuForm');
+const mapStateToProps = function(state){
+  var customStates = {
+    newMenuName: selector(state, 'newMenuName'),
+    selectedMenuName: selector(state, 'selectedMenuName')
+  }
+  if (!_.isEmpty(state.menu)) {
+    var out = _.head(state.menu);
+    return _.merge(out, customStates);
+  } else return customStates;
+}
 Menu = connect(mapStateToProps)(Menu);
 export default Menu;
+
