@@ -84,6 +84,7 @@ class Widgets extends React.Component {
                       key={index} 
                       title={item.id}
                       widgets={item.widgets}
+                      notif={me.refs.notificationSystem}
                       />
                   })
               }
