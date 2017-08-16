@@ -8,7 +8,8 @@ import {connect} from 'react-redux';
 import {
   loadWidgetAreasSuccess, 
   loadWidgetsAvailableSuccess,
-  maskArea
+  maskArea,
+  createActiveWidgetsInitialValues
 } from '../../../actions'
 import Notification from 'react-notification-system';
 import Halogen from 'halogen';
@@ -58,7 +59,7 @@ class Widgets extends React.Component {
     this.props.dispatch(maskArea(true))
     riques(Query.getAllActiveWidgets,
       (error, response, data) => {
-        console.log(JSON.stringify(data, null, 2))
+        this.props.dispatch(createActiveWidgetsInitialValues(data.data.viewer.allOptions.edges))
         this.props.dispatch(maskArea(false))
         disableForm(false)
       }

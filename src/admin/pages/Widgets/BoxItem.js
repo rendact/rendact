@@ -115,7 +115,9 @@ class BoxItem extends React.Component {
    }
 }
 
-const mapStateToProps = (state) => ({state});
+const mapStateToProps = (state) => ({
+  initialValues: state.widgets.activeWidgetsInitials
+});
 const mapDispatchToProps = (dispatch, ownProps) => ({
   removeWidget: () => {
       swalert("warning", "Sure want to remove this widget?", "", () => {
@@ -127,7 +129,7 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   },
 });
 
-BoxItem = connect(mapStateToProps, mapDispatchToProps)(BoxItem)
 BoxItem = reduxForm({form: 'widgetBox'})(BoxItem)
+BoxItem = connect(mapStateToProps, mapDispatchToProps)(BoxItem)
 
 export default BoxItem;

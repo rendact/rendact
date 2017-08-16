@@ -60,7 +60,6 @@ class WidgetAreaContainer extends React.Component {
   handleSaveButton(e){
     e.preventDefault();
     let widgetAreas = _.cloneDeep(this.props.widgetAreas)
-    console.log(widgetAreas)
 
     let toSavedData = {}
     _.forEach(widgetAreas, widgetArea => {
@@ -71,7 +70,6 @@ class WidgetAreaContainer extends React.Component {
       toSavedData[widgetArea.id] = widgets
     })
 
-    console.log(toSavedData);
 
 
     disableForm(true)
@@ -146,7 +144,7 @@ class WidgetAreaContainer extends React.Component {
 
 const mapStateToProps = (state) => ({
   widgetAreas: state.widgets.widgetAreas,
-  widgetsAvailable: state.widgets.widgetsAvailable
+  widgetsAvailable: state.widgets.widgetsAvailable,
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({

@@ -351,3 +351,8 @@ export const loadWidgetsAvailableSuccess = (widgets) => ({
   widgets
 });
 
+export const createActiveWidgetsInitialValues = (activeWidgets) => ({
+  type: 'CREATE_ACTIVE_WIDGETS_INITIAL_VALUES',
+  activeWidgets
+})
+

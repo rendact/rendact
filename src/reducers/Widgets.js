@@ -65,6 +65,17 @@ const widgets = (state = {} , action) => {
         {widgetAreas: widgetAreas}
       );
 
+    case 'CREATE_ACTIVE_WIDGETS_INITIAL_VALUES':
+      let nodes = action.activeWidgets
+      let activeWidgetsInitials = {}
+
+      _.forEach(nodes, node => {
+        let uuid = node.node.item.split("#")[1]
+        activeWidgetsInitials[uuid] = JSON.parse(JSON.parse(node.node.value))
+      });
+
+      return {...state, activeWidgetsInitials}
+
     default:
       return state
   }
