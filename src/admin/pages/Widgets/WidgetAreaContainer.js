@@ -17,7 +17,6 @@ const dropTarget = {
   drop(props, monitor, container){
     let droppedItem = monitor.getItem();
     // add to widgetarea id
-    console.log(droppedItem)
     props.addToWidgetArea(droppedItem);
   }
 }

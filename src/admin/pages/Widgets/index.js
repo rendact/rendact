@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import {riques, errorCallback, defaultHalogenStyle, getActiveWidgetArea, disableForm} from '../../../utils';
+import {toWidgetAreaStructure, riques, errorCallback, defaultHalogenStyle, getActiveWidgetArea, disableForm} from '../../../utils';
 import Query from '../../query';
 import BoxItemAvailable from './BoxItemAvailable';
 import WidgetAreaContainer from './WidgetAreaContainer';
@@ -17,6 +17,7 @@ import Halogen from 'halogen';
 class Widgets extends React.Component {
   constructor(props){
     super(props);
+    this.loadListOfWidget = this.loadListOfWidget.bind(this)
 
     var themeFunctions = require('../../../theme/default/functions.js');
     themeFunctions.default();
@@ -32,68 +33,48 @@ class Widgets extends React.Component {
     this.props.dispatch(loadWidgetAreasSuccess(_newWidgetArea));
   }
 
-  componentWillMount(){
-    /*
-     * all registered widget
-     */
-    this.props.dispatch(maskArea(true))
+  loadListOfWidget (){
     disableForm(true)
-    riques(Query.getAllWidgets,
-      (error, response, data) => {
-        if (!error && !data.errors && response.statusCode === 200){
-          this.props.dispatch(loadWidgetsAvailableSuccess(data.data.viewer.allOptions.edges))
-
-          const findWidget = (widgets, widgetItem) => {
-            return _.head(
-              _.filter(widgets, w => (w.node.item !== widgetItem))
-            ).node;
-          }
+    this.props.dispatch(maskArea(true))
     riques(Query.getListOfWidget,
       (error, response, data) => {
         if (!error && !data.errors && response.statusCode === 200) {
           let value = JSON.parse(data.data.getOptions.value)
-          let _widgetAreas = [];
+          let _widgetAreas = toWidgetAreaStructure(this.props.widgetsAvailable, value)
 
-
-          _.forIn(value, (val, key) => {
-            _widgetAreas.push({
-              id: key,
-              widgets: _.map(val, v => ({
-                id: v.id,
-                widget: findWidget(this.props.widgetsAvailable, v.widget)
-              }))
-            })
-          });
-
-
-                    this.props.dispatch(loadWidgetAreasSuccess(_widgetAreas))
+          this.props.dispatch(loadWidgetAreasSuccess(_widgetAreas))
         } else {
           errorCallback(error, data.errors?data.errors[0].message:null);
         }
-        disableForm(false)
         this.props.dispatch(maskArea(false))
+        disableForm(false)
       }
     );
+  }
+
+  componentWillMount(){
+    /*
+     * all registered widget
+     */
+    disableForm(true)
+    this.props.dispatch(maskArea(true))
+    riques(Query.getAllWidgets,
+      (error, response, data) => {
+        if (!error && !data.errors && response.statusCode === 200){
+          this.props.dispatch(loadWidgetsAvailableSuccess(data.data.viewer.allOptions.edges))
+          this.loadListOfWidget()
+
 
         } else {
           errorCallback(error, data.errors?data.errors[0].message:null);
         }
-        disableForm(false)
-        this.props.dispatch(maskArea(false))
       }
     )
 
-    /*
-     * listOfWidget query
-     */
-
-    this.props.dispatch(maskArea(true))
-    disableForm(true)
   }
 
 	render(){
     let me = this;
-    console.log(this.props.widgetsAvailable)
 		return (
 			<div className="content-wrapper">
 			<div className="container-fluid" style={{opacity: this.props.opacity}}>

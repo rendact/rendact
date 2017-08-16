@@ -330,3 +330,30 @@ export const getActiveWidgetArea = function(){
       }
   });
 }
+
+const findWidget = (widgets, widgetItem) => {
+  return _.head(
+    _.filter(widgets, w => (w.node.item !== widgetItem))
+  ).node;
+}
+
+export const toWidgetAreaStructure = (widgets, value) => {
+  /*
+   * value: value from database
+   */
+
+    let _widgetAreas = [];
+
+
+    _.forIn(value, (val, key) => {
+      _widgetAreas.push({
+        id: key,
+        widgets: _.map(val, v => ({
+          id: v.id,
+          widget: findWidget(widgets, v.widget)
+        }))
+      })
+    });
+
+  return _widgetAreas
+}
