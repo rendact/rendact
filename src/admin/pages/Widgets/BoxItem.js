@@ -4,6 +4,7 @@ import {
   removeSingleWidgetFromWidgetArea,
 } from '../../../actions'
 import {swalert} from '../../../utils'
+import {reduxForm, Field} from 'redux-form';
 
 
 class BoxItem extends React.Component {
@@ -38,15 +39,19 @@ class BoxItem extends React.Component {
     </div>
 </div>
 <div className="box-body" style={{display: "none"}}>
+  <form onSubmit={this.props.handleSubmit(value => console.log(value))}>
     <div className="form-group">
         <label htmlFor="title">Title</label>
-        <input type="text" className="form-control"/>
+        <Field name={this.props.uuid+'.title'} className="form-control" component="input" type="text"/>
     </div>
     <div className="form-group">
-        <label htmlFor="title">Text</label>
-        <textarea className="form-control" id="" name="" cols="30" rows="10"></textarea>
+        <label htmlFor="description">Text</label>
+        <Field name={this.props.uuid+".description"} className="form-control" component='textarea'/>
     </div>
-    <button onClick={(e) => (this.props.removeWidget())} className="btn btn-danger btn-xs">Remove</button>
+    
+    <button onClick={(e) => {e.preventDefault();this.props.removeWidget()}} className="btn btn-danger btn-xs">Remove</button>
+    <button className="btn btn-primary btn-xs pull-right" type="submit">Save</button>
+  </form>
 </div>
 </div>
       )}
@@ -64,5 +69,6 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
 });
 
 BoxItem = connect(mapStateToProps, mapDispatchToProps)(BoxItem)
+BoxItem = reduxForm({form: 'widgetBox'})(BoxItem)
 
 export default BoxItem;
