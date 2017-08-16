@@ -22,6 +22,16 @@ const createWidget = (item, value) => {
 
 }
 
+const getListOfWidget = {
+  query: `
+    query {
+     getOptions(id: "T3B0aW9uczo1NQ=="){
+       value
+     }
+    }
+  `
+}
+
 const updateListOfWidget = (value) => ({
   "query": `
   mutation UpdateListOfWidet($input: UpdateOptionsInput!) {
@@ -63,6 +73,7 @@ const queries = {
   createWidget: createWidget,
   getAllWidgets: getAllWidgets,
   updateListOfWidget: updateListOfWidget,
+  getListOfWidget: getListOfWidget
 }
 
 export default queries;
