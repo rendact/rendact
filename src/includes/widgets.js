@@ -6,18 +6,18 @@ import _ from 'lodash';
 
 
 export const registerWidget = (type, title, value) => {
-    let item = "widget_" + type + "_" + uuid();
-    let values = Object.assign({}, value, {
-        title: title
-    });
+  let item = "widget_" + type + "_" + uuid();
+  let values = Object.assign({}, value, {
+      title: title
+  });
 
-    riques(Query.createWidget(item, JSON.stringify(values)),
-        (error, response, data) => {
-            if (!error && !data.errors && response.statusCode === 200){
-                return data
-            }
-            console.log(data.errors)
-        })
+  riques(Query.createWidget(item, JSON.stringify(values)),
+    (error, response, data) => {
+      if (!error && !data.errors && response.statusCode === 200){
+          return data
+      }
+      console.log(data.errors)
+    })
 }
 
 export const registerWidgetArea = (widgetId) => {

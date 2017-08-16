@@ -7,9 +7,11 @@ import { connect } from 'react-redux'
 import {
   updateWidgetsOrder,
   addWidgetToWidgetArea, 
-  removeAllWidgetsFromWidgetArea
+  removeAllWidgetsFromWidgetArea,
+  maskArea
 } from '../../../actions'
-import {swalert} from '../../../utils';
+import {swalert, riques, errorCallback, disableForm} from '../../../utils';
+import Query from '../../query'
 
 const dropTarget = {
   drop(props, monitor, container){
@@ -33,6 +35,7 @@ class WidgetAreaContainer extends React.Component {
 
       this.handleClearAll = this.handleClearAll.bind(this);
       this.renderItem = this.renderItem.bind(this);
+      this.handleSaveButton = this.handleSaveButton.bind(this);
     }
 
     handleClearAll(e){
@@ -52,6 +55,41 @@ class WidgetAreaContainer extends React.Component {
       />
   }
 
+  handleSaveButton(e){
+    e.preventDefault();
+    let widgetAreas = _.cloneDeep(this.props.widgetAreas)
+
+    let toSavedData = {}
+    _.forEach(widgetAreas, widgetArea => {
+      let widgets = _.map(widgetArea.widgets, widget => ({
+        id: widget.id,
+        widget: widget.widget.item
+      }));
+      toSavedData[widgetArea.id] = widgets
+    })
+
+
+    disableForm(true)
+    this.props.maskArea(true)
+    let value = JSON.stringify(toSavedData, null, 2);
+    riques(Query.updateListOfWidget(value), 
+      (error, response, data) => {
+        if (!error && response.statusCode === 200 && !data.errors){
+          this.props.notif.addNotification({
+            message: 'List of widgets updated successfully',
+            level: 'success',
+            position: 'tr',
+            autoDismiss: 2,
+          });
+        } else {
+          errorCallback(error, data.errors?data.errors[0].message: null)
+        }
+
+        disableForm(false);
+        this.props.maskArea(false)
+      });
+  }
+
   render(){
 
     let backgroundColor;
@@ -63,7 +101,7 @@ class WidgetAreaContainer extends React.Component {
     }
 
     return this.props.connectDropToDom(
-      <div id={this.props.id} className="col-md-6">
+      <div id={this.props.id} className="item">
                 <div className="box box-default" style={{backgroundColor}}>
                     <div className="box-header with-border">
                         <h3 className="box-title">{text? text : this.props.title}</h3>
@@ -88,7 +126,7 @@ class WidgetAreaContainer extends React.Component {
                     
                     <div className="box-footer" style={{backgroundColor}}>
                         {/*<button onClick={this.handleClearAll} className="btn btn-danger">Clear All</button>*/}
-                        <button className="btn btn-primary pull-right">Save</button>
+                        <button onClick={this.handleSaveButton} className="btn btn-primary pull-right">Save</button>
                     </div>
                 </div>
             </div>
@@ -96,9 +134,9 @@ class WidgetAreaContainer extends React.Component {
     }
 }
 
-const mapStateToProps = (props) => (
-  {props}
-);
+const mapStateToProps = (state) => ({
+  widgetAreas: state.widgets.widgetAreas
+});
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   removeAllWidgets: () => {
@@ -109,7 +147,10 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   },
   addToWidgetArea: (widget) => {
     dispatch(addWidgetToWidgetArea(ownProps.id, widget))
-  }
+  },
+  maskArea: (state) => {
+    dispatch(maskArea(state))
+  },
 });
 
 WidgetAreaContainer = DropTarget('available', dropTarget, collectDrop)(WidgetAreaContainer);
