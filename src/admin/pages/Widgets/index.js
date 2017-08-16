@@ -18,6 +18,7 @@ class Widgets extends React.Component {
   constructor(props){
     super(props);
     this.loadListOfWidget = this.loadListOfWidget.bind(this)
+    this.loadActiveWidgets = this.loadActiveWidgets.bind(this)
 
     var themeFunctions = require('../../../theme/default/functions.js');
     themeFunctions.default();
@@ -52,6 +53,18 @@ class Widgets extends React.Component {
     );
   }
 
+  loadActiveWidgets (){
+    disableForm(true)
+    this.props.dispatch(maskArea(true))
+    riques(Query.getAllActiveWidgets,
+      (error, response, data) => {
+        console.log(JSON.stringify(data, null, 2))
+        this.props.dispatch(maskArea(false))
+        disableForm(false)
+      }
+    );
+  }
+
   componentWillMount(){
     /*
      * all registered widget
@@ -70,6 +83,7 @@ class Widgets extends React.Component {
         }
       }
     )
+    this.loadActiveWidgets()
 
   }
 
