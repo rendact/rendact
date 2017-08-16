@@ -105,13 +105,31 @@ const updateWidget = (id, value) => ({
   }
 });
 
+const getAllActiveWidgets = {
+    "query": `
+    query getAllWidgets {
+      viewer {
+        allOptions(where: {item: {like: "activeWidget#%"}}) {
+          edges {
+            node {
+              id
+              item
+              value
+            }
+          }
+        }
+      }
+    }
+    `
+}
 const queries = {
   createWidget: createWidget,
   getAllWidgets: getAllWidgets,
   updateListOfWidget: updateListOfWidget,
   getListOfWidget: getListOfWidget,
   updateWidget: updateWidget,
-  findWidget: findWidget
+  findWidget: findWidget,
+  getAllActiveWidgets: getAllActiveWidgets
 }
 
 export default queries;
