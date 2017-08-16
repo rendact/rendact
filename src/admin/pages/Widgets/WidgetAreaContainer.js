@@ -53,6 +53,7 @@ class WidgetAreaContainer extends React.Component {
       uuid={props.item.id}
       widgetAreaId={this.props.id}
       isDragging={props.isDragging}
+      connectDragSource={props.connectDragSource}
       />
   }
 
@@ -125,6 +126,7 @@ class WidgetAreaContainer extends React.Component {
                           renderItem={this.renderItem}
                           maxDepth={ 1 }
                           onUpdate={this.props.orderWidgets}
+                          useDragHandle
                         />
                     {isActive &&
  <div className="box box-default" style={{borderRadius: 0, color: 'white', backgroundColor: 'white', border: '1px dashed gray'}}>

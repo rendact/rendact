@@ -82,8 +82,8 @@ class BoxItem extends React.Component {
        </div>
      } else {
 
-      box =  (<div className="box box-default collapsed-box box-solid" style={{borderRadius: 0, cursor: 'move'}}>
-<div className="box-header with-border">
+      box =  (<div className="box box-default collapsed-box box-solid" style={{borderRadius: 0}}>
+        {this.props.connectDragSource(<div className="box-header with-border" style={{cursor: 'move'}}>
     <h3 className="box-title">{widgetValue.title}</h3>
     <div className="box-tools pull-right">
         <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Expand to setting widget">
@@ -93,7 +93,7 @@ class BoxItem extends React.Component {
             <i className="fa fa-times"></i>
         </button>*/}
     </div>
-</div>
+</div>)}
 <div className="box-body" style={{display: "none"}}>
   <form onSubmit={this.props.handleSubmit(this.onSubmit)}>
     <div className="form-group">
