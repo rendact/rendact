@@ -2,3 +2,27 @@
   list-style: none;
   padding-left: 0;
 }
+
+/*
+ * tutored from http://w3bits.com/css-masonry/
+ */
+
+.masonry {
+  column-count: 2;
+  -moz-column-count: 2;
+  -webkit-column-count: 2;
+  column-gap: 1em;
+  -moz-column-gap: 1em;
+  -webkit-column-gap: 1em;
+}
+
+.item {
+  display: inline-block;
+  margin: 0 0 1em;
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}

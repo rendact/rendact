@@ -1,14 +1,17 @@
 import React from 'react';
 import _ from 'lodash';
-import {riques, errorCallback, getActiveWidgetArea} from '../../../utils';
+import {riques, errorCallback, defaultHalogenStyle, getActiveWidgetArea} from '../../../utils';
 import Query from '../../query';
 import BoxItemAvailable from './BoxItemAvailable';
 import WidgetAreaContainer from './WidgetAreaContainer';
 import {connect} from 'react-redux';
 import {
   loadWidgetAreasSuccess, 
-  loadWidgetsAvailableSuccess
+  loadWidgetsAvailableSuccess,
+  maskArea
 } from '../../../actions'
+import Notification from 'react-notification-system';
+import Halogen from 'halogen';
 
 
 class Widgets extends React.Component {
@@ -23,7 +26,7 @@ class Widgets extends React.Component {
     require ('jquery-ui/themes/base/theme.css');
     require ('../../../../public/css/AdminLTE.css');
     require ('../../../../public/css/skins/_all-skins.css');
-    require('./custom.css')
+    require('./custom.css');
 
     var _newWidgetArea = getActiveWidgetArea();
     this.props.dispatch(loadWidgetAreasSuccess(_newWidgetArea));
@@ -45,9 +48,11 @@ class Widgets extends React.Component {
   }
 
 	render(){
+    let me = this;
 		return (
 			<div className="content-wrapper">
 			<div className="container-fluid">
+        <Notification ref="notificationSystem"/>
                 
 				<section className="content-header">
 		      <h1>
@@ -62,14 +67,16 @@ class Widgets extends React.Component {
         <section className="content">
           <div className="notifications-wrapper"></div>
 
-            <div className="row">
+            <div className="row" style={{opacity: this.props.opacity}}>
+              {this.props.isProcessing &&
+                <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>
+              }
               <div className="col-md-12">
                 <p>To active the widget click Add to button after selecting a widget area. To deactivate a widget and its settings you can click Clear All button in each widget area or click the close button in each widget. Also, you can drag-n-drop widget to reorder position</p>
               </div>
             </div>
-
             <div className="row">
-              <div className="col-md-8">
+              <div className="col-md-8 masonry">
               {
                   _.map(this.props.widgetAreas, function(item, index){
                     return <WidgetAreaContainer 
@@ -123,7 +130,9 @@ Widgets.defaultProps = {
 const mapStateToProps = (state) => {
   return {
     widgetAreas: state.widgets.widgetAreas,
-    widgetsAvailable: state.widgets.widgetsAvailable
+    widgetsAvailable: state.widgets.widgetsAvailable,
+    opacity: state.maskArea.opacity,
+    isProcessing: state.maskArea.isProcessing
   }
 }
 
