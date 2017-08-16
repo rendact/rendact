@@ -3,11 +3,62 @@ import {connect} from 'react-redux';
 import {
   removeSingleWidgetFromWidgetArea,
 } from '../../../actions'
-import {swalert} from '../../../utils'
+import {errorCallback, swalert, riques} from '../../../utils'
 import {reduxForm, Field} from 'redux-form';
+import Query from '../../query';
 
 
 class BoxItem extends React.Component {
+  constructor(props){
+    super(props)
+    this.onSubmit = this.onSubmit.bind(this)
+    this.newWidget = this.newWidget.bind(this)
+    this.updateWidget = this.updateWidget.bind(this)
+
+  }
+
+  newWidget(uuid, value){
+    riques(Query.createWidget(uuid, value),
+      (error, response, data) => {
+        if (!error) {
+          console.log(JSON.stringify(data, null, 2))
+        } else {
+          errorCallback(error, data.error? data.error[0].message: null)
+        }
+      }
+    );
+  }
+
+  updateWidget(id, value){
+    riques(Query.updateWidget(id, value),
+      (error, response, data) => {
+        if (!error) {
+          console.log(JSON.stringify(data, null, 2))
+        } else {
+          errorCallback(error, data.error? data.error[0].message: null)
+        }
+      }
+    );
+  }
+
+  onSubmit(value){
+    //console.log(value, this.props)
+    let toSave = JSON.stringify(value[this.props.uuid], null, 2)
+    riques(Query.findWidget(this.props.uuid),
+      (error, response, data) => {
+        if (!error) {
+          let found = data.data.viewer.allOptions.edges
+          if (!found.length){
+            console.log('will create a new data')
+            this.newWidget(this.props.uuid, JSON.stringify(toSave, null, 2))
+          } else {
+            let id = found[0].node.id
+            this.updateWidget(id, JSON.stringify(toSave, null, 2))
+          }
+        }
+      }
+    );
+  }
 
    render() {
      let widget = this.props.widget;
@@ -39,7 +90,7 @@ class BoxItem extends React.Component {
     </div>
 </div>
 <div className="box-body" style={{display: "none"}}>
-  <form onSubmit={this.props.handleSubmit(value => console.log(value))}>
+  <form onSubmit={this.props.handleSubmit(this.onSubmit)}>
     <div className="form-group">
         <label htmlFor="title">Title</label>
         <Field name={this.props.uuid+'.title'} className="form-control" component="input" type="text"/>
