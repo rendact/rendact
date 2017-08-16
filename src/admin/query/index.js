@@ -92,7 +92,9 @@ const queries = {
   createWidget: Widget.createWidget,
   getAllWidgets: Widget.getAllWidgets,
   updateListOfWidget: Widget.updateListOfWidget,
-  getListOfWidget: Widget.getListOfWidget
+  getListOfWidget: Widget.getListOfWidget,
+  updateWidget: Widget.updateWidget,
+  findWidget: Widget.findWidget
 }
 
 export default queries;
