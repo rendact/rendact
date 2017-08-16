@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import {riques, errorCallback, defaultHalogenStyle, getActiveWidgetArea} from '../../../utils';
+import {riques, errorCallback, defaultHalogenStyle, getActiveWidgetArea, disableForm} from '../../../utils';
 import Query from '../../query';
 import BoxItemAvailable from './BoxItemAvailable';
 import WidgetAreaContainer from './WidgetAreaContainer';
@@ -36,22 +36,67 @@ class Widgets extends React.Component {
     /*
      * all registered widget
      */
+    this.props.dispatch(maskArea(true))
+    disableForm(true)
     riques(Query.getAllWidgets,
       (error, response, data) => {
         if (!error && !data.errors && response.statusCode === 200){
           this.props.dispatch(loadWidgetsAvailableSuccess(data.data.viewer.allOptions.edges))
+
+          const findWidget = (widgets, widgetItem) => {
+            return _.head(
+              _.filter(widgets, w => (w.node.item !== widgetItem))
+            ).node;
+          }
+    riques(Query.getListOfWidget,
+      (error, response, data) => {
+        if (!error && !data.errors && response.statusCode === 200) {
+          let value = JSON.parse(data.data.getOptions.value)
+          let _widgetAreas = [];
+
+
+          _.forIn(value, (val, key) => {
+            _widgetAreas.push({
+              id: key,
+              widgets: _.map(val, v => ({
+                id: v.id,
+                widget: findWidget(this.props.widgetsAvailable, v.widget)
+              }))
+            })
+          });
+
+
+                    this.props.dispatch(loadWidgetAreasSuccess(_widgetAreas))
         } else {
           errorCallback(error, data.errors?data.errors[0].message:null);
         }
+        disableForm(false)
+        this.props.dispatch(maskArea(false))
+      }
+    );
+
+        } else {
+          errorCallback(error, data.errors?data.errors[0].message:null);
+        }
+        disableForm(false)
+        this.props.dispatch(maskArea(false))
       }
     )
+
+    /*
+     * listOfWidget query
+     */
+
+    this.props.dispatch(maskArea(true))
+    disableForm(true)
   }
 
 	render(){
     let me = this;
+    console.log(this.props.widgetsAvailable)
 		return (
 			<div className="content-wrapper">
-			<div className="container-fluid">
+			<div className="container-fluid" style={{opacity: this.props.opacity}}>
         <Notification ref="notificationSystem"/>
                 
 				<section className="content-header">
@@ -67,10 +112,7 @@ class Widgets extends React.Component {
         <section className="content">
           <div className="notifications-wrapper"></div>
 
-            <div className="row" style={{opacity: this.props.opacity}}>
-              {this.props.isProcessing &&
-                <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>
-              }
+            <div className="row" >
               <div className="col-md-12">
                 <p>To active the widget click Add to button after selecting a widget area. To deactivate a widget and its settings you can click Clear All button in each widget area or click the close button in each widget. Also, you can drag-n-drop widget to reorder position</p>
               </div>
@@ -111,6 +153,10 @@ class Widgets extends React.Component {
                 </div>
               </div> 
             </div>
+
+              {this.props.isProcessing &&
+                <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>
+              }
           </section>
 		    </div>
       </div>
