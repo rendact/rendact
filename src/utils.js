@@ -331,12 +331,6 @@ export const getActiveWidgetArea = function(){
   });
 }
 
-const findWidget = (widgets, widgetItem) => {
-  return _.head(
-    _.filter(widgets, w => (w.node.item !== widgetItem))
-  ).node;
-}
-
 export const toWidgetAreaStructure = (widgets, value) => {
   /*
    * value: value from database
@@ -350,7 +344,7 @@ export const toWidgetAreaStructure = (widgets, value) => {
         id: key,
         widgets: _.map(val, v => ({
           id: v.id,
-          widget: findWidget(widgets, v.widget)
+          widget: _.find(widgets, e => e.node.item === v.widget).node
         }))
       })
     });

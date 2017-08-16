@@ -68,7 +68,7 @@ const getAllWidgets = {
     `
 }
 
-const findWidget = (uuid) => ({
+const findWidget = (uuid, widgetItem) => ({
   "query" : `
     query findWidget($uuid: String!) {
       viewer {
@@ -83,7 +83,7 @@ const findWidget = (uuid) => ({
     }
   `,
   "variables": {
-    uuid: uuid
+    uuid: "activeWidget#" + uuid + "#" + widgetItem
   }
 })
 

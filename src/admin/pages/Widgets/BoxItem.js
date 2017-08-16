@@ -2,8 +2,9 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {
   removeSingleWidgetFromWidgetArea,
+  maskArea,
 } from '../../../actions'
-import {errorCallback, swalert, riques} from '../../../utils'
+import {disableForm, errorCallback, swalert, riques} from '../../../utils'
 import {reduxForm, Field} from 'redux-form';
 import Query from '../../query';
 
@@ -18,7 +19,8 @@ class BoxItem extends React.Component {
   }
 
   newWidget(uuid, value){
-    riques(Query.createWidget(uuid, value),
+    let item = "activeWidget#" + uuid + "#" + this.props.widget.item
+    riques(Query.createWidget(item, value),
       (error, response, data) => {
         if (!error) {
           console.log(JSON.stringify(data, null, 2))
@@ -42,20 +44,23 @@ class BoxItem extends React.Component {
   }
 
   onSubmit(value){
-    //console.log(value, this.props)
     let toSave = JSON.stringify(value[this.props.uuid], null, 2)
-    riques(Query.findWidget(this.props.uuid),
+    this.props.maskArea(true)
+    disableForm(true)
+    riques(Query.findWidget(this.props.uuid, this.props.widget.item),
       (error, response, data) => {
         if (!error) {
           let found = data.data.viewer.allOptions.edges
           if (!found.length){
-            console.log('will create a new data')
             this.newWidget(this.props.uuid, JSON.stringify(toSave, null, 2))
           } else {
             let id = found[0].node.id
             this.updateWidget(id, JSON.stringify(toSave, null, 2))
           }
         }
+
+        this.props.maskArea(false)
+        disableForm(false)
       }
     );
   }
@@ -116,6 +121,9 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
       swalert("warning", "Sure want to remove this widget?", "", () => {
         dispatch(removeSingleWidgetFromWidgetArea(ownProps.uuid, ownProps.widgetAreaId))
       })
+  },
+  maskArea: (state) => {
+    dispatch(maskArea(state))
   },
 });
 

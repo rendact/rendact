@@ -59,6 +59,7 @@ class WidgetAreaContainer extends React.Component {
   handleSaveButton(e){
     e.preventDefault();
     let widgetAreas = _.cloneDeep(this.props.widgetAreas)
+    console.log(widgetAreas)
 
     let toSavedData = {}
     _.forEach(widgetAreas, widgetArea => {
@@ -68,6 +69,8 @@ class WidgetAreaContainer extends React.Component {
       }));
       toSavedData[widgetArea.id] = widgets
     })
+
+    console.log(toSavedData);
 
 
     disableForm(true)
