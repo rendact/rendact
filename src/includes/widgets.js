@@ -1,12 +1,11 @@
 import React from 'react';
 import {riques} from '../utils';
-import uuid from 'uuid';
 import Query from '../admin/query';
 import _ from 'lodash';
 
 
 export const registerWidget = (type, title, value) => {
-  let item = "widget_" + type + "_" + uuid();
+  let item = "widget_" + type ;
   let values = Object.assign({}, value, {
       title: title
   });
