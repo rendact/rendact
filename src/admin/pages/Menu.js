@@ -503,6 +503,13 @@ let Menu = React.createClass({
     let treeData = this.props.treeData
     let menuId = this.props.menuId;
     let qry = Query.updateMenu(menuId, name, treeData, positionValues);
+
+    if (positionValues==="Main Menu") {
+      riques(Query.updateMainMenu(IdMainMenu), 
+        function(error, response, body) {
+        }
+      );
+    }
     
     this.disableForm(true);
     let noticeTxt = "Menu Successfully Updated";
