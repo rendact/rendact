@@ -146,7 +146,7 @@ const MenuPanel = React.createClass({
 
   item =  (
     <div id={itemData.id} className="box collapsed-box">
-      {this.props.connectDragSource(<div className="box-header with-border">
+      {this.props.connectDragSource(<div className="box-header with-border" style={{cursor: 'move'}}>
         <h3 className="box-title" style={{paddingRight : itemData.type === "category"? 75 : 50}}>{itemData.label? itemData.label : itemData.titlePanel}</h3>
         <div className="box-tools pull-right">
           <span className="label label-default" id="typeValue">
