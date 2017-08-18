@@ -333,7 +333,8 @@ let Menu = React.createClass({
       this.loadMenuItems(menuId);
       this.notifyUnsavedData(true);
     } else if(menuId==="") {
-      me.resetFormDelete();
+      this.loadData()
+      //this.resetFormDelete();
       disableBySelector(true, me.disabledSelectors);
     }
   },
