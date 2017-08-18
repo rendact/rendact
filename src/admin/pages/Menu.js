@@ -1,5 +1,4 @@
 import React from 'react';
-import $ from 'jquery';
 import {Link} from 'react-router';
 import Query from '../query';
 import _ from 'lodash';
@@ -395,10 +394,12 @@ let Menu = React.createClass({
 
     if (checkedItems.length) {
       this.props.dispatch(setTreeData(treeData))
+      this.notifyUnsavedData(true)
+      reset()
+    } else {
+      swalert("info", "",  "Cannot add empty list into Menu, please select some items")
     }
 
-    this.notifyUnsavedData(true)
-    reset()
   },
 
   removePanel: function(e){
