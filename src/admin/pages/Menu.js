@@ -36,7 +36,7 @@ let MenuContentForm = (props) => (
                     }
                     </div>
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
-   <button className="btn  btn-default" type="button" style={{marginRight: 10}} data-target={"#"+props.elementId} id={"selectAll"+_.capitalize(props.type)+"s"}>Select All</button>
+                    <button type="submit" className="btn btn-default" style={{marginRight: 10}} onClick={props.selectAll}>Select All</button>
                     <div className="box-tools pull-right">
                       <button className="btn  btn-default" type="submit" style={{marginRight: 10}} data-target="#IDcategorytList">Add to Menu</button>
                     </div>
@@ -45,13 +45,27 @@ let MenuContentForm = (props) => (
   </form>
 )
 
+
 MenuContentForm = connect(
   state => {
     if (!_.isEmpty(state.menu)) {
       var out = _.head(state.menu);
       return out;
+      
     } else return {};
   },
+  (dispatch, ownProps) => ({
+    selectAll(e){
+      e.preventDefault();
+      let status = e.currentTarget.checked;
+
+      _.forEach(ownProps.itemList, (item, index) => {
+        ownProps.change(ownProps.type + "[" + index.toString() + "]", !status);
+      });
+      e.currentTarget.checked = !status
+    }
+    
+  })
 )(MenuContentForm)
 
 MenuContentForm = reduxForm({form: 'menuContentForm'})(MenuContentForm)
@@ -520,35 +534,6 @@ let Menu = React.createClass({
     require ('../../../public/css/skins/_all-skins.css');
     require('./menucustom.css');
 
-    //Select All Pages
-    $('body').on('click', '#selectAllPages', function () {
-      if ($(this).hasClass('allChecked')) {
-          $('input[class="pageMenu"]').prop('checked', false);
-      } else {
-          $('input[class="pageMenu"]').prop('checked', true);
-      }
-      $(this).toggleClass('allChecked');
-    })
-
-    //Select All Posts
-    $('body').on('click', '#selectAllPosts', function () {
-      if ($(this).hasClass('allChecked')) {
-          $('input[class="postMenu"]').prop('checked', false);
-      } else {
-          $('input[class="postMenu"]').prop('checked', true);
-      }
-      $(this).toggleClass('allChecked');
-    })
-
-    // Select all Categorys
-    $('body').on('click', '#selectAllCategorys', function () {
-      if ($(this).hasClass('allChecked')) {
-          $('input[class="categoryMenu"]').prop('checked', false);
-      } else {
-          $('input[class="categoryMenu"]').prop('checked', true);
-      }
-      $(this).toggleClass('allChecked');
-    })
 
     //Load sidebar
     this.loadData();
