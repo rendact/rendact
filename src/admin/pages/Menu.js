@@ -281,6 +281,7 @@ let Menu = React.createClass({
   handleMenuName: function(event){
     var menuId = event.target.value.split("-")[0];
     var selectedMenuName = event.target.value.split("-")[1];
+    debugger;
     var me = this;
     
     if (menuId!=="") {
@@ -787,6 +788,7 @@ Menu = reduxForm({
   form: 'menuForm'
 })(Menu)
 const selector = formValueSelector('menuForm');
+
 const mapStateToProps = function(state){
   var customStates = {
     newMenuName: selector(state, 'newMenuName'),
