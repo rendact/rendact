@@ -7,11 +7,54 @@ import uuid from 'uuid';
 import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
-import {maskArea, setResetDelete, setTreeData, setNewMenuName, setSelectedMenuName, setDisabled, setNewMenuId, loadselectedMenuName, loadmenuSelect,
+import {maskArea, setPosition, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId, loadselectedMenuName, loadmenuSelect,
   setIdMainMenu, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
 import {swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
 import {reduxForm, Field, formValueSelector, change} from 'redux-form'
+
+
+let MenuContentForm = (props) => (
+  <form onSubmit={props.handleSubmit(values => props.addToMenu(values, props.type, props.itemList, props.reset))}>
+<div className="box box-default collapsed-box box-solid">
+                <div className="box-header with-border">
+                  <h3 className="box-title">{props.panelTitle}</h3>
+                  <div className="box-tools pull-right">
+                      <button type="button" className="btn btn-box-tool"  data-widget="collapse"><i className="fa fa-plus"></i>
+                      </button>
+                  </div>
+                </div>
+                <div className="box-body pad">
+                  <div id={props.elementId}>
+                    {
+                      _.map(props.itemList, (item, index) => (
+                        <div key={index}>
+                          <Field component="input" type="checkbox" name={props.type + "["+index+"]"} className={props.type+"Menu"}/>
+                          {item.node.name || item.node.title}
+                        </div>
+                      ))
+                    }
+                    </div>
+                    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+   <button className="btn  btn-default" type="button" style={{marginRight: 10}} data-target={"#"+props.elementId} id={"selectAll"+_.capitalize(props.type)+"s"}>Select All</button>
+                    <div className="box-tools pull-right">
+                      <button className="btn  btn-default" type="submit" style={{marginRight: 10}} data-target="#IDcategorytList">Add to Menu</button>
+                    </div>
+                </div>
+              </div>
+  </form>
+)
+
+MenuContentForm = connect(
+  state => {
+    if (!_.isEmpty(state.menu)) {
+      var out = _.head(state.menu);
+      return out;
+    } else return {};
+  },
+)(MenuContentForm)
+
+MenuContentForm = reduxForm({form: 'menuContentForm'})(MenuContentForm)
 
 
 let CustomUrlForm = (props) => (
@@ -177,7 +220,7 @@ let Menu = React.createClass({
     target: React.PropTypes.string,
     tooltip: React.PropTypes.string,
     urlData: React.PropTypes.object,
-    mainMenuPos: React.PropTypes.string,
+    position: React.PropTypes.string,
     IdMainMenu: React.PropTypes.string,
     isProcessing: React.PropTypes.bool.isRequired,
     opacity: React.PropTypes.number.isRequired,
@@ -211,7 +254,7 @@ let Menu = React.createClass({
       target: "",
       tooltip: "",
       urlData: {},
-      menuStructure: []
+      menuStructure: [],
       }
   },
 
@@ -267,7 +310,7 @@ let Menu = React.createClass({
             if (items)
             var position = body.data.getMenu.position;
             me.props.dispatch(setTreeData(items));
-            me.props.changeFieldValue('mainMenuPos', position);
+            me.props.dispatch(setPosition(position))
             me.disableForm(false);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
@@ -307,25 +350,39 @@ let Menu = React.createClass({
     reset()
   },
 
-  addToMenu: function(event){
-    var _treeData = this.props.treeData;
-    var menuFiltered = _.filter(document.getElementsByName("itemsChecked[]"), function(item){
-      return item.checked
+  addToMenu: function(values, type, itemList, reset){
+    let checkedItems = [];
+    _.forEach(values[type], (value, index) => {
+      if (value) {
+        checkedItems.push(itemList[index].node)
+      }
+    })
+    var menuValues = [];
+    menuValues = _.map(checkedItems, (item) => {
+      return {
+        titlePanel: item.name || item.title,
+        tooltip: "", 
+        type: type,
+        id: uuid(), 
+        children:[], 
+        target: item.id
+      }
     });
     
-    var menuValues = [];
-    menuValues = _.map(menuFiltered, function(item){return {titlePanel: item.value.split("-")[0], tooltip: "", 
-      type: item.value.split("-")[1], id: uuid(), children:[], target: item.id}});
-    
+    var _treeData = this.props.treeData;
     var treeData = [];
     if (_treeData===null) {
       treeData = menuValues;
     }else if (menuValues.length>0) {
       treeData = _.concat(_treeData, menuValues);
     }
-    this.props.dispatch(setTreeData(treeData))
+
+    if (checkedItems.length) {
+      this.props.dispatch(setTreeData(treeData))
+    }
+
     this.notifyUnsavedData(true)
-    this.resetFormCheckbox();
+    reset()
   },
 
   removePanel: function(e){
@@ -419,8 +476,7 @@ let Menu = React.createClass({
             if (!error) {
               var allPageList = [];
               _.forEach(body.data.viewer.allPosts.edges, function(item){
-                allPageList.push((<div key={item.node.id}><input className="pageMenu" id={item.node.id}
-                name="itemsChecked[]" type="checkbox" value={item.node.title+"-page"} /> {item.node.title}</div>));
+                allPageList.push(item);
               })
               me.props.dispatch(setAllPageList(allPageList)) 
             }
@@ -433,8 +489,7 @@ let Menu = React.createClass({
             if (!error) {
               var allPostList = [];
               _.forEach(body.data.viewer.allPosts.edges, function(item){
-                allPostList.push((<div key={item.node.id}><input className="postMenu" id={item.node.id}
-                name="itemsChecked[]" type="checkbox" value={item.node.title+"-post"} /> {item.node.title}</div>));
+                allPostList.push(item);
               })
               me.props.dispatch(setAllPostList(allPostList))
             }
@@ -444,9 +499,8 @@ let Menu = React.createClass({
           function(error, response, body) {
             if (!error) {
               var categoryList = [];
-              _.forEach(body.data.viewer.allCategories.edges, function(item){
-                categoryList.push((<div key={item.node.id}><input id={item.node.id}
-                name="itemsChecked[]" type="checkbox" value={item.node.name+"-category"} /> {item.node.name}</div>));
+              _.forEach(body.data.viewer.allCategories.edges, function(item, index){
+                categoryList.push(item);
               })
               me.props.dispatch(setCategoryMenu(categoryList))
             }
@@ -486,20 +540,38 @@ let Menu = React.createClass({
       $(this).toggleClass('allChecked');
     })
 
+    // Select all Categorys
+    $('body').on('click', '#selectAllCategorys', function () {
+      if ($(this).hasClass('allChecked')) {
+          $('input[class="categoryMenu"]').prop('checked', false);
+      } else {
+          $('input[class="categoryMenu"]').prop('checked', true);
+      }
+      $(this).toggleClass('allChecked');
+    })
+
     //Load sidebar
     this.loadData();
   },
   onChangeMainMenu: function(event){
+    const target = event.target;
+    const position = target.checked === true ? target.value : "";
+    this.props.dispatch(setPosition(position))
     this.notifyUnsavedData(true);
   },
 
   handleUpdateMenu: function(v){
     var me = this;
     var name = v.selectedMenuName;
-
-    let positionValues = v.mainMenuPos?"Main Menu":null;
+    let positionValues = this.props.position;
     let _IdMainMenu = this.props.IdMainMenu;
     let IdMainMenu = _IdMainMenu.toString();
+      if (positionValues==="Main Menu") {
+        riques(Query.updateMainMenu(IdMainMenu), 
+          function(error, response, body) {
+          }
+        );
+      }
     let treeData = this.props.treeData
     let menuId = this.props.menuId;
     let qry = Query.updateMenu(menuId, name, treeData, positionValues);
@@ -619,70 +691,34 @@ let Menu = React.createClass({
                     </div>
                   </div>
                 </form>
-              <div className="box box-default box-solid">
-                <div className="box-header with-border">
-                  <h3 className="box-title">Pages</h3>
-                  <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-minus"></i>
-                      </button>
-                  </div>
-                </div>
-                <div className="box-body pad">
-                  <div id="IDpageList">
-                      {this.props.allPageList}
-                  </div>
-                    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
-                      <button className="btn  btn-default" type="button" style={{marginRight: 10}} 
-                      data-target="#IDpageList" id="selectAllPages">Select All</button>
-                      <div className="box-tools pull-right">
-                        <button className="btn  btn-default" type="button" onClick={this.addToMenu} 
-                                    style={{marginRight: 10}} data-target="#IDpageList">Add to Menu</button>
-                      </div>
-                    </div>
-              </div>
-              <div className="box box-default collapsed-box box-solid">
-                <div className="box-header with-border">
-                  <h3 className="box-title">Posts</h3>
-                  <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" disabled={this.props.selectedMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
-                      </button>
-                  </div>
-                </div>
-                <div className="box-body pad">
-                  <div id="IDpostList">
-                      {this.props.allPostList}
-                  </div>
-                  <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
-                    <button className="btn  btn-default" type="button" style={{marginRight: 10}} 
-                      data-target="#IDpageList" id="selectAllPosts">Select All</button>
-                    <div className="box-tools pull-right">
-                      <button className="btn  btn-default" type="button" onClick={this.addToMenu} 
-                                    style={{marginRight: 10}} data-target="#IDpostList">Add to Menu</button>
-                    </div>
-                </div>
-              </div>
+
+              <MenuContentForm
+                type="page"
+                itemList={this.props.allPageList}
+                panelTitle="Pages"
+                addToMenu={this.addToMenu}
+                elementId="PageList"
+              />
+
+              <MenuContentForm
+                type="post"
+                itemList={this.props.allPostList}
+                panelTitle='Posts'
+                addToMenu={this.addToMenu}
+                elementId="PostList"
+              />
 
               <CustomUrlForm handleUrlSubmit={this.handleUrlSubmit} />
                 
-              <div className="box box-default collapsed-box box-solid">
-                <div className="box-header with-border">
-                  <h3 className="box-title">Categories</h3>
-                  <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool" disabled={this.props.selectedMenuName===""} data-widget="collapse"><i className="fa fa-plus"></i>
-                      </button>
-                  </div>
-                </div>
-                <div className="box-body pad">
-                  <div id="IDcategorytList">
-                      {this.props.categoryList}
-                    </div>
-                    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
-                    <div className="box-tools pull-right">
-                      <button className="btn  btn-default" type="button" onClick={this.addToMenu} 
-                      style={{marginRight: 10}} data-target="#IDcategorytList">Add to Menu</button>
-                    </div>
-                </div>
-              </div>
+              
+              <MenuContentForm 
+                type="category" 
+                itemList={this.props.categoryList}
+                panelTitle='Categories'
+                addToMenu={this.addToMenu}
+                elementId="CategoryList"
+              />
+
             </div>
                   <div className="col-md-9">
                     <div className="box box-default">
@@ -756,7 +792,7 @@ let Menu = React.createClass({
                       <div className="col-md-9">
                         <div className="checkbox">
                           <label key="Main Menu">
-                            <Field component="input" type="checkbox" value="Main Menu" disabled={this.props.selectedMenuName===""} id="mainMenuPos" name="mainMenuPos" onChange={this.onChangeMainMenu}/>
+                            <input type="checkbox" id="mainMenu" value="Main Menu" disabled={this.props.selectedMenuName===""} name="position" checked={this.props.position==="Main Menu"} onChange={this.onChangeMainMenu}/>
                             <i>Main Menu</i>
                           </label>
                         </div>
@@ -790,7 +826,6 @@ const mapStateToProps = function(state){
   var customStates = {
     newMenuName: selector(state, 'newMenuName'),
     selectedMenuName: selector(state, 'selectedMenuName'),
-    mainMenuPos: selector(state, 'mainMenuPos')?"Main Menu":null,
     menuSelect: selector(state, 'menuSelect')
   }
   
@@ -809,4 +844,3 @@ const mapDispatchToProps = function(dispatch){
 }
 Menu = connect(mapStateToProps, mapDispatchToProps)(Menu);
 export default Menu;
-
