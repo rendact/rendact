@@ -146,7 +146,7 @@ const MenuPanel = React.createClass({
 
   item =  (
     <div id={itemData.id} className="box collapsed-box">
-      <div className="box-header with-border">
+      {this.props.connectDragSource(<div className="box-header with-border">
         <h3 className="box-title" style={{paddingRight : itemData.type === "category"? 75 : 50}}>{itemData.label? itemData.label : itemData.titlePanel}</h3>
         <div className="box-tools pull-right">
           <span className="label label-default" id="typeValue">
@@ -155,7 +155,7 @@ const MenuPanel = React.createClass({
           <button type="button" className="btn btn-box-tool" data-widget="collapse"><i id={"icon-"+itemData.titlePanel} className="fa fa-plus"></i>
           </button>
         </div>
-      </div>
+      </div>)}
         <div className="box-body" style={{display: "none"}}>
 
           <div style={{margin: "15px 0", border: "solid 1px #ccc", padding: "10px 5px"}}>
@@ -636,13 +636,14 @@ let Menu = React.createClass({
     })
   },
 
-  renderItem: function({item, isDragging}){
+  renderItem: function({item, isDragging, connectDragSource}){
     return <MenuPanel 
         itemData={item} 
         onRemovePanel={this.removePanel} 
         notifyUnsavedData={this.notifyUnsavedData}
         assignValueToMenuItem={this.assignValueToMenuItem}
         isDragging={isDragging}
+        connectDragSource={connectDragSource}
       />
   },
 
@@ -761,13 +762,13 @@ let Menu = React.createClass({
                               <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
                             }
                           <div className="col-md-4">
-                            {/* nestable element here */}
                             <Nestable
                               items={this.props.treeData||[]}
                               renderItem={this.renderItem}
                               onUpdate={(newItems) => (me.props.dispatch(setTreeData(newItems)))}
                               childrenStyle={{marginLeft: '2rem', marginRight: '-2rem'}}
                               treeshold={40}
+                              useDragHandle
                             />
                           </div>
                         </div>
