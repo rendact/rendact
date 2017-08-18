@@ -8,7 +8,8 @@ import {connect} from 'react-redux';
 import {
   loadWidgetAreasSuccess, 
   loadWidgetsAvailableSuccess,
-  maskArea
+  maskArea,
+  createActiveWidgetsInitialValues
 } from '../../../actions'
 import Notification from 'react-notification-system';
 import Halogen from 'halogen';
@@ -18,6 +19,7 @@ class Widgets extends React.Component {
   constructor(props){
     super(props);
     this.loadListOfWidget = this.loadListOfWidget.bind(this)
+    this.loadActiveWidgets = this.loadActiveWidgets.bind(this)
 
     var themeFunctions = require('../../../theme/default/functions.js');
     themeFunctions.default();
@@ -52,6 +54,18 @@ class Widgets extends React.Component {
     );
   }
 
+  loadActiveWidgets (){
+    disableForm(true)
+    this.props.dispatch(maskArea(true))
+    riques(Query.getAllActiveWidgets,
+      (error, response, data) => {
+        this.props.dispatch(createActiveWidgetsInitialValues(data.data.viewer.allOptions.edges))
+        this.props.dispatch(maskArea(false))
+        disableForm(false)
+      }
+    );
+  }
+
   componentWillMount(){
     /*
      * all registered widget
@@ -70,6 +84,7 @@ class Widgets extends React.Component {
         }
       }
     )
+    this.loadActiveWidgets()
 
   }
 

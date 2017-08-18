@@ -7,7 +7,7 @@ import uuid from 'uuid';
 import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
-import {maskArea, setResetDelete, setTreeData, setNewMenuName, setSelectedMenuName, setDisabled, setNewMenuId, loadselectedMenuName, loadmenuSelect,
+import {maskArea, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId, loadselectedMenuName, loadmenuSelect,
   setIdMainMenu, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
 import {swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
@@ -499,7 +499,6 @@ let Menu = React.createClass({
 
     let positionValues = v.mainMenuPos?"Main Menu":null;
     let _IdMainMenu = this.props.IdMainMenu;
-    let IdMainMenu = _IdMainMenu.toString();
     let treeData = this.props.treeData
     let menuId = this.props.menuId;
     let qry = Query.updateMenu(menuId, name, treeData, positionValues);

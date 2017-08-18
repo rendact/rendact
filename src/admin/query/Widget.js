@@ -68,12 +68,68 @@ const getAllWidgets = {
     `
 }
 
+const findWidget = (uuid, widgetItem) => ({
+  "query" : `
+    query findWidget($uuid: String!) {
+      viewer {
+        allOptions(where: {item: {eq: $uuid}}) {
+          edges {
+            node {
+              id
+            }
+          }
+        }
+      }
+    }
+  `,
+  "variables": {
+    uuid: "activeWidget#" + uuid + "#" + widgetItem
+  }
+})
 
+const updateWidget = (id, value) => ({
+  "query": `
+  mutation UpdateWidet($input: UpdateOptionsInput!) {
+    updateOptions(input: $input) {
+      changedOptions {
+        item
+        value
+      }
+    }
+  }`,
+  "variables": {
+    "input": {
+      "id":id,
+      "value": value
+    }
+  }
+});
+
+const getAllActiveWidgets = {
+    "query": `
+    query getAllWidgets {
+      viewer {
+        allOptions(where: {item: {like: "activeWidget#%"}}) {
+          edges {
+            node {
+              id
+              item
+              value
+            }
+          }
+        }
+      }
+    }
+    `
+}
 const queries = {
   createWidget: createWidget,
   getAllWidgets: getAllWidgets,
   updateListOfWidget: updateListOfWidget,
-  getListOfWidget: getListOfWidget
+  getListOfWidget: getListOfWidget,
+  updateWidget: updateWidget,
+  findWidget: findWidget,
+  getAllActiveWidgets: getAllActiveWidgets
 }
 
 export default queries;

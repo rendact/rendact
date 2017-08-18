@@ -8,9 +8,10 @@ import {
   updateWidgetsOrder,
   addWidgetToWidgetArea, 
   removeAllWidgetsFromWidgetArea,
+  loadWidgetAreasSuccess,
   maskArea
 } from '../../../actions'
-import {swalert, riques, errorCallback, disableForm} from '../../../utils';
+import {toWidgetAreaStructure, swalert, riques, errorCallback, disableForm} from '../../../utils';
 import Query from '../../query'
 
 const dropTarget = {
@@ -52,6 +53,7 @@ class WidgetAreaContainer extends React.Component {
       uuid={props.item.id}
       widgetAreaId={this.props.id}
       isDragging={props.isDragging}
+      connectDragSource={props.connectDragSource}
       />
   }
 
@@ -69,6 +71,7 @@ class WidgetAreaContainer extends React.Component {
     })
 
 
+
     disableForm(true)
     this.props.maskArea(true)
     let value = JSON.stringify(toSavedData, null, 2);
@@ -81,6 +84,10 @@ class WidgetAreaContainer extends React.Component {
             position: 'tr',
             autoDismiss: 2,
           });
+          let value = JSON.parse(data.data.updateOptions.changedOptions.value)
+          let _widgetAreas = toWidgetAreaStructure(this.props.widgetsAvailable, value)
+
+          this.props.loadWidgetAreasSuccess(_widgetAreas)
         } else {
           errorCallback(error, data.errors?data.errors[0].message: null)
         }
@@ -117,6 +124,7 @@ class WidgetAreaContainer extends React.Component {
                           renderItem={this.renderItem}
                           maxDepth={ 1 }
                           onUpdate={this.props.orderWidgets}
+                          useDragHandle
                         />
                     {isActive &&
  <div className="box box-default" style={{borderRadius: 0, color: 'white', backgroundColor: 'white', border: '1px dashed gray'}}>
@@ -135,7 +143,8 @@ class WidgetAreaContainer extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-  widgetAreas: state.widgets.widgetAreas
+  widgetAreas: state.widgets.widgetAreas,
+  widgetsAvailable: state.widgets.widgetsAvailable,
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
@@ -150,6 +159,9 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   },
   maskArea: (state) => {
     dispatch(maskArea(state))
+  },
+  loadWidgetAreasSuccess: (widgetAreas) => {
+    dispatch(loadWidgetAreasSuccess(widgetAreas))
   },
 });
 

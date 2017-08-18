@@ -247,11 +247,6 @@ export const setIdMainMenu = (IdMainMenu)  => ({
   IdMainMenu
 })
 
-export const setPosition = (position)  => ({
-  type: 'SET_POSITION',
-  position
-})
-
 export const setPageListMenu = (pageList)  => ({
   type: 'SET_PAGE_LIST_MENU',
   pageList
@@ -293,11 +288,6 @@ export const assignValueToMenuItem = (menuId, name, value) => ({
   name,
   value
 });
-
-export const loadselectedMenuName = (selectedMenuName)  => ({
-  type: 'LOAD_SELECTED_MENU',
-  selectedMenuName
-})
 
 export const loadmenuSelect = (menuSelect)  => ({
   type: 'LOAD_MENU_SELECT',
@@ -350,4 +340,9 @@ export const loadWidgetsAvailableSuccess = (widgets) => ({
   type: 'LOAD_WIDGETS_AVAILABLE_SUCCESS',
   widgets
 });
+
+export const createActiveWidgetsInitialValues = (activeWidgets) => ({
+  type: 'CREATE_ACTIVE_WIDGETS_INITIAL_VALUES',
+  activeWidgets
+})
 

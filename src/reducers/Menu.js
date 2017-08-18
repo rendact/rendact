@@ -34,9 +34,6 @@ const menu = (state = [], action) => {
     case 'SET_ID_MAIN_MENU':
       return state.map(item =>  ({...item, IdMainMenu: action.IdMainMenu}))
 
-    case 'SET_POSITION':
-      return state.map(item =>  ({...item, position: action.position}))
-
     case 'SET_PAGE_LIST_MENU':
       return state.map(item =>  ({...item, pageList: action.pageList}))
 
@@ -63,9 +60,6 @@ const menu = (state = [], action) => {
       
     case 'SET_EDITOR_MODE':
       return state.map(item =>  ({...item, mode: action.mode}))
-
-    case 'LOAD_SELECTED_MENU':
-      return state.map(item =>  ({...item, selectedMenuName: action.selectedMenuName}))
 
     case 'LOAD_MENU_SELECT':
       return state.map(item =>  ({...item, menuSelect: action.menuSelect}))
