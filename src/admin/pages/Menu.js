@@ -38,7 +38,7 @@ let MenuContentForm = (props) => (
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
                     <button type="submit" className="btn btn-default" style={{marginRight: 10}} onClick={props.selectAll}>Select All</button>
                     <div className="box-tools pull-right">
-                      <button className="btn  btn-default" type="submit" style={{marginRight: 10}} data-target="#IDcategorytList">Add to Menu</button>
+                      <button className="btn  btn-default" type="submit" style={{marginRight: 10}} onClick={e => {e.currentTarget.parentElement.parentElement.checked=false;}} >Add to Menu</button>
                     </div>
                 </div>
               </div>
@@ -57,12 +57,12 @@ MenuContentForm = connect(
   (dispatch, ownProps) => ({
     selectAll(e){
       e.preventDefault();
-      let status = e.currentTarget.checked;
+      let status = e.currentTarget.parentElement.checked;
 
       _.forEach(ownProps.itemList, (item, index) => {
         ownProps.change(ownProps.type + "[" + index.toString() + "]", !status);
       });
-      e.currentTarget.checked = !status
+      e.currentTarget.parentElement.checked = !status
     }
     
   })
