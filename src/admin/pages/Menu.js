@@ -18,7 +18,7 @@ let MenuContentForm = (props) => (
                 <div className="box-header with-border">
                   <h3 className="box-title">{props.panelTitle}</h3>
                   <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool"  data-widget="collapse"><i className="fa fa-plus"></i>
+                      <button type="button" className="btn btn-box-tool"  data-widget="collapse"><i className={props.type === 'page'? "fa fa-minus" : "fa fa-plus"}></i>
                       </button>
                   </div>
                 </div>
