@@ -304,6 +304,11 @@ export const setUrlMenu = (url)  => ({
   url
 })
 
+export const setPosition = (position)  => ({
+  type: 'SET_POSITION',
+  position
+})
+
 /* 
  * WIDGET MANAGEMENT PAGE ACTION
  */
