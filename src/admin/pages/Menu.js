@@ -7,7 +7,7 @@ import uuid from 'uuid';
 import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
-import {maskArea, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId, loadselectedMenuName, loadmenuSelect,
+import {maskArea, setPosition, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId, loadselectedMenuName, loadmenuSelect,
   setIdMainMenu, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
 import {swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
@@ -177,7 +177,7 @@ let Menu = React.createClass({
     target: React.PropTypes.string,
     tooltip: React.PropTypes.string,
     urlData: React.PropTypes.object,
-    mainMenuPos: React.PropTypes.string,
+    position: React.PropTypes.string,
     IdMainMenu: React.PropTypes.string,
     isProcessing: React.PropTypes.bool.isRequired,
     opacity: React.PropTypes.number.isRequired,
@@ -211,7 +211,7 @@ let Menu = React.createClass({
       target: "",
       tooltip: "",
       urlData: {},
-      menuStructure: []
+      menuStructure: [],
       }
   },
 
@@ -267,7 +267,7 @@ let Menu = React.createClass({
             if (items)
             var position = body.data.getMenu.position;
             me.props.dispatch(setTreeData(items));
-            me.props.changeFieldValue('mainMenuPos', position);
+            me.props.dispatch(setPosition(position))
             me.disableForm(false);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
@@ -490,15 +490,24 @@ let Menu = React.createClass({
     this.loadData();
   },
   onChangeMainMenu: function(event){
+    const target = event.target;
+    const position = target.checked === true ? target.value : "";
+    this.props.dispatch(setPosition(position))
     this.notifyUnsavedData(true);
   },
 
   handleUpdateMenu: function(v){
     var me = this;
     var name = v.selectedMenuName;
-
-    let positionValues = v.mainMenuPos?"Main Menu":null;
+    let positionValues = this.props.position;
     let _IdMainMenu = this.props.IdMainMenu;
+    let IdMainMenu = _IdMainMenu.toString();
+      if (positionValues==="Main Menu") {
+        riques(Query.updateMainMenu(IdMainMenu), 
+          function(error, response, body) {
+          }
+        );
+      }
     let treeData = this.props.treeData
     let menuId = this.props.menuId;
     let qry = Query.updateMenu(menuId, name, treeData, positionValues);
@@ -748,7 +757,7 @@ let Menu = React.createClass({
                       <div className="col-md-9">
                         <div className="checkbox">
                           <label key="Main Menu">
-                            <Field component="input" type="checkbox" value="Main Menu" disabled={this.props.selectedMenuName===""} id="mainMenuPos" name="mainMenuPos" onChange={this.onChangeMainMenu}/>
+                            <input type="checkbox" id="mainMenu" value="Main Menu" disabled={this.props.selectedMenuName===""} name="position" checked={this.props.position==="Main Menu"} onChange={this.onChangeMainMenu}/>
                             <i>Main Menu</i>
                           </label>
                         </div>
@@ -782,7 +791,6 @@ const mapStateToProps = function(state){
   var customStates = {
     newMenuName: selector(state, 'newMenuName'),
     selectedMenuName: selector(state, 'selectedMenuName'),
-    mainMenuPos: selector(state, 'mainMenuPos')?"Main Menu":null,
     menuSelect: selector(state, 'menuSelect')
   }
   
