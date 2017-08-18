@@ -8,69 +8,56 @@ import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
 import {maskArea, setResetDelete, setTreeData, setNewMenuName, setSelectedMenuName, setDisabled, setNewMenuId, loadselectedMenuName, loadmenuSelect,
-  setIdMainMenu, setPosition, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
+  setIdMainMenu, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
 import {swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
-import {reduxForm, Field, formValueSelector} from 'redux-form'
+import {reduxForm, Field, formValueSelector, change} from 'redux-form'
 
 
 let CustomUrlForm = (props) => (
- <div className="box box-default collapsed-box box-solid">
-                <div className="box-header with-border">
-                  <h3 className="box-title">Custom Links</h3>
-                  <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool"  data-widget="collapse"><i className="fa fa-plus"></i>
-                      </button>
-                  </div>
-                </div>
-                <div className="box-body pad">
-                  <form onSubmit={props.handleSubmit(value => props.handleUrlSubmit(value, props.reset))} id="urlSabmit" method="get">
+  <div className="box box-default collapsed-box box-solid">
+    <div className="box-header with-border">
+      <h3 className="box-title">Custom Links</h3>
+      <div className="box-tools pull-right">
+          <button type="button" className="btn btn-box-tool"  data-widget="collapse"><i className="fa fa-plus"></i>
+          </button>
+      </div>
+    </div>
+    <div className="box-body pad">
+      <form onSubmit={props.handleSubmit(value => props.handleUrlSubmit(value, props.reset))} id="urlSabmit" method="get">
 
-                    <div className="row">
-                      <div className="col-md-3">
-                        <h5>TITLE</h5>
-                      </div>
-                      <div className="col-md-9">
-                        <Field name="title" component="input" type="text" className="form-control"/>
-                      </div>
-                    </div>
+        <div className="row">
+          <div className="col-md-3">
+            <h5>TITLE</h5>
+          </div>
+          <div className="col-md-9">
+            <Field name="title" component="input" type="text" className="form-control"/>
+          </div>
+        </div>
 
-                    <div className="row">
-                      <div className="col-md-3">
-                        <h5>URL</h5>
-                      </div>
-                      <div className="col-md-9">
-                        <Field name="url" component="input" type="text" className="form-control"/>
-                      </div>
-                    </div>
+        <div className="row">
+          <div className="col-md-3">
+            <h5>URL</h5>
+          </div>
+          <div className="col-md-9">
+            <Field name="url" component="input" type="text" className="form-control"/>
+          </div>
+        </div>
 
-                    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
-                    <div className="box-tools pull-right">
-                      <button type="submit" id="submit" className="btn  btn-default">Add to Menu</button>
-                    </div>
-                  </form>
-                </div>
-              </div>  
+        <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+        <div className="box-tools pull-right">
+          <button type="submit" id="submit" className="btn  btn-default">Add to Menu</button>
+        </div>
+      </form>
+    </div>
+  </div>  
 )
-            CustomUrlForm = connect(
-              state => ({
-                state
-              }),
-            )(CustomUrlForm)
-            CustomUrlForm = reduxForm({form: 'customUrlForm'})(CustomUrlForm)
-
-let MenuName = (props) => (
-  <div className="col-md-6">
-    <Field component="input" type="text" name="selectedMenuName" id="selectedMenuName" disabled={props.selectedMenuName===""} 
-    defaultValue={props.selectedMenuName} className="form-control" required="true" onChange={props.handleNameChange}/>
-  </div>
-)
-            MenuName = connect(
-              state => ({
-                state
-              }),
-            )(MenuName)
-            MenuName = reduxForm({form: 'menuNameForm'})(MenuName)
+CustomUrlForm = connect(
+  state => ({
+    state
+  }),
+)(CustomUrlForm)
+CustomUrlForm = reduxForm({form: 'customUrlForm'})(CustomUrlForm)
 
 const MenuPanel = React.createClass({
 
@@ -190,7 +177,7 @@ let Menu = React.createClass({
     target: React.PropTypes.string,
     tooltip: React.PropTypes.string,
     urlData: React.PropTypes.object,
-    position: React.PropTypes.string,
+    mainMenuPos: React.PropTypes.string,
     IdMainMenu: React.PropTypes.string,
     isProcessing: React.PropTypes.bool.isRequired,
     opacity: React.PropTypes.number.isRequired,
@@ -279,8 +266,8 @@ let Menu = React.createClass({
             items = body.data.getMenu.items;
             if (items)
             var position = body.data.getMenu.position;
-            me.props.dispatch(setTreeData(items))
-            me.props.dispatch(setPosition(position))
+            me.props.dispatch(setTreeData(items));
+            me.props.changeFieldValue('mainMenuPos', position);
             me.disableForm(false);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
@@ -295,9 +282,9 @@ let Menu = React.createClass({
     var menuId = event.target.value.split("-")[0];
     var selectedMenuName = event.target.value.split("-")[1];
     var me = this;
+    
     if (menuId!=="") {
-      //setValue("selectedMenuName", selectedMenuName);
-      this.props.dispatch(loadselectedMenuName(selectedMenuName));
+      this.props.changeFieldValue("selectedMenuName", selectedMenuName);
       this.props.dispatch(setMenuId(menuId))
       this.loadMenuItems(menuId);
       this.notifyUnsavedData(true);
@@ -316,7 +303,6 @@ let Menu = React.createClass({
     }else if (_url.length>0) {
       treeData = _.concat(_treeData, _url);
     }
-    //this.setState ({treeData: treeData});
     this.props.dispatch(setTreeData(treeData))
     reset()
   },
@@ -339,8 +325,6 @@ let Menu = React.createClass({
     }
     this.props.dispatch(setTreeData(treeData))
     this.notifyUnsavedData(true)
-
-    this.notifyUnsavedData(true)
     this.resetFormCheckbox();
   },
 
@@ -357,14 +341,7 @@ let Menu = React.createClass({
       this.props.dispatch(setTreeData(_treeData))
     });
   },
-
-  handleNewMenuChange: function(event){
-    var newMenuName = this.props.newMenuName;
-    this.props.dispatch(setNewMenuName(newMenuName))
-  },
   handleNameChange: function(event){
-    debugger;
-    //let selectedMenuName = getValue("selectedMenuName");
     var selectedMenuName = this.props.selectedMenuName;
     this.props.dispatch(setSelectedMenuName(selectedMenuName))
     this.notifyUnsavedData(true);
@@ -430,8 +407,8 @@ let Menu = React.createClass({
               if (mainMenuId && mainMenuName) {
                 me.props.dispatch(setMenuId(mainMenuId));
                 me.loadMenuItems(mainMenuId);
-                me.props.dispatch(setSelectedMenuName(mainMenuName));
-                //setValue("menuSelect", mainMenuId+"-"+mainMenuName);
+                me.props.changeFieldValue("selectedMenuName", mainMenuName);
+                me.props.changeFieldValue("menuSelect", mainMenuId+"-"+mainMenuName);
                 me.props.dispatch(loadmenuSelect(mainMenuId+"-"+mainMenuName));
               }
             }
@@ -513,52 +490,38 @@ let Menu = React.createClass({
     this.loadData();
   },
   onChangeMainMenu: function(event){
-    const target = event.target;
-    const position = target.checked === true ? target.value : "";
-    this.props.dispatch(setPosition(position))      
     this.notifyUnsavedData(true);
   },
 
-  handleUpdateMenu: function(event){
-      event.preventDefault();
-      var me = this;
-      var name = this.props.selectedMenuName;
+  handleUpdateMenu: function(v){
+    var me = this;
+    var name = v.selectedMenuName;
 
-      let positionValues = this.props.position;
-      let _IdMainMenu = this.props.IdMainMenu;
-      let IdMainMenu = _IdMainMenu.toString();
-
-      if (positionValues==="Main Menu") {
-        riques(Query.updateMainMenu(IdMainMenu), 
-          function(error, response, body) {
-          }
-        );
-      }
-
+    let positionValues = v.mainMenuPos?"Main Menu":null;
+    let _IdMainMenu = this.props.IdMainMenu;
+    let IdMainMenu = _IdMainMenu.toString();
     let treeData = this.props.treeData
-
-      let menuId = this.props.menuId;
-      
-      let qry = Query.updateMenu(menuId, name, treeData, positionValues);
-      this.disableForm(true);
-      let noticeTxt = "Menu Successfully Updated";
-      riques(qry, 
-        function(error, response, body) { 
-
-            if (!error && !body.errors && response.statusCode === 200) {
-            me.notif.addNotification({
-                    message: noticeTxt,
-                    level: 'success',
-                    position: 'tr',
-                    autoDismiss: 2
-            });
-            me.loadMenuItems(menuId)
-            me.notifyUnsavedData(false);
-            } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-            }
-            me.disableForm(false);
-        });
+    let menuId = this.props.menuId;
+    let qry = Query.updateMenu(menuId, name, treeData, positionValues);
+    
+    this.disableForm(true);
+    let noticeTxt = "Menu Successfully Updated";
+    riques(qry, 
+      function(error, response, body) { 
+        if (!error && !body.errors && response.statusCode === 200) {
+          me.notif.addNotification({
+            message: noticeTxt,
+            level: 'success',
+            position: 'tr',
+            autoDismiss: 2
+          });
+          me.loadMenuItems(menuId)
+          me.notifyUnsavedData(false);
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null);
+        }
+        me.disableForm(false);
+    });
   },
   resetFormNewMenu: function(){
     var me = this;
@@ -569,7 +532,6 @@ let Menu = React.createClass({
             _.forEach(body.data.viewer.allMenus.edges, function(item){
               pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
             })
-            //me.setState({pageList: pageList});
             me.props.dispatch(setPageListMenu(pageList)) 
             _.filter(document.getElementsByName("menuSelect"), function(item){
             return item.selectedIndex = "1"
@@ -580,7 +542,7 @@ let Menu = React.createClass({
     var menuId = this.props.newMenuId;
     var newMenuName = this.props.newMenuName;
     var selectedMenuName = newMenuName;
-    //setValue("selectedMenuName", selectedMenuName);
+    this.props.changeFieldValue("selectedMenuName", menuId+"-"+newMenuName);
     this.props.dispatch(loadselectedMenuName(selectedMenuName));
     this.props.dispatch(setMenuId(menuId))
     document.getElementById("menu").reset();
@@ -642,7 +604,7 @@ let Menu = React.createClass({
                         <h4>Create a new menu :</h4>
                       </div>
                       <div>
-                        <input type="text" name="newMenuName" id="newMenuName" className="form-control" onChange={this.handleNewMenuChange}/>
+                        <Field name="newMenuName" component="input" type="text" className="form-control"/>
                       </div>
                       <div className="pull-right" style={{margin: "10px 0px"}}>
                         <button type="submit" id="submit" disabled={this.props.newMenuName===""} className="btn  btn-success">Create Menu</button>
@@ -727,9 +689,9 @@ let Menu = React.createClass({
                               </div>
                               <div className="col-md-3">
                                 <div className="form-group">
-                                <select id="menuSelect" onChange={this.handleMenuName} name="menuSelect" className="form-control select">
+                                <Field id="menuSelect" name="menuSelect" component="select" className="form-control select" onChange={this.handleMenuName}>
                                  { this.props.pageList }
-                                </select>
+                                </Field>
                               </div>
                             </div>
                           </div>
@@ -740,14 +702,17 @@ let Menu = React.createClass({
                 </div>
                 
                 <div className="box box-default">
-                 <form onSubmit={this.handleUpdateMenu} id="menuName" method="get">
+                 <form onSubmit={this.props.handleSubmit(this.handleUpdateMenu)} id="menuName" method="get">
                   <div className="box-header with-border attachment-block clearfix" style={{padding: "15px 10px"}}>
                     <div className="form-group">
                       <div className="col-md-3">
                         <h4>Menu Name :</h4>
                       </div>
 
-                       <MenuName handleNameChange={this.handleNameChange} />
+                      <div className="col-md-6">
+                        <Field component="input" type="text" name="selectedMenuName" id="selectedMenuName" disabled={this.selectedMenuName===""} 
+                         className="form-control" required="true" onChange={this.handleNameChange}/>
+                      </div>
                       
                       <div className="col-md-3">
                         <div className="box-tools pull-right">
@@ -784,7 +749,7 @@ let Menu = React.createClass({
                       <div className="col-md-9">
                         <div className="checkbox">
                           <label key="Main Menu">
-                            <input type="checkbox" id="mainMenu" value="Main Menu" disabled={this.props.selectedMenuName===""} name="position" checked={this.props.position==="Main Menu"} onChange={this.onChangeMainMenu}/>
+                            <Field component="input" type="checkbox" value="Main Menu" disabled={this.props.selectedMenuName===""} id="mainMenuPos" name="mainMenuPos" onChange={this.onChangeMainMenu}/>
                             <i>Main Menu</i>
                           </label>
                         </div>
@@ -810,20 +775,6 @@ let Menu = React.createClass({
   }
 });
 
-// const mapStateToProps = function(state){
-//   if (!_.isEmpty(state.menu)) {
-//     var out = _.head(state.menu);
-//     out["initialValues"] = out.selectedMenuName;
-//     out["initialValues"] = out.menuSelect;
-//     return out;
-//   } else return {}
-// }
-// Menu = reduxForm({
-//   form: 'menuForm'
-// })(Menu)
-// Menu = connect(mapStateToProps)(Menu);
-// export default Menu;
-
 Menu = reduxForm({
   form: 'menuForm'
 })(Menu)
@@ -831,13 +782,24 @@ const selector = formValueSelector('menuForm');
 const mapStateToProps = function(state){
   var customStates = {
     newMenuName: selector(state, 'newMenuName'),
-    selectedMenuName: selector(state, 'selectedMenuName')
+    selectedMenuName: selector(state, 'selectedMenuName'),
+    mainMenuPos: selector(state, 'mainMenuPos')?"Main Menu":null,
+    menuSelect: selector(state, 'menuSelect')
   }
+  
   if (!_.isEmpty(state.menu)) {
     var out = _.head(state.menu);
     return _.merge(out, customStates);
   } else return customStates;
 }
-Menu = connect(mapStateToProps)(Menu);
+
+const mapDispatchToProps = function(dispatch){ 
+  return {
+    changeFieldValue: function(field, value) {
+      dispatch(change('menuForm', field, value))
+    }
+  }
+}
+Menu = connect(mapStateToProps, mapDispatchToProps)(Menu);
 export default Menu;
 
