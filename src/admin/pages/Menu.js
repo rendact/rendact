@@ -15,8 +15,7 @@ import {reduxForm, Field, formValueSelector, change} from 'redux-form'
 
 
 let MenuContentForm = (props) => (
-  <form onSubmit={props.handleSubmit(values => props.addToMenu(values, props.type, props.itemList, props.reset))}>
-<div className="box box-default collapsed-box box-solid">
+<div className={props.type === 'page' ? "box box-default box-solid" : "box box-default collapsed-box box-solid"}>
                 <div className="box-header with-border">
                   <h3 className="box-title">{props.panelTitle}</h3>
                   <div className="box-tools pull-right">
@@ -25,6 +24,7 @@ let MenuContentForm = (props) => (
                   </div>
                 </div>
                 <div className="box-body pad">
+  <form onSubmit={props.handleSubmit(values => props.addToMenu(values, props.type, props.itemList, props.reset))}>
                   <div id={props.elementId}>
                     {
                       _.map(props.itemList, (item, index) => (
@@ -36,13 +36,13 @@ let MenuContentForm = (props) => (
                     }
                     </div>
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
-                    <button type="submit" className="btn btn-default" style={{marginRight: 10}} onClick={props.selectAll}>Select All</button>
+                    <button id={props.type+"SelectAll"} type="submit" className="btn btn-default" style={{marginRight: 10}} onClick={props.selectAll}>Select All</button>
                     <div className="box-tools pull-right">
-                      <button className="btn  btn-default" type="submit" style={{marginRight: 10}} onClick={e => {e.currentTarget.parentElement.parentElement.checked=false;}} >Add to Menu</button>
+                      <button id={props.type+"Submit"} className="btn  btn-default" type="submit" style={{marginRight: 10}} onClick={e => {e.currentTarget.parentElement.parentElement.checked=false;}} >Add to Menu</button>
                     </div>
+  </form>
                 </div>
               </div>
-  </form>
 )
 
 
@@ -279,9 +279,9 @@ let Menu = React.createClass({
     "#menu button",
     "#selectedMenuName",
     "#mainMenu",
-    "#IDpageList > div > input.pageMenu",
-    "#selectAllPages",
-    "#menu ~ .box > .box-body.pad > .box-tools > button",
+    "#PageList > div > input.pageMenu",
+    "#pageSelectAll",
+    "#pageSubmit"
   ],
 
   assignValueToMenuItem(menuId, name, value){
