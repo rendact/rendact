@@ -397,7 +397,7 @@ let Menu = React.createClass({
       this.notifyUnsavedData(true)
       reset()
     } else {
-      swalert("info", "",  "Cannot add empty list into Menu, please select some items")
+      swalert("info", "",  "Cannot add empty list into Menu, please select some items", () => reset())
     }
 
   },
