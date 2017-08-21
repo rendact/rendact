@@ -6,7 +6,7 @@ import uuid from 'uuid';
 import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
-import {maskArea, setPosition, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId,  loadmenuSelect,
+import {toggleSelectAll, maskArea, setPosition, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId,  loadmenuSelect,
   setIdMainMenu, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
 import {swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
@@ -56,12 +56,12 @@ MenuContentForm = connect(
   (dispatch, ownProps) => ({
     selectAll(e){
       e.preventDefault();
-      let status = e.currentTarget.parentElement.checked;
+      let status = ownProps.allSelectState[ownProps.type]
 
       _.forEach(ownProps.itemList, (item, index) => {
         ownProps.change(ownProps.type + "[" + index.toString() + "]", !status);
       });
-      e.currentTarget.parentElement.checked = !status
+      dispatch(toggleSelectAll(!status, ownProps.type))
     }
     
   })
@@ -240,7 +240,8 @@ let Menu = React.createClass({
     errorMsg: React.PropTypes.string,
     loadingMsg: React.PropTypes.string,
     deleteMode: React.PropTypes.bool,
-    menuStructure: React.PropTypes.array
+    menuStructure: React.PropTypes.array,
+    allSelectState: React.PropTypes.object
   },
   getDefaultProps: function() {
     return {
@@ -268,6 +269,11 @@ let Menu = React.createClass({
       tooltip: "",
       urlData: {},
       menuStructure: [],
+      allSelectState : {
+        page: false,
+        category: false,
+        post: false
+        }
       }
   },
 
@@ -410,7 +416,10 @@ let Menu = React.createClass({
       this.notifyUnsavedData(true)
       reset()
     } else {
-      swalert("error", "",  "Cannot add empty list into Menu, please select some items", () => reset())
+      swalert("error", "",  "Cannot add empty list into Menu, please select some items", () => {
+        this.props.dispatch(toggleSelectAll(false, 'all'))
+        reset();
+      })
     }
 
   },
@@ -711,6 +720,7 @@ let Menu = React.createClass({
                 panelTitle="Pages"
                 addToMenu={this.addToMenu}
                 elementId="PageList"
+                allSelectState={this.props.allSelectState}
               />
 
               <MenuContentForm
@@ -719,6 +729,7 @@ let Menu = React.createClass({
                 panelTitle='Posts'
                 addToMenu={this.addToMenu}
                 elementId="PostList"
+                allSelectState={this.props.allSelectState}
               />
 
               <CustomUrlForm handleUrlSubmit={this.handleUrlSubmit} />
@@ -730,6 +741,7 @@ let Menu = React.createClass({
                 panelTitle='Categories'
                 addToMenu={this.addToMenu}
                 elementId="CategoryList"
+                allSelectState={this.props.allSelectState}
               />
 
             </div>

@@ -7,7 +7,12 @@ const menu = (state = [], action) => {
         {
           newMenuName: "",
           selectedMenuName: "",
-          treeData: []
+          treeData: [],
+          allSelectState : {
+            page: false,
+            category: false,
+            post: false
+          }
         }
       ]
     case 'MASK_AREA':
@@ -97,6 +102,18 @@ const menu = (state = [], action) => {
 
         return {...item, treeData: treeData}
       });
+
+    case 'TOGGLE_SELECT_ALL':
+      if (action.listType === 'all') {
+        return state.map(item => ({...item, allSelectState:{page: action.state, post: action.state, category: action.state} }))
+      } 
+       
+        return state.map(item => {
+          let allSelectState = _.clone(item.allSelectState);
+          _.set(allSelectState, action.listType, action.state)
+
+          return {...item, allSelectState}
+        });
       
     default:
       return state
