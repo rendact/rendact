@@ -6,7 +6,7 @@ import uuid from 'uuid';
 import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
-import {maskArea, setPosition, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId, loadselectedMenuName, loadmenuSelect,
+import {maskArea, setPosition, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId,  loadmenuSelect,
   setIdMainMenu, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
 import {swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
