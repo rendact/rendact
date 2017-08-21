@@ -58,8 +58,8 @@ const getAllCategory = {
 }
 
 const getAllPage = {
-  "query": 
-      'query getPages{viewer {allPosts(where: {type: {eq: "page"}}) { edges { node { id,title}}}}}'
+  "query":
+  '{viewer {allPosts(where:  {status: {eq: "Published"}, type:{eq: "page"}} ) { edges { node { id,title}}}}}'
 }
 
 const getAllPost = {
