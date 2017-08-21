@@ -307,9 +307,10 @@ let Menu = React.createClass({
   resetFormDelete: function(){
     document.getElementById("menu").reset();
     document.getElementById("menuName").reset();
+    this.props.changeFieldValue("selectedMenuName", "");
+    
     this.props.dispatch(setResetDelete())
     this.handleNameChange();
-    this.handleNewMenuChange();
     window.history.pushState("", "", '/admin/menu');
   },
 
@@ -347,14 +348,14 @@ let Menu = React.createClass({
     var selectedMenuName = event.target.value.split("-")[1];
     var me = this;
     
-    if (menuId!=="") {
+    if (menuId) {
       this.props.changeFieldValue("selectedMenuName", selectedMenuName);
       this.props.dispatch(setMenuId(menuId))
       this.loadMenuItems(menuId);
       this.notifyUnsavedData(true);
-    } else if(menuId==="") {
-      this.loadData()
-      //this.resetFormDelete();
+    } else {
+      this.loadData(true)
+      this.resetFormDelete();
       disableBySelector(true, me.disabledSelectors);
     }
 
@@ -362,7 +363,6 @@ let Menu = React.createClass({
 
     handleUrlSubmit: function(urlData, reset){
       if(urlData.title && urlData.url) {
-        console.log(urlData)
         var _treeData = this.props.treeData;
         var _url = [{titlePanel: urlData.title, url: urlData.url, tooltip: "", type: "url", id: uuid(), target: urlData.url}];
         var treeData = [];
@@ -460,7 +460,7 @@ let Menu = React.createClass({
       });
   },
 
-  loadData: function(){
+  loadData: function(withoutMenuItems){
     var me = this;
     this.notif = this.refs.notificationSystem;
 
@@ -468,10 +468,11 @@ let Menu = React.createClass({
     this.disableForm(true);
     var mainMenuId, mainMenuName;
     const disableIfNoIdMenu = () => {
-      if (!this.props.IdMainMenu){
+      if (!this.props.IdMainMenu || withoutMenuItems){
         disableBySelector(true, me.disabledSelectors);
       }
     }
+
     riques(Query.getMainMenu, 
       function(error, response, body) {
         if (!error) {
@@ -491,12 +492,16 @@ let Menu = React.createClass({
                 pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
               })
               me.props.dispatch(setPageListMenu(pageList)) 
-              if (mainMenuId && mainMenuName) {
-                me.props.dispatch(setMenuId(mainMenuId));
-                me.loadMenuItems(mainMenuId);
-                me.props.changeFieldValue("selectedMenuName", mainMenuName);
-                me.props.changeFieldValue("menuSelect", mainMenuId+"-"+mainMenuName);
-                me.props.dispatch(loadmenuSelect(mainMenuId+"-"+mainMenuName));
+              if (mainMenuId && mainMenuName && !withoutMenuItems) {
+
+                  me.props.dispatch(setMenuId(mainMenuId));
+                  me.loadMenuItems(mainMenuId);
+                  me.props.changeFieldValue("selectedMenuName", mainMenuName);
+                  me.props.changeFieldValue("menuSelect", mainMenuId+"-"+mainMenuName);
+                  me.props.dispatch(loadmenuSelect(mainMenuId+"-"+mainMenuName));
+
+              } else {
+                  disableBySelector(true, me.disabledSelectors);
               }
             }
           }
