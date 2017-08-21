@@ -415,13 +415,13 @@ let Menu = React.createClass({
     if (checkedItems.length) {
       this.props.dispatch(setTreeData(treeData))
       this.notifyUnsavedData(true)
-      reset()
     } else {
       swalert("error", "",  "Cannot add empty list into Menu, please select some items", () => {
-        this.props.dispatch(toggleSelectAll(false, 'all'))
-        reset();
       })
     }
+
+    this.props.dispatch(toggleSelectAll(false, 'all'))
+    reset();
 
   },
 
