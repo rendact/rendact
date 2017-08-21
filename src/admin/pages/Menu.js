@@ -309,7 +309,6 @@ let Menu = React.createClass({
     document.getElementById("menuName").reset();
     this.props.dispatch(setResetDelete())
     this.handleNameChange();
-    this.handleNewMenuChange();
     window.history.pushState("", "", '/admin/menu');
   },
 
