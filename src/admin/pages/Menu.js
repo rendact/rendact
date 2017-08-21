@@ -324,7 +324,7 @@ let Menu = React.createClass({
             if (items)
             var position = body.data.getMenu.position;
             me.props.dispatch(setTreeData(items));
-            me.props.dispatch(setPosition(position))
+            me.props.changeFieldValue("mainMenuPos", position==="Main Menu");
             me.disableForm(false);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
@@ -565,18 +565,12 @@ let Menu = React.createClass({
   handleUpdateMenu: function(v){
     var me = this;
     var name = v.selectedMenuName;
-    let positionValues = this.props.position;
-    let _IdMainMenu = this.props.IdMainMenu;
-    let IdMainMenu = _IdMainMenu.toString();
-      if (positionValues==="Main Menu") {
-        riques(Query.updateMainMenu(IdMainMenu), 
-          function(error, response, body) {
-          }
-        );
-      }
-    let treeData = this.props.treeData
-    let menuId = this.props.menuId;
-    let qry = Query.updateMenu(menuId, name, treeData, positionValues);
+    var positionValues = v.mainMenuPos?"Main Menu":null;
+    var _IdMainMenu = this.props.IdMainMenu;
+    var IdMainMenu = _IdMainMenu.toString();
+    var treeData = this.props.treeData
+    var menuId = this.props.menuId;
+    var qry = Query.updateMenu(menuId, name, treeData, positionValues);
 
     if (positionValues==="Main Menu") {
       riques(Query.updateMainMenu(IdMainMenu), 
@@ -794,7 +788,7 @@ let Menu = React.createClass({
                       <div className="col-md-9">
                         <div className="checkbox">
                           <label key="Main Menu">
-                            <input type="checkbox" id="mainMenu" value="Main Menu" disabled={this.props.selectedMenuName===""} name="position" checked={this.props.position==="Main Menu"} onChange={this.onChangeMainMenu}/>
+                            <Field component="input" type="checkbox" value="Main Menu" disabled={this.props.selectedMenuName===""} id="mainMenuPos" name="mainMenuPos" onChange={this.onChangeMainMenu}/>
                             <i>Main Menu</i>
                           </label>
                         </div>
@@ -830,9 +824,7 @@ const mapStateToProps = function(state){
     newMenuName: selector(state, 'newMenuName'),
     selectedMenuName: selector(state, 'selectedMenuName'),
     menuSelect: selector(state, 'menuSelect'),
-    initialValues: {
-      newMenuName: ''
-    }
+    mainMenuPos: selector(state, 'mainMenuPos')?"Main Menu":null,
   }
   
   if (!_.isEmpty(state.menu)) {
