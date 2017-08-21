@@ -274,8 +274,8 @@ let Menu = React.createClass({
   disabledSelectors : [
     "#menuName #submit",
     "#deleteBtn", 
-    "#menu ~ .box > .box-header > .box-tools > button",
     "#menu button",
+    "#menu ~ .box > .box-header > .box-tools > button",
     "#selectedMenuName",
     "#mainMenu",
     "#PageList > div > input.pageMenu",
@@ -330,6 +330,12 @@ let Menu = React.createClass({
           }
           me.disableForm(false);
           me.props.dispatch(setDisabled(false))
+          
+          if (me.props.newMenuName===""){
+            // this will disable the create menu button if the newMenuName is ""
+            disableBySelector(true, ["#menu button#submit.btn.btn-success", ]);
+          }
+
         }
       );
   },
@@ -337,7 +343,6 @@ let Menu = React.createClass({
   handleMenuName: function(event){
     var menuId = event.target.value.split("-")[0];
     var selectedMenuName = event.target.value.split("-")[1];
-    debugger;
     var me = this;
     
     if (menuId!=="") {
@@ -350,6 +355,7 @@ let Menu = React.createClass({
       //this.resetFormDelete();
       disableBySelector(true, me.disabledSelectors);
     }
+
   },
 
     handleUrlSubmit: function(urlData, reset){
@@ -816,13 +822,16 @@ const mapStateToProps = function(state){
   var customStates = {
     newMenuName: selector(state, 'newMenuName'),
     selectedMenuName: selector(state, 'selectedMenuName'),
-    menuSelect: selector(state, 'menuSelect')
+    menuSelect: selector(state, 'menuSelect'),
+    initialValues: {
+      newMenuName: ''
+    }
   }
   
   if (!_.isEmpty(state.menu)) {
     var out = _.head(state.menu);
-    return _.merge(out, customStates);
-  } else return customStates;
+    return {...out, ...customStates}
+  } else return {};
 }
 
 const mapDispatchToProps = function(dispatch){ 
