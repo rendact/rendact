@@ -361,6 +361,7 @@ let Menu = React.createClass({
       this.notifyUnsavedData(true);
     } else {
       this.loadData(true)
+      this.props.changeFieldValue("mainMenuPos", false)
       this.resetFormDelete();
       disableBySelector(true, me.disabledSelectors);
     }
@@ -462,6 +463,7 @@ let Menu = React.createClass({
           });
           me.resetFormNewMenu();
           me.props.dispatch(setTreeData([]))
+          document.getElementById("mainMenuPos").checked = false
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
