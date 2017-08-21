@@ -329,10 +329,10 @@ let Menu = React.createClass({
           if (!error && !body.errors && response.statusCode === 200) {
             var items = [];
             items = body.data.getMenu.items;
-            if (items)
             var position = body.data.getMenu.position;
-            me.props.dispatch(setTreeData(items));
             me.props.changeFieldValue("mainMenuPos", position==="Main Menu");
+            if (items)
+            me.props.dispatch(setTreeData(items));
             me.disableForm(false);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
@@ -580,7 +580,7 @@ let Menu = React.createClass({
   handleUpdateMenu: function(v){
     var me = this;
     var name = v.selectedMenuName;
-    var positionValues = v.mainMenuPos?"Main Menu":null;
+    var positionValues = v.mainMenuPos?"Main Menu":"";
     var _IdMainMenu = this.props.IdMainMenu;
     var IdMainMenu = _IdMainMenu.toString();
     var treeData = this.props.treeData
