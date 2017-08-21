@@ -481,6 +481,7 @@ let Menu = React.createClass({
     const disableIfNoIdMenu = () => {
       if (!this.props.IdMainMenu || withoutMenuItems){
         disableBySelector(true, me.disabledSelectors);
+        this.props.changeFieldValue("mainMenuPos", "");
       }
     }
 
