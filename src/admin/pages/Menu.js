@@ -6,7 +6,7 @@ import uuid from 'uuid';
 import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
-import {maskArea, setPosition, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId, loadselectedMenuName, loadmenuSelect,
+import {maskArea, setPosition, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId,  loadmenuSelect,
   setIdMainMenu, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
 import {swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
@@ -597,6 +597,17 @@ let Menu = React.createClass({
             autoDismiss: 2
           });
           me.loadMenuItems(menuId)
+
+          // also update the dropdown menu without requesting into database
+          let newMenuList = _.map(me.props.pageList, menu => {
+            if(menu.key === menuId){
+              return <option key={menu.key} value={menu.key+"-"+name}>{name}</option>
+            }
+            return <option key={menu.key} value={menu.props.value}>{menu.props.children}</option>
+          })
+          me.props.dispatch(setPageListMenu(newMenuList)) 
+          me.props.changeFieldValue("menuSelect", menuId+"-"+name);
+
           me.notifyUnsavedData(false);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
