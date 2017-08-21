@@ -624,8 +624,7 @@ let Menu = React.createClass({
     var menuId = this.props.newMenuId;
     var newMenuName = this.props.newMenuName;
     var selectedMenuName = newMenuName;
-    this.props.changeFieldValue("selectedMenuName", menuId+"-"+newMenuName);
-    this.props.dispatch(loadselectedMenuName(selectedMenuName));
+    this.props.changeFieldValue("selectedMenuName", selectedMenuName);
     this.props.dispatch(setMenuId(menuId))
     document.getElementById("menu").reset();
   },
