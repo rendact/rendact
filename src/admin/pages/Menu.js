@@ -361,16 +361,21 @@ let Menu = React.createClass({
   },
 
     handleUrlSubmit: function(urlData, reset){
-    var _treeData = this.props.treeData;
-    var _url = [{titlePanel: urlData.title, url: urlData.url, tooltip: "", type: "url", id: uuid(), target: urlData.url}];
-    var treeData = [];
-    if (_treeData===null) {
-      treeData = _url;
-    }else if (_url.length>0) {
-      treeData = _.concat(_treeData, _url);
-    }
-    this.props.dispatch(setTreeData(treeData))
-    reset()
+      if(urlData.title && urlData.url) {
+        console.log(urlData)
+        var _treeData = this.props.treeData;
+        var _url = [{titlePanel: urlData.title, url: urlData.url, tooltip: "", type: "url", id: uuid(), target: urlData.url}];
+        var treeData = [];
+        if (_treeData===null) {
+          treeData = _url;
+        }else if (_url.length>0) {
+          treeData = _.concat(_treeData, _url);
+        }
+        this.props.dispatch(setTreeData(treeData))
+        reset()
+      } else {
+        swalert('error', '', 'Please fill the blank');
+      }
   },
 
   addToMenu: function(values, type, itemList, reset){
@@ -405,7 +410,7 @@ let Menu = React.createClass({
       this.notifyUnsavedData(true)
       reset()
     } else {
-      swalert("info", "",  "Cannot add empty list into Menu, please select some items", () => reset())
+      swalert("error", "",  "Cannot add empty list into Menu, please select some items", () => reset())
     }
 
   },
