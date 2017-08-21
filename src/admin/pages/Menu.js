@@ -6,7 +6,7 @@ import uuid from 'uuid';
 import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
-import {maskArea, setPosition, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId, loadselectedMenuName, loadmenuSelect,
+import { maskArea, setPosition, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId, loadselectedMenuName, loadmenuSelect,
   setIdMainMenu, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
 import {swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
@@ -556,8 +556,6 @@ let Menu = React.createClass({
     require ('../../../public/css/AdminLTE.css');
     require ('../../../public/css/skins/_all-skins.css');
     require('./menucustom.css');
-
-
     //Load sidebar
     this.loadData();
   },
@@ -779,7 +777,7 @@ let Menu = React.createClass({
                               items={this.props.treeData||[]}
                               renderItem={this.renderItem}
                               onUpdate={(newItems) => (me.props.dispatch(setTreeData(newItems)))}
-                              childrenStyle={{marginLeft: '2rem', marginRight: '-2rem'}}
+                              childrenStyle={{marginLeft: '2rem', marginRight: screen.width === window.innerWidth ? "-2rem" : ""}}
                               treeshold={40}
                               useDragHandle
                             />
