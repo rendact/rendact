@@ -278,9 +278,11 @@ let Menu = React.createClass({
     "#menu ~ .box > .box-header > .box-tools > button",
     "#selectedMenuName",
     "#mainMenu",
-    "#PageList > div > input.pageMenu",
-    "#pageSelectAll",
-    "#pageSubmit"
+    'div > div > input[class*="Menu"]',
+    "button[id*='SelectAll']",
+    "button[id*='Submit']",
+    "#urlSabmit #submit",
+    "#urlSabmit input",
   ],
 
   assignValueToMenuItem(menuId, name, value){
@@ -502,9 +504,9 @@ let Menu = React.createClass({
                 allPageList.push(item);
               })
               me.props.dispatch(setAllPageList(allPageList)) 
+              disableIfNoIdMenu();
             }
             
-            disableIfNoIdMenu();
           }
         );
         riques(Query.getAllPost, 
@@ -515,6 +517,7 @@ let Menu = React.createClass({
                 allPostList.push(item);
               })
               me.props.dispatch(setAllPostList(allPostList))
+              disableIfNoIdMenu();
             }
           }
         );
@@ -526,6 +529,7 @@ let Menu = React.createClass({
                 categoryList.push(item);
               })
               me.props.dispatch(setCategoryMenu(categoryList))
+              disableIfNoIdMenu();
             }
           }
         );
