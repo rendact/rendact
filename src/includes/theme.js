@@ -76,12 +76,14 @@ export class ThemeHome extends React.Component {
 			pageCount: 1,
 			activePage: 1,
 			isNoConnection: false,
-      mainMenu: null
+      mainMenu: null,
+      listOfWidgets: []
 		};
     this.handlePostClick = this.handlePostClick.bind(this);
     this.theMenu = this.theMenu.bind(this);
     this.thePagination = this.thePagination.bind(this);
     this.loadMainMenu = this.loadMainMenu.bind(this);
+    this.getWidgets = this.getWidgets.bind(this);
 	}
 
   loadMainMenu(){
@@ -150,6 +152,20 @@ export class ThemeHome extends React.Component {
               </div>
 	}
 
+	getWidgets(widgetArea){
+		let Widgets = [];
+		var listOfWidgets = this.state.listOfWidgets[widgetArea]?this.state.listOfWidgets[widgetArea]:[];
+		
+		_.map(listOfWidgets,function(item){
+			Widgets.push(<div key={item.id} className="sidebar-box">
+					<h3><span>{item.widget}</span></h3>
+						<p>Empty</p>
+				</div>);
+		});
+		
+		return <div className="widgets">{Widgets}</div>;
+	}
+
 	handlePageClick(e){
 		var page = 1;
 		if (e.target.text==="«")
@@ -201,6 +217,16 @@ export class ThemeHome extends React.Component {
 		        me.setState({loadDone: true});
 		      }
 		    );
+
+		    riques(Query.getListOfWidget, 
+		    	function(error, response, body) { 
+		    		if (!error && !body.errors && response.statusCode === 200) {
+		    			me.setState({listOfWidgets: JSON.parse(body.data.getOptions.value)})
+		    		} else {
+		          errorCallback(error, body.errors?body.errors[0].message:null);
+		        }
+		    	}
+		    );
 	    }
 		);
 	}
@@ -234,7 +260,7 @@ export class ThemeHome extends React.Component {
 								theImage={this.theImage}
 								theConfig={this.state.config}
 								thePagination={this.thePagination}
-								widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
+								getWidgets={this.getWidgets}
 								footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 							/>
             }

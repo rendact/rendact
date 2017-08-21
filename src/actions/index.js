@@ -309,6 +309,12 @@ export const setPosition = (position)  => ({
   position
 })
 
+export const toggleSelectAll = (state, listType) => ({
+  type: 'TOGGLE_SELECT_ALL',
+  state,
+  listType
+})
+
 /* 
  * WIDGET MANAGEMENT PAGE ACTION
  */

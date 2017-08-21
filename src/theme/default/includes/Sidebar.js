@@ -5,9 +5,7 @@ const Sidebar = React.createClass({
 		return (
 			<div className="col-md-4 new-section">	
 				<div className="sidebar-grid wow fadeInUpBig animated" data-wow-delay="0.4s">
-					{
-						this.props.widgets.map(function(item) { return item })
-					}
+					{this.props.getWidgets('Sidebar')}
 				</div>
 			</div>
 		)
