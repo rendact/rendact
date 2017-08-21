@@ -277,7 +277,7 @@ let Menu = React.createClass({
     "#menu button",
     "#menu ~ .box > .box-header > .box-tools > button",
     "#selectedMenuName",
-    "#mainMenu",
+    "#mainMenuPos",
     'div > div > input[class*="Menu"]',
     "button[id*='SelectAll']",
     "button[id*='Submit']",
