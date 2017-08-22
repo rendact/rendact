@@ -570,6 +570,7 @@ let Menu = React.createClass({
   onChangeMainMenu: function(event){
     const target = event.target;
     const position = target.checked === true ? target.value : "";
+    !this.props.IdMainMenu && position && this.props.dispatch(setIdMainMenu(this.props.menuId))
     this.props.dispatch(setPosition(position))
     this.notifyUnsavedData(true);
   },
