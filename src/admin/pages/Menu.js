@@ -795,12 +795,12 @@ let Menu = React.createClass({
                             { this.props.isProcessing &&
                               <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
                             }
-                          <div className="col-md-4">
+                          <div className="col-md-4 wide">
                             <Nestable
                               items={this.props.treeData||[]}
                               renderItem={this.renderItem}
                               onUpdate={(newItems) => (me.props.dispatch(setTreeData(newItems)))}
-                              childrenStyle={{marginLeft: '2rem', marginRight: screen.width === window.innerWidth ? "-2rem" : ""}}
+                              childrenStyle={{marginLeft: '2rem'}}
                               treeshold={40}
                               useDragHandle
                               maxDepth={3}

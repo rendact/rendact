@@ -78,6 +78,9 @@ const menu = (state = [], action) => {
     case 'SET_POSITION':
       return state.map(item =>  ({...item, position: action.position}))
 
+    case 'SET_MARGINRIGHT':
+      return state.map(item =>  ({...item, marginRight: action.marginRight}))
+
     case 'ASSIGN_VALUE_TO_MENU_ITEM':
       return state.map(item=> {
         let treeData = [...item.treeData]

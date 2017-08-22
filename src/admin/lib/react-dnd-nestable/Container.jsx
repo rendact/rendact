@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+require('./menu.css');
 import Item from './Item';
 
 function getDepth(item, childrenProperty) {
