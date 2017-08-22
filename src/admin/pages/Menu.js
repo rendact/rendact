@@ -339,10 +339,9 @@ let Menu = React.createClass({
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
             var items = [];
-            items = body.data.getMenu.items;
             var position = body.data.getMenu.position;
             me.props.changeFieldValue("mainMenuPos", position==="Main Menu");
-            if (items)
+            if (items) items = body.data.getMenu.items;
             me.props.dispatch(setTreeData(items));
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
