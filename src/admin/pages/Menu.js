@@ -825,6 +825,7 @@ let Menu = React.createClass({
                               childrenStyle={{marginLeft: '2rem', marginRight: screen.width === window.innerWidth ? "-2rem" : ""}}
                               treeshold={40}
                               useDragHandle
+                              maxDepth={3}
                             />
                           </div>
                         </div>
