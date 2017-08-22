@@ -70,7 +70,13 @@ MenuContentForm = connect(
 MenuContentForm = reduxForm({form: 'menuContentForm'})(MenuContentForm)
 
 
-let CustomUrlForm = (props) => (
+let CustomUrlForm = (props) => {
+  let submitDisable = false;
+
+  if (!props.url)  submitDisable = true
+  if (!props.title)  submitDisable = true
+  
+  return(
   <div className="box box-default collapsed-box box-solid">
     <div className="box-header with-border">
       <h3 className="box-title">Custom Links</h3>
@@ -102,18 +108,23 @@ let CustomUrlForm = (props) => (
 
         <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
         <div className="box-tools pull-right">
-          <button type="submit" id="submit" className="btn  btn-default">Add to Menu</button>
+          <button disabled={submitDisable} type="submit" id="submit" className="btn  btn-default">Add to Menu</button>
         </div>
       </form>
     </div>
   </div>  
-)
-CustomUrlForm = connect(
-  state => ({
-    state
-  }),
-)(CustomUrlForm)
+)}
+
 CustomUrlForm = reduxForm({form: 'customUrlForm'})(CustomUrlForm)
+let custUrlSelector = formValueSelector('customUrlForm');
+CustomUrlForm = connect(
+  state => {
+    return  {
+    url: custUrlSelector(state, 'url'),
+    title: custUrlSelector(state, 'title')
+    }
+  },
+)(CustomUrlForm)
 
 const MenuPanel = React.createClass({
 
@@ -333,12 +344,12 @@ let Menu = React.createClass({
             me.props.changeFieldValue("mainMenuPos", position==="Main Menu");
             if (items)
             me.props.dispatch(setTreeData(items));
-            me.disableForm(false);
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
           }
           me.disableForm(false);
           me.props.dispatch(setDisabled(false))
+          disableBySelector(true, ["#urlSabmit #submit"])
           
           if (me.props.newMenuName===""){
             // this will disable the create menu button if the newMenuName is ""
@@ -570,6 +581,7 @@ let Menu = React.createClass({
     require('./menucustom.css');
     //Load sidebar
     this.loadData();
+    disableBySelector(true, ["#urlSabmit div button#submit"]);
   },
   onChangeMainMenu: function(event){
     const target = event.target;
