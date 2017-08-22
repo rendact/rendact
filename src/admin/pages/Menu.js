@@ -495,22 +495,27 @@ let Menu = React.createClass({
 
     this.props.dispatch(setResetDelete())
     this.disableForm(true);
+    disableBySelector(true, me.disabledSelectors);
     var mainMenuId, mainMenuName;
+
     const disableIfNoIdMenu = () => {
       if (!this.props.IdMainMenu || withoutMenuItems){
         disableBySelector(true, me.disabledSelectors);
         this.props.changeFieldValue("mainMenuPos", "");
       }
     }
+
+    const processItems = (items) => (items.edges.map(item => item))
+
     //disini perubahan
     riques(Query.loadAllMenuData, (error, response, body) => {
       if(!error && response.statusCode === 200) {
         let { mainMenu, allMenu, allPage, allPost, allCategory } = body.data.viewer;
         // processing main menu
-        if (mainMenu.length>=1){
-          mainMenuId = _.head(mainMenu).node.id;
-          mainMenuName = _.head(mainMenu).node.name;
-          me.props.dispatch(setIdMainMenu(_.head(mainMenu).node.id))
+        if (mainMenu.edges.length>=1){
+          mainMenuId = _.head(mainMenu.edges).node.id;
+          mainMenuName = _.head(mainMenu.edges).node.name;
+          me.props.dispatch(setIdMainMenu(mainMenuId))
         } 
 
         // processing all Menu
@@ -532,112 +537,24 @@ let Menu = React.createClass({
           }
 
         // processing all page
-          var allPageList = [];
-          _.forEach(allPage.edges, function(item){
-            allPageList.push(item);
-          })
-          me.props.dispatch(setAllPageList(allPageList)) 
-          disableIfNoIdMenu();
+        let allPageList = processItems(allPage)
+        me.props.dispatch(setAllPageList(allPageList)) 
 
         // processing all posts
 
-          var allPostList = [];
-          _.forEach(allPost.edges, function(item){
-            allPostList.push(item);
-          })
-          me.props.dispatch(setAllPostList(allPostList))
-          disableIfNoIdMenu();
+        let allPostList = processItems(allPost)
+        me.props.dispatch(setAllPostList(allPostList))
         // processing all categories
 
-              var categoryList = [];
-              _.forEach(allCategory.edges, function(item, index){
-                categoryList.push(item);
-              })
-              me.props.dispatch(setCategoryMenu(categoryList))
-              disableIfNoIdMenu();
+        let categoryList = processItems(allCategory)
+        me.props.dispatch(setCategoryMenu(categoryList))
 
       } else {
-        console.log("ada error")
+        errorCallback(error, body.errors?body.errors[0].message:null);
       }
       this.disableForm(false)
+      disableIfNoIdMenu();
     });
-      /*
-    riques(Query.getMainMenu, 
-      function(error, response, body) {
-        if (!error) {
-          var mainMenu = _.forEach(body.data.viewer.allMenus.edges, function(item){ return item });
-          if (mainMenu.length>=1){
-            mainMenuId = _.head(mainMenu).node.id;
-            mainMenuName = _.head(mainMenu).node.name;
-            me.props.dispatch(setIdMainMenu(_.head(mainMenu).node.id))
-          } 
-        }
-
-        riques(Query.getAllMenu, 
-          function(error, response, body) {
-            if (!error) {
-              var pageList = [(<option key="0" value="">--select menu--</option>)];
-              _.forEach(body.data.viewer.allMenus.edges, function(item){
-                pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
-              })
-              me.props.dispatch(setPageListMenu(pageList)) 
-              if (mainMenuId && mainMenuName && !withoutMenuItems) {
-
-                  me.props.dispatch(setMenuId(mainMenuId));
-                  me.loadMenuItems(mainMenuId);
-                  me.props.changeFieldValue("selectedMenuName", mainMenuName);
-                  me.props.changeFieldValue("menuSelect", mainMenuId+"-"+mainMenuName);
-                  me.props.dispatch(loadmenuSelect(mainMenuId+"-"+mainMenuName));
-
-              } else {
-                  disableBySelector(true, me.disabledSelectors);
-              }
-            }
-          }
-        );
-        riques(Query.getAllPage, 
-          function(error, response, body) {
-            if (!error) {
-              var allPageList = [];
-              _.forEach(body.data.viewer.allPosts.edges, function(item){
-                allPageList.push(item);
-              })
-              me.props.dispatch(setAllPageList(allPageList)) 
-              disableIfNoIdMenu();
-            }
-            
-          }
-        );
-        riques(Query.getAllPost, 
-          function(error, response, body) {
-            if (!error) {
-              var allPostList = [];
-              _.forEach(body.data.viewer.allPosts.edges, function(item){
-                allPostList.push(item);
-              })
-              me.props.dispatch(setAllPostList(allPostList))
-              disableIfNoIdMenu();
-            }
-          }
-        );
-        riques(Query.getAllCategory, 
-          function(error, response, body) {
-            if (!error) {
-              var categoryList = [];
-              _.forEach(body.data.viewer.allCategories.edges, function(item, index){
-                categoryList.push(item);
-              })
-              me.props.dispatch(setCategoryMenu(categoryList))
-              disableIfNoIdMenu();
-            }
-          }
-        );
-
-        me.disableForm(false);
-        disableIfNoIdMenu();
-      }
-    );
-    */
   },
 
   componentDidMount: function(){
