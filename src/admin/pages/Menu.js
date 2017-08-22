@@ -454,6 +454,13 @@ let Menu = React.createClass({
     this.props.dispatch(setSelectedMenuName(selectedMenuName))
     this.notifyUnsavedData(true);
   },
+
+  componentWillReceiveProps: function(props){
+    if(!props.newMenuName){
+      disableBySelector(true, ["#menu button"]);
+    }
+  },
+
   handleSubmit: function(event){
     event.preventDefault();
     var me = this;
@@ -658,7 +665,7 @@ let Menu = React.createClass({
     var selectedMenuName = newMenuName;
     this.props.changeFieldValue("selectedMenuName", selectedMenuName);
     this.props.dispatch(setMenuId(menuId))
-    document.getElementById("menu").reset();
+    this.props.changeFieldValue("newMenuName", "");
   },
   handleDelete: function(event){
     var me = this;
