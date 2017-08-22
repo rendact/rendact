@@ -63,10 +63,15 @@ class WidgetAreaContainer extends React.Component {
 
     let toSavedData = {}
     _.forEach(widgetAreas, widgetArea => {
-      let widgets = _.map(widgetArea.widgets, widget => ({
-        id: widget.id,
-        widget: widget.widget.item
-      }));
+      let widgets = _.map(widgetArea.widgets, widget => {
+        var widgetValue = JSON.parse(widget.widget.value);
+        return {
+          id: widget.id,
+          widget: widget.widget.item,
+          title: _.has(widgetValue, 'title')?widgetValue.title:widget.widget.item,
+          filePath: _.has(widgetValue, 'filePath')?widgetValue.filePath:null
+        }
+      });
       toSavedData[widgetArea.id] = widgets
     })
 

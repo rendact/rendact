@@ -4,10 +4,11 @@ import Query from '../admin/query';
 import _ from 'lodash';
 
 
-export const registerWidget = (type, title, value) => {
-  let item = "widget_" + type ;
+export const registerWidget = (id, title, value, filePath) => {
+  let item = "widget_" + id ;
   let values = Object.assign({}, value, {
-      title: title
+      title: title,
+      file: filePath
   });
 
   riques(Query.createWidget(item, JSON.stringify(values)),
@@ -121,3 +122,5 @@ export const contactUsWidget =
 				<p>Lorem ipsum dolor sit amet conse aliqua. Ut enim ad minim veniam Lorem ctetur adipisicing .</p>
 			</div>
 		</div>
+
+//registerWidget("search", "Search", {}, "search");
