@@ -507,10 +507,10 @@ let Menu = React.createClass({
 
     const processItems = (items) => (items.edges.map(item => item))
 
-    //disini perubahan
     riques(Query.loadAllMenuData, (error, response, body) => {
       if(!error && response.statusCode === 200) {
         let { mainMenu, allMenu, allPage, allPost, allCategory } = body.data.viewer;
+
         // processing main menu
         if (mainMenu.edges.length>=1){
           mainMenuId = _.head(mainMenu.edges).node.id;
@@ -585,6 +585,7 @@ let Menu = React.createClass({
     var qry = Query.updateMenu(menuId, name, treeData, positionValues);
 
     if (positionValues==="Main Menu") {
+      me.props.dispatch(setIdMainMenu(menuId))
       riques(Query.updateMainMenu(IdMainMenu), 
         function(error, response, body) {
         }
@@ -856,7 +857,8 @@ const mapStateToProps = function(state){
   
   if (!_.isEmpty(state.menu)) {
     var out = _.head(state.menu);
-    return {...out, ...customStates}
+    out = {...out, ...customStates}
+    return out
   } else return {};
 }
 
