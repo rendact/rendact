@@ -11,7 +11,6 @@ li .box {
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
   }
 
-
 li .box-body {
   background-color: white;
 }
@@ -33,6 +32,15 @@ div.box.box-default.box-solid.collapsed-box > div.box-header.with-border {
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
+.wide {
+  margin-right: -2em;
+}
+
+@media (max-width: 600px) {
+  .wide {
+    margin-right: 0em;
+  }
+}
 
 
 
