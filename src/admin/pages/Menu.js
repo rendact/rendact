@@ -8,7 +8,7 @@ import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
 import {toggleSelectAll, maskArea, setPosition, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId,  loadmenuSelect,
   setIdMainMenu, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
-import {swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
+import {validateUrl, swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
 import {reduxForm, Field, formValueSelector, change} from 'redux-form'
 
@@ -37,7 +37,7 @@ let MenuContentForm = (props) => (
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
                     <button id={props.type+"SelectAll"} type="submit" className="btn btn-default" style={{marginRight: 10}} onClick={props.selectAll}>Select All</button>
                     <div className="box-tools pull-right">
-                      <button id={props.type+"Submit"} className="btn  btn-default" type="submit" style={{marginRight: 10}} onClick={e => {e.currentTarget.parentElement.parentElement.checked=false;}} >Add to Menu</button>
+                      <button id={props.type+"Submit"} className="btn  btn-default" type="submit" style={{marginRight: 10}}>Add to Menu</button>
                     </div>
   </form>
                 </div>
@@ -339,10 +339,9 @@ let Menu = React.createClass({
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
             var items = [];
-            items = body.data.getMenu.items;
             var position = body.data.getMenu.position;
             me.props.changeFieldValue("mainMenuPos", position==="Main Menu");
-            if (items)
+            if (items) items = body.data.getMenu.items;
             me.props.dispatch(setTreeData(items));
           } else {
             errorCallback(error, body.errors?body.errors[0].message:null);
@@ -381,6 +380,7 @@ let Menu = React.createClass({
 
     handleUrlSubmit: function(urlData, reset){
       if(urlData.title && urlData.url) {
+        urlData.url = validateUrl(urlData.url)
         var _treeData = this.props.treeData;
         var _url = [{titlePanel: urlData.title, url: urlData.url, tooltip: "", type: "url", id: uuid(), target: urlData.url, children: []}];
         var treeData = [];
@@ -495,7 +495,9 @@ let Menu = React.createClass({
 
     this.props.dispatch(setResetDelete())
     this.disableForm(true);
+    disableBySelector(true, me.disabledSelectors);
     var mainMenuId, mainMenuName;
+
     const disableIfNoIdMenu = () => {
       if (!this.props.IdMainMenu || withoutMenuItems){
         disableBySelector(true, me.disabledSelectors);
@@ -503,81 +505,56 @@ let Menu = React.createClass({
       }
     }
 
-    riques(Query.getMainMenu, 
-      function(error, response, body) {
-        if (!error) {
-          var mainMenu = _.forEach(body.data.viewer.allMenus.edges, function(item){ return item });
-          if (mainMenu.length>=1){
-            mainMenuId = _.head(mainMenu).node.id;
-            mainMenuName = _.head(mainMenu).node.name;
-            me.props.dispatch(setIdMainMenu(_.head(mainMenu).node.id))
-          } 
-        }
+    const processItems = (items) => (items.edges.map(item => item))
 
-        riques(Query.getAllMenu, 
-          function(error, response, body) {
-            if (!error) {
-              var pageList = [(<option key="0" value="">--select menu--</option>)];
-              _.forEach(body.data.viewer.allMenus.edges, function(item){
-                pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
-              })
-              me.props.dispatch(setPageListMenu(pageList)) 
-              if (mainMenuId && mainMenuName && !withoutMenuItems) {
+    riques(Query.loadAllMenuData, (error, response, body) => {
+      if(!error && response.statusCode === 200) {
+        let { mainMenu, allMenu, allPage, allPost, allCategory } = body.data.viewer;
 
-                  me.props.dispatch(setMenuId(mainMenuId));
-                  me.loadMenuItems(mainMenuId);
-                  me.props.changeFieldValue("selectedMenuName", mainMenuName);
-                  me.props.changeFieldValue("menuSelect", mainMenuId+"-"+mainMenuName);
-                  me.props.dispatch(loadmenuSelect(mainMenuId+"-"+mainMenuName));
+        // processing main menu
+        if (mainMenu.edges.length>=1){
+          mainMenuId = _.head(mainMenu.edges).node.id;
+          mainMenuName = _.head(mainMenu.edges).node.name;
+          me.props.dispatch(setIdMainMenu(mainMenuId))
+        } 
 
-              } else {
-                  disableBySelector(true, me.disabledSelectors);
-              }
-            }
-          }
-        );
-        riques(Query.getAllPage, 
-          function(error, response, body) {
-            if (!error) {
-              var allPageList = [];
-              _.forEach(body.data.viewer.allPosts.edges, function(item){
-                allPageList.push(item);
-              })
-              me.props.dispatch(setAllPageList(allPageList)) 
-              disableIfNoIdMenu();
-            }
-            
-          }
-        );
-        riques(Query.getAllPost, 
-          function(error, response, body) {
-            if (!error) {
-              var allPostList = [];
-              _.forEach(body.data.viewer.allPosts.edges, function(item){
-                allPostList.push(item);
-              })
-              me.props.dispatch(setAllPostList(allPostList))
-              disableIfNoIdMenu();
-            }
-          }
-        );
-        riques(Query.getAllCategory, 
-          function(error, response, body) {
-            if (!error) {
-              var categoryList = [];
-              _.forEach(body.data.viewer.allCategories.edges, function(item, index){
-                categoryList.push(item);
-              })
-              me.props.dispatch(setCategoryMenu(categoryList))
-              disableIfNoIdMenu();
-            }
-          }
-        );
+        // processing all Menu
+          var pageList = [(<option key="0" value="">--select menu--</option>)];
+          _.forEach(allMenu.edges, function(item){
+            pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
+          })
+          me.props.dispatch(setPageListMenu(pageList)) 
+          if (mainMenuId && mainMenuName && !withoutMenuItems) {
 
-        me.disableForm(false);
-        disableIfNoIdMenu();
+              me.props.dispatch(setMenuId(mainMenuId));
+              me.loadMenuItems(mainMenuId);
+              me.props.changeFieldValue("selectedMenuName", mainMenuName);
+              me.props.changeFieldValue("menuSelect", mainMenuId+"-"+mainMenuName);
+              me.props.dispatch(loadmenuSelect(mainMenuId+"-"+mainMenuName));
+
+          } else {
+              disableBySelector(true, me.disabledSelectors);
+          }
+
+        // processing all page
+        let allPageList = processItems(allPage)
+        me.props.dispatch(setAllPageList(allPageList)) 
+
+        // processing all posts
+
+        let allPostList = processItems(allPost)
+        me.props.dispatch(setAllPostList(allPostList))
+        // processing all categories
+
+        let categoryList = processItems(allCategory)
+        me.props.dispatch(setCategoryMenu(categoryList))
+
+      } else {
+        errorCallback(error, body.errors?body.errors[0].message:null);
       }
-    );
+      this.disableForm(false)
+      disableIfNoIdMenu();
+    });
   },
 
   componentDidMount: function(){
@@ -608,6 +585,7 @@ let Menu = React.createClass({
     var qry = Query.updateMenu(menuId, name, treeData, positionValues);
 
     if (positionValues==="Main Menu") {
+      me.props.dispatch(setIdMainMenu(menuId))
       riques(Query.updateMainMenu(IdMainMenu), 
         function(error, response, body) {
         }
@@ -817,14 +795,15 @@ let Menu = React.createClass({
                             { this.props.isProcessing &&
                               <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
                             }
-                          <div className="col-md-4">
+                          <div className="col-md-4 wide">
                             <Nestable
                               items={this.props.treeData||[]}
                               renderItem={this.renderItem}
                               onUpdate={(newItems) => (me.props.dispatch(setTreeData(newItems)))}
-                              childrenStyle={{marginLeft: '2rem', marginRight: screen.width === window.innerWidth ? "-2rem" : ""}}
+                              childrenStyle={{marginLeft: '2rem'}}
                               treeshold={40}
                               useDragHandle
+                              maxDepth={3}
                             />
                           </div>
                         </div>
@@ -878,7 +857,8 @@ const mapStateToProps = function(state){
   
   if (!_.isEmpty(state.menu)) {
     var out = _.head(state.menu);
-    return {...out, ...customStates}
+    out = {...out, ...customStates}
+    return out
   } else return {};
 }
 

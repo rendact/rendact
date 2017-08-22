@@ -1,0 +1,9 @@
+ol {
+  margin-right: -2em;
+}
+
+@media (max-width: 600px) {
+  ol {
+    margin-right: 0em;
+  }
+}

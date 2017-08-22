@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import compose from 'recompose/compose';
 import { DragLayer } from 'react-dnd';
 import itemTypes from './itemTypes';
-
+require('./menu.css');
 const layerStyles = {
   position: 'fixed',
   pointerEvents: 'none',

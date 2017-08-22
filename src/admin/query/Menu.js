@@ -149,6 +149,59 @@ const getMainMenu = {
     }`
 }
 
+const loadAllMenuData = {
+  "query": `
+query{
+	viewer {
+    mainMenu:allMenus(where: {position :{eq: "Main Menu"}}){
+      edges {
+        node {
+          id
+          name
+        }
+      }
+    }
+    
+    allMenu:allMenus{
+      edges {
+        node {
+          id
+          name
+          items
+        }
+      }
+    }
+    
+    allPage:allPosts(where: {type: {eq : "page"}, status: {eq: "Published"}}){
+    edges {
+      node {
+        id
+        title
+      }
+    }
+  }
+    allPost:allPosts(where: {type: {eq : "post"}, status: {eq: "Published"}}){
+    edges {
+      node {
+        id
+        title
+      }
+    }
+  }
+    
+    allCategory:allCategories {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+    }
+  }  
+}
+`
+}
+
 const queries = {
   createMenu: createMenu,
   getAllMenu: getAllMenu,
@@ -159,7 +212,8 @@ const queries = {
   getAllPost: getAllPost,
   getAllCategory: getAllCategory,
   getMenuQry: getMenuQry,
-  getMainMenu: getMainMenu
+  getMainMenu: getMainMenu,
+  loadAllMenuData: loadAllMenuData
 }
 
 export default queries;

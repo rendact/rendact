@@ -351,3 +351,33 @@ export const toWidgetAreaStructure = (widgets, value) => {
 
   return _widgetAreas
 }
+
+export const validateUrl = (value) => {
+  /*
+   * console.log(validateUrl("eeehttp://google.com"))
+   * console.log(validateUrl("https://google.com"))
+   * console.log(validateUrl("https:///google.com"))
+   * console.log(validateUrl("http:/google.com"))
+   * console.log(validateUrl("http//google.com"))
+   * console.log(validateUrl("http:google.com"))
+   * console.log(validateUrl("google.com"))
+   *
+   * output:
+   * http://google.com 
+   * https://google.com 
+   * https://google.com 
+   * http://google.com 
+   * http://google.com 
+   * http://google.com 
+   * http://google.com
+   */
+  if (value.search(/https?:\/{3,}/) >= 0) {
+     return value.replace(/(https?:\/\/)\/{0,}(\w*)/, '$1$2')
+  } else if (value.search(/https?:\/{2,2}/) >= 0){
+     return value.replace(/.*(https?:\/\/)(\w*)/, '$1$2')
+  } else if (value.search(/https?:?\/{0,2}?/) >= 0){
+    return value.replace(/(https?):?\/{0,2}(\w*)/, '$1://$2')
+  } else {
+    return "http://" + value
+  }
+}

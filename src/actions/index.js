@@ -309,6 +309,11 @@ export const setPosition = (position)  => ({
   position
 })
 
+export const setmarginRight = (marginRight)  => ({
+  type: 'SET_MARGINRIGHT',
+  marginRight
+})
+
 export const toggleSelectAll = (state, listType) => ({
   type: 'TOGGLE_SELECT_ALL',
   state,
