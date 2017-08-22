@@ -382,7 +382,7 @@ let Menu = React.createClass({
     handleUrlSubmit: function(urlData, reset){
       if(urlData.title && urlData.url) {
         var _treeData = this.props.treeData;
-        var _url = [{titlePanel: urlData.title, url: urlData.url, tooltip: "", type: "url", id: uuid(), target: urlData.url}];
+        var _url = [{titlePanel: urlData.title, url: urlData.url, tooltip: "", type: "url", id: uuid(), target: urlData.url, children: []}];
         var treeData = [];
         if (_treeData===null) {
           treeData = _url;
