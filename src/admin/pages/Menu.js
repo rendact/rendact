@@ -502,7 +502,66 @@ let Menu = React.createClass({
         this.props.changeFieldValue("mainMenuPos", "");
       }
     }
+    //disini perubahan
+    riques(Query.loadAllMenuData, (error, response, body) => {
+      if(!error && response.statusCode === 200) {
+        let { mainMenu, allMenu, allPage, allPost, allCategory } = body.data.viewer;
+        // processing main menu
+        if (mainMenu.length>=1){
+          mainMenuId = _.head(mainMenu).node.id;
+          mainMenuName = _.head(mainMenu).node.name;
+          me.props.dispatch(setIdMainMenu(_.head(mainMenu).node.id))
+        } 
 
+        // processing all Menu
+          var pageList = [(<option key="0" value="">--select menu--</option>)];
+          _.forEach(allMenu.edges, function(item){
+            pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
+          })
+          me.props.dispatch(setPageListMenu(pageList)) 
+          if (mainMenuId && mainMenuName && !withoutMenuItems) {
+
+              me.props.dispatch(setMenuId(mainMenuId));
+              me.loadMenuItems(mainMenuId);
+              me.props.changeFieldValue("selectedMenuName", mainMenuName);
+              me.props.changeFieldValue("menuSelect", mainMenuId+"-"+mainMenuName);
+              me.props.dispatch(loadmenuSelect(mainMenuId+"-"+mainMenuName));
+
+          } else {
+              disableBySelector(true, me.disabledSelectors);
+          }
+
+        // processing all page
+          var allPageList = [];
+          _.forEach(allPage.edges, function(item){
+            allPageList.push(item);
+          })
+          me.props.dispatch(setAllPageList(allPageList)) 
+          disableIfNoIdMenu();
+
+        // processing all posts
+
+          var allPostList = [];
+          _.forEach(allPost.edges, function(item){
+            allPostList.push(item);
+          })
+          me.props.dispatch(setAllPostList(allPostList))
+          disableIfNoIdMenu();
+        // processing all categories
+
+              var categoryList = [];
+              _.forEach(allCategory.edges, function(item, index){
+                categoryList.push(item);
+              })
+              me.props.dispatch(setCategoryMenu(categoryList))
+              disableIfNoIdMenu();
+
+      } else {
+        console.log("ada error")
+      }
+      this.disableForm(false)
+    });
+      /*
     riques(Query.getMainMenu, 
       function(error, response, body) {
         if (!error) {
@@ -578,6 +637,7 @@ let Menu = React.createClass({
         disableIfNoIdMenu();
       }
     );
+    */
   },
 
   componentDidMount: function(){
