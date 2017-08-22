@@ -583,45 +583,55 @@ let Menu = React.createClass({
     var treeData = this.props.treeData
     var menuId = this.props.menuId;
     var qry = Query.updateMenu(menuId, name, treeData, positionValues);
+    let noticeTxt = "Menu Successfully Updated";
 
+    const callback = (error, body, response) => {
+      if (!error && !body.errors && response.statusCode === 200) {
+        me.notif.addNotification({
+          message: noticeTxt,
+          level: 'success',
+          position: 'tr',
+          autoDismiss: 2
+        });
+        me.loadMenuItems(menuId)
+
+        // also update the dropdown menu without requesting into database
+        let newMenuList = _.map(me.props.pageList, menu => {
+          if(menu.key === menuId){
+            return <option key={menu.key} value={menu.key+"-"+name}>{name}</option>
+          }
+          return <option key={menu.key} value={menu.props.value}>{menu.props.children}</option>
+        })
+        me.props.dispatch(setPageListMenu(newMenuList)) 
+        me.props.changeFieldValue("menuSelect", menuId+"-"+name);
+
+        me.notifyUnsavedData(false);
+      } else {
+        errorCallback(error, body.errors?body.errors[0].message:null);
+      }
+      me.disableForm(false);
+    }
+
+    // starting mutation
+    this.disableForm(true)
     if (positionValues==="Main Menu") {
       me.props.dispatch(setIdMainMenu(menuId))
-      riques(Query.updateMainMenu(IdMainMenu), 
+      riques(Query.updateMenuWithPos(IdMainMenu, {
+        id: menuId,
+        name: name,
+        items: treeData,
+        position: positionValues
+      }), (error, response, body) => {
+        callback(error, body, response)
+      });
+    } else {
+      riques(qry, 
         function(error, response, body) {
-        }
-      );
+          callback(error, body, response);
+      });
     }
-    
-    this.disableForm(true);
-    let noticeTxt = "Menu Successfully Updated";
-    riques(qry, 
-      function(error, response, body) { 
-        if (!error && !body.errors && response.statusCode === 200) {
-          me.notif.addNotification({
-            message: noticeTxt,
-            level: 'success',
-            position: 'tr',
-            autoDismiss: 2
-          });
-          me.loadMenuItems(menuId)
-
-          // also update the dropdown menu without requesting into database
-          let newMenuList = _.map(me.props.pageList, menu => {
-            if(menu.key === menuId){
-              return <option key={menu.key} value={menu.key+"-"+name}>{name}</option>
-            }
-            return <option key={menu.key} value={menu.props.value}>{menu.props.children}</option>
-          })
-          me.props.dispatch(setPageListMenu(newMenuList)) 
-          me.props.changeFieldValue("menuSelect", menuId+"-"+name);
-
-          me.notifyUnsavedData(false);
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-        me.disableForm(false);
-    });
   },
+
   resetFormNewMenu: function(){
     var me = this;
       riques(Query.getAllMenu, 

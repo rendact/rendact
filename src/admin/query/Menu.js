@@ -202,6 +202,34 @@ query{
 `
 }
 
+const updateMenuWithPos = (oldMainMenuId, newMenuData) => ({
+  query: `
+mutation ($updateMenuInput:UpdateMenuInput!, $positionInput:UpdateMenuInput!){
+  positionUpdate: updateMenu(input: $positionInput){
+    changedMenu {
+      id
+    }
+  }
+  
+  updateMenu: updateMenu(input: $updateMenuInput){
+    changedMenu {
+      id
+      name
+      items
+      position
+    }
+  }
+}
+`,
+  variables: {
+    positionInput: {
+      id: oldMainMenuId,
+      position: ''
+    },
+    updateMenuInput: {...newMenuData}
+  }
+})
+
 const queries = {
   createMenu: createMenu,
   getAllMenu: getAllMenu,
@@ -213,7 +241,8 @@ const queries = {
   getAllCategory: getAllCategory,
   getMenuQry: getMenuQry,
   getMainMenu: getMainMenu,
-  loadAllMenuData: loadAllMenuData
+  loadAllMenuData: loadAllMenuData,
+  updateMenuWithPos: updateMenuWithPos
 }
 
 export default queries;

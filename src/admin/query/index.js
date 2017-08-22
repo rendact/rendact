@@ -90,6 +90,7 @@ const queries = {
   getMenuQry: Menu.getMenuQry,
   getMainMenu: Menu.getMainMenu,
   loadAllMenuData: Menu.loadAllMenuData,
+  updateMenuWithPos: Menu.updateMenuWithPos,
   createWidget: Widget.createWidget,
   getAllWidgets: Widget.getAllWidgets,
   updateListOfWidget: Widget.updateListOfWidget,
