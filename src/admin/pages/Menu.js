@@ -8,7 +8,7 @@ import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
 import {toggleSelectAll, maskArea, setPosition, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId,  loadmenuSelect,
   setIdMainMenu, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
-import {swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
+import {validateUrl, swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
 import {reduxForm, Field, formValueSelector, change} from 'redux-form'
 
@@ -381,6 +381,7 @@ let Menu = React.createClass({
 
     handleUrlSubmit: function(urlData, reset){
       if(urlData.title && urlData.url) {
+        urlData.url = validateUrl(urlData.url)
         var _treeData = this.props.treeData;
         var _url = [{titlePanel: urlData.title, url: urlData.url, tooltip: "", type: "url", id: uuid(), target: urlData.url, children: []}];
         var treeData = [];
