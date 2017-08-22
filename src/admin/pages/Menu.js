@@ -37,7 +37,7 @@ let MenuContentForm = (props) => (
                     <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
                     <button id={props.type+"SelectAll"} type="submit" className="btn btn-default" style={{marginRight: 10}} onClick={props.selectAll}>Select All</button>
                     <div className="box-tools pull-right">
-                      <button id={props.type+"Submit"} className="btn  btn-default" type="submit" style={{marginRight: 10}} onClick={e => {e.currentTarget.parentElement.parentElement.checked=false;}} >Add to Menu</button>
+                      <button id={props.type+"Submit"} className="btn  btn-default" type="submit" style={{marginRight: 10}}>Add to Menu</button>
                     </div>
   </form>
                 </div>
