@@ -157,9 +157,11 @@ export class ThemeHome extends React.Component {
 		var listOfWidgets = this.state.listOfWidgets[widgetArea]?this.state.listOfWidgets[widgetArea]:[];
 		
 		_.map(listOfWidgets,function(item){
+			var widgetFn = require("./DefaultWidgets/"+item.filePath).default;
+			
 			Widgets.push(<div key={item.id} className="sidebar-box">
-					<h3><span>{item.widget}</span></h3>
-						<p>Empty</p>
+					<h3><span>{item.title}</span></h3>
+						{widgetFn()}
 				</div>);
 		});
 		
