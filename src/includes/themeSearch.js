@@ -2,7 +2,14 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {Menu} from './Menu.js';
 import { aboutUsWidget, contactUsWidget, recentPostWidget} from './widgets';
-import {getTemplateComponent, getWidgets, theExcerpt} from './theme';
+import {
+  getTemplateComponent,
+  getWidgets,
+  theExcerpt,
+  theBreadcrumb,
+  goHome,
+  theLogo
+} from './theme';
 import {riques} from '../utils';
 import Query from '../admin/query';
 import {setSearchQuery, setSearchResults, maskArea, setListOfWidgets} from '../actions';
@@ -11,33 +18,18 @@ class ThemeSearch extends React.Component {
 	constructor(props){
     super(props);
 
-    this.goHome = this.goHome.bind(this);
     this.theMenu = this.theMenu.bind(this);
-    this.theBreadcrumb = this.theBreadcrumb.bind(this);
-    this.theLogo = this.theLogo.bind(this);
     this.loadPosts = this.loadPosts.bind(this);
+    this.goHome = goHome.bind(this);
+    this.theBreadcrumb = theBreadcrumb.bind(this);
+    this.theLogo = theLogo.bind(this);
     this.getWidgets = getWidgets.bind(this);
     this.theExcerpt = theExcerpt.bind(this);
 
 	}
-	goHome(e) {
-		e.preventDefault();
-		this._reactInternalInstance._context.history.push('/')
-	}
-
 
 	theMenu(){
       return <Menu goHome={this.goHome}/>
-	}
-
-	theBreadcrumb(){
-		return <h2><a href="#" onClick={this.goHome}><h5>Home </h5></a> / PAGE</h2>
-	}
-
-	theLogo(){
-		return <div className="logo">
-							<a href="#" onClick={this.goHome}><h1>Rend<span>act</span></h1></a>
-						</div>
 	}
 
   loadPosts(query){
@@ -67,17 +59,13 @@ class ThemeSearch extends React.Component {
   }
 
   componentWillMount(){
-    //
-    let me = this;
-    riques(Query.getListOfWidget, 
-		    	function(error, response, body) { 
-		    		if (!error && !body.errors && response.statusCode === 200) {
-              me.props.dispatch(setListOfWidgets(JSON.parse(body.data.getOptions.value)));
-		    		} else {
-              console.log(error, body.errors)
-		        }
-		    	}
-    );
+    riques(Query.getListOfWidget, (error, response, body) => { 
+      if (!error && !body.errors && response.statusCode === 200) {
+        this.props.dispatch(setListOfWidgets(JSON.parse(body.data.getOptions.value)));
+      } else {
+        console.log(error, body.errors)
+      }
+    });
     this.loadPosts(this.props.query||this.props.params.search);
   }
 
@@ -106,6 +94,6 @@ export default ThemeSearch = connect(
       results: state.search.results,
       opacity: state.maskArea.opacity,
       isProcessing: state.maskArea.isProcessing,
-      listOfWidgets: state.listOfWidgets||{}
+      listOfWidgets: state.listOfWidgets
   }},
 )(ThemeSearch)
