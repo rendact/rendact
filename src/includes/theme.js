@@ -42,7 +42,7 @@ class InvalidTheme extends React.Component{
 	}
 }
 
-function getTemplateComponent(type){
+export function getTemplateComponent(type){
 	var c = window.config.theme;
 	
 	if (c.name==null || c.path==null) {
@@ -57,7 +57,9 @@ function getTemplateComponent(type){
 			Component = require('../theme/'+c.path+'/layouts/Blog.js').default;			
 		} else if (type==="single") {
 			Component = require('../theme/'+c.path+'/layouts/Single.js').default;			
-		}
+    } else if (type==="search") {
+      Component = require('../theme/'+c.path+'/layouts/Search.js').default;
+    }
 
 		return Component;
 	} catch(e) {
@@ -476,6 +478,8 @@ export class ThemeSingle extends React.Component{
 	}
 }
 
+
+
 export const getTemplates = function(){
 	var template = [{
 			id: "default",
@@ -547,3 +551,4 @@ export class CommentForm extends React.Component{
 		)
 	}
 }
+

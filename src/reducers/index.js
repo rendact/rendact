@@ -13,6 +13,7 @@ import profile from './Profile'
 import admin from './Admin'
 import menu from './Menu'
 import widgets from './Widgets';
+import search from './Search';
 import maskArea from './MaskArea';
 
 const main = (state = [], action) => {
@@ -46,7 +47,8 @@ const rendactApp = combineReducers({
   admin,
   menu,
   widgets,
-  maskArea
+  maskArea,
+  search
 })
 
 export default rendactApp
