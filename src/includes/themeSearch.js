@@ -3,6 +3,8 @@ import {connect} from 'react-redux';
 import {Menu} from './Menu.js';
 import { aboutUsWidget, contactUsWidget, recentPostWidget} from './widgets';
 import {getTemplateComponent} from './theme';
+import {riques} from '../utils';
+import Query from '../admin/query';
 
 class ThemeSearch extends React.Component {
 	constructor(props){
@@ -17,6 +19,7 @@ class ThemeSearch extends React.Component {
     this.theMenu = this.theMenu.bind(this);
     this.theBreadcrumb = this.theBreadcrumb.bind(this);
     this.theLogo = this.theLogo.bind(this);
+    this.loadPost = this.loadPost.bind(this);
 
 	}
 	goHome(e) {
@@ -38,6 +41,19 @@ class ThemeSearch extends React.Component {
 							<a href="#" onClick={this.goHome}><h1>Rend<span>act</span></h1></a>
 						</div>
 	}
+
+  loadPost(query){
+    riques(Query.searchPost(query), (error, response, body) => {
+      if(!error){
+        console.log(body.data)
+      }
+    });
+  }
+
+  componentWillMount(){
+    this.loadPost(this.props.query||this.props.params.search);
+  }
+
   render(){
     let Search = getTemplateComponent('search');
     return <Search
