@@ -4,7 +4,7 @@ import {ApolloProvider} from 'react-apollo'
 import {BrowserRouter, Match, Miss, Redirect} from 'react-router'
 import {AuthService, MatchWhenAuthorized} from './auth'
 import client from './apollo'
-import {ThemeHome, ThemeSingle, ThemeBlog} from './includes/theme'
+import {ThemeHome, ThemeSingle, ThemeBlog, ThemeSearch} from './includes/theme'
 import Admin from './admin'
 import Login from './login'
 import Register from './register'
@@ -65,6 +65,7 @@ class Main extends React.Component {
 						<Match pattern="/post/:postId?/:param1?/:param2?" component={ThemeSingle}/>
 						<Match pattern="/blog/:postId?/:param1?/:param2?" component={ThemeBlog}/>
 						<Match pattern="/category/:categoryId?/:param1?/:param2?" component={ThemeSingle}/>
+            <Match pattern="/search/:search" component={ThemeSearch}/>
 						<Match pattern="/register/:param1?" component={Register}/>
 						<Match pattern="/login/:param1?" render={props => (
 					    this.state.logged ? (
