@@ -438,17 +438,22 @@ let Menu = React.createClass({
 
   removePanel: function(e){
     var panelRemoved = e.target.id;
-    swalert("warning", "Are you sure want to delete this menu", "", () => {
-      var _treeData = this.props.treeData;
-      _treeData = _.filter(_treeData, data => {
-        if (data.children) {
-          data.children = _.filter(data.children, child => (child.id !== panelRemoved));
-        }
-        return data.id !== panelRemoved
+    const filterTree = (dataTree, toRemoveId) => {
+      let result = _.filter(dataTree, data => {
+        if (data.children) data.children = filterTree(data.children, toRemoveId);
+        return data.id !== toRemoveId
       });
-      this.props.dispatch(setTreeData(_treeData))
+
+      return result;
+    }
+
+    swalert("warning", "Are you sure want to delete this menu", "", () => {
+      var _treeData = _.cloneDeep(this.props.treeData);
+      let newData = filterTree(_treeData, panelRemoved)
+      this.props.dispatch(setTreeData(newData))
     });
   },
+
   handleNameChange: function(event){
     var selectedMenuName = this.props.selectedMenuName;
     this.props.dispatch(setSelectedMenuName(selectedMenuName))
