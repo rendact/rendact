@@ -3,6 +3,7 @@ import _ from 'lodash'
 import {reduxForm, Field} from 'redux-form'
 import {connect} from 'react-redux'
 import {setSearchQuery} from '../../actions'
+import {swalert} from '../../utils'
 
 
 class Widget extends React.Component {
@@ -13,8 +14,12 @@ class Widget extends React.Component {
   }
 
   onSearch({search}){
-    this._reactInternalInstance._context.history.push("/search/"+search)
-    this.props.dispatch(setSearchQuery(search))
+    if(search !== '""'){
+      this._reactInternalInstance._context.history.push("/search/"+search)
+      this.props.dispatch(setSearchQuery(search))
+    } else {
+      swalert("error", "", "invalid input")
+    }
     this.props.reset()
   }
 
