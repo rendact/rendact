@@ -5,6 +5,7 @@ import { aboutUsWidget, contactUsWidget, recentPostWidget} from './widgets';
 import {getTemplateComponent} from './theme';
 import {riques} from '../utils';
 import Query from '../admin/query';
+import {setSearchResults} from '../actions';
 
 class ThemeSearch extends React.Component {
 	constructor(props){
@@ -42,16 +43,17 @@ class ThemeSearch extends React.Component {
 						</div>
 	}
 
-  loadPost(query){
+  loadPosts(query){
     riques(Query.searchPost(query), (error, response, body) => {
       if(!error){
-        console.log(body.data)
+        let results = body.data.viewer.allPosts.edges.map(item => item.node)
+        this.props.dispatch(setSearchResults(results));
       }
     });
   }
 
   componentWillMount(){
-    this.loadPost(this.props.query||this.props.params.search);
+    this.loadPosts(this.props.query||this.props.params.search);
   }
 
   render(){
@@ -63,6 +65,7 @@ class ThemeSearch extends React.Component {
           theBreadcrumb={this.theBreadcrumb}
           theConfig={this.state.config}
           searchQuery={this.props.query||this.props.params.search}
+          searchResults={this.props.results}
       />
   }
 }
@@ -72,5 +75,6 @@ export default ThemeSearch = connect(
   state => {
     return {
     query: state.search.search,
+    results: state.search.results
   }},
 )(ThemeSearch)
