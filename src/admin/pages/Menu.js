@@ -817,6 +817,7 @@ let Menu = React.createClass({
                               renderItem={this.renderItem}
                               onUpdate={(newItems) => (me.props.dispatch(setTreeData(newItems)))}
                               childrenStyle={{marginLeft: '2rem'}}
+                              childrenClassName='childrenClassName'
                               treeshold={40}
                               useDragHandle
                               maxDepth={3}

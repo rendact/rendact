@@ -32,13 +32,13 @@ div.box.box-default.box-solid.collapsed-box > div.box-header.with-border {
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
-.wide {
-  margin-right: -2em;
+.childrenClassName {
+  margin-right: -2rem;
 }
 
 @media (max-width: 600px) {
-  .wide {
-    margin-right: 0em;
+  .childrenClassName {
+    margin-right: 0rem;
   }
 }
 
