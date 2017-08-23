@@ -15,6 +15,7 @@ import menu from './Menu'
 import widgets from './Widgets';
 import search from './Search';
 import maskArea from './MaskArea';
+import listOfWidgets from './ListOfWidgets';
 
 const main = (state = [], action) => {
   switch (action.type) {
@@ -48,7 +49,8 @@ const rendactApp = combineReducers({
   menu,
   widgets,
   maskArea,
-  search
+  search,
+  listOfWidgets
 })
 
 export default rendactApp

@@ -362,6 +362,11 @@ export const createActiveWidgetsInitialValues = (activeWidgets) => ({
   activeWidgets
 })
 
+export const setListOfWidgets = (listOfWidgets) => ({
+  type: 'SET_LIST_OF_WIDGETS',
+  listOfWidgets
+});
+
 /* 
  * SEARCH ACTIONS
  */

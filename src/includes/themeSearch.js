@@ -5,14 +5,11 @@ import { aboutUsWidget, contactUsWidget, recentPostWidget} from './widgets';
 import {getTemplateComponent, getWidgets, theExcerpt} from './theme';
 import {riques} from '../utils';
 import Query from '../admin/query';
-import {setSearchQuery, setSearchResults, maskArea} from '../actions';
+import {setSearchQuery, setSearchResults, maskArea, setListOfWidgets} from '../actions';
 
 class ThemeSearch extends React.Component {
 	constructor(props){
     super(props);
-    this.state = {
-      listOfWidgets: []
-    }
 
     this.goHome = this.goHome.bind(this);
     this.theMenu = this.theMenu.bind(this);
@@ -75,7 +72,7 @@ class ThemeSearch extends React.Component {
     riques(Query.getListOfWidget, 
 		    	function(error, response, body) { 
 		    		if (!error && !body.errors && response.statusCode === 200) {
-		    			me.setState({listOfWidgets: JSON.parse(body.data.getOptions.value)})
+              me.props.dispatch(setListOfWidgets(JSON.parse(body.data.getOptions.value)));
 		    		} else {
               console.log(error, body.errors)
 		        }
@@ -108,6 +105,7 @@ export default ThemeSearch = connect(
       query: state.search.search,
       results: state.search.results,
       opacity: state.maskArea.opacity,
-      isProcessing: state.maskArea.isProcessing
+      isProcessing: state.maskArea.isProcessing,
+      listOfWidgets: state.listOfWidgets||{}
   }},
 )(ThemeSearch)
