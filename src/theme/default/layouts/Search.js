@@ -2,6 +2,8 @@ import React from 'react'
 import Header from '../includes/Header'
 import Footer from '../includes/Footer'
 import Sidebar from '../includes/Sidebar';
+import moment from 'moment';
+import {Link} from 'react-router';
 
 class Search extends React.Component {
   render(){
@@ -9,15 +11,24 @@ class Search extends React.Component {
       <div className="application">
         <Header {...this.props}/>
         <div className="container">
-          <div className="col-md-8 new-section">
-            <h1>Hello, this will be a search page soon</h1>
-            <p>Please wait.....</p>
-            <p>Your search query is: <b>{this.props.searchQuery}</b></p>
+          <div className="col-md-8 new-section" style={{opacity: this.props.opacity}}>
             <h3>Result of <b>{this.props.searchQuery}</b></h3>
             {
+              this.props.searchResults.length ?
               this.props.searchResults.map((post, index) => (
-                <p key={index}>{post.title}</p>
+                <div key={post.id} className="new">
+                  <div style={{width: '100%'}} className="col-md-12 new-text wow fadeIn animated">
+                    <h4><Link to={'/post/'+post.id}>{post.title}</Link></h4>
+                    <small>{moment(post.createdAt).format("MMM Do YY, h:mm:ss a")}</small>
+                    <section className="content-body" >
+                      {this.props.theExcerpt(post.content)}
+                    </section>
+                  </div>
+                  <div className="clearfix"></div>
+                </div>
               ))
+                :
+                <p style={{color:'red'}}>No Result Found</p>
             }
           </div>
           <Sidebar {...this.props}/>

@@ -2,10 +2,10 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {Menu} from './Menu.js';
 import { aboutUsWidget, contactUsWidget, recentPostWidget} from './widgets';
-import {getTemplateComponent, getWidgets} from './theme';
+import {getTemplateComponent, getWidgets, theExcerpt} from './theme';
 import {riques} from '../utils';
 import Query from '../admin/query';
-import {setSearchResults} from '../actions';
+import {setSearchQuery, setSearchResults, maskArea} from '../actions';
 
 class ThemeSearch extends React.Component {
 	constructor(props){
@@ -20,6 +20,7 @@ class ThemeSearch extends React.Component {
     this.theLogo = this.theLogo.bind(this);
     this.loadPosts = this.loadPosts.bind(this);
     this.getWidgets = getWidgets.bind(this);
+    this.theExcerpt = theExcerpt.bind(this);
 
 	}
 	goHome(e) {
@@ -43,17 +44,19 @@ class ThemeSearch extends React.Component {
 	}
 
   loadPosts(query){
+    this.props.dispatch(maskArea(true))
     riques(Query.searchPost(query), (error, response, body) => {
       if(!error){
         let results = body.data.viewer.allPosts.edges.map(item => item.node)
         this.props.dispatch(setSearchResults(results));
+        this.props.dispatch(maskArea(false))
       }
     });
   }
 
   componentWillReceiveProps(props){
     if(props.params.search !== this.props.query){
-      this.loadPosts(props.params.search)
+      this.props.dispatch(setSearchQuery(props.params.search))
     }
   }
 
@@ -88,6 +91,9 @@ class ThemeSearch extends React.Component {
           searchQuery={this.props.query||this.props.params.search}
           searchResults={this.props.results}
           getWidgets={this.getWidgets}
+          theExcerpt={this.theExcerpt}
+          opacity={this.props.opacity}
+          isProcessing={this.props.isProcessing}
       />
   }
 }
@@ -96,7 +102,9 @@ class ThemeSearch extends React.Component {
 export default ThemeSearch = connect(
   state => {
     return {
-    query: state.search.search,
-    results: state.search.results
+      query: state.search.search,
+      results: state.search.results,
+      opacity: state.maskArea.opacity,
+      isProcessing: state.maskArea.isProcessing
   }},
 )(ThemeSearch)
