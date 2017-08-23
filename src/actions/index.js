@@ -362,3 +362,16 @@ export const createActiveWidgetsInitialValues = (activeWidgets) => ({
   activeWidgets
 })
 
+/* 
+ * SEARCH ACTIONS
+ */
+
+export const setSearchQuery = (search) => ({
+  type: 'SET_SEARCH_QUERY',
+  search
+})
+
+export const setSearchResults = (results) => ({
+  type: 'SET_SEARCH_RESULTS',
+  results
+})
