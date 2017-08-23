@@ -55,8 +55,10 @@ class ThemeSearch extends React.Component {
   }
 
   componentWillReceiveProps(props){
-    if(props.params.search !== this.props.query){
+    if(!this.props.query){
       this.props.dispatch(setSearchQuery(props.params.search))
+    } else if(this.props.query !== props.params.search) {
+      this.loadPosts(props.params.search)
     }
   }
 
@@ -68,6 +70,7 @@ class ThemeSearch extends React.Component {
   }
 
   componentWillMount(){
+    //
     let me = this;
     riques(Query.getListOfWidget, 
 		    	function(error, response, body) { 
