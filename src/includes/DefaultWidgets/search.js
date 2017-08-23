@@ -14,7 +14,7 @@ class Widget extends React.Component {
   }
 
   onSearch({search}){
-    if(search !== '""'){
+    if(search !== '""' &&  search ){
       this._reactInternalInstance._context.history.push("/search/"+search)
       this.props.dispatch(setSearchQuery(search))
     } else {
