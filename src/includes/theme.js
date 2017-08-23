@@ -138,7 +138,14 @@ function loadMainMenu(){
 
 export function getWidgets(widgetArea){
 	let Widgets = [];
-	var listOfWidgets = this.state.listOfWidgets[widgetArea]?this.state.listOfWidgets[widgetArea]:[];
+
+  // add checking if the component has implemented with redux or not
+  let listOfWidgets;
+  if (_.has(this.state, 'listOfWidgets')){
+    listOfWidgets = this.state.listOfWidgets[widgetArea]?this.state.listOfWidgets[widgetArea]:[];
+  } else {
+    listOfWidgets = this.props.listOfWidgets[widgetArea]?this.props.listOfWidgets[widgetArea]:[];
+  }
 	
 	_.map(listOfWidgets,function(item){
 		var widgetFn = require("./DefaultWidgets/"+item.filePath).default;
