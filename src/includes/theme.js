@@ -136,7 +136,7 @@ function loadMainMenu(){
     })
 }
 
-function getWidgets(widgetArea){
+export function getWidgets(widgetArea){
 	let Widgets = [];
 	var listOfWidgets = this.state.listOfWidgets[widgetArea]?this.state.listOfWidgets[widgetArea]:[];
 	
