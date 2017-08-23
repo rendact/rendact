@@ -40,7 +40,7 @@ class InvalidTheme extends React.Component{
 	}
 }
 
-function getTemplateComponent(type){
+export function getTemplateComponent(type){
 	var c = window.config.theme;
 	
 	if (c.name==null || c.path==null) {
@@ -506,51 +506,6 @@ export class ThemeSingle extends React.Component{
 	}
 }
 
-export class ThemeSearch extends React.Component {
-	constructor(props){
-    super(props);
-		this.state =  {
-			loadDone: false,
-			postData: false,
-			config: null,
-		}
-
-    this.goHome = this.goHome.bind(this);
-    this.theMenu = this.theMenu.bind(this);
-    this.theBreadcrumb = this.theBreadcrumb.bind(this);
-    this.theLogo = this.theLogo.bind(this);
-
-	}
-	goHome(e) {
-		e.preventDefault();
-		this._reactInternalInstance._context.history.push('/')
-	}
-
-
-	theMenu(){
-      return <Menu goHome={this.goHome}/>
-	}
-
-	theBreadcrumb(){
-		return <h2><a href="#" onClick={this.goHome}><h5>Home </h5></a> / PAGE</h2>
-	}
-
-	theLogo(){
-		return <div className="logo">
-							<a href="#" onClick={this.goHome}><h1>Rend<span>act</span></h1></a>
-						</div>
-	}
-  render(){
-    let Search = getTemplateComponent('search');
-    return <Search
-          footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
-          theMenu={this.theMenu}
-          theLogo={this.theLogo}
-          theBreadcrumb={this.theBreadcrumb}
-          theConfig={this.state.config}
-      />
-  }
-}
 
 
 export const getTemplates = function(){
@@ -624,3 +579,4 @@ export class CommentForm extends React.Component{
 		)
 	}
 }
+

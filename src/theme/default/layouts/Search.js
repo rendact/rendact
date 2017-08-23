@@ -10,7 +10,8 @@ class Search extends React.Component {
         <div className="container">
           <div className="col-md-12 new-section">
             <h1>Hello, this will be a search page soon</h1>
-            <p>Please wait...........</p>
+            <p>Please wait.....</p>
+            <p>Your search query is: <b>{this.props.searchQuery}</b></p>
           </div>
           <div className="clearfix"></div>
         </div>

@@ -2,6 +2,7 @@ import React from 'react'
 import _ from 'lodash'
 import {reduxForm, Field} from 'redux-form'
 import {connect} from 'react-redux'
+import {setSearchQuery} from '../../actions'
 
 
 class Widget extends React.Component {
@@ -11,8 +12,9 @@ class Widget extends React.Component {
     this.onSearch = this.onSearch.bind(this)
   }
 
-  onSearch(value){
-    this._reactInternalInstance._context.history.push("/search/"+value.search)
+  onSearch({search}){
+    this._reactInternalInstance._context.history.push("/search/"+search)
+    this.props.dispatch(setSearchQuery(search))
   }
 
   render(){
@@ -26,6 +28,7 @@ class Widget extends React.Component {
 
 Widget = _.flow([
   reduxForm({form: 'searchForm'}),
+  connect(),
 ])(Widget)
 
 const WidgetFn = (widgetData) => {
