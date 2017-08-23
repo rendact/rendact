@@ -535,6 +535,7 @@ let NewContentType = React.createClass({
                 {item.node.title}</option>));
             })
             me.props.dispatch(setPageList(pageList));
+        me.disableForm(false);
           }
       });
     }
