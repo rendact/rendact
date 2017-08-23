@@ -12,6 +12,12 @@ class Search extends React.Component {
             <h1>Hello, this will be a search page soon</h1>
             <p>Please wait.....</p>
             <p>Your search query is: <b>{this.props.searchQuery}</b></p>
+            <h3>Result of <b>{this.props.searchQuery}</b></h3>
+            {
+              this.props.searchResults.map((post, index) => (
+                <p key={index}>{post.title}</p>
+              ))
+            }
           </div>
           <div className="clearfix"></div>
         </div>

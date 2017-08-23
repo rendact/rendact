@@ -10,17 +10,12 @@ import {setSearchResults} from '../actions';
 class ThemeSearch extends React.Component {
 	constructor(props){
     super(props);
-		this.state =  {
-			loadDone: false,
-			postData: false,
-			config: null,
-		}
 
     this.goHome = this.goHome.bind(this);
     this.theMenu = this.theMenu.bind(this);
     this.theBreadcrumb = this.theBreadcrumb.bind(this);
     this.theLogo = this.theLogo.bind(this);
-    this.loadPost = this.loadPost.bind(this);
+    this.loadPosts = this.loadPosts.bind(this);
 
 	}
 	goHome(e) {
@@ -63,7 +58,6 @@ class ThemeSearch extends React.Component {
           theMenu={this.theMenu}
           theLogo={this.theLogo}
           theBreadcrumb={this.theBreadcrumb}
-          theConfig={this.state.config}
           searchQuery={this.props.query||this.props.params.search}
           searchResults={this.props.results}
       />
