@@ -75,7 +75,7 @@ function theTitle(id, title){
 	return <a href={"/post/"+id} onClick={this.handlePostClick} id={id}><h4>{title}</h4></a>
 }
 
-function theExcerpt(content){
+export function theExcerpt(content){
 	return <div dangerouslySetInnerHTML={{__html: _.truncate(content,{"length": 100})}} />
 }
 

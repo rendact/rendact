@@ -15,6 +15,7 @@ class Widget extends React.Component {
   onSearch({search}){
     this._reactInternalInstance._context.history.push("/search/"+search)
     this.props.dispatch(setSearchQuery(search))
+    this.props.reset()
   }
 
   render(){
