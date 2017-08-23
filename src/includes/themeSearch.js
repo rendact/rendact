@@ -47,6 +47,13 @@ class ThemeSearch extends React.Component {
     });
   }
 
+  componentDidMount(){
+		var c = window.config.theme;
+		require ('bootstrap/dist/css/bootstrap.css');
+		require('../theme/'+c.path+'/css/style.css');
+		require('../theme/'+c.path+'/functions.js');
+  }
+
   componentWillMount(){
     this.loadPosts(this.props.query||this.props.params.search);
   }
