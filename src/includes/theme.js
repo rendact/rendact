@@ -13,6 +13,8 @@ import {searchWidget, topPostWidget, categoriesWidget, archiveWidget, aboutUsWid
 import Notification from 'react-notification-system';
 window.config = AdminConfig;
 
+/* Theme functions */
+
 class InvalidTheme extends React.Component{
 	componentDidMount(){
 		require ('../../public/css/AdminLTE.css');
@@ -65,6 +67,93 @@ export function getTemplateComponent(type){
 	}
 }
 
+function theContent(content){
+	return <div dangerouslySetInnerHTML={{__html: content}} />
+}
+
+function theTitle(id, title){
+	return <a href={"/post/"+id} onClick={this.handlePostClick} id={id}><h4>{title}</h4></a>
+}
+
+function theExcerpt(content){
+	return <div dangerouslySetInnerHTML={{__html: _.truncate(content,{"length": 100})}} />
+}
+
+function theMenu(){
+  let items = this.state.mainMenu;
+  return <Menu menuItems={items&&items.items?items.items:[]} goHome={this.goHome}/>
+}
+
+function theLogo(){
+	return <div className="logo">
+		<a href="#" onClick={this.goHome}><h1>Rend<span>act</span></h1></a>
+	</div>
+}
+
+function theImage(image){
+	var fImage="";
+	if(image!=null){
+ 			fImage=image;
+ 		}
+ 		else{
+ 			fImage=require('../theme/default/images/logo.png');
+ 		}
+	return <a href="article" className="mask"><img src={fImage} alt="" className="img-responsive img-thumbnail" /></a>
+}
+
+function thePagination(){
+	let pages = [<li key="998" ><a href="#" onClick={this.handlePageClick}>«</a></li>];
+	for(var i=0;i<this.state.pageCount;i++){
+		if (this.state.activePage===i+1)
+			pages.push(<li key={i}><a href="#" onClick={this.handlePageClick} disabled="true">{i+1}</a></li>)
+		else 
+			pages.push(<li key={i}><a href="#" onClick={this.handlePageClick}>{i+1}</a></li>)
+	}
+	pages.push(<li key="999"><a href="#" onClick={this.handlePageClick}>»</a></li>);
+	return <div className="box-tools">
+          <ul className="pagination pagination-sm no-margin">
+          {pages}  
+          </ul>
+        </div>
+}
+
+function theBreadcrumb(){
+	return <h2><a href="#" onClick={this.goHome}><h5>Home </h5></a> / PAGE</h2>
+}
+
+function goHome(e){
+	e.preventDefault();
+	this._reactInternalInstance._context.history.push('/')
+}
+
+function loadMainMenu(){
+  riques(Query.getMainMenu, 
+    (error, response, body) => {
+      if (!error && !body.errors && response.statusCode === 200){
+        let allMenus = body.data.viewer.allMenus.edges[0];
+        this.setState({mainMenu: allMenus ? allMenus.node : []})
+      }
+    })
+}
+
+function getWidgets(widgetArea){
+	let Widgets = [];
+	var listOfWidgets = this.state.listOfWidgets[widgetArea]?this.state.listOfWidgets[widgetArea]:[];
+	
+	_.map(listOfWidgets,function(item){
+		var widgetFn = require("./DefaultWidgets/"+item.filePath).default;
+		
+		Widgets.push(<div key={item.id} className="sidebar-box">
+				<h3><span>{item.title}</span></h3>
+					{widgetFn()}
+			</div>);
+	});
+	
+	return <div className="widgets">{Widgets}</div>;
+}
+
+/* Theme Components */
+
 export class ThemeHome extends React.Component {
 	constructor(props){
     super(props);
@@ -82,92 +171,16 @@ export class ThemeHome extends React.Component {
       listOfWidgets: []
 		};
     this.handlePostClick = this.handlePostClick.bind(this);
-    this.theMenu = this.theMenu.bind(this);
-    this.thePagination = this.thePagination.bind(this);
-    this.loadMainMenu = this.loadMainMenu.bind(this);
-    this.getWidgets = this.getWidgets.bind(this);
+    this.theMenu = theMenu.bind(this);
+    this.thePagination = thePagination.bind(this);
+    this.loadMainMenu = loadMainMenu.bind(this);
+    this.getWidgets = getWidgets.bind(this);
 	}
-
-  loadMainMenu(){
-    riques(Query.getMainMenu, 
-      (error, response, body) => {
-        if (!error && !body.errors && response.statusCode === 200){
-          let allMenus = body.data.viewer.allMenus.edges[0];
-          this.setState({mainMenu: allMenus ? allMenus.node : []})
-        }
-      })
-  }
 
 	handlePostClick(e){
 		e.preventDefault();
 		var id = e.currentTarget.id;
 		this._reactInternalInstance._context.history.push('/post/'+id)
-	}
-
-	theTitle(id, title){
-		return <a href={"/post/"+id} onClick={this.handlePostClick} id={id}><h4>{title}</h4></a>
-	}
-
-	theContent(content){
-		return <div dangerouslySetInnerHTML={{__html: content}} />
-	}
-
-	theExcerpt(content){
-		return <div dangerouslySetInnerHTML={{__html: _.truncate(content,{"length": 100})}} />
-	}
-
-	theMenu(){
-    let items = this.state.mainMenu
-    return <Menu menuItems={items.items?items.items:[]}/>
-	}
-
-	theLogo(){
-		return <div className="logo">
-							<a href="#" onClick={this.goHome}><h1>Rend<span>act</span></h1></a>
-						</div>
-	}
-
-	theImage(image){
-		var fImage="";
-		if(image!=null){
-   			fImage=image;
-   		}
-   		else{
-   			fImage=require('../theme/default/images/logo.png');
-   		}
-		return <a href="article" className="mask"><img src={fImage} alt="" className="img-responsive img-thumbnail" /></a>
-	}
-
-	thePagination(){
-		let pages = [<li key="998" ><a href="#" onClick={this.handlePageClick}>«</a></li>];
-		for(var i=0;i<this.state.pageCount;i++){
-			if (this.state.activePage===i+1)
-  			pages.push(<li key={i}><a href="#" onClick={this.handlePageClick} disabled="true">{i+1}</a></li>)
-  		else 
-  			pages.push(<li key={i}><a href="#" onClick={this.handlePageClick}>{i+1}</a></li>)
-  	}
-  	pages.push(<li key="999"><a href="#" onClick={this.handlePageClick}>»</a></li>);
-		return <div className="box-tools">
-                <ul className="pagination pagination-sm no-margin">
-                {pages}  
-                </ul>
-              </div>
-	}
-
-	getWidgets(widgetArea){
-		let Widgets = [];
-		var listOfWidgets = this.state.listOfWidgets[widgetArea]?this.state.listOfWidgets[widgetArea]:[];
-		
-		_.map(listOfWidgets,function(item){
-			var widgetFn = require("./DefaultWidgets/"+item.filePath).default;
-			
-			Widgets.push(<div key={item.id} className="sidebar-box">
-					<h3><span>{item.title}</span></h3>
-						{widgetFn()}
-				</div>);
-		});
-		
-		return <div className="widgets">{Widgets}</div>;
 	}
 
 	handlePageClick(e){
@@ -256,12 +269,12 @@ export class ThemeHome extends React.Component {
 				let Home = getTemplateComponent('home');
 				return <Home 
 								latestPosts={this.state.latestPosts}
-								theTitle={this.theTitle}
-								theContent={this.theContent}
-								theExcerpt={this.theExcerpt}
+								theTitle={theTitle}
+								theContent={theContent}
+								theExcerpt={theExcerpt}
 								theMenu={this.theMenu}
-								theLogo={this.theLogo}
-								theImage={this.theImage}
+								theLogo={theLogo}
+								theImage={theImage}
 								theConfig={this.state.config}
 								thePagination={this.thePagination}
 								getWidgets={this.getWidgets}
@@ -276,46 +289,31 @@ export class ThemeHome extends React.Component {
 
 export class ThemeBlog extends React.Component{
 	constructor(props){
-        super(props);
+    super(props);
 		this.state = {
 			loadDone: false,
 			isSlugExist: false,
 			slug: this.props.location.pathname.replace("/",""),
 			latestPosts: [],
+			listOfWidgets: [],
+			mainMenu: null
 		};
-        this.handlePostClick = this.handlePostClick.bind(this);
-        this.goHome = this.goHome.bind(this);
+    this.handlePostClick = this.handlePostClick.bind(this);
+    this.goHome = goHome.bind(this);
+    this.theMenu = theMenu.bind(this);
+    this.getWidgets = getWidgets.bind(this);
+    this.loadMainMenu = loadMainMenu.bind(this);
 	}
     
-	goHome(e){
-		e.preventDefault();
-		this._reactInternalInstance._context.history.push('/')
-	}
-
 	handlePostClick(e){
 		e.preventDefault();
 		var id = e.currentTarget.id;
 		this._reactInternalInstance._context.history.push('/post/'+id)
 	}
 
-	theTitle(id, title){
-		return <a href={"/post/"+id} onClick={this.handlePostClick} id={id}><h4>{title}</h4></a>
-	}
-
-	theContent(content){
-		return <div dangerouslySetInnerHTML={{__html: content}} />
-	}
-
-	theExcerpt(content){
-		return <div dangerouslySetInnerHTML={{__html: _.truncate(content,{"length": 100})}} />
-	}
-
-	theMenu(){
-        return <Menu goHome={this.goHome}/>
-	}
-
 	componentWillMount(){
 		var me = this;
+		this.loadMainMenu();
 
 		riques(Query.checkSlugQry(this.state.slug), 
 			(error, response, body) => {
@@ -360,9 +358,10 @@ export class ThemeBlog extends React.Component{
 			let Blog = getTemplateComponent('blog');
 			return <Blog 
 							latestPosts={this.state.latestPosts}
-							theTitle={this.theTitle}
-							theContent={this.theContent}
-							theExcerpt={this.theExcerpt}
+							theTitle={theTitle}
+							theContent={theContent}
+							theExcerpt={theExcerpt}
+							getWidgets={this.getWidgets}
 							theMenu={this.theMenu}
 							widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 							footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
@@ -373,96 +372,77 @@ export class ThemeBlog extends React.Component{
 
 export class ThemeSingle extends React.Component{
 	constructor(props){
-        super(props);
+    super(props);
 		this.state =  {
 			loadDone: false,
 			postData: false,
 			config: null,
+			listOfWidgets: [],
+			mainMenu: null
 		}
 
-        this.goHome = this.goHome.bind(this);
-        this.handleSingleRequest = this.handleSingleRequest.bind(this);
-        this.theMenu = this.theMenu.bind(this);
-        this.theBreadcrumb = this.theBreadcrumb.bind(this);
-        this.theLogo = this.theLogo.bind(this);
-
+    this.goHome = goHome.bind(this);
+    this.handleSingleRequest = this.handleSingleRequest.bind(this);
+    this.theMenu = theMenu.bind(this);
+    this.theBreadcrumb = theBreadcrumb.bind(this);
+    this.theLogo = theLogo.bind(this);
+    this.getWidgets = getWidgets.bind(this);
+    this.loadMainMenu = loadMainMenu.bind(this);
 	}
 
-	goHome(e) {
-		e.preventDefault();
-		this._reactInternalInstance._context.history.push('/')
-	}
-
-
-	theMenu(){
-        return <Menu goHome={this.goHome}/>
-	}
-
-	theBreadcrumb(){
-		return <h2><a href="#" onClick={this.goHome}><h5>Home </h5></a> / PAGE</h2>
-	}
-
-	theLogo(){
-		return <div className="logo">
-							<a href="#" onClick={this.goHome}><h1>Rend<span>act</span></h1></a>
-						</div>
-	}
-
-
-    handleSingleRequest(type, id){
-        var map = {
-            post: 'getPostQry',
-            page: 'getPageQry',
-            category: 'getCategoryQry'
-        }
-        var me = this
-
-        riques(Query[map[type]](id),
-            (error, response, body) => {
-                if (!error && !body.errors && response.statusCode === 200){
-                    var data = body.data.getPost;
-                    me.setState({postData: data});
-                } else {
-                    errorCallback(error, body.errors?body.errors[0].message:null)
-                }
-                me.setState({loadDone: true});
-            }
-        );
+	handleSingleRequest(type, id){
+    var map = {
+      post: 'getPostQry',
+      page: 'getPageQry',
+      category: 'getCategoryQry'
     }
+    var me = this
 
-
-    componentWillReceiveProps(newProps){
-        var me = this;
-        me.setState({loadDone: false})
-
-        if (newProps.params.postId) {
-            me.handleSingleRequest('post', newProps.params.postId);
-        } else if (newProps.params.pageId) {
-            me.handleSingleRequest('page', newProps.params.pageId);
-        } else if (newProps.params.categoryId){
-            alert("Category page not implemented");
-            me.setState({loadDone: true});
+    riques(Query[map[type]](id),
+      (error, response, body) => {
+        if (!error && !body.errors && response.statusCode === 200){
+          var data = body.data.getPost;
+          me.setState({postData: data});
+        } else {
+          errorCallback(error, body.errors?body.errors[0].message:null)
         }
-    }
+        me.setState({loadDone: true});
+      }
+    );
+  }
 
+  componentWillReceiveProps(newProps){
+    var me = this;
+    me.setState({loadDone: false})
+
+    if (newProps.params.postId) {
+      me.handleSingleRequest('post', newProps.params.postId);
+    } else if (newProps.params.pageId) {
+      me.handleSingleRequest('page', newProps.params.pageId);
+    } else if (newProps.params.categoryId){
+      alert("Category page not implemented");
+      me.setState({loadDone: true});
+    }
+  }
 
 	componentWillMount() {
 		var me = this;
+		this.loadMainMenu();
+		
 		loadConfig(function(){
 			var config = JSON.parse(localStorage.getItem('config'));
 			me.setState({config: config});
 		});
 
-        if(this.props.params.postId){
-            me.handleSingleRequest('post', this.props.params.postId);
-      } else if (this.props.params.pageId){
-          me.handleSingleRequest('page', this.props.params.pageId);
-      } else if(this.props.params.categoryId){
-          alert("Category not implemented error");
-          me.setState({loadDone: true});
-      }
+    if(this.props.params.postId){
+      me.handleSingleRequest('post', this.props.params.postId);
+    } else if (this.props.params.pageId){
+      me.handleSingleRequest('page', this.props.params.pageId);
+    } else if(this.props.params.categoryId){
+      alert("Category not implemented error");
+      me.setState({loadDone: true});
+    }
 	}
-
 
 	componentDidMount(){
 		var c = window.config.theme;
@@ -472,33 +452,25 @@ export class ThemeSingle extends React.Component{
 	}
 
 	render() {
+		let Single = getTemplateComponent('single');
+		let SinglePost = <Single 
+											postId={this.props.params.postId} 
+											postData={this.state.postData}
+											widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
+											footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
+											theMenu={this.theMenu}
+											theLogo={this.theLogo}
+											theBreadcrumb={this.theBreadcrumb}
+											theConfig={this.state.config}
+											getWidgets={this.getWidgets}
+										/>;
 		if (!this.state.loadDone) {
 			return <Loading/>
 		} else {
 			if (this.props.params.postId){
-				let Single = getTemplateComponent('single');
-				return <Single 
-									postId={this.props.params.postId} 
-									postData={this.state.postData}
-									widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
-									footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
-									theMenu={this.theMenu}
-									theLogo={this.theLogo}
-									theBreadcrumb={this.theBreadcrumb}
-									theConfig={this.state.config}
-								/>;
+				return SinglePost;
 			} else if (this.props.params.pageId){
-				let Single = getTemplateComponent('single');
-				return <Single 
-									postId={this.props.params.postId} 
-									postData={this.state.postData}
-									widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
-									footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
-									theMenu={this.theMenu}
-									theLogo={this.theLogo}
-									theBreadcrumb={this.theBreadcrumb}
-									theConfig={this.state.config}
-								/>;
+				return <SinglePost postId={this.props.params.pageId} />
 			} else {
 				return <NotFound/>
 			}
