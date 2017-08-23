@@ -20,6 +20,7 @@ class Search extends React.Component {
               ))
             }
           </div>
+          <Sidebar {...this.props}/>
           <div className="clearfix"></div>
         </div>
         <Footer {...this.props}/>

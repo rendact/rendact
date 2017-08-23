@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {Menu} from './Menu.js';
 import { aboutUsWidget, contactUsWidget, recentPostWidget} from './widgets';
-import {getTemplateComponent} from './theme';
+import {getTemplateComponent, getWidgets} from './theme';
 import {riques} from '../utils';
 import Query from '../admin/query';
 import {setSearchResults} from '../actions';
@@ -10,12 +10,16 @@ import {setSearchResults} from '../actions';
 class ThemeSearch extends React.Component {
 	constructor(props){
     super(props);
+    this.state = {
+      listOfWidgets: []
+    }
 
     this.goHome = this.goHome.bind(this);
     this.theMenu = this.theMenu.bind(this);
     this.theBreadcrumb = this.theBreadcrumb.bind(this);
     this.theLogo = this.theLogo.bind(this);
     this.loadPosts = this.loadPosts.bind(this);
+    this.getWidgets = getWidgets.bind(this);
 
 	}
 	goHome(e) {
@@ -47,6 +51,12 @@ class ThemeSearch extends React.Component {
     });
   }
 
+  componentWillReceiveProps(props){
+    if(props.params.search !== this.props.query){
+      this.loadPosts(props.params.search)
+    }
+  }
+
   componentDidMount(){
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
@@ -55,6 +65,16 @@ class ThemeSearch extends React.Component {
   }
 
   componentWillMount(){
+    let me = this;
+    riques(Query.getListOfWidget, 
+		    	function(error, response, body) { 
+		    		if (!error && !body.errors && response.statusCode === 200) {
+		    			me.setState({listOfWidgets: JSON.parse(body.data.getOptions.value)})
+		    		} else {
+              console.log(error, body.errors)
+		        }
+		    	}
+    );
     this.loadPosts(this.props.query||this.props.params.search);
   }
 
@@ -67,6 +87,7 @@ class ThemeSearch extends React.Component {
           theBreadcrumb={this.theBreadcrumb}
           searchQuery={this.props.query||this.props.params.search}
           searchResults={this.props.results}
+          getWidgets={this.getWidgets}
       />
   }
 }
