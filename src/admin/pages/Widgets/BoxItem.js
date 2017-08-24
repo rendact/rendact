@@ -65,51 +65,57 @@ class BoxItem extends React.Component {
     );
   }
 
-   render() {
-     let widget = this.props.widget;
-     let widgetValue = JSON.parse(widget.value);
-     let isDragging = this.props.isDragging
-     let backgroundColor = isDragging && 'white'
-     let border = isDragging && '1px dashed gray'
-     let color = isDragging && 'white'
-     let isDraggingStyle = {backgroundColor, border, color}
+  render() {
+    let widget = this.props.widget;
+    let widgetValue = JSON.parse(widget.value);
+    let isDragging = this.props.isDragging
+    let backgroundColor = isDragging && 'white'
+    let border = isDragging && '1px dashed gray'
+    let color = isDragging && 'white'
+    let isDraggingStyle = {backgroundColor, border, color}
+    let box;
 
-     let box;
+    let widgetForm = null;
 
+    if (widgetValue.filePath) {
+      var widgetClass = require("../../../includes/DefaultWidgets/"+widgetValue.filePath);
+      if (widgetClass.widgetForm) {
+        widgetForm = widgetClass.widgetForm()
+      }
+    }
      if (isDragging) {
        box = <div className="box box-default" style={{borderRadius: 0, ...isDraggingStyle}}>
          <div className="box-header with-border">&nbsp;</div>
        </div>
      } else {
 
-      box =  (<div className="box box-default collapsed-box box-solid" style={{borderRadius: 0}}>
-        {this.props.connectDragSource(<div className="box-header with-border" style={{cursor: 'move'}}>
-    <h3 className="box-title">{widgetValue.title}</h3>
-    <div className="box-tools pull-right">
-        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Expand to setting widget">
-            <i className="fa fa-plus"></i>
-        </button>
-        {/*<button type="button" className="btn btn-box-tool btn-danger"  onClick={(e) => (this.props.removeWidget())} >
-            <i className="fa fa-times"></i>
-        </button>*/}
-    </div>
-</div>)}
-<div className="box-body" style={{display: "none"}}>
-  <form onSubmit={this.props.handleSubmit(this.onSubmit)}>
-    <div className="form-group">
-        <label htmlFor="title">Title</label>
-        <Field name={this.props.uuid+'.title'} className="form-control" component="input" type="text"/>
-    </div>
-    <div className="form-group">
-        <label htmlFor="description">Text</label>
-        <Field name={this.props.uuid+".description"} className="form-control" component='textarea'/>
-    </div>
-    
-    <button onClick={(e) => {e.preventDefault();this.props.removeWidget()}} className="btn btn-danger btn-xs">Remove</button>
-    <button className="btn btn-primary btn-xs pull-right" type="submit">Save</button>
-  </form>
-</div>
-</div>
+      box =  (
+      <div className="box box-default collapsed-box box-solid" style={{borderRadius: 0}}>
+        {this.props.connectDragSource(
+        <div className="box-header with-border" style={{cursor: 'move'}}>
+          <h3 className="box-title">{widgetValue.title}</h3>
+          <div className="box-tools pull-right">
+              <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Expand to setting widget">
+                  <i className="fa fa-plus"></i>
+              </button>
+              {/*<button type="button" className="btn btn-box-tool btn-danger"  onClick={(e) => (this.props.removeWidget())} >
+                  <i className="fa fa-times"></i>
+              </button>*/}
+          </div>
+        </div>)}
+        <div className="box-body" style={{display: "none"}}>
+          <form onSubmit={this.props.handleSubmit(this.onSubmit)}>
+            <div className="form-group">
+                <label htmlFor="title">Title</label>
+                <Field name={this.props.uuid+'.title'} className="form-control" component="input" type="text"/>
+            </div>
+            {widgetForm}
+          
+            <button onClick={(e) => {e.preventDefault();this.props.removeWidget()}} className="btn btn-danger btn-xs">Remove</button>
+            <button className="btn btn-primary btn-xs pull-right" type="submit">Save</button>
+          </form>
+        </div>
+      </div>
       )}
      return box;
    }

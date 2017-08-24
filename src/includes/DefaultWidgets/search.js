@@ -44,3 +44,7 @@ const WidgetFn = (widgetData) => {
 }
 
 export default WidgetFn;
+
+export const widgetForm = (widgetData) => {
+	return null
+}
