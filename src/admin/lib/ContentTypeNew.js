@@ -535,14 +535,16 @@ let NewContentType = React.createClass({
                 {item.node.title}</option>));
             })
             me.props.dispatch(setPageList(pageList));
-        me.disableForm(false);
+            me.disableForm(false);
           }
       });
     }
 
     if (this.isWidgetActive("category")) {
-      riques(Query.getAllCategoryQry(this.props.postType), 
+      var postType = this.props.postType;
+      riques(Query.getAllCategoryQry(postType), 
         function(error, response, body) {
+          debugger;
           if (!error) {
             var categoryList = [];
             _.forEach(body.data.viewer.allCategories.edges, function(item){
@@ -641,7 +643,7 @@ let NewContentType = React.createClass({
             <div className="form-group"  style={{marginBottom:30}}>
               <div>
                 <Field name="title" component="input" type="text" className="form-control"
-                  placeholder="Input Title Here" required="true" onChange={this.handleTitleChange} onBlur={() => {this.checkSlug(this.props.title.split(" ").join("-").toLowerCase())}} style={{marginBottom: 20}}/>
+                  placeholder="Input Title Here" onChange={this.handleTitleChange} onBlur={() => {this.checkSlug(this.props.title.split(" ").join("-").toLowerCase())}} style={{marginBottom: 20}}/>
                   <PermalinkEditor rootUrl={rootUrl} onCheckSlug={this.checkSlug} {...this.props} />
                   <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="text" className="form-control" />
                   <div id="trackingDiv"></div>
