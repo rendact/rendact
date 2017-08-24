@@ -3,6 +3,8 @@ import _ from 'lodash';
 const contentTypeNew = (state = [], action) => {
   console.log(action.type)
   switch (action.type) {
+    case 'EMPTY_POST_ID':
+      return state.map(item => ({...item, postId: ""}))
     case 'MASK_AREA':
       return [
         {
@@ -17,11 +19,10 @@ const contentTypeNew = (state = [], action) => {
     case 'UPDATE_POST_STATUS':
       return state.map(item =>  ({...item, status: action.status}))
     case 'RESET_POST_EDITOR':
-      return [
-        {title:"", content:"", summary:"", featuredImage: null, imageGallery:"",
+        let data = {postId: "", initialValues:{}, data:{}, title:"", content:"", summary:"", featuredImage: null, imageGallery:[],
         status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
         permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160}
-      ]
+      return state.map(item => ({...item, ...data}))
     case 'SET_CATEGORY_LIST':
       return [
         {
