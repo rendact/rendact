@@ -292,7 +292,7 @@ let NewContentType = React.createClass({
   },
   onSubmit: function(v) {
     var me = this;
-    
+    /*
     if (v.status === "Published" || v.status === "Draft" || v.status === "Reviewing") {
       if (v.title === null || v.title.length<=3) {
         this._errorNotif('Title is too short');
@@ -303,7 +303,7 @@ let NewContentType = React.createClass({
         this._errorNotif("Content can't be empty");
         return;
       }
-    }
+    }*/
     var _objData = this._emulateDataForSaving(v);
     var qry = "", noticeTxt = "";
     if (this.props.mode==="create"){
@@ -647,9 +647,9 @@ let NewContentType = React.createClass({
               <div>
                 <Field name="title" component="input" type="text" className="form-control"
                   placeholder="Input Title Here" onChange={this.handleTitleChange} onBlur={() => {this.checkSlug(this.props.title.split(" ").join("-").toLowerCase())}} style={{marginBottom: 20}}/>
-                  <PermalinkEditor rootUrl={rootUrl} onCheckSlug={this.checkSlug} {...this.props} />
-                  <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="text" className="form-control" />
-                  <div id="trackingDiv"></div>
+                <PermalinkEditor rootUrl={rootUrl} onCheckSlug={this.checkSlug} {...this.props} />
+                <Field id="content" name="content" rows="25" component="input" wrap="hard" type="textarea" className="form-control" />
+                <div id="trackingDiv"></div>
               </div>
             </div>
             
@@ -662,7 +662,7 @@ let NewContentType = React.createClass({
                 </div>
               </div>
               <div className="box-body pad">
-              <Field id="summary" name="summary" rows="3" component="textarea" wrap="hard" type="text" style={{width: '100%'}} onChange={()=>{this.notifyUnsavedData(true)}} />
+              <Field id="summary" name="summary" rows="3" component="input" wrap="hard" type="textarea" style={{width: '100%'}} onChange={()=>{this.notifyUnsavedData(true)}} />
               </div>
             </div>
 
@@ -696,7 +696,7 @@ let NewContentType = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4"><p>Meta Description</p></div>
                     <div className="col-md-8">
-                      <Field name="metaDescription" component="textarea" type="text" className="form-control metaField" 
+                      <Field name="metaDescription" component="input" type="textarea" className="form-control metaField" 
                         rows='2' style={{width:'100%'}} placeholder={this.props.summary} onChange={this.handleMetaDescriptionChange} />
                       <span className="help-block">160 characters maximum<br/>
                       {this.props.metaDescriptionLeftCharacter} characters left</span>
