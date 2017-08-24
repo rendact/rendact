@@ -65,7 +65,7 @@ class Main extends React.Component {
 						<Match pattern="/page/:pageId?/:param1?/:param2?" component={ThemeSingle}/>
 						<Match pattern="/post/:postId?/:param1?/:param2?" component={ThemeSingle}/>
 						<Match pattern="/blog/:postId?/:param1?/:param2?" component={ThemeBlog}/>
-						<Match pattern="/category/:categoryId?/:param1?/:param2?" component={ThemeSingle}/>
+						<Match pattern="/category/:categoryId?/:param1?/:param2?" component={ThemeBlog}/>
             <Match pattern="/search/:search" component={ThemeSearch}/>
 						<Match pattern="/register/:param1?" component={Register}/>
 						<Match pattern="/login/:param1?" render={props => (

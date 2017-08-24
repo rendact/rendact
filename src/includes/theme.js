@@ -136,6 +136,19 @@ function loadMainMenu(){
     })
 }
 
+function loadWidgets(){
+	var me = this;
+	riques(Query.getListOfWidget, 
+  	function(error, response, body) { 
+  		if (!error && !body.errors && response.statusCode === 200) {
+  			me.setState({listOfWidgets: JSON.parse(body.data.getOptions.value)})
+  		} else {
+        errorCallback(error, body.errors?body.errors[0].message:null);
+      }
+  	}
+  );
+}
+
 export function getWidgets(widgetArea){
 	let Widgets = [];
 
@@ -181,6 +194,7 @@ export class ThemeHome extends React.Component {
     this.theMenu = theMenu.bind(this);
     this.thePagination = thePagination.bind(this);
     this.loadMainMenu = loadMainMenu.bind(this);
+    this.loadWidgets = loadWidgets.bind(this);
     this.getWidgets = getWidgets.bind(this);
 	}
 
@@ -242,15 +256,7 @@ export class ThemeHome extends React.Component {
 		      }
 		    );
 
-		    riques(Query.getListOfWidget, 
-		    	function(error, response, body) { 
-		    		if (!error && !body.errors && response.statusCode === 200) {
-		    			me.setState({listOfWidgets: JSON.parse(body.data.getOptions.value)})
-		    		} else {
-		          errorCallback(error, body.errors?body.errors[0].message:null);
-		        }
-		    	}
-		    );
+		    me.loadWidgets();
 	    }
 		);
 	}
@@ -308,8 +314,10 @@ export class ThemeBlog extends React.Component{
     this.handlePostClick = this.handlePostClick.bind(this);
     this.goHome = goHome.bind(this);
     this.theMenu = theMenu.bind(this);
+    this.theLogo = theLogo.bind(this);
     this.getWidgets = getWidgets.bind(this);
     this.loadMainMenu = loadMainMenu.bind(this);
+    this.loadWidgets = loadWidgets.bind(this);
 	}
     
 	handlePostClick(e){
@@ -320,6 +328,7 @@ export class ThemeBlog extends React.Component{
 
 	componentWillMount(){
 		var me = this;
+		var categoryId = this.props.params.categoryId?this.props.params.categoryId:"";
 		this.loadMainMenu();
 
 		riques(Query.checkSlugQry(this.state.slug), 
@@ -333,7 +342,7 @@ export class ThemeBlog extends React.Component{
 	        me.setState({errorMsg: "error when checking slug"});
 	      }
 
-	      riques(Query.getPostListQry("Full"), 
+	      riques(Query.getPostListQry("Full", "post", "", categoryId), 
 		      function(error, response, body) { 
 		        if (!error && !body.errors && response.statusCode === 200) {
 		          var _postArr = [];
@@ -347,6 +356,8 @@ export class ThemeBlog extends React.Component{
 		        me.setState({loadDone: true});
 		      }
 		    );
+
+		    me.loadWidgets();
 	    }
 		);
 	}
@@ -369,6 +380,7 @@ export class ThemeBlog extends React.Component{
 							theContent={theContent}
 							theExcerpt={theExcerpt}
 							getWidgets={this.getWidgets}
+							theLogo={this.theLogo}
 							theMenu={this.theMenu}
 							widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 							footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
@@ -395,6 +407,7 @@ export class ThemeSingle extends React.Component{
     this.theLogo = theLogo.bind(this);
     this.getWidgets = getWidgets.bind(this);
     this.loadMainMenu = loadMainMenu.bind(this);
+    this.loadWidgets = loadWidgets.bind(this);
 	}
 
 	handleSingleRequest(type, id){
@@ -435,6 +448,7 @@ export class ThemeSingle extends React.Component{
 	componentWillMount() {
 		var me = this;
 		this.loadMainMenu();
+		this.loadWidgets();
 		
 		loadConfig(function(){
 			var config = JSON.parse(localStorage.getItem('config'));

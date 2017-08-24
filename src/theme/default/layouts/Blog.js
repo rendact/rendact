@@ -7,7 +7,7 @@ const Blog = React.createClass({
 	render: function() {
 		return (
 			<div className="application">
-				<Header theMenu={this.props.theMenu()}/>	   
+				<Header {...this.props} />   
 				<div className="container">
 					<div className="col-md-8 new-section">
 						     {
