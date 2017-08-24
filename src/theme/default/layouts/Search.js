@@ -30,12 +30,19 @@ class Search extends React.Component {
     }
   }
   render(){
+    let resultStyle = {
+      background: '#698a9a',
+      color: 'white',
+      padding: '0.5rem',
+      borderRadius: '10px 0',
+    }
+
     return (
       <div className="application">
         <Header {...this.props}/>
         <div className="container">
           <div className="col-md-8 new-section" style={{opacity: this.props.opacity}}>
-            <h3>Result of <b>{this.props.searchQuery}</b></h3>
+            <h3>Result of <span style={resultStyle}>{this.props.searchQuery}</span></h3>
             {
               this.renderSearchResult()
             }
