@@ -277,6 +277,9 @@ let NewContentType = React.createClass({
     this.props.dispatch(setPostPublishDate(resetDate, false));
   },
   _emulateDataForSaving: function(v){
+    v = _.cloneDeep(v)
+    delete v.statusSelect
+
     v["status"] = this.props.status;
     v["content"] = this.props.content;
     v["visibility"] = this.props.visibilityTxt;
