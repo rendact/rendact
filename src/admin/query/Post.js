@@ -543,7 +543,46 @@ const searchPost = (query) => ({
   `
   query {
     viewer {
-      allPosts (where: {title: {like: "%${query}%" }}) {
+      titleQuery: allPosts (where: {title: {like: "%${query}%" }}) {
+        edges {
+          node {
+            id
+            title
+            content
+            slug
+            author {username}
+            status
+            meta {
+              edges {
+                node {id, item, value}
+              }
+            }
+            category {
+              edges {
+                node { category { id, name } }
+              }
+            }
+            tag {
+              edges {
+                node { tag { id, name } }
+              }
+            }
+            comments {
+              edges{
+                node{id,content,name,email,website}
+              }
+            }
+            file {
+              edges {
+                node{id,value}
+              }
+            }
+            featuredImage
+            createdAt
+          }
+        }
+      }
+    contentQuery: allPosts (where: {content: {like: "%${query}%" }}) {
         edges {
           node {
             id

@@ -36,7 +36,7 @@ class ThemeSearch extends React.Component {
     this.props.dispatch(maskArea(true))
     riques(Query.searchPost(query), (error, response, body) => {
       if(!error){
-        let results = body.data.viewer.allPosts.edges.map(item => item.node)
+        let results = body.data.viewer.titleQuery.edges.map(item => item.node)
         this.props.dispatch(setSearchResults(results));
         this.props.dispatch(maskArea(false))
       }
