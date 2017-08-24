@@ -538,6 +538,55 @@ const bindImageGallery = function(arr, postId){
   }
 }
 
+const searchPost = (query) => ({
+  query:
+  `
+  query {
+    viewer {
+      allPosts (where: {title: {like: "%${query}%" }}) {
+        edges {
+          node {
+            id
+            title
+            content
+            slug
+            author {username}
+            status
+            meta {
+              edges {
+                node {id, item, value}
+              }
+            }
+            category {
+              edges {
+                node { category { id, name } }
+              }
+            }
+            tag {
+              edges {
+                node { tag { id, name } }
+              }
+            }
+            comments {
+              edges{
+                node{id,content,name,email,website}
+              }
+            }
+            file {
+              edges {
+                node{id,value}
+              }
+            }
+            featuredImage
+            createdAt
+          }
+        }
+      }
+    }
+  }
+  `
+})
+
 const queries = {
   getPostListQry: getPostListQry,
   getAllCategoryQry: getAllCategoryQry,
@@ -561,7 +610,8 @@ const queries = {
   UpdateTag: UpdateTag,
   addImageGallery: addImageGallery,
   removeImageGallery: removeImageGallery,
-  bindImageGallery: bindImageGallery
+  bindImageGallery: bindImageGallery,
+  searchPost: searchPost
 }
 
 export default queries;

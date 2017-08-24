@@ -75,7 +75,7 @@ function theTitle(id, title){
 	return <a href={"/post/"+id} onClick={this.handlePostClick} id={id}><h4>{title}</h4></a>
 }
 
-function theExcerpt(content){
+export function theExcerpt(content){
 	return <div dangerouslySetInnerHTML={{__html: _.truncate(content,{"length": 100})}} />
 }
 
@@ -84,7 +84,7 @@ function theMenu(){
   return <Menu menuItems={items&&items.items?items.items:[]} goHome={this.goHome}/>
 }
 
-function theLogo(){
+export function theLogo(){
 	return <div className="logo">
 		<a href="#" onClick={this.goHome}><h1>Rend<span>act</span></h1></a>
 	</div>
@@ -117,11 +117,11 @@ function thePagination(){
         </div>
 }
 
-function theBreadcrumb(){
+export function theBreadcrumb(){
 	return <h2><a href="#" onClick={this.goHome}><h5>Home </h5></a> / PAGE</h2>
 }
 
-function goHome(e){
+export function goHome(e){
 	e.preventDefault();
 	this._reactInternalInstance._context.history.push('/')
 }
@@ -136,9 +136,16 @@ function loadMainMenu(){
     })
 }
 
-function getWidgets(widgetArea){
+export function getWidgets(widgetArea){
 	let Widgets = [];
-	var listOfWidgets = this.state.listOfWidgets[widgetArea]?this.state.listOfWidgets[widgetArea]:[];
+
+  // add checking if the component has implemented with redux or not
+  let listOfWidgets;
+  if (_.has(this.state, 'listOfWidgets')){
+    listOfWidgets = this.state.listOfWidgets[widgetArea]?this.state.listOfWidgets[widgetArea]:[];
+  } else {
+    listOfWidgets = this.props.listOfWidgets[widgetArea]?this.props.listOfWidgets[widgetArea]:[];
+  }
 	
 	_.map(listOfWidgets,function(item){
 		var widgetFn = require("./DefaultWidgets/"+item.filePath).default;
