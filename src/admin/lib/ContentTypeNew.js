@@ -732,10 +732,10 @@ let NewContentType = React.createClass({
                           <div id="statusOption" className="collapse">
                             <div className="form-group">
                                 <Field id="statusSelect" name="statusSelect" component="select" style={{marginRight: 10, height: 30}}>
-                                  <option>Published</option>
-                                  <option>Reviewing</option>
+                                  <option value="Published">Published</option>
+                                  <option value="Reviewing">Reviewing</option>
                                 </Field>
-                                <button type="button" onClick={this.handleChangeStatus} className="btn btn-flat btn-xs btn-primary" 
+                                <button type="button" onClick={ ()=> this.props.dispatch(setPostStatus(this.props.statusSelect))} className="btn btn-flat btn-xs btn-primary" 
                                 style={{marginRight: 10}} data-toggle="collapse" data-target="#statusOption">OK</button>
                                 <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption">Cancel</button>
                             </div>
@@ -987,14 +987,15 @@ const mapStateToProps = function(state){
     titleTag: selector(state, 'titleTag'),
     metaKeyword: selector(state, 'metaKeyword'),
     metaDescription: selector(state, 'metaDescription'),
-    status: selector(state, 'statusSelect'),
+    statusSelect: selector(state, 'statusSelect'),
     visibilityTxt: selector(state, 'visibilityRadio')
   }
 
   if (!_.isEmpty(state.contentTypeNew)) {
     var out = _.head(state.contentTypeNew);
     out["initialValues"] = out.data;
-    return _.merge(out, customStates);
+    //return _.merge(out, customStates);
+    return {...out, ...customStates}
   } else return customStates;
 }
 
