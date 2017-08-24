@@ -17,7 +17,7 @@ import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPost
         toggleSaveImmediatelyMode, togglePermalinkEditingState,
         setPostContent, updateTitleTagLeftCharacter,
         updateMetaDescriptionLeftCharacter, setPostPublishDate, setFeaturedImage,
-        setEditorMode, toggleImageGalleyBinded, setPageList, setAllCategoryList,
+        setEditorMode, toggleImageGalleyBinded, setPageList, setAllCategoryList, emptyPostId,
         setOptions, setTagMap, loadFormData} from '../../actions'
 import {reduxForm, Field, formValueSelector} from 'redux-form';
 
@@ -146,11 +146,16 @@ let NewContentType = React.createClass({
     disableForm(isFormDisabled, this.notification);
     this.props.dispatch(maskArea(isFormDisabled));
   },
+  componentWillReceiveProps: function(props){
+    console.log(props);
+  },
   resetForm: function(){
     document.getElementById("postForm").reset();
-    window.CKEDITOR.instances['content'].setData(null);
+    window.CKEDITOR.instances['content'].setData("");
+    //this.props.dispatch(emptyPostId());
     this.props.dispatch(resetPostEditor());
     this.handleTitleChange();
+    this.props.destroy()
     window.history.pushState("", "", '/admin/'+this.props.slug+'/new');
   },
   getMetaFormValues: function(){
@@ -620,7 +625,7 @@ let NewContentType = React.createClass({
         <div className="container-fluid">
           <section className="content-header"  style={{marginBottom:20}}>
               <h1>{this.props.mode==="update"?"Edit Current "+this.props.name:"Add New "+this.props.name}
-              { this.props.mode==="update" &&
+                { this.props.mode==="update" &&
                 <small style={{marginLeft: 5}}>
                   <button className="btn btn-default btn-primary add-new-post-btn" onClick={()=>{this.resetForm()}}>Add new</button>
                 </small>
