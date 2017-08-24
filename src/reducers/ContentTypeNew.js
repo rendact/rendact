@@ -80,7 +80,8 @@ const contentTypeNew = (state = [], action) => {
         }
       ]
     case 'SET_EDITOR_MODE':
-      return [{mode: action.mode}]
+      return state.map(item =>  ({...item, mode: action.mode}))
+      //return [{mode: action.mode}]
     case 'TOGGLE_IMAGE_GALLERY_BINDED':
       return state.map(item =>  ({...item, imageGalleryUnbinded: action.state}))
     case 'SET_PAGE_LIST':

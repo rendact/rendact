@@ -314,7 +314,7 @@ let NewContentType = React.createClass({
       qry = this.props.updateQuery(_objData);
       noticeTxt = this.props.name+' Updated!';
     }
-    
+    debugger;
     this.disableForm(true);
 
     riques(qry, 
@@ -547,7 +547,6 @@ let NewContentType = React.createClass({
       var postType = this.props.postType;
       riques(Query.getAllCategoryQry(postType), 
         function(error, response, body) {
-          debugger;
           if (!error) {
             var categoryList = [];
             _.forEach(body.data.viewer.allCategories.edges, function(item){
@@ -594,6 +593,7 @@ let NewContentType = React.createClass({
       }
 
       if (me.props.postId) {
+        //debugger;
         me.props.dispatch(setEditorMode("update"));
         riques(me.props.loadQuery(me.props.postId), 
           function(error, response, body) {
@@ -986,6 +986,7 @@ const selector = formValueSelector('newContentForm');
 const mapStateToProps = function(state){
   var customStates = {
     title: selector(state, 'title'),
+    content: selector(state, 'content'),
     hours: selector(state, 'hours'),
     minutes: selector(state, 'minutes'),
     summary: selector(state, 'summary'),
