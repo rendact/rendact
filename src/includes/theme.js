@@ -84,7 +84,7 @@ function theMenu(){
   return <Menu menuItems={items&&items.items?items.items:[]} goHome={this.goHome}/>
 }
 
-function theLogo(){
+export function theLogo(){
 	return <div className="logo">
 		<a href="#" onClick={this.goHome}><h1>Rend<span>act</span></h1></a>
 	</div>
@@ -117,11 +117,11 @@ function thePagination(){
         </div>
 }
 
-function theBreadcrumb(){
+export function theBreadcrumb(){
 	return <h2><a href="#" onClick={this.goHome}><h5>Home </h5></a> / PAGE</h2>
 }
 
-function goHome(e){
+export function goHome(e){
 	e.preventDefault();
 	this._reactInternalInstance._context.history.push('/')
 }

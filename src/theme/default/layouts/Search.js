@@ -4,11 +4,12 @@ import Footer from '../includes/Footer'
 import Sidebar from '../includes/Sidebar';
 import moment from 'moment';
 import {Link} from 'react-router';
+import Halogen from 'halogen';
 
 class Search extends React.Component {
   renderSearchResult(){
     if (this.props.isProcessing){
-      return <p style={{color:'green'}}>Still loading, please wait...</p>
+      return <div><Halogen.PulseLoader color='green'/></div>
     }else if (this.props.searchResults.length) {
       return (
         this.props.searchResults.map((post, index) => (
@@ -29,12 +30,19 @@ class Search extends React.Component {
     }
   }
   render(){
+    let resultStyle = {
+      background: '#698a9a',
+      color: 'white',
+      padding: '0.5rem',
+      borderRadius: '10px 0',
+    }
+
     return (
       <div className="application">
         <Header {...this.props}/>
         <div className="container">
           <div className="col-md-8 new-section" style={{opacity: this.props.opacity}}>
-            <h3>Result of <b>{this.props.searchQuery}</b></h3>
+            <h3>Result of <span style={resultStyle}>{this.props.searchQuery}</span></h3>
             {
               this.renderSearchResult()
             }
