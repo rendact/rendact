@@ -840,7 +840,7 @@ let NewContentType = React.createClass({
                       <div>
                       <div className="form-group">
                         <p><b>Parent</b></p>
-                        <Field id="parentPage" name="parentPage" component="select" style={{widht: 250}}>
+                        <Field id="parent" name="parent" component="select" style={{widht: 250}}>
                           {this.props.pageList}
                         </Field>
                       </div>
