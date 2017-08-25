@@ -1,4 +1,5 @@
 import React from 'react';
+import _ from 'lodash';
 import {connect} from 'react-redux';
 import {Menu} from './Menu.js';
 import { aboutUsWidget, contactUsWidget, recentPostWidget} from './widgets';
@@ -36,7 +37,9 @@ class ThemeSearch extends React.Component {
     this.props.dispatch(maskArea(true))
     riques(Query.searchPost(query), (error, response, body) => {
       if(!error){
-        let results = body.data.viewer.titleQuery.edges.map(item => item.node)
+        let byTitle = body.data.viewer.titleQuery.edges.map(item => item.node)
+        let byContent = body.data.viewer.contentQuery.edges.map(item => item.node)
+        let results = _.unionBy(byTitle, byContent, 'id')
         this.props.dispatch(setSearchResults(results));
         this.props.dispatch(maskArea(false))
       }
