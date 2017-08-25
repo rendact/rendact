@@ -664,7 +664,7 @@ let NewContentType = React.createClass({
                 <Field name="title" component="input" type="text" className="form-control"
                   placeholder="Input Title Here" onChange={this.handleTitleChange} onBlur={() => {this.checkSlug(this.props.title.split(" ").join("-").toLowerCase())}} style={{marginBottom: 20}}/>
                 <PermalinkEditor rootUrl={rootUrl} onCheckSlug={this.checkSlug} {...this.props} />
-                <Field id="content" name="content" rows="25" component="input" wrap="hard" type="textarea" className="form-control" />
+                <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="textarea" className="form-control" />
                 <div id="trackingDiv"></div>
               </div>
             </div>
@@ -678,7 +678,7 @@ let NewContentType = React.createClass({
                 </div>
               </div>
               <div className="box-body pad">
-              <Field id="summary" name="summary" rows="3" component="input" wrap="hard" type="textarea" style={{width: '100%'}} onChange={()=>{this.notifyUnsavedData(true)}} />
+              <Field id="summary" name="summary" rows="5" component="textarea" wrap="hard" style={{width: '100%'}} onChange={()=>{this.notifyUnsavedData(true)}} />
               </div>
             </div>
 
