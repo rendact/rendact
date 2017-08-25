@@ -352,6 +352,7 @@ let NewContentType = React.createClass({
           }
           
           if (me.isWidgetActive("category")) {
+            here.disableForm(true);
             var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.props.postCategoryList, v.categories);
             if (catQry)
               riques(catQry,
@@ -369,6 +370,7 @@ let NewContentType = React.createClass({
           }
 
           if (me.isWidgetActive("tag")) {
+            here.disableForm(true);
             var tagQry = Query.createUpdateTagOfPostMtn(postId, me.props.postTagListInit, me.props.postTagList, me.props.tagMap);
             if (tagQry)
               riques(tagQry,
@@ -389,7 +391,6 @@ let NewContentType = React.createClass({
           here._successNotif(noticeTxt);
           here.props.dispatch(setEditorMode("update"));
           here.props.dispatch(setPostId(postId));
-          here.disableForm(false);
           here.notifyUnsavedData(false);
           here.bindPostToImageGallery(postId);
           here.props.handleNav(me.props.slug,"edit",postId);
@@ -537,48 +538,60 @@ let NewContentType = React.createClass({
     var me = this;
 
     if (this.isWidgetActive("pageHierarchy")) {
+      me.disableForm(true);
       riques(Query.getPageListQry("All"),
         function(error, response, body) {
-          if (!error) {
+          if (!error && !body.errors && response.statusCode === 200) {
             var pageList = [(<option key="0" value="">(no parent)</option>)];
             _.forEach(body.data.viewer.allPosts.edges, function(item){
               pageList.push((<option key={item.node.id} value={item.node.id} checked={me.props.parent===item.node.id}>
                 {item.node.title}</option>));
-            })
+            });
             me.props.dispatch(setPageList(pageList));
+            me.disableForm(false);
+          } else {
+            errorCallback(error, body.errors?body.errors[0].message:null);
           }
       });
     }
 
     if (this.isWidgetActive("category")) {
+      me.disableForm(true);
       var postType = this.props.postType;
       riques(Query.getAllCategoryQry(postType), 
         function(error, response, body) {
-          if (!error) {
+          if (!error && !body.errors && response.statusCode === 200) {
             var categoryList = [];
             _.forEach(body.data.viewer.allCategories.edges, function(item){
               categoryList.push((<div key={item.node.id}><input id={item.node.id}
               name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
             })
-            me.props.dispatch(setAllCategoryList(categoryList))
+            me.props.dispatch(setAllCategoryList(categoryList));
+            me.disableForm(false);
+          } else {
+            errorCallback(error, body.errors?body.errors[0].message:null);
           }
         }
       );
     }
     
     if (this.isWidgetActive("tag")) {
+      me.disableForm(true);
       riques(Query.getAllTagQry(this.props.postType), 
         function(error, response, body) {
-          if (!error) {
+          if (!error && !body.errors && response.statusCode === 200) {
             var _tagMap = {};
             var options = [];
-            
+                
             _.forEach(body.data.viewer.allTags.edges, function(item){
                 _tagMap[item.node.name] = {id: item.node.id, name: item.node.name}
                 options.push({id: item.node.id, value: item.node.name, label: item.node.name});
             })
             me.props.dispatch(setOptions(options));
             me.props.dispatch(setTagMap(_tagMap));
+            me.disableForm(false);
+          } else {
+            errorCallback(error, body.errors?body.errors[0].message:null);
           }
         }
       );

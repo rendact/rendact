@@ -34,8 +34,15 @@ const contentTypeNew = (state = INITIAL_VALUES, action) => {
       return state.map(item => ({...item, postId: action.postId}))
 
     case 'MASK_AREA':
-      return state.map(item =>  ({...item, isProcessing: action.isMasked, opacity: action.isMasked?0.4:1}))
-    
+      if (state)
+        return state.map(item =>  ({...item, isProcessing: action.isMasked, opacity: action.isMasked?0.4:1}))
+      else
+        return [
+          {
+            isProcessing: action.isMasked,
+            opacity: action.isMasked?0.4:1
+          }
+        ]
     case 'UPDATE_SLUG':
       return state.map(item =>  ({...item, permalink: action.slug, permalinkEditing: action.isEditorEnabled}))
     
@@ -79,16 +86,16 @@ const contentTypeNew = (state = INITIAL_VALUES, action) => {
     
     case 'SET_VISIBILITY_MODE':
       return state.map(item =>  ({...item, visibilityTxt: action.mode}))
-    
+
     case 'SET_POST_TITLE':
       return state.map(item =>  ({...item, title: action.title}))
-    
+
     case 'SET_POST_CONTENT':
       return state.map(item =>  ({...item, content: action.content}))
     
     case 'SET_POST_SUMMARY':
-      return state.map(item =>  ({...item,  summary: action.summary}))
-   
+      return state.map(item =>  ({...item, summary: action.summary}))
+
     case 'UPDATE_TITLE_TAG_LEFT_CHAR':
       return state.map(item =>  ({...item, titleTagLeftCharacter: action.length}))
     
@@ -100,10 +107,10 @@ const contentTypeNew = (state = INITIAL_VALUES, action) => {
     
     case 'SET_FEATURED_IMAGE':
       return state.map(item =>  ({...item, featuredImage: action.featuredImage}))
-        
+
     case 'SET_EDITOR_MODE':
       return state.map(item =>  ({...item, mode: action.mode}))
-      
+        
     case 'TOGGLE_IMAGE_GALLERY_BINDED':
       return state.map(item =>  ({...item, imageGalleryUnbinded: action.state}))
     

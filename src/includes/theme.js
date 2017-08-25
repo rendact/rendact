@@ -327,9 +327,9 @@ export class ThemeBlog extends React.Component{
 	}
 
 	componentWillMount(){
+		this.loadMainMenu();
 		var me = this;
 		var categoryId = this.props.params.categoryId?this.props.params.categoryId:"";
-		this.loadMainMenu();
 
 		riques(Query.checkSlugQry(this.state.slug), 
 			(error, response, body) => {
@@ -341,7 +341,7 @@ export class ThemeBlog extends React.Component{
 	      } else {
 	        me.setState({errorMsg: "error when checking slug"});
 	      }
-
+	      
 	      riques(Query.getPostListQry("Full", "post", "", categoryId), 
 		      function(error, response, body) { 
 		        if (!error && !body.errors && response.statusCode === 200) {
@@ -356,10 +356,34 @@ export class ThemeBlog extends React.Component{
 		        me.setState({loadDone: true});
 		      }
 		    );
-
+				
 		    me.loadWidgets();
 	    }
 		);
+		
+	}
+
+	componentWillUpdate(nextProps){
+		var me = this;
+		var categoryId = nextProps.params.categoryId?nextProps.params.categoryId:"";
+		
+		if (categoryId && nextProps.params.categoryId != this.props.params.categoryId) {
+			me.setState({loadDone: false});
+			riques(Query.getPostListQry("Full", "post", "", categoryId), 
+	      function(error, response, body) { 
+	        if (!error && !body.errors && response.statusCode === 200) {
+	          var _postArr = [];
+	          _.forEach(body.data.viewer.allPosts.edges, function(item){
+	            _postArr.push(item.node);
+	          });
+	          me.setState({latestPosts: _postArr});
+	        } else {
+	          errorCallback(error, body.errors?body.errors[0].message:null);
+	        }
+	        me.setState({loadDone: true});
+	      }
+	    );
+		}
 	}
 
 	componentDidMount(){
