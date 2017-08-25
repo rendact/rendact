@@ -194,7 +194,9 @@ let ContentType = React.createClass({
     var me = this;
     var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
-   
+    
+    swalert('warning','Sure want to delete?','Be sure before continue!',
+      function () {
       me.disableForm(true);
       riques(Query.deletePostQry(idList), 
         function(error, response, body) {
@@ -208,6 +210,7 @@ let ContentType = React.createClass({
           }
         }
       );
+    });
   },
   handleDeletePermanent: function(event){
     var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");

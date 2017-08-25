@@ -309,11 +309,6 @@ let NewContentType = React.createClass({
         this._errorNotif('Title is too short');
         return;
       }
-
-      if (!v.content) {
-        this._errorNotif("Content can't be empty");
-        return;
-      }
     }
     var _objData = this._emulateDataForSaving(v);
     var qry = "", noticeTxt = "";

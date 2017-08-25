@@ -165,7 +165,7 @@ export function getWidgets(widgetArea){
 		
 		Widgets.push(<div key={item.id} className="sidebar-box">
 				<h3><span>{item.title}</span></h3>
-					{widgetFn()}
+					{widgetFn(item.id, item.widget)}
 			</div>);
 	});
 	
@@ -366,7 +366,7 @@ export class ThemeBlog extends React.Component{
 	componentWillUpdate(nextProps){
 		var me = this;
 		var categoryId = nextProps.params.categoryId?nextProps.params.categoryId:"";
-		
+
 		if (categoryId && nextProps.params.categoryId != this.props.params.categoryId) {
 			me.setState({loadDone: false});
 			riques(Query.getPostListQry("Full", "post", "", categoryId), 
