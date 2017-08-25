@@ -19,7 +19,7 @@ const contentTypeNew = (state = [], action) => {
     case 'UPDATE_POST_STATUS':
       return state.map(item =>  ({...item, status: action.status}))
     case 'RESET_POST_EDITOR':
-        let data = {postId: "", initialValues:{}, data:{}, title:"", content:"", summary:"", featuredImage: null, imageGallery:[],
+        let data = {postId: "", initialValues:{}, data:{}, title:"", permalink: "", content:"", summary:"", featuredImage: null, imageGallery:[],
         status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
         permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160}
       return state.map(item => ({...item, ...data}))
@@ -89,17 +89,9 @@ const contentTypeNew = (state = [], action) => {
     case 'SET_ALL_CATEGORY_LIST':
       return state.map(item =>  ({...item, allCategoryList: action.catList}))
     case 'SET_TAG_MAP':
-      return [
-        {
-          tagMap: action.tagMap
-        }
-      ]
+      return state.map(item => ({...item, tagMap: action.tagMap}))
     case 'SET_OPTIONS':
-      return [
-        {
-          options: action.options
-        }
-      ]
+      return state.map(item => ({...item, options: action.options}))
     case 'LOAD_FORM_DATA':
       return state.map(item =>  ({...item, data: action.data, permalink: action.data["slug"]}))
     default:
