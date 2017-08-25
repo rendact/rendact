@@ -147,16 +147,16 @@ let NewContentType = React.createClass({
     this.props.dispatch(maskArea(isFormDisabled));
   },
   componentWillReceiveProps: function(props){
-    console.log(props);
+    if(!props.postId && this.props.postId){
+      window.CKEDITOR.instances['content'].setData("");
+      //this.props.dispatch(emptyPostId());
+      props.dispatch(resetPostEditor());
+      this.handleTitleChange();
+      props.destroy()
+    }
   },
   resetForm: function(){
-    document.getElementById("postForm").reset();
-    window.CKEDITOR.instances['content'].setData("");
-    //this.props.dispatch(emptyPostId());
-    this.props.dispatch(resetPostEditor());
-    this.handleTitleChange();
-    this.props.destroy()
-    window.history.pushState("", "", '/admin/'+this.props.slug+'/new');
+    this.props.handleNav(this.props.slug, "new")
   },
   getMetaFormValues: function(){
     var out = getFormData("metaField");

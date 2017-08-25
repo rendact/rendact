@@ -19,7 +19,7 @@ const contentTypeNew = (state = [], action) => {
       return state.map(item =>  ({...item, status: action.status}))
     
     case 'RESET_POST_EDITOR':
-        let data = {postId: "", initialValues:{}, data:{}, title:"", content:"", summary:"", featuredImage: null, imageGallery:[],
+        let data = {postId: "", initialValues:{}, data:{}, title:"", permalink: "", content:"", summary:"", featuredImage: null, imageGallery:[],
         status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
         permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160}
       return state.map(item => ({...item, ...data}))
@@ -37,14 +37,12 @@ const contentTypeNew = (state = [], action) => {
       return state.map(item =>  ({...item, connectionValue: action.connectionValueList}))
     
     case 'SET_CONTENT_FORM':
-      return [
-        {
+       return state.map(item =>  ({...item,
           title: action.values.title, content: action.values.content, summary: action.values.summary, 
           status: action.values.status, visibilityTxt: action.values.visibility, 
           publishDate: action.values.pubDate, publishDateReset: action.values.pubDate, 
           permalink: action.values.slug, featuredImage: action.values.featuredImage
-        }
-      ]
+      }))
 
     case 'TOGGLE_SAVE_IMMEDIATELY_MODE':
       return state.map(item =>  ({...item, immediatelyStatus: action.state, immediately: action.time}))
@@ -89,12 +87,12 @@ const contentTypeNew = (state = [], action) => {
       return state.map(item =>  ({...item, allCategoryList: action.catList}))
     
     case 'SET_TAG_MAP':
+
       return state.map(item =>  ({...item, tagMap: action.tagMap}))
     
     case 'SET_OPTIONS':
       return state.map(item =>  ({...item, options: action.options}))
-    
-    
+
     case 'LOAD_FORM_DATA':
       return state.map(item =>  ({...item, data: action.data, permalink: action.data["slug"]}))
     default:
