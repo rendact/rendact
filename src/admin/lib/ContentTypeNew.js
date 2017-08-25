@@ -157,6 +157,8 @@ let NewContentType = React.createClass({
   },
   resetForm: function(){
     this.props.handleNav(this.props.slug, "new")
+    $(".menu-item").removeClass("active");
+    $("#menu-posts-new").addClass("active");
   },
   getMetaFormValues: function(){
     var out = getFormData("metaField");

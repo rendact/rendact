@@ -1,3 +1,4 @@
+import $ from 'jquery'
 import React from 'react'
 import Query from '../query'
 import Fn from './functions'
@@ -271,6 +272,8 @@ let ContentType = React.createClass({
   },
   handleAddNewBtn: function(event) {
     this.props.handleNav(this.props.slug,'new');
+    $(".menu-item").removeClass("active");
+    $("#menu-posts-new").addClass("active");
   },
   handleStatusFilter: function(event){
     event.preventDefault();
