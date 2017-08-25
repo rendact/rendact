@@ -33,12 +33,15 @@ const contentTypeNew = (state = INITIAL_VALUES, action) => {
     case 'EMPTY_POST_ID':
       return state.map(item => ({...item, postId: ""}))
     case 'MASK_AREA':
-      return [
-        {
-          isProcessing: action.isMasked,
-          opacity: action.isMasked?0.4:1
-        }
-      ]
+      if (state)
+        return state.map(item =>  ({...item, isProcessing: action.isMasked, opacity: action.isMasked?0.4:1}))
+      else
+        return [
+          {
+            isProcessing: action.isMasked,
+            opacity: action.isMasked?0.4:1
+          }
+        ]
     case 'UPDATE_SLUG':
       return state.map(item =>  ({...item, permalink: action.slug, permalinkEditing: action.isEditorEnabled}))
     case 'TOGGLE_PERMALINK_PROCESS_STATE':
@@ -76,25 +79,13 @@ const contentTypeNew = (state = INITIAL_VALUES, action) => {
     case 'TOGGLE_PERMALINK_EDITING_STATE':
       return state.map(item =>  ({...item, permalinkEditing: action.state}))
     case 'SET_VISIBILITY_MODE':
-      return [
-        {
-          visibilityTxt: action.mode
-        }
-      ]
+      return state.map(item =>  ({...item, visibilityTxt: action.mode}))
     case 'SET_POST_TITLE':
-      return [
-        {
-          title: action.title
-        }
-      ]
+      return state.map(item =>  ({...item, title: action.title}))
     case 'SET_POST_CONTENT':
       return state.map(item =>  ({...item, content: action.content}))
     case 'SET_POST_SUMMARY':
-      return [
-        {
-          summary: action.summary
-        }
-      ]
+      return state.map(item =>  ({...item, summary: action.summary}))
     case 'UPDATE_TITLE_TAG_LEFT_CHAR':
       return state.map(item =>  ({...item, titleTagLeftCharacter: action.length}))
     case 'UPDATE_META_DESCRIPTION_LEFT_CHAR':
@@ -102,14 +93,9 @@ const contentTypeNew = (state = INITIAL_VALUES, action) => {
     case 'SET_POST_PUBLISH_DATE':
       return state.map(item =>  ({...item, immediatelyStatus: action.immediatelyState,publishDate: action.date}))
     case 'SET_FEATURED_IMAGE':
-      return [
-        {
-          featuredImage: action.featuredImage
-        }
-      ]
+      return state.map(item =>  ({...item, featuredImage: action.featuredImage}))
     case 'SET_EDITOR_MODE':
       return state.map(item =>  ({...item, mode: action.mode}))
-      //return [{mode: action.mode}]
     case 'TOGGLE_IMAGE_GALLERY_BINDED':
       return state.map(item =>  ({...item, imageGalleryUnbinded: action.state}))
     case 'SET_PAGE_LIST':
