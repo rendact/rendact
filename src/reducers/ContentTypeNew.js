@@ -1,6 +1,33 @@
 import _ from 'lodash';
 
-const contentTypeNew = (state = [], action) => {
+
+const INITIAL_VALUES =  [{
+      isProcessing: false,
+      opacity: 1,
+      title: "",
+      content: "",
+      status:"Published",
+      immediatelyStatus:true,
+      visibilityTxt:"Public",
+      permalinkEditing: false,
+      mode: "create",
+      postCategoryList: [],
+      postTagListInit: [],
+      postTagList: [],
+      titleTagLeftCharacter: 65,
+      metaDescriptionLeftCharacter: 160,
+      publishDate: new Date(),
+      publishDateReset: new Date(),
+      permalinkInProcess: false,
+      imageGallery: [],
+      tagMap: {},
+      connectionValue: {},
+      data: {},
+      parent: "",
+      permalink: ""
+    }]
+
+const contentTypeNew = (state = INITIAL_VALUES, action) => {
   console.log(action.type)
   switch (action.type) {
     case 'EMPTY_POST_ID':

@@ -235,6 +235,7 @@ let NewContentType = React.createClass({
       }
     });
     this.props.dispatch(setConnectionValue(_connectionValue));
+    this.props.change("title", this.props.data.title)
   },
   formatDate: function(date){
     var min = date.getMinutes();
@@ -587,6 +588,7 @@ let NewContentType = React.createClass({
   componentDidMount: function(){
     var me = this;
     
+    
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
       window.CKEDITOR.replace('content', {
         height: 400,
@@ -598,7 +600,6 @@ let NewContentType = React.createClass({
       }
 
       if (me.props.postId) {
-        //debugger;
         me.props.dispatch(setEditorMode("update"));
         riques(me.props.loadQuery(me.props.postId), 
           function(error, response, body) {
