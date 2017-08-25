@@ -237,6 +237,7 @@ let NewContentType = React.createClass({
     });
     this.props.dispatch(setConnectionValue(_connectionValue));
     this.props.change("title", this.props.data.title)
+    this.props.change("visibilityRadio", this.props.data.visibility)
   },
   formatDate: function(date){
     var min = date.getMinutes();
