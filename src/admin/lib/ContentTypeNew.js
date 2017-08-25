@@ -530,7 +530,8 @@ let NewContentType = React.createClass({
       />
     )
   },
-  componentWillMount: function(){
+ 
+  componentDidMount: function(){
     var me = this;
 
     if (this.isWidgetActive("pageHierarchy")) {
@@ -559,6 +560,7 @@ let NewContentType = React.createClass({
               name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
             })
             me.props.dispatch(setAllCategoryList(categoryList))
+            debugger;
           }
         }
       );
@@ -580,12 +582,7 @@ let NewContentType = React.createClass({
           }
         }
       );
-    
     };
-  },
- 
-  componentDidMount: function(){
-    var me = this;
     
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
       window.CKEDITOR.replace('content', {
