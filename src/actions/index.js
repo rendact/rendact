@@ -92,8 +92,9 @@ export const setVisibilityMode = (mode) => ({
   mode
 })
 
-export const emptyPostId = () => ({
-  type: 'EMPTY_POST_ID',
+export const setPostId = (postId) => ({
+  type: 'SET_POST_ID',
+  postId
 })
 export const setPostTitle = (title) => ({
   type: 'SET_POST_TITLE',

@@ -30,8 +30,8 @@ const INITIAL_VALUES =  [{
 const contentTypeNew = (state = INITIAL_VALUES, action) => {
   console.log(action.type)
   switch (action.type) {
-    case 'EMPTY_POST_ID':
-      return state.map(item => ({...item, postId: ""}))
+    case 'SET_POST_ID':
+      return state.map(item => ({...item, postId: action.postId}))
 
     case 'MASK_AREA':
       return state.map(item =>  ({...item, isProcessing: action.isMasked, opacity: action.isMasked?0.4:1}))
