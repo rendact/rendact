@@ -288,18 +288,21 @@ let NewContentType = React.createClass({
   _emulateDataForSaving: function(v){
     v = _.cloneDeep(v)
     delete v.statusSelect
+    delete v.visibilityRadio
 
-    v["status"] = this.props.status;
     v["content"] = this.props.content;
     v["visibility"] = this.props.visibilityTxt;
     v["type"] = this.props.postType;
     v["authorId"] = localStorage.getItem('userId');
     v["slug"] = this.props.permalink;
-    v["featuredImage"] = this.props.featuredImage
 
     return v
   },
-  onSubmit: function(v) {
+  onSubmit: function(v, status) {
+    if (status) {
+      this.props.dispatch(setPostStatus(status))
+      v.status = status
+    }
     var me = this;
     if (v.status === "Published" || v.status === "Draft" || v.status === "Reviewing") {
       if (v.title === null || v.title.length<=3) {
@@ -654,7 +657,7 @@ let NewContentType = React.createClass({
           </section>
           <Notification ref="notificationSystem" />
 
-          <form onSubmit={this.props.handleSubmit(this.onSubmit)} id="postForm" method="get" style={{opacity: this.props.opacity}}>
+          <form  id="postForm" method="get" style={{opacity: this.props.opacity}}>
           { this.props.isProcessing &&
           <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
           }
@@ -816,13 +819,13 @@ let NewContentType = React.createClass({
                       <div className="form-group pull-right">
                         <button type="button" className="btn btn-default btn-flat disabled" style={{marginRight: 5}}>Preview</button> 
                           <div className="btn-group">
-                            <button type="submit" id="publishBtn" className="btn btn-primary btn-flat">{this.props.mode==="update"?"Save":"Publish"}</button>
+                            <button type="submit" onClick={this.props.handleSubmit(v => this.onSubmit(v, this.props.status))} id="publishBtn" className="btn btn-primary btn-flat">{this.props.mode==="update"?"Save":"Publish"}</button>
                             <button type="button" className="btn btn-primary btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                               <span className="caret"></span>
                               <span className="sr-only">Toggle Dropdown</span>
                             </button>
                             <ul className="dropdown-menu" role="menu">
-                              <li><button onClick={()=>{this.props.dispatch(setPostStatus("Draft"))}} className="btn btn-default btn-flat">{this.props.status==="Draft"?"Save As Draft":""}</button></li>
+                              <li><button onClick={this.props.handleSubmit(v => this.onSubmit(v, 'Draft'))} className="btn btn-default btn-flat">{this.props.status!=="Draft"?"Save As Draft":""}</button></li>
                             </ul>
                           </div>
                       </div>        
