@@ -54,7 +54,7 @@ const contentTypeNew = (state = INITIAL_VALUES, action) => {
     
     case 'RESET_POST_EDITOR':
         let data = {postId: "", initialValues:{}, data:{}, title:"", permalink: "", content:"", summary:"", featuredImage: null, imageGallery:[],
-        status:"Published", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
+        status:"Published", immediately:"", immediatelyStatus:true, visibilityTxt:"Public",
         permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160}
       return state.map(item => ({...item, ...data}))
     

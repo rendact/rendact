@@ -150,7 +150,6 @@ let NewContentType = React.createClass({
     if(!props.postId && this.props.postId){
       window.CKEDITOR.instances['content'].setData("");
       props.dispatch(resetPostEditor());
-      this.handleTitleChange();
       props.destroy()
     } 
   },
