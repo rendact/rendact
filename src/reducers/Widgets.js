@@ -77,7 +77,10 @@ const widgets = (state = {} , action) => {
       return {...state, activeWidgetsInitials}
 
     case 'SET_ALL_CATEGORY_LIST':
-      return {allCategoryList: action.catList}
+      return {...state, allCategoryList: action.catList}
+
+    case 'SET_WIDGET_DATA':
+      return {widgetData: action.widgetData}
 
     default:
       return state

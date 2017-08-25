@@ -371,6 +371,10 @@ export const setListOfWidgets = (listOfWidgets) => ({
   listOfWidgets
 });
 
+export const setWidgetData = (widgetData) => ({
+  type: 'SET_WIDGET_DATA',
+  widgetData
+})
 /* 
  * SEARCH ACTIONS
  */

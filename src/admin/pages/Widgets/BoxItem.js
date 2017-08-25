@@ -52,10 +52,10 @@ class BoxItem extends React.Component {
         if (!error) {
           let found = data.data.viewer.allOptions.edges
           if (!found.length){
-            this.newWidget(this.props.uuid, JSON.stringify(toSave, null, 2))
+            this.newWidget(this.props.uuid, toSave, null, 2)
           } else {
             let id = found[0].node.id
-            this.updateWidget(id, JSON.stringify(toSave, null, 2))
+            this.updateWidget(id, toSave, null, 2)
           }
         }
 
@@ -80,7 +80,7 @@ class BoxItem extends React.Component {
     if (widgetValue.filePath) {
       var widgetClass = require("../../../includes/DefaultWidgets/"+widgetValue.filePath);
       if (widgetClass.widgetForm) {
-        widgetForm = widgetClass.widgetForm()
+        widgetForm = widgetClass.widgetForm(this.props.uuid)
       }
     }
      if (isDragging) {

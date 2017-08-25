@@ -76,6 +76,7 @@ const findWidget = (uuid, widgetItem) => ({
           edges {
             node {
               id
+              value
             }
           }
         }
