@@ -17,7 +17,7 @@ import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPost
         toggleSaveImmediatelyMode, togglePermalinkEditingState,
         setPostContent, updateTitleTagLeftCharacter,
         updateMetaDescriptionLeftCharacter, setPostPublishDate, setFeaturedImage,
-        setEditorMode, toggleImageGalleyBinded, setPageList, setAllCategoryList, emptyPostId,
+        setEditorMode, toggleImageGalleyBinded, setPageList, setAllCategoryList, setPostId,
         setOptions, setTagMap, loadFormData} from '../../actions'
 import {reduxForm, Field, formValueSelector} from 'redux-form';
 
@@ -149,14 +149,14 @@ let NewContentType = React.createClass({
   componentWillReceiveProps: function(props){
     if(!props.postId && this.props.postId){
       window.CKEDITOR.instances['content'].setData("");
-      //this.props.dispatch(emptyPostId());
       props.dispatch(resetPostEditor());
       this.handleTitleChange();
       props.destroy()
-    }
+    } 
   },
   resetForm: function(){
     this.props.handleNav(this.props.slug, "new")
+    this.props.dispatch(setPostId(""))
     $(".menu-item").removeClass("active");
     $("#menu-posts-new").addClass("active");
   },
@@ -255,6 +255,7 @@ let NewContentType = React.createClass({
   handleContentChange: function(event){
     var content = window.CKEDITOR.instances['content'].getData();
     this.props.dispatch(setPostContent(content));
+    this.props.change('content', content)
     this.notifyUnsavedData(true);
   },
   handleTitleTagChange: function(event){
@@ -385,6 +386,7 @@ let NewContentType = React.createClass({
           // do these when post data succesfully saved
           here._successNotif(noticeTxt);
           here.props.dispatch(setEditorMode("update"));
+          here.props.dispatch(setPostId(postId));
           here.notifyUnsavedData(false);
           here.bindPostToImageGallery(postId);
           here.props.handleNav(me.props.slug,"edit",postId);

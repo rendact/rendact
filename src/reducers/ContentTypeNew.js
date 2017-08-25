@@ -30,8 +30,8 @@ const INITIAL_VALUES =  [{
 const contentTypeNew = (state = INITIAL_VALUES, action) => {
   console.log(action.type)
   switch (action.type) {
-    case 'EMPTY_POST_ID':
-      return state.map(item => ({...item, postId: ""}))
+    case 'SET_POST_ID':
+      return state.map(item => ({...item, postId: action.postId}))
 
     case 'MASK_AREA':
       if (state)
@@ -54,7 +54,7 @@ const contentTypeNew = (state = INITIAL_VALUES, action) => {
     
     case 'RESET_POST_EDITOR':
         let data = {postId: "", initialValues:{}, data:{}, title:"", permalink: "", content:"", summary:"", featuredImage: null, imageGallery:[],
-        status:"Draft", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
+        status:"Published", immediately:"", immediatelyStatus:false, visibilityTxt:"Public",
         permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160}
       return state.map(item => ({...item, ...data}))
     
