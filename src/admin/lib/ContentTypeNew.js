@@ -255,6 +255,7 @@ let NewContentType = React.createClass({
   handleContentChange: function(event){
     var content = window.CKEDITOR.instances['content'].getData();
     this.props.dispatch(setPostContent(content));
+    this.props.change('content', content)
     this.notifyUnsavedData(true);
   },
   handleTitleTagChange: function(event){
