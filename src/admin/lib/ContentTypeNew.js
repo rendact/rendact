@@ -300,7 +300,6 @@ let NewContentType = React.createClass({
   },
   onSubmit: function(v) {
     var me = this;
-    /*
     if (v.status === "Published" || v.status === "Draft" || v.status === "Reviewing") {
       if (v.title === null || v.title.length<=3) {
         this._errorNotif('Title is too short');
@@ -311,7 +310,7 @@ let NewContentType = React.createClass({
         this._errorNotif("Content can't be empty");
         return;
       }
-    }*/
+    }
     var _objData = this._emulateDataForSaving(v);
     var qry = "", noticeTxt = "";
     if (this.props.mode==="create"){
@@ -322,7 +321,6 @@ let NewContentType = React.createClass({
       qry = this.props.updateQuery(_objData);
       noticeTxt = this.props.name+' Updated!';
     }
-    debugger;
     this.disableForm(true);
 
     riques(qry, 
@@ -533,7 +531,8 @@ let NewContentType = React.createClass({
       />
     )
   },
-  componentWillMount: function(){
+ 
+  componentDidMount: function(){
     var me = this;
 
     if (this.isWidgetActive("pageHierarchy")) {
@@ -546,7 +545,6 @@ let NewContentType = React.createClass({
                 {item.node.title}</option>));
             })
             me.props.dispatch(setPageList(pageList));
-            me.disableForm(false);
           }
       });
     }
@@ -583,14 +581,8 @@ let NewContentType = React.createClass({
           }
         }
       );
-    
     };
-  },
- 
-  componentDidMount: function(){
-    var me = this;
-    
-    
+        
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
       window.CKEDITOR.replace('content', {
         height: 400,
@@ -619,6 +611,7 @@ let NewContentType = React.createClass({
     else
       document.getElementById("private").setAttribute('checked', true);
 
+            me.disableForm(false);
     this.notification = this.refs.notificationSystem;
   },
   render: function(){
