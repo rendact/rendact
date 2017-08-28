@@ -21,6 +21,7 @@ import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPost
         setOptions, setTagMap, loadFormData} from '../../actions'
 import {reduxForm, Field, formValueSelector} from 'redux-form';
 
+
 const PermalinkEditor = (props) => {
   return (
     <div className="form-inline">
@@ -193,10 +194,14 @@ let NewContentType = React.createClass({
     //this.props.dispatch(setContentFormValues(v));
 
     // set categories value to state
+    let me = this
     var _postCategoryList = [];
     if (v.category.edges.length>0) {
       _.forEach(v.category.edges, function(i){
-        if (i.node.category){ _postCategoryList.push(i.node.category.id) }
+        if (i.node.category){ 
+          _postCategoryList.push(i.node.category.id) 
+          me.props.change("categories."+i.node.category.id, true)
+        }
       });
       this.props.dispatch(setCategoryList(_postCategoryList));
     }
@@ -289,6 +294,7 @@ let NewContentType = React.createClass({
     v = _.cloneDeep(v)
     delete v.statusSelect
     delete v.visibilityRadio
+    delete v.categories
 
     v["content"] = this.props.content;
     v["visibility"] = this.props.visibilityTxt;
@@ -351,8 +357,12 @@ let NewContentType = React.createClass({
           }
           
           if (me.isWidgetActive("category")) {
+            // process categories
+            let categToSave = _.keys(v.categories) 
+
             here.disableForm(true);
-            var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.props.postCategoryList, v.categories);
+            var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.props.postCategoryList, categToSave);
+            console.log(catQry)
             if (catQry)
               riques(catQry,
                 function(error, response, body) {
@@ -560,11 +570,14 @@ let NewContentType = React.createClass({
       riques(Query.getAllCategoryQry(postType), 
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
+            /*
             var categoryList = [];
             _.forEach(body.data.viewer.allCategories.edges, function(item){
               categoryList.push((<div key={item.node.id}><input id={item.node.id}
               name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
             })
+            */
+            let categoryList = body.data.viewer.allCategories.edges.map(item => item.node)
             me.props.dispatch(setAllCategoryList(categoryList));
             me.disableForm(false);
           } else {
@@ -875,7 +888,14 @@ let NewContentType = React.createClass({
                     <div className="box-body pad">
                       <div>
                       <div className="form-group">
-                          {this.props.allCategoryList}
+                        {
+                          _.map(this.props.allCategoryList, (cat, index) => {
+                            return <div key={index}> 
+                              <Field name={"categories." + cat.id} component="input" type="checkbox"/>
+                              {cat.name}
+                            </div>
+                          })
+                        }
                       </div>
                       </div>                  
                     </div>
