@@ -43,10 +43,11 @@ const getPostListQry = function(s, postType, tagId, cateId) {
     category = ', category: {category: {id: {eq: "'+cateId+'"}}}';
   }
 
+  //
   return {
     "query": 
       'query getPosts{viewer {allPosts(where: {type: {eq: "post"}, status: '+status+' '+tag+' '+category+' }) { edges { node { '
-      +'id,title,content,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{category{id, name}}}},tag{edges{node{tag{id, name}}}},comments{edges{node{id,content,name,email,website}}},file{edges{node{id,value}}}, featuredImage,createdAt}}}}}'
+      +'id,title,content,slug,author{username},status,meta{edges{node{id,item,value}}},category{edges{node{id,category{id, name}}}},tag{edges{node{tag{id, name}}}},comments{edges{node{id,content,name,email,website}}},file{edges{node{id,value}}}, featuredImage,createdAt}}}}}'
   };
 }
 
@@ -309,8 +310,15 @@ const getUpdateCategoryOfPostQry = function(id, postId, categoryId){
 
 const createUpdateCategoryOfPostMtn = function(postId, currentCat, newCat){
   var variables = {};
-  var deleteList = _.difference(currentCat, newCat);
-  var addList = _.difference(newCat, currentCat);
+  var currentCatIds = _.map(currentCat, x => x[0])
+  var deleteList = [] ;
+  _.forEach(currentCat, cc => {
+    if (_.indexOf(newCat, cc[0]) === -1){
+      deleteList.push(cc[1])
+    }
+  })
+ 
+  var addList = _.difference(newCat, currentCatIds);
 
   if (deleteList.length===0 && addList.length===0) return null;
   
@@ -333,8 +341,7 @@ const createUpdateCategoryOfPostMtn = function(postId, currentCat, newCat){
   _.forEach(deleteList, function(item){
     query += ' DeleteCategoryOfPost'+index+' : deleteCategoryOfPost(input: $input'+index+'){ changedCategoryOfPost{ id } }'; 
     variables["input"+index] = {
-      postId: postId,
-      categoryId: item
+      id: item
     }
 
     index++;
@@ -367,7 +374,6 @@ const createUpdateTagOfPostMtn = function(postId, oldTag, currentTag, tagMap){
     var obj = _.find(oldTag, {name: item});
     return obj.connectionId;
   })
-  debugger;
   if (deleteListId.length===0 && addList.length===0) return null;
 
   var query = "mutation (";
@@ -415,7 +421,7 @@ const createUpdateTagOfPostMtn = function(postId, oldTag, currentTag, tagMap){
 const getPostQry = function(postId){
   return {"query": 
      `{getPost(id:"`+postId+`"){ id,title,content,slug,author{username},status,visibility,featuredImage,
-      summary,category{edges{node{category{id,name}}}},comments{edges{node{id,content,name,email,website}}},file{edges{node{id value}}},
+      summary,category{edges{node{id, category{id,name}}}},comments{edges{node{id,content,name,email,website}}},file{edges{node{id value}}},
       tag{edges{node{id,tag{id,name}}}},meta{edges{node{id,item,value}}},createdAt}}`
     }
 };

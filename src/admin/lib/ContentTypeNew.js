@@ -199,7 +199,9 @@ let NewContentType = React.createClass({
     if (v.category.edges.length>0) {
       _.forEach(v.category.edges, function(i){
         if (i.node.category){ 
-          _postCategoryList.push(i.node.category.id) 
+          // index 0 is category id
+          // index 1 is categoryOfPost id
+          _postCategoryList.push([i.node.category.id, i.node.id]) 
           me.props.change("categories."+i.node.category.id, true)
         }
       });
@@ -362,7 +364,6 @@ let NewContentType = React.createClass({
 
             here.disableForm(true);
             var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.props.postCategoryList, categToSave);
-            console.log(catQry)
             if (catQry)
               riques(catQry,
                 function(error, response, body) {
