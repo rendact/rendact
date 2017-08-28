@@ -5,7 +5,7 @@ import Fn from './functions'
 import _ from 'lodash'
 import Notification from 'react-notification-system'
 import Halogen from 'halogen'
-import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle, swalert, getValue} from '../../utils'
+import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle, swalert, getValue, disableForm} from '../../utils'
 import {Table, SearchBoxPost, DeleteButtons} from './Table'
 import {connect} from 'react-redux'
 import {setStatusCounter, initContentList, maskArea, toggleDeleteMode, toggleSelectedItemState} from '../../actions'
@@ -23,7 +23,6 @@ let ContentType = React.createClass({
     dynamicStateBtnList: React.PropTypes.arrayOf(React.PropTypes.string),
     activeStatus: React.PropTypes.string,
     itemSelected: React.PropTypes.bool,
-    //isProcessing: React.PropTypes.bool,
     fields: React.PropTypes.array,
     allPostId: React.PropTypes.array,
     replaceStatusWithRole: React.PropTypes.bool
@@ -42,6 +41,7 @@ let ContentType = React.createClass({
   dt: null,
   loadData: function(status, callback) {
     var me = this;
+    this.disableForm(true);
     var metaItemList = _.map(this.props.customFields, function(item) { return item.id });
     riques(this.props.listQuery("Full", this.props.postType, this.props.tagId, this.props.cateId), 
       function(error, response, body) { 
@@ -66,13 +66,15 @@ let ContentType = React.createClass({
         
         if (me.props.replaceStatusWithRole){
           _statusCount["All"] = _postArr.length;
+          me.disableForm(false);
         } else {
           _statusCount["All"] = _postArr.length-_statusCount["Trash"];
+          me.disableForm(false);
         }
         me.props.dispatch(setStatusCounter(_statusCount))
       }
     );
-
+    this.disableForm(true);
     var qry = this.props.listQuery(status, this.props.postType, this.props.tagId, this.props.cateId);
     var fields = _.map(this.props.fields, function(item){
       return item.id
@@ -144,17 +146,20 @@ let ContentType = React.createClass({
                 }
                 else
                   _obj[fld] = item.node[fld];
+                  me.disableForm(false);
               } else {
                 if (fld==="like"){
                   var likeNode = _.find(item.node.meta.edges,{"node": {"item": "like"}});
                   var likes = likeNode?likeNode.node.value:"0";
                   _obj[fld] = likes;
+                  me.disableForm(false);
                 }
 
                 if (_.indexOf(metaItemList, fld)>-1) {
                   var _edge = _.find(item.node.meta.edges,{"node": {"item": fld}});
                   var _val = _edge?_edge.node.value:"";
                   _obj[fld] = _val; 
+                  me.disableForm(false);
                 }
               }
             });
@@ -170,22 +175,17 @@ let ContentType = React.createClass({
           me.props.dispatch(initContentList(monthList, _allPostId))
 
           if (callback) callback.call();
+          me.disableForm(false);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
+          me.disableForm(false);
         }
       }
     );
   },
-  disableForm: function(isDisabled){
-    var me = this;
-    _.forEach(document.getElementsByTagName('input'), function(el){ el.disabled = isDisabled;})
-    _.forEach(document.getElementsByTagName('button'), function(el){ 
-      if (_.indexOf(me.props.dynamicStateBtnList, el.id) < 0)
-        el.disabled = isDisabled;
-    })
-    _.forEach(document.getElementsByTagName('select'), function(el){ el.disabled = isDisabled;})
-    this.props.dispatch(maskArea(isDisabled))
-    if (!isDisabled) { this.checkDynamicButtonState();}
+  disableForm: function(isFormDisabled){
+    disableForm(isFormDisabled, this.notification);
+    this.props.dispatch(maskArea(isFormDisabled));
   },
   isWidgetActive: function(name){
     return _.indexOf(this.props.widgets, name) > -1;
@@ -389,9 +389,7 @@ let ContentType = React.createClass({
     var datatable = this.table.datatable;
     this.refs.rendactSearchBoxPost.bindToTable(datatable);
     this.dt=datatable;
-    this.disableForm(true);
     this.loadData("All");
-    this.disableForm(false);
   },
   render: function(){
     return (
