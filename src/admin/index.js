@@ -201,6 +201,7 @@ class PageLoader extends React.Component{
     var pid = this.props.postId;
     var hn = this.props.handleNav;
     var hud = this.props.handleUnsavedData;
+    var params = this.props.urlParams;
     var map = {
       'dashboard' : <Dashboard />,
       'settings' : <Settings handleNav={hn}/>,
@@ -224,8 +225,8 @@ class PageLoader extends React.Component{
       'pages-new' : <NewPage handleNav={hn} handleUnsavedData={hud}/>,
       'theme-new' : <NewTheme handleNav={hn}/>,
       'users-new' : <NewUser handleNav={hn}/>,
-      'posts-edit' : <NewPost postId={pid} handleNav={hn} handleUnsavedData={hud}/>,
-      'pages-edit' : <NewPage postId={pid} handleNav={hn} handleUnsavedData={hud}/>,
+      'posts-edit' : <NewPost postId={pid} urlParams={params} handleNav={hn} handleUnsavedData={hud}/>,
+      'pages-edit' : <NewPage postId={pid} urlParams={params} handleNav={hn} handleUnsavedData={hud}/>,
       'users-edit' : <NewUser userId={pid} handleNav={hn}/>,
       'widget': <Widgets handleNav={hn}/>
     }
@@ -425,16 +426,19 @@ class Admin extends React.Component{
                 action: actionId,
                 postId: postId
             })
-            window.history.pushState("", "", '/admin/'+pageId+'/'+actionId+'/'+postId);
+            //window.history.pushState("", "", '/admin/'+pageId+'/'+actionId+'/'+postId);
+            me._reactInternalInstance._context.history.push('/admin/'+pageId+'/'+actionId+'/'+postId)
           } else {
             me.setState({
               page: pageId,
               action: actionId
             })
             if (actionId)
-              window.history.pushState("", "", '/admin/'+pageId+'/'+actionId);
+              //window.history.pushState("", "", '/admin/'+pageId+'/'+actionId);
+              me._reactInternalInstance._context.history.push('/admin/'+pageId+'/'+actionId)
             else 
-              window.history.pushState("", "", '/admin/'+pageId);
+              //window.history.pushState("", "", '/admin/'+pageId);
+              me._reactInternalInstance._context.history.push('/admin/'+pageId)
           }
       });
   }
@@ -468,6 +472,7 @@ class Admin extends React.Component{
               postId={this.state.postId} 
               handleNav={this.redirectToPage}
               handleUnsavedData={this.setUnsavedDataState}
+              urlParams={this.props.params}
             />
             <Footer/>
             { this.state.showCtrlSidebar && 
