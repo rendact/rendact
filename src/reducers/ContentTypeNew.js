@@ -6,6 +6,7 @@ const INITIAL_VALUES =  [{
       opacity: 1,
       title: "",
       content: "",
+      featuredImage: "",
       status:"Published",
       immediatelyStatus:true,
       visibilityTxt:"Public",

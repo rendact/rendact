@@ -96,6 +96,7 @@ let NewContentType = React.createClass({
       opacity: 1,
       title: "",
       content: "",
+      featuredImage: "",
       status:"Published",
       immediatelyStatus:true,
       visibilityTxt:"Public",
@@ -292,12 +293,20 @@ let NewContentType = React.createClass({
     var resetDate = this.props.publishDateReset;
     this.props.dispatch(setPostPublishDate(resetDate, false));
   },
+  featuredImageChange: function(e){
+    var me = this;
+    var reader = new FileReader();
+    reader.onload = function(){
+      me.props.dispatch(setFeaturedImage(reader.result));
+    };
+    reader.readAsDataURL(e.target.files[0]);
+  },
   _emulateDataForSaving: function(v){
     v = _.cloneDeep(v)
     delete v.statusSelect
     delete v.visibilityRadio
     delete v.categories
-
+debugger;
     v["content"] = this.props.content;
     v["visibility"] = this.props.visibilityTxt;
     v["type"] = this.props.postType;
@@ -361,7 +370,6 @@ let NewContentType = React.createClass({
           if (me.isWidgetActive("category")) {
             // process categories
             let categToSave = _.keys(v.categories) 
-
             here.disableForm(true);
             var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.props.postCategoryList, categToSave);
             if (catQry)
@@ -426,14 +434,6 @@ let NewContentType = React.createClass({
       position: 'tr',
       autoDismiss: 2
     });
-  },
-  featuredImageChange: function(e){
-    var me = this;
-    var reader = new FileReader();
-    reader.onload = function(){
-      me.props.dispatch(setFeaturedImage(reader.result));
-    };
-    reader.readAsDataURL(e.target.files[0]);
   },
   imageGalleryChange: function(e){
     var me = this;
@@ -941,7 +941,8 @@ let NewContentType = React.createClass({
                       <div>
                         { this.props.featuredImage &&
                           <div style={{position: "relative"}}>
-                            <img src={this.props.featuredImage} style={{width: "100%"}} alt={this.props.title}/>
+                            <Field component="img" src={this.props.featuredImage} style={{width: "100%"}} alt={this.props.title} />
+                            { /* <img src={this.props.featuredImage} style={{width: "100%"}} alt={this.props.title}/> */ }
                             <button onClick={()=>{this.props.dispatch(setFeaturedImage(null))}} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
                           </div>
                         }
