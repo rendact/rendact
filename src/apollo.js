@@ -31,9 +31,9 @@ networkInterface.use([{
     if (!req.options.headers) {
       req.options.headers = {};  // Create the header object if needed.
     }
-    if (localStorage.getItem('scaphold_user_token')) {
+    if (localStorage.getItem('token')) {
       // This is how to authorize users using http auth headers
-      req.options.headers.Authorization = `Bearer ${localStorage.getItem('scaphold_user_token')}`;
+      req.options.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
     }
     next();
   },
