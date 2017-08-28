@@ -305,6 +305,7 @@ let NewContentType = React.createClass({
     delete v.metaDescription
     delete v.metaKeyword
     delete v.titleTag
+    delete v.pageTemplate
 
     v["content"] = this.props.content;
     v["visibility"] = this.props.visibilityTxt;
