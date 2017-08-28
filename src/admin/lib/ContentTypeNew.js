@@ -161,7 +161,7 @@ let NewContentType = React.createClass({
     $(".menu-item").removeClass("active");
     $("#menu-posts-new").addClass("active");
   },
-  getMetaFormValues: function(){
+  getMetaFormValues: function(v){
     var out = getFormData("metaField");
 
     _.forEach(this.props.connectionValue, function(item, key){
@@ -243,9 +243,14 @@ let NewContentType = React.createClass({
         _connectionValue[isConnItem[1]] = item.value; 
       }
     });
+    // manual change because with initialValues values in the
+    // these fields not displayed
     this.props.dispatch(setConnectionValue(_connectionValue));
     this.props.change("title", this.props.data.title)
     this.props.change("visibilityRadio", this.props.data.visibility)
+    _.forEach(this.props.data.meta.edges, meta => {
+      this.props.change(meta.node.item, meta.node.value)
+    })
   },
   formatDate: function(date){
     var min = date.getMinutes();
@@ -306,7 +311,11 @@ let NewContentType = React.createClass({
     delete v.statusSelect
     delete v.visibilityRadio
     delete v.categories
-debugger;
+    delete v.metaDescription
+    delete v.metaKeyword
+    delete v.titleTag
+    delete v.pageTemplate
+
     v["content"] = this.props.content;
     v["visibility"] = this.props.visibilityTxt;
     v["type"] = this.props.postType;
@@ -338,13 +347,13 @@ debugger;
       noticeTxt = this.props.name+' Updated!';
     }
     this.disableForm(true);
+          var metaDataList = me.getMetaFormValues();
 
     riques(qry, 
       function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
           var here = me, postId = "", pmQry = "";
           
-          var metaDataList = me.getMetaFormValues();
  
           if (me.props.mode==="create"){
             postId = body.data.createPost.changedPost.id;
