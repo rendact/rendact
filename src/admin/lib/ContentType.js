@@ -286,6 +286,7 @@ let ContentType = React.createClass({
       var me = this;
       this.loadData("Trash", function(){
         me.props.dispatch(toggleDeleteMode(status, true));
+        debugger;
         me.disableForm(false);
       });
     }else{
@@ -388,8 +389,9 @@ let ContentType = React.createClass({
     var datatable = this.table.datatable;
     this.refs.rendactSearchBoxPost.bindToTable(datatable);
     this.dt=datatable;
+    this.disableForm(true);
     this.loadData("All");
-    this.props.dispatch(maskArea(true))
+    this.disableForm(false);
   },
   render: function(){
     return (
