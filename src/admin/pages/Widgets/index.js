@@ -1,16 +1,10 @@
 import React from 'react';
 import _ from 'lodash';
-import {toWidgetAreaStructure, riques, errorCallback, defaultHalogenStyle, getActiveWidgetArea, disableForm} from '../../../utils';
+import {toWidgetAreaStructure,  defaultHalogenStyle, getActiveWidgetArea} from '../../../utils';
 import Query from '../../query';
 import BoxItemAvailable from './BoxItemAvailable';
 import WidgetAreaContainer from './WidgetAreaContainer';
 import {connect} from 'react-redux';
-import {
-  loadWidgetAreasSuccess, 
-  loadWidgetsAvailableSuccess,
-  maskArea,
-  createActiveWidgetsInitialValues
-} from '../../../actions'
 import Notification from 'react-notification-system';
 import Halogen from 'halogen';
 import {graphql} from 'react-apollo';
@@ -26,7 +20,9 @@ let AllWidgetsAvailable = (props) => {
           <ul id="widgetAvailables" className="widgets no-drop list-unstyled">
               {_.map(props.data.viewer.allOptions.edges, (widget, index) => (
                 <div className='col-md-12' key={index}>
-                  <BoxItemAvailable widget={widget.node}/>
+                  <BoxItemAvailable 
+                    widget={widget.node}
+                  />
 
                 </div>
               ))}
@@ -41,12 +37,53 @@ const allWidgetsQuery = gql`${Query.getAllWidgets.query}`
 AllWidgetsAvailable = graphql(allWidgetsQuery)(AllWidgetsAvailable)
 
 
+let ListOfWidget = (props) => {
+  let activeWidgetArea = getActiveWidgetArea()
+
+  if (props.listOfWidget.loading || props.allWidgets.loading){
+  return            <div className="col-md-8 masonry">
+              {
+                  _.map(activeWidgetArea, function(item, index){
+                    return <WidgetAreaContainer 
+                      id={item.id}
+                      key={index} 
+                      title={item.id}
+                      widgets={item.widgets}
+                      notif={props.notif}
+                      />
+                  })
+              }
+              </div>
+  }
+  else {
+          let value = JSON.parse(props.listOfWidget.getOptions.value)
+          let _widgetAreas = toWidgetAreaStructure(props.allWidgets.viewer.allOptions.edges, value)
+  return            <div className="col-md-8 masonry">
+              {
+                  _.map(_widgetAreas, function(item, index){
+                    return <WidgetAreaContainer 
+                      id={item.id}
+                      key={index} 
+                      title={item.id}
+                      widgets={item.widgets}
+                      notif={props.notif}
+                      />
+                  })
+              }
+              </div>
+  }
+}
+
+ListOfWidget = _.flow([
+  graphql(gql`${Query.getAllWidgets.query}`, {name: "allWidgets"}),
+  graphql(gql`${Query.getListOfWidget.query}`, {name: "listOfWidget"})
+])(ListOfWidget)
+
+
 
 class Widgets extends React.Component {
   constructor(props){
     super(props);
-    this.loadListOfWidget = this.loadListOfWidget.bind(this)
-    this.loadActiveWidgets = this.loadActiveWidgets.bind(this)
 
     var themeFunctions = require('../../../theme/default/functions.js');
     themeFunctions.default();
@@ -57,66 +94,10 @@ class Widgets extends React.Component {
     require ('../../../../public/css/AdminLTE.css');
     require ('../../../../public/css/skins/_all-skins.css');
     require('./custom.css');
-
-    var _newWidgetArea = getActiveWidgetArea();
-    this.props.dispatch(loadWidgetAreasSuccess(_newWidgetArea));
   }
 
-  loadListOfWidget (){
-    disableForm(true)
-    this.props.dispatch(maskArea(true))
-    riques(Query.getListOfWidget,
-      (error, response, data) => {
-        if (!error && !data.errors && response.statusCode === 200) {
-          let value = JSON.parse(data.data.getOptions.value)
-          let _widgetAreas = toWidgetAreaStructure(this.props.widgetsAvailable, value)
-
-          this.props.dispatch(loadWidgetAreasSuccess(_widgetAreas))
-        } else {
-          errorCallback(error, data.errors?data.errors[0].message:null);
-        }
-        this.props.dispatch(maskArea(false))
-        disableForm(false)
-      }
-    );
-  }
-
-  loadActiveWidgets (){
-    disableForm(true)
-    this.props.dispatch(maskArea(true))
-    riques(Query.getAllActiveWidgets,
-      (error, response, data) => {
-        this.props.dispatch(createActiveWidgetsInitialValues(data.data.viewer.allOptions.edges))
-        this.props.dispatch(maskArea(false))
-        disableForm(false)
-      }
-    );
-  }
-
-  componentWillMount(){
-    /*
-     * all registered widget
-     */
-    disableForm(true)
-    this.props.dispatch(maskArea(true))
-    riques(Query.getAllWidgets,
-      (error, response, data) => {
-        if (!error && !data.errors && response.statusCode === 200){
-          this.props.dispatch(loadWidgetsAvailableSuccess(data.data.viewer.allOptions.edges))
-          this.loadListOfWidget()
-
-
-        } else {
-          errorCallback(error, data.errors?data.errors[0].message:null);
-        }
-      }
-    )
-    this.loadActiveWidgets()
-
-  }
 
 	render(){
-    let me = this;
 		return (
 			<div className="content-wrapper">
 			<div className="container-fluid" style={{opacity: this.props.opacity}}>
@@ -141,19 +122,7 @@ class Widgets extends React.Component {
               </div>
             </div>
             <div className="row">
-              <div className="col-md-8 masonry">
-              {
-                  _.map(this.props.widgetAreas, function(item, index){
-                    return <WidgetAreaContainer 
-                      id={item.id}
-                      key={index} 
-                      title={item.id}
-                      widgets={item.widgets}
-                      notif={me.refs.notificationSystem}
-                      />
-                  })
-              }
-              </div>
+              <ListOfWidget notif={this.refs.notificationSystem}/>
 
               <div className="col-md-4 pull-right">
                 <div className="box box-primary">
