@@ -196,6 +196,7 @@ export class ThemeHome extends React.Component {
     this.loadMainMenu = loadMainMenu.bind(this);
     this.loadWidgets = loadWidgets.bind(this);
     this.getWidgets = getWidgets.bind(this);
+    this.handlePageClick = this.handlePageClick.bind(this)
 	}
 
 	handlePostClick(e){
