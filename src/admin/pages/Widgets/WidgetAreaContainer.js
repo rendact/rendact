@@ -13,6 +13,8 @@ import {
 } from '../../../actions'
 import {toWidgetAreaStructure, swalert, riques, errorCallback, disableForm} from '../../../utils';
 import Query from '../../query'
+import {addToWidgetArea} from './helpers';
+import {withApollo} from 'react-apollo';
 
 const dropTarget = {
   drop(props, monitor, container){
@@ -160,7 +162,7 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     dispatch(updateWidgetsOrder(ownProps.id, items))
   },
   addToWidgetArea: (widget) => {
-    dispatch(addWidgetToWidgetArea(ownProps.id, widget))
+    addToWidgetArea(ownProps.id, widget.widget, ownProps.client)
   },
   maskArea: (state) => {
     dispatch(maskArea(state))
@@ -172,5 +174,6 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
 
 WidgetAreaContainer = DropTarget('available', dropTarget, collectDrop)(WidgetAreaContainer);
 WidgetAreaContainer = connect(mapStateToProps, mapDispatchToProps)(WidgetAreaContainer)
+WidgetAreaContainer = withApollo(WidgetAreaContainer)
 
 export default WidgetAreaContainer;
