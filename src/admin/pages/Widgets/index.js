@@ -86,6 +86,7 @@ class Widgets extends React.Component {
                             <div className='col-md-12' key={index}>
                               <BoxItemAvailable 
                                 widget={widget.node}
+                                widgetAreas={this.props.widgetAreas}
                               />
 
                             </div>
