@@ -17,7 +17,7 @@ import {graphql} from 'react-apollo';
 import gql from 'graphql-tag';
 
 
-const AllWidgetsAvailable = (props) => {
+let AllWidgetsAvailable = (props) => {
   if (props.data.loading){
     return <p>Loading</p>
   } else {
@@ -39,7 +39,6 @@ const AllWidgetsAvailable = (props) => {
 
 const allWidgetsQuery = gql`${Query.getAllWidgets.query}`
 AllWidgetsAvailable = graphql(allWidgetsQuery)(AllWidgetsAvailable)
-
 
 
 
