@@ -315,13 +315,13 @@ let NewContentType = React.createClass({
     delete v.metaKeyword
     delete v.titleTag
     delete v.pageTemplate
-
+    debugger;
     v["content"] = this.props.content;
     v["visibility"] = this.props.visibilityTxt;
     v["type"] = this.props.postType;
     v["authorId"] = localStorage.getItem('userId');
     v["slug"] = this.props.permalink;
-
+    v["featuredImage"] = this.props.featuredImage;
     return v
   },
   onSubmit: function(v, status) {
