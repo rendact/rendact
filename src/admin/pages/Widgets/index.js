@@ -13,6 +13,34 @@ import {
 } from '../../../actions'
 import Notification from 'react-notification-system';
 import Halogen from 'halogen';
+import {graphql} from 'react-apollo';
+import gql from 'graphql-tag';
+
+
+const AllWidgetsAvailable = (props) => {
+  if (props.data.loading){
+    return <p>Loading</p>
+  } else {
+    return (
+        <div className="row">
+          <ul id="widgetAvailables" className="widgets no-drop list-unstyled">
+              {_.map(props.data.viewer.allOptions.edges, (widget, index) => (
+                <div className='col-md-12' key={index}>
+                  <BoxItemAvailable widget={widget.node}/>
+
+                </div>
+              ))}
+
+          </ul>
+        </div>
+    )
+  }
+}
+
+const allWidgetsQuery = gql`${Query.getAllWidgets.query}`
+AllWidgetsAvailable = graphql(allWidgetsQuery)(AllWidgetsAvailable)
+
+
 
 
 class Widgets extends React.Component {
@@ -134,17 +162,7 @@ class Widgets extends React.Component {
                       <h3 className="box-title">Available widgets</h3>
                   </div>
                   <div className="box-body">
-                    <div className="row">
-                      <ul id="widgetAvailables" className="widgets no-drop list-unstyled">
-                          {_.map(this.props.widgetsAvailable, (widget, index) => (
-                            <div className='col-md-12' key={index}>
-                              <BoxItemAvailable widget={widget.node}/>
-
-                            </div>
-                          ))}
-
-                      </ul>
-                    </div>
+                    <AllWidgetsAvailable/>
                   </div>
                 </div>
               </div> 

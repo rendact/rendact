@@ -149,11 +149,18 @@ let NewContentType = React.createClass({
     this.props.dispatch(maskArea(isFormDisabled));
   },
   componentWillReceiveProps: function(props){
+    //
+    console.log(props.urlParams)
+    if (props.urlParams.postId !== this.props.postId){
+      props.dispatch(setPostId(props.urlParams.postId))
+      props.destroy()
+      console.log("hello")
+    }
     if(!props.postId && this.props.postId){
       window.CKEDITOR.instances['content'].setData("");
       props.dispatch(resetPostEditor());
       props.destroy()
-    } 
+    }
   },
   resetForm: function(){
     this.props.handleNav(this.props.slug, "new")
@@ -176,6 +183,7 @@ let NewContentType = React.createClass({
   setFormValues: function(v){
     var meta = [];
     var metaValues = {}
+    this.props.destroy()
 
     // prepare post meta values
     if (v.meta.edges.length>0) {
@@ -391,6 +399,7 @@ let NewContentType = React.createClass({
                     
                   } else {
                     errorCallback(error, body.errors?body.errors[0].message:null, "Save Category");
+                    debugger
                   }
                 }
               );

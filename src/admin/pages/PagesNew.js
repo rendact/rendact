@@ -18,6 +18,7 @@ let NewPage = React.createClass({
       modifyRole="modify-page"
       handleNav={this.props.handleNav}
       handleUnsavedData={this.props.handleUnsavedData}
+      urlParams={this.props.urlParams}
     />
   }
 });
