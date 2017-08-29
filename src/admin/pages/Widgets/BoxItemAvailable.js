@@ -38,7 +38,7 @@ class BoxItemAvailable extends React.Component {
         <p>{widgetValue.help}</p>
     </div>
     <div className="box-footer text-center">
-      <AddToWidgetAreaForm widget={widget} />
+      <AddToWidgetAreaForm widget={widget} widgetAreas={this.props.widgetAreas} />
     </div>
   </div>
     )
