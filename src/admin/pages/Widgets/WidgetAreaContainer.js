@@ -13,7 +13,7 @@ import {
 } from '../../../actions'
 import {toWidgetAreaStructure, swalert, riques, errorCallback, disableForm} from '../../../utils';
 import Query from '../../query'
-import {addToWidgetArea} from './helpers';
+import {addToWidgetArea, orderWidgetArea} from './helpers';
 import {withApollo} from 'react-apollo';
 
 const dropTarget = {
@@ -159,7 +159,7 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     dispatch(removeAllWidgetsFromWidgetArea(ownProps.id))
   },
   orderWidgets: (items) => {
-    dispatch(updateWidgetsOrder(ownProps.id, items))
+    orderWidgetArea(ownProps.id, items, ownProps.client)
   },
   addToWidgetArea: (widget) => {
     addToWidgetArea(ownProps.id, widget.widget, ownProps.client)
