@@ -323,13 +323,13 @@ let NewContentType = React.createClass({
     delete v.metaKeyword
     delete v.titleTag
     delete v.pageTemplate
-
+    debugger;
     v["content"] = this.props.content;
     v["visibility"] = this.props.visibilityTxt;
     v["type"] = this.props.postType;
     v["authorId"] = localStorage.getItem('userId');
     v["slug"] = this.props.permalink;
-
+    v["featuredImage"] = this.props.featuredImage;
     return v
   },
   onSubmit: function(v, status) {
@@ -959,7 +959,7 @@ let NewContentType = React.createClass({
                       <div>
                         { this.props.featuredImage &&
                           <div style={{position: "relative"}}>
-                            <Field component="img" src={this.props.featuredImage} style={{width: "100%"}} alt={this.props.title} />
+                            <Field id="featuredImage" name="featuredImage" component="img" src={this.props.featuredImage} style={{width: "100%"}} alt={this.props.title} />
                             { /* <img src={this.props.featuredImage} style={{width: "100%"}} alt={this.props.title}/> */ }
                             <button onClick={()=>{this.props.dispatch(setFeaturedImage(null))}} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
                           </div>
@@ -1044,6 +1044,7 @@ const mapStateToProps = function(state){
     hours: selector(state, 'hours'),
     minutes: selector(state, 'minutes'),
     summary: selector(state, 'summary'),
+    featuredImage: selector(state, 'featuredImage'),
     titleTag: selector(state, 'titleTag'),
     metaKeyword: selector(state, 'metaKeyword'),
     metaDescription: selector(state, 'metaDescription'),
