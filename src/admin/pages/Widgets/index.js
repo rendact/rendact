@@ -1,7 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import {toWidgetAreaStructure,  defaultHalogenStyle, getActiveWidgetArea} from '../../../utils';
-import Query from '../../query';
+import {toWidgetAreaStructure,  defaultHalogenStyle, errorCallback, getActiveWidgetArea} from '../../../utils';
 import BoxItemAvailable from './BoxItemAvailable';
 import WidgetAreaContainer from './WidgetAreaContainer';
 import {connect} from 'react-redux';
@@ -10,11 +9,8 @@ import Halogen from 'halogen';
 import {withApollo, graphql} from 'react-apollo';
 import gql from 'graphql-tag';
 import {
-  loadWidgetsAvailableSuccess,
-  loadWidgetAreasSuccess,
   maskArea,
 } from '../../../actions';
-import clientGraphql from '../../../apollo';
 
 
 class Widgets extends React.Component {
@@ -179,6 +175,7 @@ Widgets = graphql(widgetQry, {
       }
     } else if(data.error) {
       console.log(data.error)
+      errorCallback(data.error, data.error, data.error)
        return {hasError: true}
     } else {
 

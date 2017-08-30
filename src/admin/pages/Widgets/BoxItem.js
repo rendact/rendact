@@ -1,10 +1,9 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {
-  removeSingleWidgetFromWidgetArea,
   maskArea,
 } from '../../../actions'
-import {disableForm, errorCallback, swalert, riques} from '../../../utils'
+import {disableForm, swalert} from '../../../utils'
 import {reduxForm, Field} from 'redux-form';
 import Query from '../../query';
 import {withApollo, graphql, compose} from 'react-apollo'
@@ -57,8 +56,7 @@ class BoxItem extends React.Component {
           refetchQueries: [
             {query: query }
           ]
-        }).
-          then(({data}) => {
+        }).then(({data}) => {
             disableForm(false)
             this.props.maskArea(false)
           })

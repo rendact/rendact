@@ -5,13 +5,9 @@ import BoxItem from './BoxItem';
 import { Nestable } from '../../lib/react-dnd-nestable/react-dnd-nestable'
 import { connect } from 'react-redux'
 import {
-  updateWidgetsOrder,
-  addWidgetToWidgetArea, 
-  removeAllWidgetsFromWidgetArea,
-  loadWidgetAreasSuccess,
   maskArea
 } from '../../../actions'
-import {toWidgetAreaStructure, swalert, riques, errorCallback, disableForm} from '../../../utils';
+import { swalert,  disableForm} from '../../../utils';
 import Query from '../../query'
 import {addToWidgetArea, orderWidgetArea, clearAllWidget} from './helpers';
 import {graphql, withApollo} from 'react-apollo';
@@ -142,9 +138,6 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   },
   maskArea: (state) => {
     dispatch(maskArea(state))
-  },
-  loadWidgetAreasSuccess: (widgetAreas) => {
-    dispatch(loadWidgetAreasSuccess(widgetAreas))
   },
 });
 
