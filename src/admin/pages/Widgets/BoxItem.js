@@ -76,8 +76,7 @@ class BoxItem extends React.Component {
 
     if (widgetValue.filePath) {
       var widgetClass = require("../../../includes/DefaultWidgets/"+widgetValue.filePath);
-      if (widgetClass.widgetForm) {
-        widgetForm = widgetClass.widgetForm(this.props.uuid)
+      if (widgetClass.widgetForm) { widgetForm = widgetClass.widgetForm(this.props.uuid)
       }
     }
      if (isDragging) {
@@ -118,9 +117,6 @@ class BoxItem extends React.Component {
    }
 }
 
-const mapStateToProps = (state) => ({
-  initialValues: state.widgets.activeWidgetsInitials
-});
 const mapDispatchToProps = (dispatch, ownProps) => ({
   removeWidget: () => {
       swalert("warning", "Sure want to remove this widget?", "", () => {
@@ -133,7 +129,7 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
 });
 
 BoxItem = reduxForm({form: 'widgetBox'})(BoxItem)
-BoxItem = connect(mapStateToProps, mapDispatchToProps)(BoxItem)
+BoxItem = connect(null, mapDispatchToProps)(BoxItem)
 BoxItem = withApollo(BoxItem)
 BoxItem = compose(
   graphql(gql`${Query.createWidget().query}`, {name: 'createNew'}),

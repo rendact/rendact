@@ -75,6 +75,7 @@ class Widgets extends React.Component {
                       title={item.id}
                       widgets={item.widgets}
                       notif={this.refs.notificationSystem}
+                      initialValues={this.props.initialValues}
                       />
                   })
               }
@@ -179,13 +180,22 @@ Widgets = graphql(widgetQry, {
     let allWidgets = data.viewer.allWidgets.edges
 
     let _listOfWidget = JSON.parse(data.getOptions.value)
-    _listOfWidget = toWidgetAreaStructure(allWidgets, _listOfWidget)
+      _listOfWidget = toWidgetAreaStructure(allWidgets, _listOfWidget)
+
+      let allActiveWidget = _.map(data.viewer.allActiveWidget.edges, item => item.node)
+      let initials = {}
+
+      _.forEach(allActiveWidget, widget => {
+        let uuid = widget.item.split("#")[1]
+        initials[uuid] = JSON.parse(widget.value)
+      })
 
     return {
       opacity: 1,
       isProcessing: false,
       widgetsAvailable: allWidgets,
-      widgetAreas : _listOfWidget
+      widgetAreas : _listOfWidget,
+      initialValues: initials
     }
     }
 
