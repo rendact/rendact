@@ -1044,7 +1044,7 @@ const mapStateToProps = function(state){
     hours: selector(state, 'hours'),
     minutes: selector(state, 'minutes'),
     summary: selector(state, 'summary'),
-    featuredImage: selector(state, 'featuredImage'),
+    //featuredImage: selector(state, 'featuredImage'),
     titleTag: selector(state, 'titleTag'),
     metaKeyword: selector(state, 'metaKeyword'),
     metaDescription: selector(state, 'metaDescription'),
