@@ -140,7 +140,7 @@ class Nestable extends Component {
 
   render() {
     const { items } = this.state;
-    const { renderItem, childrenProperty, childrenStyle, childrenClassName } = this.props;
+    const { renderItem, childrenProperty, childrenStyle, childrenClassName, type } = this.props;
 
     return (
       <div>
@@ -151,12 +151,14 @@ class Nestable extends Component {
           childrenStyle={ childrenStyle }
           topLevel={ true }
           childrenClassName={childrenClassName}
+          type={type}
         />
         <CustomDragLayer
           renderItem={ renderItem }
           childrenProperty={ childrenProperty }
           childrenStyle={ childrenStyle }
           childrenClassName={childrenClassName}
+          type={type}
         />
       </div>
     );

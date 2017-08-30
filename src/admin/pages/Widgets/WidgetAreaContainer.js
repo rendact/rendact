@@ -103,6 +103,7 @@ class WidgetAreaContainer extends React.Component {
                           renderItem={this.renderItem}
                           maxDepth={ 1 }
                           onUpdate={this.props.orderWidgets}
+                          type={this.props.id + "-item"}
                           useDragHandle
                         />
                     {isActive &&

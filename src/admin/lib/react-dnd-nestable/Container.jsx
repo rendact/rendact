@@ -26,7 +26,8 @@ class Container extends Component {
       childrenProperty,
       childrenClassName,
       childrenStyle,
-      topLevel
+      topLevel,
+      type
     } = this.props;
 
     return (
@@ -44,6 +45,7 @@ class Container extends Component {
               siblings={ items }
               position={ position }
               depth={ getDepth(item, childrenProperty) }
+              type={type}
             >
               { children && children.length
                 ? <WrappedContainer 
@@ -52,6 +54,7 @@ class Container extends Component {
                     childrenProperty={ childrenProperty }
                     childrenStyle={ childrenStyle }
                     childrenClassName={childrenClassName}
+                    type={type}
                   />
                 : null
               }
