@@ -7,6 +7,8 @@ import {
 import {disableForm, errorCallback, swalert, riques} from '../../../utils'
 import {reduxForm, Field} from 'redux-form';
 import Query from '../../query';
+import {withApollo} from 'react-apollo'
+import {removeSingleWidget} from './helpers';
 
 
 class BoxItem extends React.Component {
@@ -127,7 +129,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch, ownProps) => ({
   removeWidget: () => {
       swalert("warning", "Sure want to remove this widget?", "", () => {
-        dispatch(removeSingleWidgetFromWidgetArea(ownProps.uuid, ownProps.widgetAreaId))
+        removeSingleWidget(ownProps.widgetAreaId, ownProps.uuid, ownProps.client)
       })
   },
   maskArea: (state) => {
@@ -137,5 +139,6 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
 
 BoxItem = reduxForm({form: 'widgetBox'})(BoxItem)
 BoxItem = connect(mapStateToProps, mapDispatchToProps)(BoxItem)
+BoxItem = withApollo(BoxItem)
 
 export default BoxItem;

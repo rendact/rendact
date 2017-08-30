@@ -53,3 +53,17 @@ export const clearAllWidget = (widgetAreaId, client) => {
       data: listOfWidget
     })
 }
+
+export const removeSingleWidget = (widgetAreaId, widgetId, client) => {
+
+  let listOfWidget = client.readQuery({query: gql`${Query.getListOfWidget.query}`})
+  let widgetAreas = JSON.parse(listOfWidget.getOptions.value)
+  widgetAreas[widgetAreaId] = _.filter(widgetAreas[widgetAreaId], w => (w.id !== widgetId))
+
+  listOfWidget.getOptions.value = JSON.stringify(widgetAreas)
+
+    client.writeQuery({
+      query: gql`${Query.getListOfWidget.query}`,
+      data: listOfWidget
+    })
+}
