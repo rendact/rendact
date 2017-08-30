@@ -14,7 +14,9 @@ import {
 import {toWidgetAreaStructure, swalert, riques, errorCallback, disableForm} from '../../../utils';
 import Query from '../../query'
 import {addToWidgetArea, orderWidgetArea} from './helpers';
-import {withApollo} from 'react-apollo';
+import {graphql, withApollo} from 'react-apollo';
+import gql from 'graphql-tag'
+
 
 const dropTarget = {
   drop(props, monitor, container){
@@ -61,47 +63,20 @@ class WidgetAreaContainer extends React.Component {
 
   handleSaveButton(e){
     e.preventDefault();
-    let widgetAreas = _.cloneDeep(this.props.widgetAreas)
-
-    let toSavedData = {}
-    _.forEach(widgetAreas, widgetArea => {
-      let widgets = _.map(widgetArea.widgets, widget => {
-        var widgetValue = JSON.parse(widget.widget.value);
-        return {
-          id: widget.id,
-          widget: widget.widget.item,
-          title: _.has(widgetValue, 'title')?widgetValue.title:widget.widget.item,
-          filePath: _.has(widgetValue, 'filePath')?widgetValue.filePath:null
-        }
-      });
-      toSavedData[widgetArea.id] = widgets
-    })
-
-
-
+    let listOfWidget = this.props.client.readQuery({query: gql`${Query.getListOfWidget.query}`})
     disableForm(true)
     this.props.maskArea(true)
-    let value = JSON.stringify(toSavedData, null, 2);
-    riques(Query.updateListOfWidget(value), 
-      (error, response, data) => {
-        if (!error && response.statusCode === 200 && !data.errors){
-          this.props.notif.addNotification({
-            message: 'List of widgets updated successfully',
-            level: 'success',
-            position: 'tr',
-            autoDismiss: 2,
-          });
-          let value = JSON.parse(data.data.updateOptions.changedOptions.value)
-          let _widgetAreas = toWidgetAreaStructure(this.props.widgetsAvailable, value)
+    this.props.mutate({variables : {
+      input : { 
+        id: "T3B0aW9uczo1NQ==", 
+        value: listOfWidget.getOptions.value
+      }
+    }}).then(({data}) => {
+      console.log(data);
+      disableForm(false)
+      this.props.maskArea(false)
+    });
 
-          this.props.loadWidgetAreasSuccess(_widgetAreas)
-        } else {
-          errorCallback(error, data.errors?data.errors[0].message: null)
-        }
-
-        disableForm(false);
-        this.props.maskArea(false)
-      });
   }
 
   render(){
@@ -172,6 +147,16 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   },
 });
 
+let updateListOfWidgetQuery = gql`mutation UpdateListOfWidet($input: UpdateOptionsInput!) {
+    updateOptions(input: $input) {
+      changedOptions {
+        item
+        value
+      }
+    }
+  }`
+
+WidgetAreaContainer = graphql(updateListOfWidgetQuery)(WidgetAreaContainer);
 WidgetAreaContainer = DropTarget('available', dropTarget, collectDrop)(WidgetAreaContainer);
 WidgetAreaContainer = connect(mapStateToProps, mapDispatchToProps)(WidgetAreaContainer)
 WidgetAreaContainer = withApollo(WidgetAreaContainer)
