@@ -7,12 +7,13 @@ import WidgetAreaContainer from './WidgetAreaContainer';
 import {connect} from 'react-redux';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen';
-import {graphql} from 'react-apollo';
+import {withApollo, graphql} from 'react-apollo';
 import gql from 'graphql-tag';
 import {
   loadWidgetsAvailableSuccess,
   loadWidgetAreasSuccess,
 } from '../../../actions';
+import clientGraphql from '../../../apollo';
 
 
 class Widgets extends React.Component {
@@ -24,7 +25,11 @@ class Widgets extends React.Component {
   }
 
   componentWillReceiveProps(props){
-    console.log(props)
+    console.dir(props.client.readQuery({query: gql`query {
+         allWidget: getOptions(id: "T3B0aW9uczo1NQ=="){
+                value
+                     }
+                     }`}))
   }
 
   componentDidMount(){
@@ -186,6 +191,7 @@ Widgets = graphql(widgetQry, {
 
   }
 })(Widgets)
+Widgets = withApollo(Widgets)
 
 Widgets = connect(mapStateToProps)(Widgets);
 export default Widgets;

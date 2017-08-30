@@ -4,6 +4,12 @@ import {connect} from 'react-redux';
 import {
   addWidgetToWidgetArea,
 } from '../../../actions';
+import {withApollo} from 'react-apollo';
+import Query from '../../query';
+import gql from 'graphql-tag'
+import uuid from 'uuid';
+import _ from 'lodash';
+import {addToWidgetArea} from './helpers'
 
 let AddToWidgetAreaForm = props => {
   const {handleSubmit, widgetAreas} = props;
@@ -32,9 +38,12 @@ let AddToWidgetAreaForm = props => {
 AddToWidgetAreaForm = reduxForm({form: 'addToWidgetAreaForm'})(AddToWidgetAreaForm)
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-  onSubmit: value => dispatch(addWidgetToWidgetArea(value.widgetAreaId, {widget: ownProps.widget})),
+  onSubmit: value => {
+    addToWidgetArea(value.widgetAreaId, ownProps.widget, ownProps.client)
+  },
 })
 
 AddToWidgetAreaForm = connect(null, mapDispatchToProps)(AddToWidgetAreaForm)
+AddToWidgetAreaForm = withApollo(AddToWidgetAreaForm)
 
 export default AddToWidgetAreaForm;
