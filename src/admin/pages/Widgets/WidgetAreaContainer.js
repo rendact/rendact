@@ -13,7 +13,7 @@ import {
 } from '../../../actions'
 import {toWidgetAreaStructure, swalert, riques, errorCallback, disableForm} from '../../../utils';
 import Query from '../../query'
-import {addToWidgetArea, orderWidgetArea} from './helpers';
+import {addToWidgetArea, orderWidgetArea, clearAllWidget} from './helpers';
 import {graphql, withApollo} from 'react-apollo';
 import gql from 'graphql-tag'
 
@@ -131,7 +131,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   removeAllWidgets: () => {
-    dispatch(removeAllWidgetsFromWidgetArea(ownProps.id))
+    clearAllWidget(ownProps.id, ownProps.client)
   },
   orderWidgets: (items) => {
     orderWidgetArea(ownProps.id, items, ownProps.client)

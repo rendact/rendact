@@ -40,3 +40,16 @@ export const orderWidgetArea = (widgetAreaId, items, client) => {
     })
   
 }
+
+export const clearAllWidget = (widgetAreaId, client) => {
+  let listOfWidget = client.readQuery({query: gql`${Query.getListOfWidget.query}`})
+  let widgetAreas = JSON.parse(listOfWidget.getOptions.value)
+  widgetAreas[widgetAreaId] = []
+  
+  listOfWidget.getOptions.value = JSON.stringify(widgetAreas)
+
+    client.writeQuery({
+      query: gql`${Query.getListOfWidget.query}`,
+      data: listOfWidget
+    })
+}
