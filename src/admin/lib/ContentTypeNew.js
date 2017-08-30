@@ -315,22 +315,13 @@ let NewContentType = React.createClass({
     reader.readAsDataURL(e.target.files[0]);
   },
   _emulateDataForSaving: function(v){
-    v = _.cloneDeep(v)
-    delete v.statusSelect
-    delete v.visibilityRadio
-    delete v.categories
-    delete v.metaDescription
-    delete v.metaKeyword
-    delete v.titleTag
-    delete v.pageTemplate;
-    delete v.author;
-    delete v.comments;
-    delete v.meta;
-    delete v.hours;
-    delete v.minutes;
-    delete v.publishDateReset;
-    delete v.category;
-    delete v.createdAt;
+    var output = {};
+    var fields = ["id","title","type","content","order","deleteData",
+    "featuredImage","slug","status","publishDate","passwordPage","parent","summary","visibility","authorId"];
+    _.forEach(fields, function(item){
+      if (v[item]) output[item] = v[item];
+    });
+    
     v["content"] = this.props.content;
     v["visibility"] = this.props.visibilityTxt;
     v["type"] = this.props.postType;
