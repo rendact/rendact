@@ -320,7 +320,7 @@ export const objectToDataset = (obj) => {
 }
 
 export const getActiveWidgetArea = function(){
-  var activeWidgetArea = localStorage.getItem("activeWidgetArea");
+  var activeWidgetArea = localStorage.getItem("activeWidgetArea")||"";
   activeWidgetArea = activeWidgetArea.split(",");
 
   return _.map(activeWidgetArea, function(item){

@@ -25,11 +25,6 @@ class Widgets extends React.Component {
   }
 
   componentWillReceiveProps(props){
-    console.dir(props.client.readQuery({query: gql`query {
-         allWidget: getOptions(id: "T3B0aW9uczo1NQ=="){
-                value
-                     }
-                     }`}))
   }
 
   componentDidMount(){
