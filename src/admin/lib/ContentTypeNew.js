@@ -55,6 +55,7 @@ const PermalinkEditor = (props) => {
 
 let NewContentType = React.createClass({
   propTypes: {
+    urlParams: React.PropTypes.string,
     isProcessing: React.PropTypes.bool.isRequired,
     opacity: React.PropTypes.number.isRequired,
     errorMsg: React.PropTypes.string,
@@ -92,6 +93,7 @@ let NewContentType = React.createClass({
   },
   getDefaultProps: function() {
     return {
+      urlParams: "",
       isProcessing: false,
       opacity: 1,
       title: "",
@@ -149,7 +151,7 @@ let NewContentType = React.createClass({
     this.props.dispatch(maskArea(isFormDisabled));
   },
   componentWillReceiveProps: function(props){
-    //
+    debugger;
     console.log(props.urlParams)
     if (props.urlParams.postId !== this.props.postId){
       props.dispatch(setPostId(props.urlParams.postId))
