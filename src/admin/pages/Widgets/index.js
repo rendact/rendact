@@ -7,78 +7,13 @@ import WidgetAreaContainer from './WidgetAreaContainer';
 import {connect} from 'react-redux';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen';
-import {graphql} from 'react-apollo';
+import {withApollo, graphql} from 'react-apollo';
 import gql from 'graphql-tag';
-
-
-let AllWidgetsAvailable = (props) => {
-  if (props.data.loading){
-    return <p>Loading</p>
-  } else {
-    return (
-        <div className="row">
-          <ul id="widgetAvailables" className="widgets no-drop list-unstyled">
-              {_.map(props.data.viewer.allOptions.edges, (widget, index) => (
-                <div className='col-md-12' key={index}>
-                  <BoxItemAvailable 
-                    widget={widget.node}
-                  />
-
-                </div>
-              ))}
-
-          </ul>
-        </div>
-    )
-  }
-}
-
-const allWidgetsQuery = gql`${Query.getAllWidgets.query}`
-AllWidgetsAvailable = graphql(allWidgetsQuery)(AllWidgetsAvailable)
-
-
-let ListOfWidget = (props) => {
-  let activeWidgetArea = getActiveWidgetArea()
-
-  if (props.listOfWidget.loading || props.allWidgets.loading){
-  return            <div className="col-md-8 masonry">
-              {
-                  _.map(activeWidgetArea, function(item, index){
-                    return <WidgetAreaContainer 
-                      id={item.id}
-                      key={index} 
-                      title={item.id}
-                      widgets={item.widgets}
-                      notif={props.notif}
-                      />
-                  })
-              }
-              </div>
-  }
-  else {
-          let value = JSON.parse(props.listOfWidget.getOptions.value)
-          let _widgetAreas = toWidgetAreaStructure(props.allWidgets.viewer.allOptions.edges, value)
-  return            <div className="col-md-8 masonry">
-              {
-                  _.map(_widgetAreas, function(item, index){
-                    return <WidgetAreaContainer 
-                      id={item.id}
-                      key={index} 
-                      title={item.id}
-                      widgets={item.widgets}
-                      notif={props.notif}
-                      />
-                  })
-              }
-              </div>
-  }
-}
-
-ListOfWidget = _.flow([
-  graphql(gql`${Query.getAllWidgets.query}`, {name: "allWidgets"}),
-  graphql(gql`${Query.getListOfWidget.query}`, {name: "listOfWidget"})
-])(ListOfWidget)
-
+import {
+  loadWidgetsAvailableSuccess,
+  loadWidgetAreasSuccess,
+} from '../../../actions';
+import clientGraphql from '../../../apollo';
 
 
 class Widgets extends React.Component {
@@ -87,6 +22,14 @@ class Widgets extends React.Component {
 
     var themeFunctions = require('../../../theme/default/functions.js');
     themeFunctions.default();
+  }
+
+  componentWillReceiveProps(props){
+    console.dir(props.client.readQuery({query: gql`query {
+         allWidget: getOptions(id: "T3B0aW9uczo1NQ=="){
+                value
+                     }
+                     }`}))
   }
 
   componentDidMount(){
@@ -122,15 +65,40 @@ class Widgets extends React.Component {
               </div>
             </div>
             <div className="row">
-              <ListOfWidget notif={this.refs.notificationSystem}/>
 
+              <div className="col-md-8 masonry">
+              {
+                _.map(this.props.widgetAreas, (item, index) => {
+                    return <WidgetAreaContainer 
+                      id={item.id}
+                      key={index} 
+                      title={item.id}
+                      widgets={item.widgets}
+                      notif={this.refs.notificationSystem}
+                      />
+                  })
+              }
+              </div>
               <div className="col-md-4 pull-right">
                 <div className="box box-primary">
                   <div className="box-header with-border">
                       <h3 className="box-title">Available widgets</h3>
                   </div>
                   <div className="box-body">
-                    <AllWidgetsAvailable/>
+                    <div className="row">
+                      <ul id="widgetAvailables" className="widgets no-drop list-unstyled">
+                          {_.map(this.props.widgetsAvailable, (widget, index) => (
+                            <div className='col-md-12' key={index}>
+                              <BoxItemAvailable 
+                                widget={widget.node}
+                                widgetAreas={this.props.widgetAreas}
+                              />
+
+                            </div>
+                          ))}
+
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div> 
@@ -164,6 +132,66 @@ const mapStateToProps = (state) => {
     isProcessing: state.maskArea.isProcessing
   }
 }
+
+let widgetQry = gql`
+query {
+  getOptions(id: "T3B0aW9uczo1NQ==") {
+      value
+  }
+
+  viewer {
+    allWidgets: allOptions(where: {item: {like: "widget_%"}}) {
+      edges {
+        node {
+          id
+          item
+          value
+        }
+      }
+    }
+
+    allActiveWidget: allOptions(where: {item: {like: "activeWidget#%"}}) {
+      edges {
+        node {
+          id
+          item
+          value
+        }
+      }
+    }
+
+  }
+}
+`
+
+Widgets = graphql(widgetQry, {
+  props: ({ownProps, data}) => {
+    if (data.loading) {
+      return {
+        opacity: 0.5, 
+        isProcessing: true,
+        widgetAreas: getActiveWidgetArea()
+      }
+    } else if(data.error) {
+       return {hasError: true}
+    } else {
+
+    let allWidgets = data.viewer.allWidgets.edges
+
+    let _listOfWidget = JSON.parse(data.getOptions.value)
+    _listOfWidget = toWidgetAreaStructure(allWidgets, _listOfWidget)
+
+    return {
+      opacity: 1,
+      isProcessing: false,
+      widgetsAvailable: allWidgets,
+      widgetAreas : _listOfWidget
+    }
+    }
+
+  }
+})(Widgets)
+Widgets = withApollo(Widgets)
 
 Widgets = connect(mapStateToProps)(Widgets);
 export default Widgets;

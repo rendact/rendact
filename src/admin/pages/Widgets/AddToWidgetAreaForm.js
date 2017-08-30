@@ -4,31 +4,15 @@ import {connect} from 'react-redux';
 import {
   addWidgetToWidgetArea,
 } from '../../../actions';
-import {graphql} from 'react-apollo'
-import gql from 'graphql-tag';
-import Query from '../../query'
-import _ from 'lodash'
-
-
-let WidgetAreaOptions = (props) => {
-   if (!props.data.loading) {
-    let value = JSON.parse(props.data.getOptions.value)
-    return <Field name="widgetAreaId" component="select" className="form-control select">
-    <option>---widget area---</option>
-    {
-      _.map(_.keys(value), (widgetArea, index) => (
-        <option value={widgetArea} key={index}>{widgetArea}</option>
-      ))
-    }
-
-    </Field>
-  }
-}
-
-WidgetAreaOptions = graphql(gql`${Query.getListOfWidget.query}`)(WidgetAreaOptions)
+import {withApollo} from 'react-apollo';
+import Query from '../../query';
+import gql from 'graphql-tag'
+import uuid from 'uuid';
+import _ from 'lodash';
+import {addToWidgetArea} from './helpers'
 
 let AddToWidgetAreaForm = props => {
-  const {handleSubmit} = props;
+  const {handleSubmit, widgetAreas} = props;
 
   return (
     <form onSubmit={handleSubmit}>
@@ -37,7 +21,15 @@ let AddToWidgetAreaForm = props => {
         <span className="input-group-btn">
             <button className="btn btn-default" type="submit">Add to</button>
         </span>
-        <WidgetAreaOptions/>
+        <Field name="widgetAreaId" component="select" className="form-control select">
+        <option>---widget area---</option>
+        {
+          widgetAreas.map((widgetArea, index) => (
+            <option value={widgetArea.id} key={index}>{widgetArea.id}</option>
+          ))
+          }
+
+        </Field>
       </div>
     </form>
     )
@@ -45,14 +37,13 @@ let AddToWidgetAreaForm = props => {
 
 AddToWidgetAreaForm = reduxForm({form: 'addToWidgetAreaForm'})(AddToWidgetAreaForm)
 
-const mapStateToProps = (state) => ({
-  widgetAreas: state.widgets.widgetAreas
-});
-
 const mapDispatchToProps = (dispatch, ownProps) => ({
-  onSubmit: value => dispatch(addWidgetToWidgetArea(value.widgetAreaId, {widget: ownProps.widget})),
+  onSubmit: value => {
+    addToWidgetArea(value.widgetAreaId, ownProps.widget, ownProps.client)
+  },
 })
 
-AddToWidgetAreaForm = connect(mapStateToProps, mapDispatchToProps)(AddToWidgetAreaForm)
+AddToWidgetAreaForm = connect(null, mapDispatchToProps)(AddToWidgetAreaForm)
+AddToWidgetAreaForm = withApollo(AddToWidgetAreaForm)
 
 export default AddToWidgetAreaForm;

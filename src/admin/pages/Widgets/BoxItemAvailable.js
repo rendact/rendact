@@ -21,7 +21,7 @@ class BoxItemAvailable extends React.Component {
 
     var widget = this.props.widget;
     var widgetValue = JSON.parse(widget.value);
-    var {connectDragToDom, isDragging} = this.props;
+    var {connectDragToDom, isDragging, widgetAreas} = this.props;
 
     let opacity = isDragging? 0.5 : 1;
 
@@ -38,7 +38,7 @@ class BoxItemAvailable extends React.Component {
         <p>{widgetValue.help}</p>
     </div>
     <div className="box-footer text-center">
-      <AddToWidgetAreaForm widget={widget} widgetAreas={this.props.widgetAreas} />
+      <AddToWidgetAreaForm widget={widget} widgetAreas={widgetAreas} />
     </div>
   </div>
     )

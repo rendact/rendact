@@ -322,8 +322,15 @@ let NewContentType = React.createClass({
     delete v.metaDescription
     delete v.metaKeyword
     delete v.titleTag
-    delete v.pageTemplate
-    debugger;
+    delete v.pageTemplate;
+    delete v.author;
+    delete v.comments;
+    delete v.meta;
+    delete v.hours;
+    delete v.minutes;
+    delete v.publishDateReset;
+    delete v.category;
+    delete v.createdAt;
     v["content"] = this.props.content;
     v["visibility"] = this.props.visibilityTxt;
     v["type"] = this.props.postType;
@@ -355,7 +362,7 @@ let NewContentType = React.createClass({
       noticeTxt = this.props.name+' Updated!';
     }
     this.disableForm(true);
-          var metaDataList = me.getMetaFormValues();
+    var metaDataList = me.getMetaFormValues();
 
     riques(qry, 
       function(error, response, body) {
@@ -399,7 +406,6 @@ let NewContentType = React.createClass({
                     
                   } else {
                     errorCallback(error, body.errors?body.errors[0].message:null, "Save Category");
-                    debugger
                   }
                 }
               );
