@@ -12,6 +12,7 @@ import gql from 'graphql-tag';
 import {
   loadWidgetsAvailableSuccess,
   loadWidgetAreasSuccess,
+  maskArea,
 } from '../../../actions';
 import clientGraphql from '../../../apollo';
 
@@ -25,6 +26,9 @@ class Widgets extends React.Component {
   }
 
   componentWillReceiveProps(props){
+    if(!props.isLoading && this.props.isLoading){
+      props.dispatch(maskArea(false))
+    } 
   }
 
   componentDidMount(){
@@ -32,6 +36,12 @@ class Widgets extends React.Component {
     require ('../../../../public/css/AdminLTE.css');
     require ('../../../../public/css/skins/_all-skins.css');
     require('./custom.css');
+  }
+
+  componentWillMount(){
+    if(this.props.isLoading){
+      this.props.dispatch(maskArea(true))
+    }
   }
 
 
@@ -122,12 +132,12 @@ Widgets.defaultProps = {
 
 const mapStateToProps = (state) => {
   return {
-    widgetAreas: state.widgets.widgetAreas,
-    widgetsAvailable: state.widgets.widgetsAvailable,
     opacity: state.maskArea.opacity,
     isProcessing: state.maskArea.isProcessing
   }
 }
+
+Widgets = connect(mapStateToProps)(Widgets);
 
 let widgetQry = gql`
 query {
@@ -164,8 +174,7 @@ Widgets = graphql(widgetQry, {
   props: ({ownProps, data}) => {
     if (data.loading) {
       return {
-        opacity: 0.5, 
-        isProcessing: true,
+        isLoading: true,
         widgetAreas: getActiveWidgetArea()
       }
     } else if(data.error) {
@@ -187,8 +196,7 @@ Widgets = graphql(widgetQry, {
       })
 
     return {
-      opacity: 1,
-      isProcessing: false,
+      isLoading: false,
       widgetsAvailable: allWidgets,
       widgetAreas : _listOfWidget,
       initialValues: initials

@@ -47,7 +47,10 @@ class BoxItem extends React.Component {
           refetchQueries: [
             {query: query}
           ]
-        }).then(({data}) => disableForm(false))
+        }).then(({data}) => {
+          disableForm(false)
+          this.props.maskArea(false)
+        })
       } else {
         console.log("buat baru")
         this.props.createNew({variables: {input : { item: widgetName, value: toSave}},
@@ -57,6 +60,7 @@ class BoxItem extends React.Component {
         }).
           then(({data}) => {
             disableForm(false)
+            this.props.maskArea(false)
           })
       }
     })
@@ -128,8 +132,8 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   },
 });
 
-BoxItem = reduxForm({form: 'widgetBox'})(BoxItem)
 BoxItem = connect(null, mapDispatchToProps)(BoxItem)
+BoxItem = reduxForm({form: 'widgetBox'})(BoxItem)
 BoxItem = withApollo(BoxItem)
 BoxItem = compose(
   graphql(gql`${Query.createWidget().query}`, {name: 'createNew'}),
