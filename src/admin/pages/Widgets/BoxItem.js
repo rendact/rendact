@@ -1,12 +1,13 @@
 import React from 'react';
 import {connect} from 'react-redux';
+import _ from 'lodash';
 import {
   maskArea,
 } from '../../../actions'
 import {disableForm, swalert} from '../../../utils'
 import {reduxForm, Field} from 'redux-form';
 import Query from '../../query';
-import {withApollo, graphql, compose} from 'react-apollo'
+import {withApollo, graphql} from 'react-apollo'
 import gql from 'graphql-tag'
 import {removeSingleWidget} from './helpers';
 
@@ -62,6 +63,12 @@ class BoxItem extends React.Component {
           })
       }
     })
+  }
+
+  componentWillReceiveProps(props){
+    if(!props.isLoading && !this.props.initialized){
+      props.initialize(props.initialValues)
+    }
   }
 
   render() {
@@ -133,9 +140,31 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
 BoxItem = connect(null, mapDispatchToProps)(BoxItem)
 BoxItem = reduxForm({form: 'widgetBox'})(BoxItem)
 BoxItem = withApollo(BoxItem)
-BoxItem = compose(
+BoxItem = _.flow(
   graphql(gql`${Query.createWidget().query}`, {name: 'createNew'}),
-  graphql(gql`${Query.updateWidget().query}`, {name: 'updateWidget'})
+  graphql(gql`${Query.updateWidget().query}`, {name: 'updateWidget'}),
+  graphql(gql`${Query.getAllActiveWidgets.query}`,
+    {
+      props: ({ownProps, data}) => {
+        if (!data.loading) {
+
+        let allActiveWidget = _.map(data.viewer.allOptions.edges, item => item.node)
+        let initials = {}
+
+        _.forEach(allActiveWidget, widget => {
+          let uuid = widget.item.split("#")[1]
+          initials[uuid] = JSON.parse(widget.value)
+        })
+
+        return {
+          initialValues: initials,
+          isLoading: false
+        }
+        }
+
+      }
+    }
+  )
 )(BoxItem)
 
 export default BoxItem;
