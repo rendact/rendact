@@ -151,7 +151,6 @@ let NewContentType = React.createClass({
     this.props.dispatch(maskArea(isFormDisabled));
   },
   componentWillReceiveProps: function(props){
-    debugger;
     console.log(props.urlParams)
     if (props.urlParams.postId !== this.props.postId){
       props.dispatch(setPostId(props.urlParams.postId))
@@ -324,13 +323,13 @@ let NewContentType = React.createClass({
       if (v[item]) output[item] = v[item];
     });
     
-    v["content"] = this.props.content;
-    v["visibility"] = this.props.visibilityTxt;
-    v["type"] = this.props.postType;
-    v["authorId"] = localStorage.getItem('userId');
-    v["slug"] = this.props.permalink;
-    v["featuredImage"] = this.props.featuredImage;
-    return v
+    output["content"] = this.props.content;
+    output["visibility"] = this.props.visibilityTxt;
+    output["type"] = this.props.postType;
+    output["authorId"] = localStorage.getItem('userId');
+    output["slug"] = this.props.permalink;
+    output["featuredImage"] = this.props.featuredImage;
+    return output;
   },
   onSubmit: function(v, status) {
     if (status) {
@@ -431,7 +430,7 @@ let NewContentType = React.createClass({
           here.props.handleNav(me.props.slug,"edit",postId);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null, "Save Post");
-          here.disableForm(false);
+          me.disableForm(false);
         }
       }
     );  
