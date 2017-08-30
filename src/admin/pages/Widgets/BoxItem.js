@@ -7,7 +7,8 @@ import {
 import {disableForm, errorCallback, swalert, riques} from '../../../utils'
 import {reduxForm, Field} from 'redux-form';
 import Query from '../../query';
-import {withApollo} from 'react-apollo'
+import {withApollo, graphql, compose} from 'react-apollo'
+import gql from 'graphql-tag'
 import {removeSingleWidget} from './helpers';
 
 
@@ -15,56 +16,50 @@ class BoxItem extends React.Component {
   constructor(props){
     super(props)
     this.onSubmit = this.onSubmit.bind(this)
-    this.newWidget = this.newWidget.bind(this)
-    this.updateWidget = this.updateWidget.bind(this)
 
-  }
-
-  newWidget(uuid, value){
-    let item = "activeWidget#" + uuid + "#" + this.props.widget.item
-    riques(Query.createWidget(item, value),
-      (error, response, data) => {
-        if (!error) {
-          console.log(JSON.stringify(data, null, 2))
-        } else {
-          errorCallback(error, data.error? data.error[0].message: null)
-        }
-      }
-    );
-  }
-
-  updateWidget(id, value){
-    riques(Query.updateWidget(id, value),
-      (error, response, data) => {
-        if (!error) {
-          console.log(JSON.stringify(data, null, 2))
-        } else {
-          errorCallback(error, data.error? data.error[0].message: null)
-        }
-      }
-    );
   }
 
   onSubmit(value){
     let toSave = JSON.stringify(value[this.props.uuid], null, 2)
     this.props.maskArea(true)
     disableForm(true)
-    riques(Query.findWidget(this.props.uuid, this.props.widget.item),
-      (error, response, data) => {
-        if (!error) {
-          let found = data.data.viewer.allOptions.edges
-          if (!found.length){
-            this.newWidget(this.props.uuid, toSave, null, 2)
-          } else {
-            let id = found[0].node.id
-            this.updateWidget(id, toSave, null, 2)
+    let widgetName = "activeWidget#" + this.props.uuid + "#" + this.props.widget.item
+    let query = gql` 
+    {
+      viewer {
+        allOptions(where: {item: { eq: "${widgetName}"}}) {
+          edges {
+            node {
+              id
+              value
+            }
           }
         }
-
-        this.props.maskArea(false)
-        disableForm(false)
       }
-    );
+    }`
+    this.props.client.query({query: query}).then(({data}) => {
+      let found = data.viewer.allOptions.edges
+      if (found.length){
+        console.log("update")
+        //nanti update di sini
+        let id = found[0].node.id
+        this.props.updateWidget({variables: {input: {id: id, value: toSave}},
+          refetchQueries: [
+            {query: query}
+          ]
+        }).then(({data}) => disableForm(false))
+      } else {
+        console.log("buat baru")
+        this.props.createNew({variables: {input : { item: widgetName, value: toSave}},
+          refetchQueries: [
+            {query: query }
+          ]
+        }).
+          then(({data}) => {
+            disableForm(false)
+          })
+      }
+    })
   }
 
   render() {
@@ -140,5 +135,9 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
 BoxItem = reduxForm({form: 'widgetBox'})(BoxItem)
 BoxItem = connect(mapStateToProps, mapDispatchToProps)(BoxItem)
 BoxItem = withApollo(BoxItem)
+BoxItem = compose(
+  graphql(gql`${Query.createWidget().query}`, {name: 'createNew'}),
+  graphql(gql`${Query.updateWidget().query}`, {name: 'updateWidget'})
+)(BoxItem)
 
 export default BoxItem;
