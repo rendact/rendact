@@ -1,5 +1,6 @@
 import ApolloClient, {createNetworkInterface} from 'apollo-client';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
+import Config from './config';
 //import config from './config';
 
 
@@ -34,6 +35,7 @@ networkInterface.use([{
     if (localStorage.getItem('token')) {
       // This is how to authorize users using http auth headers
       req.options.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
+      //req.options.headers['content-type'] = "application/json"
     }
     next();
   },

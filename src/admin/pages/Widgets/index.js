@@ -169,6 +169,7 @@ Widgets = graphql(widgetQry, {
         widgetAreas: getActiveWidgetArea()
       }
     } else if(data.error) {
+      console.log(data.error)
        return {hasError: true}
     } else {
 
@@ -198,5 +199,5 @@ Widgets = graphql(widgetQry, {
 })(Widgets)
 Widgets = withApollo(Widgets)
 
-Widgets = connect(mapStateToProps)(Widgets);
+//Widgets = connect(mapStateToProps)(Widgets);
 export default Widgets;
