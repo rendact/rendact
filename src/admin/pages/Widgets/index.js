@@ -1,7 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import {toWidgetAreaStructure,  defaultHalogenStyle, getActiveWidgetArea} from '../../../utils';
-import Query from '../../query';
+import {toWidgetAreaStructure,  defaultHalogenStyle, errorCallback, getActiveWidgetArea} from '../../../utils';
 import BoxItemAvailable from './BoxItemAvailable';
 import WidgetAreaContainer from './WidgetAreaContainer';
 import {connect} from 'react-redux';
@@ -10,10 +9,8 @@ import Halogen from 'halogen';
 import {withApollo, graphql} from 'react-apollo';
 import gql from 'graphql-tag';
 import {
-  loadWidgetsAvailableSuccess,
-  loadWidgetAreasSuccess,
+  maskArea,
 } from '../../../actions';
-import clientGraphql from '../../../apollo';
 
 
 class Widgets extends React.Component {
@@ -25,6 +22,9 @@ class Widgets extends React.Component {
   }
 
   componentWillReceiveProps(props){
+    if(!props.isLoading && this.props.isLoading){
+      props.dispatch(maskArea(false))
+    } 
   }
 
   componentDidMount(){
@@ -32,6 +32,12 @@ class Widgets extends React.Component {
     require ('../../../../public/css/AdminLTE.css');
     require ('../../../../public/css/skins/_all-skins.css');
     require('./custom.css');
+  }
+
+  componentWillMount(){
+    if(this.props.isLoading){
+      this.props.dispatch(maskArea(true))
+    }
   }
 
 
@@ -122,12 +128,12 @@ Widgets.defaultProps = {
 
 const mapStateToProps = (state) => {
   return {
-    widgetAreas: state.widgets.widgetAreas,
-    widgetsAvailable: state.widgets.widgetsAvailable,
     opacity: state.maskArea.opacity,
     isProcessing: state.maskArea.isProcessing
   }
 }
+
+Widgets = connect(mapStateToProps)(Widgets);
 
 let widgetQry = gql`
 query {
@@ -145,7 +151,6 @@ query {
         }
       }
     }
-
     allActiveWidget: allOptions(where: {item: {like: "activeWidget#%"}}) {
       edges {
         node {
@@ -155,7 +160,6 @@ query {
         }
       }
     }
-
   }
 }
 `
@@ -164,35 +168,36 @@ Widgets = graphql(widgetQry, {
   props: ({ownProps, data}) => {
     if (data.loading) {
       return {
-        opacity: 0.5, 
-        isProcessing: true,
+        isLoading: true,
         widgetAreas: getActiveWidgetArea()
       }
     } else if(data.error) {
       console.log(data.error)
+      errorCallback(data.error, data.error, data.error)
        return {hasError: true}
     } else {
 
-    let allWidgets = data.viewer.allWidgets.edges
+      let allWidgets = data.viewer.allWidgets.edges
 
-    let _listOfWidget = JSON.parse(data.getOptions.value)
+      let _listOfWidget = JSON.parse(data.getOptions.value)
+      
       _listOfWidget = toWidgetAreaStructure(allWidgets, _listOfWidget)
 
-      let allActiveWidget = _.map(data.viewer.allActiveWidget.edges, item => item.node)
-      let initials = {}
+        let allActiveWidget = _.map(data.viewer.allActiveWidget.edges, item => item.node)
+        let initials = {}
 
-      _.forEach(allActiveWidget, widget => {
-        let uuid = widget.item.split("#")[1]
-        initials[uuid] = JSON.parse(widget.value)
-      })
+        _.forEach(allActiveWidget, widget => {
+          let uuid = widget.item.split("#")[1]
+          initials[uuid] = JSON.parse(widget.value)
+        })
 
-    return {
-      opacity: 1,
-      isProcessing: false,
-      widgetsAvailable: allWidgets,
-      widgetAreas : _listOfWidget,
-      initialValues: initials
-    }
+
+      return {
+        isLoading: false,
+        widgetsAvailable: allWidgets,
+        widgetAreas : _listOfWidget,
+        initialValues: initials
+      }
     }
 
   }

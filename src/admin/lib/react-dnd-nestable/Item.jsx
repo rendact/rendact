@@ -289,10 +289,10 @@ export default compose(
     moveItem: PropTypes.func.isRequired,
     dropItem: PropTypes.func.isRequired
   }),
-  DropTarget(itemTypes.nestedItem, cardTarget, (connect, monitor) => ({
+  DropTarget((props) => props.type || itemTypes.nestedItem, cardTarget, (connect, monitor) => ({
     connectDropTarget: connect.dropTarget(),
   })),
-  DragSource(itemTypes.nestedItem, cardSource, (connect, monitor) => ({
+  DragSource((props) => props.type || itemTypes.nestedItem, cardSource, (connect, monitor) => ({
     connectDragSource: connect.dragSource(),
     connectDragPreview: connect.dragPreview(),
     isDragging: monitor.isDragging()

@@ -70,10 +70,11 @@ class CustomDragLayer extends Component {
       itemType,
       renderItem,
       isDragging,
-      childrenProperty
+      childrenProperty,
+      type
     } = this.props;
 
-    if (!isDragging || itemType !== itemTypes.nestedItem) {
+    if (!isDragging ||  [itemTypes.nestedItem, type].indexOf(itemType) === -1) {
       return null;
     }
 
@@ -85,7 +86,8 @@ class CustomDragLayer extends Component {
             isDragging: false,
             isPreview: true,
             depth: 1,
-            connectDragSource: noopConnectDragSource
+            connectDragSource: noopConnectDragSource,
+            type: type
           }) }
           { this.getChildren(item.data[childrenProperty], 2) }
         </div>

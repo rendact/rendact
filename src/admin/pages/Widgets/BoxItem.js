@@ -1,13 +1,13 @@
 import React from 'react';
 import {connect} from 'react-redux';
+import _ from 'lodash';
 import {
-  removeSingleWidgetFromWidgetArea,
   maskArea,
 } from '../../../actions'
-import {disableForm, errorCallback, swalert, riques} from '../../../utils'
+import {disableForm, swalert} from '../../../utils'
 import {reduxForm, Field} from 'redux-form';
 import Query from '../../query';
-import {withApollo, graphql, compose} from 'react-apollo'
+import {withApollo, graphql} from 'react-apollo'
 import gql from 'graphql-tag'
 import {removeSingleWidget} from './helpers';
 
@@ -40,26 +40,34 @@ class BoxItem extends React.Component {
     this.props.client.query({query: query}).then(({data}) => {
       let found = data.viewer.allOptions.edges
       if (found.length){
-        console.log("update")
-        //nanti update di sini
         let id = found[0].node.id
         this.props.updateWidget({variables: {input: {id: id, value: toSave}},
           refetchQueries: [
-            {query: query}
+            {query: query},
+            {query: gql`${Query.getListOfWidget.query}`}
           ]
-        }).then(({data}) => disableForm(false))
+        }).then(({data}) => {
+          disableForm(false)
+          this.props.maskArea(false)
+        })
       } else {
-        console.log("buat baru")
         this.props.createNew({variables: {input : { item: widgetName, value: toSave}},
           refetchQueries: [
-            {query: query }
+            {query: query },
+            {query: gql`${Query.getListOfWidget.query}`}
           ]
-        }).
-          then(({data}) => {
+        }).then(({data}) => {
             disableForm(false)
+            this.props.maskArea(false)
           })
       }
     })
+  }
+
+  componentWillUpdate(nextProps, nextState){
+    if(!nextProps.initialized){
+      nextProps.initialize(nextProps.initialValues)
+    }
   }
 
   render() {
@@ -128,12 +136,12 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   },
 });
 
-BoxItem = reduxForm({form: 'widgetBox'})(BoxItem)
 BoxItem = connect(null, mapDispatchToProps)(BoxItem)
+BoxItem = reduxForm({form: 'widgetBox'})(BoxItem)
 BoxItem = withApollo(BoxItem)
-BoxItem = compose(
+BoxItem = _.flow(
   graphql(gql`${Query.createWidget().query}`, {name: 'createNew'}),
-  graphql(gql`${Query.updateWidget().query}`, {name: 'updateWidget'})
+  graphql(gql`${Query.updateWidget().query}`, {name: 'updateWidget'}),
 )(BoxItem)
 
 export default BoxItem;

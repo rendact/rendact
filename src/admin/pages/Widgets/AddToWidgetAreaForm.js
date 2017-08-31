@@ -1,13 +1,7 @@
 import React from 'react';
 import {reduxForm, Field} from 'redux-form';
 import {connect} from 'react-redux';
-import {
-  addWidgetToWidgetArea,
-} from '../../../actions';
 import {withApollo} from 'react-apollo';
-import Query from '../../query';
-import gql from 'graphql-tag'
-import uuid from 'uuid';
 import _ from 'lodash';
 import {addToWidgetArea} from './helpers'
 
