@@ -40,22 +40,21 @@ class BoxItem extends React.Component {
     this.props.client.query({query: query}).then(({data}) => {
       let found = data.viewer.allOptions.edges
       if (found.length){
-        console.log("update")
-        //nanti update di sini
         let id = found[0].node.id
         this.props.updateWidget({variables: {input: {id: id, value: toSave}},
           refetchQueries: [
-            {query: query}
+            {query: query},
+            {query: gql`${Query.getListOfWidget.query}`}
           ]
         }).then(({data}) => {
           disableForm(false)
           this.props.maskArea(false)
         })
       } else {
-        console.log("buat baru")
         this.props.createNew({variables: {input : { item: widgetName, value: toSave}},
           refetchQueries: [
-            {query: query }
+            {query: query },
+            {query: gql`${Query.getListOfWidget.query}`}
           ]
         }).then(({data}) => {
             disableForm(false)
