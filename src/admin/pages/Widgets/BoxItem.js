@@ -64,10 +64,8 @@ class BoxItem extends React.Component {
     })
   }
 
-  componentWillReceiveProps(props){
-    if(!props.isLoading && !this.props.initialized){
-      props.initialize(props.initialValues)
-    }
+  componentWillUpdate(nextProps, nextState){
+    nextProps.initialize(nextProps.initialValues)
   }
 
   render() {
@@ -142,28 +140,6 @@ BoxItem = withApollo(BoxItem)
 BoxItem = _.flow(
   graphql(gql`${Query.createWidget().query}`, {name: 'createNew'}),
   graphql(gql`${Query.updateWidget().query}`, {name: 'updateWidget'}),
-  graphql(gql`${Query.getAllActiveWidgets.query}`,
-    {
-      props: ({ownProps, data}) => {
-        if (!data.loading) {
-
-        let allActiveWidget = _.map(data.viewer.allOptions.edges, item => item.node)
-        let initials = {}
-
-        _.forEach(allActiveWidget, widget => {
-          let uuid = widget.item.split("#")[1]
-          initials[uuid] = JSON.parse(widget.value)
-        })
-
-        return {
-          initialValues: initials,
-          isLoading: false
-        }
-        }
-
-      }
-    }
-  )
 )(BoxItem)
 
 export default BoxItem;

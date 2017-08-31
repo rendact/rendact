@@ -54,6 +54,7 @@ class WidgetAreaContainer extends React.Component {
       widgetAreaId={this.props.id}
       isDragging={props.isDragging}
       connectDragSource={props.connectDragSource}
+      initialValues={this.props.initialValues}
       />
   }
 
