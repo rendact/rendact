@@ -65,7 +65,9 @@ class BoxItem extends React.Component {
   }
 
   componentWillUpdate(nextProps, nextState){
-    nextProps.initialize(nextProps.initialValues)
+    if(!nextProps.initialized){
+      nextProps.initialize(nextProps.initialValues)
+    }
   }
 
   render() {
