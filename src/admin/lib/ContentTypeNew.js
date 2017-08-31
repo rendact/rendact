@@ -422,12 +422,12 @@ let NewContentType = React.createClass({
           } 
 
           // do these when post data succesfully saved
-          me._successNotif(noticeTxt);
-          me.props.dispatch(setEditorMode("update"));
-          me.props.dispatch(setPostId(postId));
-          me.notifyUnsavedData(false);
-          me.bindPostToImageGallery(postId);
-          me.props.handleNav(me.props.slug,"edit",postId);
+          here._successNotif(noticeTxt);
+          here.props.dispatch(setEditorMode("update"));
+          here.props.dispatch(setPostId(postId));
+          here.notifyUnsavedData(false);
+          here.bindPostToImageGallery(postId);
+          here.props.handleNav(me.props.slug,"edit",postId);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null, "Save Post");
           me.disableForm(false);
