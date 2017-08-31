@@ -152,11 +152,11 @@ let NewContentType = React.createClass({
   },
   componentWillReceiveProps: function(props){
     console.log(props.urlParams)
-    if (props.urlParams.postId !== this.props.postId){
+    /*if (props.urlParams.postId !== this.props.postId){
       props.dispatch(setPostId(props.urlParams.postId))
       props.destroy()
       console.log("hello")
-    }
+    }*/
     if(!props.postId && this.props.postId){
       window.CKEDITOR.instances['content'].setData("");
       props.dispatch(resetPostEditor());
