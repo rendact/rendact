@@ -7,6 +7,8 @@ import {riques, errorCallback, getFormData, disableForm, defaultHalogenStyle} fr
 import {connect} from 'react-redux'
 import {maskArea, loadFormData} from '../../actions'
 import {reduxForm, Field} from 'redux-form'
+import gql from 'graphql-tag'
+import {graphql} from 'react-apollo'
 
 var Settings = React.createClass({
 	propTypes: {
@@ -21,29 +23,6 @@ var Settings = React.createClass({
       data: {}
 		}
  	},
-	loadData: function(){
-		var qry = Query.loadSettingsQry;
-		var me = this;
-		this.props.dispatch(maskArea(false));
-		riques(qry, 
-			function(error, response, body){
-				if(!error && !body.errors) {
-					var _data = {}
-					_.forEach(body.data.viewer.allOptions.edges, function(item){
-						_data[item.node.item] = item.node.value;
-					});
-					me.props.dispatch(loadFormData(_data));
-					me.props.dispatch(maskArea(false));
-				} else {
-					errorCallback(error, body.errors?body.errors[0].message:null);
-				}
-			}
-		);
-	},
-	disableForm: function(state){
-    disableForm(state, this.notification);
-    this.props.dispatch(maskArea(false));
-  },
 	handleSubmitBtn: function(event){
 		event.preventDefault();
 		var me = this;
@@ -61,9 +40,11 @@ var Settings = React.createClass({
 			}
 		);
 	}, 
+	componentWillReceiveProps(props){
+	},
 	componentDidMount: function(){
 		this.notification = this.refs.notificationSystem;
-		this.loadData();
+		//this.loadData();
 	},
 	render: function(){
 		return (
@@ -207,4 +188,28 @@ Settings = reduxForm({
   form: 'settingsForm'
 })(Settings)
 Settings = connect(mapStateToProps)(Settings)
+
+//React-Apollo
+Settings = graphql(gql`${Query.loadSettingsQry.query}`,{
+	props: ({ownProps, data}) => {
+    if (data.loading) {
+      return {
+        isLoading: true
+      }
+    } else if(data.error) {
+      errorCallback(data.error, data.error, data.error)
+       return {hasError: true}
+    } else {
+    	var _data = {}
+			_.forEach(data.viewer.allOptions.edges, function(item){
+				_data[item.node.item] = item.node.value;
+			});
+	return {
+        isLoading: false,
+        initialValues: _data
+    }
+	}
+	}
+})(Settings)
+
 export default Settings;
