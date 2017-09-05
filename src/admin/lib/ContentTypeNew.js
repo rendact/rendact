@@ -23,6 +23,32 @@ import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {graphql} from 'react-apollo';
 import gql from 'graphql-tag';
 
+let ImageGalleryWidget = (props) => (
+<div className="box box-info" style={{marginTop:20}}>
+  <div className="box-header with-border">
+    <h3 className="box-title">Image Gallery</h3>         
+    <div className="pull-right box-tools">
+      <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
+      <i className="fa fa-minus"></i></button>
+    </div>
+  </div>
+  <div className="box-body pad">
+    <div>
+      <input type="file" id="imageGallery" name="imageGallery" onChange={props.imageGalleryChange}/>
+      {
+        _.map(props.imageGallery, function(item, index){
+          return <div key={index} className="margin" style={{width: 150, float: "left", position: "relative"}}>
+          <a href="" onClick={props.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue"}} alt={"gallery"+index}/></a>
+          <button id={item.id+"-"+index} onClick={props.handleImageRemove} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
+          </div>
+        })
+      }
+    </div>                  
+  </div>
+</div>
+)
+
+
 let FeaturedImageWidget = (props) => (
 <div className="box box-info" style={{marginTop:20}}>
   <div className="box-header with-border">
@@ -1014,28 +1040,12 @@ let NewContentType = React.createClass({
                   }
 
                   { this.isWidgetActive("imageGallery") &&
-                  <div className="box box-info" style={{marginTop:20}}>
-                    <div className="box-header with-border">
-                      <h3 className="box-title">Image Gallery</h3>         
-                      <div className="pull-right box-tools">
-                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
-                        <i className="fa fa-minus"></i></button>
-                      </div>
-                    </div>
-                    <div className="box-body pad">
-                      <div>
-                        <input type="file" id="imageGallery" name="imageGallery" onChange={this.imageGalleryChange}/>
-                        {
-                          _.map(this.props.imageGallery, function(item, index){
-                            return <div key={index} className="margin" style={{width: 150, float: "left", position: "relative"}}>
-                            <a href="" onClick={this.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue"}} alt={"gallery"+index}/></a>
-                            <button id={item.id+"-"+index} onClick={this.handleImageRemove} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
-                            </div>
-                          }.bind(this))
-                        }
-                      </div>                  
-                    </div>
-                  </div>
+                      <ImageGalleryWidget
+                        imageGallery={this.props.imageGallery}
+                        handleImageClick={this.handleImageClick}
+                        handleImageRemove={this.handleImageRemove}
+                        imageGalleryChange={this.imageGalleryChange}
+                      />
                   }
 
                   {
