@@ -7,7 +7,7 @@ const menu = (state = [], action) => {
         {
           newMenuName: "",
           selectedMenuName: "",
-          treeData: [],
+          //treeData: [],
           allSelectState : {
             page: false,
             category: false,

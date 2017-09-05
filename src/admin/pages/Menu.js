@@ -8,7 +8,7 @@ import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
 import {toggleSelectAll, maskArea, setPosition, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId,  loadmenuSelect,
   setIdMainMenu, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
-import {validateUrl, swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
+import {validateUrl, swalert, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
 import {reduxForm, Field, formValueSelector, change} from 'redux-form';
 import {withApollo, graphql} from 'react-apollo';
@@ -297,7 +297,7 @@ let Menu = React.createClass({
     "#menu ~ .box > .box-header > .box-tools > button",
     "#selectedMenuName",
     "#mainMenuPos",
-    'div > div > input[class*="Menu"]',
+    "div > div > input[class*='Menu']",
     "button[id*='SelectAll']",
     "button[id*='Submit']",
     "#urlSabmit #submit",
@@ -362,7 +362,6 @@ let Menu = React.createClass({
       this.resetFormDelete();
       disableBySelector(true, me.disabledSelectors);
     }
-
   },
 
     handleUrlSubmit: function(urlData, reset){
@@ -420,7 +419,6 @@ let Menu = React.createClass({
 
     this.props.dispatch(toggleSelectAll(false, 'all'))
     reset();
-
   },
 
   removePanel: function(e){
@@ -447,12 +445,6 @@ let Menu = React.createClass({
     this.notifyUnsavedData(true);
   },
 
-  componentWillReceiveProps: function(props){
-    if(!props.newMenuName){
-      disableBySelector(true, ["#menu button"]);
-    }
-  },
-
   handleSubmit: function(event){
     event.preventDefault();
     var me = this;
@@ -460,25 +452,24 @@ let Menu = React.createClass({
     this.disableForm(true);
     var qry = Query.createMenu(newMenuName);
     var noticeTxt = "Menu Saved";
-    riques(qry, 
-      function(error, response, body) {
-        var newMenuId = body.data.createMenu.changedMenu.id;
-        me.props.dispatch(setNewMenuId(newMenuId))
-        if (!error && !body.errors && response.statusCode === 200) {
-          me.notif.addNotification({
-                  message: noticeTxt,
-                  level: 'success',
-                  position: 'tr',
-                  autoDismiss: 2
-          });
-          me.resetFormNewMenu();
-          me.props.dispatch(setTreeData([]))
-          document.getElementById("mainMenuPos").checked = false
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-        me.disableForm(false);
+    this.props.createMenu({variables: {
+      input: {
+        name: newMenuName
+      }
+    }}).then(({data}) => {
+      var newMenuId = data.createMenu.changedMenu.id;
+      me.props.dispatch(setNewMenuId(newMenuId))
+      me.notif.addNotification({
+        message: noticeTxt,
+        level: 'success',
+        position: 'tr',
+        autoDismiss: 2
       });
+      me.resetFormNewMenu();
+      me.props.dispatch(setTreeData([]))
+      document.getElementById("mainMenuPos").checked = false
+      me.disableForm(false);
+    });
   },
 
   componentDidMount: function(){
@@ -496,11 +487,17 @@ let Menu = React.createClass({
     this.props.dispatch(setResetDelete())
   },
   componentWillReceiveProps(props){
+    this.disableForm(props.isLoading);
     if(!props.isLoading && this.props.isLoading){
       props.dispatch(setResetDelete())
       props.dispatch(maskArea(false))
     }
-    this.disableForm(props.isLoading);
+    if(!props.newMenuName){
+      disableBySelector(true, ["#menu button"]);
+    }
+    if(!props.menuId){
+      disableBySelector(true, this.disabledSelectors);
+    }
   },
   onChangeMainMenu: function(event){
     const target = event.target;
@@ -518,12 +515,11 @@ let Menu = React.createClass({
     var IdMainMenu = _IdMainMenu.toString();
     var treeData = this.props.treeData
     var menuId = this.props.menuId;
-    var qry = Query.updateMenu(menuId, name, treeData, positionValues);
     let noticeTxt = "Menu Successfully Updated";
 
-    const callback = (error, body, response) => {
-      if (!error && !body.errors && response.statusCode === 200) {
-        me.notif.addNotification({
+    const callback = (me, data) => {
+      if (data) {
+        me.refs.notificationSystem.addNotification({
           message: noticeTxt,
           level: 'success',
           position: 'tr',
@@ -542,9 +538,7 @@ let Menu = React.createClass({
         me.props.changeFieldValue("menuSelect", menuId+"-"+name);
 
         me.notifyUnsavedData(false);
-      } else {
-        errorCallback(error, body.errors?body.errors[0].message:null);
-      }
+      } 
       me.disableForm(false);
     }
 
@@ -552,38 +546,42 @@ let Menu = React.createClass({
     this.disableForm(true)
     if (positionValues==="Main Menu") {
       me.props.dispatch(setIdMainMenu(menuId))
-      riques(Query.updateMenuWithPos(IdMainMenu, {
-        id: menuId,
-        name: name,
-        items: treeData,
-        position: positionValues
-      }), (error, response, body) => {
-        callback(error, body, response)
+      this.props.updateMenuWithPos({variables: {
+        positionInput: {
+          id: IdMainMenu,
+          position: ''
+        },
+        updateMenuInput: {
+          id: menuId,
+          name: name,
+          items: treeData,
+          position: positionValues
+        }
+      }}).then(({data}) => {
+        callback(me, data)
       });
     } else {
-      riques(qry, 
-        function(error, response, body) {
-          callback(error, body, response);
+      this.props.updateMenu({variables: {
+        input: {
+          id: menuId,
+          name: name,
+          items: treeData,
+          position: positionValues
+        }
+      }}).then(({data}) => {
+        callback(me, data)
       });
     }
   },
 
   resetFormNewMenu: function(){
-    var me = this;
-      riques(Query.getAllMenu, 
-        function(error, response, body) {
-          if (!error) {
-            var pageList = [(<option key="0" value="">--select menu--</option>)];
-            _.forEach(body.data.viewer.allMenus.edges, function(item){
-              pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
-            })
-            me.props.dispatch(setPageListMenu(pageList)) 
-            _.filter(document.getElementsByName("menuSelect"), function(item){
-            return item.selectedIndex = "1"
-            });
-          }
-        }
-      );
+    var allMenuData = this.props.client.readQuery({query: Query.loadAllMenuData});
+    var pageList = [(<option key="0" value="">--select menu--</option>)];
+    _.forEach(allMenuData.viewer.allMenu.edges, function(item){
+      pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
+    })
+    this.props.dispatch(setPageListMenu(pageList)) 
+        
     var menuId = this.props.newMenuId;
     var newMenuName = this.props.newMenuName;
     var selectedMenuName = newMenuName;
@@ -597,19 +595,21 @@ let Menu = React.createClass({
     swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
       function () {
       me.disableForm(true);
-      riques(Query.deleteMenuQry(idList), 
-        function(error, response, body) {
-          if (!error && !body.errors && response.statusCode === 200) {
-            //me.loadData()
-            me.resetFormDelete();
-            me.notifyUnsavedData(false)
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-          }
-          me.disableForm(false);
-          disableBySelector(true, me.disabledSelectors);
-        }
-      );
+      me.props.deleteMenu({
+        variables: {
+          user: {
+          id: idList
+        },
+        refetchQueries: [
+          {query: Query.loadAllMenuData }
+        ]
+      }}).then(({data}) => {
+        me.resetFormNewMenu()
+        //me.resetFormDelete();
+        me.notifyUnsavedData(false);
+        me.disableForm(false);
+        disableBySelector(true, me.disabledSelectors);
+      });
     })
   },
 
@@ -839,22 +839,18 @@ Menu = graphql(Query.loadAllMenuData, {
           selectedMenuName = mainMenuData.name;
           menuSelect = mainMenuData.id+"-"+mainMenuData.name;
         } 
-
         // processing all Menu
-          var pageList = [(<option key="0" value="">--select menu--</option>)];
-          _.forEach(allMenu.edges, function(item){
-            pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
-          })
-          
+        var pageList = [(<option key="0" value="">--select menu--</option>)];
+        _.forEach(allMenu.edges, function(item){
+          pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
+        })
         // processing all page
         let allPageList = processItems(allPage)
-
         // processing all posts
         let allPostList = processItems(allPost)
-
         // processing all categories
         let categoryList = processItems(allCategory)
-        console.log("APOLLO :"+treeData)
+        
         return {
           menuId: mainMenuId,
           pageList: pageList,
@@ -878,6 +874,11 @@ Menu = graphql(Query.loadAllMenuData, {
     }
   }
 })(Menu);
+
+Menu = graphql(Query.createMenu, {name: 'createMenu'})(Menu);
+Menu = graphql(Query.updateMenu, {name: 'updateMenu'})(Menu);
+Menu = graphql(Query.updateMenuWithPos, {name: 'updateMenuWithPos'})(Menu);
+Menu = graphql(Query.deleteMenu, {name: 'deleteMenu'})(Menu);
 Menu = withApollo(Menu);
 
 export default Menu;

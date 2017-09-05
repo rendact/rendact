@@ -1,26 +1,17 @@
 import _ from 'lodash';
 import gql from 'graphql-tag';
 
-const createMenu = function(newMenuName){
-  return {
-      "query": `
-    mutation createMenu($input: CreateMenuInput!) {
-        createMenu(input: $input) {
-          changedMenu{
-            id,
-            name
-        }
+const createMenu = gql`
+  mutation createMenu($input: CreateMenuInput!) {
+      createMenu(input: $input) {
+        changedMenu{
+          id,
+          name
       }
     }
-    `,
-      "variables": {
-        "input": {
-          "name": newMenuName
-        }
-      }
-    }
-  };
-
+  }
+  `
+  
 const getAllMenu = {
   "query": `query getMenus{
     viewer {
@@ -68,70 +59,55 @@ const getAllPost = {
     '{viewer {allPosts(where:  {status: {eq: "Published"}, type:{eq: "post"}} ) { edges { node { id,title}}}}}'
 }
 
-const deleteMenuQry = function(idList) {
-  return{
-  "query": `
-    mutation DeleteMenu($user: DeleteMenuInput!) {
-      deleteMenu(input: $user) {
-        changedMenu {
-          id
-        }
+const deleteMenu = gql`
+  mutation DeleteMenu($user: DeleteMenuInput!) {
+    deleteMenu(input: $user) {
+      changedMenu {
+        id
       }
     }
-  `,
-  "variables": {
-    "user": {
-      "id": idList
+  }
+`
+/*
+"variables": {
+  "user": {
+    "id": idList
+  }
+}
+*/
+const updateMenu = gql`
+  mutation UpdateMenu($input: UpdateMenuInput!) {
+      updateMenu(input: $input) {
+        changedMenu{
+          id,
+          name,
+          items,
+          position
+      }
     }
   }
+  `
+
+const updateMainMenu = function(IdMainMenu){
+return {
+    "query": `
+  mutation UpdateMenu($input: UpdateMenuInput!) {
+      updateMenu(input: $input) {
+        changedMenu{
+          id,
+          position
+      }
+    }
+  }
+  `,
+    "variables": {
+      "input": {
+        "id": IdMainMenu,
+        "position": ""
+      }
+    }
   }
 };
-
-const updateMenu = function(menuId, name, menuSortableTree, positionValues){
-  return {
-      "query": `
-    mutation UpdateMenu($input: UpdateMenuInput!) {
-        updateMenu(input: $input) {
-          changedMenu{
-            id,
-            name,
-            items,
-            position
-        }
-      }
-    }
-    `,
-      "variables": {
-        "input": {
-          "id": menuId,
-          "name": name,
-          "items": menuSortableTree,
-          "position": positionValues
-        }
-      }
-    }
-  };
-
-  const updateMainMenu = function(IdMainMenu){
-  return {
-      "query": `
-    mutation UpdateMenu($input: UpdateMenuInput!) {
-        updateMenu(input: $input) {
-          changedMenu{
-            id,
-            position
-        }
-      }
-    }
-    `,
-      "variables": {
-        "input": {
-          "id": IdMainMenu,
-          "position": ""
-        }
-      }
-    }
-  };
 
 const getMainMenu = {
   "query": 
@@ -203,8 +179,7 @@ query{
 }
 `
 
-const updateMenuWithPos = (oldMainMenuId, newMenuData) => ({
-  query: `
+const updateMenuWithPos = gql`
 mutation ($updateMenuInput:UpdateMenuInput!, $positionInput:UpdateMenuInput!){
   positionUpdate: updateMenu(input: $positionInput){
     changedMenu {
@@ -221,20 +196,12 @@ mutation ($updateMenuInput:UpdateMenuInput!, $positionInput:UpdateMenuInput!){
     }
   }
 }
-`,
-  variables: {
-    positionInput: {
-      id: oldMainMenuId,
-      position: ''
-    },
-    updateMenuInput: {...newMenuData}
-  }
-})
+`
 
 const queries = {
   createMenu: createMenu,
   getAllMenu: getAllMenu,
-  deleteMenuQry: deleteMenuQry,
+  deleteMenu: deleteMenu,
   updateMenu: updateMenu,
   updateMainMenu: updateMainMenu,
   getAllPage: getAllPage,
