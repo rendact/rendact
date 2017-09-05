@@ -23,6 +23,32 @@ import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {graphql} from 'react-apollo';
 import gql from 'graphql-tag';
 
+
+let TagWidget = (props) => (
+<div className="box box-info" style={{marginTop:20}}>
+  <div className="box-header with-border">
+    <h3 className="box-title">Tags</h3>         
+    <div className="pull-right box-tools">
+      <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
+      <i className="fa fa-minus"></i></button>
+    </div>
+  </div>
+  <div className="box-body pad">
+    <div className="form-group" style={{width: '100%'}}>
+        <ReactSelect.Creatable
+          id="tag"
+          name="form-field-name"
+          value={props.postTagList}
+          options={props.options}
+          onChange={props.onChange}
+          multi={true}
+        />
+        <p><span className="help-block">Press enter after inputting tag</span></p>
+    </div>
+  </div>
+</div>
+)
+
 let PageHiererachyWidget = (props) => {
   let templates = getTemplates();
   return <div className="box box-info" style={{marginTop:20}}>
@@ -540,7 +566,11 @@ let NewContentType = React.createClass({
 
           if (me.isWidgetActive("tag")) {
             here.disableForm(true);
-            var tagQry = Query.createUpdateTagOfPostMtn(postId, me.props.postTagListInit, me.props.postTagList, me.props.tagMap);
+            let tagMap = {}
+            _.forEach(me.props.options, function(item){
+                tagMap[item.name] = {id: item.id, name: item.name}
+            })
+            var tagQry = Query.createUpdateTagOfPostMtn(postId, me.props.postTagListInit, me.props.postTagList, tagMap);
             if (tagQry)
               riques(tagQry,
                 function(error, response, body) {
@@ -698,28 +728,6 @@ let NewContentType = React.createClass({
   componentDidMount: function(){
     var me = this;
 
-    if (this.isWidgetActive("tag")) {
-      me.disableForm(true);
-      riques(Query.getAllTagQry(this.props.postType), 
-        function(error, response, body) {
-          if (!error && !body.errors && response.statusCode === 200) {
-            var _tagMap = {};
-            var options = [];
-                
-            _.forEach(body.data.viewer.allTags.edges, function(item){
-                _tagMap[item.node.name] = {id: item.node.id, name: item.node.name}
-                options.push({id: item.node.id, value: item.node.name, label: item.node.name});
-            })
-            me.props.dispatch(setOptions(options));
-            me.props.dispatch(setTagMap(_tagMap));
-            me.disableForm(false);
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-          }
-        }
-      );
-    };
-        
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
       window.CKEDITOR.replace('content', {
         height: 400,
@@ -961,28 +969,8 @@ let NewContentType = React.createClass({
                   }
 
                   { this.isWidgetActive("tag") &&
-                  <div className="box box-info" style={{marginTop:20}}>
-                    <div className="box-header with-border">
-                      <h3 className="box-title">Tags</h3>         
-                      <div className="pull-right box-tools">
-                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
-                        <i className="fa fa-minus"></i></button>
-                      </div>
-                    </div>
-                    <div className="box-body pad">
-                      <div className="form-group" style={{width: '100%'}}>
-                          <ReactSelect.Creatable
-                            id="tag"
-                            name="form-field-name"
-                            value={this.props.postTagList}
-                            options={this.props.options}
-                            onChange={(value)=>{this.props.dispatch(setTagList(this.props.postTagListInit, value))}}
-                            multi={true}
-                          />
-                          <p><span className="help-block">Press enter after inputting tag</span></p>
-                      </div>
-                    </div>
-                  </div>
+                      <TagWidget postTagList={this.props.postTagList} options={this.props.options} onChange={(value)=>{this.props.dispatch(setTagList(this.props.postTagListInit, value))}}/>
+                  
                   }
 
                   { this.isWidgetActive("featuredImage") &&
@@ -1073,6 +1061,50 @@ let NewContentType = React.createClass({
 
 }
 });
+
+const getAllTagQry = gql`query getTags ($type: String!){
+    viewer {
+      allTags (where: {type: {eq: $type}}) {
+        edges {
+          node {
+            id,
+            name,
+            post {
+              edges {
+                node{
+                  id
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`
+
+NewContentType = graphql(getAllTagQry, {
+  options: (props) => ({
+    variables: {
+      type: props.postType,
+    }
+  }),
+  props: ({ownProps, data}) => {
+    if (data.loading) {
+      return {isLoading: true}
+    } else if (data.error) {
+      return {hasError: true, error: data.error}
+    } else {
+      let options = _.map(data.viewer.allTags.edges, item => (
+        {id: item.node.id, value: item.node.name, label: item.node.name}
+      ))
+
+      return {
+        isLoading: false,
+        options: options
+      }
+    }
+  }
+})(NewContentType)
 
 const selector = formValueSelector('newContentForm');
 
