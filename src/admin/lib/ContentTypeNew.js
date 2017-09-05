@@ -23,6 +23,65 @@ import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {graphql} from 'react-apollo';
 import gql from 'graphql-tag';
 
+let PageHiererachyWidget = (props) => {
+  let templates = getTemplates();
+  return <div className="box box-info" style={{marginTop:20}}>
+    <div className="box-header with-border">
+      <h3 className="box-title">Page Attributes</h3>         
+      <div className="pull-right box-tools">
+        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
+        <i className="fa fa-minus"></i></button>
+      </div>
+    </div>
+    <div className="box-body pad">
+      <div>
+      <div className="form-group">
+        <p><b>Parent</b></p>
+        <Field id="parent" name="parent" component="select" disabled={props.isLoading} style={{widht: 250}}>
+          {props.pageList}
+        </Field>
+      </div>
+      <div className="form-group">
+        <p><b>Page  Template</b></p>
+        <Field name="pageTemplate" component="select" className="metaField" style={{width: 250}} defaultValue={templates?templates[0].item:null}>
+        { templates ?
+          templates.map(function(item, index){
+            return (<option key={item.id}>{item.name}</option>)
+          }) : ""
+        }
+        </Field>
+      </div>
+      <div className="form-group">
+        <p><b>Order</b></p>
+        <input type="text" id="pageOrder" placeholder="0" style={{width:50}} min="0" step="1" data-bind="value:pageOrder"/>
+      </div>
+      </div>                  
+    </div>
+  </div>
+}
+
+const allPageListQry = gql`
+query 
+getPages{viewer {allPosts(where: {type: {eq: "page"}}) { edges { node { 
+     id,title,slug,author{username},status,comments{edges{node{id}}},createdAt}}}}}
+`
+
+PageHiererachyWidget = graphql(allPageListQry, {
+  props: ({ownProps, data}) => {
+    if (data.loading) {
+      return {isLoading: true, pageList: [(<option key="0" value="">(no parent)</option>)]}
+    } else if (data.error) {
+      return {hasError: true, error: data.error}
+    } else {
+      var pageList = [(<option key="0" value="">(no parent)</option>)];
+      _.forEach(data.viewer.allPosts.edges, function(item){
+        pageList.push((<option key={item.node.id} value={item.node.id} checked={ownProps.parent===item.node.id}>
+          {item.node.title}</option>));
+      });
+      return {isLoading: false, pageList: pageList}
+    }
+  }
+})(PageHiererachyWidget)
 
 let CategoryWidget = (props) => (
     <div className="box box-info" style={{marginTop:20}}>
@@ -639,24 +698,6 @@ let NewContentType = React.createClass({
   componentDidMount: function(){
     var me = this;
 
-    if (this.isWidgetActive("pageHierarchy")) {
-      me.disableForm(true);
-      riques(Query.getPageListQry("All"),
-        function(error, response, body) {
-          if (!error && !body.errors && response.statusCode === 200) {
-            var pageList = [(<option key="0" value="">(no parent)</option>)];
-            _.forEach(body.data.viewer.allPosts.edges, function(item){
-              pageList.push((<option key={item.node.id} value={item.node.id} checked={me.props.parent===item.node.id}>
-                {item.node.title}</option>));
-            });
-            me.props.dispatch(setPageList(pageList));
-            me.disableForm(false);
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-          }
-      });
-    }
-    
     if (this.isWidgetActive("tag")) {
       me.disableForm(true);
       riques(Query.getAllTagQry(this.props.postType), 
@@ -911,39 +952,8 @@ let NewContentType = React.createClass({
                   </div>
 
                   { this.isWidgetActive("pageHierarchy") &&
-                  <div className="box box-info" style={{marginTop:20}}>
-                    <div className="box-header with-border">
-                      <h3 className="box-title">Page Attributes</h3>         
-                      <div className="pull-right box-tools">
-                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
-                        <i className="fa fa-minus"></i></button>
-                      </div>
-                    </div>
-                    <div className="box-body pad">
-                      <div>
-                      <div className="form-group">
-                        <p><b>Parent</b></p>
-                        <Field id="parent" name="parent" component="select" style={{widht: 250}}>
-                          {this.props.pageList}
-                        </Field>
-                      </div>
-                      <div className="form-group">
-                        <p><b>Page  Template</b></p>
-                        <Field name="pageTemplate" component="select" className="metaField" style={{width: 250}} defaultValue={templates?templates[0].item:null}>
-                        { templates ?
-                          templates.map(function(item, index){
-                            return (<option key={item.id}>{item.name}</option>)
-                          }) : ""
-                        }
-                        </Field>
-                      </div>
-                      <div className="form-group">
-                        <p><b>Order</b></p>
-                        <input type="text" id="pageOrder" placeholder="0" style={{width:50}} min="0" step="1" data-bind="value:pageOrder"/>
-                      </div>
-                      </div>                  
-                    </div>
-                  </div>
+                      <PageHiererachyWidget parent={this.props.parent}/>
+                  
                   }
 
                   { this.isWidgetActive("category") &&
