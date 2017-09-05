@@ -23,6 +23,32 @@ import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {graphql} from 'react-apollo';
 import gql from 'graphql-tag';
 
+let FeaturedImageWidget = (props) => (
+<div className="box box-info" style={{marginTop:20}}>
+  <div className="box-header with-border">
+    <h3 className="box-title">Featured Image</h3>         
+    <div className="pull-right box-tools">
+      <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
+      <i className="fa fa-minus"></i></button>
+    </div>
+  </div>
+  <div className="box-body pad">
+    <div>
+      { props.featuredImage &&
+        <div style={{position: "relative"}}>
+          <Field id="featuredImage" name="featuredImage" component="img" src={props.featuredImage} style={{width: "100%"}} alt={props.title} />
+          { /* <img src={this.props.featuredImage} style={{width: "100%"}} alt={this.props.title}/> */ }
+          <button onClick={props.onClick} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
+        </div>
+      }
+      { !props.featuredImage &&
+        <input type="file" name="featuredImage" onChange={props.onChange}/>
+      }
+    </div>                  
+  </div>
+</div>
+)
+
 
 let TagWidget = (props) => (
 <div className="box box-info" style={{marginTop:20}}>
@@ -418,6 +444,7 @@ let NewContentType = React.createClass({
     this.props.dispatch(setConnectionValue(_connectionValue));
     this.props.change("title", this.props.data.title)
     this.props.change("visibilityRadio", this.props.data.visibility)
+    this.props.change("featuredImage", this.props.data.featuredImage)
     _.forEach(this.props.data.meta.edges, meta => {
       this.props.change(meta.node.item, meta.node.value)
     })
@@ -969,34 +996,21 @@ let NewContentType = React.createClass({
                   }
 
                   { this.isWidgetActive("tag") &&
-                      <TagWidget postTagList={this.props.postTagList} options={this.props.options} onChange={(value)=>{this.props.dispatch(setTagList(this.props.postTagListInit, value))}}/>
-                  
+                      <TagWidget 
+                        postTagList={this.props.postTagList} 
+                        options={this.props.options} 
+                        onChange={(value)=>{this.props.dispatch(setTagList(this.props.postTagListInit, value))}}
+                      />
                   }
 
                   { this.isWidgetActive("featuredImage") &&
-                  <div className="box box-info" style={{marginTop:20}}>
-                    <div className="box-header with-border">
-                      <h3 className="box-title">Featured Image</h3>         
-                      <div className="pull-right box-tools">
-                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
-                        <i className="fa fa-minus"></i></button>
-                      </div>
-                    </div>
-                    <div className="box-body pad">
-                      <div>
-                        { this.props.featuredImage &&
-                          <div style={{position: "relative"}}>
-                            <Field id="featuredImage" name="featuredImage" component="img" src={this.props.featuredImage} style={{width: "100%"}} alt={this.props.title} />
-                            { /* <img src={this.props.featuredImage} style={{width: "100%"}} alt={this.props.title}/> */ }
-                            <button onClick={()=>{this.props.dispatch(setFeaturedImage(null))}} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
-                          </div>
-                        }
-                        { !this.props.featuredImage &&
-                          <input type="file" name="featuredImage" onChange={this.featuredImageChange}/>
-                        }
-                      </div>                  
-                    </div>
-                  </div>
+                      <FeaturedImageWidget
+                        title={this.props.title}
+                        featuredImage={this.props.data.featuredImage}
+                        onClick={()=>{this.props.dispatch(setFeaturedImage(null))}}
+                        onChange={this.featuredImageChange}
+                      />
+                  
                   }
 
                   { this.isWidgetActive("imageGallery") &&
