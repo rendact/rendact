@@ -6,44 +6,43 @@ import uuid from 'uuid';
 import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
-import {toggleSelectAll, maskArea, setPosition, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId,  loadmenuSelect,
-  setIdMainMenu, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
-import {validateUrl, swalert, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
+import {toggleSelectAll, maskArea, setPosition, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId,
+  setIdMainMenu, setPageListMenu, setMenuId, assignValueToMenuItem} from '../../actions'
+import {validateUrl, swalert, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
 import {reduxForm, Field, formValueSelector, change} from 'redux-form';
 import {withApollo, graphql} from 'react-apollo';
-import gql from 'graphql-tag';
 
 
 let MenuContentForm = (props) => (
-<div className={props.type === 'page' ? "box box-default box-solid" : "box box-default collapsed-box box-solid"}>
-                <div className="box-header with-border">
-                  <h3 className="box-title">{props.panelTitle}</h3>
-                  <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool"  data-widget="collapse"><i className={props.type === 'page'? "fa fa-minus" : "fa fa-plus"}></i>
-                      </button>
-                  </div>
-                </div>
-                <div className="box-body pad">
-  <form onSubmit={props.handleSubmit(values => props.addToMenu(values, props.type, props.itemList, props.reset))}>
-                  <div id={props.elementId}>
-                    {
-                      _.map(props.itemList, (item, index) => (
-                        <div key={index}>
-                          <Field component="input" type="checkbox" name={props.type + "["+index+"]"} className={props.type+"Menu"}/>
-                          {item.node.name || item.node.title}
-                        </div>
-                      ))
-                    }
-                    </div>
-                    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
-                    <button id={props.type+"SelectAll"} type="submit" className="btn btn-default" style={{marginRight: 10}} onClick={props.selectAll}>Select All</button>
-                    <div className="box-tools pull-right">
-                      <button id={props.type+"Submit"} className="btn  btn-default" type="submit" style={{marginRight: 10}}>Add to Menu</button>
-                    </div>
-  </form>
-                </div>
-              </div>
+  <div className={props.type === 'page' ? "box box-default box-solid" : "box box-default collapsed-box box-solid"}>
+    <div className="box-header with-border">
+      <h3 className="box-title">{props.panelTitle}</h3>
+      <div className="box-tools pull-right">
+          <button type="button" className="btn btn-box-tool"  data-widget="collapse"><i className={props.type === 'page'? "fa fa-minus" : "fa fa-plus"}></i>
+          </button>
+      </div>
+    </div>
+    <div className="box-body pad">
+      <form onSubmit={props.handleSubmit(values => props.addToMenu(values, props.type, props.itemList, props.reset))}>
+        <div id={props.elementId}>
+        {
+          _.map(props.itemList, (item, index) => (
+            <div key={index}>
+              <Field component="input" type="checkbox" name={props.type + "["+index+"]"} className={props.type+"Menu"}/>
+              {item.node.name || item.node.title}
+            </div>
+          ))
+        }
+        </div>
+        <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+        <button id={props.type+"SelectAll"} type="submit" className="btn btn-default" style={{marginRight: 10}} onClick={props.selectAll}>Select All</button>
+        <div className="box-tools pull-right">
+          <button id={props.type+"Submit"} className="btn  btn-default" type="submit" style={{marginRight: 10}}>Add to Menu</button>
+        </div>
+      </form>
+    </div>
+  </div>
 )
 
 
@@ -68,13 +67,10 @@ MenuContentForm = connect(
     
   })
 )(MenuContentForm)
-
 MenuContentForm = reduxForm({form: 'menuContentForm'})(MenuContentForm)
-
 
 let CustomUrlForm = (props) => {
   let submitDisable = false;
-
   if (!props.url)  submitDisable = true
   if (!props.title)  submitDisable = true
   
@@ -334,7 +330,6 @@ let Menu = React.createClass({
   },
 
   loadMenuItems: function(menuId){
-    var qry = Query.getMenuQry(menuId);
     this.disableForm(true)
     var allMenuData = this.props.client.readQuery({query: Query.loadAllMenuData});
     var menuFound = _.find(allMenuData.viewer.allMenu.edges, {node: {id: menuId}});
@@ -428,7 +423,6 @@ let Menu = React.createClass({
         if (data.children) data.children = filterTree(data.children, toRemoveId);
         return data.id !== toRemoveId
       });
-
       return result;
     }
 
@@ -450,7 +444,6 @@ let Menu = React.createClass({
     var me = this;
     var newMenuName = this.props.newMenuName;
     this.disableForm(true);
-    var qry = Query.createMenu(newMenuName);
     var noticeTxt = "Menu Saved";
     this.props.createMenu({variables: {
       input: {
@@ -615,13 +608,13 @@ let Menu = React.createClass({
 
   renderItem: function({item, isDragging, connectDragSource}){
     return <MenuPanel 
-        itemData={item} 
-        onRemovePanel={this.removePanel} 
-        notifyUnsavedData={this.notifyUnsavedData}
-        assignValueToMenuItem={this.assignValueToMenuItem}
-        isDragging={isDragging}
-        connectDragSource={connectDragSource}
-      />
+      itemData={item} 
+      onRemovePanel={this.removePanel} 
+      notifyUnsavedData={this.notifyUnsavedData}
+      assignValueToMenuItem={this.assignValueToMenuItem}
+      isDragging={isDragging}
+      connectDragSource={connectDragSource}
+    />
   },
 
   render: function(){
