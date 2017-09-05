@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import gql from 'graphql-tag';
 
 const createMenu = function(newMenuName){
   return {
@@ -149,15 +150,15 @@ const getMainMenu = {
     }`
 }
 
-const loadAllMenuData = {
-  "query": `
+const loadAllMenuData = gql`
 query{
-	viewer {
+  viewer {
     mainMenu:allMenus(where: {position :{eq: "Main Menu"}}){
       edges {
         node {
           id
           name
+          items
         }
       }
     }
@@ -168,26 +169,27 @@ query{
           id
           name
           items
+          position
         }
       }
     }
     
     allPage:allPosts(where: {type: {eq : "page"}, status: {eq: "Published"}}){
-    edges {
-      node {
-        id
-        title
+      edges {
+        node {
+          id
+          title
+        }
       }
     }
-  }
     allPost:allPosts(where: {type: {eq : "post"}, status: {eq: "Published"}}){
-    edges {
-      node {
-        id
-        title
+      edges {
+        node {
+          id
+          title
+        }
       }
     }
-  }
     
     allCategory:allCategories {
       edges {
@@ -200,7 +202,6 @@ query{
   }  
 }
 `
-}
 
 const updateMenuWithPos = (oldMainMenuId, newMenuData) => ({
   query: `

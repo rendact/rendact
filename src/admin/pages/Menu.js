@@ -10,7 +10,9 @@ import {toggleSelectAll, maskArea, setPosition, setResetDelete, setTreeData, set
   setIdMainMenu, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
 import {validateUrl, swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
-import {reduxForm, Field, formValueSelector, change} from 'redux-form'
+import {reduxForm, Field, formValueSelector, change} from 'redux-form';
+import {withApollo, graphql} from 'react-apollo';
+import gql from 'graphql-tag';
 
 
 let MenuContentForm = (props) => (
@@ -333,30 +335,16 @@ let Menu = React.createClass({
 
   loadMenuItems: function(menuId){
     var qry = Query.getMenuQry(menuId);
-    var me = this;
-    me.disableForm(true)
-      riques(qry, 
-        function(error, response, body) {
-          if (!error && !body.errors && response.statusCode === 200) {
-            var items = [];
-            var position = body.data.getMenu.position;
-            me.props.changeFieldValue("mainMenuPos", position==="Main Menu");
-            if (items) items = body.data.getMenu.items;
-            me.props.dispatch(setTreeData(items));
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-          }
-          me.disableForm(false);
-          me.props.dispatch(setDisabled(false))
-          disableBySelector(true, ["#urlSabmit #submit"])
-          
-          if (me.props.newMenuName===""){
-            // this will disable the create menu button if the newMenuName is ""
-            disableBySelector(true, ["#menu button#submit.btn.btn-success", ]);
-          }
-
-        }
-      );
+    this.disableForm(true)
+    var allMenuData = this.props.client.readQuery({query: Query.loadAllMenuData});
+    var menuFound = _.find(allMenuData.viewer.allMenu.edges, {node: {id: menuId}});
+    if (menuFound) {
+      this.props.changeFieldValue("mainMenuPos", menuFound.node.position==="Main Menu");
+      this.props.dispatch(setTreeData(menuFound.node.items));
+    }
+    this.disableForm(false);
+    this.props.dispatch(setDisabled(false))
+    disableBySelector(true, ["#urlSabmit #submit"])
   },
 
   handleMenuName: function(event){
@@ -370,7 +358,6 @@ let Menu = React.createClass({
       this.loadMenuItems(menuId);
       this.notifyUnsavedData(true);
     } else {
-      this.loadData(true)
       this.props.changeFieldValue("mainMenuPos", false)
       this.resetFormDelete();
       disableBySelector(true, me.disabledSelectors);
@@ -494,83 +481,26 @@ let Menu = React.createClass({
       });
   },
 
-  loadData: function(withoutMenuItems){
-    var me = this;
-    this.notif = this.refs.notificationSystem;
-
-    this.props.dispatch(setResetDelete())
-    this.disableForm(true);
-    disableBySelector(true, me.disabledSelectors);
-    var mainMenuId, mainMenuName;
-
-    const disableIfNoIdMenu = () => {
-      if (!this.props.IdMainMenu || withoutMenuItems){
-        disableBySelector(true, me.disabledSelectors);
-        this.props.changeFieldValue("mainMenuPos", "");
-      }
-    }
-
-    const processItems = (items) => (items.edges.map(item => item))
-
-    riques(Query.loadAllMenuData, (error, response, body) => {
-      if(!error && response.statusCode === 200) {
-        let { mainMenu, allMenu, allPage, allPost, allCategory } = body.data.viewer;
-
-        // processing main menu
-        if (mainMenu.edges.length>=1){
-          mainMenuId = _.head(mainMenu.edges).node.id;
-          mainMenuName = _.head(mainMenu.edges).node.name;
-          me.props.dispatch(setIdMainMenu(mainMenuId))
-        } 
-
-        // processing all Menu
-          var pageList = [(<option key="0" value="">--select menu--</option>)];
-          _.forEach(allMenu.edges, function(item){
-            pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
-          })
-          me.props.dispatch(setPageListMenu(pageList)) 
-          if (mainMenuId && mainMenuName && !withoutMenuItems) {
-
-              me.props.dispatch(setMenuId(mainMenuId));
-              me.loadMenuItems(mainMenuId);
-              me.props.changeFieldValue("selectedMenuName", mainMenuName);
-              me.props.changeFieldValue("menuSelect", mainMenuId+"-"+mainMenuName);
-              me.props.dispatch(loadmenuSelect(mainMenuId+"-"+mainMenuName));
-
-          } else {
-              disableBySelector(true, me.disabledSelectors);
-          }
-
-        // processing all page
-        let allPageList = processItems(allPage)
-        me.props.dispatch(setAllPageList(allPageList)) 
-
-        // processing all posts
-
-        let allPostList = processItems(allPost)
-        me.props.dispatch(setAllPostList(allPostList))
-        // processing all categories
-
-        let categoryList = processItems(allCategory)
-        me.props.dispatch(setCategoryMenu(categoryList))
-
-      } else {
-        errorCallback(error, body.errors?body.errors[0].message:null);
-      }
-      this.disableForm(false)
-      disableIfNoIdMenu();
-    });
-  },
-
   componentDidMount: function(){
     require ('jquery-ui/themes/base/theme.css');
     require ('../lib/jquery-sortable.js');
     require ('../../../public/css/AdminLTE.css');
     require ('../../../public/css/skins/_all-skins.css');
     require('./menucustom.css');
-    //Load sidebar
-    this.loadData();
     disableBySelector(true, ["#urlSabmit div button#submit"]);
+  },
+  componentWillMount(){
+    if(this.props.isLoading){
+      this.props.dispatch(maskArea(true))
+    }
+    this.props.dispatch(setResetDelete())
+  },
+  componentWillReceiveProps(props){
+    if(!props.isLoading && this.props.isLoading){
+      props.dispatch(setResetDelete())
+      props.dispatch(maskArea(false))
+    }
+    this.disableForm(props.isLoading);
   },
   onChangeMainMenu: function(event){
     const target = event.target;
@@ -670,7 +600,7 @@ let Menu = React.createClass({
       riques(Query.deleteMenuQry(idList), 
         function(error, response, body) {
           if (!error && !body.errors && response.statusCode === 200) {
-            me.loadData()
+            //me.loadData()
             me.resetFormDelete();
             me.notifyUnsavedData(false)
           } else {
@@ -887,4 +817,67 @@ const mapDispatchToProps = function(dispatch){
   }
 }
 Menu = connect(mapStateToProps, mapDispatchToProps)(Menu);
+
+Menu = graphql(Query.loadAllMenuData, {
+  name: 'getAllMenu',
+  props: ({ownProps, getAllMenu}) => {
+    var mainMenuId, mainMenuName;
+
+    const processItems = (items) => (items.edges.map(item => item));
+    
+    if (!getAllMenu.loading) {
+      let { mainMenu, allMenu, allPage, allPost, allCategory } = getAllMenu.viewer;
+      let selectedMenuName, menuSelect  = null;
+      var treeData = [];
+
+        // processing main menu
+        if (mainMenu.edges.length>=1){
+          var mainMenuData = _.head(mainMenu.edges).node;
+          mainMenuId = mainMenuData.id;
+          mainMenuName = mainMenuData.name;
+          treeData = mainMenuData.items;
+          selectedMenuName = mainMenuData.name;
+          menuSelect = mainMenuData.id+"-"+mainMenuData.name;
+        } 
+
+        // processing all Menu
+          var pageList = [(<option key="0" value="">--select menu--</option>)];
+          _.forEach(allMenu.edges, function(item){
+            pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
+          })
+          
+        // processing all page
+        let allPageList = processItems(allPage)
+
+        // processing all posts
+        let allPostList = processItems(allPost)
+
+        // processing all categories
+        let categoryList = processItems(allCategory)
+        console.log("APOLLO :"+treeData)
+        return {
+          menuId: mainMenuId,
+          pageList: pageList,
+          IdMainMenu: mainMenuId,
+          mainMenuName: mainMenuName,
+          menuSelect: mainMenuId+"-"+mainMenuName,
+          allPageList: allPageList,
+          allPostList: allPostList,
+          categoryList: categoryList,
+          isLoading: false,
+          treeData: treeData,
+          initialValues: {
+            selectedMenuName: selectedMenuName,
+            menuSelect: menuSelect
+          }
+        }
+    } else {
+      return {
+        isLoading: true
+      }
+    }
+  }
+})(Menu);
+Menu = withApollo(Menu);
+
 export default Menu;
