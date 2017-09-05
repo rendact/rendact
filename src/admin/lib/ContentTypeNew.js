@@ -20,7 +20,83 @@ import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPost
         setEditorMode, toggleImageGalleyBinded, setPageList, setAllCategoryList, setPostId,
         setOptions, setTagMap, loadFormData} from '../../actions'
 import {reduxForm, Field, formValueSelector} from 'redux-form';
+import {graphql} from 'react-apollo';
+import gql from 'graphql-tag';
 
+
+let CategoryWidget = (props) => (
+    <div className="box box-info" style={{marginTop:20}}>
+      <div className="box-header with-border">
+          <h3 className="box-title">Category</h3>         
+          <div className="pull-right box-tools">
+            <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
+              <i className="fa fa-minus"></i></button>
+            </div>
+          </div>
+          <div className="box-body pad">
+            <div>
+            <div className="form-group">
+              {props.isLoading ?
+                <Halogen.PulseLoader color="#4DAF7C"/>                  
+                  :
+                _.map(props.allCategoryList, (cat, index) => {
+                  return <div key={index}> 
+                    <Field name={"categories." + cat.id} component="input" type="checkbox"/>
+                    {cat.name}
+                  </div>
+                })
+              }
+            </div>
+          </div>                  
+        </div>
+      </div>
+)
+
+let categoryQuery = gql`
+query getCategories ($type: String!){
+    viewer {
+      allCategories (where: {type: {eq: $type}}) {
+        edges {
+          node {
+            id,
+            name,
+            description,
+            post {
+              edges {
+                node{
+                  id
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+}
+`
+
+CategoryWidget = graphql(categoryQuery,
+  { 
+    options: props => ({
+      variables: {
+        type: props.postType
+      },
+    }),
+      props: ({ownProps, data}) => {
+        if (data.loading){
+          return {isLoading: true}
+        } else if (data.error){
+          return {hasError: true, error: data.error}
+        } else {
+          let allCategoryList = _.map(data.viewer.allCategories.edges, item => item.node)
+          return {
+            isLoading: false,
+            allCategoryList: allCategoryList
+          }
+        }
+      }
+  }
+)(CategoryWidget)
 
 const PermalinkEditor = (props) => {
   return (
@@ -580,29 +656,6 @@ let NewContentType = React.createClass({
           }
       });
     }
-
-    if (this.isWidgetActive("category")) {
-      me.disableForm(true);
-      var postType = this.props.postType;
-      riques(Query.getAllCategoryQry(postType), 
-        function(error, response, body) {
-          if (!error && !body.errors && response.statusCode === 200) {
-            /*
-            var categoryList = [];
-            _.forEach(body.data.viewer.allCategories.edges, function(item){
-              categoryList.push((<div key={item.node.id}><input id={item.node.id}
-              name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
-            })
-            */
-            let categoryList = body.data.viewer.allCategories.edges.map(item => item.node)
-            me.props.dispatch(setAllCategoryList(categoryList));
-            me.disableForm(false);
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-          }
-        }
-      );
-    }
     
     if (this.isWidgetActive("tag")) {
       me.disableForm(true);
@@ -894,29 +947,7 @@ let NewContentType = React.createClass({
                   }
 
                   { this.isWidgetActive("category") &&
-                  <div className="box box-info" style={{marginTop:20}}>
-                    <div className="box-header with-border">
-                      <h3 className="box-title">Category</h3>         
-                      <div className="pull-right box-tools">
-                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
-                        <i className="fa fa-minus"></i></button>
-                      </div>
-                    </div>
-                    <div className="box-body pad">
-                      <div>
-                      <div className="form-group">
-                        {
-                          _.map(this.props.allCategoryList, (cat, index) => {
-                            return <div key={index}> 
-                              <Field name={"categories." + cat.id} component="input" type="checkbox"/>
-                              {cat.name}
-                            </div>
-                          })
-                        }
-                      </div>
-                      </div>                  
-                    </div>
-                  </div>
+                      <CategoryWidget postType={this.props.postType}/>
                   }
 
                   { this.isWidgetActive("tag") &&
@@ -1052,6 +1083,7 @@ const mapStateToProps = function(state){
 
   if (!_.isEmpty(state.contentTypeNew)) {
     var out = _.head(state.contentTypeNew);
+    console.log(out)
     out["initialValues"] = out.data;
     //return _.merge(out, customStates);
     return {...out, ...customStates}
