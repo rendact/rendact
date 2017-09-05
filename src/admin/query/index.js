@@ -82,7 +82,7 @@ const queries = {
   setAsOwner: User.setAsOwner,
   createMenu: Menu.createMenu,
   getAllMenu: Menu.getAllMenu,
-  deleteMenuQry: Menu.deleteMenuQry,
+  deleteMenu: Menu.deleteMenu,
   updateMenu: Menu.updateMenu,
   updateMainMenu: Menu.updateMainMenu,
   getAllPage: Menu.getAllPage,
