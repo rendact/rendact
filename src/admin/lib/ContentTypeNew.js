@@ -294,7 +294,7 @@ const PermalinkEditor = (props) => {
 
 let NewContentTypeNoPostId = React.createClass({
   propTypes: {
-    urlParams: React.PropTypes.string,
+    urlParams: React.PropTypes.object,
     isProcessing: React.PropTypes.bool.isRequired,
     opacity: React.PropTypes.number.isRequired,
     errorMsg: React.PropTypes.string,
@@ -385,15 +385,17 @@ let NewContentTypeNoPostId = React.createClass({
     var time = this.props.publishDate + hours + minute;
     this.props.dispatch(toggleSaveImmediatelyMode(false, time));
   },
+
   disableForm: function(isFormDisabled){
     disableForm(isFormDisabled, this.notification);
     this.props.dispatch(maskArea(isFormDisabled));
   },
-  componentWillUpdate: function(props) {
-    props.initialize(props.initialValues)
-  },
+
   componentWillReceiveProps: function(props){
     console.log(props)
+    if (props.data !== this.props.data){
+      props.initialize(props.initialValues)
+    }
 
     /*if (props.urlParams.postId !== this.props.postId){
       props.dispatch(setPostId(props.urlParams.postId))
@@ -424,62 +426,10 @@ let NewContentTypeNoPostId = React.createClass({
     return out;
   },
   setFormValues: function(v){
-    var meta = [];
-    var metaValues = {}
-    this.props.destroy()
-
-    // prepare post meta values
-    if (v.meta.edges.length>0) {
-      _.forEach(v.meta.edges, function(i){ meta.push(i.node) });
-    }
-    
-    // prepare main post values
-    var pubDate = v.publishDate? new Date(v.publishDate) : new Date();
-    window.CKEDITOR.instances['content'].setData(v.content);
-    v["hours"] = pubDate.getHours();
-    v["minutes"] = pubDate.getMinutes();
-    v["publishDate"] = pubDate;
-    v["publishDateReset"] = pubDate;
-    v["visibilityRadio"] = v.visibility;
-
-    this.props.dispatch(loadFormData(_.merge(v, metaValues)));
-    //this.props.dispatch(setContentFormValues(v));
-
-    // set categories value to state
-    let me = this
-    var _postCategoryList = [];
-    if (v.category.edges.length>0) {
-      _.forEach(v.category.edges, function(i){
-        if (i.node.category){ 
-          // index 0 is category id
-          // index 1 is categoryOfPost id
-          _postCategoryList.push([i.node.category.id, i.node.id]) 
-          me.props.change("categories."+i.node.category.id, true)
-        }
-      });
-      this.props.dispatch(setCategoryList(_postCategoryList));
-    }
-    // set tags value to state
-    var _postTagList = [];
-    if (v.tag && v.tag.edges.length>0) {
-      _.forEach(v.tag.edges, function(i){
-        if (i.node.tag){
-          _postTagList.push({id: i.node.tag.id, value: i.node.tag.name, name: i.node.tag.name, label: i.node.tag.name, connectionId: i.node.id});
-        }
-      });
-      this.props.dispatch(setTagList(_postTagList, _postTagList));
-    }
-
-    // set gallery values to state
-    var _imageGalleryList = [];    
-    if (v.tag && v.file.edges.length>0) {
-      _.forEach(v.file.edges, function(i){
-        if (i.node.value){
-          _imageGalleryList.push({id: i.node.id, value: i.node.value});
-        }
-      });
-      this.props.dispatch(setImageGalleryList(_imageGalleryList));
-    }
+    let metaValues = {};
+    let meta = [];
+    // dont delete this function first
+    // still confuse with this behaviour
 
     // set additional field values to state
     var _connectionValue = this.props.connectionValue;
@@ -494,15 +444,6 @@ let NewContentTypeNoPostId = React.createClass({
         _connectionValue[isConnItem[1]] = item.value; 
       }
     });
-    // manual change because with initialValues values in the
-    // these fields not displayed
-    this.props.dispatch(setConnectionValue(_connectionValue));
-    this.props.change("title", this.props.data.title)
-    this.props.change("visibilityRadio", this.props.data.visibility)
-    this.props.change("featuredImage", this.props.data.featuredImage)
-    _.forEach(this.props.data.meta.edges, meta => {
-      this.props.change(meta.node.item, meta.node.value)
-    })
   },
   formatDate: function(date){
     var min = date.getMinutes();
@@ -568,8 +509,6 @@ let NewContentTypeNoPostId = React.createClass({
       if (v[item]) output[item] = v[item];
     });
     
-    output["content"] = this.props.content;
-    output["visibility"] = this.props.visibilityTxt;
     output["type"] = this.props.postType;
     output["authorId"] = localStorage.getItem('userId');
     output["slug"] = this.props.permalink;
@@ -590,17 +529,31 @@ let NewContentTypeNoPostId = React.createClass({
     }
     var _objData = this._emulateDataForSaving(v);
     var qry = "", noticeTxt = "";
+    let mutate;
     if (this.props.mode==="create"){
       qry = this.props.createQuery(_objData);
       noticeTxt = this.props.name+' Published!';
+      mutate = this.props.createPostQuery
+
     }else{
-      _objData["id"] = this.props.postId;
+      _objData["id"] = this.props.urlParams.postId;
       qry = this.props.updateQuery(_objData);
       noticeTxt = this.props.name+' Updated!';
+      mutate = this.props.updatePostQuery
     }
-    this.disableForm(true);
     var metaDataList = me.getMetaFormValues();
+    this.disableForm(true)
 
+    mutate({
+      variables: {
+        input: _objData
+      }
+    }).then(data => {
+      console.log(data)
+      this.disableForm(false)
+    })
+
+    /*
     riques(qry, 
       function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
@@ -683,6 +636,7 @@ let NewContentTypeNoPostId = React.createClass({
         }
       }
     );  
+    */
   },
   _errorNotif: function(msg){
     this.refs.notificationSystem.addNotification({
@@ -1102,6 +1056,11 @@ let NewContentTypeNoPostId = React.createClass({
 
 }
 });
+NewContentTypeNoPostId = _.flow([
+  graphql(gql`${Query.getUpdatePostQry().query}`, {name: 'updatePostQuery'}),
+  graphql(gql`${Query.getCreatePostQry().query}`, {name: 'createPostQuery'})
+])(NewContentTypeNoPostId)
+
 
 const getAllTagQry = gql`query getTags ($type: String!){
     viewer {
@@ -1147,6 +1106,10 @@ NewContentTypeNoPostId = graphql(getAllTagQry, {
   }
 })(NewContentTypeNoPostId)
 
+NewContentTypeNoPostId = reduxForm({
+  form: 'newContentForm'
+})(NewContentTypeNoPostId)
+
 const getPostQry = gql`query ($id: ID!){getPost(id: $id){ id,title,content,slug,author{username},status,visibility,featuredImage,
       summary,category{edges{node{id, category{id,name}}}},comments{edges{node{id,content,name,email,website}}},file{edges{node{id value}}},
       tag{edges{node{id,tag{id,name}}}},meta{edges{node{id,item,value}}},createdAt}}`
@@ -1162,14 +1125,12 @@ const NewContentTypeWithPostId = graphql(getPostQry, {
       return {
         isLoading: true,
         data: {},
-        initialValues: {}
       }
     } else if (data.error) {
       return {
         isLoading: false,
         hasError: true,
         data: {},
-        initialValues: {}
       }
     } else {
       let initials = {};
@@ -1277,8 +1238,5 @@ const mapStateToProps = function(state){
   } else return customStates;
 }
 
-NewContentType = reduxForm({
-  form: 'newContentForm'
-})(NewContentType)
 NewContentType = connect(null)(NewContentType);
 export default NewContentType;
