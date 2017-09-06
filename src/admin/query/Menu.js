@@ -11,7 +11,7 @@ const createMenu = gql`
     }
   }
   `
-  
+
 const getAllMenu = {
   "query": `query getMenus{
     viewer {
@@ -135,6 +135,7 @@ query{
           id
           name
           items
+          position
         }
       }
     }

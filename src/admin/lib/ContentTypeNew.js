@@ -406,7 +406,7 @@ let NewContentTypeNoPostId = React.createClass({
       props.dispatch(resetPostEditor());
       props.destroy()
     }
-  },
+},
   resetForm: function(){
     this.props.handleNav(this.props.slug, "new")
     this.props.dispatch(setPostId(""))
