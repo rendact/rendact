@@ -23,6 +23,39 @@ import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {graphql} from 'react-apollo';
 import gql from 'graphql-tag';
 
+class CkeditorField extends React.Component{
+  componentDidMount(){
+    let me = this;
+    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
+      window.CKEDITOR.replace('content', {
+        height: 400,
+        title: false
+      });
+      for (var i in window.CKEDITOR.instances) {
+        if (window.CKEDITOR.instances.hasOwnProperty(i))
+          window.CKEDITOR.instances[i].on('change', me.props.handleContentChange);
+      }
+
+        /*
+      if (me.props.postId) {
+        me.props.dispatch(setEditorMode("update"));
+        riques(me.props.loadQuery(me.props.postId), 
+          function(error, response, body) {
+            if (!error ) {
+              var values = body.data.getPost;
+              me.setFormValues(values);
+            }
+          }
+        );
+      }
+      */
+    });
+  }
+  render(){
+    return <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="textarea" className="form-control" />
+  }
+}
+
 let ImageGalleryWidget = (props) => (
 <div className="box box-info" style={{marginTop:20}}>
   <div className="box-header with-border">
@@ -266,7 +299,7 @@ const PermalinkEditor = (props) => {
   )
 }
 
-let NewContentType = React.createClass({
+let NewContentTypeNoPostId = React.createClass({
   propTypes: {
     urlParams: React.PropTypes.string,
     isProcessing: React.PropTypes.bool.isRequired,
@@ -488,12 +521,14 @@ let NewContentType = React.createClass({
   handleTitleChange: function(event){
     this.notifyUnsavedData(true);
   },
+
   handleContentChange: function(event){
     var content = window.CKEDITOR.instances['content'].getData();
-    this.props.dispatch(setPostContent(content));
+    //  this.props.dispatch(setPostContent(content));
     this.props.change('content', content)
     this.notifyUnsavedData(true);
   },
+
   handleTitleTagChange: function(event){
     var titleTag = this.props.titleTag;
     this.props.dispatch(updateTitleTagLeftCharacter(65-(titleTag.length)));
@@ -781,28 +816,6 @@ let NewContentType = React.createClass({
   componentDidMount: function(){
     var me = this;
 
-    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
-      window.CKEDITOR.replace('content', {
-        height: 400,
-        title: false
-      });
-      for (var i in window.CKEDITOR.instances) {
-        if (window.CKEDITOR.instances.hasOwnProperty(i))
-          window.CKEDITOR.instances[i].on('change', me.handleContentChange);
-      }
-
-      if (me.props.postId) {
-        me.props.dispatch(setEditorMode("update"));
-        riques(me.props.loadQuery(me.props.postId), 
-          function(error, response, body) {
-            if (!error ) {
-              var values = body.data.getPost;
-              me.setFormValues(values);
-            }
-          }
-        );
-      }
-    });
 
     if (this.props.visibilityTxt==="Public") 
       document.getElementById("public").setAttribute('checked', true);
@@ -847,7 +860,11 @@ let NewContentType = React.createClass({
                 <Field name="title" component="input" type="text" className="form-control"
                   placeholder="Input Title Here" onChange={this.handleTitleChange} onBlur={() => {this.checkSlug(this.props.title.split(" ").join("-").toLowerCase())}} style={{marginBottom: 20}}/>
                 <PermalinkEditor rootUrl={rootUrl} onCheckSlug={this.checkSlug} {...this.props} />
-                <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="textarea" className="form-control" />
+
+                <CkeditorField 
+                  handleContentChange={this.handleContentChange}
+                />
+
                 <div id="trackingDiv"></div>
               </div>
             </div>
@@ -1106,7 +1123,7 @@ const getAllTagQry = gql`query getTags ($type: String!){
     }
   }`
 
-NewContentType = graphql(getAllTagQry, {
+NewContentTypeNoPostId = graphql(getAllTagQry, {
   options: (props) => ({
     variables: {
       type: props.postType,
@@ -1128,7 +1145,16 @@ NewContentType = graphql(getAllTagQry, {
       }
     }
   }
-})(NewContentType)
+})(NewContentTypeNoPostId)
+
+
+let NewContentType = (props) => {
+  if (!props.urlParams) {
+    return <NewContentTypeNoPostId {...props}/>
+  }
+
+  return <NewContentTypeNoPostId {...props}/>
+}
 
 const selector = formValueSelector('newContentForm');
 
