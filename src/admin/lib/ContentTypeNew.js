@@ -20,7 +20,7 @@ import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPost
         setEditorMode, toggleImageGalleyBinded, setPageList, setAllCategoryList, setPostId,
         setOptions, setTagMap, loadFormData} from '../../actions'
 import {reduxForm, Field, formValueSelector} from 'redux-form';
-import {graphql} from 'react-apollo';
+import {graphql, withApollo} from 'react-apollo';
 import gql from 'graphql-tag';
 
 class CkeditorField extends React.Component{
@@ -549,7 +549,30 @@ let NewContentTypeNoPostId = React.createClass({
         input: _objData
       }
     }).then(data => {
-      console.log(data)
+      let postId ;
+      
+      if (me.props.mode==="create"){
+        postId = data.data.createPost.changedPost.id;
+      } else {
+        postId = data.data.updatePost.changedPost.id;
+      }
+
+      // prosess metadata
+
+      if (metaDataList.length > 0) {
+        this.props.client.mutate({
+          mutation: gql`${Query.createUpdatePostMetaMtn(postId, metaDataList).query}`
+        }).then(data => console.log(data))
+      }
+          if (me.isWidgetActive("category")) {
+            // process categories
+            let categToSave = _.keys(v.categories) 
+            var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.props.postCategoryList, categToSave);
+            if (catQry) this.props.client.mutate({
+              mutation: gql`${catQry.query}`,
+              variables: catQry.variables
+            }).then(data => console.log(data))
+          }
       this.disableForm(false)
     })
 
@@ -560,11 +583,6 @@ let NewContentTypeNoPostId = React.createClass({
           var here = me, postId = "", pmQry = "";
           
  
-          if (me.props.mode==="create"){
-            postId = body.data.createPost.changedPost.id;
-          } else {
-            postId = body.data.updatePost.changedPost.id;
-          }
           
           if (metaDataList.length>0) {
             pmQry = Query.createUpdatePostMetaMtn(postId, metaDataList);
@@ -1058,7 +1076,8 @@ let NewContentTypeNoPostId = React.createClass({
 });
 NewContentTypeNoPostId = _.flow([
   graphql(gql`${Query.getUpdatePostQry().query}`, {name: 'updatePostQuery'}),
-  graphql(gql`${Query.getCreatePostQry().query}`, {name: 'createPostQuery'})
+  graphql(gql`${Query.getCreatePostQry().query}`, {name: 'createPostQuery'}),
+  withApollo
 ])(NewContentTypeNoPostId)
 
 
