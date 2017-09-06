@@ -150,7 +150,7 @@ let NewContentType = React.createClass({
     disableForm(isFormDisabled, this.notification);
     this.props.dispatch(maskArea(isFormDisabled));
   },
-  componentWillReceiveProps: function(props){
+   componentWillReceiveProps: function(props){
     console.log(props.urlParams)
     /*if (props.urlParams.postId !== this.props.postId){
       props.dispatch(setPostId(props.urlParams.postId))
@@ -162,7 +162,7 @@ let NewContentType = React.createClass({
       props.dispatch(resetPostEditor());
       props.destroy()
     }
-  },
+},
   resetForm: function(){
     this.props.handleNav(this.props.slug, "new")
     this.props.dispatch(setPostId(""))

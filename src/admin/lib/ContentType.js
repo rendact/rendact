@@ -9,6 +9,9 @@ import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle, swalert,
 import {Table, SearchBoxPost, DeleteButtons} from './Table'
 import {connect} from 'react-redux'
 import {setStatusCounter, initContentList, maskArea, toggleDeleteMode, toggleSelectedItemState} from '../../actions'
+import {graphql} from 'react-apollo';
+import gql from 'graphql-tag';
+
 
 let ContentType = React.createClass({
   propTypes: {
@@ -26,7 +29,6 @@ let ContentType = React.createClass({
     fields: React.PropTypes.array,
     allPostId: React.PropTypes.array,
     replaceStatusWithRole: React.PropTypes.bool
-    
   },
   getDefaultProps: function() {
     return {
@@ -39,7 +41,7 @@ let ContentType = React.createClass({
     }
   },
   dt: null,
-  loadData: function(status, callback) {
+  /*loadData: function(status, callback) {
     var me = this;
     this.disableForm(true);
     var metaItemList = _.map(this.props.customFields, function(item) { return item.id });
@@ -182,7 +184,7 @@ let ContentType = React.createClass({
         }
       }
     );
-  },
+  },*/
   disableForm: function(isFormDisabled){
     disableForm(isFormDisabled, this.notification);
     this.props.dispatch(maskArea(isFormDisabled));
@@ -278,7 +280,7 @@ let ContentType = React.createClass({
     $(".menu-item").removeClass("active");
     $("#menu-posts-new").addClass("active");
   },
-  handleStatusFilter: function(event){
+  /*handleStatusFilter: function(event){
     event.preventDefault();
     this.disableForm(true);
     var status = event.target.text;
@@ -286,7 +288,6 @@ let ContentType = React.createClass({
       var me = this;
       this.loadData("Trash", function(){
         me.props.dispatch(toggleDeleteMode(status, true));
-        debugger;
         me.disableForm(false);
       });
     }else{
@@ -319,7 +320,7 @@ let ContentType = React.createClass({
         te.disableForm(false);
       })
     } ;
-  },
+  },*/
   handleSetOwnerButton: function(e){
     var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     if (checkedRow.length > 1) {
@@ -389,7 +390,7 @@ let ContentType = React.createClass({
     var datatable = this.table.datatable;
     this.refs.rendactSearchBoxPost.bindToTable(datatable);
     this.dt=datatable;
-    this.loadData("All");
+    //this.loadData("All");
   },
   render: function(){
     return (
@@ -489,4 +490,59 @@ const mapStateToProps = function(state){
 }
 
 ContentType = connect(mapStateToProps)(ContentType)
+
+let getAllPosts = gql`
+query getAllPosts ($type: String!, $cateId: ID!, $tagId: ID!){
+  viewer { 
+    allPosts(where: {type: {eq: $type},status: {ne: ""},
+    category: {category: {id: {eq: $cateId}}}, tag: {tag: {id: {eq: $tagId}}} }) {
+      edges { 
+        node { 
+          id,
+          title,
+          content,
+          slug,
+          author{username},
+          status,
+          meta{edges{node{id,item,value}}},
+          category{edges{node{id,category{id, name}}}},
+          tag{edges{node{tag{id, name}}}},
+          comments{edges{node{id,content,name,email,website}}},
+          file{edges{node{id,value}}}, 
+          featuredImage,
+          createdAt
+        }
+      }
+    }
+  }
+}
+`
+
+ContentType = graphql(getAllPosts,
+  { 
+    options: props => ({
+      variables: {
+        type: props.postType,
+        cateId: props.cateId,
+        tagId: props.tagId,
+      },
+    }),
+    props: ({ownProps, data}) => {
+
+      debugger;
+      if (data.loading){
+          return {isLoading: true}
+      } else if (data.error){
+          return {hasError: true, error: data.error}
+      } else {
+          let allPosts = _.map(data.viewer.allPosts.edges, item => item.node.title);
+      return {
+            isLoading: false,
+            initialValues: allPosts
+        }
+      }
+    }
+  }
+)(ContentType)
+
 export default ContentType;
