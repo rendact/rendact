@@ -389,11 +389,11 @@ let NewContentTypeNoPostId = React.createClass({
     disableForm(isFormDisabled, this.notification);
     this.props.dispatch(maskArea(isFormDisabled));
   },
+  componentWillUpdate: function(props) {
+    props.initialize(props.initialValues)
+  },
   componentWillReceiveProps: function(props){
     console.log(props)
-    if (!props.isLoading) {
-      props.initialize(props.initialValues)
-    }
 
     /*if (props.urlParams.postId !== this.props.postId){
       props.dispatch(setPostId(props.urlParams.postId))
@@ -1237,7 +1237,8 @@ const NewContentTypeWithPostId = graphql(getPostQry, {
         initialValues: initials,
         postTagList : _postTagList,
         imageGallery: _imageGalleryList,
-        mode: "update"
+        mode: "update",
+        permalink: v.slug
       }
     }
   }
@@ -1279,5 +1280,5 @@ const mapStateToProps = function(state){
 NewContentType = reduxForm({
   form: 'newContentForm'
 })(NewContentType)
-NewContentType = connect(mapStateToProps)(NewContentType);
+NewContentType = connect(null)(NewContentType);
 export default NewContentType;
