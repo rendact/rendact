@@ -808,6 +808,9 @@ let NewContentTypeNoPostId = React.createClass({
       />
     )
   },
+  componentWillMount: function(){
+    this.props.dispatch(maskArea(true))
+  },
  
   componentDidMount: function(){
     var me = this;
@@ -1218,11 +1221,23 @@ const NewContentTypeWithPostId = graphql(getPostQry, {
         });
       }
 
+      // set gallery 
+      var _imageGalleryList = [];    
+      if (v.tag && v.file.edges.length>0) {
+        _.forEach(v.file.edges, function(i){
+          if (i.node.value){
+            _imageGalleryList.push({id: i.node.id, value: i.node.value});
+          }
+        });
+      }
+
       return {
         isLoading: false,
         data: data.getPost,
         initialValues: initials,
-        postTagList : _postTagList
+        postTagList : _postTagList,
+        imageGallery: _imageGalleryList,
+        mode: "update"
       }
     }
   }
@@ -1230,7 +1245,7 @@ const NewContentTypeWithPostId = graphql(getPostQry, {
 
 let NewContentType = (props) => {
   if (!props.urlParams) {
-    return <NewContentTypeNoPostId {...props}/>
+    return <NewContentTypeNoPostId {...props} mode="create"/>
   }
 
   return <NewContentTypeWithPostId {...props}/>
