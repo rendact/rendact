@@ -20,7 +20,240 @@ import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPost
         setEditorMode, toggleImageGalleyBinded, setPageList, setAllCategoryList, setPostId,
         setOptions, setTagMap, loadFormData} from '../../actions'
 import {reduxForm, Field, formValueSelector} from 'redux-form';
+import {graphql} from 'react-apollo';
+import gql from 'graphql-tag';
 
+class CkeditorField extends React.Component{
+  componentDidMount(){
+    let me = this;
+    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
+      window.CKEDITOR.replace('content', {
+        height: 400,
+        title: false
+      });
+      window.CKEDITOR.instances['content'].setData(me.props.content);
+      for (var i in window.CKEDITOR.instances) {
+        if (window.CKEDITOR.instances.hasOwnProperty(i))
+          window.CKEDITOR.instances[i].on('change', me.props.handleContentChange);
+      }
+    });
+  }
+  render(){
+    return <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="textarea" className="form-control" />
+  }
+}
+
+let ImageGalleryWidget = (props) => (
+<div className="box box-info" style={{marginTop:20}}>
+  <div className="box-header with-border">
+    <h3 className="box-title">Image Gallery</h3>         
+    <div className="pull-right box-tools">
+      <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
+      <i className="fa fa-minus"></i></button>
+    </div>
+  </div>
+  <div className="box-body pad">
+    <div>
+      <input type="file" id="imageGallery" name="imageGallery" onChange={props.imageGalleryChange}/>
+      {
+        _.map(props.imageGallery, function(item, index){
+          return <div key={index} className="margin" style={{width: 150, float: "left", position: "relative"}}>
+          <a href="" onClick={props.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue"}} alt={"gallery"+index}/></a>
+          <button id={item.id+"-"+index} onClick={props.handleImageRemove} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
+          </div>
+        })
+      }
+    </div>                  
+  </div>
+</div>
+)
+
+
+let FeaturedImageWidget = (props) => (
+<div className="box box-info" style={{marginTop:20}}>
+  <div className="box-header with-border">
+    <h3 className="box-title">Featured Image</h3>         
+    <div className="pull-right box-tools">
+      <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
+      <i className="fa fa-minus"></i></button>
+    </div>
+  </div>
+  <div className="box-body pad">
+    <div>
+      { props.featuredImage &&
+        <div style={{position: "relative"}}>
+          <Field id="featuredImage" name="featuredImage" component="img" src={props.featuredImage} style={{width: "100%"}} alt={props.title} />
+          { /* <img src={this.props.featuredImage} style={{width: "100%"}} alt={this.props.title}/> */ }
+          <button onClick={props.onClick} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
+        </div>
+      }
+      { !props.featuredImage &&
+        <input type="file" name="featuredImage" onChange={props.onChange}/>
+      }
+    </div>                  
+  </div>
+</div>
+)
+
+
+let TagWidget = (props) => (
+<div className="box box-info" style={{marginTop:20}}>
+  <div className="box-header with-border">
+    <h3 className="box-title">Tags</h3>         
+    <div className="pull-right box-tools">
+      <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
+      <i className="fa fa-minus"></i></button>
+    </div>
+  </div>
+  <div className="box-body pad">
+    <div className="form-group" style={{width: '100%'}}>
+        <ReactSelect.Creatable
+          id="tag"
+          name="form-field-name"
+          value={props.postTagList}
+          options={props.options}
+          onChange={props.onChange}
+          multi={true}
+        />
+        <p><span className="help-block">Press enter after inputting tag</span></p>
+    </div>
+  </div>
+</div>
+)
+
+let PageHiererachyWidget = (props) => {
+  let templates = getTemplates();
+  return <div className="box box-info" style={{marginTop:20}}>
+    <div className="box-header with-border">
+      <h3 className="box-title">Page Attributes</h3>         
+      <div className="pull-right box-tools">
+        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
+        <i className="fa fa-minus"></i></button>
+      </div>
+    </div>
+    <div className="box-body pad">
+      <div>
+      <div className="form-group">
+        <p><b>Parent</b></p>
+        <Field id="parent" name="parent" component="select" disabled={props.isLoading} style={{widht: 250}}>
+          {props.pageList}
+        </Field>
+      </div>
+      <div className="form-group">
+        <p><b>Page  Template</b></p>
+        <Field name="pageTemplate" component="select" className="metaField" style={{width: 250}} defaultValue={templates?templates[0].item:null}>
+        { templates ?
+          templates.map(function(item, index){
+            return (<option key={item.id}>{item.name}</option>)
+          }) : ""
+        }
+        </Field>
+      </div>
+      <div className="form-group">
+        <p><b>Order</b></p>
+        <input type="text" id="pageOrder" placeholder="0" style={{width:50}} min="0" step="1" data-bind="value:pageOrder"/>
+      </div>
+      </div>                  
+    </div>
+  </div>
+}
+
+const allPageListQry = gql`
+query 
+getPages{viewer {allPosts(where: {type: {eq: "page"}}) { edges { node { 
+     id,title,slug,author{username},status,comments{edges{node{id}}},createdAt}}}}}
+`
+
+PageHiererachyWidget = graphql(allPageListQry, {
+  props: ({ownProps, data}) => {
+    if (data.loading) {
+      return {isLoading: true, pageList: [(<option key="0" value="">(no parent)</option>)]}
+    } else if (data.error) {
+      return {hasError: true, error: data.error}
+    } else {
+      var pageList = [(<option key="0" value="">(no parent)</option>)];
+      _.forEach(data.viewer.allPosts.edges, function(item){
+        pageList.push((<option key={item.node.id} value={item.node.id} checked={ownProps.parent===item.node.id}>
+          {item.node.title}</option>));
+      });
+      return {isLoading: false, pageList: pageList}
+    }
+  }
+})(PageHiererachyWidget)
+
+let CategoryWidget = (props) => (
+    <div className="box box-info" style={{marginTop:20}}>
+      <div className="box-header with-border">
+          <h3 className="box-title">Category</h3>         
+          <div className="pull-right box-tools">
+            <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
+              <i className="fa fa-minus"></i></button>
+            </div>
+          </div>
+          <div className="box-body pad">
+            <div>
+            <div className="form-group">
+              {props.isLoading ?
+                <Halogen.PulseLoader color="#4DAF7C"/>                  
+                  :
+                _.map(props.allCategoryList, (cat, index) => {
+                  return <div key={index}> 
+                    <Field name={"categories." + cat.id} component="input" type="checkbox"/>
+                    {cat.name}
+                  </div>
+                })
+              }
+            </div>
+          </div>                  
+        </div>
+      </div>
+)
+
+let categoryQuery = gql`
+query getCategories ($type: String!){
+    viewer {
+      allCategories (where: {type: {eq: $type}}) {
+        edges {
+          node {
+            id,
+            name,
+            description,
+            post {
+              edges {
+                node{
+                  id
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+}
+`
+
+CategoryWidget = graphql(categoryQuery,
+  { 
+    options: props => ({
+      variables: {
+        type: props.postType
+      },
+    }),
+      props: ({ownProps, data}) => {
+        if (data.loading){
+          return {isLoading: true}
+        } else if (data.error){
+          return {hasError: true, error: data.error}
+        } else {
+          let allCategoryList = _.map(data.viewer.allCategories.edges, item => item.node)
+          return {
+            isLoading: false,
+            allCategoryList: allCategoryList
+          }
+        }
+      }
+  }
+)(CategoryWidget)
 
 const PermalinkEditor = (props) => {
   return (
@@ -53,7 +286,7 @@ const PermalinkEditor = (props) => {
   )
 }
 
-let NewContentType = React.createClass({
+let NewContentTypeNoPostId = React.createClass({
   propTypes: {
     urlParams: React.PropTypes.string,
     isProcessing: React.PropTypes.bool.isRequired,
@@ -150,8 +383,12 @@ let NewContentType = React.createClass({
     disableForm(isFormDisabled, this.notification);
     this.props.dispatch(maskArea(isFormDisabled));
   },
-   componentWillReceiveProps: function(props){
-    console.log(props.urlParams)
+  componentWillReceiveProps: function(props){
+    console.log(props)
+    if (!props.isLoading) {
+      props.initialize(props.initialValues)
+    }
+
     /*if (props.urlParams.postId !== this.props.postId){
       props.dispatch(setPostId(props.urlParams.postId))
       props.destroy()
@@ -257,6 +494,7 @@ let NewContentType = React.createClass({
     this.props.dispatch(setConnectionValue(_connectionValue));
     this.props.change("title", this.props.data.title)
     this.props.change("visibilityRadio", this.props.data.visibility)
+    this.props.change("featuredImage", this.props.data.featuredImage)
     _.forEach(this.props.data.meta.edges, meta => {
       this.props.change(meta.node.item, meta.node.value)
     })
@@ -274,12 +512,14 @@ let NewContentType = React.createClass({
   handleTitleChange: function(event){
     this.notifyUnsavedData(true);
   },
+
   handleContentChange: function(event){
     var content = window.CKEDITOR.instances['content'].getData();
-    this.props.dispatch(setPostContent(content));
+    //  this.props.dispatch(setPostContent(content));
     this.props.change('content', content)
     this.notifyUnsavedData(true);
   },
+
   handleTitleTagChange: function(event){
     var titleTag = this.props.titleTag;
     this.props.dispatch(updateTitleTagLeftCharacter(65-(titleTag.length)));
@@ -405,7 +645,11 @@ let NewContentType = React.createClass({
 
           if (me.isWidgetActive("tag")) {
             here.disableForm(true);
-            var tagQry = Query.createUpdateTagOfPostMtn(postId, me.props.postTagListInit, me.props.postTagList, me.props.tagMap);
+            let tagMap = {}
+            _.forEach(me.props.options, function(item){
+                tagMap[item.name] = {id: item.id, name: item.name}
+            })
+            var tagQry = Query.createUpdateTagOfPostMtn(postId, me.props.postTagListInit, me.props.postTagList, tagMap);
             if (tagQry)
               riques(tagQry,
                 function(error, response, body) {
@@ -563,91 +807,6 @@ let NewContentType = React.createClass({
   componentDidMount: function(){
     var me = this;
 
-    if (this.isWidgetActive("pageHierarchy")) {
-      me.disableForm(true);
-      riques(Query.getPageListQry("All"),
-        function(error, response, body) {
-          if (!error && !body.errors && response.statusCode === 200) {
-            var pageList = [(<option key="0" value="">(no parent)</option>)];
-            _.forEach(body.data.viewer.allPosts.edges, function(item){
-              pageList.push((<option key={item.node.id} value={item.node.id} checked={me.props.parent===item.node.id}>
-                {item.node.title}</option>));
-            });
-            me.props.dispatch(setPageList(pageList));
-            me.disableForm(false);
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-          }
-      });
-    }
-
-    if (this.isWidgetActive("category")) {
-      me.disableForm(true);
-      var postType = this.props.postType;
-      riques(Query.getAllCategoryQry(postType), 
-        function(error, response, body) {
-          if (!error && !body.errors && response.statusCode === 200) {
-            /*
-            var categoryList = [];
-            _.forEach(body.data.viewer.allCategories.edges, function(item){
-              categoryList.push((<div key={item.node.id}><input id={item.node.id}
-              name="categoryCheckbox[]" type="checkbox" value={item.node.id} /> {item.node.name}</div>));
-            })
-            */
-            let categoryList = body.data.viewer.allCategories.edges.map(item => item.node)
-            me.props.dispatch(setAllCategoryList(categoryList));
-            me.disableForm(false);
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-          }
-        }
-      );
-    }
-    
-    if (this.isWidgetActive("tag")) {
-      me.disableForm(true);
-      riques(Query.getAllTagQry(this.props.postType), 
-        function(error, response, body) {
-          if (!error && !body.errors && response.statusCode === 200) {
-            var _tagMap = {};
-            var options = [];
-                
-            _.forEach(body.data.viewer.allTags.edges, function(item){
-                _tagMap[item.node.name] = {id: item.node.id, name: item.node.name}
-                options.push({id: item.node.id, value: item.node.name, label: item.node.name});
-            })
-            me.props.dispatch(setOptions(options));
-            me.props.dispatch(setTagMap(_tagMap));
-            me.disableForm(false);
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-          }
-        }
-      );
-    };
-        
-    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
-      window.CKEDITOR.replace('content', {
-        height: 400,
-        title: false
-      });
-      for (var i in window.CKEDITOR.instances) {
-        if (window.CKEDITOR.instances.hasOwnProperty(i))
-          window.CKEDITOR.instances[i].on('change', me.handleContentChange);
-      }
-
-      if (me.props.postId) {
-        me.props.dispatch(setEditorMode("update"));
-        riques(me.props.loadQuery(me.props.postId), 
-          function(error, response, body) {
-            if (!error ) {
-              var values = body.data.getPost;
-              me.setFormValues(values);
-            }
-          }
-        );
-      }
-    });
 
     if (this.props.visibilityTxt==="Public") 
       document.getElementById("public").setAttribute('checked', true);
@@ -692,7 +851,12 @@ let NewContentType = React.createClass({
                 <Field name="title" component="input" type="text" className="form-control"
                   placeholder="Input Title Here" onChange={this.handleTitleChange} onBlur={() => {this.checkSlug(this.props.title.split(" ").join("-").toLowerCase())}} style={{marginBottom: 20}}/>
                 <PermalinkEditor rootUrl={rootUrl} onCheckSlug={this.checkSlug} {...this.props} />
-                <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="textarea" className="form-control" />
+
+                <CkeditorField 
+                  handleContentChange={this.handleContentChange}
+                  content={this.props.data.content}
+                />
+
                 <div id="trackingDiv"></div>
               </div>
             </div>
@@ -797,13 +961,13 @@ let NewContentType = React.createClass({
                           <div id="visibilityOption" className="collapse">
                             <div className="radio">
                               <label>
-                                <Field id="public" name="visibilityRadio" component="input" type="radio" value="Public" />
+                                <Field id="public" name="visibility" component="input" type="radio" value="Public" />
                                 Public
                               </label>
                             </div>
                             <div className="radio">
                               <label>
-                                <Field id="private" name="visibilityRadio" component="input" type="radio" value="Private" />
+                                <Field id="private" name="visibility" component="input" type="radio" value="Private" />
                                 Private
                               </label>
                             </div>
@@ -858,141 +1022,39 @@ let NewContentType = React.createClass({
                   </div>
 
                   { this.isWidgetActive("pageHierarchy") &&
-                  <div className="box box-info" style={{marginTop:20}}>
-                    <div className="box-header with-border">
-                      <h3 className="box-title">Page Attributes</h3>         
-                      <div className="pull-right box-tools">
-                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
-                        <i className="fa fa-minus"></i></button>
-                      </div>
-                    </div>
-                    <div className="box-body pad">
-                      <div>
-                      <div className="form-group">
-                        <p><b>Parent</b></p>
-                        <Field id="parent" name="parent" component="select" style={{widht: 250}}>
-                          {this.props.pageList}
-                        </Field>
-                      </div>
-                      <div className="form-group">
-                        <p><b>Page  Template</b></p>
-                        <Field name="pageTemplate" component="select" className="metaField" style={{width: 250}} defaultValue={templates?templates[0].item:null}>
-                        { templates ?
-                          templates.map(function(item, index){
-                            return (<option key={item.id}>{item.name}</option>)
-                          }) : ""
-                        }
-                        </Field>
-                      </div>
-                      <div className="form-group">
-                        <p><b>Order</b></p>
-                        <input type="text" id="pageOrder" placeholder="0" style={{width:50}} min="0" step="1" data-bind="value:pageOrder"/>
-                      </div>
-                      </div>                  
-                    </div>
-                  </div>
+                      <PageHiererachyWidget parent={this.props.parent}/>
+                  
                   }
 
                   { this.isWidgetActive("category") &&
-                  <div className="box box-info" style={{marginTop:20}}>
-                    <div className="box-header with-border">
-                      <h3 className="box-title">Category</h3>         
-                      <div className="pull-right box-tools">
-                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
-                        <i className="fa fa-minus"></i></button>
-                      </div>
-                    </div>
-                    <div className="box-body pad">
-                      <div>
-                      <div className="form-group">
-                        {
-                          _.map(this.props.allCategoryList, (cat, index) => {
-                            return <div key={index}> 
-                              <Field name={"categories." + cat.id} component="input" type="checkbox"/>
-                              {cat.name}
-                            </div>
-                          })
-                        }
-                      </div>
-                      </div>                  
-                    </div>
-                  </div>
+                      <CategoryWidget postType={this.props.postType}/>
                   }
 
                   { this.isWidgetActive("tag") &&
-                  <div className="box box-info" style={{marginTop:20}}>
-                    <div className="box-header with-border">
-                      <h3 className="box-title">Tags</h3>         
-                      <div className="pull-right box-tools">
-                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
-                        <i className="fa fa-minus"></i></button>
-                      </div>
-                    </div>
-                    <div className="box-body pad">
-                      <div className="form-group" style={{width: '100%'}}>
-                          <ReactSelect.Creatable
-                            id="tag"
-                            name="form-field-name"
-                            value={this.props.postTagList}
-                            options={this.props.options}
-                            onChange={(value)=>{this.props.dispatch(setTagList(this.props.postTagListInit, value))}}
-                            multi={true}
-                          />
-                          <p><span className="help-block">Press enter after inputting tag</span></p>
-                      </div>
-                    </div>
-                  </div>
+                      <TagWidget 
+                        postTagList={this.props.postTagList} 
+                        options={this.props.options} 
+                        onChange={(value)=>{this.props.dispatch(setTagList(this.props.postTagListInit, value))}}
+                      />
                   }
 
                   { this.isWidgetActive("featuredImage") &&
-                  <div className="box box-info" style={{marginTop:20}}>
-                    <div className="box-header with-border">
-                      <h3 className="box-title">Featured Image</h3>         
-                      <div className="pull-right box-tools">
-                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
-                        <i className="fa fa-minus"></i></button>
-                      </div>
-                    </div>
-                    <div className="box-body pad">
-                      <div>
-                        { this.props.featuredImage &&
-                          <div style={{position: "relative"}}>
-                            <Field id="featuredImage" name="featuredImage" component="img" src={this.props.featuredImage} style={{width: "100%"}} alt={this.props.title} />
-                            { /* <img src={this.props.featuredImage} style={{width: "100%"}} alt={this.props.title}/> */ }
-                            <button onClick={()=>{this.props.dispatch(setFeaturedImage(null))}} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
-                          </div>
-                        }
-                        { !this.props.featuredImage &&
-                          <input type="file" name="featuredImage" onChange={this.featuredImageChange}/>
-                        }
-                      </div>                  
-                    </div>
-                  </div>
+                      <FeaturedImageWidget
+                        title={this.props.title}
+                        featuredImage={this.props.data.featuredImage}
+                        onClick={()=>{this.props.dispatch(setFeaturedImage(null))}}
+                        onChange={this.featuredImageChange}
+                      />
+                  
                   }
 
                   { this.isWidgetActive("imageGallery") &&
-                  <div className="box box-info" style={{marginTop:20}}>
-                    <div className="box-header with-border">
-                      <h3 className="box-title">Image Gallery</h3>         
-                      <div className="pull-right box-tools">
-                        <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
-                        <i className="fa fa-minus"></i></button>
-                      </div>
-                    </div>
-                    <div className="box-body pad">
-                      <div>
-                        <input type="file" id="imageGallery" name="imageGallery" onChange={this.imageGalleryChange}/>
-                        {
-                          _.map(this.props.imageGallery, function(item, index){
-                            return <div key={index} className="margin" style={{width: 150, float: "left", position: "relative"}}>
-                            <a href="" onClick={this.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue"}} alt={"gallery"+index}/></a>
-                            <button id={item.id+"-"+index} onClick={this.handleImageRemove} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
-                            </div>
-                          }.bind(this))
-                        }
-                      </div>                  
-                    </div>
-                  </div>
+                      <ImageGalleryWidget
+                        imageGallery={this.props.imageGallery}
+                        handleImageClick={this.handleImageClick}
+                        handleImageRemove={this.handleImageRemove}
+                        imageGalleryChange={this.imageGalleryChange}
+                      />
                   }
 
                   {
@@ -1032,6 +1094,143 @@ let NewContentType = React.createClass({
 
 }
 });
+
+const getAllTagQry = gql`query getTags ($type: String!){
+    viewer {
+      allTags (where: {type: {eq: $type}}) {
+        edges {
+          node {
+            id,
+            name,
+            post {
+              edges {
+                node{
+                  id
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`
+
+NewContentTypeNoPostId = graphql(getAllTagQry, {
+  options: (props) => ({
+    variables: {
+      type: props.postType,
+    }
+  }),
+  props: ({ownProps, data}) => {
+    if (data.loading) {
+      return {isLoading: true}
+    } else if (data.error) {
+      return {hasError: true, error: data.error}
+    } else {
+      let options = _.map(data.viewer.allTags.edges, item => (
+        {id: item.node.id, value: item.node.name, label: item.node.name}
+      ))
+
+      return {
+        isLoading: false,
+        options: options
+      }
+    }
+  }
+})(NewContentTypeNoPostId)
+
+const getPostQry = gql`query ($id: ID!){getPost(id: $id){ id,title,content,slug,author{username},status,visibility,featuredImage,
+      summary,category{edges{node{id, category{id,name}}}},comments{edges{node{id,content,name,email,website}}},file{edges{node{id value}}},
+      tag{edges{node{id,tag{id,name}}}},meta{edges{node{id,item,value}}},createdAt}}`
+
+const NewContentTypeWithPostId = graphql(getPostQry, {
+  options : (props) => ({
+    variables: {
+      id: props.urlParams.postId
+    }
+  }),
+  props: ({ownProps, data}) => {
+    if (data.loading){
+      return {
+        isLoading: true,
+        data: {},
+        initialValues: {}
+      }
+    } else if (data.error) {
+      return {
+        isLoading: false,
+        hasError: true,
+        data: {},
+        initialValues: {}
+      }
+    } else {
+      let initials = {};
+      let v = data.getPost
+
+      let fields = ["id","title","type","content","order","deleteData",
+      "featuredImage","slug","status","publishDate","passwordPage","parent","summary","visibility","authorId"];
+      _.forEach(fields, function(item){
+        if (data.getPost[item]) initials[item] = data.getPost[item];
+      });
+
+      // setting the meta values
+
+      if (data.getPost.meta.edges.length) {
+        _.forEach(data.getPost.meta.edges, meta => {
+          if(meta.node.value){
+            initials[meta.node.item] = meta.node.value
+          }
+        })
+      }
+
+      // setting content
+      var pubDate = data.getPost.publishDate? new Date(data.getPost.publishDate) : new Date();
+      initials["hours"] = pubDate.getHours();
+      initials["minutes"] = pubDate.getMinutes();
+      initials["publishDate"] = pubDate;
+
+      // setting category
+      initials.categories = {};
+      if (data.getPost.category.edges.length) {
+        _.forEach(data.getPost.category.edges, cat => {
+          initials.categories[cat.node.category.id] = true
+        })
+      }
+
+      // setting tag list
+      var _postTagList = [];
+      if (v.tag && v.tag.edges.length>0) {
+        _.forEach(v.tag.edges, function(i){
+          if (i.node.tag){
+            _postTagList.push({
+              id: i.node.tag.id,
+              value: i.node.tag.name,
+              name: i.node.tag.name,
+              label: i.node.tag.name,
+              connectionId: i.node.id
+            });
+          }
+        });
+      }
+
+      debugger
+      return {
+        isLoading: false,
+        data: data.getPost,
+        initialValues: initials,
+        postTagList : _postTagList
+      }
+    }
+  }
+})(NewContentTypeNoPostId)
+
+let NewContentType = (props) => {
+  if (!props.urlParams) {
+    return <NewContentTypeNoPostId {...props}/>
+  }
+
+  return <NewContentTypeWithPostId {...props}/>
+}
 
 const selector = formValueSelector('newContentForm');
 

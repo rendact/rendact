@@ -6,42 +6,43 @@ import uuid from 'uuid';
 import Halogen from 'halogen';
 import Notification from 'react-notification-system';
 import {connect} from 'react-redux'
-import {toggleSelectAll, maskArea, setPosition, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId,  loadmenuSelect,
-  setIdMainMenu, setPageListMenu, setMenuId, setAllPageList, setAllPostList, setCategoryMenu, assignValueToMenuItem} from '../../actions'
-import {validateUrl, swalert, riques, errorCallback, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
+import {toggleSelectAll, maskArea, setPosition, setResetDelete, setTreeData, setSelectedMenuName, setDisabled, setNewMenuId,
+  setIdMainMenu, setPageListMenu, setMenuId, assignValueToMenuItem} from '../../actions'
+import {validateUrl, swalert, disableForm, defaultHalogenStyle, disableBySelector} from '../../utils';
 import {Nestable} from '../lib/react-dnd-nestable/react-dnd-nestable';
-import {reduxForm, Field, formValueSelector, change} from 'redux-form'
+import {reduxForm, Field, formValueSelector, change} from 'redux-form';
+import {withApollo, graphql} from 'react-apollo';
 
 
 let MenuContentForm = (props) => (
-<div className={props.type === 'page' ? "box box-default box-solid" : "box box-default collapsed-box box-solid"}>
-                <div className="box-header with-border">
-                  <h3 className="box-title">{props.panelTitle}</h3>
-                  <div className="box-tools pull-right">
-                      <button type="button" className="btn btn-box-tool"  data-widget="collapse"><i className={props.type === 'page'? "fa fa-minus" : "fa fa-plus"}></i>
-                      </button>
-                  </div>
-                </div>
-                <div className="box-body pad">
-  <form onSubmit={props.handleSubmit(values => props.addToMenu(values, props.type, props.itemList, props.reset))}>
-                  <div id={props.elementId}>
-                    {
-                      _.map(props.itemList, (item, index) => (
-                        <div key={index}>
-                          <Field component="input" type="checkbox" name={props.type + "["+index+"]"} className={props.type+"Menu"}/>
-                          {item.node.name || item.node.title}
-                        </div>
-                      ))
-                    }
-                    </div>
-                    <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
-                    <button id={props.type+"SelectAll"} type="submit" className="btn btn-default" style={{marginRight: 10}} onClick={props.selectAll}>Select All</button>
-                    <div className="box-tools pull-right">
-                      <button id={props.type+"Submit"} className="btn  btn-default" type="submit" style={{marginRight: 10}}>Add to Menu</button>
-                    </div>
-  </form>
-                </div>
-              </div>
+  <div className={props.type === 'page' ? "box box-default box-solid" : "box box-default collapsed-box box-solid"}>
+    <div className="box-header with-border">
+      <h3 className="box-title">{props.panelTitle}</h3>
+      <div className="box-tools pull-right">
+          <button type="button" className="btn btn-box-tool"  data-widget="collapse"><i className={props.type === 'page'? "fa fa-minus" : "fa fa-plus"}></i>
+          </button>
+      </div>
+    </div>
+    <div className="box-body pad">
+      <form onSubmit={props.handleSubmit(values => props.addToMenu(values, props.type, props.itemList, props.reset))}>
+        <div id={props.elementId}>
+        {
+          _.map(props.itemList, (item, index) => (
+            <div key={index}>
+              <Field component="input" type="checkbox" name={props.type + "["+index+"]"} className={props.type+"Menu"}/>
+              {item.node.name || item.node.title}
+            </div>
+          ))
+        }
+        </div>
+        <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10, marginBottom: 10}}></div>
+        <button id={props.type+"SelectAll"} type="submit" className="btn btn-default" style={{marginRight: 10}} onClick={props.selectAll}>Select All</button>
+        <div className="box-tools pull-right">
+          <button id={props.type+"Submit"} className="btn  btn-default" type="submit" style={{marginRight: 10}}>Add to Menu</button>
+        </div>
+      </form>
+    </div>
+  </div>
 )
 
 
@@ -66,13 +67,10 @@ MenuContentForm = connect(
     
   })
 )(MenuContentForm)
-
 MenuContentForm = reduxForm({form: 'menuContentForm'})(MenuContentForm)
-
 
 let CustomUrlForm = (props) => {
   let submitDisable = false;
-
   if (!props.url)  submitDisable = true
   if (!props.title)  submitDisable = true
   
@@ -295,7 +293,7 @@ let Menu = React.createClass({
     "#menu ~ .box > .box-header > .box-tools > button",
     "#selectedMenuName",
     "#mainMenuPos",
-    'div > div > input[class*="Menu"]',
+    "div > div > input[class*='Menu']",
     "button[id*='SelectAll']",
     "button[id*='Submit']",
     "#urlSabmit #submit",
@@ -321,79 +319,18 @@ let Menu = React.createClass({
       return item.checked = false
     });
   },
-  resetFormDelete: function(){
-    document.getElementById("menu").reset();
-    document.getElementById("menuName").reset();
-    this.props.changeFieldValue("selectedMenuName", "");
-    
-    this.props.dispatch(setResetDelete())
-    this.handleNameChange();
-    window.history.pushState("", "", '/admin/menu');
-  },
 
   loadMenuItems: function(menuId){
-    var qry = Query.getMenuQry(menuId);
-    var me = this;
-    me.disableForm(true)
-      riques(qry, 
-        function(error, response, body) {
-          if (!error && !body.errors && response.statusCode === 200) {
-            var items = [];
-            var position = body.data.getMenu.position;
-            me.props.changeFieldValue("mainMenuPos", position==="Main Menu");
-            if (items) items = body.data.getMenu.items;
-            me.props.dispatch(setTreeData(items));
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-          }
-          me.disableForm(false);
-          me.props.dispatch(setDisabled(false))
-          disableBySelector(true, ["#urlSabmit #submit"])
-          
-          if (me.props.newMenuName===""){
-            // this will disable the create menu button if the newMenuName is ""
-            disableBySelector(true, ["#menu button#submit.btn.btn-success", ]);
-          }
-
-        }
-      );
-  },
-
-  handleMenuName: function(event){
-    var menuId = event.target.value.split("-")[0];
-    var selectedMenuName = event.target.value.split("-")[1];
-    var me = this;
-    
-    if (menuId) {
-      this.props.changeFieldValue("selectedMenuName", selectedMenuName);
-      this.props.dispatch(setMenuId(menuId))
-      this.loadMenuItems(menuId);
-      this.notifyUnsavedData(true);
-    } else {
-      this.loadData(true)
-      this.props.changeFieldValue("mainMenuPos", false)
-      this.resetFormDelete();
-      disableBySelector(true, me.disabledSelectors);
+    this.disableForm(true)
+    var allMenuData = this.props.client.readQuery({query: Query.loadAllMenuData});
+    var menuFound = _.find(allMenuData.viewer.allMenu.edges, {node: {id: menuId}});
+    if (menuFound) {
+      this.props.changeFieldValue("mainMenuPos", menuFound.node.position==="Main Menu");
+      this.props.dispatch(setTreeData(menuFound.node.items));
     }
-
-  },
-
-    handleUrlSubmit: function(urlData, reset){
-      if(urlData.title && urlData.url) {
-        urlData.url = validateUrl(urlData.url)
-        var _treeData = this.props.treeData;
-        var _url = [{titlePanel: urlData.title, url: urlData.url, tooltip: "", type: "url", id: uuid(), target: urlData.url, children: []}];
-        var treeData = [];
-        if (_treeData===null) {
-          treeData = _url;
-        }else if (_url.length>0) {
-          treeData = _.concat(_treeData, _url);
-        }
-        this.props.dispatch(setTreeData(treeData))
-        reset()
-      } else {
-        swalert('error', '', 'Please fill the blank');
-      }
+    this.disableForm(false);
+    this.props.dispatch(setDisabled(false))
+    disableBySelector(true, ["#urlSabmit #submit"])
   },
 
   addToMenu: function(values, type, itemList, reset){
@@ -433,7 +370,6 @@ let Menu = React.createClass({
 
     this.props.dispatch(toggleSelectAll(false, 'all'))
     reset();
-
   },
 
   removePanel: function(e){
@@ -443,7 +379,6 @@ let Menu = React.createClass({
         if (data.children) data.children = filterTree(data.children, toRemoveId);
         return data.id !== toRemoveId
       });
-
       return result;
     }
 
@@ -454,16 +389,18 @@ let Menu = React.createClass({
     });
   },
 
+  refreshMenuList: function(menuList){
+    var pageList = [(<option key="0" value="">--select menu--</option>)];
+    _.forEach(menuList, function(item){
+      pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
+    })
+    this.props.dispatch(setPageListMenu(pageList)) 
+  },
+
   handleNameChange: function(event){
     var selectedMenuName = this.props.selectedMenuName;
     this.props.dispatch(setSelectedMenuName(selectedMenuName))
     this.notifyUnsavedData(true);
-  },
-
-  componentWillReceiveProps: function(props){
-    if(!props.newMenuName){
-      disableBySelector(true, ["#menu button"]);
-    }
   },
 
   handleSubmit: function(event){
@@ -471,113 +408,77 @@ let Menu = React.createClass({
     var me = this;
     var newMenuName = this.props.newMenuName;
     this.disableForm(true);
-    var qry = Query.createMenu(newMenuName);
     var noticeTxt = "Menu Saved";
-    riques(qry, 
-      function(error, response, body) {
-        var newMenuId = body.data.createMenu.changedMenu.id;
-        me.props.dispatch(setNewMenuId(newMenuId))
-        if (!error && !body.errors && response.statusCode === 200) {
-          me.notif.addNotification({
-                  message: noticeTxt,
-                  level: 'success',
-                  position: 'tr',
-                  autoDismiss: 2
-          });
-          me.resetFormNewMenu();
-          me.props.dispatch(setTreeData([]))
-          document.getElementById("mainMenuPos").checked = false
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-        me.disableForm(false);
+    this.props.createMenu({variables: {
+      input: {
+        name: newMenuName
+      }
+    }}).then(({data}) => {
+      me.props.refetchAllMenuData().then(({data}) => {
+        me.refreshMenuList(data.viewer.allMenu.edges);
       });
-  },
+      var newMenuId = data.createMenu.changedMenu.id;
+      me.props.dispatch(setNewMenuId(newMenuId))
+      me.props.dispatch(setMenuId(newMenuId))
+      me.props.dispatch(setTreeData([]))
+      
+      me.props.changeFieldValue("selectedMenuName", newMenuName);
+      me.props.changeFieldValue("newMenuName", "");
+      me.props.changeFieldValue("menuSelect",newMenuId+"-"+newMenuName);
+      me.props.changeFieldValue("mainMenuPos",false);
 
-  loadData: function(withoutMenuItems){
-    var me = this;
-    this.notif = this.refs.notificationSystem;
-
-    this.props.dispatch(setResetDelete())
-    this.disableForm(true);
-    disableBySelector(true, me.disabledSelectors);
-    var mainMenuId, mainMenuName;
-
-    const disableIfNoIdMenu = () => {
-      if (!this.props.IdMainMenu || withoutMenuItems){
-        disableBySelector(true, me.disabledSelectors);
-        this.props.changeFieldValue("mainMenuPos", "");
-      }
-    }
-
-    const processItems = (items) => (items.edges.map(item => item))
-
-    riques(Query.loadAllMenuData, (error, response, body) => {
-      if(!error && response.statusCode === 200) {
-        let { mainMenu, allMenu, allPage, allPost, allCategory } = body.data.viewer;
-
-        // processing main menu
-        if (mainMenu.edges.length>=1){
-          mainMenuId = _.head(mainMenu.edges).node.id;
-          mainMenuName = _.head(mainMenu.edges).node.name;
-          me.props.dispatch(setIdMainMenu(mainMenuId))
-        } 
-
-        // processing all Menu
-          var pageList = [(<option key="0" value="">--select menu--</option>)];
-          _.forEach(allMenu.edges, function(item){
-            pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
-          })
-          me.props.dispatch(setPageListMenu(pageList)) 
-          if (mainMenuId && mainMenuName && !withoutMenuItems) {
-
-              me.props.dispatch(setMenuId(mainMenuId));
-              me.loadMenuItems(mainMenuId);
-              me.props.changeFieldValue("selectedMenuName", mainMenuName);
-              me.props.changeFieldValue("menuSelect", mainMenuId+"-"+mainMenuName);
-              me.props.dispatch(loadmenuSelect(mainMenuId+"-"+mainMenuName));
-
-          } else {
-              disableBySelector(true, me.disabledSelectors);
-          }
-
-        // processing all page
-        let allPageList = processItems(allPage)
-        me.props.dispatch(setAllPageList(allPageList)) 
-
-        // processing all posts
-
-        let allPostList = processItems(allPost)
-        me.props.dispatch(setAllPostList(allPostList))
-        // processing all categories
-
-        let categoryList = processItems(allCategory)
-        me.props.dispatch(setCategoryMenu(categoryList))
-
-      } else {
-        errorCallback(error, body.errors?body.errors[0].message:null);
-      }
-      this.disableForm(false)
-      disableIfNoIdMenu();
+      me.refs.notificationSystem.addNotification({
+        message: noticeTxt,
+        level: 'success',
+        position: 'tr',
+        autoDismiss: 2
+      });
+      me.disableForm(false);
     });
   },
 
-  componentDidMount: function(){
-    require ('jquery-ui/themes/base/theme.css');
-    require ('../lib/jquery-sortable.js');
-    require ('../../../public/css/AdminLTE.css');
-    require ('../../../public/css/skins/_all-skins.css');
-    require('./menucustom.css');
-    //Load sidebar
-    this.loadData();
-    disableBySelector(true, ["#urlSabmit div button#submit"]);
-  },
-  onChangeMainMenu: function(event){
+  handleChangeMainMenu: function(event){
     const target = event.target;
     const position = target.checked === true ? target.value : "";
     !this.props.IdMainMenu && position && this.props.dispatch(setIdMainMenu(this.props.menuId))
     this.props.dispatch(setPosition(position))
     this.notifyUnsavedData(true);
+  },
+
+  handleMenuName: function(event){
+    var menuId = event.target.value.split("-")[0];
+    var selectedMenuName = event.target.value.split("-")[1];
+    var me = this;
+    
+    if (menuId) {
+      this.props.changeFieldValue("selectedMenuName", selectedMenuName);
+      this.props.dispatch(setMenuId(menuId))
+      this.loadMenuItems(menuId);
+      this.notifyUnsavedData(true);
+    } else {
+      this.props.changeFieldValue("mainMenuPos", false)
+      this.props.changeFieldValue("selectedMenuName", "");
+      this.props.dispatch(setResetDelete());
+      disableBySelector(true, me.disabledSelectors);
+    }
+  },
+
+  handleUrlSubmit: function(urlData, reset){
+    if(urlData.title && urlData.url) {
+      urlData.url = validateUrl(urlData.url)
+      var _treeData = this.props.treeData;
+      var _url = [{titlePanel: urlData.title, url: urlData.url, tooltip: "", type: "url", id: uuid(), target: urlData.url, children: []}];
+      var treeData = [];
+      if (_treeData===null) {
+        treeData = _url;
+      }else if (_url.length>0) {
+        treeData = _.concat(_treeData, _url);
+      }
+      this.props.dispatch(setTreeData(treeData))
+      reset()
+    } else {
+      swalert('error', '', 'Please fill the blank');
+    }
   },
 
   handleUpdateMenu: function(v){
@@ -588,12 +489,11 @@ let Menu = React.createClass({
     var IdMainMenu = _IdMainMenu.toString();
     var treeData = this.props.treeData
     var menuId = this.props.menuId;
-    var qry = Query.updateMenu(menuId, name, treeData, positionValues);
     let noticeTxt = "Menu Successfully Updated";
 
-    const callback = (error, body, response) => {
-      if (!error && !body.errors && response.statusCode === 200) {
-        me.notif.addNotification({
+    const callback = (me, data) => {
+      if (data) {
+        me.refs.notificationSystem.addNotification({
           message: noticeTxt,
           level: 'success',
           position: 'tr',
@@ -612,9 +512,7 @@ let Menu = React.createClass({
         me.props.changeFieldValue("menuSelect", menuId+"-"+name);
 
         me.notifyUnsavedData(false);
-      } else {
-        errorCallback(error, body.errors?body.errors[0].message:null);
-      }
+      } 
       me.disableForm(false);
     }
 
@@ -622,76 +520,101 @@ let Menu = React.createClass({
     this.disableForm(true)
     if (positionValues==="Main Menu") {
       me.props.dispatch(setIdMainMenu(menuId))
-      riques(Query.updateMenuWithPos(IdMainMenu, {
-        id: menuId,
-        name: name,
-        items: treeData,
-        position: positionValues
-      }), (error, response, body) => {
-        callback(error, body, response)
+      this.props.updateMenuWithPos({variables: {
+        positionInput: {
+          id: IdMainMenu,
+          position: ''
+        },
+        updateMenuInput: {
+          id: menuId,
+          name: name,
+          items: treeData,
+          position: positionValues
+        }
+      }}).then(({data}) => {
+        callback(me, data)
       });
     } else {
-      riques(qry, 
-        function(error, response, body) {
-          callback(error, body, response);
+      this.props.updateMenu({variables: {
+        input: {
+          id: menuId,
+          name: name,
+          items: treeData,
+          position: positionValues
+        }
+      }}).then(({data}) => {
+        callback(me, data)
       });
     }
   },
 
-  resetFormNewMenu: function(){
-    var me = this;
-      riques(Query.getAllMenu, 
-        function(error, response, body) {
-          if (!error) {
-            var pageList = [(<option key="0" value="">--select menu--</option>)];
-            _.forEach(body.data.viewer.allMenus.edges, function(item){
-              pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
-            })
-            me.props.dispatch(setPageListMenu(pageList)) 
-            _.filter(document.getElementsByName("menuSelect"), function(item){
-            return item.selectedIndex = "1"
-            });
-          }
-        }
-      );
-    var menuId = this.props.newMenuId;
-    var newMenuName = this.props.newMenuName;
-    var selectedMenuName = newMenuName;
-    this.props.changeFieldValue("selectedMenuName", selectedMenuName);
-    this.props.dispatch(setMenuId(menuId))
-    this.props.changeFieldValue("newMenuName", "");
-  },
   handleDelete: function(event){
     var me = this;
     var idList = this.props.menuId;
     swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
       function () {
       me.disableForm(true);
-      riques(Query.deleteMenuQry(idList), 
-        function(error, response, body) {
-          if (!error && !body.errors && response.statusCode === 200) {
-            me.loadData()
-            me.resetFormDelete();
-            me.notifyUnsavedData(false)
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-          }
-          me.disableForm(false);
-          disableBySelector(true, me.disabledSelectors);
+      me.props.deleteMenu({
+        variables: {
+          user: {
+          id: idList
         }
-      );
+      }}).then(({data, test}) => {
+        me.props.refetchAllMenuData().then(({data}) => {
+          me.refreshMenuList(data.viewer.allMenu.edges);
+        });
+        
+        me.props.dispatch(setResetDelete())
+        me.props.dispatch(setTreeData([]))
+        
+        me.props.changeFieldValue("selectedMenuName", "");
+        me.props.changeFieldValue("newMenuName", "");
+        me.props.changeFieldValue("menuSelect","");
+        me.props.changeFieldValue("mainMenuPos",false);
+
+        me.notifyUnsavedData(false);
+        me.disableForm(false);
+        disableBySelector(true, me.disabledSelectors);
+      });
     })
   },
 
   renderItem: function({item, isDragging, connectDragSource}){
     return <MenuPanel 
-        itemData={item} 
-        onRemovePanel={this.removePanel} 
-        notifyUnsavedData={this.notifyUnsavedData}
-        assignValueToMenuItem={this.assignValueToMenuItem}
-        isDragging={isDragging}
-        connectDragSource={connectDragSource}
-      />
+      itemData={item} 
+      onRemovePanel={this.removePanel} 
+      notifyUnsavedData={this.notifyUnsavedData}
+      assignValueToMenuItem={this.assignValueToMenuItem}
+      isDragging={isDragging}
+      connectDragSource={connectDragSource}
+    />
+  },
+
+  componentDidMount: function(){
+    require ('jquery-ui/themes/base/theme.css');
+    require ('../lib/jquery-sortable.js');
+    require ('../../../public/css/AdminLTE.css');
+    require ('../../../public/css/skins/_all-skins.css');
+    require('./menucustom.css');
+    disableBySelector(true, ["#urlSabmit div button#submit"]);
+  },
+  componentWillMount(){
+    if(this.props.isLoading){
+      this.props.dispatch(maskArea(true))
+    }
+    this.props.dispatch(setResetDelete())
+  },
+  componentWillReceiveProps(props){
+    if(!props.isLoading && this.props.isLoading){
+      props.dispatch(setResetDelete())
+      props.dispatch(maskArea(false))
+    }
+    if(!props.newMenuName){
+      disableBySelector(true, ["#menu button"]);
+    }
+    if(!props.menuId){
+      disableBySelector(true, this.disabledSelectors);
+    }
   },
 
   render: function(){
@@ -833,7 +756,7 @@ let Menu = React.createClass({
                       <div className="col-md-9">
                         <div className="checkbox">
                           <label key="Main Menu">
-                            <Field component="input" type="checkbox" value="Main Menu" disabled={this.props.selectedMenuName===""} id="mainMenuPos" name="mainMenuPos" onChange={this.onChangeMainMenu}/>
+                            <Field component="input" type="checkbox" value="Main Menu" disabled={this.props.selectedMenuName===""} id="mainMenuPos" name="mainMenuPos" onChange={this.handleChangeMainMenu}/>
                             <i>Main Menu</i>
                           </label>
                         </div>
@@ -887,4 +810,70 @@ const mapDispatchToProps = function(dispatch){
   }
 }
 Menu = connect(mapStateToProps, mapDispatchToProps)(Menu);
+
+Menu = graphql(Query.loadAllMenuData, {
+  props: ({ownProps, data}) => {
+    var mainMenuId, mainMenuName;
+    const processItems = (items) => (items.edges.map(item => item));
+    
+    if (!data.loading) {
+      let { mainMenu, allMenu, allPage, allPost, allCategory } = data.viewer;
+      let selectedMenuName, menuSelect = null;
+      var menuPos = false;
+      var treeData = [];
+
+        // processing main menu
+        if (mainMenu.edges.length>=1){
+          var mainMenuData = _.head(mainMenu.edges).node;
+          mainMenuId = mainMenuData.id;
+          mainMenuName = mainMenuData.name;
+          treeData = mainMenuData.items;
+          selectedMenuName = mainMenuData.name;
+          menuSelect = mainMenuData.id+"-"+mainMenuData.name;
+          menuPos = mainMenuData.position == "Main Menu"
+        } 
+        // processing all Menu
+        var pageList = [(<option key="0" value="">--select menu--</option>)];
+        _.forEach(allMenu.edges, function(item){
+          pageList.push((<option key={item.node.id} value={item.node.id+"-"+item.node.name}>{item.node.name}</option>));
+        })
+        // processing all page
+        let allPageList = processItems(allPage)
+        // processing all posts
+        let allPostList = processItems(allPost)
+        // processing all categories
+        let categoryList = processItems(allCategory)
+        
+        return {
+          menuId: mainMenuId,
+          pageList: pageList,
+          IdMainMenu: mainMenuId,
+          mainMenuName: mainMenuName,
+          menuSelect: mainMenuId+"-"+mainMenuName,
+          allPageList: allPageList,
+          allPostList: allPostList,
+          categoryList: categoryList,
+          isLoading: false,
+          treeData: treeData,
+          initialValues: {
+            selectedMenuName: selectedMenuName,
+            menuSelect: menuSelect,
+            mainMenuPos: menuPos
+          },
+          refetchAllMenuData: data.refetch
+        }
+    } else {
+      return {
+        isLoading: true
+      }
+    }
+  }
+})(Menu);
+
+Menu = graphql(Query.createMenu, {name: 'createMenu'})(Menu);
+Menu = graphql(Query.updateMenu, {name: 'updateMenu'})(Menu);
+Menu = graphql(Query.updateMenuWithPos, {name: 'updateMenuWithPos'})(Menu);
+Menu = graphql(Query.deleteMenu, {name: 'deleteMenu'})(Menu);
+Menu = withApollo(Menu);
+
 export default Menu;
