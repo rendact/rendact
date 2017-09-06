@@ -564,97 +564,33 @@ let NewContentTypeNoPostId = React.createClass({
           mutation: gql`${Query.createUpdatePostMetaMtn(postId, metaDataList).query}`
         }).then(data => console.log(data))
       }
-          if (me.isWidgetActive("category")) {
-            // process categories
-            let categToSave = _.keys(v.categories) 
-            var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.props.postCategoryList, categToSave);
-            if (catQry) this.props.client.mutate({
-              mutation: gql`${catQry.query}`,
-              variables: catQry.variables
-            }).then(data => console.log(data))
-          }
+      if (me.isWidgetActive("category")) {
+        // process categories
+        let categToSave = _.keys(v.categories) 
+        var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.props.postCategoryList, categToSave);
+        if (catQry) this.props.client.mutate({
+          mutation: gql`${catQry.query}`,
+          variables: catQry.variables
+        }).then(data => console.log(data))
+      }
+
+      if (me.isWidgetActive("tag")) {
+        let tagMap = {}
+        _.forEach(me.props.options, function(item){
+            tagMap[item.name] = {id: item.id, name: item.name}
+        })
+        var tagQry = Query.createUpdateTagOfPostMtn(postId, me.props.postTagListInit, me.props.postTagList, tagMap);
+
+        if (tagQry)
+          this.props.client.mutate({
+            mutation: gql`${tagQry.query}`,
+            variables: tagQry.variables
+          }).then(data => console.log("tags", data))
+      } 
+
       this.disableForm(false)
     })
 
-    /*
-    riques(qry, 
-      function(error, response, body) {
-        if (!error && !body.errors && response.statusCode === 200) {
-          var here = me, postId = "", pmQry = "";
-          
- 
-          
-          if (metaDataList.length>0) {
-            pmQry = Query.createUpdatePostMetaMtn(postId, metaDataList);
-            riques(pmQry, 
-              function(error, response, body) {
-                if (!error && !body.errors && response.statusCode === 200) {
-                  
-                } else {
-                  errorCallback(error, body.errors?body.errors[0].message:null, "Save Post Meta");
-                }
-                here.disableForm(false);
-                here.notifyUnsavedData(false);
-              }
-            );
-          }
-          
-          if (me.isWidgetActive("category")) {
-            // process categories
-            let categToSave = _.keys(v.categories) 
-            here.disableForm(true);
-            var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.props.postCategoryList, categToSave);
-            if (catQry)
-              riques(catQry,
-                function(error, response, body) {
-                  here.disableForm(false);
-                  here.notifyUnsavedData(false);
-                  here.bindPostToImageGallery(postId);
-                  if (!error && !body.errors && response.statusCode === 200) {
-                    
-                  } else {
-                    errorCallback(error, body.errors?body.errors[0].message:null, "Save Category");
-                  }
-                }
-              );
-          }
-
-          if (me.isWidgetActive("tag")) {
-            here.disableForm(true);
-            let tagMap = {}
-            _.forEach(me.props.options, function(item){
-                tagMap[item.name] = {id: item.id, name: item.name}
-            })
-            var tagQry = Query.createUpdateTagOfPostMtn(postId, me.props.postTagListInit, me.props.postTagList, tagMap);
-            if (tagQry)
-              riques(tagQry,
-                function(error, response, body) {
-                  here.disableForm(false);
-                  here.notifyUnsavedData(false);
-                  here.bindPostToImageGallery(postId);
-                  if (!error && !body.errors && response.statusCode === 200) {
-                    
-                  } else {
-                    errorCallback(error, body.errors?body.errors[0].message:null, "Save Tag");
-                  }
-                }
-              );
-          } 
-
-          // do these when post data succesfully saved
-          here._successNotif(noticeTxt);
-          here.props.dispatch(setEditorMode("update"));
-          here.props.dispatch(setPostId(postId));
-          here.notifyUnsavedData(false);
-          here.bindPostToImageGallery(postId);
-          here.props.handleNav(me.props.slug,"edit",postId);
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null, "Save Post");
-          me.disableForm(false);
-        }
-      }
-    );  
-    */
   },
   _errorNotif: function(msg){
     this.refs.notificationSystem.addNotification({
