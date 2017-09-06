@@ -23,6 +23,26 @@ import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {graphql} from 'react-apollo';
 import gql from 'graphql-tag';
 
+class CkeditorField extends React.Component{
+  componentDidMount(){
+    let me = this;
+    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
+      window.CKEDITOR.replace('content', {
+        height: 400,
+        title: false
+      });
+      window.CKEDITOR.instances['content'].setData(me.props.content);
+      for (var i in window.CKEDITOR.instances) {
+        if (window.CKEDITOR.instances.hasOwnProperty(i))
+          window.CKEDITOR.instances[i].on('change', me.props.handleContentChange);
+      }
+    });
+  }
+  render(){
+    return <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="textarea" className="form-control" />
+  }
+}
+
 let ImageGalleryWidget = (props) => (
 <div className="box box-info" style={{marginTop:20}}>
   <div className="box-header with-border">
@@ -266,7 +286,7 @@ const PermalinkEditor = (props) => {
   )
 }
 
-let NewContentType = React.createClass({
+let NewContentTypeNoPostId = React.createClass({
   propTypes: {
     urlParams: React.PropTypes.string,
     isProcessing: React.PropTypes.bool.isRequired,
@@ -364,7 +384,11 @@ let NewContentType = React.createClass({
     this.props.dispatch(maskArea(isFormDisabled));
   },
   componentWillReceiveProps: function(props){
-    console.log(props.urlParams)
+    console.log(props)
+    if (!props.isLoading) {
+      props.initialize(props.initialValues)
+    }
+
     /*if (props.urlParams.postId !== this.props.postId){
       props.dispatch(setPostId(props.urlParams.postId))
       props.destroy()
@@ -488,12 +512,14 @@ let NewContentType = React.createClass({
   handleTitleChange: function(event){
     this.notifyUnsavedData(true);
   },
+
   handleContentChange: function(event){
     var content = window.CKEDITOR.instances['content'].getData();
-    this.props.dispatch(setPostContent(content));
+    //  this.props.dispatch(setPostContent(content));
     this.props.change('content', content)
     this.notifyUnsavedData(true);
   },
+
   handleTitleTagChange: function(event){
     var titleTag = this.props.titleTag;
     this.props.dispatch(updateTitleTagLeftCharacter(65-(titleTag.length)));
@@ -781,28 +807,6 @@ let NewContentType = React.createClass({
   componentDidMount: function(){
     var me = this;
 
-    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
-      window.CKEDITOR.replace('content', {
-        height: 400,
-        title: false
-      });
-      for (var i in window.CKEDITOR.instances) {
-        if (window.CKEDITOR.instances.hasOwnProperty(i))
-          window.CKEDITOR.instances[i].on('change', me.handleContentChange);
-      }
-
-      if (me.props.postId) {
-        me.props.dispatch(setEditorMode("update"));
-        riques(me.props.loadQuery(me.props.postId), 
-          function(error, response, body) {
-            if (!error ) {
-              var values = body.data.getPost;
-              me.setFormValues(values);
-            }
-          }
-        );
-      }
-    });
 
     if (this.props.visibilityTxt==="Public") 
       document.getElementById("public").setAttribute('checked', true);
@@ -847,7 +851,12 @@ let NewContentType = React.createClass({
                 <Field name="title" component="input" type="text" className="form-control"
                   placeholder="Input Title Here" onChange={this.handleTitleChange} onBlur={() => {this.checkSlug(this.props.title.split(" ").join("-").toLowerCase())}} style={{marginBottom: 20}}/>
                 <PermalinkEditor rootUrl={rootUrl} onCheckSlug={this.checkSlug} {...this.props} />
-                <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="textarea" className="form-control" />
+
+                <CkeditorField 
+                  handleContentChange={this.handleContentChange}
+                  content={this.props.data.content}
+                />
+
                 <div id="trackingDiv"></div>
               </div>
             </div>
@@ -952,13 +961,13 @@ let NewContentType = React.createClass({
                           <div id="visibilityOption" className="collapse">
                             <div className="radio">
                               <label>
-                                <Field id="public" name="visibilityRadio" component="input" type="radio" value="Public" />
+                                <Field id="public" name="visibility" component="input" type="radio" value="Public" />
                                 Public
                               </label>
                             </div>
                             <div className="radio">
                               <label>
-                                <Field id="private" name="visibilityRadio" component="input" type="radio" value="Private" />
+                                <Field id="private" name="visibility" component="input" type="radio" value="Private" />
                                 Private
                               </label>
                             </div>
@@ -1106,7 +1115,7 @@ const getAllTagQry = gql`query getTags ($type: String!){
     }
   }`
 
-NewContentType = graphql(getAllTagQry, {
+NewContentTypeNoPostId = graphql(getAllTagQry, {
   options: (props) => ({
     variables: {
       type: props.postType,
@@ -1128,7 +1137,100 @@ NewContentType = graphql(getAllTagQry, {
       }
     }
   }
-})(NewContentType)
+})(NewContentTypeNoPostId)
+
+const getPostQry = gql`query ($id: ID!){getPost(id: $id){ id,title,content,slug,author{username},status,visibility,featuredImage,
+      summary,category{edges{node{id, category{id,name}}}},comments{edges{node{id,content,name,email,website}}},file{edges{node{id value}}},
+      tag{edges{node{id,tag{id,name}}}},meta{edges{node{id,item,value}}},createdAt}}`
+
+const NewContentTypeWithPostId = graphql(getPostQry, {
+  options : (props) => ({
+    variables: {
+      id: props.urlParams.postId
+    }
+  }),
+  props: ({ownProps, data}) => {
+    if (data.loading){
+      return {
+        isLoading: true,
+        data: {},
+        initialValues: {}
+      }
+    } else if (data.error) {
+      return {
+        isLoading: false,
+        hasError: true,
+        data: {},
+        initialValues: {}
+      }
+    } else {
+      let initials = {};
+      let v = data.getPost
+
+      let fields = ["id","title","type","content","order","deleteData",
+      "featuredImage","slug","status","publishDate","passwordPage","parent","summary","visibility","authorId"];
+      _.forEach(fields, function(item){
+        if (data.getPost[item]) initials[item] = data.getPost[item];
+      });
+
+      // setting the meta values
+
+      if (data.getPost.meta.edges.length) {
+        _.forEach(data.getPost.meta.edges, meta => {
+          if(meta.node.value){
+            initials[meta.node.item] = meta.node.value
+          }
+        })
+      }
+
+      // setting content
+      var pubDate = data.getPost.publishDate? new Date(data.getPost.publishDate) : new Date();
+      initials["hours"] = pubDate.getHours();
+      initials["minutes"] = pubDate.getMinutes();
+      initials["publishDate"] = pubDate;
+
+      // setting category
+      initials.categories = {};
+      if (data.getPost.category.edges.length) {
+        _.forEach(data.getPost.category.edges, cat => {
+          initials.categories[cat.node.category.id] = true
+        })
+      }
+
+      // setting tag list
+      var _postTagList = [];
+      if (v.tag && v.tag.edges.length>0) {
+        _.forEach(v.tag.edges, function(i){
+          if (i.node.tag){
+            _postTagList.push({
+              id: i.node.tag.id,
+              value: i.node.tag.name,
+              name: i.node.tag.name,
+              label: i.node.tag.name,
+              connectionId: i.node.id
+            });
+          }
+        });
+      }
+
+      debugger
+      return {
+        isLoading: false,
+        data: data.getPost,
+        initialValues: initials,
+        postTagList : _postTagList
+      }
+    }
+  }
+})(NewContentTypeNoPostId)
+
+let NewContentType = (props) => {
+  if (!props.urlParams) {
+    return <NewContentTypeNoPostId {...props}/>
+  }
+
+  return <NewContentTypeWithPostId {...props}/>
+}
 
 const selector = formValueSelector('newContentForm');
 
@@ -1149,7 +1251,6 @@ const mapStateToProps = function(state){
 
   if (!_.isEmpty(state.contentTypeNew)) {
     var out = _.head(state.contentTypeNew);
-    console.log(out)
     out["initialValues"] = out.data;
     //return _.merge(out, customStates);
     return {...out, ...customStates}
