@@ -397,7 +397,12 @@ let NewContentTypeNoPostId = React.createClass({
     this.props.dispatch(maskArea(isFormDisabled));
   },
   componentWillReceiveProps: function(props){
-    console.log(props.urlParams)
+    console.log(props)
+    if (!props.isLoading) {
+      props.initialize(props.initialValues)
+      window.CKEDITOR.instances['content'].setData(props.data.content);
+    }
+
     /*if (props.urlParams.postId !== this.props.postId){
       props.dispatch(setPostId(props.urlParams.postId))
       props.destroy()
@@ -1147,13 +1152,52 @@ NewContentTypeNoPostId = graphql(getAllTagQry, {
   }
 })(NewContentTypeNoPostId)
 
+const getPostQry = gql`query ($id: ID!){getPost(id: $id){ id,title,content,slug,author{username},status,visibility,featuredImage,
+      summary,category{edges{node{id, category{id,name}}}},comments{edges{node{id,content,name,email,website}}},file{edges{node{id value}}},
+      tag{edges{node{id,tag{id,name}}}},meta{edges{node{id,item,value}}},createdAt}}`
+
+const NewContentTypeWithPostId = graphql(getPostQry, {
+  options : (props) => ({
+    variables: {
+      id: props.urlParams.postId
+    }
+  }),
+  props: ({ownProps, data}) => {
+    if (data.loading){
+      return {
+        isLoading: true,
+        data: {},
+        initialValues: {}
+      }
+    } else if (data.error) {
+      return {
+        isLoading: false,
+        hasError: true,
+        data: {},
+        initialValues: {}
+      }
+    } else {
+      let initials = {};
+      let fields = ["id","title","type","content","order","deleteData",
+      "featuredImage","slug","status","publishDate","passwordPage","parent","summary","visibility","authorId"];
+      _.forEach(fields, function(item){
+        if (data.getPost[item]) initials[item] = data.getPost[item];
+      });
+      return {
+        isLoading: false,
+        data: data.getPost,
+        initialValues: initials
+      }
+    }
+  }
+})(NewContentTypeNoPostId)
 
 let NewContentType = (props) => {
   if (!props.urlParams) {
     return <NewContentTypeNoPostId {...props}/>
   }
 
-  return <NewContentTypeNoPostId {...props}/>
+  return <NewContentTypeWithPostId {...props}/>
 }
 
 const selector = formValueSelector('newContentForm');
@@ -1175,7 +1219,6 @@ const mapStateToProps = function(state){
 
   if (!_.isEmpty(state.contentTypeNew)) {
     var out = _.head(state.contentTypeNew);
-    console.log(out)
     out["initialValues"] = out.data;
     //return _.merge(out, customStates);
     return {...out, ...customStates}
