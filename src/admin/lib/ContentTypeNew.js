@@ -24,6 +24,13 @@ import {graphql} from 'react-apollo';
 import gql from 'graphql-tag';
 
 class CkeditorField extends React.Component{
+
+  componentWillReceiveProps(props){
+    if (props.content !== this.props.content){
+      if(window.CKEDITOR) window.CKEDITOR.instances['content'].setData(props.content);
+    }
+  }
+
   componentDidMount(){
     let me = this;
     $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
@@ -31,7 +38,6 @@ class CkeditorField extends React.Component{
         height: 400,
         title: false
       });
-      window.CKEDITOR.instances['content'].setData(me.props.content);
       for (var i in window.CKEDITOR.instances) {
         if (window.CKEDITOR.instances.hasOwnProperty(i))
           window.CKEDITOR.instances[i].on('change', me.props.handleContentChange);
@@ -395,7 +401,6 @@ let NewContentTypeNoPostId = React.createClass({
       console.log("hello")
     }*/
     if(!props.postId && this.props.postId){
-      window.CKEDITOR.instances['content'].setData("");
       props.dispatch(resetPostEditor());
       props.destroy()
     }
@@ -1191,9 +1196,9 @@ const NewContentTypeWithPostId = graphql(getPostQry, {
 
       // setting category
       initials.categories = {};
-      if (data.getPost.category.edges.length) {
+      if (data.getPost.category.edges.length>0) {
         _.forEach(data.getPost.category.edges, cat => {
-          initials.categories[cat.node.category.id] = true
+          if (cat.node.category) initials.categories[cat.node.category.id] = true
         })
       }
 
@@ -1213,7 +1218,6 @@ const NewContentTypeWithPostId = graphql(getPostQry, {
         });
       }
 
-      debugger
       return {
         isLoading: false,
         data: data.getPost,
