@@ -589,6 +589,9 @@ let NewContentTypeNoPostId = React.createClass({
       } 
 
       this.disableForm(false)
+      this._successNotif(noticeTxt)
+      this.notifyUnsavedData(false)
+      this.props.handleNav(me.props.slug, "edit", postId)
     })
 
   },
