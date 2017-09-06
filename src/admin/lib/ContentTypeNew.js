@@ -31,24 +31,11 @@ class CkeditorField extends React.Component{
         height: 400,
         title: false
       });
+      window.CKEDITOR.instances['content'].setData(me.props.content);
       for (var i in window.CKEDITOR.instances) {
         if (window.CKEDITOR.instances.hasOwnProperty(i))
           window.CKEDITOR.instances[i].on('change', me.props.handleContentChange);
       }
-
-        /*
-      if (me.props.postId) {
-        me.props.dispatch(setEditorMode("update"));
-        riques(me.props.loadQuery(me.props.postId), 
-          function(error, response, body) {
-            if (!error ) {
-              var values = body.data.getPost;
-              me.setFormValues(values);
-            }
-          }
-        );
-      }
-      */
     });
   }
   render(){
@@ -400,7 +387,6 @@ let NewContentTypeNoPostId = React.createClass({
     console.log(props)
     if (!props.isLoading) {
       props.initialize(props.initialValues)
-      window.CKEDITOR.instances['content'].setData(props.data.content);
     }
 
     /*if (props.urlParams.postId !== this.props.postId){
@@ -868,6 +854,7 @@ let NewContentTypeNoPostId = React.createClass({
 
                 <CkeditorField 
                   handleContentChange={this.handleContentChange}
+                  content={this.props.data.content}
                 />
 
                 <div id="trackingDiv"></div>
@@ -974,13 +961,13 @@ let NewContentTypeNoPostId = React.createClass({
                           <div id="visibilityOption" className="collapse">
                             <div className="radio">
                               <label>
-                                <Field id="public" name="visibilityRadio" component="input" type="radio" value="Public" />
+                                <Field id="public" name="visibility" component="input" type="radio" value="Public" />
                                 Public
                               </label>
                             </div>
                             <div className="radio">
                               <label>
-                                <Field id="private" name="visibilityRadio" component="input" type="radio" value="Private" />
+                                <Field id="private" name="visibility" component="input" type="radio" value="Private" />
                                 Private
                               </label>
                             </div>
@@ -1178,15 +1165,60 @@ const NewContentTypeWithPostId = graphql(getPostQry, {
       }
     } else {
       let initials = {};
+      let v = data.getPost
+
       let fields = ["id","title","type","content","order","deleteData",
       "featuredImage","slug","status","publishDate","passwordPage","parent","summary","visibility","authorId"];
       _.forEach(fields, function(item){
         if (data.getPost[item]) initials[item] = data.getPost[item];
       });
+
+      // setting the meta values
+
+      if (data.getPost.meta.edges.length) {
+        _.forEach(data.getPost.meta.edges, meta => {
+          if(meta.node.value){
+            initials[meta.node.item] = meta.node.value
+          }
+        })
+      }
+
+      // setting content
+      var pubDate = data.getPost.publishDate? new Date(data.getPost.publishDate) : new Date();
+      initials["hours"] = pubDate.getHours();
+      initials["minutes"] = pubDate.getMinutes();
+      initials["publishDate"] = pubDate;
+
+      // setting category
+      initials.categories = {};
+      if (data.getPost.category.edges.length) {
+        _.forEach(data.getPost.category.edges, cat => {
+          initials.categories[cat.node.category.id] = true
+        })
+      }
+
+      // setting tag list
+      var _postTagList = [];
+      if (v.tag && v.tag.edges.length>0) {
+        _.forEach(v.tag.edges, function(i){
+          if (i.node.tag){
+            _postTagList.push({
+              id: i.node.tag.id,
+              value: i.node.tag.name,
+              name: i.node.tag.name,
+              label: i.node.tag.name,
+              connectionId: i.node.id
+            });
+          }
+        });
+      }
+
+      debugger
       return {
         isLoading: false,
         data: data.getPost,
-        initialValues: initials
+        initialValues: initials,
+        postTagList : _postTagList
       }
     }
   }
