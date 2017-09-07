@@ -391,6 +391,7 @@ let NewContentTypeNoPostId = React.createClass({
     console.log(props)
     if (props.data !== this.props.data){
       props.initialize(props.initialValues)
+      props.dispatch(setImageGalleryList(props.imageGallery))
     } else if (this.props.loading && !props.loading){
       this.disableForm(false)
     }
@@ -645,14 +646,21 @@ let NewContentTypeNoPostId = React.createClass({
           }
         },
         update: (store, data) => {
-          if (me.props.urlParams.postId){
-            let postQry = store.readQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}})
-            postQry.getPost.file.edges.splice(0, 0,{
-              node: {...data.data.createFile.changedFile},
-              __typename: 'FileEdge'
-            })
-            store.writeQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}, data: postQry})
+          let image = data.data.createFile.changedFile
+
+        
+          let imageGallery = _.cloneDeep(me.props.imageGallery);
+          if (imageGallery.length){
+            if (imageGallery[0].value === image.value){
+              imageGallery.splice(0, 1, {id: image.id, value: image.value})
+            } else {
+              imageGallery.splice(0, 0, {id: image.id, value: image.value})
+            }
+          } else {
+            imageGallery = []
+            imageGallery.push({id: image.id, value: image.value})
           }
+          me.props.dispatch(setImageGalleryList(imageGallery));
         }
       }).then(data => {
         console.log("addImageGallery mutation result", data)
@@ -689,10 +697,9 @@ let NewContentTypeNoPostId = React.createClass({
 
   handleImageRemove: function(e){
     var me = this;
-    var id = e.target.id;
+    var id = e.currentTarget.id;
     var index = id.split("-")[1];
     var imageId = id.split("-")[0];
-    this.disableForm(true);
 
     this.props.removeImageGallery({
       variables: {
@@ -700,17 +707,31 @@ let NewContentTypeNoPostId = React.createClass({
           id: imageId
         }
       },
+      optimisticResponse: {
+        deleteFile: {
+          changedFile: {
+            id: imageId,
+            type: "",
+            value: "",
+            blobMimeType: "",
+            blobUrl: "",
+            __typename: ""
+          },
+          __typename: ""
+        }
+      },
         update: (store, data) => {
-          if (me.props.urlParams.postId){
-            let postQry = store.readQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}})
-            postQry.getPost.file.edges = _.filter(postQry.getPost.file.edges, item => item.node.id !== imageId)
-            debugger
-            store.writeQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}, data: postQry})
+          let image = data.data.deleteFile.changedFile
+
+        
+          let imageGallery = _.cloneDeep(me.props.imageGallery);
+          if (imageGallery.length){
+            imageGallery = _.filter(imageGallery, item => item.id !== imageId)
           }
+          me.props.dispatch(setImageGalleryList(imageGallery));
         }
     }).then(data => {
       console.log("remove mutation returned data ", data)
-      this.disableForm(false)
       document.getElementById("imageGallery").value=null
       //this.props.postRefetch()
     }).catch(error => console.log(error))
