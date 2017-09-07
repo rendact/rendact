@@ -616,7 +616,6 @@ let NewContentTypeNoPostId = React.createClass({
   },
   imageGalleryChange: function(e){
     var me = this;
-    this.disableForm(true);
     var reader = new FileReader();
     reader.onload = function(){
       if (!me.props.postId) me.props.dispatch(toggleImageGalleyBinded(true));
@@ -638,7 +637,8 @@ let NewContentTypeNoPostId = React.createClass({
               type: "gallery",
               value: reader.result,
               postId: me.props.urlParams.postId,
-              blobFieldName: 'myBlobField'
+              blobFieldName: 'myBlobField',
+              id: "customid"
             }
           }
         },
@@ -653,7 +653,6 @@ let NewContentTypeNoPostId = React.createClass({
       }).then(data => {
         // must to refetch post instead
         console.log("addImageGallery mutation result", data)
-        me.disableForm(false);
         document.getElementById("imageGallery").value=null;
         me.props.postRefetch()
       })
@@ -709,20 +708,14 @@ let NewContentTypeNoPostId = React.createClass({
   _genReactSelect: function(contentId){
     var me = this;
     var getConnectionOptions = function(input, callback) {
-      var qry = Query.getContentPostListQry("All", contentId);
-      
-      riques(qry, 
-        function(error, response, body) {
-          var options = [];
-          _.forEach(body.data.viewer.allPosts.edges, function(item){
-            options.push({value: item.node.slug, label: item.node.title});
-          });
-          callback(error, {
+      me.props.client.query({
+        query: gql`${Query.getContentPostListQry("All", contentId).query}`}).then(data => {
+          let options = _.forEach(data.data.viewer.allPosts.edges, item => ({value: item.node.slug, label: item.node.title}));
+          callback(data.error, {
             options: options,
             complete: true
-          });
-        }
-      );
+          })
+        })
     }
 
     var handleSelectConnectionChange = function(newValue) {
@@ -1044,7 +1037,8 @@ const mapStateToProps = function(state){
   return {
     isProcessing: state.maskArea.isProcessing,
     opacity: state.maskArea.opacity,
-    imageGalleryUnbinded: ctn.imageGalleryUnbinded
+    imageGalleryUnbinded: ctn.imageGalleryUnbinded,
+    connectionValue: ctn.connectionValue
   }
 
 }
