@@ -41,6 +41,7 @@ const queries = {
   getUserListByTypeQry: User.getUserListByTypeQry,
   createUserMtn: User.createUserMtn,
   getPostQry: Post.getPostQry,
+  getPost: Post.getPost,
   checkSlugQry: Page.checkSlugQry,
   saveProfileMtn: User.saveProfileMtn,
   saveUserMetaMtn: User.saveUserMetaMtn,

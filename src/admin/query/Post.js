@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import gql from 'graphql-tag';
 
 
 const getPostListQry = function(s, postType, tagId, cateId) {
@@ -401,6 +402,10 @@ const getPostQry = function(postId){
     }
 };
 
+const getPost = gql`query ($id: ID!){getPost(id: $id){ id,title,content,slug,author{username},status,visibility,featuredImage,
+      summary,category{edges{node{id, category{id,name}}}},comments{edges{node{id,content,name,email,website}}},file{edges{node{id value}}},
+      tag{edges{node{id,tag{id,name}}}},meta{edges{node{id,item,value}}},createdAt}}`
+
 const deletePostQry = function(idList){
   var query = "mutation { ";
   _.forEach(idList, function(val, index){
@@ -631,7 +636,8 @@ const queries = {
   addImageGallery: addImageGallery,
   removeImageGallery: removeImageGallery,
   bindImageGallery: bindImageGallery,
-  searchPost: searchPost
+  searchPost: searchPost,
+  getPost: getPost
 }
 
 export default queries;

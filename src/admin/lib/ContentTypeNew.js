@@ -594,6 +594,7 @@ let NewContentTypeNoPostId = React.createClass({
       this._successNotif(noticeTxt)
       this.notifyUnsavedData(false)
       this.props.handleNav(me.props.slug, "edit", postId)
+      this.bindPostToImageGallery(postId)
     })
 
   },
@@ -627,7 +628,10 @@ let NewContentTypeNoPostId = React.createClass({
             postId: me.props.urlParams.postId,
             blobFieldName: "myBlobField"
           }
-        }
+        },
+        refetchQueries: [
+          {query: Query.getPost, variables: {id: me.props.urlParams.postId}}
+        ]
       }).then(data => {
         // must to refetch post instead
         console.log("addImageGallery mutation result", data)
@@ -675,7 +679,10 @@ let NewContentTypeNoPostId = React.createClass({
         input : {
           id: imageId
         }
-      }
+      },
+      refetchQueries: [
+        {query: Query.getPost, variables: { id: this.props.urlParams.postId}}
+      ]
     }).then(data => {
       console.log("remove mutation returned data ", data)
       this.disableFrom(false)
@@ -1083,11 +1090,8 @@ NewContentTypeNoPostId = reduxForm({
   form: 'newContentForm'
 })(NewContentTypeNoPostId)
 
-const getPostQry = gql`query ($id: ID!){getPost(id: $id){ id,title,content,slug,author{username},status,visibility,featuredImage,
-      summary,category{edges{node{id, category{id,name}}}},comments{edges{node{id,content,name,email,website}}},file{edges{node{id value}}},
-      tag{edges{node{id,tag{id,name}}}},meta{edges{node{id,item,value}}},createdAt}}`
 
-const NewContentTypeWithPostId = graphql(getPostQry, {
+const NewContentTypeWithPostId = graphql(Query.getPost, {
   options : (props) => ({
     variables: {
       id: props.urlParams.postId
