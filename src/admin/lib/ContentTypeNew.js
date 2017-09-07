@@ -629,14 +629,33 @@ let NewContentTypeNoPostId = React.createClass({
             blobFieldName: "myBlobField"
           }
         },
-        refetchQueries: [
-          {query: Query.getPost, variables: {id: me.props.urlParams.postId}}
-        ]
+        optimisticResponse: {
+          __typename: 'Mutation',
+          createFile: {
+            __typename: 'CreateFilePayload',
+            changedFile: {
+              __typename: 'File',
+              type: "gallery",
+              value: reader.result,
+              postId: me.props.urlParams.postId,
+              blobFieldName: 'myBlobField'
+            }
+          }
+        },
+        update: (store, data) => {
+          let postQry = store.readQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}})
+          postQry.getPost.file.edges.push({
+            node: {...data.data.createFile.changedFile},
+            __typename: 'FileEdge'
+          })
+          store.writeQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}, data: postQry})
+        }
       }).then(data => {
         // must to refetch post instead
         console.log("addImageGallery mutation result", data)
         me.disableForm(false);
         document.getElementById("imageGallery").value=null;
+        me.props.postRefetch()
       })
     }
     reader.readAsDataURL(e.target.files[0]);
@@ -680,13 +699,11 @@ let NewContentTypeNoPostId = React.createClass({
           id: imageId
         }
       },
-      refetchQueries: [
-        {query: Query.getPost, variables: { id: this.props.urlParams.postId}}
-      ]
     }).then(data => {
       console.log("remove mutation returned data ", data)
-      this.disableFrom(false)
+      this.disableForm(true)
       document.getElementById("imageGallery").value=null
+      this.props.postRefetch()
     }).catch(error => console.log(error))
   },
   _genReactSelect: function(contentId){
@@ -1176,7 +1193,8 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
         postTagList : _postTagList,
         imageGallery: _imageGalleryList,
         mode: "update",
-        permalink: v.slug
+        permalink: v.slug,
+        postRefetch: data.refetch,
       }
     }
   }
