@@ -29,6 +29,7 @@ class CkeditorField extends React.Component{
     if (props.content !== this.props.content){
       if(window.CKEDITOR) window.CKEDITOR.instances['content'].setData(props.content);
     }
+
   }
 
   componentDidMount(){
@@ -356,7 +357,6 @@ let NewContentTypeNoPostId = React.createClass({
       connectionValue: {},
       data: {},
       parent: "",
-      permalink: ""
     }
   },
   isWidgetActive: function(name){
@@ -366,18 +366,15 @@ let NewContentTypeNoPostId = React.createClass({
     var me = this;
     if (permalink===this.props.permalink) return;
     this.props.dispatch(togglePermalinkProcessState(true));
-    riques( Query.checkSlugQry(permalink),
-      function(error, response, body) {
-        me.props.dispatch(togglePermalinkProcessState(false));
-        if (!error && !body.errors && response.statusCode === 200) {
-          var slugCount = body.data.viewer.allPosts.edges.length;
-          if (slugCount > 0) me.props.dispatch(setSlug(permalink+"-"+slugCount, false));
-          else me.props.dispatch(setSlug(permalink, false));
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null, "Check Slug");
-        }
-      }
-    );
+    this.props.client.query({
+      query: gql`${Query.checkSlugQry(permalink).query}`,
+    }).then(data => {
+      let slugCount = data.data.viewer.allPosts.edges.length;
+      if (slugCount > 0) me.props.dispatch(setSlug(permalink+"-"+slugCount, false));
+      else me.props.dispatch(setSlug(permalink, false));
+      this.props.dispatch(togglePermalinkProcessState(false));
+    }).catch(({error}) => errorCallback(error, error, "Check Slug"))
+      
   },
   saveImmediately: function(event){
     var hours = this.props.hours;
@@ -398,8 +395,12 @@ let NewContentTypeNoPostId = React.createClass({
     } else if (this.props.loading && !props.loading){
       this.disableForm(false)
     }
+    if (!this.props.permalink && props.permalinkFromDb){
+      props.dispatch(setSlug(props.permalinkFromDb, false))
+    }
 
-    /*if (props.urlParams.postId !== this.props.postId){
+  /*
+  if (props.urlParams.postId !== this.props.postId){
       props.dispatch(setPostId(props.urlParams.postId))
       props.destroy()
       console.log("hello")
@@ -783,7 +784,7 @@ let NewContentTypeNoPostId = React.createClass({
             <div className="form-group"  style={{marginBottom:30}}>
               <div>
                 <Field name="title" component="input" type="text" className="form-control"
-                  placeholder="Input Title Here" onChange={this.handleTitleChange} onBlur={() => {this.checkSlug(this.props.title.split(" ").join("-").toLowerCase())}} style={{marginBottom: 20}}/>
+                  placeholder="Input Title Here" onChange={this.handleTitleChange} onBlur={(e) => {this.checkSlug(e.currentTarget.value.split(" ").join("-").toLowerCase())}} style={{marginBottom: 20}}/>
                 <PermalinkEditor rootUrl={rootUrl} onCheckSlug={this.checkSlug} {...this.props} />
 
                 <CkeditorField 
@@ -1038,7 +1039,10 @@ const mapStateToProps = function(state){
     isProcessing: state.maskArea.isProcessing,
     opacity: state.maskArea.opacity,
     imageGalleryUnbinded: ctn.imageGalleryUnbinded,
-    connectionValue: ctn.connectionValue
+    connectionValue: ctn.connectionValue,
+    permalink: ctn.permalink,
+    permalinkEditing: ctn.permalinkEditing,
+    permalinkInProcess: ctn.permalinkInProcess
   }
 
 }
@@ -1187,7 +1191,7 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
         postTagList : _postTagList,
         imageGallery: _imageGalleryList,
         mode: "update",
-        permalink: v.slug,
+        permalinkFromDb: v.slug,
         postRefetch: data.refetch,
       }
     }
