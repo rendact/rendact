@@ -1,17 +1,12 @@
 import _ from 'lodash';
 
 
-const INITIAL_VALUES =  [{
+const INITIAL_VALUES =  {
       isProcessing: false,
       opacity: 1,
-      title: "",
-      content: "",
-      featuredImage: "",
       status:"Published",
       immediatelyStatus:true,
       visibilityTxt:"Public",
-      permalinkEditing: false,
-      mode: "create",
       postCategoryList: [],
       postTagListInit: [],
       postTagList: [],
@@ -19,117 +14,99 @@ const INITIAL_VALUES =  [{
       metaDescriptionLeftCharacter: 160,
       publishDate: new Date(),
       publishDateReset: new Date(),
-      permalinkInProcess: false,
-      imageGallery: [],
-      tagMap: {},
-      connectionValue: {},
-      data: {},
-      parent: "",
-      permalink: ""
-    }]
+    }
 
 const contentTypeNew = (state = INITIAL_VALUES, action) => {
-  console.log(action.type)
   switch (action.type) {
     case 'SET_POST_ID':
-      return state.map(item => ({...item, postId: action.postId}))
+      return {...state, postId: action.postId}
 
-    case 'MASK_AREA':
-      if (state)
-        return state.map(item =>  ({...item, isProcessing: action.isMasked, opacity: action.isMasked?0.4:1}))
-      else
-        return [
-          {
-            isProcessing: action.isMasked,
-            opacity: action.isMasked?0.4:1
-          }
-        ]
     case 'UPDATE_SLUG':
-      return state.map(item =>  ({...item, permalink: action.slug, permalinkEditing: action.isEditorEnabled}))
+      return {...state, permalink: action.slug, permalinkEditing: action.isEditorEnabled}
     
     case 'TOGGLE_PERMALINK_PROCESS_STATE':
-      return state.map(item =>  ({...item, permalinkInProcess: action.state}))
+      return {...state, permalinkInProcess: action.state}
     
     case 'UPDATE_POST_STATUS':
-      return state.map(item =>  ({...item, status: action.status}))
+      return {...state, status: action.status}
     
     case 'RESET_POST_EDITOR':
         let data = {postId: "", initialValues:{}, data:{}, title:"", permalink: "", content:"", summary:"", featuredImage: null, imageGallery:[],
         status:"Published", immediately:"", immediatelyStatus:true, visibilityTxt:"Public",
         permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160}
-      return state.map(item => ({...item, ...data}))
+      return {...state, ...data}
     
     case 'SET_CATEGORY_LIST':
-      return state.map(item =>  ({...item, postCategoryList: action.catList}))
+      return {...state, postCategoryList: action.catList}
     
     case 'SET_TAG_LIST':
-      return state.map(item =>  ({...item, postTagListInit: action.tagListInit, postTagList: action.tagList}))
+      return {...state, postTagListInit: action.tagListInit, postTagList: action.tagList}
     
     case 'SET_IMAGE_GALLERY_LIST':
-      return state.map(item =>  ({...item, imageGallery: action.imageList}))
+      return {...state, imageGallery: action.imageList}
     
     case 'SET_CONNECTION_VALUE_LIST':
-      return state.map(item =>  ({...item, connectionValue: action.connectionValueList}))
+      return {...state, connectionValue: action.connectionValueList}
     
     case 'SET_CONTENT_FORM':
-       return state.map(item =>  ({...item,
+       return {...state,
           title: action.values.title, content: action.values.content, summary: action.values.summary, 
           status: action.values.status, visibilityTxt: action.values.visibility, 
           publishDate: action.values.pubDate, publishDateReset: action.values.pubDate, 
           permalink: action.values.slug, featuredImage: action.values.featuredImage
-      }))
+      }
 
     case 'TOGGLE_SAVE_IMMEDIATELY_MODE':
-      return state.map(item =>  ({...item, immediatelyStatus: action.state, immediately: action.time}))
+      return {...state, immediatelyStatus: action.state, immediately: action.time}
     
     case 'TOGGLE_PERMALINK_EDITING_STATE':
-      return state.map(item =>  ({...item, permalinkEditing: action.state}))
+      return {...state, permalinkEditing: action.state}
     
     case 'SET_VISIBILITY_MODE':
-      return state.map(item =>  ({...item, visibilityTxt: action.mode}))
+      return {...state, visibilityTxt: action.mode}
 
     case 'SET_POST_TITLE':
-      return state.map(item =>  ({...item, title: action.title}))
+      return {...state, title: action.title}
 
     case 'SET_POST_CONTENT':
-      return state.map(item =>  ({...item, content: action.content}))
+      return {...state, content: action.content}
     
     case 'SET_POST_SUMMARY':
-      return state.map(item =>  ({...item, summary: action.summary}))
+      return {...state, summary: action.summary}
 
     case 'UPDATE_TITLE_TAG_LEFT_CHAR':
-      return state.map(item =>  ({...item, titleTagLeftCharacter: action.length}))
+      return {...state, titleTagLeftCharacter: action.length}
     
     case 'UPDATE_META_DESCRIPTION_LEFT_CHAR':
-      return state.map(item =>  ({...item, metaDescriptionLeftCharacter: action.length}))
+      return {...state, metaDescriptionLeftCharacter: action.length}
     
     case 'SET_POST_PUBLISH_DATE':
-      return state.map(item =>  ({...item, immediatelyStatus: action.immediatelyState,publishDate: action.date}))
+      return {...state, immediatelyStatus: action.immediatelyState,publishDate: action.date}
     
     case 'SET_FEATURED_IMAGE':
-      return state.map(item =>  ({...item, featuredImage: action.featuredImage}))
+      return {...state, featuredImage: action.featuredImage}
 
     case 'SET_EDITOR_MODE':
-      return state.map(item =>  ({...item, mode: action.mode}))
+      return {...state, mode: action.mode}
         
     case 'TOGGLE_IMAGE_GALLERY_BINDED':
-      return state.map(item =>  ({...item, imageGalleryUnbinded: action.state}))
+      return {...state, imageGalleryUnbinded: action.state}
     
     case 'SET_PAGE_LIST':
-      return state.map(item =>  ({...item, pageList: action.pageList}))
+      return {...state, pageList: action.pageList}
     
     case 'SET_ALL_CATEGORY_LIST':
-      return state.map(item =>  ({...item, allCategoryList: action.catList}))
+      return {...state, allCategoryList: action.catList}
     
     case 'SET_TAG_MAP':
 
-      return state.map(item =>  ({...item, tagMap: action.tagMap}))
+      return {...state, tagMap: action.tagMap}
     
     case 'SET_OPTIONS':
-      return state.map(item =>  ({...item, options: action.options}))
+      return {...state, options: action.options}
 
     case 'LOAD_FORM_DATA':
-      return state.map(item =>  ({...item, data: action.data, permalink: action.data["slug"]}))
+      return {...state, data: action.data, permalink: action.data["slug"]}
     default:
       return state
   }
