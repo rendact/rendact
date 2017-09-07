@@ -41,16 +41,16 @@ let ContentType = React.createClass({
     }
   },
   dt: null,
-  /*loadData: function(status, callback) {
+
+  loadData: function(status, callback) {
     var me = this;
     this.disableForm(true);
     var metaItemList = _.map(this.props.customFields, function(item) { return item.id });
-    riques(this.props.listQuery("Full", this.props.postType, this.props.tagId, this.props.cateId), 
+    /*riques(this.props.listQuery("Full", this.props.postType, this.props.tagId, this.props.cateId), 
       function(error, response, body) { 
         var nodeName = "all"+me.props.tableName+"s";
         var _postArr = body.data.viewer[nodeName].edges;
         var _statusCount = me.props.statusCount;
-
         if (me.props.replaceStatusWithRole){
           var _postArr0 = _postArr;
           _.forEach(_postArr0, function(item, index){
@@ -75,13 +75,12 @@ let ContentType = React.createClass({
         }
         me.props.dispatch(setStatusCounter(_statusCount))
       }
-    );
+    );*/
     this.disableForm(true);
     var qry = this.props.listQuery(status, this.props.postType, this.props.tagId, this.props.cateId);
     var fields = _.map(this.props.fields, function(item){
       return item.id
     });
-    
     riques(qry, 
       function(error, response, body) { 
         
@@ -165,7 +164,6 @@ let ContentType = React.createClass({
                 }
               }
             });
-
             _dataArr.push(_obj);
 
             var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
@@ -184,7 +182,7 @@ let ContentType = React.createClass({
         }
       }
     );
-  },*/
+  },
   disableForm: function(isFormDisabled){
     disableForm(isFormDisabled, this.notification);
     this.props.dispatch(maskArea(isFormDisabled));
@@ -390,7 +388,10 @@ let ContentType = React.createClass({
     var datatable = this.table.datatable;
     this.refs.rendactSearchBoxPost.bindToTable(datatable);
     this.dt=datatable;
-    //this.loadData("All");
+    this.loadData("All");
+  },
+  componentWillReceiveProps(props){
+
   },
   render: function(){
     return (
@@ -492,10 +493,9 @@ const mapStateToProps = function(state){
 ContentType = connect(mapStateToProps)(ContentType)
 
 let getAllPosts = gql`
-query getAllPosts ($type: String!, $cateId: ID!, $tagId: ID!){
+query getAllPosts ($type: String!){
   viewer { 
-    allPosts(where: {type: {eq: $type},status: {ne: ""},
-    category: {category: {id: {eq: $cateId}}}, tag: {tag: {id: {eq: $tagId}}} }) {
+    allPosts(where: {type: {eq: $type},status: {ne: ""} }) {
       edges { 
         node { 
           id,
@@ -523,26 +523,104 @@ ContentType = graphql(getAllPosts,
     options: props => ({
       variables: {
         type: props.postType,
-        cateId: props.cateId,
-        tagId: props.tagId,
       },
     }),
     props: ({ownProps, data}) => {
+      if (!data.loading) {
+          var me = this;
+          var monthList = ["all"];
+          var _dataArr = [];
+          var _allPostId = [];
+          var _postArr = data.viewer.allPosts.edges;
+          var fields = _.map(ownProps.fields, function(item){
+            return item.id
+          });
+          var metaItemList = _.map(ownProps.customFields, function(item) { return item.id });
 
-      debugger;
-      if (data.loading){
-          return {isLoading: true}
-      } else if (data.error){
-          return {hasError: true, error: data.error}
-      } else {
-          let allPosts = _.map(data.viewer.allPosts.edges, item => item.node.title);
-      return {
-            isLoading: false,
-            initialValues: allPosts
+          _.forEach(_postArr, function(item){
+            var dt = new Date(item.node.createdAt);
+            var _obj = {postId: item.node.id};
+            _allPostId.push(item.node.id);
+            _.forEach(fields, function(fld){
+              if (_.has(item.node, fld)) { 
+                if (fld==="createdAt") {
+                  _obj[fld] = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+                }
+                else if (fld==="comments")
+                  _obj[fld] = item.node.comments.edges.length;
+                else if (fld==="author")
+                  _obj[fld] = item.node.author?item.node.author.username:"";
+                else if (fld==="category"){
+                  var categories = [];
+                  _.forEach(item.node.category.edges, function(item){ 
+                    if (item.node.category)
+                      categories.push(item.node.category.name)
+                  });
+                  if (categories.length===0)
+                    categories = "Uncategorized";
+                  _obj[fld] = categories;
+                }
+                else if (fld==="tag"){
+                  var tags = [];
+                  _.forEach(item.node.tag.edges, function(item){ 
+                    if (item.node.tag)
+                      tags.push(item.node.tag.name)
+                  });
+                  if (tags.length===0)
+                    tags = "";
+                  _obj[fld] = tags;
+                } else if (fld==="image"){
+                  _obj[fld] = item.node.image?item.node.image:getConfig('rootUrl')+"/images/avatar-default.png"
+                } else if (fld==="roles") {
+                  var roles = "No Role";
+                  var rolesLen = item.node.roles.edges.length;
+                  if (rolesLen>0) {
+                    var isOwner = _.find(item.node.roles.edges, {node: {name: "Owner"}} );
+                    if (isOwner) roles = "Owner";
+                    else {
+                      roles = _.join(
+                        _.map(item.node.roles.edges, function(item){
+                          return item.node.name;
+                        }), "<br/>");
+                    }
+                  }
+                  if (status==="No Role"){
+                    if (rolesLen>0) return;
+                  }
+                  _obj[fld] = roles;
+                } else if (fld==="posts") {
+                  _obj[fld] = item.node.posts.edges.length
+                }
+                else
+                  _obj[fld] = item.node[fld];
+                  //me.disableForm(false);
+              } else {
+                if (fld==="like"){
+                  var likeNode = _.find(item.node.meta.edges,{"node": {"item": "like"}});
+                  var likes = likeNode?likeNode.node.value:"0";
+                  _obj[fld] = likes;
+                  //me.disableForm(false);
+                }
+
+                if (_.indexOf(metaItemList, fld)>-1) {
+                  var _edge = _.find(item.node.meta.edges,{"node": {"item": fld}});
+                  var _val = _edge?_edge.node.value:"";
+                  _obj[fld] = _val; 
+                  //me.disableForm(false);
+                }
+              }
+            });
+
+            _dataArr.push(_obj);
+          }); 
+      } else { 
+        return {
+          isLoading: true
         }
       }
+      }
     }
-  }
+  
 )(ContentType)
 
 export default ContentType;
