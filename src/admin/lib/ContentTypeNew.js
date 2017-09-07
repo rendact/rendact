@@ -395,6 +395,8 @@ let NewContentTypeNoPostId = React.createClass({
     console.log(props)
     if (props.data !== this.props.data){
       props.initialize(props.initialValues)
+    } else if (this.props.loading && !props.loading){
+      this.disableForm(false)
     }
 
     /*if (props.urlParams.postId !== this.props.postId){
@@ -617,21 +619,21 @@ let NewContentTypeNoPostId = React.createClass({
     var reader = new FileReader();
     reader.onload = function(){
       if (!me.props.postId) me.props.dispatch(toggleImageGalleyBinded(true));
-      riques(Query.addImageGallery(reader.result, me.props.postId), 
-        function(error, response, body){
-          if (!error && !body.errors && response.statusCode === 200) {
-            var data = body.data.createFile.changedFile;
-            var imageGallery = me.props.imageGallery;
-            imageGallery.push({id: data.id, value:data.value});
-            me.props.dispatch(setImageGalleryList(imageGallery));
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null, "Image Gallery");
+      me.props.addImageGallery({
+        variables: {
+          input: {
+            type: "gallery",
+            value: reader.result,
+            postId: me.props.urlParams.postId,
+            blobFieldName: "myBlobField"
           }
-          me.disableForm(false);
-          document.getElementById("imageGallery").value=null;
         }
-      );
-      
+      }).then(data => {
+        // must to refetch post instead
+        console.log("addImageGallery mutation result", data)
+        me.disableForm(false);
+        document.getElementById("imageGallery").value=null;
+      })
     }
     reader.readAsDataURL(e.target.files[0]);
   },
@@ -646,22 +648,21 @@ let NewContentTypeNoPostId = React.createClass({
       confirmButtonText: 'Close'
     })
   },
+
   bindPostToImageGallery: function(postId){
     var me = this;
     if (this.props.imageGallery.length>0 && this.props.imageGalleryUnbinded) {
       var qry = Query.bindImageGallery(this.props.imageGallery, postId);
-      
-      riques(qry, 
-        function(error, response, body){
-          if (!error && !body.errors && response.statusCode === 200) {
-            me.props.dispatch(toggleImageGalleyBinded(false));
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null, "Bind To Image Galley");
-          }
-        }
-      );
+
+      this.props.client.mutate({
+        mutation: gql`${qry.query}`,
+        variables: qry.variables
+      }).then((data) => {
+        this.props.dispatch(toggleImageGalleyBinded(false))
+      })
     }
   },
+
   handleImageRemove: function(e){
     var me = this;
     var id = e.target.id;
@@ -669,20 +670,17 @@ let NewContentTypeNoPostId = React.createClass({
     var imageId = id.split("-")[0];
     this.disableForm(true);
 
-    var qry = Query.removeImageGallery(imageId);
-    riques(qry, 
-      function(error, response, body){
-        if (!error && !body.errors && response.statusCode === 200) {
-          var imageGallery = me.props.imageGallery;
-          _.pull(imageGallery, _.nth(imageGallery, index));
-          me.props.dispatch(setImageGalleryList(imageGallery));
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
+    this.props.removeImageGallery({
+      variables: {
+        input : {
+          id: imageId
         }
-        me.disableForm(false);
-        document.getElementById("imageGallery").value=null;
       }
-    );
+    }).then(data => {
+      console.log("remove mutation returned data ", data)
+      this.disableFrom(false)
+      document.getElementById("imageGallery").value=null
+    }).catch(error => console.log(error))
   },
   _genReactSelect: function(contentId){
     var me = this;
@@ -720,7 +718,7 @@ let NewContentTypeNoPostId = React.createClass({
     )
   },
   componentWillMount: function(){
-    this.props.dispatch(maskArea(true))
+    this.disableForm(true)
   },
  
   componentDidMount: function(){
@@ -1013,10 +1011,27 @@ let NewContentTypeNoPostId = React.createClass({
 
 }
 });
+
+const mapStateToProps = function(state){
+  console.log("global state", state)
+  let ctn = state.contentTypeNew
+  console.log("contentTypeNew states", ctn)
+
+  return {
+    isProcessing: state.maskArea.isProcessing,
+    opacity: state.maskArea.opacity,
+    imageGalleryUnbinded: ctn.imageGalleryUnbinded
+  }
+
+}
+
 NewContentTypeNoPostId = _.flow([
+  connect(mapStateToProps),
   graphql(gql`${Query.getUpdatePostQry().query}`, {name: 'updatePostQuery'}),
   graphql(gql`${Query.getCreatePostQry().query}`, {name: 'createPostQuery'}),
-  withApollo
+  graphql(gql`${Query.addImageGallery().query}`, {name: 'addImageGallery'}),
+  graphql(gql`${Query.removeImageGallery().query}`, {name: 'removeImageGallery'}),
+  withApollo,
 ])(NewContentTypeNoPostId)
 
 
@@ -1171,30 +1186,5 @@ let NewContentType = (props) => {
   return <NewContentTypeWithPostId {...props}/>
 }
 
-const selector = formValueSelector('newContentForm');
 
-const mapStateToProps = function(state){
-  var customStates = {
-    title: selector(state, 'title'),
-    content: selector(state, 'content'),
-    hours: selector(state, 'hours'),
-    minutes: selector(state, 'minutes'),
-    summary: selector(state, 'summary'),
-    //featuredImage: selector(state, 'featuredImage'),
-    titleTag: selector(state, 'titleTag'),
-    metaKeyword: selector(state, 'metaKeyword'),
-    metaDescription: selector(state, 'metaDescription'),
-    statusSelect: selector(state, 'statusSelect'),
-    visibilityTxt: selector(state, 'visibilityRadio')
-  }
-
-  if (!_.isEmpty(state.contentTypeNew)) {
-    var out = _.head(state.contentTypeNew);
-    out["initialValues"] = out.data;
-    //return _.merge(out, customStates);
-    return {...out, ...customStates}
-  } else return customStates;
-}
-
-NewContentType = connect(null)(NewContentType);
 export default NewContentType;
