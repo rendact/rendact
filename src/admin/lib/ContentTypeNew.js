@@ -90,7 +90,7 @@ let FeaturedImageWidget = (props) => (
       { props.featuredImage &&
         <div style={{position: "relative"}}>
           <Field id="featuredImage" name="featuredImage" component="img" src={props.featuredImage} style={{width: "100%"}} alt={props.title} />
-          { /* <img src={this.props.featuredImage} style={{width: "100%"}} alt={this.props.title}/> */ }
+          {/*<img src={props.featuredImage} style={{width: "100%"}} alt={props.title}/> */}
           <button onClick={props.onClick} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
         </div>
       }
@@ -333,12 +333,11 @@ let NewContentTypeNoPostId = React.createClass({
   },
   getDefaultProps: function() {
     return {
-      urlParams: "",
+      urlParams: {},
       isProcessing: false,
       opacity: 1,
       title: "",
       content: "",
-      featuredImage: "",
       status:"Published",
       immediatelyStatus:true,
       visibilityTxt:"Public",
@@ -501,6 +500,7 @@ let NewContentTypeNoPostId = React.createClass({
     var reader = new FileReader();
     reader.onload = function(){
       me.props.dispatch(setFeaturedImage(reader.result));
+      me.props.change("featuredImage", reader.result)
     };
     reader.readAsDataURL(e.target.files[0]);
   },
@@ -515,7 +515,6 @@ let NewContentTypeNoPostId = React.createClass({
     output["type"] = this.props.postType;
     output["authorId"] = localStorage.getItem('userId');
     output["slug"] = this.props.permalink;
-    output["featuredImage"] = this.props.featuredImage;
     return output;
   },
   onSubmit: function(v, status) {
@@ -1042,7 +1041,10 @@ const mapStateToProps = function(state){
     connectionValue: ctn.connectionValue,
     permalink: ctn.permalink,
     permalinkEditing: ctn.permalinkEditing,
-    permalinkInProcess: ctn.permalinkInProcess
+    permalinkInProcess: ctn.permalinkInProcess,
+    immediatelyStatus: ctn.immediatelyStatus,
+    immediately: ctn.immediately,
+    publishDate: ctn.publishData,
   }
 
 }
