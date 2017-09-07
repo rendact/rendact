@@ -65,8 +65,8 @@ let ImageGalleryWidget = (props) => (
       {
         _.map(props.imageGallery, function(item, index){
           return <div key={index} className="margin" style={{width: 150, float: "left", position: "relative"}}>
-          <a href="" onClick={props.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue"}} alt={"gallery"+index}/></a>
-          <button id={item.id+"-"+index} onClick={props.handleImageRemove} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
+          <a href="" onClick={props.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue", opacity: item.id === "customid" ? 0.5 : 1}} alt={"gallery"+index}/></a>
+          <button id={item.id+"-"+index} onClick={props.handleImageRemove} type="button" className="btn btn-info btn-sm" disabled={item.id==="customid"} style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
           </div>
         })
       }
@@ -638,23 +638,25 @@ let NewContentTypeNoPostId = React.createClass({
               value: reader.result,
               postId: me.props.urlParams.postId,
               blobFieldName: 'myBlobField',
-              id: "customid"
+              id: "customid",
+              blobMimeType: "image/jpeg",
+              blobUrl: ""
             }
           }
         },
         update: (store, data) => {
-          let postQry = store.readQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}})
-          postQry.getPost.file.edges.push({
-            node: {...data.data.createFile.changedFile},
-            __typename: 'FileEdge'
-          })
-          store.writeQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}, data: postQry})
+          if (me.props.urlParams.postId){
+            let postQry = store.readQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}})
+            postQry.getPost.file.edges.splice(0, 0,{
+              node: {...data.data.createFile.changedFile},
+              __typename: 'FileEdge'
+            })
+            store.writeQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}, data: postQry})
+          }
         }
       }).then(data => {
-        // must to refetch post instead
         console.log("addImageGallery mutation result", data)
         document.getElementById("imageGallery").value=null;
-        me.props.postRefetch()
       })
     }
     reader.readAsDataURL(e.target.files[0]);
@@ -678,7 +680,7 @@ let NewContentTypeNoPostId = React.createClass({
 
       this.props.client.mutate({
         mutation: gql`${qry.query}`,
-        variables: qry.variables
+        variables: qry.variables,
       }).then((data) => {
         this.props.dispatch(toggleImageGalleyBinded(false))
       })
@@ -698,11 +700,19 @@ let NewContentTypeNoPostId = React.createClass({
           id: imageId
         }
       },
+        update: (store, data) => {
+          if (me.props.urlParams.postId){
+            let postQry = store.readQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}})
+            postQry.getPost.file.edges = _.filter(postQry.getPost.file.edges, item => item.node.id !== imageId)
+            debugger
+            store.writeQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}, data: postQry})
+          }
+        }
     }).then(data => {
       console.log("remove mutation returned data ", data)
-      this.disableForm(true)
+      this.disableForm(false)
       document.getElementById("imageGallery").value=null
-      this.props.postRefetch()
+      //this.props.postRefetch()
     }).catch(error => console.log(error))
   },
   _genReactSelect: function(contentId){
@@ -1035,16 +1045,8 @@ const mapStateToProps = function(state){
   console.log("contentTypeNew states", ctn)
 
   return {
-    isProcessing: state.maskArea.isProcessing,
-    opacity: state.maskArea.opacity,
-    imageGalleryUnbinded: ctn.imageGalleryUnbinded,
-    connectionValue: ctn.connectionValue,
-    permalink: ctn.permalink,
-    permalinkEditing: ctn.permalinkEditing,
-    permalinkInProcess: ctn.permalinkInProcess,
-    immediatelyStatus: ctn.immediatelyStatus,
-    immediately: ctn.immediately,
-    publishDate: ctn.publishData,
+    ...ctn,
+    ...state.maskArea
   }
 
 }

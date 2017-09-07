@@ -4,14 +4,9 @@ import _ from 'lodash';
 const INITIAL_VALUES =  {
       isProcessing: false,
       opacity: 1,
-      title: "",
-      content: "",
-      featuredImage: "",
       status:"Published",
       immediatelyStatus:true,
       visibilityTxt:"Public",
-      permalinkEditing: false,
-      mode: "create",
       postCategoryList: [],
       postTagListInit: [],
       postTagList: [],
@@ -19,13 +14,6 @@ const INITIAL_VALUES =  {
       metaDescriptionLeftCharacter: 160,
       publishDate: new Date(),
       publishDateReset: new Date(),
-      permalinkInProcess: false,
-      imageGallery: [],
-      tagMap: {},
-      connectionValue: {},
-      data: {},
-      parent: "",
-      permalink: ""
     }
 
 const contentTypeNew = (state = INITIAL_VALUES, action) => {
