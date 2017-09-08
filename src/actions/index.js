@@ -388,3 +388,8 @@ export const setSearchResults = (results) => ({
   type: 'SET_SEARCH_RESULTS',
   results
 })
+
+export const setCheckAuthDone = (state) => ({
+  type: 'SET_CHECK_AUTH_DONE',
+  state
+})

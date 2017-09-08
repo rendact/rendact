@@ -286,15 +286,19 @@ const getUpdateCategoryOfPostQry = function(id, postId, categoryId){
 
 const createUpdateCategoryOfPostMtn = function(postId, currentCat, newCat){
   var variables = {};
-  var currentCatIds = _.map(currentCat, x => x[0])
+  //  var currentCatIds = _.map(currentCat, x => x[0])
+  /*
   var deleteList = [] ;
   _.forEach(currentCat, cc => {
     if (_.indexOf(newCat, cc[0]) === -1){
       deleteList.push(cc[1])
     }
   })
+  */
  
-  var addList = _.difference(newCat, currentCatIds);
+  var addList = _.difference(newCat, currentCat);
+  var deleteList = _.difference(currentCat, newCat);
+  debugger
 
   if (deleteList.length===0 && addList.length===0) return null;
   
@@ -342,13 +346,11 @@ const createUpdateCategoryOfPostMtn = function(postId, currentCat, newCat){
 
 const createUpdateTagOfPostMtn = function(postId, oldTag, currentTag, tagMap){
   var variables = {};
-  var oldTagNameArr = _.map(oldTag, function(item){return item.name});
-  var deleteList = _.difference(oldTagNameArr, currentTag);
-  var addList = _.difference(currentTag, oldTagNameArr);
+  var deleteList = _.difference(oldTag, currentTag);
+  var addList = _.difference(currentTag, oldTag);
 
   var deleteListId = _.map(deleteList, function(item){
-    var obj = _.find(oldTag, {name: item});
-    return obj.connectionId;
+    return item.connectionId;
   })
   if (deleteListId.length===0 && addList.length===0) return null;
 

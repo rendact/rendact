@@ -4,15 +4,11 @@ import _ from 'lodash';
 const INITIAL_VALUES =  {
       isProcessing: false,
       opacity: 1,
-      status:"Published",
-      immediatelyStatus:true,
+  //   status:"Published",
+  //immediatelyStatus:true,
       visibilityTxt:"Public",
-      postCategoryList: [],
-      postTagListInit: [],
-      postTagList: [],
       titleTagLeftCharacter: 65,
       metaDescriptionLeftCharacter: 160,
-      publishDate: new Date(),
       publishDateReset: new Date(),
     }
 
