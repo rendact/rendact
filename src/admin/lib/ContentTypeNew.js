@@ -65,10 +65,10 @@ let ImageGalleryWidget = (props) => (
       {
         _.map(props.imageGallery, function(item, index){
           return <div key={index} >
-            <div className="margin" style={{width: 150, float: "left", position: "relative"}}>
+            {item.value && <div className="margin" style={{width: 150, float: "left", position: "relative"}}>
           <a href="" onClick={props.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue", opacity: item.id === "customid" || item.toDelete ? 0.5 : 1}} alt={"gallery"+index}/></a>
           <button id={item.id+"-"+index} onClick={props.handleImageRemove} type="button" className="btn btn-info btn-sm" disabled={item.id==="customid" || item.toDelete} style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
-          </div>
+          </div>}
           {item.message ? <p style={{color:'red', clear: 'left', position: 'absolute'}}>{item.message.toString()}</p> : null}
           </div>
         })
@@ -671,7 +671,19 @@ let NewContentTypeNoPostId = React.createClass({
       }).then(data => {
         console.log("addImageGallery mutation result", data)
         document.getElementById("imageGallery").value=null;
-      })
+      }).catch(error => {
+        let imageGallery = _.cloneDeep(me.props.imageGallery);
+
+        imageGallery = _.map(imageGallery, item => {
+          if (item.id === "customid"){
+            item.value = ''
+            item.message = error
+          }
+          return item
+        });
+
+        me.props.dispatch(setImageGalleryList(imageGallery));
+      });
     }
     reader.readAsDataURL(e.target.files[0]);
   },
