@@ -257,7 +257,6 @@ CategoryWidget = graphql(categoryQuery,
           return {hasError: true, error: data.error}
         } else {
           let allCategoryList = _.map(data.viewer.allCategories.edges, item => item.node)
-          debugger
           return {
             isLoading: false,
             allCategoryList: allCategoryList
@@ -594,7 +593,8 @@ let NewContentTypeNoPostId = React.createClass({
             if (v.categories[key]) categToSave.push(key)
           })
 
-          let currentCat = _.keys(me.props.postCategoryList)
+          //let currentCat = _.keys(me.props.postCategoryList)
+          let currentCat = me.props.postCategoryList
 
           var catQry = Query.createUpdateCategoryOfPostMtn(postId, currentCat, categToSave);
           if (catQry) return this.props.client.mutate({
@@ -622,7 +622,7 @@ let NewContentTypeNoPostId = React.createClass({
       }
 
       let promise = _.reduce([processMetadata, processCategory, processTag], (prev, task) => {
-        return prev.then(() =>  task())
+        return prev.then(() =>  task()).catch(error => errorCallback(error, error, error))
       }, Promise.resolve())
 
       promise.then(() => {
@@ -1254,9 +1254,13 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
 
       // setting category
       initials.categories = {};
+      let postCategoryList = []
       if (data.getPost.category.edges.length>0) {
         _.forEach(data.getPost.category.edges, cat => {
-          if (cat.node.category) initials.categories[cat.node.category.id] = true
+          if (cat.node.category){
+            initials.categories[cat.node.category.id] = true
+            postCategoryList.push([cat.node.category.id, cat.node.id]);
+          }
         })
       }
 
@@ -1297,7 +1301,7 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
         postRefetch: data.refetch,
         publishDate: v.publishDate,
         immediatelyStatus: false,
-        postCategoryList: initials.categories
+        postCategoryList: postCategoryList
       }
     }
   }
