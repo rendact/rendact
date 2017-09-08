@@ -979,7 +979,7 @@ let NewContentTypeNoPostId = React.createClass({
                         </div>
 
                         <div className="form-group">
-                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>{this.props.data.visibility} </b>
+                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>{this.props.visibilityTxt} </b>
                           <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#visibilityOption"> Edit </button></p>
                           <div id="visibilityOption" className="collapse">
                             <div className="radio">
@@ -1125,7 +1125,8 @@ const mapStateToProps = function(state){
   let customProps = {
     titleTag : selector(state, 'titleTag'),
     metaDescription: selector(state, 'metaDescription'),
-    metaKeyword: selector(state, 'metaKeyword')
+    metaKeyword: selector(state, 'metaKeyword'),
+    visibilityTxt: selector(state, 'visibility')
   }
     
 
