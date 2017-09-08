@@ -392,7 +392,7 @@ let NewContentTypeNoPostId = React.createClass({
   },
 
   componentWillReceiveProps: function(props){
-    console.log(props)
+    console.log("nextProps", props)
     if (props.data !== this.props.data){
       props.initialize(props.initialValues)
       props.dispatch(setImageGalleryList(props.imageGallery))
@@ -404,26 +404,15 @@ let NewContentTypeNoPostId = React.createClass({
     } else if (this.props.loading && !props.loading){
       this.disableForm(false)
     }
-    if (!this.props.permalink && props.permalinkFromDb){
-      props.dispatch(setSlug(props.permalinkFromDb, false))
-    }
 
-  /*
-  if (props.urlParams.postId !== this.props.postId){
-      props.dispatch(setPostId(props.urlParams.postId))
-      props.destroy()
-      console.log("hello")
-    }*/
-    if(!props.postId && this.props.postId){
-      props.dispatch(resetPostEditor());
-      props.destroy()
-    }
 },
   resetForm: function(){
-    this.props.handleNav(this.props.slug, "new")
-    this.props.dispatch(setPostId(""))
-    $(".menu-item").removeClass("active");
-    $("#menu-posts-new").addClass("active");
+    this.props.handleNav(this.props.slug, "new", null, null, () => {
+      this.props.dispatch(resetPostEditor());
+      this.props.destroy()
+      $(".menu-item").removeClass("active");
+      $("#menu-posts-new").addClass("active");
+    })
   },
   getMetaFormValues: function(v){
     var out = getFormData("metaField");
@@ -1132,7 +1121,6 @@ let NewContentTypeNoPostId = React.createClass({
 let selector = formValueSelector("newContentForm")
 
 const mapStateToProps = function(state){
-  console.log(state.form)
   let ctn = state.contentTypeNew
   let customProps = {
     titleTag : selector(state, 'titleTag'),
@@ -1301,7 +1289,7 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
         postTagList : _postTagList,
         imageGallery: _imageGalleryList,
         mode: "update",
-        permalinkFromDb: v.slug,
+        permalink: v.slug,
         postRefetch: data.refetch,
         publishDate: v.publishDate,
         immediatelyStatus: false,

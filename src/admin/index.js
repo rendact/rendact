@@ -416,7 +416,7 @@ class Admin extends React.Component{
               this.redirectToPage('profile');
           }
 
-  redirectToPage(pageId, actionId, postId, tagId){
+  redirectToPage(pageId, actionId, postId, tagId, callback){
       var me = this;
       this.confirmUnsavedData(
         function() {
@@ -440,6 +440,8 @@ class Admin extends React.Component{
               //window.history.pushState("", "", '/admin/'+pageId);
               me._reactInternalInstance._context.history.push('/admin/'+pageId)
           }
+
+          if (callback) callback.call()
       });
   }
 
