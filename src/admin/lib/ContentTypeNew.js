@@ -538,6 +538,11 @@ let NewContentTypeNoPostId = React.createClass({
         return;
       }
     }
+
+    if (v.metaDescription.length > 160){
+      this._errorNotif('Meta Description is too long...!!')
+      return;
+    }
     var _objData = this._emulateDataForSaving(v);
     var qry = "", noticeTxt = "";
     let mutate;
