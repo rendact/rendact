@@ -4,19 +4,31 @@ import 'bootstrap/dist/css/bootstrap.css'
 import '../public/css/Login.css'
 //import {setLogged} from './actions'
 import {connect} from 'react-redux'
+import gql from 'graphql-tag'
+import {graphql} from 'react-apollo';
+import {setProfile} from './utils';
+import Config from './config';
+import Auth0Lock from 'auth0-lock';
 
 class Login extends React.Component{
 	constructor(props){
-        super(props);
+    super(props);
 		this.state = {
 			errorMsg:null,
 			loadingMsg:null
 		}
 
-        this.disableForm = this.disableForm.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.auth0LoginHandle = this.auth0LoginHandle.bind(this);
-        this.handleErrorMsgClose = this.handleErrorMsgClose.bind(this);
+		this.lock = new Auth0Lock(Config.auth0ClientId, Config.auth0Domain, {
+	    auth: {
+	      redirectUrl: '/login/redirect',
+	      responseType: 'token'
+	    }
+	  })
+
+    this.disableForm = this.disableForm.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.auth0LoginHandle = this.auth0LoginHandle.bind(this);
+    this.handleErrorMsgClose = this.handleErrorMsgClose.bind(this);
 	}
 
 	disableForm(state){
@@ -30,6 +42,26 @@ class Login extends React.Component{
 		require ('font-awesome/css/font-awesome.css');
 		require ('../public/css/ionicons.min.css');
 		require ('../public/css/AdminLTE.css');
+
+		var me = this;
+		var _doAuthentication = function(authResult) {
+	    localStorage.setItem('token', authResult.idToken)
+	    
+	    me.lock.getProfile(authResult.idToken, function(error, profile) {
+	      if (error) {
+	        console.log("ERROR");
+	        console.log(error);
+	        return;
+	      }
+	      localStorage.setItem('token', authResult.idToken);
+	      localStorage.setItem('auth0_profile', JSON.stringify(profile));
+	      localStorage.setItem('loginType','auth0');
+	      console.log("Auth0 authenticated");
+	      //window.location = '/admin';
+	      this.props.onlogin(true, 'admin');
+	    });
+	  }
+	  this.lock.on('authenticated', _doAuthentication);
 		
 		AdminLTEinit();
 	}
@@ -42,25 +74,37 @@ class Login extends React.Component{
     var password = document.getElementById("password").value;
 
 		var me = this;
-		var pathname = null;
+		var pathname = 'admin';
 		try {
 			pathname = this.props.location.state.from.pathname;
 		} catch(e) {}
 
-		function successFn(){
-			me.disableForm(false);
-			//this.props.dispatch(setLogged(true, pathname))
-			me.props.onlogin(true, pathname);
-		}
-		function failedFn(msg){
-			me.setState({errorMsg: msg});
-	  	me.disableForm(false);
-		}
-		this.props.authService.doLogin(username, password, successFn, failedFn);
+		this.props.doLogin({"variables": {
+        "input": {
+          "username": username,
+          "password": password
+        }
+      }
+     }).then(({data}) => {
+     	debugger;
+     	if (data) {
+        if (data.loginUser) {
+          var p = data.loginUser.user;
+          localStorage.token = data.loginUser.token;
+          localStorage.userId = p.id;
+          setProfile(p);
+        }
+        me.disableForm(false);
+				me.props.onlogin(true, pathname);
+      } else {
+        me.setState({errorMsg: "Login failed"});
+	  		me.disableForm(false);
+      }
+     });
 	}
 
 	auth0LoginHandle(){
-		this.props.authService.showPopup()
+		this.lock.show()
 	}
 
 	handleErrorMsgClose(){
@@ -127,4 +171,45 @@ class Login extends React.Component{
 }
 
 Login = connect()(Login);
+
+var loginMtn = gql`mutation LoginUserQuery ($input: LoginUserInput!) {
+  loginUser(input: $input) {
+    token
+    user {
+      id
+      username
+      fullName
+      gender
+      email
+      image
+      country
+      lastLogin
+      createdAt
+      dateOfBirth
+      meta { edges { node { id, item, value } }}
+      roles { edges { node { id, name } }}
+    }
+  }
+}`
+
+var loginAuth0Mtn = gql`mutation LoginUserWithAuth0Lock ($input: LoginUserWithAuth0LockInput!) {
+  loginUserWithAuth0Lock(input: $input) {
+    user {
+      id
+      username
+      fullName
+      gender
+      email
+      image
+      country
+      lastLogin
+      createdAt
+      dateOfBirth
+      meta { edges { node { id, item, value } }}
+      roles { edges { node { id, name } }}
+    }
+  }
+}`
+Login = graphql(loginMtn, {name: "doLogin"})(Login);
+Login = graphql(loginAuth0Mtn, {name: "doAuth0Login"})(Login);
 export default Login;

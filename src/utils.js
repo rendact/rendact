@@ -390,3 +390,48 @@ export function connectWithStore(store, WrappedComponent, ...args) {
     return <ConnectedWrappedComponent {...props} store={store} />
   }
 }
+export const setProfile = (p) => { 
+  var meta = {}
+  var metaList = AdminConfig.userMetaList;
+  var metaIdList = {};
+  _.forEach(metaList, function(item){
+    meta[item] = _.find(p.meta.edges, {"node": {"item": item}});
+    metaIdList[item] = meta[item]?meta[item].node.id:null;
+  })
+  
+  var roleList = [];
+  _.forEach(p.roles.edges, function(item){
+    roleList.push(item.node.name)
+  })
+  
+  var profile = {
+      name: p.fullName?p.fullName:p.username,
+      username: p.username,
+      email: p.email,
+      gender: p.gender,
+      image: p.image,
+      lastLogin: p.lastLogin,
+      createdAt: p.createdAt,
+      biography: meta["bio"]?meta["bio"].node.value:"",
+      dateOfBirth: p.dateOfBirth?p.dateOfBirth:"",
+      phone: meta["phone"]?meta["phone"].node.value:"",
+      country: p.country?p.country:"",
+      timezone: meta["timezone"]?meta["timezone"].node.value:"",
+      website: meta["website"]?meta["website"].node.value:"",
+      facebook: meta["facebook"]?meta["facebook"].node.value:"",
+      twitter: meta["twitter"]?meta["twitter"].node.value:"",
+      linkedin: meta["linkedin"]?meta["linkedin"].node.value:"",
+      userPrefConfig: meta["userPrefConfig"]?meta["userPrefConfig"].node.value:"",
+      roles: roleList
+  }
+  
+  localStorage.setItem("userId", p.id);
+  localStorage.setItem('profile', JSON.stringify(profile));
+  localStorage.setItem('metaIdList', JSON.stringify(metaIdList));
+
+  if (meta["userPrefConfig"]){
+    _.forEach(JSON.parse(meta["userPrefConfig"].node.value), function(value, key){
+      localStorage.setItem(key, value);
+    });
+  }
+}
