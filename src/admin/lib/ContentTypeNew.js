@@ -392,6 +392,8 @@ let NewContentTypeNoPostId = React.createClass({
     if (props.data !== this.props.data){
       props.initialize(props.initialValues)
       props.dispatch(setImageGalleryList(props.imageGallery))
+      props.dispatch(setTagList(props.postTagList, props.postTagList))
+      props.dispatch(setPostStatus(props.data.status))
     } else if (this.props.loading && !props.loading){
       this.disableForm(false)
     }
@@ -550,7 +552,7 @@ let NewContentTypeNoPostId = React.createClass({
     mutate({
       variables: {
         input: _objData
-      }
+      },
     }).then(data => {
       let postId ;
       
@@ -596,6 +598,7 @@ let NewContentTypeNoPostId = React.createClass({
       this.notifyUnsavedData(false)
       this.props.handleNav(me.props.slug, "edit", postId)
       this.bindPostToImageGallery(postId)
+      this.props.postRefetch()
     })
 
   },
@@ -921,7 +924,7 @@ let NewContentTypeNoPostId = React.createClass({
                         </div>
 
                         <div className="form-group">
-                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>{this.props.visibilityTxt} </b>
+                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>{this.props.data.visibility} </b>
                           <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#visibilityOption"> Edit </button></p>
                           <div id="visibilityOption" className="collapse">
                             <div className="radio">
@@ -1156,7 +1159,7 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
       let fields = ["id","title","type","content","order","deleteData",
       "featuredImage","slug","status","publishDate","passwordPage","parent","summary","visibility","authorId"];
       _.forEach(fields, function(item){
-        if (data.getPost[item]) initials[item] = data.getPost[item];
+        if (data.getPost) initials[item] = data.getPost[item];
       });
 
       // setting the meta values
@@ -1218,6 +1221,8 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
         mode: "update",
         permalinkFromDb: v.slug,
         postRefetch: data.refetch,
+        publishDate: v.publishDate,
+        immediatelyStatus: false
       }
     }
   }
