@@ -28,13 +28,13 @@ let ContentType = React.createClass({
     itemSelected: React.PropTypes.bool,
     fields: React.PropTypes.array,
     allPostId: React.PropTypes.array,
-    replaceStatusWithRole: React.PropTypes.bool
+    replaceStatusWithRole: React.PropTypes.bool,
   },
   getDefaultProps: function() {
     return {
       isProcessing: false,
       opacity: 1,
-      monthList: [],
+      _allPostId: [],
       statusCount: {},
       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
       replaceStatusWithRole: false
@@ -42,147 +42,6 @@ let ContentType = React.createClass({
   },
   dt: null,
 
-  loadData: function(status, callback) {
-    var me = this;
-    this.disableForm(true);
-    var metaItemList = _.map(this.props.customFields, function(item) { return item.id });
-    /*riques(this.props.listQuery("Full", this.props.postType, this.props.tagId, this.props.cateId), 
-      function(error, response, body) { 
-        var nodeName = "all"+me.props.tableName+"s";
-        var _postArr = body.data.viewer[nodeName].edges;
-        var _statusCount = me.props.statusCount;
-        if (me.props.replaceStatusWithRole){
-          var _postArr0 = _postArr;
-          _.forEach(_postArr0, function(item, index){
-            var role = "";
-            
-            if (item.node.roles.edges.length>0)
-              role = item.node.roles.edges[0].node.name
-            _postArr[index].node.status = role;
-          })
-        }
-        _.forEach(me.props.statusList, function(status){
-          var found = _.filter(_postArr, {node: {status: status}});
-          _statusCount[status] = found?found.length:0;
-        });
-        
-        if (me.props.replaceStatusWithRole){
-          _statusCount["All"] = _postArr.length;
-          me.disableForm(false);
-        } else {
-          _statusCount["All"] = _postArr.length-_statusCount["Trash"];
-          me.disableForm(false);
-        }
-        me.props.dispatch(setStatusCounter(_statusCount))
-      }
-    );*/
-    this.disableForm(true);
-    var qry = this.props.listQuery(status, this.props.postType, this.props.tagId, this.props.cateId);
-    var fields = _.map(this.props.fields, function(item){
-      return item.id
-    });
-    riques(qry, 
-      function(error, response, body) { 
-        
-        if (body.data) { 
-          var monthList = ["all"];
-          var _dataArr = [];
-          var _allPostId = [];
-          var nodeName = "all"+me.props.tableName+"s";
-          var _postArr = body.data.viewer[nodeName].edges;
-
-          _.forEach(_postArr, function(item){
-            var dt = new Date(item.node.createdAt);
-            var _obj = {postId: item.node.id};
-            _allPostId.push(item.node.id);
-            _.forEach(fields, function(fld){
-              if (_.has(item.node, fld)) { 
-                if (fld==="createdAt") {
-                  _obj[fld] = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
-                }
-                else if (fld==="comments")
-                  _obj[fld] = item.node.comments.edges.length;
-                else if (fld==="author")
-                  _obj[fld] = item.node.author?item.node.author.username:"";
-                else if (fld==="category"){
-                  var categories = [];
-                  _.forEach(item.node.category.edges, function(item){ 
-                    if (item.node.category)
-                      categories.push(item.node.category.name)
-                  });
-                  if (categories.length===0)
-                    categories = "Uncategorized";
-                  _obj[fld] = categories;
-                }
-                else if (fld==="tag"){
-                  var tags = [];
-                  _.forEach(item.node.tag.edges, function(item){ 
-                    if (item.node.tag)
-                      tags.push(item.node.tag.name)
-                  });
-                  if (tags.length===0)
-                    tags = "";
-                  _obj[fld] = tags;
-                } else if (fld==="image"){
-                  _obj[fld] = item.node.image?item.node.image:getConfig('rootUrl')+"/images/avatar-default.png"
-                } else if (fld==="roles") {
-                  var roles = "No Role";
-                  var rolesLen = item.node.roles.edges.length;
-                  if (rolesLen>0) {
-                    var isOwner = _.find(item.node.roles.edges, {node: {name: "Owner"}} );
-                    if (isOwner) roles = "Owner";
-                    else {
-                      roles = _.join(
-                        _.map(item.node.roles.edges, function(item){
-                          return item.node.name;
-                        }), "<br/>");
-                    }
-                  }
-                  if (status==="No Role"){
-                    if (rolesLen>0) return;
-                  }
-                  _obj[fld] = roles;
-                } else if (fld==="posts") {
-                  _obj[fld] = item.node.posts.edges.length
-                }
-                else
-                  _obj[fld] = item.node[fld];
-                  me.disableForm(false);
-              } else {
-                if (fld==="like"){
-                  var likeNode = _.find(item.node.meta.edges,{"node": {"item": "like"}});
-                  var likes = likeNode?likeNode.node.value:"0";
-                  _obj[fld] = likes;
-                  me.disableForm(false);
-                }
-
-                if (_.indexOf(metaItemList, fld)>-1) {
-                  var _edge = _.find(item.node.meta.edges,{"node": {"item": fld}});
-                  var _val = _edge?_edge.node.value:"";
-                  _obj[fld] = _val; 
-                  me.disableForm(false);
-                }
-              }
-            });
-            _dataArr.push(_obj);
-
-            var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
-            if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
-          });
-
-          var bEdit = hasRole(me.props.modifyRole);
-          me.table.loadData(_dataArr, bEdit);
-          me.props.dispatch(initContentList(monthList, _allPostId))
-
-          if (callback) callback.call();
-          me.disableForm(false);
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-          me.disableForm(false);
-        }
-      }
-    );
-  },
   disableForm: function(isFormDisabled){
     disableForm(isFormDisabled, this.notification);
     this.props.dispatch(maskArea(isFormDisabled));
@@ -382,17 +241,21 @@ let ContentType = React.createClass({
       return this.props.statusCount[status]
     else return 0;
   },
+  componentWillReceiveProps(props){
+    if(props._allPostId && !this.props._allPostId){
+    this.table.loadData(props._dataArr, props.bEdit);
+    this.props.dispatch(initContentList(props.monthList, props._allPostId))
+    }
+  },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
     this.table = this.refs.rendactTable;
     var datatable = this.table.datatable;
     this.refs.rendactSearchBoxPost.bindToTable(datatable);
     this.dt=datatable;
-    this.loadData("All");
+    //this.loadData("All");
   },
-  componentWillReceiveProps(props){
 
-  },
   render: function(){
     return (
       <div className="content-wrapper">
@@ -527,7 +390,6 @@ ContentType = graphql(getAllPosts,
     }),
     props: ({ownProps, data}) => {
       if (!data.loading) {
-          var me = this;
           var monthList = ["all"];
           var _dataArr = [];
           var _allPostId = [];
@@ -610,17 +472,31 @@ ContentType = graphql(getAllPosts,
                 }
               }
             });
-
+            
             _dataArr.push(_obj);
-          }); 
+
+            var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
+            if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
+          });
+
+          var bEdit = hasRole(ownProps.modifyRole);
+          //me.table.loadData(_dataArr, bEdit);
+          //me.props.dispatch(initContentList(monthList, _allPostId))
+          return {
+            bEdit: bEdit,
+            _dataArr: _dataArr,
+            _allPostId: _allPostId,
+            _postArr: _postArr,
+            fields: fields,
+            monthList: monthList,
+            metaItemList: metaItemList,
+          }
       } else { 
         return {
           isLoading: true
         }
       }
-      }
     }
-  
-)(ContentType)
+})(ContentType)
 
 export default ContentType;
