@@ -257,6 +257,7 @@ CategoryWidget = graphql(categoryQuery,
           return {hasError: true, error: data.error}
         } else {
           let allCategoryList = _.map(data.viewer.allCategories.edges, item => item.node)
+          debugger
           return {
             isLoading: false,
             allCategoryList: allCategoryList
@@ -575,40 +576,63 @@ let NewContentTypeNoPostId = React.createClass({
 
       // prosess metadata
 
-      if (metaDataList.length > 0) {
-        this.props.client.mutate({
-          mutation: gql`${Query.createUpdatePostMetaMtn(postId, metaDataList).query}`
-        }).then(data => this.props.postRefetch())
-      }
-      if (me.isWidgetActive("category")) {
-        // process categories
-        let categToSave = _.keys(v.categories) 
-        var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.props.postCategoryList, categToSave);
-        if (catQry) this.props.client.mutate({
-          mutation: gql`${catQry.query}`,
-          variables: catQry.variables
-        }).then(data => this.props.postRefetch())
+      const processMetadata = () => {
+
+        if (metaDataList.length > 0) {
+          return this.props.client.mutate({
+            mutation: gql`${Query.createUpdatePostMetaMtn(postId, metaDataList).query}`
+          })
+        }
       }
 
-      if (me.isWidgetActive("tag")) {
-        let tagMap = {}
-        _.forEach(me.props.options, function(item){
-            tagMap[item.name] = {id: item.id, name: item.name}
-        })
-        var tagQry = Query.createUpdateTagOfPostMtn(postId, me.props.postTagListInit, me.props.postTagList, tagMap);
+      const processCategory = () => {
+        if (me.isWidgetActive("category")) {
+          // process categories
+          let categToSave = []
 
-        if (tagQry)
-          this.props.client.mutate({
-            mutation: gql`${tagQry.query}`,
-            variables: tagQry.variables
-          }).then(data => this.props.postRefetch())
-      } 
+          _.forEach(_.keys(v.categories), key => {
+            if (v.categories[key]) categToSave.push(key)
+          })
 
-      this.disableForm(false)
-      this._successNotif(noticeTxt)
-      this.notifyUnsavedData(false)
-      this.props.handleNav(me.props.slug, "edit", postId)
-      this.bindPostToImageGallery(postId)
+          let currentCat = _.keys(me.props.postCategoryList)
+
+          var catQry = Query.createUpdateCategoryOfPostMtn(postId, currentCat, categToSave);
+          if (catQry) return this.props.client.mutate({
+            mutation: gql`${catQry.query}`,
+            variables: catQry.variables
+          })
+        }
+      }
+
+      const processTag = () => {
+
+        if (me.isWidgetActive("tag")) {
+          let tagMap = {}
+          _.forEach(me.props.options, function(item){
+              tagMap[item.name] = {id: item.id, name: item.name}
+          })
+          var tagQry = Query.createUpdateTagOfPostMtn(postId, me.props.postTagListInit, me.props.postTagList, tagMap);
+
+          if (tagQry)
+            return this.props.client.mutate({
+              mutation: gql`${tagQry.query}`,
+              variables: tagQry.variables
+            })
+        } 
+      }
+
+      let promise = _.reduce([processMetadata, processCategory, processTag], (prev, task) => {
+        return prev.then(() =>  task())
+      }, Promise.resolve())
+
+      promise.then(() => {
+        this.disableForm(false)
+        this._successNotif(noticeTxt)
+        this.notifyUnsavedData(false)
+        this.props.handleNav(me.props.slug, "edit", postId)
+        this.bindPostToImageGallery(postId)
+        this.props.postRefetch()
+      })
     })
 
   },
@@ -1107,6 +1131,7 @@ let NewContentTypeNoPostId = React.createClass({
 let selector = formValueSelector("newContentForm")
 
 const mapStateToProps = function(state){
+  console.log(state.form)
   let ctn = state.contentTypeNew
   let customProps = {
     titleTag : selector(state, 'titleTag'),
@@ -1271,7 +1296,8 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
         permalinkFromDb: v.slug,
         postRefetch: data.refetch,
         publishDate: v.publishDate,
-        immediatelyStatus: false
+        immediatelyStatus: false,
+        postCategoryList: initials.categories
       }
     }
   }

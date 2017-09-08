@@ -7,7 +7,6 @@ const INITIAL_VALUES =  {
   //   status:"Published",
   //immediatelyStatus:true,
       visibilityTxt:"Public",
-      postCategoryList: [],
       titleTagLeftCharacter: 65,
       metaDescriptionLeftCharacter: 160,
       publishDateReset: new Date(),
