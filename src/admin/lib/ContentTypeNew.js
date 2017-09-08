@@ -23,30 +23,6 @@ import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {graphql, withApollo} from 'react-apollo';
 import gql from 'graphql-tag';
 
-const renderField = ({
-  input,
-  label,
-  type,
-  meta: { touched, error, warning },
-  className
-}) =>
-  <div>
-    <label>
-      {label}
-    </label>
-    <div>
-      <input {...input} placeholder={label} className={className} type={type} />
-      {touched &&
-        ((error &&
-          <span>
-            {error}
-          </span>) ||
-          (warning &&
-            <span>
-              {warning}
-            </span>))}
-    </div>
-  </div>
 
 class CkeditorField extends React.Component{
 
@@ -422,6 +398,8 @@ let NewContentTypeNoPostId = React.createClass({
       props.dispatch(setImageGalleryList(props.imageGallery))
       props.dispatch(setTagList(props.postTagList, props.postTagList))
       props.dispatch(setPostStatus(props.data.status))
+      props.dispatch(updateTitleTagLeftCharacter(65-(props.titleTag.length)));
+      props.dispatch(updateMetaDescriptionLeftCharacter(160-(props.metaDescription.length)));
     } else if (this.props.loading && !props.loading){
       this.disableForm(false)
     }
@@ -500,12 +478,12 @@ let NewContentTypeNoPostId = React.createClass({
   },
 
   handleTitleTagChange: function(event){
-    var titleTag = this.props.titleTag;
+    var titleTag = event.currentTarget.value;
     this.props.dispatch(updateTitleTagLeftCharacter(65-(titleTag.length)));
     this.notifyUnsavedData(true);
   },
   handleMetaDescriptionChange: function(event){
-    var metaDescription = this.props.metaDescription;
+    var metaDescription = event.currentTarget.value;
     this.props.dispatch(updateMetaDescriptionLeftCharacter(160-(metaDescription.length)));
     this.notifyUnsavedData(true);
   },
@@ -924,16 +902,15 @@ let NewContentTypeNoPostId = React.createClass({
                     <div className="col-md-8">
                       <Field name="titleTag" component="input" type="text" className="form-control metaField" 
                         style={{width: '100%'}} placeholder={this.props.title} onChange={this.handleTitleTagChange} />
-                        <span className="help-block">Up to 65 characters recommended<br/>
+                      <span className="help-block" style={{color: this.props.titleTagLeftCharacter < 0? '#f74747' : ''}}>Up to 65 characters recommended<br/>
                         {this.props.titleTagLeftCharacter} characters left</span>                     
                     </div>
                   </div>
                   <div className="form-group">
                     <div className="col-md-4"><p>Meta Description</p></div>
                     <div className="col-md-8">
-                      <Field name="metaDescription" component={renderField} type="textarea" className="form-control metaField" validate={[(value) => value && value.length > 160 ? `max character is 160, got ${value.length}`: undefined]}
-                        rows='2' style={{width:'100%'}} placeholder={this.props.summary} onChange={this.handleMetaDescriptionChange} />
-                      <span className="help-block">160 characters maximum<br/>
+                      <Field name="metaDescription" component="textarea" type="textarea" className="form-control metaField"                         rows='2' style={{width:'100%'}} placeholder={this.props.summary} onChange={this.handleMetaDescriptionChange} />
+                      <span className="help-block" style={{color: this.props.metaDescriptionLeftCharacter < 0? '#f74747' : ''}}>160 characters maximum<br/>
                       {this.props.metaDescriptionLeftCharacter} characters left</span>
                     </div>
                   </div>
