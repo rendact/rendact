@@ -64,9 +64,12 @@ let ImageGalleryWidget = (props) => (
       <input type="file" id="imageGallery" name="imageGallery" onChange={props.imageGalleryChange}/>
       {
         _.map(props.imageGallery, function(item, index){
-          return <div key={index} className="margin" style={{width: 150, float: "left", position: "relative"}}>
-          <a href="" onClick={props.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue", opacity: item.id === "customid" ? 0.5 : 1}} alt={"gallery"+index}/></a>
-          <button id={item.id+"-"+index} onClick={props.handleImageRemove} type="button" className="btn btn-info btn-sm" disabled={item.id==="customid"} style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
+          return <div key={index} >
+            <div className="margin" style={{width: 150, float: "left", position: "relative"}}>
+          <a href="" onClick={props.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue", opacity: item.id === "customid" || item.toDelete ? 0.5 : 1}} alt={"gallery"+index}/></a>
+          <button id={item.id+"-"+index} onClick={props.handleImageRemove} type="button" className="btn btn-info btn-sm" disabled={item.id==="customid" || item.toDelete} style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
+          </div>
+          {item.message ? <p style={{color:'red', clear: 'left', position: 'absolute'}}>{item.message.toString()}</p> : null}
           </div>
         })
       }
@@ -729,7 +732,16 @@ let NewContentTypeNoPostId = React.createClass({
         
           let imageGallery = _.cloneDeep(me.props.imageGallery);
           if (imageGallery.length){
-            imageGallery = _.filter(imageGallery, item => item.id !== imageId)
+            if (!image.value){
+              imageGallery = _.map(imageGallery, item => {
+                if (item.id === image.id) {
+                  item.toDelete = true
+                }
+                return item
+              })
+            } else {
+              imageGallery = _.filter(imageGallery, item => item.id !== imageId)
+            }
           }
           me.props.dispatch(setImageGalleryList(imageGallery));
         }
@@ -737,7 +749,18 @@ let NewContentTypeNoPostId = React.createClass({
       console.log("remove mutation returned data ", data)
       document.getElementById("imageGallery").value=null
       //this.props.postRefetch()
-    }).catch(error => console.log(error))
+    }).catch(error => {
+      console.log(error)
+      let imageGallery = _.cloneDeep(me.props.imageGallery);
+      imageGallery = _.map(imageGallery, item => {
+        if (item.id === imageId) {
+          item.toDelete = false
+          item.message = error
+        }
+        return item
+      })
+      me.props.dispatch(setImageGalleryList(imageGallery));
+    })
   },
   _genReactSelect: function(contentId){
     var me = this;
