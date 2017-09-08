@@ -23,6 +23,7 @@ import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {graphql, withApollo} from 'react-apollo';
 import gql from 'graphql-tag';
 
+
 class CkeditorField extends React.Component{
 
   componentWillReceiveProps(props){
@@ -64,9 +65,12 @@ let ImageGalleryWidget = (props) => (
       <input type="file" id="imageGallery" name="imageGallery" onChange={props.imageGalleryChange}/>
       {
         _.map(props.imageGallery, function(item, index){
-          return <div key={index} className="margin" style={{width: 150, float: "left", position: "relative"}}>
-          <a href="" onClick={props.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue", opacity: item.id === "customid" ? 0.5 : 1}} alt={"gallery"+index}/></a>
-          <button id={item.id+"-"+index} onClick={props.handleImageRemove} type="button" className="btn btn-info btn-sm" disabled={item.id==="customid"} style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
+          return <div key={index} >
+            {item.value && <div className="margin" style={{width: 150, float: "left", position: "relative"}}>
+          <a href="" onClick={props.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue", opacity: item.id === "customid" || item.toDelete ? 0.5 : 1}} alt={"gallery"+index}/></a>
+          <button id={item.id+"-"+index} onClick={props.handleImageRemove} type="button" className="btn btn-info btn-sm" disabled={item.id==="customid" || item.toDelete} style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
+          </div>}
+          {item.message ? <p style={{color:'red', clear: 'left', position: 'absolute'}}>{item.message.toString()}</p> : null}
           </div>
         })
       }
@@ -253,6 +257,7 @@ CategoryWidget = graphql(categoryQuery,
           return {hasError: true, error: data.error}
         } else {
           let allCategoryList = _.map(data.viewer.allCategories.edges, item => item.node)
+          debugger
           return {
             isLoading: false,
             allCategoryList: allCategoryList
@@ -392,6 +397,10 @@ let NewContentTypeNoPostId = React.createClass({
     if (props.data !== this.props.data){
       props.initialize(props.initialValues)
       props.dispatch(setImageGalleryList(props.imageGallery))
+      props.dispatch(setTagList(props.postTagList, props.postTagList))
+      props.dispatch(setPostStatus(props.data.status))
+      props.dispatch(updateTitleTagLeftCharacter(65-(props.titleTag.length)));
+      props.dispatch(updateMetaDescriptionLeftCharacter(160-(props.metaDescription.length)));
     } else if (this.props.loading && !props.loading){
       this.disableForm(false)
     }
@@ -470,12 +479,12 @@ let NewContentTypeNoPostId = React.createClass({
   },
 
   handleTitleTagChange: function(event){
-    var titleTag = this.props.titleTag;
+    var titleTag = event.currentTarget.value;
     this.props.dispatch(updateTitleTagLeftCharacter(65-(titleTag.length)));
     this.notifyUnsavedData(true);
   },
   handleMetaDescriptionChange: function(event){
-    var metaDescription = this.props.metaDescription;
+    var metaDescription = event.currentTarget.value;
     this.props.dispatch(updateMetaDescriptionLeftCharacter(160-(metaDescription.length)));
     this.notifyUnsavedData(true);
   },
@@ -530,6 +539,11 @@ let NewContentTypeNoPostId = React.createClass({
         return;
       }
     }
+
+    if (v.metaDescription.length > 160){
+      this._errorNotif('Meta Description is too long...!!')
+      return;
+    }
     var _objData = this._emulateDataForSaving(v);
     var qry = "", noticeTxt = "";
     let mutate;
@@ -550,7 +564,7 @@ let NewContentTypeNoPostId = React.createClass({
     mutate({
       variables: {
         input: _objData
-      }
+      },
     }).then(data => {
       let postId ;
       
@@ -562,40 +576,63 @@ let NewContentTypeNoPostId = React.createClass({
 
       // prosess metadata
 
-      if (metaDataList.length > 0) {
-        this.props.client.mutate({
-          mutation: gql`${Query.createUpdatePostMetaMtn(postId, metaDataList).query}`
-        }).then(data => console.log(data))
-      }
-      if (me.isWidgetActive("category")) {
-        // process categories
-        let categToSave = _.keys(v.categories) 
-        var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.props.postCategoryList, categToSave);
-        if (catQry) this.props.client.mutate({
-          mutation: gql`${catQry.query}`,
-          variables: catQry.variables
-        }).then(data => console.log(data))
+      const processMetadata = () => {
+
+        if (metaDataList.length > 0) {
+          return this.props.client.mutate({
+            mutation: gql`${Query.createUpdatePostMetaMtn(postId, metaDataList).query}`
+          })
+        }
       }
 
-      if (me.isWidgetActive("tag")) {
-        let tagMap = {}
-        _.forEach(me.props.options, function(item){
-            tagMap[item.name] = {id: item.id, name: item.name}
-        })
-        var tagQry = Query.createUpdateTagOfPostMtn(postId, me.props.postTagListInit, me.props.postTagList, tagMap);
+      const processCategory = () => {
+        if (me.isWidgetActive("category")) {
+          // process categories
+          let categToSave = []
 
-        if (tagQry)
-          this.props.client.mutate({
-            mutation: gql`${tagQry.query}`,
-            variables: tagQry.variables
-          }).then(data => console.log("tags", data))
-      } 
+          _.forEach(_.keys(v.categories), key => {
+            if (v.categories[key]) categToSave.push(key)
+          })
 
-      this.disableForm(false)
-      this._successNotif(noticeTxt)
-      this.notifyUnsavedData(false)
-      this.props.handleNav(me.props.slug, "edit", postId)
-      this.bindPostToImageGallery(postId)
+          let currentCat = _.keys(me.props.postCategoryList)
+
+          var catQry = Query.createUpdateCategoryOfPostMtn(postId, currentCat, categToSave);
+          if (catQry) return this.props.client.mutate({
+            mutation: gql`${catQry.query}`,
+            variables: catQry.variables
+          })
+        }
+      }
+
+      const processTag = () => {
+
+        if (me.isWidgetActive("tag")) {
+          let tagMap = {}
+          _.forEach(me.props.options, function(item){
+              tagMap[item.name] = {id: item.id, name: item.name}
+          })
+          var tagQry = Query.createUpdateTagOfPostMtn(postId, me.props.postTagListInit, me.props.postTagList, tagMap);
+
+          if (tagQry)
+            return this.props.client.mutate({
+              mutation: gql`${tagQry.query}`,
+              variables: tagQry.variables
+            })
+        } 
+      }
+
+      let promise = _.reduce([processMetadata, processCategory, processTag], (prev, task) => {
+        return prev.then(() =>  task())
+      }, Promise.resolve())
+
+      promise.then(() => {
+        this.disableForm(false)
+        this._successNotif(noticeTxt)
+        this.notifyUnsavedData(false)
+        this.props.handleNav(me.props.slug, "edit", postId)
+        this.bindPostToImageGallery(postId)
+        this.props.postRefetch()
+      })
     })
 
   },
@@ -665,7 +702,19 @@ let NewContentTypeNoPostId = React.createClass({
       }).then(data => {
         console.log("addImageGallery mutation result", data)
         document.getElementById("imageGallery").value=null;
-      })
+      }).catch(error => {
+        let imageGallery = _.cloneDeep(me.props.imageGallery);
+
+        imageGallery = _.map(imageGallery, item => {
+          if (item.id === "customid"){
+            item.value = ''
+            item.message = error
+          }
+          return item
+        });
+
+        me.props.dispatch(setImageGalleryList(imageGallery));
+      });
     }
     reader.readAsDataURL(e.target.files[0]);
   },
@@ -726,7 +775,16 @@ let NewContentTypeNoPostId = React.createClass({
         
           let imageGallery = _.cloneDeep(me.props.imageGallery);
           if (imageGallery.length){
-            imageGallery = _.filter(imageGallery, item => item.id !== imageId)
+            if (!image.value){
+              imageGallery = _.map(imageGallery, item => {
+                if (item.id === image.id) {
+                  item.toDelete = true
+                }
+                return item
+              })
+            } else {
+              imageGallery = _.filter(imageGallery, item => item.id !== imageId)
+            }
           }
           me.props.dispatch(setImageGalleryList(imageGallery));
         }
@@ -734,7 +792,18 @@ let NewContentTypeNoPostId = React.createClass({
       console.log("remove mutation returned data ", data)
       document.getElementById("imageGallery").value=null
       //this.props.postRefetch()
-    }).catch(error => console.log(error))
+    }).catch(error => {
+      console.log(error)
+      let imageGallery = _.cloneDeep(me.props.imageGallery);
+      imageGallery = _.map(imageGallery, item => {
+        if (item.id === imageId) {
+          item.toDelete = false
+          item.message = error
+        }
+        return item
+      })
+      me.props.dispatch(setImageGalleryList(imageGallery));
+    })
   },
   _genReactSelect: function(contentId){
     var me = this;
@@ -862,16 +931,15 @@ let NewContentTypeNoPostId = React.createClass({
                     <div className="col-md-8">
                       <Field name="titleTag" component="input" type="text" className="form-control metaField" 
                         style={{width: '100%'}} placeholder={this.props.title} onChange={this.handleTitleTagChange} />
-                        <span className="help-block">Up to 65 characters recommended<br/>
+                      <span className="help-block" style={{color: this.props.titleTagLeftCharacter < 0? '#f74747' : ''}}>Up to 65 characters recommended<br/>
                         {this.props.titleTagLeftCharacter} characters left</span>                     
                     </div>
                   </div>
                   <div className="form-group">
                     <div className="col-md-4"><p>Meta Description</p></div>
                     <div className="col-md-8">
-                      <Field name="metaDescription" component="input" type="textarea" className="form-control metaField" 
-                        rows='2' style={{width:'100%'}} placeholder={this.props.summary} onChange={this.handleMetaDescriptionChange} />
-                      <span className="help-block">160 characters maximum<br/>
+                      <Field name="metaDescription" component="textarea" type="textarea" className="form-control metaField"                         rows='2' style={{width:'100%'}} placeholder={this.props.summary} onChange={this.handleMetaDescriptionChange} />
+                      <span className="help-block" style={{color: this.props.metaDescriptionLeftCharacter < 0? '#f74747' : ''}}>160 characters maximum<br/>
                       {this.props.metaDescriptionLeftCharacter} characters left</span>
                     </div>
                   </div>
@@ -921,7 +989,7 @@ let NewContentTypeNoPostId = React.createClass({
                         </div>
 
                         <div className="form-group">
-                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>{this.props.visibilityTxt} </b>
+                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>{this.props.data.visibility} </b>
                           <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#visibilityOption"> Edit </button></p>
                           <div id="visibilityOption" className="collapse">
                             <div className="radio">
@@ -1060,14 +1128,23 @@ let NewContentTypeNoPostId = React.createClass({
 }
 });
 
+let selector = formValueSelector("newContentForm")
+
 const mapStateToProps = function(state){
-  console.log("global state", state)
+  console.log(state.form)
   let ctn = state.contentTypeNew
-  console.log("contentTypeNew states", ctn)
+  let customProps = {
+    titleTag : selector(state, 'titleTag'),
+    metaDescription: selector(state, 'metaDescription'),
+    metaKeyword: selector(state, 'metaKeyword')
+  }
+    
+
 
   return {
     ...ctn,
-    ...state.maskArea
+    ...state.maskArea,
+    ...customProps
   }
 
 }
@@ -1156,7 +1233,7 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
       let fields = ["id","title","type","content","order","deleteData",
       "featuredImage","slug","status","publishDate","passwordPage","parent","summary","visibility","authorId"];
       _.forEach(fields, function(item){
-        if (data.getPost[item]) initials[item] = data.getPost[item];
+        if (data.getPost) initials[item] = data.getPost[item];
       });
 
       // setting the meta values
@@ -1218,6 +1295,9 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
         mode: "update",
         permalinkFromDb: v.slug,
         postRefetch: data.refetch,
+        publishDate: v.publishDate,
+        immediatelyStatus: false,
+        postCategoryList: initials.categories
       }
     }
   }
