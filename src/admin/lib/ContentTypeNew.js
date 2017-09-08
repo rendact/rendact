@@ -23,6 +23,31 @@ import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {graphql, withApollo} from 'react-apollo';
 import gql from 'graphql-tag';
 
+const renderField = ({
+  input,
+  label,
+  type,
+  meta: { touched, error, warning },
+  className
+}) =>
+  <div>
+    <label>
+      {label}
+    </label>
+    <div>
+      <input {...input} placeholder={label} className={className} type={type} />
+      {touched &&
+        ((error &&
+          <span>
+            {error}
+          </span>) ||
+          (warning &&
+            <span>
+              {warning}
+            </span>))}
+    </div>
+  </div>
+
 class CkeditorField extends React.Component{
 
   componentWillReceiveProps(props){
@@ -907,7 +932,7 @@ let NewContentTypeNoPostId = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4"><p>Meta Description</p></div>
                     <div className="col-md-8">
-                      <Field name="metaDescription" component="input" type="textarea" className="form-control metaField" 
+                      <Field name="metaDescription" component={renderField} type="textarea" className="form-control metaField" validate={[(value) => value && value.length > 160 ? `max character is 160, got ${value.length}`: undefined]}
                         rows='2' style={{width:'100%'}} placeholder={this.props.summary} onChange={this.handleMetaDescriptionChange} />
                       <span className="help-block">160 characters maximum<br/>
                       {this.props.metaDescriptionLeftCharacter} characters left</span>
@@ -1098,14 +1123,22 @@ let NewContentTypeNoPostId = React.createClass({
 }
 });
 
+let selector = formValueSelector("newContentForm")
+
 const mapStateToProps = function(state){
-  console.log("global state", state)
   let ctn = state.contentTypeNew
-  console.log("contentTypeNew states", ctn)
+  let customProps = {
+    titleTag : selector(state, 'titleTag'),
+    metaDescription: selector(state, 'metaDescription'),
+    metaKeyword: selector(state, 'metaKeyword')
+  }
+    
+
 
   return {
     ...ctn,
-    ...state.maskArea
+    ...state.maskArea,
+    ...customProps
   }
 
 }
