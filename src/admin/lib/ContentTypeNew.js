@@ -595,7 +595,7 @@ let NewContentTypeNoPostId = React.createClass({
       if (metaDataList.length > 0) {
         this.props.client.mutate({
           mutation: gql`${Query.createUpdatePostMetaMtn(postId, metaDataList).query}`
-        }).then(data => console.log(data))
+        }).then(data => this.props.postRefetch())
       }
       if (me.isWidgetActive("category")) {
         // process categories
@@ -604,7 +604,7 @@ let NewContentTypeNoPostId = React.createClass({
         if (catQry) this.props.client.mutate({
           mutation: gql`${catQry.query}`,
           variables: catQry.variables
-        }).then(data => console.log(data))
+        }).then(data => this.props.postRefetch())
       }
 
       if (me.isWidgetActive("tag")) {
@@ -618,7 +618,7 @@ let NewContentTypeNoPostId = React.createClass({
           this.props.client.mutate({
             mutation: gql`${tagQry.query}`,
             variables: tagQry.variables
-          }).then(data => console.log("tags", data))
+          }).then(data => this.props.postRefetch())
       } 
 
       this.disableForm(false)
@@ -626,7 +626,6 @@ let NewContentTypeNoPostId = React.createClass({
       this.notifyUnsavedData(false)
       this.props.handleNav(me.props.slug, "edit", postId)
       this.bindPostToImageGallery(postId)
-      this.props.postRefetch()
     })
 
   },
