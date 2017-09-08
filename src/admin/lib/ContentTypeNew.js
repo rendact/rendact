@@ -398,8 +398,9 @@ let NewContentTypeNoPostId = React.createClass({
       props.dispatch(setImageGalleryList(props.imageGallery))
       props.dispatch(setTagList(props.postTagList, props.postTagList))
       props.dispatch(setPostStatus(props.data.status))
-      props.dispatch(updateTitleTagLeftCharacter(65-(props.titleTag.length)));
-      props.dispatch(updateMetaDescriptionLeftCharacter(160-(props.metaDescription.length)));
+      
+      props.titleTag && props.dispatch(updateTitleTagLeftCharacter(65-(props.titleTag.length)));
+      props.metaDescription && props.dispatch(updateMetaDescriptionLeftCharacter(160-(props.metaDescription.length)));
     } else if (this.props.loading && !props.loading){
       this.disableForm(false)
     }
@@ -539,7 +540,7 @@ let NewContentTypeNoPostId = React.createClass({
       }
     }
 
-    if (v.metaDescription.length > 160){
+    if (v.metaDescription && v.metaDescription.length > 160){
       this._errorNotif('Meta Description is too long...!!')
       return;
     }
@@ -929,7 +930,7 @@ let NewContentTypeNoPostId = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4"><p>Title Tag</p></div>
                     <div className="col-md-8">
-                      <Field name="titleTag" component="input" type="text" className="form-control metaField" 
+                      <Field id={this.props.metaIds? this.props.metaIds.titleTag: null} name="titleTag" component="input" type="text" className="form-control metaField" 
                         style={{width: '100%'}} placeholder={this.props.title} onChange={this.handleTitleTagChange} />
                       <span className="help-block" style={{color: this.props.titleTagLeftCharacter < 0? '#f74747' : ''}}>Up to 65 characters recommended<br/>
                         {this.props.titleTagLeftCharacter} characters left</span>                     
@@ -938,7 +939,7 @@ let NewContentTypeNoPostId = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4"><p>Meta Description</p></div>
                     <div className="col-md-8">
-                      <Field name="metaDescription" component="textarea" type="textarea" className="form-control metaField"                         rows='2' style={{width:'100%'}} placeholder={this.props.summary} onChange={this.handleMetaDescriptionChange} />
+                      <Field id={this.props.metaIds ? this.props.metaIds.metaDescription: null} name="metaDescription" component="textarea" type="textarea" className="form-control metaField"                         rows='2' style={{width:'100%'}} placeholder={this.props.summary} onChange={this.handleMetaDescriptionChange} />
                       <span className="help-block" style={{color: this.props.metaDescriptionLeftCharacter < 0? '#f74747' : ''}}>160 characters maximum<br/>
                       {this.props.metaDescriptionLeftCharacter} characters left</span>
                     </div>
@@ -947,7 +948,7 @@ let NewContentTypeNoPostId = React.createClass({
                     <div className="col-md-4"><p>Meta Keywords</p></div>
                     <div className="col-md-8">
                       <div className="form-group">
-                        <Field name="metaKeyword" component="input" type="text" className="form-control metaField" style={{width: '100%'}} />
+                        <Field id={this.props.metaIds ? this.props.metaIds.metaKeyword: null} name="metaKeyword" component="input" type="text" className="form-control metaField" style={{width: '100%'}} />
                         <span className="help-block"><b>News keywords </b><a>(?)</a></span>
                       </div>
                     </div>
@@ -1238,8 +1239,11 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
 
       // setting the meta values
 
+      let metaIds = {}
+
       if (data.getPost.meta.edges.length) {
         _.forEach(data.getPost.meta.edges, meta => {
+          metaIds[meta.node.item] = meta.node.id
           if(meta.node.value){
             initials[meta.node.item] = meta.node.value
           }
@@ -1301,7 +1305,8 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
         postRefetch: data.refetch,
         publishDate: v.publishDate,
         immediatelyStatus: false,
-        postCategoryList: postCategoryList
+        postCategoryList: postCategoryList,
+        metaIds: metaIds
       }
     }
   }
