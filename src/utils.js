@@ -1,9 +1,11 @@
+import React from 'react';
 import request from 'request';
 import Config from './config';
 import AdminConfig from './admin/AdminConfig';
 import Query from './admin/query';
 import _ from 'lodash';
 import { default as swal } from 'sweetalert2';
+import {connect} from 'react-redux'
 
 export const swalert = function(type, title, body, callback, rgba){
   var background = '#fff';
@@ -379,5 +381,12 @@ export const validateUrl = (value) => {
     return value.replace(/(https?):?\/{0,2}(\w*)/, '$1://$2')
   } else {
     return "http://" + value
+  }
+}
+
+export function connectWithStore(store, WrappedComponent, ...args) {
+  var ConnectedWrappedComponent = connect(...args)(WrappedComponent)
+  return function (props) {
+    return <ConnectedWrappedComponent {...props} store={store} />
   }
 }

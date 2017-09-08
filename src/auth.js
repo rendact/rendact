@@ -7,7 +7,11 @@ import AdminConfig from './admin/AdminConfig';
 import Query from './admin/query';
 import {riques, getConfig} from './utils';
 import _ from 'lodash';
-import {setLogged} from './actions';
+import {setLogged, setCheckAuthDone} from './actions';
+import gql from 'graphql-tag'
+import {graphql} from 'react-apollo';
+import Loading from './admin/Loading';
+import {connect} from 'react-redux'
 
 window.browserHistory = browserHistory;
 window.Redirect = Redirect;
@@ -200,15 +204,145 @@ export function AuthService(){
   //this.checkAuth();
 }
 
-export const MatchWhenAuthorized = ({ component: Component, logged: Logged, authService: AuthService, onlogin: OnLogin, ...rest }) => (
-  <Match {...rest} render={props => (
-    Logged ? (
-      <Component AuthService={AuthService} onlogin={setLogged} logged={Logged} {...props}/>
-    ) : (
-      <Redirect to={{
-        pathname: '/login',
-        state: { from: props.location }
-      }}/>
-    )
-  )}/>
-)
+let MatchWhenAuthorized = React.createClass({
+  propTypes: {
+    checkAuthDone: React.PropTypes.bool,
+    logged: React.PropTypes.bool.isRequired,
+    pathname: React.PropTypes.string.isRequired,
+  },
+  getDefaultProps: function() {
+    return {
+      checkAuthDone: false, 
+      logged: false,
+      pathname: 'admin'
+    }
+  },
+  _setProfile(p) { 
+    var meta = {}
+    var metaList = AdminConfig.userMetaList;
+    var metaIdList = {};
+    _.forEach(metaList, function(item){
+      meta[item] = _.find(p.meta.edges, {"node": {"item": item}});
+      metaIdList[item] = meta[item]?meta[item].node.id:null;
+    })
+    
+    var roleList = [];
+    _.forEach(p.roles.edges, function(item){
+      roleList.push(item.node.name)
+    })
+    
+    var profile = {
+        name: p.fullName?p.fullName:p.username,
+        username: p.username,
+        email: p.email,
+        gender: p.gender,
+        image: p.image,
+        lastLogin: p.lastLogin,
+        createdAt: p.createdAt,
+        biography: meta["bio"]?meta["bio"].node.value:"",
+        dateOfBirth: p.dateOfBirth?p.dateOfBirth:"",
+        phone: meta["phone"]?meta["phone"].node.value:"",
+        country: p.country?p.country:"",
+        timezone: meta["timezone"]?meta["timezone"].node.value:"",
+        website: meta["website"]?meta["website"].node.value:"",
+        facebook: meta["facebook"]?meta["facebook"].node.value:"",
+        twitter: meta["twitter"]?meta["twitter"].node.value:"",
+        linkedin: meta["linkedin"]?meta["linkedin"].node.value:"",
+        userPrefConfig: meta["userPrefConfig"]?meta["userPrefConfig"].node.value:"",
+        roles: roleList
+    }
+    
+    localStorage.setItem("userId", p.id);
+    localStorage.setItem('profile', JSON.stringify(profile));
+    localStorage.setItem('metaIdList', JSON.stringify(metaIdList));
+
+    if (meta["userPrefConfig"]){
+      _.forEach(JSON.parse(meta["userPrefConfig"].node.value), function(value, key){
+        localStorage.setItem(key, value);
+      });
+    }
+  },
+  componentWillReceiveProps(nextProps){
+    if (nextProps.profileData){
+      this.props.dispatch(setCheckAuthDone(true))
+      this._setProfile(nextProps.profileData)
+    }
+  },
+  render(){
+    let Component = this.props.component
+    console.log(this.props.checkAuthDone)
+    if (this.props.checkAuthDone) {
+      return <Match {...this.props} render={props => (
+        this.props.logged ? (
+          <Component AuthService={this.props.authService} onlogin={setLogged} logged={this.props.logged} {...this.props}/>
+        ) : (
+          <Redirect to={{
+            pathname: '/login',
+            state: { from: this.props.location }
+          }}/>
+        )
+      )}/>
+    } else {
+      return <Match {...this.props} render={props => (<Loading/>)} />
+    }
+  }
+});
+
+var getUserQry = gql`query GetUser($id: ID!) {
+  getUser(id: $id) {
+    id
+    username
+    fullName
+    gender
+    image
+    email
+    lastLogin
+    createdAt
+    country
+    dateOfBirth
+    meta {
+      edges {
+        node {
+          id
+          item
+          value
+        }
+      }
+    }
+    roles {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+    }
+  }
+}`
+const mapStateToProps = function(state){
+  if (!_.isEmpty(state.main)) {
+    var out = _.head(state.main);
+    return out;
+  } else return {}
+}
+
+MatchWhenAuthorized = connect(mapStateToProps)(MatchWhenAuthorized);
+
+MatchWhenAuthorized = graphql(getUserQry, {
+  options: { variables: { id: localStorage.userId } },
+  props: ({ownProps, data}) => {
+    if (data.getUser) {
+      return {
+        logged: true,
+        profileData: data.getUser,
+        isLoading: data.loading
+      }
+    } else { 
+      return {
+        logged: false
+      }
+    }
+  }
+})(MatchWhenAuthorized);
+
+export { MatchWhenAuthorized };
