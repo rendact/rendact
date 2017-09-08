@@ -1,4 +1,9 @@
-const maskArea = (state = false, action) => {
+const initial = {
+  isProcessing: false,
+  opacity: 1
+}
+
+const maskArea = (state = initial, action) => {
   switch(action.type){
     case 'MASK_AREA':
       return {

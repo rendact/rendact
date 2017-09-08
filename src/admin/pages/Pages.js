@@ -15,6 +15,7 @@ let Pages = React.createClass({
 			modifyRole="modify-page"
 			statusList={["All", "Published", "Draft", "Reviewing", "Trash"]}
 			handleNav={this.props.handleNav}
+			postType="page"
 			/>
   }
 });

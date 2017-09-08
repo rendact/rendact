@@ -29,6 +29,7 @@ class CkeditorField extends React.Component{
     if (props.content !== this.props.content){
       if(window.CKEDITOR) window.CKEDITOR.instances['content'].setData(props.content);
     }
+
   }
 
   componentDidMount(){
@@ -64,8 +65,8 @@ let ImageGalleryWidget = (props) => (
       {
         _.map(props.imageGallery, function(item, index){
           return <div key={index} className="margin" style={{width: 150, float: "left", position: "relative"}}>
-          <a href="" onClick={props.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue"}} alt={"gallery"+index}/></a>
-          <button id={item.id+"-"+index} onClick={props.handleImageRemove} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
+          <a href="" onClick={props.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue", opacity: item.id === "customid" ? 0.5 : 1}} alt={"gallery"+index}/></a>
+          <button id={item.id+"-"+index} onClick={props.handleImageRemove} type="button" className="btn btn-info btn-sm" disabled={item.id==="customid"} style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
           </div>
         })
       }
@@ -89,7 +90,7 @@ let FeaturedImageWidget = (props) => (
       { props.featuredImage &&
         <div style={{position: "relative"}}>
           <Field id="featuredImage" name="featuredImage" component="img" src={props.featuredImage} style={{width: "100%"}} alt={props.title} />
-          { /* <img src={this.props.featuredImage} style={{width: "100%"}} alt={this.props.title}/> */ }
+          {/*<img src={props.featuredImage} style={{width: "100%"}} alt={props.title}/> */}
           <button onClick={props.onClick} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
         </div>
       }
@@ -332,12 +333,11 @@ let NewContentTypeNoPostId = React.createClass({
   },
   getDefaultProps: function() {
     return {
-      urlParams: "",
+      urlParams: {},
       isProcessing: false,
       opacity: 1,
       title: "",
       content: "",
-      featuredImage: "",
       status:"Published",
       immediatelyStatus:true,
       visibilityTxt:"Public",
@@ -356,7 +356,6 @@ let NewContentTypeNoPostId = React.createClass({
       connectionValue: {},
       data: {},
       parent: "",
-      permalink: ""
     }
   },
   isWidgetActive: function(name){
@@ -366,18 +365,15 @@ let NewContentTypeNoPostId = React.createClass({
     var me = this;
     if (permalink===this.props.permalink) return;
     this.props.dispatch(togglePermalinkProcessState(true));
-    riques( Query.checkSlugQry(permalink),
-      function(error, response, body) {
-        me.props.dispatch(togglePermalinkProcessState(false));
-        if (!error && !body.errors && response.statusCode === 200) {
-          var slugCount = body.data.viewer.allPosts.edges.length;
-          if (slugCount > 0) me.props.dispatch(setSlug(permalink+"-"+slugCount, false));
-          else me.props.dispatch(setSlug(permalink, false));
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null, "Check Slug");
-        }
-      }
-    );
+    this.props.client.query({
+      query: gql`${Query.checkSlugQry(permalink).query}`,
+    }).then(data => {
+      let slugCount = data.data.viewer.allPosts.edges.length;
+      if (slugCount > 0) me.props.dispatch(setSlug(permalink+"-"+slugCount, false));
+      else me.props.dispatch(setSlug(permalink, false));
+      this.props.dispatch(togglePermalinkProcessState(false));
+    }).catch(({error}) => errorCallback(error, error, "Check Slug"))
+      
   },
   saveImmediately: function(event){
     var hours = this.props.hours;
@@ -395,9 +391,16 @@ let NewContentTypeNoPostId = React.createClass({
     console.log(props)
     if (props.data !== this.props.data){
       props.initialize(props.initialValues)
+      props.dispatch(setImageGalleryList(props.imageGallery))
+    } else if (this.props.loading && !props.loading){
+      this.disableForm(false)
+    }
+    if (!this.props.permalink && props.permalinkFromDb){
+      props.dispatch(setSlug(props.permalinkFromDb, false))
     }
 
-    /*if (props.urlParams.postId !== this.props.postId){
+  /*
+  if (props.urlParams.postId !== this.props.postId){
       props.dispatch(setPostId(props.urlParams.postId))
       props.destroy()
       console.log("hello")
@@ -498,6 +501,7 @@ let NewContentTypeNoPostId = React.createClass({
     var reader = new FileReader();
     reader.onload = function(){
       me.props.dispatch(setFeaturedImage(reader.result));
+      me.props.change("featuredImage", reader.result)
     };
     reader.readAsDataURL(e.target.files[0]);
   },
@@ -512,7 +516,6 @@ let NewContentTypeNoPostId = React.createClass({
     output["type"] = this.props.postType;
     output["authorId"] = localStorage.getItem('userId');
     output["slug"] = this.props.permalink;
-    output["featuredImage"] = this.props.featuredImage;
     return output;
   },
   onSubmit: function(v, status) {
@@ -564,97 +567,37 @@ let NewContentTypeNoPostId = React.createClass({
           mutation: gql`${Query.createUpdatePostMetaMtn(postId, metaDataList).query}`
         }).then(data => console.log(data))
       }
-          if (me.isWidgetActive("category")) {
-            // process categories
-            let categToSave = _.keys(v.categories) 
-            var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.props.postCategoryList, categToSave);
-            if (catQry) this.props.client.mutate({
-              mutation: gql`${catQry.query}`,
-              variables: catQry.variables
-            }).then(data => console.log(data))
-          }
+      if (me.isWidgetActive("category")) {
+        // process categories
+        let categToSave = _.keys(v.categories) 
+        var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.props.postCategoryList, categToSave);
+        if (catQry) this.props.client.mutate({
+          mutation: gql`${catQry.query}`,
+          variables: catQry.variables
+        }).then(data => console.log(data))
+      }
+
+      if (me.isWidgetActive("tag")) {
+        let tagMap = {}
+        _.forEach(me.props.options, function(item){
+            tagMap[item.name] = {id: item.id, name: item.name}
+        })
+        var tagQry = Query.createUpdateTagOfPostMtn(postId, me.props.postTagListInit, me.props.postTagList, tagMap);
+
+        if (tagQry)
+          this.props.client.mutate({
+            mutation: gql`${tagQry.query}`,
+            variables: tagQry.variables
+          }).then(data => console.log("tags", data))
+      } 
+
       this.disableForm(false)
+      this._successNotif(noticeTxt)
+      this.notifyUnsavedData(false)
+      this.props.handleNav(me.props.slug, "edit", postId)
+      this.bindPostToImageGallery(postId)
     })
 
-    /*
-    riques(qry, 
-      function(error, response, body) {
-        if (!error && !body.errors && response.statusCode === 200) {
-          var here = me, postId = "", pmQry = "";
-          
- 
-          
-          if (metaDataList.length>0) {
-            pmQry = Query.createUpdatePostMetaMtn(postId, metaDataList);
-            riques(pmQry, 
-              function(error, response, body) {
-                if (!error && !body.errors && response.statusCode === 200) {
-                  
-                } else {
-                  errorCallback(error, body.errors?body.errors[0].message:null, "Save Post Meta");
-                }
-                here.disableForm(false);
-                here.notifyUnsavedData(false);
-              }
-            );
-          }
-          
-          if (me.isWidgetActive("category")) {
-            // process categories
-            let categToSave = _.keys(v.categories) 
-            here.disableForm(true);
-            var catQry = Query.createUpdateCategoryOfPostMtn(postId, me.props.postCategoryList, categToSave);
-            if (catQry)
-              riques(catQry,
-                function(error, response, body) {
-                  here.disableForm(false);
-                  here.notifyUnsavedData(false);
-                  here.bindPostToImageGallery(postId);
-                  if (!error && !body.errors && response.statusCode === 200) {
-                    
-                  } else {
-                    errorCallback(error, body.errors?body.errors[0].message:null, "Save Category");
-                  }
-                }
-              );
-          }
-
-          if (me.isWidgetActive("tag")) {
-            here.disableForm(true);
-            let tagMap = {}
-            _.forEach(me.props.options, function(item){
-                tagMap[item.name] = {id: item.id, name: item.name}
-            })
-            var tagQry = Query.createUpdateTagOfPostMtn(postId, me.props.postTagListInit, me.props.postTagList, tagMap);
-            if (tagQry)
-              riques(tagQry,
-                function(error, response, body) {
-                  here.disableForm(false);
-                  here.notifyUnsavedData(false);
-                  here.bindPostToImageGallery(postId);
-                  if (!error && !body.errors && response.statusCode === 200) {
-                    
-                  } else {
-                    errorCallback(error, body.errors?body.errors[0].message:null, "Save Tag");
-                  }
-                }
-              );
-          } 
-
-          // do these when post data succesfully saved
-          here._successNotif(noticeTxt);
-          here.props.dispatch(setEditorMode("update"));
-          here.props.dispatch(setPostId(postId));
-          here.notifyUnsavedData(false);
-          here.bindPostToImageGallery(postId);
-          here.props.handleNav(me.props.slug,"edit",postId);
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null, "Save Post");
-          me.disableForm(false);
-        }
-      }
-    );  
-    */
   },
   _errorNotif: function(msg){
     this.refs.notificationSystem.addNotification({
@@ -674,25 +617,55 @@ let NewContentTypeNoPostId = React.createClass({
   },
   imageGalleryChange: function(e){
     var me = this;
-    this.disableForm(true);
     var reader = new FileReader();
     reader.onload = function(){
       if (!me.props.postId) me.props.dispatch(toggleImageGalleyBinded(true));
-      riques(Query.addImageGallery(reader.result, me.props.postId), 
-        function(error, response, body){
-          if (!error && !body.errors && response.statusCode === 200) {
-            var data = body.data.createFile.changedFile;
-            var imageGallery = me.props.imageGallery;
-            imageGallery.push({id: data.id, value:data.value});
-            me.props.dispatch(setImageGalleryList(imageGallery));
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null, "Image Gallery");
+      me.props.addImageGallery({
+        variables: {
+          input: {
+            type: "gallery",
+            value: reader.result,
+            postId: me.props.urlParams.postId,
+            blobFieldName: "myBlobField"
           }
-          me.disableForm(false);
-          document.getElementById("imageGallery").value=null;
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          createFile: {
+            __typename: 'CreateFilePayload',
+            changedFile: {
+              __typename: 'File',
+              type: "gallery",
+              value: reader.result,
+              postId: me.props.urlParams.postId,
+              blobFieldName: 'myBlobField',
+              id: "customid",
+              blobMimeType: "image/jpeg",
+              blobUrl: ""
+            }
+          }
+        },
+        update: (store, data) => {
+          let image = data.data.createFile.changedFile
+
+        
+          let imageGallery = _.cloneDeep(me.props.imageGallery);
+          if (imageGallery.length){
+            if (imageGallery[0].value === image.value){
+              imageGallery.splice(0, 1, {id: image.id, value: image.value})
+            } else {
+              imageGallery.splice(0, 0, {id: image.id, value: image.value})
+            }
+          } else {
+            imageGallery = []
+            imageGallery.push({id: image.id, value: image.value})
+          }
+          me.props.dispatch(setImageGalleryList(imageGallery));
         }
-      );
-      
+      }).then(data => {
+        console.log("addImageGallery mutation result", data)
+        document.getElementById("imageGallery").value=null;
+      })
     }
     reader.readAsDataURL(e.target.files[0]);
   },
@@ -707,61 +680,73 @@ let NewContentTypeNoPostId = React.createClass({
       confirmButtonText: 'Close'
     })
   },
+
   bindPostToImageGallery: function(postId){
     var me = this;
     if (this.props.imageGallery.length>0 && this.props.imageGalleryUnbinded) {
       var qry = Query.bindImageGallery(this.props.imageGallery, postId);
-      
-      riques(qry, 
-        function(error, response, body){
-          if (!error && !body.errors && response.statusCode === 200) {
-            me.props.dispatch(toggleImageGalleyBinded(false));
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null, "Bind To Image Galley");
-          }
-        }
-      );
+
+      this.props.client.mutate({
+        mutation: gql`${qry.query}`,
+        variables: qry.variables,
+      }).then((data) => {
+        this.props.dispatch(toggleImageGalleyBinded(false))
+      })
     }
   },
+
   handleImageRemove: function(e){
     var me = this;
-    var id = e.target.id;
+    var id = e.currentTarget.id;
     var index = id.split("-")[1];
     var imageId = id.split("-")[0];
-    this.disableForm(true);
 
-    var qry = Query.removeImageGallery(imageId);
-    riques(qry, 
-      function(error, response, body){
-        if (!error && !body.errors && response.statusCode === 200) {
-          var imageGallery = me.props.imageGallery;
-          _.pull(imageGallery, _.nth(imageGallery, index));
-          me.props.dispatch(setImageGalleryList(imageGallery));
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
+    this.props.removeImageGallery({
+      variables: {
+        input : {
+          id: imageId
         }
-        me.disableForm(false);
-        document.getElementById("imageGallery").value=null;
-      }
-    );
+      },
+      optimisticResponse: {
+        deleteFile: {
+          changedFile: {
+            id: imageId,
+            type: "",
+            value: "",
+            blobMimeType: "",
+            blobUrl: "",
+            __typename: ""
+          },
+          __typename: ""
+        }
+      },
+        update: (store, data) => {
+          let image = data.data.deleteFile.changedFile
+
+        
+          let imageGallery = _.cloneDeep(me.props.imageGallery);
+          if (imageGallery.length){
+            imageGallery = _.filter(imageGallery, item => item.id !== imageId)
+          }
+          me.props.dispatch(setImageGalleryList(imageGallery));
+        }
+    }).then(data => {
+      console.log("remove mutation returned data ", data)
+      document.getElementById("imageGallery").value=null
+      //this.props.postRefetch()
+    }).catch(error => console.log(error))
   },
   _genReactSelect: function(contentId){
     var me = this;
     var getConnectionOptions = function(input, callback) {
-      var qry = Query.getContentPostListQry("All", contentId);
-      
-      riques(qry, 
-        function(error, response, body) {
-          var options = [];
-          _.forEach(body.data.viewer.allPosts.edges, function(item){
-            options.push({value: item.node.slug, label: item.node.title});
-          });
-          callback(error, {
+      me.props.client.query({
+        query: gql`${Query.getContentPostListQry("All", contentId).query}`}).then(data => {
+          let options = _.forEach(data.data.viewer.allPosts.edges, item => ({value: item.node.slug, label: item.node.title}));
+          callback(data.error, {
             options: options,
             complete: true
-          });
-        }
-      );
+          })
+        })
     }
 
     var handleSelectConnectionChange = function(newValue) {
@@ -781,7 +766,7 @@ let NewContentTypeNoPostId = React.createClass({
     )
   },
   componentWillMount: function(){
-    this.props.dispatch(maskArea(true))
+    this.disableForm(true)
   },
  
   componentDidMount: function(){
@@ -829,7 +814,7 @@ let NewContentTypeNoPostId = React.createClass({
             <div className="form-group"  style={{marginBottom:30}}>
               <div>
                 <Field name="title" component="input" type="text" className="form-control"
-                  placeholder="Input Title Here" onChange={this.handleTitleChange} onBlur={() => {this.checkSlug(this.props.title.split(" ").join("-").toLowerCase())}} style={{marginBottom: 20}}/>
+                  placeholder="Input Title Here" onChange={this.handleTitleChange} onBlur={(e) => {this.checkSlug(e.currentTarget.value.split(" ").join("-").toLowerCase())}} style={{marginBottom: 20}}/>
                 <PermalinkEditor rootUrl={rootUrl} onCheckSlug={this.checkSlug} {...this.props} />
 
                 <CkeditorField 
@@ -1074,10 +1059,26 @@ let NewContentTypeNoPostId = React.createClass({
 
 }
 });
+
+const mapStateToProps = function(state){
+  console.log("global state", state)
+  let ctn = state.contentTypeNew
+  console.log("contentTypeNew states", ctn)
+
+  return {
+    ...ctn,
+    ...state.maskArea
+  }
+
+}
+
 NewContentTypeNoPostId = _.flow([
+  connect(mapStateToProps),
   graphql(gql`${Query.getUpdatePostQry().query}`, {name: 'updatePostQuery'}),
   graphql(gql`${Query.getCreatePostQry().query}`, {name: 'createPostQuery'}),
-  withApollo
+  graphql(gql`${Query.addImageGallery().query}`, {name: 'addImageGallery'}),
+  graphql(gql`${Query.removeImageGallery().query}`, {name: 'removeImageGallery'}),
+  withApollo,
 ])(NewContentTypeNoPostId)
 
 
@@ -1129,11 +1130,8 @@ NewContentTypeNoPostId = reduxForm({
   form: 'newContentForm'
 })(NewContentTypeNoPostId)
 
-const getPostQry = gql`query ($id: ID!){getPost(id: $id){ id,title,content,slug,author{username},status,visibility,featuredImage,
-      summary,category{edges{node{id, category{id,name}}}},comments{edges{node{id,content,name,email,website}}},file{edges{node{id value}}},
-      tag{edges{node{id,tag{id,name}}}},meta{edges{node{id,item,value}}},createdAt}}`
 
-const NewContentTypeWithPostId = graphql(getPostQry, {
+const NewContentTypeWithPostId = graphql(Query.getPost, {
   options : (props) => ({
     variables: {
       id: props.urlParams.postId
@@ -1218,7 +1216,8 @@ const NewContentTypeWithPostId = graphql(getPostQry, {
         postTagList : _postTagList,
         imageGallery: _imageGalleryList,
         mode: "update",
-        permalink: v.slug
+        permalinkFromDb: v.slug,
+        postRefetch: data.refetch,
       }
     }
   }
@@ -1232,30 +1231,5 @@ let NewContentType = (props) => {
   return <NewContentTypeWithPostId {...props}/>
 }
 
-const selector = formValueSelector('newContentForm');
 
-const mapStateToProps = function(state){
-  var customStates = {
-    title: selector(state, 'title'),
-    content: selector(state, 'content'),
-    hours: selector(state, 'hours'),
-    minutes: selector(state, 'minutes'),
-    summary: selector(state, 'summary'),
-    //featuredImage: selector(state, 'featuredImage'),
-    titleTag: selector(state, 'titleTag'),
-    metaKeyword: selector(state, 'metaKeyword'),
-    metaDescription: selector(state, 'metaDescription'),
-    statusSelect: selector(state, 'statusSelect'),
-    visibilityTxt: selector(state, 'visibilityRadio')
-  }
-
-  if (!_.isEmpty(state.contentTypeNew)) {
-    var out = _.head(state.contentTypeNew);
-    out["initialValues"] = out.data;
-    //return _.merge(out, customStates);
-    return {...out, ...customStates}
-  } else return customStates;
-}
-
-NewContentType = connect(null)(NewContentType);
 export default NewContentType;
