@@ -1,7 +1,6 @@
 const INITIAL_VALUES =  [{
       isProcessing: false,
       opacity: 1,
-      monthList: [],
       statusCount: {},
       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
       replaceStatusWithRole: false

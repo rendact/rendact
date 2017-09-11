@@ -9,7 +9,7 @@ import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle, swalert,
 import {Table, SearchBoxPost, DeleteButtons} from './Table'
 import {connect} from 'react-redux'
 import {setStatusCounter, initContentList, maskArea, toggleDeleteMode, toggleSelectedItemState} from '../../actions'
-import {graphql} from 'react-apollo';
+import {graphql, withApollo} from 'react-apollo';
 import gql from 'graphql-tag';
 
 
@@ -28,13 +28,14 @@ let ContentType = React.createClass({
     itemSelected: React.PropTypes.bool,
     fields: React.PropTypes.array,
     allPostId: React.PropTypes.array,
-    replaceStatusWithRole: React.PropTypes.bool
+    replaceStatusWithRole: React.PropTypes.bool,
   },
   getDefaultProps: function() {
     return {
       isProcessing: false,
       opacity: 1,
       monthList: [],
+      _allPostId: [],
       statusCount: {},
       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
       replaceStatusWithRole: false
@@ -43,10 +44,12 @@ let ContentType = React.createClass({
   dt: null,
 
   loadData: function(status, callback) {
-    var me = this;
+    //let listOfData = client.readQuery({query: gql`${Query.loadSettingsQry.query}`})
+    //debugger;
+    /*var me = this;
     this.disableForm(true);
     var metaItemList = _.map(this.props.customFields, function(item) { return item.id });
-    /*riques(this.props.listQuery("Full", this.props.postType, this.props.tagId, this.props.cateId), 
+    riques(this.props.listQuery("Full", this.props.postType, this.props.tagId, this.props.cateId), 
       function(error, response, body) { 
         var nodeName = "all"+me.props.tableName+"s";
         var _postArr = body.data.viewer[nodeName].edges;
@@ -75,7 +78,7 @@ let ContentType = React.createClass({
         }
         me.props.dispatch(setStatusCounter(_statusCount))
       }
-    );*/
+    );
     this.disableForm(true);
     var qry = this.props.listQuery(status, this.props.postType, this.props.tagId, this.props.cateId);
     var fields = _.map(this.props.fields, function(item){
@@ -164,6 +167,7 @@ let ContentType = React.createClass({
                 }
               }
             });
+            
             _dataArr.push(_obj);
 
             var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
@@ -181,8 +185,9 @@ let ContentType = React.createClass({
           me.disableForm(false);
         }
       }
-    );
+    );*/
   },
+
   disableForm: function(isFormDisabled){
     disableForm(isFormDisabled, this.notification);
     this.props.dispatch(maskArea(isFormDisabled));
@@ -278,7 +283,7 @@ let ContentType = React.createClass({
     $(".menu-item").removeClass("active");
     $("#menu-posts-new").addClass("active");
   },
-  /*handleStatusFilter: function(event){
+  handleStatusFilter: function(event){
     event.preventDefault();
     this.disableForm(true);
     var status = event.target.text;
@@ -296,7 +301,7 @@ let ContentType = React.createClass({
       })
     } ;
   },
-  handleDateFilter: function(event){
+  /*handleDateFilter: function(event){
     this.disableForm(true);
     var status = this.props.activeStatus;
     if (status==='Trash'){
@@ -382,17 +387,22 @@ let ContentType = React.createClass({
       return this.props.statusCount[status]
     else return 0;
   },
+  componentWillReceiveProps(props){
+    if(props._allPostId.length && !this.props._allPostId.length){
+      this.table.loadData(props._dataArr, props.bEdit);
+      this.props.dispatch(setStatusCounter(props._statusCount))
+      this.props.dispatch(initContentList(props.monthList, props._allPostId))
+    }
+  },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
     this.table = this.refs.rendactTable;
     var datatable = this.table.datatable;
     this.refs.rendactSearchBoxPost.bindToTable(datatable);
     this.dt=datatable;
-    this.loadData("All");
+    // this.loadData("All");
   },
-  componentWillReceiveProps(props){
 
-  },
   render: function(){
     return (
       <div className="content-wrapper">
@@ -527,7 +537,6 @@ ContentType = graphql(getAllPosts,
     }),
     props: ({ownProps, data}) => {
       if (!data.loading) {
-          var me = this;
           var monthList = ["all"];
           var _dataArr = [];
           var _allPostId = [];
@@ -537,6 +546,16 @@ ContentType = graphql(getAllPosts,
           });
           var metaItemList = _.map(ownProps.customFields, function(item) { return item.id });
 
+          //Show status
+          var _postArr = data.viewer.allPosts.edges;
+          var _statusCount = {};
+          _.forEach(ownProps.statusList, function(status){
+            var found = _.filter(_postArr, {node: {status: status}});
+            _statusCount[status] = found?found.length:0;
+          });
+          _statusCount["All"] = _postArr.length-_statusCount["Trash"];
+
+          //Show data
           _.forEach(_postArr, function(item){
             var dt = new Date(item.node.createdAt);
             var _obj = {postId: item.node.id};
@@ -610,17 +629,31 @@ ContentType = graphql(getAllPosts,
                 }
               }
             });
-
+            
             _dataArr.push(_obj);
-          }); 
+
+            var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
+            if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
+          });
+
+          var bEdit = hasRole(ownProps.modifyRole);
+          return {
+            bEdit: bEdit,
+            _dataArr: _dataArr,
+            _allPostId: _allPostId,
+            _postArr: _postArr,
+            fields: fields,
+            monthList: monthList,
+            metaItemList: metaItemList,
+            _statusCount: _statusCount
+          }
       } else { 
         return {
           isLoading: true
         }
       }
-      }
     }
-  
-)(ContentType)
+})(ContentType)
+ContentType = withApollo(ContentType);
 
 export default ContentType;
