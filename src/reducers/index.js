@@ -16,6 +16,7 @@ import widgets from './Widgets';
 import search from './Search';
 import maskArea from './MaskArea';
 import listOfWidgets from './ListOfWidgets';
+import clientGraphql from '../apollo'
 
 const main = (state = [], action) => {
   switch (action.type) {
@@ -34,6 +35,7 @@ const main = (state = [], action) => {
 
 const rendactApp = combineReducers({
   form: reduxFormReducer,
+  apollo: clientGraphql.reducer(),
 	main,
   settings,
   contentNew,

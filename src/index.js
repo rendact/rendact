@@ -12,9 +12,10 @@ import Register from './register'
 import reducer from './reducers'
 import {DragDropContext} from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
-import { createStore } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
+import clientGraphql from './apollo'
 window.AuthService = AuthService
-const store = createStore(reducer)
+const store = createStore(reducer, {}, compose(applyMiddleware(clientGraphql.middleware())))
 
 class Main extends React.Component {
     constructor(props){
