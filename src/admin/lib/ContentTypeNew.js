@@ -598,6 +598,10 @@ let NewContentTypeNoPostId = React.createClass({
         }
       }
 
+      const processBinding = () => {
+        return this.bindPostToImageGallery(postId)
+      }
+
       const processTag = () => {
 
         if (me.isWidgetActive("tag")) {
@@ -615,7 +619,7 @@ let NewContentTypeNoPostId = React.createClass({
         } 
       }
 
-      let promise = _.reduce([processMetadata, processCategory, processTag], (prev, task) => {
+      let promise = _.reduce([processBinding, processMetadata, processCategory, processTag], (prev, task) => {
         return prev.then(() =>  task()).catch(error => errorCallback(error, error, error))
       }, Promise.resolve())
 
@@ -624,9 +628,10 @@ let NewContentTypeNoPostId = React.createClass({
         this._successNotif(noticeTxt)
         this.notifyUnsavedData(false)
         this.props.handleNav(me.props.slug, "edit", postId)
-        this.bindPostToImageGallery(postId)
-        this.props.postRefetch()
-      })
+        if (this.props.mode==="update"){
+          this.props.postRefetch()
+        }
+      }).catch(error => console.log(error))
     })
 
   },
@@ -671,12 +676,13 @@ let NewContentTypeNoPostId = React.createClass({
               postId: me.props.urlParams.postId,
               blobFieldName: 'myBlobField',
               id: "customid",
-              blobMimeType: "image/jpeg",
+              blobMimeType: null,
               blobUrl: ""
             }
           }
         },
         update: (store, data) => {
+          let image = data.data.createFile.changedFile
           if (me.props.urlParams.postId){
             let postQry = store.readQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}})
             postQry.getPost.file.edges.splice(0, 0,{
@@ -684,6 +690,21 @@ let NewContentTypeNoPostId = React.createClass({
               __typename: 'FileEdge'
             })
             store.writeQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}, data: postQry})
+          } else {
+            // this process imageGallery on create mode
+            let imageGallery = _.cloneDeep(me.props.imageGallery)
+
+            if (!imageGallery.length){
+              imageGallery.push({id: image.id, value: image.value})
+            } else {
+              if (imageGallery[0].value === image.value) {
+                imageGallery.splice(0, 1, {id: image.id, value: image.value})
+              } else {
+                imageGallery.splice(0, 0, {id: image.id, value: image.value})
+              }
+            }
+
+            me.props.setImageGallery(imageGallery)
           }
         }
       }).then(data => {
@@ -709,16 +730,20 @@ let NewContentTypeNoPostId = React.createClass({
 
   bindPostToImageGallery: function(postId){
     var me = this;
-    if (this.props.imageGallery.length>0 && this.props.imageGalleryUnbinded) {
-      var qry = Query.bindImageGallery(this.props.imageGallery, postId);
+      return new Promise((resolve, reject) => {
+        if (me.props.imageGallery.length>0 && me.props.imageGalleryUnbinded) {
+          var qry = Query.bindImageGallery(me.props.imageGallery, postId);
 
-      this.props.client.mutate({
-        mutation: gql`${qry.query}`,
-        variables: qry.variables,
-      }).then((data) => {
-        this.props.dispatch(toggleImageGalleyBinded(false))
+          me.props.client.mutate({
+            mutation: gql`${qry.query}`,
+            variables: qry.variables,
+          }).then((data) => {
+            me.props.dispatch(toggleImageGalleyBinded(false))
+          })
+        }
+
+        resolve("hello world")
       })
-    }
   },
 
   handleImageRemove: function(e){
@@ -1254,10 +1279,6 @@ const mapResultToProps = ({ownProps, data}) => {
         });
       }
 
-      const setImageGallery = (gallery) => {
-        _imageGalleryList = [...gallery]
-      }
-
       return {
         isLoading: false,
         data: data.getPost,
@@ -1271,7 +1292,6 @@ const mapResultToProps = ({ownProps, data}) => {
         immediatelyStatus: false,
         postCategoryList: postCategoryList,
         metaIds: metaIds,
-        setImageGallery,
       }
     }
 }
@@ -1279,18 +1299,33 @@ const mapResultToProps = ({ownProps, data}) => {
 const NewContentTypeWithPostId = graphql(Query.getPost, {
   options : (props) => ({
     variables: {
-      id: props.urlParams.postId
+      id: props.postId
     }
   }),
   props: mapResultToProps
 })(NewContentTypeNoPostId)
 
-let NewContentType = (props) => {
-  if (!props.urlParams) {
-    return <NewContentTypeNoPostId {...props} mode="create"/>
+
+class NewContentType extends React.Component{
+  constructor(props){
+    super(props)
+    this.state = {
+      imageGallery : []
+    }
+
+    this.setImageGallery = this.setImageGallery.bind(this)
   }
 
-  return <NewContentTypeWithPostId {...props}/>
+  setImageGallery(gallery){
+    this.setState({imageGallery: [...gallery]})
+  }
+
+  render(){
+    if (!this.props.urlParams) {
+      return <NewContentTypeNoPostId {...this.props} mode="create" imageGallery={this.state.imageGallery} setImageGallery={this.setImageGallery}/>
+    }
+    return <NewContentTypeWithPostId {...this.props} urlParams={this.props.urlParams}/>
+  }
 }
 
 
