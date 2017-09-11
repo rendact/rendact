@@ -1320,6 +1320,12 @@ class NewContentType extends React.Component{
     this.setState({imageGallery: [...gallery]})
   }
 
+  componentWillReceiveProps(nextProps) {
+    if(this.props.urlParams && !nextProps.urlParams){
+      this.setImageGallery([])
+    }
+  }
+
   render(){
     if (!this.props.urlParams) {
       return <NewContentTypeNoPostId {...this.props} mode="create" imageGallery={this.state.imageGallery} setImageGallery={this.setImageGallery}/>
