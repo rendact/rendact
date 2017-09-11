@@ -514,6 +514,10 @@ let NewContentTypeNoPostId = React.createClass({
     output["type"] = this.props.postType;
     output["authorId"] = localStorage.getItem('userId');
     output["slug"] = this.props.permalink;
+
+    if (["Public", "Private"].indexOf(output.visibility) === -1){
+      output.visibility = "Public"
+    }
     return output;
   },
   onSubmit: function(v, status) {
