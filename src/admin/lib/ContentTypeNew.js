@@ -787,6 +787,20 @@ let NewContentTypeNoPostId = React.createClass({
                 postQry.getPost.file.edges = _.filter(postQry.getPost.file.edges, item => item.node.id !== imageId)
               }
             store.writeQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}, data: postQry})
+          } else {
+            let imageGallery = _.cloneDeep(me.props.imageGallery)
+
+            if(!image.value){
+              imageGallery = _.map(imageGallery, item => {
+                if(item.id === image.id){
+                  item.toDelete = true
+                } return item
+              })
+            } else {
+              imageGallery = _.filter(imageGallery, item => item.id !== imageId)
+            }
+
+            me.props.setImageGallery(imageGallery)
           }
         }
     }).then(data => {
