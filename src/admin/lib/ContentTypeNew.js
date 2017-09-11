@@ -677,37 +677,20 @@ let NewContentTypeNoPostId = React.createClass({
           }
         },
         update: (store, data) => {
-          let image = data.data.createFile.changedFile
-
-        
-          let imageGallery = _.cloneDeep(me.props.imageGallery);
-          if (imageGallery.length){
-            if (imageGallery[0].value === image.value){
-              imageGallery.splice(0, 1, {id: image.id, value: image.value})
-            } else {
-              imageGallery.splice(0, 0, {id: image.id, value: image.value})
-            }
-          } else {
-            imageGallery = []
-            imageGallery.push({id: image.id, value: image.value})
+          if (me.props.urlParams.postId){
+            let postQry = store.readQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}})
+            postQry.getPost.file.edges.splice(0, 0,{
+              node: {...data.data.createFile.changedFile},
+              __typename: 'FileEdge'
+            })
+            store.writeQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}, data: postQry})
           }
-          me.props.dispatch(setImageGalleryList(imageGallery));
         }
       }).then(data => {
         console.log("addImageGallery mutation result", data)
         document.getElementById("imageGallery").value=null;
       }).catch(error => {
-        let imageGallery = _.cloneDeep(me.props.imageGallery);
-
-        imageGallery = _.map(imageGallery, item => {
-          if (item.id === "customid"){
-            item.value = ''
-            item.message = error
-          }
-          return item
-        });
-
-        me.props.dispatch(setImageGalleryList(imageGallery));
+        me._errorNotif(error.message)
       });
     }
     reader.readAsDataURL(e.target.files[0]);
@@ -765,38 +748,27 @@ let NewContentTypeNoPostId = React.createClass({
       },
         update: (store, data) => {
           let image = data.data.deleteFile.changedFile
-
-        
-          let imageGallery = _.cloneDeep(me.props.imageGallery);
-          if (imageGallery.length){
+          if (me.props.urlParams.postId){
+            let postQry = store.readQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}})
             if (!image.value){
-              imageGallery = _.map(imageGallery, item => {
-                if (item.id === image.id) {
-                  item.toDelete = true
-                }
+              postQry.getPost.file.edges = _.map(postQry.getPost.file.edges, item => {
+                if (item.node.id === image.id){
+                  item.node.id = "customid"
+                  item.node.toDelete = true
+                } 
                 return item
               })
-            } else {
-              imageGallery = _.filter(imageGallery, item => item.id !== imageId)
-            }
+              } else {
+                postQry.getPost.file.edges = _.filter(postQry.getPost.file.edges, item => item.node.id !== imageId)
+              }
+            store.writeQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}, data: postQry})
           }
-          me.props.dispatch(setImageGalleryList(imageGallery));
         }
     }).then(data => {
       console.log("remove mutation returned data ", data)
       document.getElementById("imageGallery").value=null
-      //this.props.postRefetch()
     }).catch(error => {
-      console.log(error)
-      let imageGallery = _.cloneDeep(me.props.imageGallery);
-      imageGallery = _.map(imageGallery, item => {
-        if (item.id === imageId) {
-          item.toDelete = false
-          item.message = error
-        }
-        return item
-      })
-      me.props.dispatch(setImageGalleryList(imageGallery));
+      this._errorNotif(error.message)
     })
   },
   _genReactSelect: function(contentId){
@@ -957,7 +929,6 @@ let NewContentTypeNoPostId = React.createClass({
                 <div className="col-md-12">  
                   <div className="box box-info">
                     <div className="box-header with-border">
-                      <h3 className="box-title">Publish</h3>
                       <div className="pull-right box-tools">
                             <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool ">
                               <i className="fa fa-minus"></i></button>
@@ -1124,7 +1095,7 @@ let NewContentTypeNoPostId = React.createClass({
 
 let selector = formValueSelector("newContentForm")
 
-const mapStateToProps = function(state){
+const mapStateToProps = function(state, ownProps){
   let ctn = state.contentTypeNew
   let customProps = {
     titleTag : selector(state, 'titleTag'),
@@ -1132,13 +1103,14 @@ const mapStateToProps = function(state){
     metaKeyword: selector(state, 'metaKeyword'),
     visibilityTxt: selector(state, 'visibility')
   }
-    
 
+  let imageGallery = ownProps.imageGallery || []
 
   return {
     ...ctn,
     ...state.maskArea,
-    ...customProps
+    ...customProps,
+    imageGallery,
   }
 
 }
@@ -1202,13 +1174,7 @@ NewContentTypeNoPostId = reduxForm({
 })(NewContentTypeNoPostId)
 
 
-const NewContentTypeWithPostId = graphql(Query.getPost, {
-  options : (props) => ({
-    variables: {
-      id: props.urlParams.postId
-    }
-  }),
-  props: ({ownProps, data}) => {
+const mapResultToProps = ({ownProps, data}) => {
     if (data.loading){
       return {
         isLoading: true,
@@ -1221,6 +1187,7 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
         data: {},
       }
     } else {
+
       let initials = {};
       let v = data.getPost
 
@@ -1282,9 +1249,13 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
       if (v.tag && v.file.edges.length>0) {
         _.forEach(v.file.edges, function(i){
           if (i.node.value){
-            _imageGalleryList.push({id: i.node.id, value: i.node.value});
+            _imageGalleryList.push({id: i.node.id, value: i.node.value, toDelete: i.node.toDelete});
           }
         });
+      }
+
+      const setImageGallery = (gallery) => {
+        _imageGalleryList = [...gallery]
       }
 
       return {
@@ -1299,10 +1270,19 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
         publishDate: v.publishDate,
         immediatelyStatus: false,
         postCategoryList: postCategoryList,
-        metaIds: metaIds
+        metaIds: metaIds,
+        setImageGallery,
       }
     }
-  }
+}
+
+const NewContentTypeWithPostId = graphql(Query.getPost, {
+  options : (props) => ({
+    variables: {
+      id: props.urlParams.postId
+    }
+  }),
+  props: mapResultToProps
 })(NewContentTypeNoPostId)
 
 let NewContentType = (props) => {
