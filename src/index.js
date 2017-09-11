@@ -72,19 +72,20 @@ let Main = React.createClass({
 							<Match pattern="/category/:categoryId?/:param1?/:param2?" component={ThemeBlog}/>
 	            <Match pattern="/search/:search" component={ThemeSearch}/>
 							<Match pattern="/register/:param1?" component={Register}/>
-							<Match pattern="/login/:param1?" render={props => (
-						    this.props.logged ? (
-						      <Redirect to={{
-						        pathname: this.props.pathname,
-						        state: { from: props.location }
-						      }}/>
-						    ) : (
-						      <Login logged={this.props.logged} 
-						      	onlogin={this.setLogged} 
-						      	{...props}
-						      />
-						    )
-						  )}/>
+							<Match pattern="/login/:param1?" 
+								render={ function(props){
+							    return this.props.logged ? (
+							      <Redirect to={{
+							        pathname: this.props.pathname,
+							        state: { from: props.location }
+							      }}/>
+							    ) : (
+							      <Login logged={this.props.logged} 
+							      	onlogin={this.setLogged} 
+							      	{...props}
+							      />
+							    )
+						  }.bind(this)}/>
 							<Miss component={ThemeHome}/>
 					</div>
 					) : (
@@ -98,8 +99,7 @@ let Main = React.createClass({
 
 const mapStateToProps = function(state){
 	if (!_.isEmpty(state.main)) {
-		var out = _.head(state.main);
-		return out;
+		return state.main;
 	} else return {}
 }
 Main = connectWithStore(store, Main, mapStateToProps);
@@ -144,7 +144,6 @@ Main = graphql(getUserQry, {
   		return {
         logged: false,
         error: data.error
-        //checkAuthDone: true
       }
   	}
   	
@@ -152,13 +151,11 @@ Main = graphql(getUserQry, {
       return {
         profileData: data.getUser,
         logged: true
-        //checkAuthDone: true
       }
     } else { 
       return {
         logged: false,
         profileData: null
-        //checkAuthDone: true
       }
     }
   }

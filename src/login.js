@@ -86,7 +86,6 @@ class Login extends React.Component{
         }
       }
      }).then(({data}) => {
-     	debugger;
      	if (data) {
         if (data.loginUser) {
           var p = data.loginUser.user;

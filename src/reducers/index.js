@@ -20,21 +20,9 @@ import listOfWidgets from './ListOfWidgets';
 const main = (state = [], action) => {
   switch (action.type) {
     case 'LOGGED':
-      if (state)
-        return state.map(item =>  ({...item, 
-          logged: action.isLogged, 
-          //checkAuthDone: action.isLogged, 
-          pathname: action.pathname?action.pathname:null}))
-      else
-        return [{ 
-          logged: action.isLogged, 
-          //checkAuthDone: action.isLogged, 
-          pathname: action.pathname?action.pathname:null 
-        }]
+      return { ...state, logged: action.isLogged, pathname: action.pathname?action.pathname:null}
     case 'SET_CHECK_AUTH_DONE':
-      return [
-        { checkAuthDone: action.state }
-      ]
+      return { ...state, checkAuthDone: action.state }
     default:
       return state
   }
