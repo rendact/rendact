@@ -225,7 +225,7 @@ export const disableForm = function(state, notif, excludeClass){
   */
 }
 
-export const _saveConfig = function(name, value){
+export const saveConfig = function(name, value){
   var config = JSON.parse(localStorage.getItem('config'));
   if (config === null ){
     config = {}
@@ -257,7 +257,7 @@ export const loadConfig = function(callback){
           });
 
         });
-        _saveConfig("contentList", _dataArr);
+        saveConfig("contentList", _dataArr);
 
       } else {
         errorCallback(error);
@@ -270,7 +270,7 @@ export const loadConfig = function(callback){
     function(error, response, body) { 
       if (!error && !body.errors && response.statusCode === 200) {
         _.forEach(body.data.viewer.allOptions.edges, function(item){
-          _saveConfig(item.node.item, item.node.value);
+          saveConfig(item.node.item, item.node.value);
         });
         if (callback) 
           callback.call();

@@ -35,7 +35,7 @@ import AdminConfig from './AdminConfig';
 import AdminLTEinit from './lib/app.js';
 import {riques, hasRole, errorCallback, getConfig, swalert} from '../utils';
 import Query from './query';
-import {loadConfig} from '../utils';
+import {saveConfig} from '../utils';
 import { toggleConfigLoadState, toggleControlSidebarState, toggleUnsavedDataState, setActivePage } from '../actions';
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo';
@@ -382,10 +382,6 @@ let Admin = React.createClass({
 
     AdminLTEinit();
 
-    loadConfig(function(){
-      me.props.dispatch(toggleConfigLoadState(true))
-    });
-
     if (this.props.page==="themes" && this.props.action==="customize") {
       this.props.dispatch(toggleControlSidebarState(false))
     } else {
@@ -497,5 +493,76 @@ const mapStateToProps = function(state){
   } else return {}
 }
 Admin = connect(mapStateToProps)(Admin);
+
+var qry = gql`query {
+  viewer {
+    allContents (where: {status: {eq: "active"}}) {
+      edges {
+        node {
+          id,
+          name,
+          slug,
+          description,
+          menuIcon,
+          fields,
+          customFields,
+          label,
+          labelSingular,
+          labelAddNew,
+          labelEdit,
+          createdAt,
+          status,
+          connection
+        }
+      }
+    }
+  }
+
+  viewer {
+    allOptions {
+      edges {
+        node {
+          id,
+          item,
+          value
+        }
+      }
+    }
+  }
+}`
+
+Admin = graphql(qry, {
+  props: ({ownProps, data}) => {
+    if (data.viewer) {
+      var _dataArr = [];
+
+      _.forEach(data.viewer.allContents.edges, function(item){
+        var dt = new Date(item.node.createdAt);
+        var fields = item.node.fields;
+        if (item.node.customFields) fields = _.concat(item.node.fields, item.node.customFields)
+
+        _dataArr.push({
+          "postId": item.node.id,
+          "name": item.node.name,
+          "fields": fields,
+          "customFields": item.node.customFields,
+          "slug": item.node.slug?item.node.slug:"",
+          "status": item.node.status?item.node.status:"",
+          "createdAt": dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate()
+        });
+
+      });
+      saveConfig("contentList", _dataArr);
+
+      _.forEach(data.viewer.allOptions.edges, function(item){
+        saveConfig(item.node.item, item.node.value);
+      });
+
+      return {
+        configLoaded: true
+      }
+    } 
+  }
+})(Admin);
 
 export default Admin
