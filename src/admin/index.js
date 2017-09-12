@@ -412,9 +412,9 @@ class Admin extends React.Component{
   }
 
   handleProfileClick(e){
-              e.preventDefault();
-              this.redirectToPage('profile');
-          }
+    e.preventDefault();
+    this.redirectToPage('profile');
+  }
 
   redirectToPage(pageId, actionId, postId, tagId){
       var me = this;
@@ -455,16 +455,15 @@ class Admin extends React.Component{
   }
 
   handleSignout(){
-    this.props.AuthService.logout();
-    this.props.onlogin(false);
+    this.props.onlogin(false, 'login');
   }
 
   render() {
-    if (this.props.AuthService.loggedIn() && this.state.configLoaded) {
+    if (this.props.logged && this.state.configLoaded) {
       return (
         <div className="wrapper">
                   
-          <AdminHeader authService={this.props.AuthService} handleSignout={this.handleSignout} onProfileClick={this.handleProfileClick} />
+          <AdminHeader handleSignout={this.handleSignout} onProfileClick={this.handleProfileClick} />
             <SideMenu onClick={this.handleMenuClick} activeMenu={this.state.page+(this.state.action?'-':'')+this.state.action}/>
               <PageLoader 
               pageId={this.state.page} 

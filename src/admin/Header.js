@@ -16,9 +16,7 @@ const AdminHeader = React.createClass({
   },
   render: function() {
     var rootUrl = getConfig('rootUrl');
-    var profile = this.props.profile;
-    if (this.props.authService.getProfile())
-      profile = this.props.authService.getProfile()
+    var profile = JSON.parse(localStorage.getItem('profile'))
 
     var image = rootUrl+"/images/avatar-default.png";
     if (JSON.parse(localStorage.getItem("profile")).image)

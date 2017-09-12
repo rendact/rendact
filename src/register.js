@@ -9,16 +9,16 @@ import { sendMail } from './utils'
 
 class Register extends React.Component{
 	constructor(props){
-        super(props);
+    super(props);
 		this.state = {
 			errorMsg:null,
 			loadingMsg:null
 		}
 
-        this.disableForm = this.disableForm.bind(this);
-        this.setProfile = this.setProfile.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.auth0LoginHandle = this.auth0LoginHandle.bind(this);
+    this.disableForm = this.disableForm.bind(this);
+    this.setProfile = this.setProfile.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.auth0LoginHandle = this.auth0LoginHandle.bind(this);
 
 	}
 
@@ -112,7 +112,7 @@ class Register extends React.Component{
 	}
 
 	auth0LoginHandle(){
-		//this.props.authService.showPopup()
+		
 	}
 
 	render(){
