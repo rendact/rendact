@@ -117,24 +117,7 @@ class TagWidget extends React.Component {
 
   handleOnUpdate(value){
     console.log(value)
-    modifyApolloCache({query: Query.getAllTags, variables: {type: this.props.postType, postId: this.props.postId}},
-      this.props.client,
-      toModify => {
-        toModify.viewer.currentTags.edges = _.map(value, item => {
-          let output = {}
-          output.node = {}
-          output.node.id = item.connectionId
-          output.node.tag = {
-            id: item.id,
-            name: item.label,
-            __typename: "Tag",
-          }
-          output.node.__typename = "TagOfPost"
-          return output
-        })
-        return toModify
-      }
-    )
+    //this.props.onChange(value)
   }
   render(){
     return (
@@ -153,7 +136,7 @@ class TagWidget extends React.Component {
                 name="form-field-name"
                 value={this.props.postTagList}
                 options={this.props.options}
-                onChange={this.handleOnUpdate}
+                onChange={this.props.onChange}
                 multi={true}
                 isLoading={this.props.isLoading}
                 disabled={this.props.isLoading}
@@ -174,7 +157,6 @@ TagWidget = _.flowRight([
     options: (props) => ({
       variables: {
         type: props.postType,
-        postId: props.postId
       }
     }),
     props: ({ownProps, data}) => {
@@ -186,14 +168,10 @@ TagWidget = _.flowRight([
         let options = _.map(data.viewer.allTags.edges, item => (
           {id: item.node.id, value: item.node.name, label: item.node.name}
         ))
-        let postTagList = _.map(data.viewer.currentTags.edges, item => (
-          {id: item.node.tag.id, value: item.node.tag.name, label: item.node.tag.name, connectionId: item.node.id}
-        ))
 
         return {
           isLoading: false,
           options,
-          postTagList,
         }
       }
     }
@@ -463,7 +441,7 @@ let NewContentTypeNoPostId = React.createClass({
     console.log("nextProps", props)
     if (props.data !== this.props.data){
       props.initialize(props.initialValues)
-      props.dispatch(setTagList(props.postTagList, props.postTagList))
+      props.dispatch(setTagList(props._postTagList, props._postTagList))
       props.dispatch(setPostStatus(props.data.status))
       
       props.titleTag && props.dispatch(updateTitleTagLeftCharacter(65-(props.titleTag.length)));
@@ -477,6 +455,7 @@ let NewContentTypeNoPostId = React.createClass({
     this.props.handleNav(this.props.slug, "new", null, null, () => {
       this.props.dispatch(resetPostEditor());
       this.props.destroy()
+      this.props.dispatch(setTagList([], []))
       $(".menu-item").removeClass("active");
       $("#menu-posts-new").addClass("active");
     })
@@ -1228,14 +1207,12 @@ const mapStateToProps = function(state, ownProps){
   }
 
   let imageGallery = ownProps.imageGallery || []
-  let postTagList = ownProps.postTagList || []
 
   return {
     ...ctn,
     ...state.maskArea,
     ...customProps,
     imageGallery,
-    postTagList
   }
 
 }
@@ -1339,7 +1316,7 @@ const mapResultToProps = ({ownProps, data}) => {
         isLoading: false,
         data: data.getPost,
         initialValues: initials,
-        postTagList : _postTagList,
+        _postTagList : _postTagList,
         imageGallery: _imageGalleryList,
         mode: "update",
         permalink: v.slug,
@@ -1384,9 +1361,9 @@ class NewContentType extends React.Component{
 
   render(){
     if (!this.props.urlParams) {
-      return <NewContentTypeNoPostId {...this.props} mode="create" imageGallery={this.state.imageGallery} setImageGallery={this.setImageGallery}/>
+      return <NewContentTypeNoPostId _postTagList={[]} {...this.props} mode="create" imageGallery={this.state.imageGallery} setImageGallery={this.setImageGallery}/>
     }
-    return <NewContentTypeWithPostId {...this.props} urlParams={this.props.urlParams}/>
+    return <NewContentTypeWithPostId  {...this.props} urlParams={this.props.urlParams}/>
   }
 }
 

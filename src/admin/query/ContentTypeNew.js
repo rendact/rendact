@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
 
-const getAllTags = gql`query getTags ($type: String!, $postId: ID!){
+const getAllTags = gql`query getTags ($type: String!){
     viewer {
       allTags : allTags (where: {type: {eq: $type}}) {
         edges {
@@ -10,17 +10,6 @@ const getAllTags = gql`query getTags ($type: String!, $postId: ID!){
           }
         }
       }
-currentTags:  allTagOfPosts(where: {postId: {eq: $postId}}){
-    edges{
-      node{
-        id
-        tag{
-          name
-          id
-        }
-      }
-    }
-  }
     }
   }`
 
