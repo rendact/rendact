@@ -125,12 +125,39 @@ let TagWidget = (props) => (
           options={props.options}
           onChange={props.onChange}
           multi={true}
+          isLoading={props.isLoading}
         />
         <p><span className="help-block">Press enter after inputting tag</span></p>
     </div>
   </div>
 </div>
 )
+
+
+
+TagWidget = graphql(Query.getAllTags, {
+  options: (props) => ({
+    variables: {
+      type: props.postType,
+    }
+  }),
+  props: ({ownProps, data}) => {
+    if (data.loading) {
+      return {isLoading: true}
+    } else if (data.error) {
+      return {hasError: true, error: data.error}
+    } else {
+      let options = _.map(data.viewer.allTags.edges, item => (
+        {id: item.node.id, value: item.node.name, label: item.node.name}
+      ))
+
+      return {
+        isLoading: false,
+        options: options
+      }
+    }
+  }
+})(TagWidget)
 
 let PageHiererachyWidget = (props) => {
   let templates = getTemplates();
@@ -1085,7 +1112,6 @@ let NewContentTypeNoPostId = React.createClass({
                   { this.isWidgetActive("tag") &&
                       <TagWidget 
                         postTagList={this.props.postTagList} 
-                        options={this.props.options} 
                         onChange={(value)=>{this.props.dispatch(setTagList(this.props.postTagListInit, value))}}
                       />
                   }
@@ -1180,50 +1206,6 @@ NewContentTypeNoPostId = _.flow([
   withApollo,
 ])(NewContentTypeNoPostId)
 
-
-const getAllTagQry = gql`query getTags ($type: String!){
-    viewer {
-      allTags (where: {type: {eq: $type}}) {
-        edges {
-          node {
-            id,
-            name,
-            post {
-              edges {
-                node{
-                  id
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }`
-
-NewContentTypeNoPostId = graphql(getAllTagQry, {
-  options: (props) => ({
-    variables: {
-      type: props.postType,
-    }
-  }),
-  props: ({ownProps, data}) => {
-    if (data.loading) {
-      return {isLoading: true}
-    } else if (data.error) {
-      return {hasError: true, error: data.error}
-    } else {
-      let options = _.map(data.viewer.allTags.edges, item => (
-        {id: item.node.id, value: item.node.name, label: item.node.name}
-      ))
-
-      return {
-        isLoading: false,
-        options: options
-      }
-    }
-  }
-})(NewContentTypeNoPostId)
 
 NewContentTypeNoPostId = reduxForm({
   form: 'newContentForm'

@@ -6,6 +6,7 @@ import Settings from './Settings.js'
 import Content from './Content.js'
 import Menu from './Menu.js'
 import Widget from './Widget'
+import ContentTypeNew from './ContentTypeNew';
 
 const subscriptionQry = `subscription {
       subscribeToPost(filter: {status: {eq: "Published"}}, mutations: [createPost]) {
@@ -99,7 +100,8 @@ const queries = {
   getListOfWidget: Widget.getListOfWidget,
   updateWidget: Widget.updateWidget,
   findWidget: Widget.findWidget,
-  getAllActiveWidgets: Widget.getAllActiveWidgets
+  getAllActiveWidgets: Widget.getAllActiveWidgets,
+  getAllTags: ContentTypeNew.getAllTags
 }
 
 export default queries;
