@@ -36,6 +36,10 @@ import AdminLTEinit from './lib/app.js';
 import {riques, hasRole, errorCallback, getConfig, swalert} from '../utils';
 import Query from './query';
 import {loadConfig} from '../utils';
+import { toggleConfigLoadState, toggleControlSidebarState, toggleUnsavedDataState, setActivePage } from '../actions';
+import gql from 'graphql-tag'
+import {graphql} from 'react-apollo';
+import {connect} from 'react-redux'
 
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -332,68 +336,69 @@ class PageLoader extends React.Component{
 }
 
 
-class Admin extends React.Component{
-  constructor(props) {
-    super(props);
-    this.state = {
-      page: this.props.params['page']?this.props.params['page']:'dashboard',
-      action: this.props.params['action']?this.props.params['action']:'',
-      postId: this.props.params['postId']?this.props.params['postId']:null,
-      tagId: this.props.params['tagId']?this.props.params['tagId']:null,
+let Admin = React.createClass({
+  propTypes: {
+    params: React.PropTypes.object,
+    page: React.PropTypes.string,
+    action: React.PropTypes.action,
+    postId: React.PropTypes.postId,
+    configLoaded: React.PropTypes.bool,
+    hasUnsavedData: React.PropTypes.bool,
+    showCtrlSidebar: React.PropTypes.bool
+  },
+  getDefaultProps: function() {
+    return { 
+      params: {
+        page: 'dashboard',
+        action: ''
+      },
+      page: 'dashboard',
+      action: '',
+      postId: '',
       configLoaded: false,
       hasUnsavedData: false,
-      showCtrlSidebar: true
+      showCtrlSidebar: false
     }
-    this.onBackButtonEvent = this.onBackButtonEvent.bind(this);
-    this.setUnsavedDataState = this.setUnsavedDataState.bind(this);
-    this.confirmUnsavedData = this.confirmUnsavedData.bind(this);
-    this.handleProfileClick = this.handleProfileClick.bind(this);
-    this.redirectToPage = this.redirectToPage.bind(this);
-    this.handleMenuClick = this.handleMenuClick.bind(this);
-    this.handleSignout = this.handleSignout.bind(this);
-  }
-
+  },
   componentDidMount(){
     var me = this;
+    require ('jquery-ui/themes/base/theme.css');
+    require ('jquery-ui/themes/base/tooltip.css');
+    require ('font-awesome/css/font-awesome.css');
+    require ('../../public/css/ionicons.min.css');
+    require ('../../public/css/AdminLTE.css');
+    require ('../../public/css/skins/_all-skins.css');
+    require ('jquery-ui/ui/widgets/tooltip')
+
+    AdminLTEinit();
+
     loadConfig(function(){
-      me.setState({configLoaded: true})
-
-      require ('jquery-ui/themes/base/theme.css');
-      require ('jquery-ui/themes/base/tooltip.css');
-      require ('font-awesome/css/font-awesome.css');
-      require ('../../public/css/ionicons.min.css');
-      require ('../../public/css/AdminLTE.css');
-      require ('../../public/css/skins/_all-skins.css');
-      require ('jquery-ui/ui/widgets/tooltip')
-
-      AdminLTEinit();
+      me.props.dispatch(toggleConfigLoadState(true))
     });
 
-    if (this.state.page==="themes" && this.state.action==="customize") {
-      this.setState({showCtrlSidebar: false})
+    if (this.props.page==="themes" && this.props.action==="customize") {
+      this.props.dispatch(toggleControlSidebarState(false))
     } else {
-      this.setState({showCtrlSidebar: true})
+      this.props.dispatch(toggleControlSidebarState(true))
     }
 
     window.onpopstate = this.onBackButtonEvent;
-  }
-
+  },
   onBackButtonEvent(e){
     e.preventDefault();
+    if (this._reactInternalInstance)
       this._reactInternalInstance._context.history.go(0);
-  }
-
+  },
   setUnsavedDataState(state){
-    this.setState({hasUnsavedData: state});
-  }
-
+    this.props.dispatch(toggleUnsavedDataState(state))
+  },
   confirmUnsavedData(callback){
     var state = true;
     var me = this;
     if (!callback)
     callback = function() {}
 
-    if (this.state.hasUnsavedData) {
+    if (this.props.hasUnsavedData) {
       swalert('warning','Sure want to navigate away?','You might lost some data',
         function(){
             callback.call();
@@ -409,30 +414,21 @@ class Admin extends React.Component{
       state = true;
     }
     return state;
-  }
-
+  },
   handleProfileClick(e){
     e.preventDefault();
     this.redirectToPage('profile');
-  }
-
+  },
   redirectToPage(pageId, actionId, postId, tagId){
       var me = this;
       this.confirmUnsavedData(
         function() {
           if (postId) {
-            me.setState({
-                page: pageId,
-                action: actionId,
-                postId: postId
-            })
+            me.props.dispatch(setActivePage(pageId, actionId, postId))
             //window.history.pushState("", "", '/admin/'+pageId+'/'+actionId+'/'+postId);
             me._reactInternalInstance._context.history.push('/admin/'+pageId+'/'+actionId+'/'+postId)
           } else {
-            me.setState({
-              page: pageId,
-              action: actionId
-            })
+            me.props.dispatch(setActivePage(pageId, actionId))
             if (actionId)
               //window.history.pushState("", "", '/admin/'+pageId+'/'+actionId);
               me._reactInternalInstance._context.history.push('/admin/'+pageId+'/'+actionId)
@@ -441,40 +437,37 @@ class Admin extends React.Component{
               me._reactInternalInstance._context.history.push('/admin/'+pageId)
           }
       });
-  }
-
+  },
   handleMenuClick(pageId, callback){
     var me = this;
     this.confirmUnsavedData(
       function(){
         var pg = pageId.split("-");
-        me.setState({page: pg[0], action: pg[1]?pg[1]:''});
+        me.props.dispatch(setActivePage(pg[0], pg[1]?pg[1]:''))
         callback.call();
       }
     );
-  }
-
+  },
   handleSignout(){
     this.props.onlogin(false, 'login');
-  }
-
+  },
   render() {
-    if (this.props.logged && this.state.configLoaded) {
+    if (this.props.logged && this.props.configLoaded) {
       return (
         <div className="wrapper">
                   
           <AdminHeader handleSignout={this.handleSignout} onProfileClick={this.handleProfileClick} />
-            <SideMenu onClick={this.handleMenuClick} activeMenu={this.state.page+(this.state.action?'-':'')+this.state.action}/>
+            <SideMenu onClick={this.handleMenuClick} activeMenu={this.props.page+(this.props.action?'-':'')+this.props.action}/>
               <PageLoader 
-              pageId={this.state.page} 
-              actionId={this.state.action} 
-              postId={this.state.postId} 
+              pageId={this.props.page} 
+              actionId={this.props.action} 
+              postId={this.props.postId} 
               handleNav={this.redirectToPage}
               handleUnsavedData={this.setUnsavedDataState}
               urlParams={this.props.params}
             />
             <Footer/>
-            { this.state.showCtrlSidebar && 
+            { this.props.showCtrlSidebar && 
               <ControlSidebar/>
             }
             <div className="control-sidebar-bg"></div>
@@ -486,13 +479,13 @@ class Admin extends React.Component{
       )
     }
   }
-}
+});
 
-Admin.defaultProps = {
-    params: {
-        page: 'dashboard',
-        action: ''
-    }
+const mapStateToProps = function(state){
+  if (!_.isEmpty(state.admin)) {
+    return state.admin;
+  } else return {}
 }
+Admin = connect(mapStateToProps)(Admin);
 
 export default Admin

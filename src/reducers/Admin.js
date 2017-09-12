@@ -1,43 +1,33 @@
 const admin = (state = [], action) => {
   switch (action.type) {
     case 'MASK_AREA':
-      return [
+      return {
         ...state,
-        {
-          isProcessing: action.isMasked,
-          opacity: action.isMasked?0.4:1
-        }
-      ]
+        isProcessing: action.isMasked,
+        opacity: action.isMasked?0.4:1
+      }
     case 'TOGGLE_CONFIG_LOAD':
-      return [
-        ...state,
-        {
-          configLoaded: action.state,
-        }
-      ]
+      return {
+      ...state,
+        configLoaded: action.state,
+      }
     case 'TOGGLE_CONTROL_SIDEBAR':
-      return [
-        ...state,
-        {
-          showCtrlSidebar: action.state
-        }
-      ]
+      return {
+      ...state,
+        showCtrlSidebar: action.state
+      }
     case 'TOGGLE_UNSAVED_DATA':
-      return [
-        ...state,
-        {
-          hasUnsavedData: action.state
-        }
-      ]
+      return {
+      ...state,
+        hasUnsavedData: action.state
+      }
     case 'SET_ACTIVE_PAGE':
-      return [
+      return {
         ...state,
-        {
-          page: action.pageId,
-          action: action.actionId,
-          postId: action.postId
-        }
-      ]
+        page: action.pageId,
+        action: action.actionId,
+        postId: action.postId?action.postId:null
+      }
     default:
       return state
   }

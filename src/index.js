@@ -48,15 +48,6 @@ let Main = React.createClass({
 	    request({url: 'https://rendact.auth0.com/v2/logout'});
 		}
 	},
-	componentWillReceiveProps(nextProps){
-    if (nextProps.profileData){
-      this.props.dispatch(setCheckAuthDone(true))
-      setProfile(nextProps.profileData)
-    }
-    if (nextProps.error){
-      this.props.dispatch(setCheckAuthDone(true))
-    }
-  },
 	render(){
 		return (
 				<BrowserRouter>
@@ -76,7 +67,7 @@ let Main = React.createClass({
 								render={ function(props){
 							    return this.props.logged ? (
 							      <Redirect to={{
-							        pathname: this.props.pathname,
+							        pathname: "/"+this.props.pathname,
 							        state: { from: props.location }
 							      }}/>
 							    ) : (
@@ -89,7 +80,9 @@ let Main = React.createClass({
 							<Miss component={ThemeHome}/>
 					</div>
 					) : (
-						<Loading />
+						<div id="router" style={{height: "100vh"}}>
+							<Loading />
+						</div>
 					) 
 				}
 				</BrowserRouter>
@@ -143,14 +136,16 @@ Main = graphql(getUserQry, {
   	if (data.error) {
   		return {
         logged: false,
-        error: data.error
+        error: data.error,
+        checkAuthDone: true
       }
   	}
   	
     if (data.getUser) {
       return {
         profileData: data.getUser,
-        logged: true
+        logged: true,
+        checkAuthDone: true
       }
     } else { 
       return {
