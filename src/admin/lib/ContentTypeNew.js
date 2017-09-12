@@ -107,57 +107,98 @@ let FeaturedImageWidget = (props) => (
 )
 
 
-let TagWidget = (props) => (
-<div className="box box-info" style={{marginTop:20}}>
-  <div className="box-header with-border">
-    <h3 className="box-title">Tags</h3>         
-    <div className="pull-right box-tools">
-      <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
-      <i className="fa fa-minus"></i></button>
-    </div>
-  </div>
-  <div className="box-body pad">
-    <div className="form-group" style={{width: '100%'}}>
-        <ReactSelect.Creatable
-          id="tag"
-          name="form-field-name"
-          value={props.postTagList}
-          options={props.options}
-          onChange={props.onChange}
-          multi={true}
-          isLoading={props.isLoading}
-        />
-        <p><span className="help-block">Press enter after inputting tag</span></p>
-    </div>
-  </div>
-</div>
-)
+
+class TagWidget extends React.Component {
+  constructor(props){
+    super(props)
+
+    this.handleOnUpdate = this.handleOnUpdate.bind(this)
+  }
+
+  handleOnUpdate(value){
+    console.log(value)
+    modifyApolloCache({query: Query.getAllTags, variables: {type: this.props.postType, postId: this.props.postId}},
+      this.props.client,
+      toModify => {
+        toModify.viewer.currentTags.edges = _.map(value, item => {
+          let output = {}
+          output.node = {}
+          output.node.id = item.connectionId
+          output.node.tag = {
+            id: item.id,
+            name: item.label,
+            __typename: "Tag",
+          }
+          output.node.__typename = "TagOfPost"
+          return output
+        })
+        return toModify
+      }
+    )
+  }
+  render(){
+    return (
+      <div className="box box-info" style={{marginTop:20}}>
+        <div className="box-header with-border">
+          <h3 className="box-title">Tags</h3>         
+          <div className="pull-right box-tools">
+            <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
+            <i className="fa fa-minus"></i></button>
+          </div>
+        </div>
+        <div className="box-body pad">
+          <div className="form-group" style={{width: '100%'}}>
+              <ReactSelect.Creatable
+                id="tag"
+                name="form-field-name"
+                value={this.props.postTagList}
+                options={this.props.options}
+                onChange={this.handleOnUpdate}
+                multi={true}
+                isLoading={this.props.isLoading}
+                disabled={this.props.isLoading}
+              />
+              <p><span className="help-block">Press enter after inputting tag</span></p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
 
 
 
-TagWidget = graphql(Query.getAllTags, {
-  options: (props) => ({
-    variables: {
-      type: props.postType,
-    }
-  }),
-  props: ({ownProps, data}) => {
-    if (data.loading) {
-      return {isLoading: true}
-    } else if (data.error) {
-      return {hasError: true, error: data.error}
-    } else {
-      let options = _.map(data.viewer.allTags.edges, item => (
-        {id: item.node.id, value: item.node.name, label: item.node.name}
-      ))
+TagWidget = _.flowRight([
+  withApollo,
+  graphql(Query.getAllTags, {
+    options: (props) => ({
+      variables: {
+        type: props.postType,
+        postId: props.postId
+      }
+    }),
+    props: ({ownProps, data}) => {
+      if (data.loading) {
+        return {isLoading: true}
+      } else if (data.error) {
+        return {hasError: true, error: data.error}
+      } else {
+        let options = _.map(data.viewer.allTags.edges, item => (
+          {id: item.node.id, value: item.node.name, label: item.node.name}
+        ))
+        let postTagList = _.map(data.viewer.currentTags.edges, item => (
+          {id: item.node.tag.id, value: item.node.tag.name, label: item.node.tag.name, connectionId: item.node.id}
+        ))
 
-      return {
-        isLoading: false,
-        options: options
+        return {
+          isLoading: false,
+          options,
+          postTagList,
+        }
       }
     }
-  }
-})(TagWidget)
+  })
+])(TagWidget)
 
 let PageHiererachyWidget = (props) => {
   let templates = getTemplates();
@@ -1114,6 +1155,7 @@ let NewContentTypeNoPostId = React.createClass({
                         postTagList={this.props.postTagList} 
                         onChange={(value)=>{this.props.dispatch(setTagList(this.props.postTagListInit, value))}}
                         postType={this.props.postType}
+                        postId={this.props.postId || "undefined"}
                       />
                   }
 
