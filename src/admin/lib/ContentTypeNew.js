@@ -3,7 +3,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import Query from '../query';
 import {riques, disableForm, errorCallback, 
-        getConfig, defaultHalogenStyle, getFormData} from '../../utils';
+        getConfig, defaultHalogenStyle, getFormData, modifyApolloCache} from '../../utils';
 import {getTemplates} from '../../includes/theme';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
@@ -395,7 +395,6 @@ let NewContentTypeNoPostId = React.createClass({
     console.log("nextProps", props)
     if (props.data !== this.props.data){
       props.initialize(props.initialValues)
-      props.dispatch(setImageGalleryList(props.imageGallery))
       props.dispatch(setTagList(props.postTagList, props.postTagList))
       props.dispatch(setPostStatus(props.data.status))
       
@@ -661,7 +660,7 @@ let NewContentTypeNoPostId = React.createClass({
           input: {
             type: "gallery",
             value: reader.result,
-            postId: me.props.urlParams.postId,
+            postId: me.props.urlParams.postId || null,
             blobFieldName: "myBlobField"
           }
         },
@@ -684,12 +683,20 @@ let NewContentTypeNoPostId = React.createClass({
         update: (store, data) => {
           let image = data.data.createFile.changedFile
           if (me.props.urlParams.postId){
-            let postQry = store.readQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}})
-            postQry.getPost.file.edges.splice(0, 0,{
-              node: {...data.data.createFile.changedFile},
-              __typename: 'FileEdge'
-            })
-            store.writeQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}, data: postQry})
+            modifyApolloCache(
+              {
+                query: Query.getPost,
+                variables: {
+                  id: me.props.urlParams.postId
+                }
+              },
+              store,
+              (toModify) => {
+                toModify.getPost.file.edges = [{node: {...image}, __typename: "FileEdge"}, ...toModify.getPost.file.edges]
+                return toModify
+              }
+            )
+
           } else {
             // this process imageGallery on create mode
             let imageGallery = _.cloneDeep(me.props.imageGallery)
@@ -774,6 +781,26 @@ let NewContentTypeNoPostId = React.createClass({
         update: (store, data) => {
           let image = data.data.deleteFile.changedFile
           if (me.props.urlParams.postId){
+            modifyApolloCache({query: Query.getPost, variables: {id: me.props.urlParams.postId}},
+              store,
+              (toModify) => {
+                if (!image.value) {
+                  debugger
+                  toModify.getPost.file.edges = _.map(toModify.getPot.file.edges, item => {
+                    if (item.node.id === image.id) {
+                      item.node.id = "customid"
+                      item.node.toDelete = true
+                    }
+                    return item
+                  })
+                } else {
+                  toModify.getPost.file.edges = _.filter(toModify.getPost.file.edges, item => item.node.id !== imageId)
+                }
+
+                return toModify
+              }
+            )
+            /*
             let postQry = store.readQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}})
             if (!image.value){
               postQry.getPost.file.edges = _.map(postQry.getPost.file.edges, item => {
@@ -787,6 +814,7 @@ let NewContentTypeNoPostId = React.createClass({
                 postQry.getPost.file.edges = _.filter(postQry.getPost.file.edges, item => item.node.id !== imageId)
               }
             store.writeQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}, data: postQry})
+            */
           } else {
             let imageGallery = _.cloneDeep(me.props.imageGallery)
 
@@ -1144,12 +1172,14 @@ const mapStateToProps = function(state, ownProps){
   }
 
   let imageGallery = ownProps.imageGallery || []
+  let postTagList = ownProps.postTagList || []
 
   return {
     ...ctn,
     ...state.maskArea,
     ...customProps,
     imageGallery,
+    postTagList
   }
 
 }

@@ -381,3 +381,9 @@ export const validateUrl = (value) => {
     return "http://" + value
   }
 }
+
+export const modifyApolloCache = (queryParam, client, modifier) => {
+  let data = client.readQuery(queryParam)
+  let modified = _.partial(modifier, data)()
+  client.writeQuery({...queryParam, data: modified})
+}
