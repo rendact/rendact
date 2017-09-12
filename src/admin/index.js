@@ -183,25 +183,35 @@ class SideMenu extends React.Component{
   }
 }
 
-class PageLoader extends React.Component{
-  constructor(props) {
-    super(props);
-    this.state = {pageId: "dashboard", actionId: ''}
-    this.isContentType = this.isContentType.bind(this)
-  }
-
+let PageLoader = React.createClass({
+  propTypes: {
+    params: React.PropTypes.object,
+    page: React.PropTypes.string,
+    action: React.PropTypes.action,
+    postId: React.PropTypes.postId,
+    configLoaded: React.PropTypes.bool,
+    hasUnsavedData: React.PropTypes.bool,
+    showCtrlSidebar: React.PropTypes.bool
+  },
+  getDefaultProps: function() {
+    return { 
+      page: 'dashboard',
+      action: '',
+      postId: '',
+      configLoaded: false,
+      hasUnsavedData: false,
+      showCtrlSidebar: false
+    }
+  },
   isContentType(page){
     var contentList = getConfig("contentList");
     var contentListIds = _.map(contentList, function(item){ return item.slug });
     return (_.indexOf(contentListIds, page) !== -1);
-  }
+  },
 
   render() {
     var page = this.props.pageId;
-    var action = "";
-    if (this.props.actionId) {
-                    action = "-"+this.props.actionId;
-                }
+    var action = this.props.actionId?"-"+this.props.actionId:"";
     var pid = this.props.postId;
     var hn = this.props.handleNav;
     var hud = this.props.handleUnsavedData;
@@ -333,7 +343,7 @@ class PageLoader extends React.Component{
       return <NotFound/>
       }
   }
-}
+});
 
 
 let Admin = React.createClass({
@@ -459,9 +469,9 @@ let Admin = React.createClass({
           <AdminHeader handleSignout={this.handleSignout} onProfileClick={this.handleProfileClick} />
             <SideMenu onClick={this.handleMenuClick} activeMenu={this.props.page+(this.props.action?'-':'')+this.props.action}/>
               <PageLoader 
-              pageId={this.props.page} 
-              actionId={this.props.action} 
-              postId={this.props.postId} 
+              pageId={this.props.params.page} 
+              actionId={this.props.params.action} 
+              postId={this.props.params.postId} 
               handleNav={this.redirectToPage}
               handleUnsavedData={this.setUnsavedDataState}
               urlParams={this.props.params}

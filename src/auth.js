@@ -30,7 +30,7 @@ let MatchWhenAuthorized = React.createClass({
     let Component = this.props.component;
     return <Match {...this.props} render={props => (
       this.props.logged ? (
-        <Component onlogin={setLogged} logged={this.props.logged} {...this.props}/>
+        <Component onlogin={setLogged} logged={this.props.logged} {...props}/>
       ) : (
         <Redirect to={{
           pathname: '/login',

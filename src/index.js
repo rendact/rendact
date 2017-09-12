@@ -69,7 +69,9 @@ let Main = React.createClass({
 							      <Redirect to={{
 							        pathname: "/"+this.props.pathname,
 							        state: { from: props.location }
-							      }}/>
+							      }}
+							      	{...props} 
+							      />
 							    ) : (
 							      <Login logged={this.props.logged} 
 							      	onlogin={this.setLogged} 
