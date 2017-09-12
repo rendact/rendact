@@ -3,7 +3,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import Query from '../query';
 import {riques, disableForm, errorCallback, 
-        getConfig, defaultHalogenStyle, getFormData} from '../../utils';
+        getConfig, defaultHalogenStyle, getFormData, modifyApolloCache} from '../../utils';
 import {getTemplates} from '../../includes/theme';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
@@ -257,7 +257,6 @@ CategoryWidget = graphql(categoryQuery,
           return {hasError: true, error: data.error}
         } else {
           let allCategoryList = _.map(data.viewer.allCategories.edges, item => item.node)
-          debugger
           return {
             isLoading: false,
             allCategoryList: allCategoryList
@@ -393,37 +392,26 @@ let NewContentTypeNoPostId = React.createClass({
   },
 
   componentWillReceiveProps: function(props){
-    console.log(props)
+    console.log("nextProps", props)
     if (props.data !== this.props.data){
       props.initialize(props.initialValues)
-      props.dispatch(setImageGalleryList(props.imageGallery))
       props.dispatch(setTagList(props.postTagList, props.postTagList))
       props.dispatch(setPostStatus(props.data.status))
-      props.dispatch(updateTitleTagLeftCharacter(65-(props.titleTag.length)));
-      props.dispatch(updateMetaDescriptionLeftCharacter(160-(props.metaDescription.length)));
+      
+      props.titleTag && props.dispatch(updateTitleTagLeftCharacter(65-(props.titleTag.length)));
+      props.metaDescription && props.dispatch(updateMetaDescriptionLeftCharacter(160-(props.metaDescription.length)));
     } else if (this.props.loading && !props.loading){
       this.disableForm(false)
     }
-    if (!this.props.permalink && props.permalinkFromDb){
-      props.dispatch(setSlug(props.permalinkFromDb, false))
-    }
 
-  /*
-  if (props.urlParams.postId !== this.props.postId){
-      props.dispatch(setPostId(props.urlParams.postId))
-      props.destroy()
-      console.log("hello")
-    }*/
-    if(!props.postId && this.props.postId){
-      props.dispatch(resetPostEditor());
-      props.destroy()
-    }
 },
   resetForm: function(){
-    this.props.handleNav(this.props.slug, "new")
-    this.props.dispatch(setPostId(""))
-    $(".menu-item").removeClass("active");
-    $("#menu-posts-new").addClass("active");
+    this.props.handleNav(this.props.slug, "new", null, null, () => {
+      this.props.dispatch(resetPostEditor());
+      this.props.destroy()
+      $(".menu-item").removeClass("active");
+      $("#menu-posts-new").addClass("active");
+    })
   },
   getMetaFormValues: function(v){
     var out = getFormData("metaField");
@@ -525,6 +513,10 @@ let NewContentTypeNoPostId = React.createClass({
     output["type"] = this.props.postType;
     output["authorId"] = localStorage.getItem('userId');
     output["slug"] = this.props.permalink;
+
+    if (["Public", "Private"].indexOf(output.visibility) === -1){
+      output.visibility = "Public"
+    }
     return output;
   },
   onSubmit: function(v, status) {
@@ -540,7 +532,7 @@ let NewContentTypeNoPostId = React.createClass({
       }
     }
 
-    if (v.metaDescription.length > 160){
+    if (v.metaDescription && v.metaDescription.length > 160){
       this._errorNotif('Meta Description is too long...!!')
       return;
     }
@@ -594,7 +586,8 @@ let NewContentTypeNoPostId = React.createClass({
             if (v.categories[key]) categToSave.push(key)
           })
 
-          let currentCat = _.keys(me.props.postCategoryList)
+          //let currentCat = _.keys(me.props.postCategoryList)
+          let currentCat = me.props.postCategoryList
 
           var catQry = Query.createUpdateCategoryOfPostMtn(postId, currentCat, categToSave);
           if (catQry) return this.props.client.mutate({
@@ -602,6 +595,10 @@ let NewContentTypeNoPostId = React.createClass({
             variables: catQry.variables
           })
         }
+      }
+
+      const processBinding = () => {
+        return this.bindPostToImageGallery(postId)
       }
 
       const processTag = () => {
@@ -621,8 +618,8 @@ let NewContentTypeNoPostId = React.createClass({
         } 
       }
 
-      let promise = _.reduce([processMetadata, processCategory, processTag], (prev, task) => {
-        return prev.then(() =>  task())
+      let promise = _.reduce([processBinding, processMetadata, processCategory, processTag], (prev, task) => {
+        return prev.then(() =>  task()).catch(error => errorCallback(error, error, error))
       }, Promise.resolve())
 
       promise.then(() => {
@@ -630,9 +627,10 @@ let NewContentTypeNoPostId = React.createClass({
         this._successNotif(noticeTxt)
         this.notifyUnsavedData(false)
         this.props.handleNav(me.props.slug, "edit", postId)
-        this.bindPostToImageGallery(postId)
-        this.props.postRefetch()
-      })
+        if (this.props.mode==="update"){
+          this.props.postRefetch()
+        }
+      }).catch(error => console.log(error))
     })
 
   },
@@ -662,7 +660,7 @@ let NewContentTypeNoPostId = React.createClass({
           input: {
             type: "gallery",
             value: reader.result,
-            postId: me.props.urlParams.postId,
+            postId: me.props.urlParams.postId || null,
             blobFieldName: "myBlobField"
           }
         },
@@ -677,43 +675,50 @@ let NewContentTypeNoPostId = React.createClass({
               postId: me.props.urlParams.postId,
               blobFieldName: 'myBlobField',
               id: "customid",
-              blobMimeType: "image/jpeg",
+              blobMimeType: null,
               blobUrl: ""
             }
           }
         },
         update: (store, data) => {
           let image = data.data.createFile.changedFile
+          if (me.props.urlParams.postId){
+            modifyApolloCache(
+              {
+                query: Query.getPost,
+                variables: {
+                  id: me.props.urlParams.postId
+                }
+              },
+              store,
+              (toModify) => {
+                toModify.getPost.file.edges = [{node: {...image}, __typename: "FileEdge"}, ...toModify.getPost.file.edges]
+                return toModify
+              }
+            )
 
-        
-          let imageGallery = _.cloneDeep(me.props.imageGallery);
-          if (imageGallery.length){
-            if (imageGallery[0].value === image.value){
-              imageGallery.splice(0, 1, {id: image.id, value: image.value})
-            } else {
-              imageGallery.splice(0, 0, {id: image.id, value: image.value})
-            }
           } else {
-            imageGallery = []
-            imageGallery.push({id: image.id, value: image.value})
+            // this process imageGallery on create mode
+            let imageGallery = _.cloneDeep(me.props.imageGallery)
+
+            if (!imageGallery.length){
+              imageGallery.push({id: image.id, value: image.value})
+            } else {
+              if (imageGallery[0].value === image.value) {
+                imageGallery.splice(0, 1, {id: image.id, value: image.value})
+              } else {
+                imageGallery.splice(0, 0, {id: image.id, value: image.value})
+              }
+            }
+
+            me.props.setImageGallery(imageGallery)
           }
-          me.props.dispatch(setImageGalleryList(imageGallery));
         }
       }).then(data => {
         console.log("addImageGallery mutation result", data)
         document.getElementById("imageGallery").value=null;
       }).catch(error => {
-        let imageGallery = _.cloneDeep(me.props.imageGallery);
-
-        imageGallery = _.map(imageGallery, item => {
-          if (item.id === "customid"){
-            item.value = ''
-            item.message = error
-          }
-          return item
-        });
-
-        me.props.dispatch(setImageGalleryList(imageGallery));
+        me._errorNotif(error.message)
       });
     }
     reader.readAsDataURL(e.target.files[0]);
@@ -732,16 +737,20 @@ let NewContentTypeNoPostId = React.createClass({
 
   bindPostToImageGallery: function(postId){
     var me = this;
-    if (this.props.imageGallery.length>0 && this.props.imageGalleryUnbinded) {
-      var qry = Query.bindImageGallery(this.props.imageGallery, postId);
+      return new Promise((resolve, reject) => {
+        if (me.props.imageGallery.length>0 && me.props.imageGalleryUnbinded) {
+          var qry = Query.bindImageGallery(me.props.imageGallery, postId);
 
-      this.props.client.mutate({
-        mutation: gql`${qry.query}`,
-        variables: qry.variables,
-      }).then((data) => {
-        this.props.dispatch(toggleImageGalleyBinded(false))
+          me.props.client.mutate({
+            mutation: gql`${qry.query}`,
+            variables: qry.variables,
+          }).then((data) => {
+            me.props.dispatch(toggleImageGalleyBinded(false))
+          })
+        }
+
+        resolve("hello world")
       })
-    }
   },
 
   handleImageRemove: function(e){
@@ -771,38 +780,62 @@ let NewContentTypeNoPostId = React.createClass({
       },
         update: (store, data) => {
           let image = data.data.deleteFile.changedFile
-
-        
-          let imageGallery = _.cloneDeep(me.props.imageGallery);
-          if (imageGallery.length){
-            if (!image.value){
-              imageGallery = _.map(imageGallery, item => {
-                if (item.id === image.id) {
-                  item.toDelete = true
+          if (me.props.urlParams.postId){
+            modifyApolloCache({query: Query.getPost, variables: {id: me.props.urlParams.postId}},
+              store,
+              (toModify) => {
+                if (!image.value) {
+                  debugger
+                  toModify.getPost.file.edges = _.map(toModify.getPot.file.edges, item => {
+                    if (item.node.id === image.id) {
+                      item.node.id = "customid"
+                      item.node.toDelete = true
+                    }
+                    return item
+                  })
+                } else {
+                  toModify.getPost.file.edges = _.filter(toModify.getPost.file.edges, item => item.node.id !== imageId)
                 }
+
+                return toModify
+              }
+            )
+            /*
+            let postQry = store.readQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}})
+            if (!image.value){
+              postQry.getPost.file.edges = _.map(postQry.getPost.file.edges, item => {
+                if (item.node.id === image.id){
+                  item.node.id = "customid"
+                  item.node.toDelete = true
+                } 
                 return item
+              })
+              } else {
+                postQry.getPost.file.edges = _.filter(postQry.getPost.file.edges, item => item.node.id !== imageId)
+              }
+            store.writeQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}, data: postQry})
+            */
+          } else {
+            let imageGallery = _.cloneDeep(me.props.imageGallery)
+
+            if(!image.value){
+              imageGallery = _.map(imageGallery, item => {
+                if(item.id === image.id){
+                  item.toDelete = true
+                } return item
               })
             } else {
               imageGallery = _.filter(imageGallery, item => item.id !== imageId)
             }
+
+            me.props.setImageGallery(imageGallery)
           }
-          me.props.dispatch(setImageGalleryList(imageGallery));
         }
     }).then(data => {
       console.log("remove mutation returned data ", data)
       document.getElementById("imageGallery").value=null
-      //this.props.postRefetch()
     }).catch(error => {
-      console.log(error)
-      let imageGallery = _.cloneDeep(me.props.imageGallery);
-      imageGallery = _.map(imageGallery, item => {
-        if (item.id === imageId) {
-          item.toDelete = false
-          item.message = error
-        }
-        return item
-      })
-      me.props.dispatch(setImageGalleryList(imageGallery));
+      this._errorNotif(error.message)
     })
   },
   _genReactSelect: function(contentId){
@@ -929,7 +962,7 @@ let NewContentTypeNoPostId = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4"><p>Title Tag</p></div>
                     <div className="col-md-8">
-                      <Field name="titleTag" component="input" type="text" className="form-control metaField" 
+                      <Field id={this.props.metaIds? this.props.metaIds.titleTag: null} name="titleTag" component="input" type="text" className="form-control metaField" 
                         style={{width: '100%'}} placeholder={this.props.title} onChange={this.handleTitleTagChange} />
                       <span className="help-block" style={{color: this.props.titleTagLeftCharacter < 0? '#f74747' : ''}}>Up to 65 characters recommended<br/>
                         {this.props.titleTagLeftCharacter} characters left</span>                     
@@ -938,7 +971,7 @@ let NewContentTypeNoPostId = React.createClass({
                   <div className="form-group">
                     <div className="col-md-4"><p>Meta Description</p></div>
                     <div className="col-md-8">
-                      <Field name="metaDescription" component="textarea" type="textarea" className="form-control metaField"                         rows='2' style={{width:'100%'}} placeholder={this.props.summary} onChange={this.handleMetaDescriptionChange} />
+                      <Field id={this.props.metaIds ? this.props.metaIds.metaDescription: null} name="metaDescription" component="textarea" type="textarea" className="form-control metaField"                         rows='2' style={{width:'100%'}} placeholder={this.props.summary} onChange={this.handleMetaDescriptionChange} />
                       <span className="help-block" style={{color: this.props.metaDescriptionLeftCharacter < 0? '#f74747' : ''}}>160 characters maximum<br/>
                       {this.props.metaDescriptionLeftCharacter} characters left</span>
                     </div>
@@ -947,7 +980,7 @@ let NewContentTypeNoPostId = React.createClass({
                     <div className="col-md-4"><p>Meta Keywords</p></div>
                     <div className="col-md-8">
                       <div className="form-group">
-                        <Field name="metaKeyword" component="input" type="text" className="form-control metaField" style={{width: '100%'}} />
+                        <Field id={this.props.metaIds ? this.props.metaIds.metaKeyword: null} name="metaKeyword" component="input" type="text" className="form-control metaField" style={{width: '100%'}} />
                         <span className="help-block"><b>News keywords </b><a>(?)</a></span>
                       </div>
                     </div>
@@ -963,7 +996,6 @@ let NewContentTypeNoPostId = React.createClass({
                 <div className="col-md-12">  
                   <div className="box box-info">
                     <div className="box-header with-border">
-                      <h3 className="box-title">Publish</h3>
                       <div className="pull-right box-tools">
                             <button type="button" data-widget="collapse" data-toggle="tooltip" title="Collapse" className="btn btn-box-tool ">
                               <i className="fa fa-minus"></i></button>
@@ -989,7 +1021,7 @@ let NewContentTypeNoPostId = React.createClass({
                         </div>
 
                         <div className="form-group">
-                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>{this.props.data.visibility} </b>
+                          <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>{this.props.visibilityTxt} </b>
                           <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#visibilityOption"> Edit </button></p>
                           <div id="visibilityOption" className="collapse">
                             <div className="radio">
@@ -1130,21 +1162,24 @@ let NewContentTypeNoPostId = React.createClass({
 
 let selector = formValueSelector("newContentForm")
 
-const mapStateToProps = function(state){
-  console.log(state.form)
+const mapStateToProps = function(state, ownProps){
   let ctn = state.contentTypeNew
   let customProps = {
     titleTag : selector(state, 'titleTag'),
     metaDescription: selector(state, 'metaDescription'),
-    metaKeyword: selector(state, 'metaKeyword')
+    metaKeyword: selector(state, 'metaKeyword'),
+    visibilityTxt: selector(state, 'visibility')
   }
-    
 
+  let imageGallery = ownProps.imageGallery || []
+  let postTagList = ownProps.postTagList || []
 
   return {
     ...ctn,
     ...state.maskArea,
-    ...customProps
+    ...customProps,
+    imageGallery,
+    postTagList
   }
 
 }
@@ -1208,13 +1243,7 @@ NewContentTypeNoPostId = reduxForm({
 })(NewContentTypeNoPostId)
 
 
-const NewContentTypeWithPostId = graphql(Query.getPost, {
-  options : (props) => ({
-    variables: {
-      id: props.urlParams.postId
-    }
-  }),
-  props: ({ownProps, data}) => {
+const mapResultToProps = ({ownProps, data}) => {
     if (data.loading){
       return {
         isLoading: true,
@@ -1227,6 +1256,7 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
         data: {},
       }
     } else {
+
       let initials = {};
       let v = data.getPost
 
@@ -1238,8 +1268,11 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
 
       // setting the meta values
 
+      let metaIds = {}
+
       if (data.getPost.meta.edges.length) {
         _.forEach(data.getPost.meta.edges, meta => {
+          metaIds[meta.node.item] = meta.node.id
           if(meta.node.value){
             initials[meta.node.item] = meta.node.value
           }
@@ -1254,9 +1287,13 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
 
       // setting category
       initials.categories = {};
+      let postCategoryList = []
       if (data.getPost.category.edges.length>0) {
         _.forEach(data.getPost.category.edges, cat => {
-          if (cat.node.category) initials.categories[cat.node.category.id] = true
+          if (cat.node.category){
+            initials.categories[cat.node.category.id] = true
+            postCategoryList.push([cat.node.category.id, cat.node.id]);
+          }
         })
       }
 
@@ -1281,7 +1318,7 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
       if (v.tag && v.file.edges.length>0) {
         _.forEach(v.file.edges, function(i){
           if (i.node.value){
-            _imageGalleryList.push({id: i.node.id, value: i.node.value});
+            _imageGalleryList.push({id: i.node.id, value: i.node.value, toDelete: i.node.toDelete});
           }
         });
       }
@@ -1293,22 +1330,52 @@ const NewContentTypeWithPostId = graphql(Query.getPost, {
         postTagList : _postTagList,
         imageGallery: _imageGalleryList,
         mode: "update",
-        permalinkFromDb: v.slug,
+        permalink: v.slug,
         postRefetch: data.refetch,
         publishDate: v.publishDate,
         immediatelyStatus: false,
-        postCategoryList: initials.categories
+        postCategoryList: postCategoryList,
+        metaIds: metaIds,
       }
     }
-  }
+}
+
+const NewContentTypeWithPostId = graphql(Query.getPost, {
+  options : (props) => ({
+    variables: {
+      id: props.postId
+    }
+  }),
+  props: mapResultToProps
 })(NewContentTypeNoPostId)
 
-let NewContentType = (props) => {
-  if (!props.urlParams) {
-    return <NewContentTypeNoPostId {...props} mode="create"/>
+
+class NewContentType extends React.Component{
+  constructor(props){
+    super(props)
+    this.state = {
+      imageGallery : []
+    }
+
+    this.setImageGallery = this.setImageGallery.bind(this)
   }
 
-  return <NewContentTypeWithPostId {...props}/>
+  setImageGallery(gallery){
+    this.setState({imageGallery: [...gallery]})
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(this.props.urlParams && !nextProps.urlParams){
+      this.setImageGallery([])
+    }
+  }
+
+  render(){
+    if (!this.props.urlParams) {
+      return <NewContentTypeNoPostId {...this.props} mode="create" imageGallery={this.state.imageGallery} setImageGallery={this.setImageGallery}/>
+    }
+    return <NewContentTypeWithPostId {...this.props} urlParams={this.props.urlParams}/>
+  }
 }
 
 

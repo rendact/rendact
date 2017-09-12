@@ -384,6 +384,11 @@ export const validateUrl = (value) => {
   }
 }
 
+export const modifyApolloCache = (queryParam, client, modifier) => {
+  let data = client.readQuery(queryParam)
+  let modified = _.partial(modifier, data)()
+  client.writeQuery({...queryParam, data: modified})
+}
 export function connectWithStore(store, WrappedComponent, ...args) {
   var ConnectedWrappedComponent = connect(...args)(WrappedComponent)
   return function (props) {

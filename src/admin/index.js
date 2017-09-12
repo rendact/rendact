@@ -422,10 +422,11 @@ let Admin = React.createClass({
     return state;
   },
   handleProfileClick(e){
-    e.preventDefault();
-    this.redirectToPage('profile');
-  },
-  redirectToPage(pageId, actionId, postId, tagId){
+        e.preventDefault();
+        this.redirectToPage('profile');
+    },
+
+  redirectToPage(pageId, actionId, postId, tagId, callback){
       var me = this;
       this.confirmUnsavedData(
         function() {
@@ -442,6 +443,8 @@ let Admin = React.createClass({
               //window.history.pushState("", "", '/admin/'+pageId);
               me._reactInternalInstance._context.history.push('/admin/'+pageId)
           }
+
+          if (callback) callback.call()
       });
   },
   handleMenuClick(pageId, callback){

@@ -12,7 +12,8 @@ import Register from './register'
 import reducer from './reducers'
 import {DragDropContext} from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
-import { createStore } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
+import clientGraphql from './apollo'
 import { setLogged, setCheckAuthDone } from './actions'
 import { connectWithStore, setProfile } from './utils'
 import gql from 'graphql-tag'
@@ -20,8 +21,7 @@ import _ from 'lodash'
 import AdminConfig from './admin/AdminConfig';
 import request from 'request';
 import Loading from './admin/Loading';
-
-const store = createStore(reducer)
+const store = createStore(reducer, {}, compose(applyMiddleware(clientGraphql.middleware())))
 
 let Main = React.createClass({
 	propTypes: {
