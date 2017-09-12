@@ -678,6 +678,7 @@ let NewContentTypeNoPostId = React.createClass({
         if (this.props.mode==="update"){
           this.props.postRefetch()
         }
+        this.props.dispatch(setEditorMode("update"))
       }).catch(error => console.log(error))
     })
 
@@ -1320,7 +1321,6 @@ const mapResultToProps = ({ownProps, data}) => {
         initialValues: initials,
         _postTagList : _postTagList,
         imageGallery: _imageGalleryList,
-        mode: "update",
         permalink: v.slug,
         postRefetch: data.refetch,
         publishDate: pubDate,
@@ -1365,7 +1365,7 @@ class NewContentType extends React.Component{
     if (!this.props.urlParams) {
       return <NewContentTypeNoPostId _postTagList={[]} {...this.props} mode="create" imageGallery={this.state.imageGallery} setImageGallery={this.setImageGallery}/>
     }
-    return <NewContentTypeWithPostId  {...this.props} urlParams={this.props.urlParams}/>
+    return <NewContentTypeWithPostId  {...this.props} urlParams={this.props.urlParams} mode="update"/>
   }
 }
 
