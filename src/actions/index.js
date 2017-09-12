@@ -1,8 +1,22 @@
+/* 
+ * MAIN ACTIONS
+ */
+
 export const setLogged = (isLogged, pathname) => ({
   type: 'LOGGED',
   isLogged,
   pathname
 })
+
+export const setCheckAuthDone = (state) => ({
+  type: 'SET_CHECK_AUTH_DONE',
+  state
+})
+
+/* 
+ * CONTENT LIST ACTION
+ */
+
 
 export const maskArea = (isMasked) => ({
   type: 'MASK_AREA',
@@ -181,28 +195,6 @@ export const setDateBirthAndTimezone = (dateOfBirth, timeZone) => ({
 export const setAvatar = (avatar)  => ({
   type: 'SET_AVATAR',
   avatar
-})
-
-export const toggleConfigLoad = (state)  => ({
-  type: 'TOGGLE_CONFIG_LOAD',
-  state
-})
-
-export const toggleControlSidebar = (state)  => ({
-  type: 'TOGGLE_CONTROL_SIDEBAR',
-  state
-})
-
-export const toggleUnsavedDataState = (state)  => ({
-  type: 'TOGGLE_UNSAVED_DATA',
-  state
-})
-
-export const setActivePage = (pageId, actioId, postId)  => ({
-  type: 'SET_ACTIVE_PAGE',
-  pageId,
-  actioId,
-  postId
 })
 
 export const loadFormData = (data)  => ({
@@ -387,4 +379,32 @@ export const setSearchQuery = (search) => ({
 export const setSearchResults = (results) => ({
   type: 'SET_SEARCH_RESULTS',
   results
+})
+
+
+/* 
+ * ADMIN ACTIONS
+ */
+
+
+export const toggleUnsavedDataState = (state)  => ({
+  type: 'TOGGLE_UNSAVED_DATA',
+  state
+})
+
+export const toggleConfigLoadState = (state)  => ({
+  type: 'TOGGLE_CONFIG_LOAD',
+  state
+})
+
+export const toggleControlSidebarState = (state)  => ({
+  type: 'TOGGLE_CONTROL_SIDEBAR',
+  state
+})
+
+export const setActivePage = (pageId, actionId, postId)  => ({
+  type: 'SET_ACTIVE_PAGE',
+  pageId,
+  actionId,
+  postId
 })
