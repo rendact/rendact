@@ -674,6 +674,7 @@ let NewContentTypeNoPostId = React.createClass({
         this._successNotif(noticeTxt)
         this.notifyUnsavedData(false)
         this.props.handleNav(me.props.slug, "edit", postId)
+        this.props.dispatch(toggleSaveImmediatelyMode(false, v.publishDate))
         if (this.props.mode==="update"){
           this.props.postRefetch()
         }
@@ -917,6 +918,7 @@ let NewContentTypeNoPostId = React.createClass({
             me.disableForm(false);
     this.notification = this.refs.notificationSystem;
   },
+
   render: function(){
     var rootUrl = getConfig('rootUrl');
     var templates = getTemplates();
