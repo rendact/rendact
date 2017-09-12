@@ -30,6 +30,11 @@ const admin = (state = [], action) => {
           postId: action.postId?action.postId:null
         }
       }
+    case 'SET_ACTIVE_MENU_ID':
+      return {
+        ...state,
+        activeMenu: action.menuId
+      }
     default:
       return state
   }

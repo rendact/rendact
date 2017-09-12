@@ -408,3 +408,8 @@ export const setActivePage = (pageId, actionId, postId)  => ({
   actionId,
   postId
 })
+
+export const setActiveMenuId = (menuId) => ({
+  type: 'SET_ACTIVE_MENU_ID',
+  menuId
+})

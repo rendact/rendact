@@ -36,7 +36,7 @@ import AdminLTEinit from './lib/app.js';
 import {riques, hasRole, errorCallback, getConfig, swalert} from '../utils';
 import Query from './query';
 import {saveConfig} from '../utils';
-import { toggleConfigLoadState, toggleControlSidebarState, toggleUnsavedDataState, setActivePage } from '../actions';
+import { toggleConfigLoadState, toggleControlSidebarState, toggleUnsavedDataState, setActivePage, setActiveMenuId } from '../actions';
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo';
 import {connect} from 'react-redux'
@@ -48,70 +48,56 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 
 require ('bootstrap');
 
-class SideMenu extends React.Component{
-  constructor(props) {
-    super(props);
-    this.state = {
-        activeMenu: this.props.activeMenu,
-        menuList: AdminConfig.menuList
+let SideMenu = React.createClass({
+  propTypes: {
+    activeMenu: React.PropTypes.string,
+    menuList: React.PropTypes.array
+  },
+  getDefaultProps: function() {
+    return { 
+      menuList: AdminConfig.menuList
     }
-    this.onClick = this.onClick.bind(this);
-    this.loadMenuOfContent = this.loadMenuOfContent.bind(this);
-  }
-
+  },  
   onClick(id, url, e){
     e.preventDefault();
     var me = this;
     var callback = function(){
-      me.setState({activeMenu: id});
       $(".menu-item").removeClass("active");
       $("#menu-"+id).addClass("active");
       window.history.pushState("", "", url);
     }
     this.props.onClick(id, callback);
-  }
-
-  loadMenuOfContent(){
-    var me = this;
-    var qry = Query.getContentListQry("active");
-    riques(qry, 
-      function(error, response, body) { 
-        if (body.data) { 
-          var _dataArr = [];
-
-          _.forEach(body.data.viewer.allContents.edges, function(item){
-            _dataArr.push(
-              {id: item.node.slug, label: item.node.name, icon: item.node.menuIcon?item.node.menuIcon:'fa-drivers-license-o', open: false, role: 5, roleId: 'view-post',
-                elements: [
-                  {id: item.node.slug, label: item.node.name, icon: 'fa-drivers-license-o', open: true, url: '/admin/'+item.node.slug, role: 5, roleId: 'view-post'},
-                  {id: item.node.slug+'-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/'+item.node.slug+'/new', role: 5, roleId: 'modify-post'},
-                  {id: item.node.slug+'-category', label: 'Category', icon: 'fa-edit', open: false, url: '/admin/'+item.node.slug+'/category', role: 5, roleId: 'modify-category'},
-                  {id: item.node.slug+'-tag', label: 'Tag', icon: 'fa-edit', open: false, url: '/admin/'+item.node.slug+'/tag', role: 5, roleId: 'modify-tag'}
-                ]
-              }
-            );
-          });
-          
-          me.setState({menuList: _.concat(me.state.menuList, _dataArr)})
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-      }
-    );
-  }
+  },
 
   componentDidMount(){
-    $("#menu-"+this.state.activeMenu).addClass("active");
-    $("#menu-"+this.state.activeMenu).parent("ul").parent("li").addClass("active");
-
-    this.loadMenuOfContent();
-  }
+    $("#menu-"+this.props.activeMenu).addClass("active");
+    $("#menu-"+this.props.activeMenu).parent("ul").parent("li").addClass("active");
+  },
 
   render() {
     let p = JSON.parse(localStorage.getItem("profile"));
     var image = getConfig('rootUrl')+"/images/avatar-default.png";
     if (p.image)
-    image = p.image;
+      image = p.image;
+
+    var menuList = this.props.menuList;
+    var _dataArr = [];
+
+    _.forEach(this.props.contentList, function(item){
+      _dataArr.push(
+        {id: item.node.slug, label: item.node.name, icon: item.node.menuIcon?item.node.menuIcon:'fa-drivers-license-o', open: false, role: 5, roleId: 'view-post',
+          elements: [
+            {id: item.node.slug, label: item.node.name, icon: 'fa-drivers-license-o', open: true, url: '/admin/'+item.node.slug, role: 5, roleId: 'view-post'},
+            {id: item.node.slug+'-new', label: 'Add New', icon: 'fa-edit', open: false, url: '/admin/'+item.node.slug+'/new', role: 5, roleId: 'modify-post'},
+            {id: item.node.slug+'-category', label: 'Category', icon: 'fa-edit', open: false, url: '/admin/'+item.node.slug+'/category', role: 5, roleId: 'modify-category'},
+            {id: item.node.slug+'-tag', label: 'Tag', icon: 'fa-edit', open: false, url: '/admin/'+item.node.slug+'/tag', role: 5, roleId: 'modify-tag'}
+          ]
+        }
+      );
+    });
+    
+    menuList = _.concat(menuList, _dataArr);
+
     return (
       <aside className="main-sidebar">
         <section className="sidebar">
@@ -134,7 +120,7 @@ class SideMenu extends React.Component{
             </div>
           </form>
           <ul className="sidebar-menu">
-            { this.state.menuList.map(function(item, index) {
+            { menuList.map(function(item, index) {
               if (item.roleId) {
                 if (!hasRole(item.roleId)) {
                   return null
@@ -181,14 +167,14 @@ class SideMenu extends React.Component{
       </aside>
     )
   }
-}
+});
 
 let PageLoader = React.createClass({
   propTypes: {
     params: React.PropTypes.object,
     page: React.PropTypes.string,
-    action: React.PropTypes.action,
-    postId: React.PropTypes.postId,
+    action: React.PropTypes.string,
+    postId: React.PropTypes.string,
     configLoaded: React.PropTypes.bool,
     hasUnsavedData: React.PropTypes.bool,
     showCtrlSidebar: React.PropTypes.bool
@@ -350,11 +336,13 @@ let Admin = React.createClass({
   propTypes: {
     params: React.PropTypes.object,
     page: React.PropTypes.string,
-    action: React.PropTypes.action,
-    postId: React.PropTypes.postId,
+    action: React.PropTypes.string,
+    postId: React.PropTypes.string,
     configLoaded: React.PropTypes.bool,
     hasUnsavedData: React.PropTypes.bool,
-    showCtrlSidebar: React.PropTypes.bool
+    showCtrlSidebar: React.PropTypes.bool,
+    contentList: React.PropTypes.array,
+    activeMenu: React.PropTypes.string
   },
   getDefaultProps: function() {
     return { 
@@ -367,7 +355,9 @@ let Admin = React.createClass({
       postId: '',
       configLoaded: false,
       hasUnsavedData: false,
-      showCtrlSidebar: false
+      showCtrlSidebar: false,
+      contentList: [],
+      activeMenu: ''
     }
   },
   componentDidMount(){
@@ -453,6 +443,7 @@ let Admin = React.createClass({
       function(){
         var pg = pageId.split("-");
         me.props.dispatch(setActivePage(pg[0], pg[1]?pg[1]:''))
+        me.props.dispatch(setActiveMenuId(pageId));
         callback.call();
       }
     );
@@ -466,20 +457,24 @@ let Admin = React.createClass({
         <div className="wrapper">
                   
           <AdminHeader handleSignout={this.handleSignout} onProfileClick={this.handleProfileClick} />
-            <SideMenu onClick={this.handleMenuClick} activeMenu={this.props.page+(this.props.action?'-':'')+this.props.action}/>
-              <PageLoader 
-              pageId={this.props.params.page} 
-              actionId={this.props.params.action} 
-              postId={this.props.params.postId} 
-              handleNav={this.redirectToPage}
-              handleUnsavedData={this.setUnsavedDataState}
-              urlParams={this.props.params}
+            <SideMenu 
+              onClick={this.handleMenuClick} 
+              activeMenu={this.props.page+(this.props.action?'-':'')+this.props.action}
+              contentList={this.props.contentList}
             />
-            <Footer/>
-            { this.props.showCtrlSidebar && 
-              <ControlSidebar/>
-            }
-            <div className="control-sidebar-bg"></div>
+                <PageLoader 
+                  pageId={this.props.params.page} 
+                  actionId={this.props.params.action} 
+                  postId={this.props.params.postId} 
+                  handleNav={this.redirectToPage}
+                  handleUnsavedData={this.setUnsavedDataState}
+                  urlParams={this.props.params}
+                />
+                <Footer/>
+                { this.props.showCtrlSidebar && 
+                  <ControlSidebar/>
+                }
+                <div className="control-sidebar-bg"></div>
         </div>
       );
     } else {
@@ -562,7 +557,8 @@ Admin = graphql(qry, {
       });
 
       return {
-        configLoaded: true
+        configLoaded: true,
+        contentList: data.viewer.allContents.edges
       }
     } 
   }
