@@ -286,19 +286,15 @@ const getUpdateCategoryOfPostQry = function(id, postId, categoryId){
 
 const createUpdateCategoryOfPostMtn = function(postId, currentCat, newCat){
   var variables = {};
-  //  var currentCatIds = _.map(currentCat, x => x[0])
-  /*
+    var currentCatIds = _.map(currentCat, x => x[0])
   var deleteList = [] ;
   _.forEach(currentCat, cc => {
     if (_.indexOf(newCat, cc[0]) === -1){
       deleteList.push(cc[1])
     }
   })
-  */
  
-  var addList = _.difference(newCat, currentCat);
-  var deleteList = _.difference(currentCat, newCat);
-  debugger
+  var addList = _.difference(newCat, currentCatIds);
 
   if (deleteList.length===0 && addList.length===0) return null;
   

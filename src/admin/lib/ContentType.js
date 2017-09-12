@@ -146,7 +146,6 @@ let ContentType = React.createClass({
 
           me.disableForm(false);
         })
-      
 
     /*var me = this;
     this.disableForm(true);

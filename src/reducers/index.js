@@ -16,16 +16,14 @@ import widgets from './Widgets';
 import search from './Search';
 import maskArea from './MaskArea';
 import listOfWidgets from './ListOfWidgets';
+import clientGraphql from '../apollo'
 
 const main = (state = [], action) => {
   switch (action.type) {
     case 'LOGGED':
-      return [
-        ...state,
-        {
-          logged: action.isLogged, pathname: action.pathname?action.pathname:null
-        }
-      ]
+      return { ...state, logged: action.isLogged, pathname: action.pathname?action.pathname:null}
+    case 'SET_CHECK_AUTH_DONE':
+      return { ...state, checkAuthDone: action.state }
     default:
       return state
   }
@@ -34,6 +32,7 @@ const main = (state = [], action) => {
 
 const rendactApp = combineReducers({
   form: reduxFormReducer,
+  apollo: clientGraphql.reducer(),
 	main,
   settings,
   contentNew,

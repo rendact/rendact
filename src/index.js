@@ -1,8 +1,8 @@
 import React from 'react'
 import {render} from 'react-dom'
-import {ApolloProvider} from 'react-apollo'
+import {ApolloProvider,graphql} from 'react-apollo'
 import {BrowserRouter, Match, Miss, Redirect} from 'react-router'
-import {AuthService, MatchWhenAuthorized} from './auth'
+import {MatchWhenAuthorized} from './auth'
 import client from './apollo'
 import {ThemeHome, ThemeSingle, ThemeBlog} from './includes/theme'
 import ThemeSearch from './includes/themeSearch'
@@ -12,84 +12,151 @@ import Register from './register'
 import reducer from './reducers'
 import {DragDropContext} from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
-import { createStore } from 'redux'
-window.AuthService = AuthService
-const store = createStore(reducer)
+import { createStore, applyMiddleware, compose } from 'redux'
+import clientGraphql from './apollo'
+import { setLogged, setCheckAuthDone } from './actions'
+import { connectWithStore, setProfile } from './utils'
+import gql from 'graphql-tag'
+import _ from 'lodash'
+import AdminConfig from './admin/AdminConfig';
+import request from 'request';
+import Loading from './admin/Loading';
+const store = createStore(reducer, {}, compose(applyMiddleware(clientGraphql.middleware())))
 
-class Main extends React.Component {
-    constructor(props){
-        super(props);
-        this.state = {
+let Main = React.createClass({
+	propTypes: {
+		logged: React.PropTypes.bool.isRequired,
+		pathname: React.PropTypes.string.isRequired,
+		checkAuthDone: React.PropTypes.bool.isRequired
+	},
+	getDefaultProps: function() {
+  	return {
 			logged: localStorage.getItem("token")?true:false,
-			pathname: 'admin'
-		};
-        this.setLogged = this.setLogged.bind(this);
-	}
+			checkAuthDone: false,
+      pathname: 'admin'
+		}
+ 	},
 	setLogged(state, pathname){
-		var _obj = {logged: state};
-		if (pathname) _obj['pathname'] = pathname;
-		this.setState(_obj);
-	}
-	componentWillMount(){
-		this.AuthService = new AuthService(this);
-		this.AuthService.checkAuth(this.onlogin);
-	}
-	/*
-	componentDidMount(){
-		this.subscribe();
-	}
-	
-	subscribe(repoName, updateQuery){
-	  this.subscriptionObserver = this.refs.provider.props.client.subscribe({
-		    query: Query.subscriptionQry
-	  }).subscribe({
-	    next(data) {
-	    	console.log("Data received");
-	    },
-	    error(err) { 
-	    	console.log(err); 
-	    },
-	  });
-	}
-	*/
+		this.props.dispatch(setLogged(state, pathname))
+		if (!state) {
+			localStorage.removeItem('token');
+	    localStorage.removeItem('userId');
+	    localStorage.removeItem('profile');
+	    localStorage.removeItem('loginType');
+	    localStorage.removeItem('auth0_profile');
+	    localStorage.removeItem('config');
+	    request({url: 'https://rendact.auth0.com/v2/logout'});
+		}
+	},
 	render(){
 		return (
-			<ApolloProvider client={client} ref="provider" store={store}>
 				<BrowserRouter>
+					{ this.props.checkAuthDone ? ( 
 					<div id="router" style={{height: "100vh"}}>
-						<MatchWhenAuthorized pattern="/admin/:page?/:action?/:postId?" 
-							component={Admin} 
-							onlogin={this.setLogged} 
-							logged={this.state.logged}
-							authService={this.AuthService} />
-						<Match pattern="/page/:pageId?/:param1?/:param2?" component={ThemeSingle}/>
-						<Match pattern="/post/:postId?/:param1?/:param2?" component={ThemeSingle}/>
-						<Match pattern="/blog/:postId?/:param1?/:param2?" component={ThemeBlog}/>
-						<Match pattern="/category/:categoryId?/:param1?/:param2?" component={ThemeBlog}/>
-            <Match pattern="/search/:search" component={ThemeSearch}/>
-						<Match pattern="/register/:param1?" component={Register}/>
-						<Match pattern="/login/:param1?" render={props => (
-					    this.state.logged ? (
-					      <Redirect to={{
-					        pathname: this.state.pathname,
-					        state: { from: props.location }
-					      }}/>
-					    ) : (
-					      <Login logged={this.state.logged} 
-					      	onlogin={this.setLogged} 
-					      	authService={this.AuthService}
-					      	{...props}
-					      />
-					    )
-					  )}/>
-						<Miss component={ThemeHome}/>
+							<MatchWhenAuthorized pattern="/admin/:page?/:action?/:postId?" 
+								component={Admin} 
+								logged={this.props.logged}
+								onlogin={this.setLogged} />
+							<Match pattern="/page/:pageId?/:param1?/:param2?" component={ThemeSingle}/>
+							<Match pattern="/post/:postId?/:param1?/:param2?" component={ThemeSingle}/>
+							<Match pattern="/blog/:postId?/:param1?/:param2?" component={ThemeBlog}/>
+							<Match pattern="/category/:categoryId?/:param1?/:param2?" component={ThemeBlog}/>
+	            <Match pattern="/search/:search" component={ThemeSearch}/>
+							<Match pattern="/register/:param1?" component={Register}/>
+							<Match pattern="/login/:param1?" 
+								render={ function(props){
+							    return this.props.logged ? (
+							      <Redirect to={{
+							        pathname: "/"+this.props.pathname,
+							        state: { from: props.location }
+							      }}
+							      	{...props} 
+							      />
+							    ) : (
+							      <Login logged={this.props.logged} 
+							      	onlogin={this.setLogged} 
+							      	{...props}
+							      />
+							    )
+						  }.bind(this)}/>
+							<Miss component={ThemeHome}/>
 					</div>
+					) : (
+						<div id="router" style={{height: "100vh"}}>
+							<Loading />
+						</div>
+					) 
+				}
 				</BrowserRouter>
-			</ApolloProvider>
 		)
 	}
+})
+
+const mapStateToProps = function(state){
+	if (!_.isEmpty(state.main)) {
+		return state.main;
+	} else return {}
 }
+Main = connectWithStore(store, Main, mapStateToProps);
+
+var getUserQry = gql`query GetUser($id: ID!) {
+  getUser(id: $id) {
+    id
+    username
+    fullName
+    gender
+    image
+    email
+    lastLogin
+    createdAt
+    country
+    dateOfBirth
+    meta {
+      edges {
+        node {
+          id
+          item
+          value
+        }
+      }
+    }
+    roles {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+    }
+  }
+}`
+
+Main = graphql(getUserQry, {
+  options: { variables: { id: localStorage.userId } },
+  props: ({ownProps, data}) => {
+  	
+  	if (data.error) {
+  		return {
+        logged: false,
+        error: data.error,
+        checkAuthDone: true
+      }
+  	}
+  	
+    if (data.getUser) {
+      return {
+        profileData: data.getUser,
+        logged: true,
+        checkAuthDone: true
+      }
+    } else { 
+      return {
+        logged: false,
+        profileData: null
+      }
+    }
+  }
+})(Main);
 
 Main = DragDropContext(HTML5Backend)(Main);
-
-render(<Main/>, document.getElementById('root'));
+render(<ApolloProvider client={client} store={store}><Main/></ApolloProvider>, document.getElementById('root'));

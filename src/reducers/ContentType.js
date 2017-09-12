@@ -22,7 +22,8 @@ const contentType = (state = INITIAL_VALUES, action) => {
     case 'TOGGLE_SELECTED_ITEM':
       return state.map(item =>  ({...item, itemSelected: action.isSelected}))
 
-    case 'MASK_AREA':if (state)
+    case 'MASK_AREA':
+      if (state)
         return state.map(item =>  ({...item, isProcessing: action.isMasked, opacity: action.isMasked?0.4:1}))
       else
         return [

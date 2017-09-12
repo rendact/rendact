@@ -1,9 +1,11 @@
+import React from 'react';
 import request from 'request';
 import Config from './config';
 import AdminConfig from './admin/AdminConfig';
 import Query from './admin/query';
 import _ from 'lodash';
 import { default as swal } from 'sweetalert2';
+import {connect} from 'react-redux'
 
 export const swalert = function(type, title, body, callback, rgba){
   var background = '#fff';
@@ -223,7 +225,7 @@ export const disableForm = function(state, notif, excludeClass){
   */
 }
 
-export const _saveConfig = function(name, value){
+export const saveConfig = function(name, value){
   var config = JSON.parse(localStorage.getItem('config'));
   if (config === null ){
     config = {}
@@ -255,7 +257,7 @@ export const loadConfig = function(callback){
           });
 
         });
-        _saveConfig("contentList", _dataArr);
+        saveConfig("contentList", _dataArr);
 
       } else {
         errorCallback(error);
@@ -268,7 +270,7 @@ export const loadConfig = function(callback){
     function(error, response, body) { 
       if (!error && !body.errors && response.statusCode === 200) {
         _.forEach(body.data.viewer.allOptions.edges, function(item){
-          _saveConfig(item.node.item, item.node.value);
+          saveConfig(item.node.item, item.node.value);
         });
         if (callback) 
           callback.call();
@@ -379,5 +381,62 @@ export const validateUrl = (value) => {
     return value.replace(/(https?):?\/{0,2}(\w*)/, '$1://$2')
   } else {
     return "http://" + value
+  }
+}
+
+export const modifyApolloCache = (queryParam, client, modifier) => {
+  let data = client.readQuery(queryParam)
+  let modified = _.partial(modifier, data)()
+  client.writeQuery({...queryParam, data: modified})
+}
+export function connectWithStore(store, WrappedComponent, ...args) {
+  var ConnectedWrappedComponent = connect(...args)(WrappedComponent)
+  return function (props) {
+    return <ConnectedWrappedComponent {...props} store={store} />
+  }
+}
+export const setProfile = (p) => { 
+  var meta = {}
+  var metaList = AdminConfig.userMetaList;
+  var metaIdList = {};
+  _.forEach(metaList, function(item){
+    meta[item] = _.find(p.meta.edges, {"node": {"item": item}});
+    metaIdList[item] = meta[item]?meta[item].node.id:null;
+  })
+  
+  var roleList = [];
+  _.forEach(p.roles.edges, function(item){
+    roleList.push(item.node.name)
+  })
+  
+  var profile = {
+      name: p.fullName?p.fullName:p.username,
+      username: p.username,
+      email: p.email,
+      gender: p.gender,
+      image: p.image,
+      lastLogin: p.lastLogin,
+      createdAt: p.createdAt,
+      biography: meta["bio"]?meta["bio"].node.value:"",
+      dateOfBirth: p.dateOfBirth?p.dateOfBirth:"",
+      phone: meta["phone"]?meta["phone"].node.value:"",
+      country: p.country?p.country:"",
+      timezone: meta["timezone"]?meta["timezone"].node.value:"",
+      website: meta["website"]?meta["website"].node.value:"",
+      facebook: meta["facebook"]?meta["facebook"].node.value:"",
+      twitter: meta["twitter"]?meta["twitter"].node.value:"",
+      linkedin: meta["linkedin"]?meta["linkedin"].node.value:"",
+      userPrefConfig: meta["userPrefConfig"]?meta["userPrefConfig"].node.value:"",
+      roles: roleList
+  }
+  
+  localStorage.setItem("userId", p.id);
+  localStorage.setItem('profile', JSON.stringify(profile));
+  localStorage.setItem('metaIdList', JSON.stringify(metaIdList));
+
+  if (meta["userPrefConfig"]){
+    _.forEach(JSON.parse(meta["userPrefConfig"].node.value), function(value, key){
+      localStorage.setItem(key, value);
+    });
   }
 }
