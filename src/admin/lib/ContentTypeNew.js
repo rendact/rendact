@@ -682,6 +682,10 @@ let NewContentTypeNoPostId = React.createClass({
         },
         update: (store, data) => {
           let image = data.data.createFile.changedFile
+          const modifier = (toModify) => {
+            toModify.getPost.file.edges = [{node: {...image}, __typename: "FileEdge"}, ...toModify.getPost.file.edges]
+            return toModify
+          }
           if (me.props.urlParams.postId){
             modifyApolloCache(
               {
@@ -691,10 +695,7 @@ let NewContentTypeNoPostId = React.createClass({
                 }
               },
               store,
-              (toModify) => {
-                toModify.getPost.file.edges = [{node: {...image}, __typename: "FileEdge"}, ...toModify.getPost.file.edges]
-                return toModify
-              }
+              modifier
             )
 
           } else {
@@ -781,12 +782,9 @@ let NewContentTypeNoPostId = React.createClass({
         update: (store, data) => {
           let image = data.data.deleteFile.changedFile
           if (me.props.urlParams.postId){
-            modifyApolloCache({query: Query.getPost, variables: {id: me.props.urlParams.postId}},
-              store,
-              (toModify) => {
+            const modifier = (toModify) => {
                 if (!image.value) {
-                  debugger
-                  toModify.getPost.file.edges = _.map(toModify.getPot.file.edges, item => {
+                  toModify.getPost.file.edges = _.map(toModify.getPost.file.edges, item => {
                     if (item.node.id === image.id) {
                       item.node.id = "customid"
                       item.node.toDelete = true
@@ -798,23 +796,12 @@ let NewContentTypeNoPostId = React.createClass({
                 }
 
                 return toModify
-              }
+            }
+
+            modifyApolloCache({query: Query.getPost, variables: {id: me.props.urlParams.postId}},
+              store,
+              modifier
             )
-            /*
-            let postQry = store.readQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}})
-            if (!image.value){
-              postQry.getPost.file.edges = _.map(postQry.getPost.file.edges, item => {
-                if (item.node.id === image.id){
-                  item.node.id = "customid"
-                  item.node.toDelete = true
-                } 
-                return item
-              })
-              } else {
-                postQry.getPost.file.edges = _.filter(postQry.getPost.file.edges, item => item.node.id !== imageId)
-              }
-            store.writeQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}, data: postQry})
-            */
           } else {
             let imageGallery = _.cloneDeep(me.props.imageGallery)
 
