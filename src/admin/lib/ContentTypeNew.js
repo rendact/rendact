@@ -1113,6 +1113,7 @@ let NewContentTypeNoPostId = React.createClass({
                       <TagWidget 
                         postTagList={this.props.postTagList} 
                         onChange={(value)=>{this.props.dispatch(setTagList(this.props.postTagListInit, value))}}
+                        postType={this.props.postType}
                       />
                   }
 
