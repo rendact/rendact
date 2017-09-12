@@ -44,8 +44,11 @@ let ContentType = React.createClass({
   dt: null,
 
   loadData: function(status, callback) {
-    //let listOfData = client.readQuery({query: gql`${Query.loadSettingsQry.query}`})
-    //debugger;
+    let listOfData = this.props.client.query({query: gql`${Query.getPostListQry(status).query}`})
+    listOfData.then(function(data) { query: gql`${Query.getPostListQry(status).query}` })
+    debugger;
+
+
     /*var me = this;
     this.disableForm(true);
     var metaItemList = _.map(this.props.customFields, function(item) { return item.id });
@@ -301,7 +304,7 @@ let ContentType = React.createClass({
       })
     } ;
   },
-  /*handleDateFilter: function(event){
+  handleDateFilter: function(event){
     this.disableForm(true);
     var status = this.props.activeStatus;
     if (status==='Trash'){
@@ -323,7 +326,7 @@ let ContentType = React.createClass({
         te.disableForm(false);
       })
     } ;
-  },*/
+  },
   handleSetOwnerButton: function(e){
     var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     if (checkedRow.length > 1) {
