@@ -24,9 +24,11 @@ const admin = (state = [], action) => {
     case 'SET_ACTIVE_PAGE':
       return {
         ...state,
-        page: action.pageId,
-        action: action.actionId,
-        postId: action.postId?action.postId:null
+        params: {
+          page: action.pageId,
+          action: action.actionId,
+          postId: action.postId?action.postId:null
+        }
       }
     default:
       return state
