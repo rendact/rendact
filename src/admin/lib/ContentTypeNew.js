@@ -1292,7 +1292,7 @@ const mapResultToProps = ({ownProps, data}) => {
       }
 
       // setting content
-      var pubDate = data.getPost.publishDate? new Date(data.getPost.publishDate) : new Date();
+      var pubDate = v.createdAt? new Date(v.createdAt) : new Date();
       initials["hours"] = pubDate.getHours();
       initials["minutes"] = pubDate.getMinutes();
       initials["publishDate"] = pubDate;
@@ -1344,7 +1344,7 @@ const mapResultToProps = ({ownProps, data}) => {
         mode: "update",
         permalink: v.slug,
         postRefetch: data.refetch,
-        publishDate: v.publishDate,
+        publishDate: pubDate,
         immediatelyStatus: false,
         postCategoryList: postCategoryList,
         metaIds: metaIds,
