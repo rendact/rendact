@@ -22,32 +22,50 @@ import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPost
 import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {graphql, withApollo} from 'react-apollo';
 import gql from 'graphql-tag';
+import Script from 'react-load-script'
 
 
-class CkeditorField extends React.Component{
+class CkeditorField extends React.Component {
+  constructor(props){
+    super(props)
+
+    this.onLoad = this.onLoad.bind(this)
+    this.handleOnError = this.handleOnError.bind(this)
+  }
+
+  onLoad(){
+    window.CKEDITOR.replace('content', {
+      height: 400,
+      title: false
+    })
+
+    for (var i in window.CKEDITOR.instances) {
+      if (window.CKEDITOR.instances.hasOwnProperty(i)) {
+        window.CKEDITOR.instances[i].on('change', this.props.handleContentChange)
+      }
+    }
+  }
+
+  handleOnError(){
+  }
 
   componentWillReceiveProps(props){
-    if (props.content !== this.props.content){
-      if(window.CKEDITOR) window.CKEDITOR.instances['content'].setData(props.content);
+    if (props.content && (!window.CKEDITOR.instances['content'].getData() || !this.props.content)){
+      window.CKEDITOR.instances['content'].setData(props.content)
     }
-
   }
 
-  componentDidMount(){
-    let me = this;
-    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
-      window.CKEDITOR.replace('content', {
-        height: 400,
-        title: false
-      });
-      for (var i in window.CKEDITOR.instances) {
-        if (window.CKEDITOR.instances.hasOwnProperty(i))
-          window.CKEDITOR.instances[i].on('change', me.props.handleContentChange);
-      }
-    });
-  }
   render(){
-    return <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="textarea" className="form-control" />
+    return (
+      <div>
+        <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="textarea" className="form-control" />
+        <Script
+          url="https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js"
+          onError={this.handleOnError}
+          onLoad={this.onLoad}
+        />
+      </div>
+    )
   }
 }
 
