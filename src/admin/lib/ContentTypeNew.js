@@ -22,32 +22,50 @@ import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPost
 import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {graphql, withApollo} from 'react-apollo';
 import gql from 'graphql-tag';
+import Script from 'react-load-script'
 
 
-class CkeditorField extends React.Component{
+class CkeditorField extends React.Component {
+  constructor(props){
+    super(props)
+
+    this.onLoad = this.onLoad.bind(this)
+    this.handleOnError = this.handleOnError.bind(this)
+  }
+
+  onLoad(){
+    window.CKEDITOR.replace('content', {
+      height: 400,
+      title: false
+    })
+
+    for (var i in window.CKEDITOR.instances) {
+      if (window.CKEDITOR.instances.hasOwnProperty(i)) {
+        window.CKEDITOR.instances[i].on('change', this.props.handleContentChange)
+      }
+    }
+  }
+
+  handleOnError(){
+  }
 
   componentWillReceiveProps(props){
-    if (props.content !== this.props.content){
-      if(window.CKEDITOR) window.CKEDITOR.instances['content'].setData(props.content);
+    if (props.content && (!window.CKEDITOR.instances['content'].getData() || !this.props.content)){
+      window.CKEDITOR.instances['content'].setData(props.content)
     }
-
   }
 
-  componentDidMount(){
-    let me = this;
-    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
-      window.CKEDITOR.replace('content', {
-        height: 400,
-        title: false
-      });
-      for (var i in window.CKEDITOR.instances) {
-        if (window.CKEDITOR.instances.hasOwnProperty(i))
-          window.CKEDITOR.instances[i].on('change', me.props.handleContentChange);
-      }
-    });
-  }
   render(){
-    return <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="textarea" className="form-control" />
+    return (
+      <div>
+        <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="textarea" className="form-control" />
+        <Script
+          url="https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js"
+          onError={this.handleOnError}
+          onLoad={this.onLoad}
+        />
+      </div>
+    )
   }
 }
 
@@ -107,30 +125,76 @@ let FeaturedImageWidget = (props) => (
 )
 
 
-let TagWidget = (props) => (
-<div className="box box-info" style={{marginTop:20}}>
-  <div className="box-header with-border">
-    <h3 className="box-title">Tags</h3>         
-    <div className="pull-right box-tools">
-      <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
-      <i className="fa fa-minus"></i></button>
-    </div>
-  </div>
-  <div className="box-body pad">
-    <div className="form-group" style={{width: '100%'}}>
-        <ReactSelect.Creatable
-          id="tag"
-          name="form-field-name"
-          value={props.postTagList}
-          options={props.options}
-          onChange={props.onChange}
-          multi={true}
-        />
-        <p><span className="help-block">Press enter after inputting tag</span></p>
-    </div>
-  </div>
-</div>
-)
+
+class TagWidget extends React.Component {
+  constructor(props){
+    super(props)
+
+    this.handleOnUpdate = this.handleOnUpdate.bind(this)
+  }
+
+  handleOnUpdate(value){
+    console.log(value)
+    //this.props.onChange(value)
+  }
+  render(){
+    return (
+      <div className="box box-info" style={{marginTop:20}}>
+        <div className="box-header with-border">
+          <h3 className="box-title">Tags</h3>         
+          <div className="pull-right box-tools">
+            <button type="button" className="btn btn-box-tool" data-widget="collapse" title="Collapse">
+            <i className="fa fa-minus"></i></button>
+          </div>
+        </div>
+        <div className="box-body pad">
+          <div className="form-group" style={{width: '100%'}}>
+              <ReactSelect.Creatable
+                id="tag"
+                name="form-field-name"
+                value={this.props.postTagList}
+                options={this.props.options}
+                onChange={this.props.onChange}
+                multi={true}
+                isLoading={this.props.isLoading}
+                disabled={this.props.isLoading}
+              />
+              <p><span className="help-block">Press enter after inputting tag</span></p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
+
+
+
+TagWidget = _.flowRight([
+  withApollo,
+  graphql(Query.getAllTags, {
+    options: (props) => ({
+      variables: {
+        type: props.postType,
+      }
+    }),
+    props: ({ownProps, data}) => {
+      if (data.loading) {
+        return {isLoading: true}
+      } else if (data.error) {
+        return {hasError: true, error: data.error}
+      } else {
+        let options = _.map(data.viewer.allTags.edges, item => (
+          {id: item.node.id, value: item.node.name, label: item.node.name}
+        ))
+
+        return {
+          isLoading: false,
+          options,
+        }
+      }
+    }
+  })
+])(TagWidget)
 
 let PageHiererachyWidget = (props) => {
   let templates = getTemplates();
@@ -395,7 +459,7 @@ let NewContentTypeNoPostId = React.createClass({
     console.log("nextProps", props)
     if (props.data !== this.props.data){
       props.initialize(props.initialValues)
-      props.dispatch(setTagList(props.postTagList, props.postTagList))
+      props.dispatch(setTagList(props._postTagList, props._postTagList))
       props.dispatch(setPostStatus(props.data.status))
       
       props.titleTag && props.dispatch(updateTitleTagLeftCharacter(65-(props.titleTag.length)));
@@ -409,6 +473,7 @@ let NewContentTypeNoPostId = React.createClass({
     this.props.handleNav(this.props.slug, "new", null, null, () => {
       this.props.dispatch(resetPostEditor());
       this.props.destroy()
+      this.props.dispatch(setTagList([], []))
       $(".menu-item").removeClass("active");
       $("#menu-posts-new").addClass("active");
     })
@@ -627,9 +692,11 @@ let NewContentTypeNoPostId = React.createClass({
         this._successNotif(noticeTxt)
         this.notifyUnsavedData(false)
         this.props.handleNav(me.props.slug, "edit", postId)
+        this.props.dispatch(toggleSaveImmediatelyMode(false, v.publishDate))
         if (this.props.mode==="update"){
           this.props.postRefetch()
         }
+        this.props.dispatch(setEditorMode("update"))
       }).catch(error => console.log(error))
     })
 
@@ -682,6 +749,10 @@ let NewContentTypeNoPostId = React.createClass({
         },
         update: (store, data) => {
           let image = data.data.createFile.changedFile
+          const modifier = (toModify) => {
+            toModify.getPost.file.edges = [{node: {...image}, __typename: "FileEdge"}, ...toModify.getPost.file.edges]
+            return toModify
+          }
           if (me.props.urlParams.postId){
             modifyApolloCache(
               {
@@ -691,10 +762,7 @@ let NewContentTypeNoPostId = React.createClass({
                 }
               },
               store,
-              (toModify) => {
-                toModify.getPost.file.edges = [{node: {...image}, __typename: "FileEdge"}, ...toModify.getPost.file.edges]
-                return toModify
-              }
+              modifier
             )
 
           } else {
@@ -781,12 +849,9 @@ let NewContentTypeNoPostId = React.createClass({
         update: (store, data) => {
           let image = data.data.deleteFile.changedFile
           if (me.props.urlParams.postId){
-            modifyApolloCache({query: Query.getPost, variables: {id: me.props.urlParams.postId}},
-              store,
-              (toModify) => {
+            const modifier = (toModify) => {
                 if (!image.value) {
-                  debugger
-                  toModify.getPost.file.edges = _.map(toModify.getPot.file.edges, item => {
+                  toModify.getPost.file.edges = _.map(toModify.getPost.file.edges, item => {
                     if (item.node.id === image.id) {
                       item.node.id = "customid"
                       item.node.toDelete = true
@@ -798,23 +863,12 @@ let NewContentTypeNoPostId = React.createClass({
                 }
 
                 return toModify
-              }
+            }
+
+            modifyApolloCache({query: Query.getPost, variables: {id: me.props.urlParams.postId}},
+              store,
+              modifier
             )
-            /*
-            let postQry = store.readQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}})
-            if (!image.value){
-              postQry.getPost.file.edges = _.map(postQry.getPost.file.edges, item => {
-                if (item.node.id === image.id){
-                  item.node.id = "customid"
-                  item.node.toDelete = true
-                } 
-                return item
-              })
-              } else {
-                postQry.getPost.file.edges = _.filter(postQry.getPost.file.edges, item => item.node.id !== imageId)
-              }
-            store.writeQuery({query: Query.getPost, variables: {id: me.props.urlParams.postId}, data: postQry})
-            */
           } else {
             let imageGallery = _.cloneDeep(me.props.imageGallery)
 
@@ -883,6 +937,7 @@ let NewContentTypeNoPostId = React.createClass({
             me.disableForm(false);
     this.notification = this.refs.notificationSystem;
   },
+
   render: function(){
     var rootUrl = getConfig('rootUrl');
     var templates = getTemplates();
@@ -1098,8 +1153,9 @@ let NewContentTypeNoPostId = React.createClass({
                   { this.isWidgetActive("tag") &&
                       <TagWidget 
                         postTagList={this.props.postTagList} 
-                        options={this.props.options} 
                         onChange={(value)=>{this.props.dispatch(setTagList(this.props.postTagListInit, value))}}
+                        postType={this.props.postType}
+                        postId={this.props.postId || "undefined"}
                       />
                   }
 
@@ -1172,14 +1228,12 @@ const mapStateToProps = function(state, ownProps){
   }
 
   let imageGallery = ownProps.imageGallery || []
-  let postTagList = ownProps.postTagList || []
 
   return {
     ...ctn,
     ...state.maskArea,
     ...customProps,
     imageGallery,
-    postTagList
   }
 
 }
@@ -1193,50 +1247,6 @@ NewContentTypeNoPostId = _.flow([
   withApollo,
 ])(NewContentTypeNoPostId)
 
-
-const getAllTagQry = gql`query getTags ($type: String!){
-    viewer {
-      allTags (where: {type: {eq: $type}}) {
-        edges {
-          node {
-            id,
-            name,
-            post {
-              edges {
-                node{
-                  id
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }`
-
-NewContentTypeNoPostId = graphql(getAllTagQry, {
-  options: (props) => ({
-    variables: {
-      type: props.postType,
-    }
-  }),
-  props: ({ownProps, data}) => {
-    if (data.loading) {
-      return {isLoading: true}
-    } else if (data.error) {
-      return {hasError: true, error: data.error}
-    } else {
-      let options = _.map(data.viewer.allTags.edges, item => (
-        {id: item.node.id, value: item.node.name, label: item.node.name}
-      ))
-
-      return {
-        isLoading: false,
-        options: options
-      }
-    }
-  }
-})(NewContentTypeNoPostId)
 
 NewContentTypeNoPostId = reduxForm({
   form: 'newContentForm'
@@ -1280,7 +1290,7 @@ const mapResultToProps = ({ownProps, data}) => {
       }
 
       // setting content
-      var pubDate = data.getPost.publishDate? new Date(data.getPost.publishDate) : new Date();
+      var pubDate = v.createdAt? new Date(v.createdAt) : new Date();
       initials["hours"] = pubDate.getHours();
       initials["minutes"] = pubDate.getMinutes();
       initials["publishDate"] = pubDate;
@@ -1327,12 +1337,11 @@ const mapResultToProps = ({ownProps, data}) => {
         isLoading: false,
         data: data.getPost,
         initialValues: initials,
-        postTagList : _postTagList,
+        _postTagList : _postTagList,
         imageGallery: _imageGalleryList,
-        mode: "update",
         permalink: v.slug,
         postRefetch: data.refetch,
-        publishDate: v.publishDate,
+        publishDate: pubDate,
         immediatelyStatus: false,
         postCategoryList: postCategoryList,
         metaIds: metaIds,
@@ -1372,9 +1381,9 @@ class NewContentType extends React.Component{
 
   render(){
     if (!this.props.urlParams) {
-      return <NewContentTypeNoPostId {...this.props} mode="create" imageGallery={this.state.imageGallery} setImageGallery={this.setImageGallery}/>
+      return <NewContentTypeNoPostId _postTagList={[]} {...this.props} mode="create" imageGallery={this.state.imageGallery} setImageGallery={this.setImageGallery}/>
     }
-    return <NewContentTypeWithPostId {...this.props} urlParams={this.props.urlParams}/>
+    return <NewContentTypeWithPostId  {...this.props} urlParams={this.props.urlParams} mode="update"/>
   }
 }
 
