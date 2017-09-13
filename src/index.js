@@ -4,7 +4,9 @@ import {ApolloProvider,graphql} from 'react-apollo'
 import {BrowserRouter, Match, Miss, Redirect} from 'react-router'
 import {MatchWhenAuthorized} from './auth'
 import client from './apollo'
-import {ThemeHome, ThemeSingle, ThemeBlog} from './includes/theme'
+import ThemeHome from './includes/Theme/ThemeHome'
+import ThemeSingle from './includes/Theme/ThemeSingle'
+import ThemeBlog from './includes/Theme/ThemeBlog'
 import ThemeSearch from './includes/themeSearch'
 import Admin from './admin'
 import Login from './login'
@@ -14,11 +16,10 @@ import {DragDropContext} from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { createStore, applyMiddleware, compose } from 'redux'
 import clientGraphql from './apollo'
-import { setLogged, setCheckAuthDone } from './actions'
-import { connectWithStore, setProfile } from './utils'
+import {setLogged} from './actions'
+import {connectWithStore } from './utils'
 import gql from 'graphql-tag'
 import _ from 'lodash'
-import AdminConfig from './admin/AdminConfig';
 import request from 'request';
 import Loading from './admin/Loading';
 const store = createStore(reducer, {}, compose(applyMiddleware(clientGraphql.middleware())))

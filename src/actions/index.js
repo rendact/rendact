@@ -106,6 +106,11 @@ export const setVisibilityMode = (mode) => ({
   mode
 })
 
+export const toggleVisibilityIsChangedProcess = (status) => ({
+  type: 'TOGGLE_VISIBILITY_IS_CHANGED_PROCESS',
+  status
+})
+
 export const setPostId = (postId) => ({
   type: 'SET_POST_ID',
   postId
@@ -413,3 +418,13 @@ export const setActiveMenuId = (menuId) => ({
   type: 'SET_ACTIVE_MENU_ID',
   menuId
 })
+
+/*
+ * THEME ACTIONS
+ */
+
+ export const setPaginationPage = (latestPosts, page) => ({
+  type: 'SET_PAGINATION_PAGE',
+  latestPosts, 
+  page
+ })

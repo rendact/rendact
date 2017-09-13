@@ -59,7 +59,10 @@ const contentTypeNew = (state = INITIAL_VALUES, action) => {
       return {...state, permalinkEditing: action.state}
     
     case 'SET_VISIBILITY_MODE':
-      return {...state, visibilityTxt: action.mode}
+      return {...state, visibilityTxtTemp: action.mode}
+
+    case 'TOGGLE_VISIBILITY_IS_CHANGED_PROCESS':
+      return {...state, visibilityIsChangedProcess: action.status}
 
     case 'SET_POST_TITLE':
       return {...state, title: action.title}

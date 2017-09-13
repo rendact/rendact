@@ -4,7 +4,7 @@ import $ from 'jquery';
 import Query from '../query';
 import {riques, disableForm, errorCallback, 
         getConfig, defaultHalogenStyle, getFormData, modifyApolloCache} from '../../utils';
-import {getTemplates} from '../../includes/theme';
+import {getTemplates} from '../../includes/Theme/includes';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen';
@@ -12,9 +12,9 @@ import { default as swal } from 'sweetalert2';
 import ReactSelect from 'react-select';
 import 'react-select/dist/react-select.css';
 import {connect} from 'react-redux';
-import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPostEditor,
+import {maskArea, setSlug, setVisibilityMode, togglePermalinkProcessState, setPostStatus, resetPostEditor,
         setCategoryList, setTagList, setImageGalleryList, setConnectionValue, 
-        toggleSaveImmediatelyMode, togglePermalinkEditingState,
+        toggleSaveImmediatelyMode, toggleVisibilityIsChangedProcess, togglePermalinkEditingState,
         setPostContent, updateTitleTagLeftCharacter,
         updateMetaDescriptionLeftCharacter, setPostPublishDate, setFeaturedImage,
         setEditorMode, toggleImageGalleyBinded, setPageList, setAllCategoryList, setPostId,
@@ -22,32 +22,50 @@ import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPost
 import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {graphql, withApollo} from 'react-apollo';
 import gql from 'graphql-tag';
+import Script from 'react-load-script'
 
 
-class CkeditorField extends React.Component{
+class CkeditorField extends React.Component {
+  constructor(props){
+    super(props)
+
+    this.onLoad = this.onLoad.bind(this)
+    this.handleOnError = this.handleOnError.bind(this)
+  }
+
+  onLoad(){
+    window.CKEDITOR.replace('content', {
+      height: 400,
+      title: false
+    })
+
+    for (var i in window.CKEDITOR.instances) {
+      if (window.CKEDITOR.instances.hasOwnProperty(i)) {
+        window.CKEDITOR.instances[i].on('change', this.props.handleContentChange)
+      }
+    }
+  }
+
+  handleOnError(){
+  }
 
   componentWillReceiveProps(props){
-    if (props.content !== this.props.content){
-      if(window.CKEDITOR) window.CKEDITOR.instances['content'].setData(props.content);
+    if (props.content && (!window.CKEDITOR.instances['content'].getData() || !this.props.content)){
+      window.CKEDITOR.instances['content'].setData(props.content)
     }
-
   }
 
-  componentDidMount(){
-    let me = this;
-    $.getScript("https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js", function(data, status, xhr){
-      window.CKEDITOR.replace('content', {
-        height: 400,
-        title: false
-      });
-      for (var i in window.CKEDITOR.instances) {
-        if (window.CKEDITOR.instances.hasOwnProperty(i))
-          window.CKEDITOR.instances[i].on('change', me.props.handleContentChange);
-      }
-    });
-  }
   render(){
-    return <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="textarea" className="form-control" />
+    return (
+      <div>
+        <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="textarea" className="form-control" />
+        <Script
+          url="https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js"
+          onError={this.handleOnError}
+          onLoad={this.onLoad}
+        />
+      </div>
+    )
   }
 }
 
@@ -117,24 +135,7 @@ class TagWidget extends React.Component {
 
   handleOnUpdate(value){
     console.log(value)
-    modifyApolloCache({query: Query.getAllTags, variables: {type: this.props.postType, postId: this.props.postId}},
-      this.props.client,
-      toModify => {
-        toModify.viewer.currentTags.edges = _.map(value, item => {
-          let output = {}
-          output.node = {}
-          output.node.id = item.connectionId
-          output.node.tag = {
-            id: item.id,
-            name: item.label,
-            __typename: "Tag",
-          }
-          output.node.__typename = "TagOfPost"
-          return output
-        })
-        return toModify
-      }
-    )
+    //this.props.onChange(value)
   }
   render(){
     return (
@@ -153,7 +154,7 @@ class TagWidget extends React.Component {
                 name="form-field-name"
                 value={this.props.postTagList}
                 options={this.props.options}
-                onChange={this.handleOnUpdate}
+                onChange={this.props.onChange}
                 multi={true}
                 isLoading={this.props.isLoading}
                 disabled={this.props.isLoading}
@@ -174,7 +175,6 @@ TagWidget = _.flowRight([
     options: (props) => ({
       variables: {
         type: props.postType,
-        postId: props.postId
       }
     }),
     props: ({ownProps, data}) => {
@@ -186,14 +186,10 @@ TagWidget = _.flowRight([
         let options = _.map(data.viewer.allTags.edges, item => (
           {id: item.node.id, value: item.node.name, label: item.node.name}
         ))
-        let postTagList = _.map(data.viewer.currentTags.edges, item => (
-          {id: item.node.tag.id, value: item.node.tag.name, label: item.node.tag.name, connectionId: item.node.id}
-        ))
 
         return {
           isLoading: false,
           options,
-          postTagList,
         }
       }
     }
@@ -463,7 +459,7 @@ let NewContentTypeNoPostId = React.createClass({
     console.log("nextProps", props)
     if (props.data !== this.props.data){
       props.initialize(props.initialValues)
-      props.dispatch(setTagList(props.postTagList, props.postTagList))
+      props.dispatch(setTagList(props._postTagList, props._postTagList))
       props.dispatch(setPostStatus(props.data.status))
       
       props.titleTag && props.dispatch(updateTitleTagLeftCharacter(65-(props.titleTag.length)));
@@ -472,11 +468,20 @@ let NewContentTypeNoPostId = React.createClass({
       this.disableForm(false)
     }
 
+    if (props.visibilityTxt !== this.props.visibilityTxt && !this.props.visibilityIsChangedProcess){
+      // set visibilityTxtTemp to this.props.visibilityTxt
+      // when visibilityIsChangedProcess is false and
+      // props.visibilityTxt !== this.props.visibilityTxt
+      props.dispatch(setVisibilityMode(this.props.visibilityTxt))
+      props.dispatch(toggleVisibilityIsChangedProcess(true))
+    }
+
 },
   resetForm: function(){
     this.props.handleNav(this.props.slug, "new", null, null, () => {
       this.props.dispatch(resetPostEditor());
       this.props.destroy()
+      this.props.dispatch(setTagList([], []))
       $(".menu-item").removeClass("active");
       $("#menu-posts-new").addClass("active");
     })
@@ -695,9 +700,11 @@ let NewContentTypeNoPostId = React.createClass({
         this._successNotif(noticeTxt)
         this.notifyUnsavedData(false)
         this.props.handleNav(me.props.slug, "edit", postId)
+        this.props.dispatch(toggleSaveImmediatelyMode(false, v.publishDate))
         if (this.props.mode==="update"){
           this.props.postRefetch()
         }
+        this.props.dispatch(setEditorMode("update"))
       }).catch(error => console.log(error))
     })
 
@@ -927,17 +934,24 @@ let NewContentTypeNoPostId = React.createClass({
   },
  
   componentDidMount: function(){
-    var me = this;
-
-
-    if (this.props.visibilityTxt==="Public") 
-      document.getElementById("public").setAttribute('checked', true);
-    else
-      document.getElementById("private").setAttribute('checked', true);
-
-            me.disableForm(false);
+    this.disableForm(false);
     this.notification = this.refs.notificationSystem;
   },
+
+  handleStatusOk: function(e){
+    e.preventDefault()
+    this.props.dispatch(setPostStatus(this.props.statusTxt))
+  },
+
+  handleVisibilityOk: function(e) {
+    this.props.dispatch(toggleVisibilityIsChangedProcess(false))
+  },
+
+  handleVisibilityCancel: function(e) {
+    this.props.change("visibility", this.props.visibilityTxtTemp)
+    this.props.dispatch(toggleVisibilityIsChangedProcess(false))
+  },
+
   render: function(){
     var rootUrl = getConfig('rootUrl');
     var templates = getTemplates();
@@ -1068,7 +1082,7 @@ let NewContentTypeNoPostId = React.createClass({
                                   <option value="Published">Published</option>
                                   <option value="Reviewing">Reviewing</option>
                                 </Field>
-                                <button type="button" onClick={ ()=> this.props.dispatch(setPostStatus(this.props.statusSelect))} className="btn btn-flat btn-xs btn-primary" 
+                                <button type="button" onClick={this.handleStatusOk} className="btn btn-flat btn-xs btn-primary" 
                                 style={{marginRight: 10}} data-toggle="collapse" data-target="#statusOption">OK</button>
                                 <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption">Cancel</button>
                             </div>
@@ -1077,7 +1091,7 @@ let NewContentTypeNoPostId = React.createClass({
 
                         <div className="form-group">
                           <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>{this.props.visibilityTxt} </b>
-                          <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#visibilityOption"> Edit </button></p>
+                          <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" onClick={this.handleVisibilityCancel} data-target="#visibilityOption"> Edit </button></p>
                           <div id="visibilityOption" className="collapse">
                             <div className="radio">
                               <label>
@@ -1092,9 +1106,9 @@ let NewContentTypeNoPostId = React.createClass({
                               </label>
                             </div>
                             <div className="form-inline" style={{marginTop: 10}}>
-                              <button type="button" onClick={this.saveVisibility} className="btn btn-flat btn-xs btn-primary" 
+                              <button type="button" onClick={this.handleVisibilityOk} className="btn btn-flat btn-xs btn-primary" 
                               style={{marginRight: 10}} data-toggle="collapse" data-target="#visibilityOption">OK</button>
-                              <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#visibilityOption">Cancel</button>
+                              <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" onClick={this.handleVisibilityCancel} data-target="#visibilityOption">Cancel</button>
                             </div>
                           </div>
                         </div>
@@ -1224,18 +1238,17 @@ const mapStateToProps = function(state, ownProps){
     titleTag : selector(state, 'titleTag'),
     metaDescription: selector(state, 'metaDescription'),
     metaKeyword: selector(state, 'metaKeyword'),
-    visibilityTxt: selector(state, 'visibility')
+    visibilityTxt: selector(state, 'visibility'),
+    statusTxt : selector(state, 'statusSelect'),
   }
 
   let imageGallery = ownProps.imageGallery || []
-  let postTagList = ownProps.postTagList || []
 
   return {
     ...ctn,
     ...state.maskArea,
     ...customProps,
     imageGallery,
-    postTagList
   }
 
 }
@@ -1292,7 +1305,7 @@ const mapResultToProps = ({ownProps, data}) => {
       }
 
       // setting content
-      var pubDate = data.getPost.publishDate? new Date(data.getPost.publishDate) : new Date();
+      var pubDate = v.createdAt? new Date(v.createdAt) : new Date();
       initials["hours"] = pubDate.getHours();
       initials["minutes"] = pubDate.getMinutes();
       initials["publishDate"] = pubDate;
@@ -1339,12 +1352,11 @@ const mapResultToProps = ({ownProps, data}) => {
         isLoading: false,
         data: data.getPost,
         initialValues: initials,
-        postTagList : _postTagList,
+        _postTagList : _postTagList,
         imageGallery: _imageGalleryList,
-        mode: "update",
         permalink: v.slug,
         postRefetch: data.refetch,
-        publishDate: v.publishDate,
+        publishDate: pubDate,
         immediatelyStatus: false,
         postCategoryList: postCategoryList,
         metaIds: metaIds,
@@ -1384,9 +1396,9 @@ class NewContentType extends React.Component{
 
   render(){
     if (!this.props.urlParams) {
-      return <NewContentTypeNoPostId {...this.props} mode="create" imageGallery={this.state.imageGallery} setImageGallery={this.setImageGallery}/>
+      return <NewContentTypeNoPostId _postTagList={[]} {...this.props} mode="create" imageGallery={this.state.imageGallery} setImageGallery={this.setImageGallery}/>
     }
-    return <NewContentTypeWithPostId {...this.props} urlParams={this.props.urlParams}/>
+    return <NewContentTypeWithPostId  {...this.props} urlParams={this.props.urlParams} mode="update"/>
   }
 }
 

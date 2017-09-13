@@ -1,8 +1,5 @@
 import ApolloClient, {createNetworkInterface} from 'apollo-client';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
-import Config from './config';
-//import config from './config';
-
 
 function addGraphQLSubscriptions(networkInterface, wsClient) {
   return Object.assign(networkInterface, {

@@ -1,9 +1,8 @@
 import React from 'react'
 import _ from 'lodash'
-import {reduxForm, Field} from 'redux-form'
 import {connect} from 'react-redux'
-import {setSearchQuery, setAllCategoryList} from '../../actions'
-import {riques, swalert} from '../../utils'
+import {setAllCategoryList} from '../../actions'
+import {riques} from '../../utils'
 import Query from '../../admin/query';
 
 class Widget extends React.Component {
