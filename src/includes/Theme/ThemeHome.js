@@ -72,14 +72,35 @@ let ThemeHome = React.createClass({
 		this.props.dispatch(setPaginationPage(latestPosts, page))
 	},
 
+	getWidgets(widgetArea){
+		let Widgets = [];
+
+	  // add checking if the component has implemented with redux or not
+	  let listOfWidgets = this.props.listOfWidgets[widgetArea]?this.props.listOfWidgets[widgetArea]:[];
+		
+		_.map(listOfWidgets,function(item){
+			var widgetFn = require("../DefaultWidgets/"+item.filePath).default;
+			
+			Widgets.push(<div key={item.id} className="sidebar-box">
+					<h3><span>{item.title}</span></h3>
+						{widgetFn(item.id, item.widget)}
+				</div>);
+		});
+		
+		return <div className="widgets">{Widgets}</div>;
+	},
+
 	componentDidMount(){
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
 		require('../../theme/'+c.path+'/css/style.css');
 		require('../../theme/'+c.path+'/functions.js');
+
+		//loadWidgets();
 	},
 
 	render(){
+		
 		if (!this.props.loadDone) {
 			return <Loading/>
 		} else {
@@ -101,8 +122,9 @@ let ThemeHome = React.createClass({
 					theImage={theImage}
 					theConfig={this.props.config}
 					thePagination={thePagination}
-					getWidgets={getWidgets}
+					getWidgets={this.getWidgets}
 					footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
+					listOfWidgets={this.props.listOfWidgets}
 				/>
       }
 		} 

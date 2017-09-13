@@ -134,7 +134,7 @@ export function loadWidgets(){
 	riques(Query.getListOfWidget, 
   	function(error, response, body) { 
   		if (!error && !body.errors && response.statusCode === 200) {
-  			//me.setState({listOfWidgets: JSON.parse(body.data.getOptions.value)})
+  			me.setState({listOfWidgets: JSON.parse(body.data.getOptions.value)})
   		} else {
         errorCallback(error, body.errors?body.errors[0].message:null);
       }
@@ -142,18 +142,11 @@ export function loadWidgets(){
   );
 }
 
-export function getWidgets(widgetArea, listOfWidgets){
+export function getWidgets(widgetArea){
 	let Widgets = [];
 
   // add checking if the component has implemented with redux or not
-  /*
-  let listOfWidgets;
-  if (_.has(this.state, 'listOfWidgets')){
-    listOfWidgets = this.state.listOfWidgets[widgetArea]?this.state.listOfWidgets[widgetArea]:[];
-  } else {
-    listOfWidgets = this.props.listOfWidgets[widgetArea]?this.props.listOfWidgets[widgetArea]:[];
-  }
-  */
+  let listOfWidgets = this.props.listOfWidgets[widgetArea]?this.props.listOfWidgets[widgetArea]:[];
 	
 	_.map(listOfWidgets,function(item){
 		var widgetFn = require("../DefaultWidgets/"+item.filePath).default;
