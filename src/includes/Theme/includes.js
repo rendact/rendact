@@ -74,7 +74,7 @@ export function theExcerpt(content){
 }
 
 export function theMenu(items, onClickHandler){
-  return <Menu menuItems={items&&items.items?items.items:[]} goHome={onClickHandler}/>
+  return <Menu menuItems={items&&items.items?items.items:[]} goHome={goHome}/>
 }
 
 export function theLogo(onClickHandler){
