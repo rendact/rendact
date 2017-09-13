@@ -16,7 +16,8 @@ import widgets from './Widgets';
 import search from './Search';
 import maskArea from './MaskArea';
 import listOfWidgets from './ListOfWidgets';
-import clientGraphql from '../apollo'
+import clientGraphql from '../apollo';
+import {themeHome, themeSingle, themeBlog } from './Theme'
 
 const main = (state = [], action) => {
   switch (action.type) {
@@ -49,7 +50,10 @@ const rendactApp = combineReducers({
   widgets,
   maskArea,
   search,
-  listOfWidgets
+  listOfWidgets,
+  themeHome,
+  themeSingle,
+  themeBlog
 })
 
 export default rendactApp

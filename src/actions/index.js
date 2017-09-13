@@ -418,3 +418,13 @@ export const setActiveMenuId = (menuId) => ({
   type: 'SET_ACTIVE_MENU_ID',
   menuId
 })
+
+/*
+ * THEME ACTIONS
+ */
+
+ export const setPaginationPage = (latestPosts, page) => ({
+  type: 'SET_PAGINATION_PAGE',
+  latestPosts, 
+  page
+ })

@@ -4,7 +4,7 @@ import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
 import Notification from 'react-notification-system';
 import moment from 'moment'
-import {CommentForm} from '../../../includes/theme';
+import {CommentForm} from '../../../includes/Theme/ThemeSingle';
 
 const Single = React.createClass({
 	componentDidMount: function() {
