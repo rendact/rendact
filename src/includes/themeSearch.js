@@ -10,7 +10,7 @@ import {
   theBreadcrumb,
   goHome,
   theLogo
-} from './theme';
+} from './Theme/includes';
 import {riques} from '../utils';
 import Query from '../admin/query';
 import {setSearchQuery, setSearchResults, maskArea, setListOfWidgets} from '../actions';
