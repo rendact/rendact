@@ -50,7 +50,8 @@ let ContentType = React.createClass({
     var fields = _.map(this.props.fields, function(item){
       return item
     });
-    let listOfData = this.props.client.query({query: gql`${Query.getPostListQry(status).query}`})
+    var listQuery = this.props.listQuery;
+    let listOfData = this.props.client.query({query: gql`${listQuery(status).query}`})
     listOfData.then(function(data) {
       //_.forEach(data.data.viewer.allPosts.edges, function(item){
         //var a = item;
