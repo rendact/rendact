@@ -5,8 +5,7 @@ import LostConnection from '../../admin/LostConnection';
 import Query from '../../admin/query';
 import {riques, errorCallback, getValue, setValue, saveConfig, loadConfig} from '../../utils';
 import {getTemplateComponent, theTitle, theContent, theExcerpt, theMenu, 
-				theLogo, theImage, thePagination, theBreadcrumb, loadMainMenu, loadWidgets,
-				getWidgets, goHome} from './includes'
+				theLogo, theImage, thePagination, theBreadcrumb, getWidgets, goHome} from './includes'
 import {Menu} from '../Menu.js';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -20,6 +19,8 @@ import {graphql} from 'react-apollo';
 import {connect} from 'react-redux'
 
 window.config = AdminConfig;
+
+var pagePerPost = 5;
 
 /* Theme Components */
 
@@ -121,7 +122,7 @@ let ThemeHome = React.createClass({
 					theLogo={theLogo}
 					theImage={theImage}
 					theConfig={this.props.config}
-					thePagination={thePagination}
+					thePagination={thePagination(this.props.pageCount, this.props.activePage, this.handlePostClick)}
 					getWidgets={this.getWidgets}
 					footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 					listOfWidgets={this.props.listOfWidgets}
@@ -185,7 +186,10 @@ var qry = gql`query {
       }
     }
   }
-    
+
+  getOptions(id: "T3B0aW9uczo1NQ=="){
+     value
+  }  
 }`
 
 ThemeHome = graphql(qry, {
@@ -211,15 +215,16 @@ ThemeHome = graphql(qry, {
       });
 
       var allMenus = data.viewer.allMenus.edges[0];
-
-      return {
+      
+      return  {
         config: JSON.parse(localStorage.getItem('config')),
         slug: ownProps.location.pathname.replace("/",""),
         isSlugExist: slugFound!==null,
         allPosts: _postArr, 
-        latestPosts: _.slice(_postArr, 0, ownProps.postPerPage), 
-        pageCount: _postArr.length%ownProps.postPerPage,
+        latestPosts: _.slice(_postArr, 0, pagePerPost), 
+        pageCount: _postArr.length/pagePerPost,
         mainMenu: allMenus ? allMenus.node : [],
+        listOfWidgets: JSON.parse(data.getOptions.value),
         loadDone: true
       }
     } 
