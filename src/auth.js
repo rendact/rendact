@@ -1,16 +1,8 @@
 import React from 'react';
-import request from 'request';
-import Auth0Lock from 'auth0-lock'
 import { Match, Redirect } from 'react-router'
-import Config from './config';
-import AdminConfig from './admin/AdminConfig';
-import Query from './admin/query';
-import {riques, getConfig, setProfile} from './utils';
-import _ from 'lodash';
-import {setLogged, setCheckAuthDone} from './actions';
-import gql from 'graphql-tag'
-import {graphql} from 'react-apollo';
-import Loading from './admin/Loading';
+//import Query from './admin/query';
+import _ from 'lodash'
+import {setLogged} from './actions'
 import {connect} from 'react-redux'
 
 let MatchWhenAuthorized = React.createClass({

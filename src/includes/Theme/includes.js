@@ -1,8 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import {Menu} from '../Menu.js';
-import {riques, errorCallback} from '../../utils';
-import Query from '../../admin/query';
+//import Query from '../../admin/query';
 import AdminConfig from '../../admin/AdminConfig';
 
 window.config = AdminConfig;

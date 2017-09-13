@@ -33,10 +33,10 @@ import CategoryContent from './lib/CategoryContent';
 import TagContent from './lib/TagContent';
 import AdminConfig from './AdminConfig';
 import AdminLTEinit from './lib/app.js';
-import {riques, hasRole, errorCallback, getConfig, swalert} from '../utils';
+import {hasRole, getConfig, swalert} from '../utils';
 import Query from './query';
 import {saveConfig} from '../utils';
-import { toggleConfigLoadState, toggleControlSidebarState, toggleUnsavedDataState, setActivePage, setActiveMenuId } from '../actions';
+import {toggleControlSidebarState, toggleUnsavedDataState, setActivePage, setActiveMenuId } from '../actions';
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo';
 import {connect} from 'react-redux'
@@ -60,7 +60,6 @@ let SideMenu = React.createClass({
   },  
   onClick(id, url, e){
     e.preventDefault();
-    var me = this;
     var callback = function(){
       $(".menu-item").removeClass("active");
       $("#menu-"+id).addClass("active");
@@ -361,7 +360,6 @@ let Admin = React.createClass({
     }
   },
   componentDidMount(){
-    var me = this;
     require ('jquery-ui/themes/base/theme.css');
     require ('jquery-ui/themes/base/tooltip.css');
     require ('font-awesome/css/font-awesome.css');

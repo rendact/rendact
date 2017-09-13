@@ -830,7 +830,7 @@ Menu = graphql(Query.loadAllMenuData, {
           treeData = mainMenuData.items;
           selectedMenuName = mainMenuData.name;
           menuSelect = mainMenuData.id+"-"+mainMenuData.name;
-          menuPos = mainMenuData.position == "Main Menu"
+          menuPos = (mainMenuData.position === "Main Menu")
         } 
         // processing all Menu
         var pageList = [(<option key="0" value="">--select menu--</option>)];

@@ -1,25 +1,21 @@
 import React from 'react';
 import AdminConfig from '../../admin/AdminConfig';
 import NotFound from '../../admin/NotFound';
-import LostConnection from '../../admin/LostConnection';
-import Query from '../../admin/query';
-import {riques, errorCallback, getValue, setValue, saveConfig, loadConfig} from '../../utils';
+//import LostConnection from '../../admin/LostConnection';
+//import Query from '../../admin/query';
+import {saveConfig} from '../../utils';
 import {getTemplateComponent, theTitle, theContent, theExcerpt, theMenu, 
-				theLogo, theImage, thePagination, theBreadcrumb, getWidgets, goHome} from './includes'
-import {Menu} from '../Menu.js';
+				theLogo, theImage, thePagination} from './includes'
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
 import Loading from '../../admin/Loading';
 import _ from 'lodash';
-import {searchWidget, topPostWidget, categoriesWidget, archiveWidget, aboutUsWidget, contactUsWidget, recentPostWidget} from '../widgets';
-import Notification from 'react-notification-system';
+import {aboutUsWidget, contactUsWidget, recentPostWidget} from '../widgets';
 import {setPaginationPage} from '../../actions';
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo';
 import {connect} from 'react-redux'
-
 window.config = AdminConfig;
-
 var pagePerPost = 5;
 
 /* Theme Components */
@@ -35,8 +31,8 @@ let ThemeHome = React.createClass({
 		pageCount: React.PropTypes.number,
 		activePage: React.PropTypes.number,
 		isNoConnection: React.PropTypes.bool,
-    mainMenu: React.PropTypes.string,
-    listOfWidgets: React.PropTypes.array
+    mainMenu: React.PropTypes.object,
+    listOfWidgets: React.PropTypes.object
   },
   getDefaultProps: function() {
     return {
