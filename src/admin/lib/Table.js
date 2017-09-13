@@ -141,7 +141,6 @@ export const Table = React.createClass({
       });
       me.datatable.row.add(_cols);
     });
-
     this.datatable.draw();
 
     if (me.props.checkBoxAtFirstColumn) {
