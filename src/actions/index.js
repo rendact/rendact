@@ -106,6 +106,11 @@ export const setVisibilityMode = (mode) => ({
   mode
 })
 
+export const toggleVisibilityIsChangedProcess = (status) => ({
+  type: 'TOGGLE_VISIBILITY_IS_CHANGED_PROCESS',
+  status
+})
+
 export const setPostId = (postId) => ({
   type: 'SET_POST_ID',
   postId
