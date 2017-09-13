@@ -938,6 +938,11 @@ let NewContentTypeNoPostId = React.createClass({
     this.notification = this.refs.notificationSystem;
   },
 
+  handleStatusOk: function(e){
+    e.preventDefault()
+    this.props.dispatch(setPostStatus(this.props.statusTxt))
+  },
+
   render: function(){
     var rootUrl = getConfig('rootUrl');
     var templates = getTemplates();
@@ -1068,7 +1073,7 @@ let NewContentTypeNoPostId = React.createClass({
                                   <option value="Published">Published</option>
                                   <option value="Reviewing">Reviewing</option>
                                 </Field>
-                                <button type="button" onClick={ ()=> this.props.dispatch(setPostStatus(this.props.statusSelect))} className="btn btn-flat btn-xs btn-primary" 
+                                <button type="button" onClick={this.handleStatusOk} className="btn btn-flat btn-xs btn-primary" 
                                 style={{marginRight: 10}} data-toggle="collapse" data-target="#statusOption">OK</button>
                                 <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption">Cancel</button>
                             </div>
@@ -1224,7 +1229,8 @@ const mapStateToProps = function(state, ownProps){
     titleTag : selector(state, 'titleTag'),
     metaDescription: selector(state, 'metaDescription'),
     metaKeyword: selector(state, 'metaKeyword'),
-    visibilityTxt: selector(state, 'visibility')
+    visibilityTxt: selector(state, 'visibility'),
+    statusTxt : selector(state, 'statusSelect'),
   }
 
   let imageGallery = ownProps.imageGallery || []
