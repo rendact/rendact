@@ -12,9 +12,9 @@ import { default as swal } from 'sweetalert2';
 import ReactSelect from 'react-select';
 import 'react-select/dist/react-select.css';
 import {connect} from 'react-redux';
-import {maskArea, setSlug, togglePermalinkProcessState, setPostStatus, resetPostEditor,
+import {maskArea, setSlug, setVisibilityMode, togglePermalinkProcessState, setPostStatus, resetPostEditor,
         setCategoryList, setTagList, setImageGalleryList, setConnectionValue, 
-        toggleSaveImmediatelyMode, togglePermalinkEditingState,
+        toggleSaveImmediatelyMode, toggleVisibilityIsChangedProcess, togglePermalinkEditingState,
         setPostContent, updateTitleTagLeftCharacter,
         updateMetaDescriptionLeftCharacter, setPostPublishDate, setFeaturedImage,
         setEditorMode, toggleImageGalleyBinded, setPageList, setAllCategoryList, setPostId,
@@ -466,6 +466,14 @@ let NewContentTypeNoPostId = React.createClass({
       props.metaDescription && props.dispatch(updateMetaDescriptionLeftCharacter(160-(props.metaDescription.length)));
     } else if (this.props.loading && !props.loading){
       this.disableForm(false)
+    }
+
+    if (props.visibilityTxt !== this.props.visibilityTxt && !this.props.visibilityIsChangedProcess){
+      // set visibilityTxtTemp to this.props.visibilityTxt
+      // when visibilityIsChangedProcess is false and
+      // props.visibilityTxt !== this.props.visibilityTxt
+      props.dispatch(setVisibilityMode(this.props.visibilityTxt))
+      props.dispatch(toggleVisibilityIsChangedProcess(true))
     }
 
 },
@@ -926,16 +934,22 @@ let NewContentTypeNoPostId = React.createClass({
   },
  
   componentDidMount: function(){
-    var me = this;
-
-
-    if (this.props.visibilityTxt==="Public") 
-      document.getElementById("public").setAttribute('checked', true);
-    else
-      document.getElementById("private").setAttribute('checked', true);
-
-            me.disableForm(false);
+    this.disableForm(false);
     this.notification = this.refs.notificationSystem;
+  },
+
+  handleStatusOk: function(e){
+    e.preventDefault()
+    this.props.dispatch(setPostStatus(this.props.statusTxt))
+  },
+
+  handleVisibilityOk: function(e) {
+    this.props.dispatch(toggleVisibilityIsChangedProcess(false))
+  },
+
+  handleVisibilityCancel: function(e) {
+    this.props.change("visibility", this.props.visibilityTxtTemp)
+    this.props.dispatch(toggleVisibilityIsChangedProcess(false))
   },
 
   render: function(){
@@ -1068,7 +1082,7 @@ let NewContentTypeNoPostId = React.createClass({
                                   <option value="Published">Published</option>
                                   <option value="Reviewing">Reviewing</option>
                                 </Field>
-                                <button type="button" onClick={ ()=> this.props.dispatch(setPostStatus(this.props.statusSelect))} className="btn btn-flat btn-xs btn-primary" 
+                                <button type="button" onClick={this.handleStatusOk} className="btn btn-flat btn-xs btn-primary" 
                                 style={{marginRight: 10}} data-toggle="collapse" data-target="#statusOption">OK</button>
                                 <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption">Cancel</button>
                             </div>
@@ -1077,7 +1091,7 @@ let NewContentTypeNoPostId = React.createClass({
 
                         <div className="form-group">
                           <p style={{fontSize: 14}}><span className="glyphicon glyphicon-sunglasses" style={{marginRight:10}}></span>Visibility: <b>{this.props.visibilityTxt} </b>
-                          <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#visibilityOption"> Edit </button></p>
+                          <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" onClick={this.handleVisibilityCancel} data-target="#visibilityOption"> Edit </button></p>
                           <div id="visibilityOption" className="collapse">
                             <div className="radio">
                               <label>
@@ -1092,9 +1106,9 @@ let NewContentTypeNoPostId = React.createClass({
                               </label>
                             </div>
                             <div className="form-inline" style={{marginTop: 10}}>
-                              <button type="button" onClick={this.saveVisibility} className="btn btn-flat btn-xs btn-primary" 
+                              <button type="button" onClick={this.handleVisibilityOk} className="btn btn-flat btn-xs btn-primary" 
                               style={{marginRight: 10}} data-toggle="collapse" data-target="#visibilityOption">OK</button>
-                              <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#visibilityOption">Cancel</button>
+                              <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" onClick={this.handleVisibilityCancel} data-target="#visibilityOption">Cancel</button>
                             </div>
                           </div>
                         </div>
@@ -1224,7 +1238,8 @@ const mapStateToProps = function(state, ownProps){
     titleTag : selector(state, 'titleTag'),
     metaDescription: selector(state, 'metaDescription'),
     metaKeyword: selector(state, 'metaKeyword'),
-    visibilityTxt: selector(state, 'visibility')
+    visibilityTxt: selector(state, 'visibility'),
+    statusTxt : selector(state, 'statusSelect'),
   }
 
   let imageGallery = ownProps.imageGallery || []
