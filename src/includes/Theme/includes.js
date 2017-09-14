@@ -135,3 +135,22 @@ export function getWidgets(widgetArea){
 	
 	return <div className="widgets">{Widgets}</div>;
 }
+
+export const getTemplates = function(){
+	var template = [{
+			id: "default",
+			name: "Default Template"
+		}];
+	//var c = window.config.theme;
+	try {
+		//let Component = require('../theme/'+c.path+'/layouts/Template.js').default;
+		template = [{
+			id: "default",
+			name: "Default Template"
+		}]
+	} catch(e) {
+		
+	}
+	return template;
+}
+

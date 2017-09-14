@@ -23,103 +23,69 @@ window.config = AdminConfig;
 
 /* Theme Components */
 
-export class ThemeSingle extends React.Component{
-	constructor(props){
-    super(props);
-		this.state =  {
+let ThemeSingle = React.createClass({
+	propTypes: {
+    loadDone: React.PropTypes.bool,
+		postData: React.PropTypes.bool,
+		config: React.PropTypes.object,
+		mainMenu: React.PropTypes.object,
+    listOfWidgets: React.PropTypes.object
+  },
+  getDefaultProps: function() {
+    return {
 			loadDone: false,
 			postData: false,
 			config: null,
 			listOfWidgets: [],
 			mainMenu: null
 		}
+  },
 
-    this.goHome = goHome.bind(this);
-    this.handleSingleRequest = this.handleSingleRequest.bind(this);
-    this.theMenu = theMenu.bind(this);
-    this.theBreadcrumb = theBreadcrumb.bind(this);
-    this.theLogo = theLogo.bind(this);
-    this.getWidgets = getWidgets.bind(this);
-    this.loadMainMenu = loadMainMenu.bind(this);
-    this.loadWidgets = loadWidgets.bind(this);
-	}
+  handlePostClick(e){
+		e.preventDefault();
+		var id = e.currentTarget.id;
+		this._reactInternalInstance._context.history.push('/')
+	},
 
-	handleSingleRequest(type, id){
-    var map = {
-      post: 'getPostQry',
-      page: 'getPageQry',
-      category: 'getCategoryQry'
-    }
-    var me = this
+	getWidgets(widgetArea){
+		let Widgets = [];
 
-    riques(Query[map[type]](id),
-      (error, response, body) => {
-        if (!error && !body.errors && response.statusCode === 200){
-          var data = body.data.getPost;
-          me.setState({postData: data});
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null)
-        }
-        me.setState({loadDone: true});
-      }
-    );
-  }
-
-  componentWillReceiveProps(newProps){
-    var me = this;
-    me.setState({loadDone: false})
-
-    if (newProps.params.postId) {
-      me.handleSingleRequest('post', newProps.params.postId);
-    } else if (newProps.params.pageId) {
-      me.handleSingleRequest('page', newProps.params.pageId);
-    } else if (newProps.params.categoryId){
-      alert("Category page not implemented");
-      me.setState({loadDone: true});
-    }
-  }
-
-	componentWillMount() {
-		var me = this;
-		this.loadMainMenu();
-		this.loadWidgets();
+	  // add checking if the component has implemented with redux or not
+	  let listOfWidgets = this.props.listOfWidgets[widgetArea]?this.props.listOfWidgets[widgetArea]:[];
 		
-		loadConfig(function(){
-			var config = JSON.parse(localStorage.getItem('config'));
-			me.setState({config: config});
+		_.map(listOfWidgets,function(item){
+			var widgetFn = require("../DefaultWidgets/"+item.filePath).default;
+			
+			Widgets.push(<div key={item.id} className="sidebar-box">
+					<h3><span>{item.title}</span></h3>
+						{widgetFn(item.id, item.widget)}
+				</div>);
 		});
-
-    if(this.props.params.postId){
-      me.handleSingleRequest('post', this.props.params.postId);
-    } else if (this.props.params.pageId){
-      me.handleSingleRequest('page', this.props.params.pageId);
-    } else if(this.props.params.categoryId){
-      alert("Category not implemented error");
-      me.setState({loadDone: true});
-    }
-	}
+		
+		return <div className="widgets">{Widgets}</div>;
+	},
 
 	componentDidMount(){
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
-		require('../theme/'+c.path+'/css/style.css');
-		require('../theme/'+c.path+'/functions.js');
-	}
+		require('../../theme/'+c.path+'/css/style.css');
+		require('../../theme/'+c.path+'/functions.js');
+	},
 
 	render() {
 		let Single = getTemplateComponent('single');
 		let SinglePost = <Single 
 											postId={this.props.params.postId} 
-											postData={this.state.postData}
+											postData={this.props.postData}
 											widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 											footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
-											theMenu={this.theMenu}
-											theLogo={this.theLogo}
-											theBreadcrumb={this.theBreadcrumb}
-											theConfig={this.state.config}
+											theMenu={theMenu(this.props.mainMenu)}
+											theLogo={theLogo}
+											theBreadcrumb={theBreadcrumb(this.handlePostClick)}
+											theConfig={this.props.config}
 											getWidgets={this.getWidgets}
 										/>;
-		if (!this.state.loadDone) {
+		if (!this.props.loadDone) {
 			return <Loading/>
 		} else {
 			if (this.props.params.postId){
@@ -131,79 +97,102 @@ export class ThemeSingle extends React.Component{
 			}
 		}
 	}
+});
+
+const mapStateToProps = function(state){
+  if (!_.isEmpty(state.ThemeSingle)) {
+    return state.ThemeSingle;
+  } else return {}
 }
 
+ThemeSingle = connect(mapStateToProps)(ThemeSingle);
 
+var qry = gql`query ($postId: ID!) {
+	getPost(id:$postId){ 
+		id,
+		title,
+		content,
+		slug,
+		author{username},
+		status,
+		visibility,
+		featuredImage,
+		summary,
+		category{edges{node{id, category{id,name}}}},
+		comments{edges{node{id,content,name,email,website}}},
+		file{edges{node{id value}}},
+    tag{edges{node{id,tag{id,name}}}},
+    meta{edges{node{id,item,value}}},
+    createdAt
+  }
 
-export const getTemplates = function(){
-	var template = [{
-			id: "default",
-			name: "Default Template"
-		}];
-	//var c = window.config.theme;
-	try {
-		//let Component = require('../theme/'+c.path+'/layouts/Template.js').default;
-		template = [{
-			id: "default",
-			name: "Default Template"
-		}]
-	} catch(e) {
-		
-	}
-	return template;
-}
+	viewer {
+    allOptions {
+      edges {
+        node {
+          id,
+          item,
+          value
+        }
+      }
+    }
+  }
 
-export class CommentForm extends React.Component{
-	componentDidMount() {
-  	this.notification = this.refs.notificationSystem;
-	}
+  viewer {
+    allMenus(where: {position: {eq: "Main Menu"}}) { 
+      edges {
+        node { 
+          id,
+          name, 
+          items
+        }
+      }
+    }
+  }
 
-	handleSubmitBtn(event){
-		event.preventDefault();
-		var me = this;
-		var author = getValue("author");
-		var email = getValue("email");
-		var comment = getValue("comment");
-		var qry = Query.createComment(author,email,comment,this.props.postId);
-	  
-		riques(qry, 
-			function(error, response, body){
-				if(!error && !body.errors) {
-					me.notification.addNotification({
-							message: 'Comment has been sent',
-							level: 'success',
-							position: 'tr',
-							autoDismiss: 5
-						});
-					author=setValue("author","");
-					email=setValue("email","");
-					comment=setValue("comment","");
-				} else {
-					errorCallback(error, body.errors?body.errors[0].message:null);
-				}
-			}
-		)
-	} 
+  getOptions(id: "T3B0aW9uczo1NQ=="){
+     value
+  }  
+}`
 
-	render() {
-		return (
-			<form onSubmit={this.handleSubmitBtn} id="commentform">
-				<Notification ref="notificationSystem" />
-				 <p className="comment-form-author-name"><label htmlFor="author">Name</label>
-					<input id="author" className="form-control" name="author" type="text" size="30" />
-				 </p>
-				 <p className="comment-form-email">
-					<label htmlFor="email">Email</label>
-					<input id="email" className="form-control" name="email" type="text" size="30" />
-				 </p>
-				 <p className="comment-form-comment">
-					<label htmlFor="comment">Comment</label>
-					<textarea id="comment" className="form-control"></textarea>
-				 </p>
-				 <div className="clearfix"></div>
-				<input type="submit" value="send" className="btn btn-primary btn-sm" />
-			</form>
-		)
-	}
-}
+ThemeSingle = graphql(qry, {
+	options: (props) => {
+		return { 
+			variables: { 
+				postId: props.params.postId
+			} 
+		}
+	},
+  props: ({ownProps, data}) => {
+  	if (data.error){
+  		return {
+  			isNoConnection: true
+  		}
+  	}
 
+    if (data.viewer) {
+    	var _dataArr = [];
+    	var _postData = [];
+
+    	if (data.getPost){
+    		_postData = data.getPost
+    	} else if (data.viewer.allPosts)
+
+      _.forEach(data.viewer.allOptions.edges, function(item){
+        saveConfig(item.node.item, item.node.value);
+      });
+
+      var allMenus = data.viewer.allMenus.edges[0];
+      
+      return  {
+      	postData: data.getPost,
+      	config: JSON.parse(localStorage.getItem('config')),
+        mainMenu: allMenus ? allMenus.node : [],
+        listOfWidgets: JSON.parse(data.getOptions.value),
+        loadDone: true
+      }
+    } 
+  }
+})(ThemeSingle);
+
+export default ThemeSingle;
