@@ -109,15 +109,13 @@ let FeaturedImageWidget = (props) => (
   </div>
   <div className="box-body pad">
     <div>
+      <input type="file" name="featuredImage" onChange={props.onChange} />
+      <Field component="input" type="hidden" name="featuredImage" hello/>
       { props.featuredImage &&
-        <div style={{position: "relative"}}>
-          <Field id="featuredImage" name="featuredImage" component="img" src={props.featuredImage} style={{width: "100%"}} alt={props.title} />
-          {/*<img src={props.featuredImage} style={{width: "100%"}} alt={props.title}/> */}
+        <div style={{position: "relative", marginTop: 25}}>
+          <img src={props.featuredImage.value} style={{width: "100%"}} alt={props.title}/> 
           <button onClick={props.onClick} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
         </div>
-      }
-      { !props.featuredImage &&
-        <input type="file" name="featuredImage" onChange={props.onChange}/>
       }
     </div>                  
   </div>
@@ -550,14 +548,53 @@ let NewContentTypeNoPostId = React.createClass({
     var resetDate = this.props.publishDateReset;
     this.props.dispatch(setPostPublishDate(resetDate, false));
   },
+  featuredImageRemove: function(e){
+    this.props.dispatch(setFeaturedImage(""))
+  },
+
   featuredImageChange: function(e){
     var me = this;
     var reader = new FileReader();
-    reader.onload = function(){
-      me.props.dispatch(setFeaturedImage(reader.result));
-      me.props.change("featuredImage", reader.result)
-    };
-    reader.readAsDataURL(e.target.files[0]);
+    let file = e.target.files[0]
+
+    reader.onload = (event) => {
+      let data = {
+        value: reader.result,
+        blobFieldName: 'myBlobField',
+        featuredImageConnectionId: me.props.urlParams.postId || null,
+        type: "featuredImage"
+      }
+
+      let mutate;
+
+      if (!this.props.featuredImage.id){
+        mutate = me.props.addImageGallery
+      mutate({
+        variables: {
+          input: data
+        }
+      }).then(data => console.log(data))
+      } else {
+        //  mutate = me.props.updateFeaturedImage
+        debugger
+        data = {...data, ...me.props.featuredImage}
+        me.props.client.mutate({
+          mutation: Query.updateFeaturedImage,
+          variables: {
+            input: data
+          }
+        }).then(hello => console.log(hello))
+      }
+
+        // update featuredImage
+      me.props.change("featuredImage", file)
+      document.querySelector("input[type='file'][name='featuredImage']").value = null
+      }
+
+    if (file){
+      reader.readAsDataURL(file);
+    }
+
   },
   _emulateDataForSaving: function(v){
     var output = {};
@@ -581,6 +618,7 @@ let NewContentTypeNoPostId = React.createClass({
     if (["Public", "Private"].indexOf(output.visibility) === -1){
       output.visibility = "Public"
     }
+    output.featuredImage = this.props.featuredImage
     return output;
   },
   onSubmit: function(v, status) {
@@ -665,6 +703,19 @@ let NewContentTypeNoPostId = React.createClass({
         return this.bindPostToImageGallery(postId)
       }
 
+      const processUploadFeaturedImage = () => {
+        return this.props.addImageGallery({
+          variables: {
+            input: {
+              type: "gallery",
+              value: this.props.featuredImage,
+              postId: postId,
+              blobFieldName: "myBlobField"
+            }
+          }
+        })
+      }
+
       const processTag = () => {
 
         if (me.isWidgetActive("tag")) {
@@ -682,7 +733,7 @@ let NewContentTypeNoPostId = React.createClass({
         } 
       }
 
-      let promise = _.reduce([processBinding, processMetadata, processCategory, processTag], (prev, task) => {
+      let promise = _.reduce([processUploadFeaturedImage, processBinding, processMetadata, processCategory, processTag], (prev, task) => {
         return prev.then(() =>  task()).catch(error => errorCallback(error, error, error))
       }, Promise.resolve())
 
@@ -1166,8 +1217,8 @@ let NewContentTypeNoPostId = React.createClass({
                   { this.isWidgetActive("featuredImage") &&
                       <FeaturedImageWidget
                         title={this.props.title}
-                        featuredImage={this.props.data.featuredImage}
-                        onClick={()=>{this.props.dispatch(setFeaturedImage(null))}}
+                        featuredImage={this.props.featuredImage}
+                        onClick={this.featuredImageRemove}
                         onChange={this.featuredImageChange}
                       />
                   
@@ -1233,18 +1284,21 @@ const mapStateToProps = function(state, ownProps){
   }
 
   let imageGallery = ownProps.imageGallery || []
+  let featuredImage = ownProps.featuredImage || {}
 
   return {
     ...ctn,
     ...state.maskArea,
     ...customProps,
     imageGallery,
+    featuredImage
   }
 
 }
 
 NewContentTypeNoPostId = _.flow([
   connect(mapStateToProps),
+  graphql(Query.updateFeaturedImage, {name: 'updateFeaturedImage'}),
   graphql(gql`${Query.getUpdatePostQry().query}`, {name: 'updatePostQuery'}),
   graphql(gql`${Query.getCreatePostQry().query}`, {name: 'createPostQuery'}),
   graphql(gql`${Query.addImageGallery().query}`, {name: 'addImageGallery'}),
@@ -1338,6 +1392,14 @@ const mapResultToProps = ({ownProps, data}) => {
         });
       }
 
+      // set featured image
+
+      let featuredImage = {}
+      if (v.imageFeatured && !_.isEmpty(v.imageFeatured)){
+        featuredImage.value = v.imageFeatured.value
+        featuredImage.id = v.imageFeatured.id
+      }
+
       // this still not work
 
       let metaValues = {};
@@ -1371,6 +1433,7 @@ const mapResultToProps = ({ownProps, data}) => {
         immediatelyStatus: false,
         postCategoryList: postCategoryList,
         metaIds: metaIds,
+        featuredImage
       }
     }
 }
