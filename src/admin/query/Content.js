@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import gql from 'graphql-tag';
 
 const getContentListQry = function(status){
   var statusFilter = "";
@@ -75,9 +76,7 @@ const createContentMtn = function(data){
     }
   };
 
-  const createComment = function(author, email, comment, post){
-  return {
-      "query": `
+  const createComment = gql`
     mutation createComment($input: CreateCommentInput!) {
         createComment(input: $input) {
           changedComment {
@@ -88,17 +87,7 @@ const createContentMtn = function(data){
         }
       }
     }
-    `,
-      "variables": {
-        "input": {
-          "name": author,
-          "email": email,
-          "content": comment,
-          "postId": post
-        }
-      }
-    }
-  };
+    `;
 
 const getContentQry = function(contentId){
   return {"query": 

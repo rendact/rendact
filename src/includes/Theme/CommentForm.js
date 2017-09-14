@@ -1,12 +1,14 @@
 import React from 'react';
 import Notification from 'react-notification-system';
-import {riques, errorCallback, getValue, setValue, saveConfig, loadConfig} from '../../utils';
+import {getValue, setValue} from '../../utils';
 import Query from '../../admin/query';
+import gql from 'graphql-tag'
+import {graphql} from 'react-apollo';
 
-export class CommentForm extends React.Component{
+let CommentForm = React.createClass({
 	componentDidMount() {
   	this.notification = this.refs.notificationSystem;
-	}
+	},
 
 	handleSubmitBtn(event){
 		event.preventDefault();
@@ -14,26 +16,27 @@ export class CommentForm extends React.Component{
 		var author = getValue("author");
 		var email = getValue("email");
 		var comment = getValue("comment");
-		var qry = Query.createComment(author,email,comment,this.props.postId);
-	  
-		riques(qry, 
-			function(error, response, body){
-				if(!error && !body.errors) {
-					me.notification.addNotification({
-							message: 'Comment has been sent',
-							level: 'success',
-							position: 'tr',
-							autoDismiss: 5
-						});
-					author=setValue("author","");
-					email=setValue("email","");
-					comment=setValue("comment","");
-				} else {
-					errorCallback(error, body.errors?body.errors[0].message:null);
-				}
-			}
-		)
-	} 
+		
+	  this.props.addComment({
+	  	variables: {
+        input: {
+          name: author,
+          email: email,
+          content: comment,
+          postId: this.props.postId
+        }
+      }}).then(({data}) => {
+	    	me.notification.addNotification({
+						message: 'Comment has been sent',
+						level: 'success',
+						position: 'tr',
+						autoDismiss: 5
+					});
+				author=setValue("author","");
+				email=setValue("email","");
+				comment=setValue("comment","");
+    });
+	} ,
 
 	render() {
 		return (
@@ -55,4 +58,8 @@ export class CommentForm extends React.Component{
 			</form>
 		)
 	}
-}
+})
+
+CommentForm = graphql(Query.createComment, {name: 'addComment'})(CommentForm);
+
+export default CommentForm;

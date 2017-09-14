@@ -4,9 +4,9 @@ import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
 import Notification from 'react-notification-system';
 import moment from 'moment'
-import {CommentForm} from '../../../includes/Theme/CommentForm';
+import CommentForm from '../../../includes/Theme/CommentForm';
 
-const Single = React.createClass({
+let Single = React.createClass({
 	componentDidMount: function() {
   	this.notification = this.refs.notificationSystem;
 	},
