@@ -2,6 +2,20 @@ import _ from 'lodash';
 import gql from 'graphql-tag';
 
 
+const updateFeaturedImage = gql`
+mutation updateFile($input: UpdateFileInput!) {
+        updateFile(input: $input) {
+          changedFile {
+            id
+            type
+            value
+            blobMimeType
+            blobUrl
+          }
+        }
+      }
+      `
+
 const getPostListQry = function(s, postType, tagId, cateId) {
   var status = '{ne: "Trash"}';
   if (s==="Published" || s==="Trash" || s==="Draft" || s==="Reviewing")
@@ -400,7 +414,7 @@ const getPostQry = function(postId){
     }
 };
 
-const getPost = gql`query ($id: ID!){getPost(id: $id){ id,publishDate,title,content,slug,author{username},status,visibility,featuredImage,
+const getPost = gql`query ($id: ID!){getPost(id: $id){ id,publishDate,imageFeatured{id, value},title,content,slug,author{username},status,visibility,featuredImage,
       summary,category{edges{node{id, category{id,name}}}},comments{edges{node{id,content,name,email,website}}},file{edges{node{id value}}},
       tag{edges{node{id,tag{id,name}}}},meta{edges{node{id,item,value}}},createdAt}}`
 
@@ -635,7 +649,8 @@ const queries = {
   removeImageGallery: removeImageGallery,
   bindImageGallery: bindImageGallery,
   searchPost: searchPost,
-  getPost: getPost
+  getPost: getPost,
+  updateFeaturedImage: updateFeaturedImage
 }
 
 export default queries;

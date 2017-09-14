@@ -101,7 +101,8 @@ const queries = {
   updateWidget: Widget.updateWidget,
   findWidget: Widget.findWidget,
   getAllActiveWidgets: Widget.getAllActiveWidgets,
-  getAllTags: ContentTypeNew.getAllTags
+  getAllTags: ContentTypeNew.getAllTags,
+  updateFeaturedImage: Post.updateFeaturedImage,
 }
 
 export default queries;
