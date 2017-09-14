@@ -135,7 +135,6 @@ class TagWidget extends React.Component {
 
   handleOnUpdate(value){
     console.log(value)
-    //this.props.onChange(value)
   }
   render(){
     return (
@@ -458,15 +457,20 @@ let NewContentTypeNoPostId = React.createClass({
   componentWillReceiveProps: function(props){
     console.log("nextProps", props)
     if (props.data !== this.props.data){
+      if (props.data && (window.CKEDITOR && !window.CKEDITOR.instances['content'].getData())){
+        window.CKEDITOR.instances['content'].setData(props.data.content)
+      }
       props.initialize(props.initialValues)
       props.dispatch(setTagList(props._postTagList, props._postTagList))
       props.dispatch(setPostStatus(props.data.status))
       
       props.titleTag && props.dispatch(updateTitleTagLeftCharacter(65-(props.titleTag.length)));
       props.metaDescription && props.dispatch(updateMetaDescriptionLeftCharacter(160-(props.metaDescription.length)));
-    } else if (this.props.loading && !props.loading){
+    } 
+    if ((this.props.isLoadPost && !props.isLoadPost) || props.mode === "create"){
       this.disableForm(false)
     }
+
 
     if (props.visibilityTxt !== this.props.visibilityTxt && !this.props.visibilityIsChangedProcess){
       // set visibilityTxtTemp to this.props.visibilityTxt
@@ -691,6 +695,7 @@ let NewContentTypeNoPostId = React.createClass({
           this.props.postRefetch()
         }
         this.props.dispatch(setEditorMode("update"))
+        this.props.dispatch(setPostId(postId))
       }).catch(error => console.log(error))
     })
 
@@ -920,7 +925,6 @@ let NewContentTypeNoPostId = React.createClass({
   },
  
   componentDidMount: function(){
-    this.disableForm(false);
     this.notification = this.refs.notificationSystem;
   },
 
@@ -1257,12 +1261,12 @@ NewContentTypeNoPostId = reduxForm({
 const mapResultToProps = ({ownProps, data}) => {
     if (data.loading){
       return {
-        isLoading: true,
+        isLoadPost: true,
         data: {},
       }
     } else if (data.error) {
       return {
-        isLoading: false,
+        isLoadPost: false,
         hasError: true,
         data: {},
       }
@@ -1356,7 +1360,7 @@ const mapResultToProps = ({ownProps, data}) => {
       });
 
       return {
-        isLoading: false,
+        isLoadPost: false,
         data: data.getPost,
         initialValues: initials,
         _postTagList : _postTagList,
@@ -1402,12 +1406,15 @@ class NewContentType extends React.Component{
   }
 
   render(){
-    if (!this.props.urlParams) {
-      return <NewContentTypeNoPostId _postTagList={[]} {...this.props} mode="create" imageGallery={this.state.imageGallery} setImageGallery={this.setImageGallery}/>
-    }
-    return <NewContentTypeWithPostId  {...this.props} urlParams={this.props.urlParams} mode="update"/>
+    return (
+      <div>
+        {this.props.postId  ?
+            <NewContentTypeWithPostId  {...this.props} urlParams={this.props.urlParams} mode="update"/>
+            :
+      <NewContentTypeNoPostId _postTagList={[]} {...this.props} mode="create" imageGallery={this.state.imageGallery} setImageGallery={this.setImageGallery}/>}
+      </div>
+    )
   }
 }
-
 
 export default NewContentType;
