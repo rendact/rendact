@@ -1305,7 +1305,7 @@ const mapResultToProps = ({ownProps, data}) => {
       }
 
       // setting content
-      var pubDate = v.createdAt? new Date(v.createdAt) : new Date();
+      var pubDate = v.publishDate? new Date(v.publishDate) : new Date();
       initials["hours"] = pubDate.getHours();
       initials["minutes"] = pubDate.getMinutes();
       initials["publishDate"] = pubDate;
