@@ -216,7 +216,7 @@ let PageHiererachyWidget = (props) => {
       </div>
       <div className="form-group">
         <p><b>Page  Template</b></p>
-        <Field name="pageTemplate" component="select" className="metaField" style={{width: 250}} defaultValue={templates?templates[0].item:null}>
+        <Field name="pageTemplate" component="select" className="metaField" style={{width: 250}}>
         { templates ?
           templates.map(function(item, index){
             return (<option key={item.id}>{item.name}</option>)
@@ -498,26 +498,7 @@ let NewContentTypeNoPostId = React.createClass({
 
     return out;
   },
-  setFormValues: function(v){
-    let metaValues = {};
-    let meta = [];
-    // dont delete this function first
-    // still confuse with this behaviour
 
-    // set additional field values to state
-    var _connectionValue = this.props.connectionValue;
-    _.forEach(meta, function(item){
-      metaValues[item.item] = item.value;
-      var el = document.getElementsByName(item.item);
-      if (el && el.length>0) {
-        el[0].id = item.id
-      }
-      var isConnItem = item.item.split("~");
-      if (isConnItem.length > 1) {
-        _connectionValue[isConnItem[1]] = item.value; 
-      }
-    });
-  },
   formatDate: function(date){
     var min = date.getMinutes();
     if (min.length<2) min = "0"+min;
@@ -534,7 +515,6 @@ let NewContentTypeNoPostId = React.createClass({
 
   handleContentChange: function(event){
     var content = window.CKEDITOR.instances['content'].getData();
-    //  this.props.dispatch(setPostContent(content));
     this.props.change('content', content)
     this.notifyUnsavedData(true);
   },
@@ -1125,8 +1105,8 @@ let NewContentTypeNoPostId = React.createClass({
                                   <DatePicker id="datepicker" style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.props.publishDate.toISOString()} onChange={this.handleDateChange}/>
                                 </div>
                                 <div className="col-md-6">
-                                  <Field name="hours" component="input" type="text" className="form-control" style={{width: 30, height: 34, textAlign: "center"}} defaultValue={new Date().getHours()} onChange={this.handleTimeChange} />
-                                  <Field name="minutes" component="input" type="text" className="form-control" style={{width: 30, height: 34, textAlign: "center"}} defaultValue={new Date().getMinutes()} onChange={this.handleTimeChange} />
+                                  <Field name="hours" component="input" type="text" className="form-control" style={{width: 30, height: 34, textAlign: "center"}}  onChange={this.handleTimeChange} />
+                                  <Field name="minutes" component="input" type="text" className="form-control" style={{width: 30, height: 34, textAlign: "center"}}  onChange={this.handleTimeChange} />
                                 </div>
                               </div>
                               <div className="form-inline" style={{marginTop: 10}}>
@@ -1347,6 +1327,27 @@ const mapResultToProps = ({ownProps, data}) => {
           }
         });
       }
+
+      // this still not work
+
+      let metaValues = {};
+      let meta = [];
+      // dont delete this function first
+      // still confuse with this behaviour
+
+      // set additional field values to state
+      var _connectionValue = ownProps.connectionValue;
+      _.forEach(meta, function(item){
+        metaValues[item.item] = item.value;
+        var el = document.getElementsByName(item.item);
+        if (el && el.length>0) {
+          el[0].id = item.id
+        }
+        var isConnItem = item.item.split("~");
+        if (isConnItem.length > 1) {
+          _connectionValue[isConnItem[1]] = item.value; 
+        }
+      });
 
       return {
         isLoading: false,
