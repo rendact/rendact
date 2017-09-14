@@ -567,6 +567,13 @@ let NewContentTypeNoPostId = React.createClass({
     output["authorId"] = localStorage.getItem('userId');
     output["slug"] = this.props.permalink;
 
+    if (this.props.immediatelyStatus){
+      output["publishDate"] = new Date();
+      this.props.dispatch(setPostPublishDate(output.publishDate, false))
+    } else {
+      output["publishDate"] = this.props.publishDate
+    }
+
     if (["Public", "Private"].indexOf(output.visibility) === -1){
       output.visibility = "Public"
     }
@@ -680,7 +687,6 @@ let NewContentTypeNoPostId = React.createClass({
         this._successNotif(noticeTxt)
         this.notifyUnsavedData(false)
         this.props.handleNav(me.props.slug, "edit", postId)
-        this.props.dispatch(toggleSaveImmediatelyMode(false, v.publishDate))
         if (this.props.mode==="update"){
           this.props.postRefetch()
         }
