@@ -4,7 +4,7 @@ import $ from 'jquery';
 import Query from '../query';
 import {riques, disableForm, errorCallback, 
         getConfig, defaultHalogenStyle, getFormData, modifyApolloCache} from '../../utils';
-import {getTemplates} from '../../includes/Theme/includes';
+import {getTemplates} from '../../includes/Theme/ThemeSingle';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen';
@@ -135,7 +135,6 @@ class TagWidget extends React.Component {
 
   handleOnUpdate(value){
     console.log(value)
-    //this.props.onChange(value)
   }
   render(){
     return (
@@ -216,7 +215,7 @@ let PageHiererachyWidget = (props) => {
       </div>
       <div className="form-group">
         <p><b>Page  Template</b></p>
-        <Field name="pageTemplate" component="select" className="metaField" style={{width: 250}} defaultValue={templates?templates[0].item:null}>
+        <Field name="pageTemplate" component="select" className="metaField" style={{width: 250}}>
         { templates ?
           templates.map(function(item, index){
             return (<option key={item.id}>{item.name}</option>)
@@ -458,15 +457,20 @@ let NewContentTypeNoPostId = React.createClass({
   componentWillReceiveProps: function(props){
     console.log("nextProps", props)
     if (props.data !== this.props.data){
+      if (props.data && (window.CKEDITOR && !window.CKEDITOR.instances['content'].getData())){
+        window.CKEDITOR.instances['content'].setData(props.data.content)
+      }
       props.initialize(props.initialValues)
       props.dispatch(setTagList(props._postTagList, props._postTagList))
       props.dispatch(setPostStatus(props.data.status))
       
       props.titleTag && props.dispatch(updateTitleTagLeftCharacter(65-(props.titleTag.length)));
       props.metaDescription && props.dispatch(updateMetaDescriptionLeftCharacter(160-(props.metaDescription.length)));
-    } else if (this.props.loading && !props.loading){
+    } 
+    if ((this.props.isLoadPost && !props.isLoadPost) || props.mode === "create"){
       this.disableForm(false)
     }
+
 
     if (props.visibilityTxt !== this.props.visibilityTxt && !this.props.visibilityIsChangedProcess){
       // set visibilityTxtTemp to this.props.visibilityTxt
@@ -498,26 +502,7 @@ let NewContentTypeNoPostId = React.createClass({
 
     return out;
   },
-  setFormValues: function(v){
-    let metaValues = {};
-    let meta = [];
-    // dont delete this function first
-    // still confuse with this behaviour
 
-    // set additional field values to state
-    var _connectionValue = this.props.connectionValue;
-    _.forEach(meta, function(item){
-      metaValues[item.item] = item.value;
-      var el = document.getElementsByName(item.item);
-      if (el && el.length>0) {
-        el[0].id = item.id
-      }
-      var isConnItem = item.item.split("~");
-      if (isConnItem.length > 1) {
-        _connectionValue[isConnItem[1]] = item.value; 
-      }
-    });
-  },
   formatDate: function(date){
     var min = date.getMinutes();
     if (min.length<2) min = "0"+min;
@@ -534,7 +519,6 @@ let NewContentTypeNoPostId = React.createClass({
 
   handleContentChange: function(event){
     var content = window.CKEDITOR.instances['content'].getData();
-    //  this.props.dispatch(setPostContent(content));
     this.props.change('content', content)
     this.notifyUnsavedData(true);
   },
@@ -586,6 +570,13 @@ let NewContentTypeNoPostId = React.createClass({
     output["type"] = this.props.postType;
     output["authorId"] = localStorage.getItem('userId');
     output["slug"] = this.props.permalink;
+
+    if (this.props.immediatelyStatus){
+      output["publishDate"] = new Date();
+      this.props.dispatch(setPostPublishDate(output.publishDate, false))
+    } else {
+      output["publishDate"] = this.props.publishDate
+    }
 
     if (["Public", "Private"].indexOf(output.visibility) === -1){
       output.visibility = "Public"
@@ -700,11 +691,11 @@ let NewContentTypeNoPostId = React.createClass({
         this._successNotif(noticeTxt)
         this.notifyUnsavedData(false)
         this.props.handleNav(me.props.slug, "edit", postId)
-        this.props.dispatch(toggleSaveImmediatelyMode(false, v.publishDate))
         if (this.props.mode==="update"){
           this.props.postRefetch()
         }
         this.props.dispatch(setEditorMode("update"))
+        this.props.dispatch(setPostId(postId))
       }).catch(error => console.log(error))
     })
 
@@ -934,7 +925,6 @@ let NewContentTypeNoPostId = React.createClass({
   },
  
   componentDidMount: function(){
-    this.disableForm(false);
     this.notification = this.refs.notificationSystem;
   },
 
@@ -1125,8 +1115,8 @@ let NewContentTypeNoPostId = React.createClass({
                                   <DatePicker id="datepicker" style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.props.publishDate.toISOString()} onChange={this.handleDateChange}/>
                                 </div>
                                 <div className="col-md-6">
-                                  <Field name="hours" component="input" type="text" className="form-control" style={{width: 30, height: 34, textAlign: "center"}} defaultValue={new Date().getHours()} onChange={this.handleTimeChange} />
-                                  <Field name="minutes" component="input" type="text" className="form-control" style={{width: 30, height: 34, textAlign: "center"}} defaultValue={new Date().getMinutes()} onChange={this.handleTimeChange} />
+                                  <Field name="hours" component="input" type="text" className="form-control" style={{width: 30, height: 34, textAlign: "center"}}  onChange={this.handleTimeChange} />
+                                  <Field name="minutes" component="input" type="text" className="form-control" style={{width: 30, height: 34, textAlign: "center"}}  onChange={this.handleTimeChange} />
                                 </div>
                               </div>
                               <div className="form-inline" style={{marginTop: 10}}>
@@ -1271,12 +1261,12 @@ NewContentTypeNoPostId = reduxForm({
 const mapResultToProps = ({ownProps, data}) => {
     if (data.loading){
       return {
-        isLoading: true,
+        isLoadPost: true,
         data: {},
       }
     } else if (data.error) {
       return {
-        isLoading: false,
+        isLoadPost: false,
         hasError: true,
         data: {},
       }
@@ -1305,7 +1295,7 @@ const mapResultToProps = ({ownProps, data}) => {
       }
 
       // setting content
-      var pubDate = v.createdAt? new Date(v.createdAt) : new Date();
+      var pubDate = v.publishDate? new Date(v.publishDate) : new Date();
       initials["hours"] = pubDate.getHours();
       initials["minutes"] = pubDate.getMinutes();
       initials["publishDate"] = pubDate;
@@ -1348,8 +1338,29 @@ const mapResultToProps = ({ownProps, data}) => {
         });
       }
 
+      // this still not work
+
+      let metaValues = {};
+      let meta = [];
+      // dont delete this function first
+      // still confuse with this behaviour
+
+      // set additional field values to state
+      var _connectionValue = ownProps.connectionValue;
+      _.forEach(meta, function(item){
+        metaValues[item.item] = item.value;
+        var el = document.getElementsByName(item.item);
+        if (el && el.length>0) {
+          el[0].id = item.id
+        }
+        var isConnItem = item.item.split("~");
+        if (isConnItem.length > 1) {
+          _connectionValue[isConnItem[1]] = item.value; 
+        }
+      });
+
       return {
-        isLoading: false,
+        isLoadPost: false,
         data: data.getPost,
         initialValues: initials,
         _postTagList : _postTagList,
@@ -1395,12 +1406,15 @@ class NewContentType extends React.Component{
   }
 
   render(){
-    if (!this.props.urlParams) {
-      return <NewContentTypeNoPostId _postTagList={[]} {...this.props} mode="create" imageGallery={this.state.imageGallery} setImageGallery={this.setImageGallery}/>
-    }
-    return <NewContentTypeWithPostId  {...this.props} urlParams={this.props.urlParams} mode="update"/>
+    return (
+      <div>
+        {this.props.postId  ?
+            <NewContentTypeWithPostId  {...this.props} urlParams={this.props.urlParams} mode="update"/>
+            :
+      <NewContentTypeNoPostId _postTagList={[]} {...this.props} mode="create" imageGallery={this.state.imageGallery} setImageGallery={this.setImageGallery}/>}
+      </div>
+    )
   }
 }
-
 
 export default NewContentType;

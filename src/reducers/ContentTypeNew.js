@@ -53,7 +53,7 @@ const contentTypeNew = (state = INITIAL_VALUES, action) => {
       }
 
     case 'TOGGLE_SAVE_IMMEDIATELY_MODE':
-      return {...state, immediatelyStatus: action.state, immediately: action.time}
+      return {...state, immediatelyStatus: action.state, publishDate: action.time}
     
     case 'TOGGLE_PERMALINK_EDITING_STATE':
       return {...state, permalinkEditing: action.state}
