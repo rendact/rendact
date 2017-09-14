@@ -1,8 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import {Menu} from '../Menu.js';
-import {riques, errorCallback} from '../../utils';
-import Query from '../../admin/query';
+//import Query from '../../admin/query';
 import AdminConfig from '../../admin/AdminConfig';
 
 window.config = AdminConfig;
@@ -117,29 +116,6 @@ export function theBreadcrumb(onClickHandler){
 export function goHome(e){
 	e.preventDefault();
 	this._reactInternalInstance._context.history.push('/')
-}
-
-export const loadMainMenu = () => {
-  riques(Query.getMainMenu, 
-    (error, response, body) => {
-      if (!error && !body.errors && response.statusCode === 200){
-        let allMenus = body.data.viewer.allMenus.edges[0];
-        //this.setState({mainMenu: allMenus ? allMenus.node : []})
-      }
-    })
-}
-
-export function loadWidgets(){
-	var me = this;
-	riques(Query.getListOfWidget, 
-  	function(error, response, body) { 
-  		if (!error && !body.errors && response.statusCode === 200) {
-  			me.setState({listOfWidgets: JSON.parse(body.data.getOptions.value)})
-  		} else {
-        errorCallback(error, body.errors?body.errors[0].message:null);
-      }
-  	}
-  );
 }
 
 export function getWidgets(widgetArea){

@@ -1,22 +1,12 @@
 import React from 'react'
 import _ from 'lodash'
-import {reduxForm, Field} from 'redux-form'
+import {Field} from 'redux-form'
 import {connect} from 'react-redux'
 import {setWidgetData} from '../../actions'
-import {riques, swalert} from '../../utils'
+import {riques} from '../../utils'
 import Query from '../../admin/query';
 
 class Widget extends React.Component {
-  constructor(props){
-    super(props)
-  }
-
-  getDefaultProps() {
-    return {
-      widgetData: {}
-    }
-  }
-
   componentDidMount(){
     var me = this;
     riques(Query.findWidget(this.props.widgetId, this.props.widgetName),
