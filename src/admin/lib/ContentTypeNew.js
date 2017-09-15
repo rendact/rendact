@@ -18,7 +18,7 @@ import {maskArea, setSlug, setVisibilityMode, togglePermalinkProcessState, setPo
         setPostContent, updateTitleTagLeftCharacter,
         updateMetaDescriptionLeftCharacter, setPostPublishDate, setFeaturedImage,
         setEditorMode, toggleImageGalleyBinded, setPageList, setAllCategoryList, setPostId,
-        setOptions, setTagMap, loadFormData} from '../../actions'
+        setOptions, setTagMap, loadFormData, toggleFeaturedImageBindingStatus} from '../../actions'
 import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {graphql, withApollo} from 'react-apollo';
 import gql from 'graphql-tag';
@@ -568,29 +568,41 @@ let NewContentTypeNoPostId = React.createClass({
       },
       update: (store, data) =>  {
         let featuredImage = data.data.deleteFile.changedFile;
-        let modifier;
+        if (this.props.postId){
+          let modifier;
 
-        modifier = (toDelete) => {
+          modifier = (toDelete) => {
 
-          if (!featuredImage.value){
-            toDelete.getPost.imageFeatured = {...toDelete.getPost.imageFeatured, id:"customId", toDelete: true}
-          }else{
-            toDelete.getPost.imageFeatured = null
+            if (!featuredImage.value){
+              toDelete.getPost.imageFeatured = {...toDelete.getPost.imageFeatured, id:"customId", toDelete: true}
+            }else{
+              toDelete.getPost.imageFeatured = null
+            }
+
+            return toDelete
           }
 
-          return toDelete
+          modifyApolloCache(
+            {
+              query: Query.getPost,
+              variables: {
+                id: this.props.urlParams.postId
+              }
+            },
+            store,
+            modifier
+          )
+        } else {
+          if (!featuredImage.value){
+            this.props.setFeaturedImage({
+              ...featuredImage, 
+              value: this.props.featuredImage.value,
+              id: "customId"
+            })
+          } else {
+            this.props.setFeaturedImage({})
+          }
         }
-
-        modifyApolloCache(
-          {
-            query: Query.getPost,
-            variables: {
-              id: this.props.urlParams.postId
-            }
-          },
-          store,
-          modifier
-        )
       }
     }).then(data => console.log(data))
   },
@@ -599,6 +611,7 @@ let NewContentTypeNoPostId = React.createClass({
     var me = this;
     var reader = new FileReader();
     let file = e.target.files[0]
+    this.props.dispatch(toggleFeaturedImageBindingStatus(true))
 
     reader.onload = (event) => {
       let data = {
@@ -645,6 +658,7 @@ let NewContentTypeNoPostId = React.createClass({
             featuredImage = data.data.createFile.changedFile;
           }
 
+          if(this.props.urlParams.postId){
 
           let modifier = (toModify) => {
             toModify = _.cloneDeep(toModify)
@@ -661,6 +675,10 @@ let NewContentTypeNoPostId = React.createClass({
             store,
             modifier
           )
+          }else{
+            this.props.setFeaturedImage({...featuredImage})
+          }
+
 
         }
       }).then(data => {
@@ -696,7 +714,6 @@ let NewContentTypeNoPostId = React.createClass({
     if (["Public", "Private"].indexOf(output.visibility) === -1){
       output.visibility = "Public"
     }
-    output.featuredImage = this.props.featuredImage
     return output;
   },
   onSubmit: function(v, status) {
@@ -781,18 +798,28 @@ let NewContentTypeNoPostId = React.createClass({
         return this.bindPostToImageGallery(postId)
       }
 
-      const processUploadFeaturedImage = () => {
-        return this.props.addImageGallery({
-          variables: {
-            input: {
-              type: "gallery",
-              value: this.props.featuredImage,
-              postId: postId,
-              blobFieldName: "myBlobField"
-            }
-          }
-        })
+      const processBindingFeaturedImage = () => {
+        if (this.props.mode === "create"){
+          return new Promise((resolve, reject) => {
+              this.props.updateFeaturedImage({
+              variables: {
+                input: {
+                  id: this.props.featuredImage.id,
+                  featuredImageConnectionId: postId
+                }
+              }
+              }).then(data => {
+                resolve(data)
+                this.props.dispatch(toggleFeaturedImageBindingStatus(false))
+              }).catch(error => {
+                reject(error)
+              })
+            })
+        } else {
+          return Promise.resolve()
+        }
       }
+
 
       const processTag = () => {
 
@@ -811,8 +838,8 @@ let NewContentTypeNoPostId = React.createClass({
         } 
       }
 
-      let promise = _.reduce([processUploadFeaturedImage, processBinding, processMetadata, processCategory, processTag], (prev, task) => {
-        return prev.then(() =>  task()).catch(error => errorCallback(error, error, error))
+      let promise = _.reduce([processBindingFeaturedImage, processBinding, processMetadata, processCategory, processTag], (prev, task) => {
+        return prev.then(() =>  task()).catch(error => this._errorNotif(error.message))
       }, Promise.resolve())
 
       promise.then(() => {
@@ -825,12 +852,12 @@ let NewContentTypeNoPostId = React.createClass({
         }
         this.props.dispatch(setEditorMode("update"))
         this.props.dispatch(setPostId(postId))
-      }).catch(error => console.log(error))
+      }).catch(error => this._errorNotif(error.message))
     })
 
   },
   _errorNotif: function(msg){
-    this.refs.notificationSystem.addNotification({
+    this.notification.addNotification({
       title: 'Error',
       message: msg,
       level: 'error',
@@ -838,7 +865,7 @@ let NewContentTypeNoPostId = React.createClass({
     });
   },
   _successNotif: function(msg){
-    this.refs.notificationSystem.addNotification({
+    this.notification.addNotification({
       message: msg,
       level: 'success',
       position: 'tr',
@@ -1079,6 +1106,7 @@ let NewContentTypeNoPostId = React.createClass({
     
     const newPost=(
       <div className="content-wrapper">
+          <Notification ref="notificationSystem" />
         <div className="container-fluid">
           <section className="content-header"  style={{marginBottom:20}}>
               <h1>{this.props.mode==="update"?"Edit Current "+this.props.name:"Add New "+this.props.name}
@@ -1096,7 +1124,6 @@ let NewContentTypeNoPostId = React.createClass({
                 </ol>
                <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
           </section>
-          <Notification ref="notificationSystem" />
 
           <form  id="postForm" method="get" style={{opacity: this.props.opacity}}>
           { this.props.isProcessing &&
@@ -1533,19 +1560,28 @@ class NewContentType extends React.Component{
   constructor(props){
     super(props)
     this.state = {
-      imageGallery : []
+      imageGallery : [],
+      featuredImage: {}
     }
 
     this.setImageGallery = this.setImageGallery.bind(this)
+    this.setFeaturedImage = this.setFeaturedImage.bind(this)
   }
 
   setImageGallery(gallery){
     this.setState({imageGallery: [...gallery]})
   }
 
+  setFeaturedImage(image){
+    this.setState({
+      featuredImage: {...image}
+    })
+  }
+
   componentWillReceiveProps(nextProps) {
     if(this.props.urlParams && !nextProps.urlParams){
       this.setImageGallery([])
+      this.setFeaturedImage({})
     }
   }
 
@@ -1555,7 +1591,15 @@ class NewContentType extends React.Component{
         {this.props.postId  ?
             <NewContentTypeWithPostId  {...this.props} urlParams={this.props.urlParams} mode="update"/>
             :
-      <NewContentTypeNoPostId _postTagList={[]} {...this.props} mode="create" imageGallery={this.state.imageGallery} setImageGallery={this.setImageGallery}/>}
+            <NewContentTypeNoPostId 
+              _postTagList={[]} 
+              {...this.props} 
+              mode="create" 
+              imageGallery={this.state.imageGallery} 
+              setImageGallery={this.setImageGallery}
+              featuredImage={this.state.featuredImage}
+              setFeaturedImage={this.setFeaturedImage}
+            />}
       </div>
     )
   }
