@@ -489,15 +489,6 @@ let NewContentTypeNoPostId = React.createClass({
   },
   getMetaFormValues: function(v){
     var out = getFormData("metaField");
-
-    debugger
-    _.forEach(this.props.connectionValue, function(item, key){
-      out.push({
-        item: "conn~"+key,
-        value: item.value
-      });
-    });
-
     return out;
   },
 
@@ -744,7 +735,6 @@ let NewContentTypeNoPostId = React.createClass({
 
     }else{
       _objData["id"] = this.props.urlParams.postId;
-      debugger
       qry = this.props.updateQuery(_objData);
       noticeTxt = this.props.name+' Updated!';
       mutate = this.props.updatePostQuery
@@ -1076,7 +1066,6 @@ let NewContentTypeNoPostId = React.createClass({
     )
   },
   componentWillMount: function(){
-    debugger
     if (!_.isEmpty(this.props.urlParams) && this.props.isLoadPost){
       this.disableForm(true)
     }
@@ -1345,7 +1334,7 @@ let NewContentTypeNoPostId = React.createClass({
                     this.props.customFields && this.props.customFields.map(function(item){
                       var form;
                       if (item.type === "text" || item.type === "number")
-                        form = (<Field id={me.props.metaIds? me.props.metaIds[item.id] : null} name={item.id} className="metaField" type="text" component="input" style={{width: '100%'}}/>)
+                        form = (<Field id={me.props.metaIds? me.props.metaIds[item.id] : null} name={item.id} className="form-control metaField" type="text" component="input" style={{width: '100%'}}/>)
                       if (item.type === "date")
                         form = (<DatePicker id={item.id} name={item.id} style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.props.publishDate.toISOString()} onChange={this.handleDateChange}/>)
                       if (item.type === "connection") {
@@ -1509,27 +1498,6 @@ const mapResultToProps = ({ownProps, data}) => {
         featuredImage.id = v.imageFeatured.id
         featuredImage.toDelete = v.imageFeatured.toDelete
       }
-
-      // this still not work
-
-      let metaValues = {};
-      let meta = [];
-      // dont delete this function first
-      // still confuse with this behaviour
-
-      // set additional field values to state
-      var _connectionValue = ownProps.connectionValue;
-      _.forEach(meta, function(item){
-        metaValues[item.item] = item.value;
-        var el = document.getElementsByName(item.item);
-        if (el && el.length>0) {
-          el[0].id = item.id
-        }
-        var isConnItem = item.item.split("~");
-        if (isConnItem.length > 1) {
-          _connectionValue[isConnItem[1]] = item.value; 
-        }
-      });
 
       return {
         isLoadPost: false,
