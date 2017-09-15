@@ -290,6 +290,7 @@ let PageLoader = React.createClass({
             viewRole="view-post"
             modifyRole="modify-post"
             handleNav={ me.props.handleNav }
+            urlParams={params}
             />
         }
     });

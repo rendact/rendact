@@ -490,6 +490,7 @@ let NewContentTypeNoPostId = React.createClass({
   getMetaFormValues: function(v){
     var out = getFormData("metaField");
 
+    debugger
     _.forEach(this.props.connectionValue, function(item, key){
       out.push({
         item: "conn~"+key,
@@ -743,6 +744,7 @@ let NewContentTypeNoPostId = React.createClass({
 
     }else{
       _objData["id"] = this.props.urlParams.postId;
+      debugger
       qry = this.props.updateQuery(_objData);
       noticeTxt = this.props.name+' Updated!';
       mutate = this.props.updatePostQuery
@@ -1049,15 +1051,12 @@ let NewContentTypeNoPostId = React.createClass({
   },
   _genReactSelect: function(contentId){
     var me = this;
-    var getConnectionOptions = function(input, callback) {
+    var getConnectionOptions = function(input) {
       me.props.client.query({
         query: gql`${Query.getContentPostListQry("All", contentId).query}`}).then(data => {
           let options = _.forEach(data.data.viewer.allPosts.edges, item => ({value: item.node.slug, label: item.node.title}));
-          callback(data.error, {
-            options: options,
-            complete: true
-          })
-        })
+          return {options: options}
+        }).then(out => out)    
     }
 
     var handleSelectConnectionChange = function(newValue) {
@@ -1077,6 +1076,7 @@ let NewContentTypeNoPostId = React.createClass({
     )
   },
   componentWillMount: function(){
+    debugger
     if (!_.isEmpty(this.props.urlParams) && this.props.isLoadPost){
       this.disableForm(true)
     }
@@ -1103,6 +1103,7 @@ let NewContentTypeNoPostId = React.createClass({
   render: function(){
     var rootUrl = getConfig('rootUrl');
     var templates = getTemplates();
+    var me = this;
     
     const newPost=(
       <div className="content-wrapper">
@@ -1344,7 +1345,7 @@ let NewContentTypeNoPostId = React.createClass({
                     this.props.customFields && this.props.customFields.map(function(item){
                       var form;
                       if (item.type === "text" || item.type === "number")
-                        form = (<input id={item.id} name={item.id} className="metaField" type="text" style={{width: '100%'}}/>)
+                        form = (<Field id={me.props.metaIds? me.props.metaIds[item.id] : null} name={item.id} className="metaField" type="text" component="input" style={{width: '100%'}}/>)
                       if (item.type === "date")
                         form = (<DatePicker id={item.id} name={item.id} style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.props.publishDate.toISOString()} onChange={this.handleDateChange}/>)
                       if (item.type === "connection") {
@@ -1442,7 +1443,6 @@ const mapResultToProps = ({ownProps, data}) => {
         if (data.getPost) initials[item] = data.getPost[item];
       });
 
-      debugger
 
       // setting the meta values
 
