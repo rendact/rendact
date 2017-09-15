@@ -110,10 +110,10 @@ let FeaturedImageWidget = (props) => (
   <div className="box-body pad">
     <div>
       <input type="file" name="featuredImage" onChange={props.onChange} />
-      { props.featuredImage &&
+      { !_.isEmpty(props.featuredImage) &&
         <div style={{position: "relative", marginTop: 25}}>
-          <img src={props.featuredImage.value} style={{width: "100%"}} alt={props.title}/> 
-          <button onClick={props.onClick} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
+          <img src={props.featuredImage.value} style={{width: "100%", opacity: props.featuredImage.id === 'customId'? 0.5 : 1}} alt={props.title}/> 
+          <button onClick={props.onClick} disabled={props.featuredImage.id === 'customId'} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
         </div>
       }
     </div>                  
@@ -554,6 +554,43 @@ let NewContentTypeNoPostId = React.createClass({
         input: {
           id: this.props.featuredImage.id
         }
+      },
+      optimisticResponse: {
+        __typename: "DeleteFilePayload",
+        deleteFile: {
+          __typename: "File",
+          changedFile: {
+            id: this.props.featuredImage.id,
+            type: "featuredImage",
+            value: "",
+          }
+        }
+      },
+      update: (store, data) =>  {
+        let featuredImage = data.data.deleteFile.changedFile;
+        let modifier;
+
+        modifier = (toDelete) => {
+
+          if (!featuredImage.value){
+            toDelete.getPost.imageFeatured = {...toDelete.getPost.imageFeatured, id:"customId", toDelete: true}
+          }else{
+            toDelete.getPost.imageFeatured = null
+          }
+
+          return toDelete
+        }
+
+        modifyApolloCache(
+          {
+            query: Query.getPost,
+            variables: {
+              id: this.props.urlParams.postId
+            }
+          },
+          store,
+          modifier
+        )
       }
     }).then(data => console.log(data))
   },
@@ -1399,6 +1436,7 @@ const mapResultToProps = ({ownProps, data}) => {
       if (v.imageFeatured && !_.isEmpty(v.imageFeatured)){
         featuredImage.value = v.imageFeatured.value
         featuredImage.id = v.imageFeatured.id
+        featuredImage.toDelete = v.imageFeatured.toDelete
       }
 
       // this still not work
