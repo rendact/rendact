@@ -623,11 +623,51 @@ let NewContentTypeNoPostId = React.createClass({
       mutate({
         variables: {
           input: data
-        }
-      }).then(data => console.log(data))
+        },
+        optimisticResponse: {
+          updateFile: {
+            __typename: "",
+            changedFile: {
+              __typename: "",
+              id: 'customId',
+              value: reader.result,
+              type: "",
+              blobMimeType: "",
+              blobUrl: ""
+            }
+          }
+        },
+        update : (store, data) => {
+          let featuredImage;
+          if(data.data.updateFile){
+            featuredImage = data.data.updateFile.changedFile;
+          } else {
+            featuredImage = data.data.createFile.changedFile;
+          }
 
-      document.querySelector("input[type='file'][name='featuredImage']").value = null
-      }
+
+          let modifier = (toModify) => {
+            toModify = _.cloneDeep(toModify)
+
+            if(featuredImage.id === 'customId'){
+              toModify.getPost.imageFeatured = {...featuredImage}
+            } else {
+              toModify.getPost.imageFeatured = {...toModify.getPost.imageFeatured, ...featuredImage}
+            }
+            return toModify
+          }
+
+          modifyApolloCache({query: Query.getPost, variables: {id : this.props.urlParams.postId}},
+            store,
+            modifier
+          )
+
+        }
+      }).then(data => {
+        console.log(data)
+        document.querySelector("input[type='file'][name='featuredImage']").value = null
+      })
+    }
 
     if (file){
       reader.readAsDataURL(file);
