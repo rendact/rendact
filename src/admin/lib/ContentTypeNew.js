@@ -49,18 +49,12 @@ class CkeditorField extends React.Component {
   handleOnError(){
   }
 
-  componentWillReceiveProps(props){
-    if (props.content && (!window.CKEDITOR.instances['content'].getData() || !this.props.content)){
-      window.CKEDITOR.instances['content'].setData(props.content)
-    }
-  }
-
   render(){
     return (
       <div>
         <Field id="content" name="content" rows="25" component="textarea" wrap="hard" type="textarea" className="form-control" />
         <Script
-          url="https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js"
+          url="//cdn.ckeditor.com/4.7.3/standard/ckeditor.js"
           onError={this.handleOnError}
           onLoad={this.onLoad}
         />
