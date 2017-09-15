@@ -4,7 +4,7 @@ import $ from 'jquery';
 import Query from '../query';
 import {riques, disableForm, errorCallback, 
         getConfig, defaultHalogenStyle, getFormData, modifyApolloCache} from '../../utils';
-import {getTemplates} from '../../includes/Theme/ThemeSingle';
+import {getTemplates} from '../../includes/Theme/includes';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen';
@@ -110,7 +110,6 @@ let FeaturedImageWidget = (props) => (
   <div className="box-body pad">
     <div>
       <input type="file" name="featuredImage" onChange={props.onChange} />
-      <Field component="input" type="hidden" name="featuredImage" hello/>
       { props.featuredImage &&
         <div style={{position: "relative", marginTop: 25}}>
           <img src={props.featuredImage.value} style={{width: "100%"}} alt={props.title}/> 
@@ -569,25 +568,20 @@ let NewContentTypeNoPostId = React.createClass({
 
       if (!this.props.featuredImage.id){
         mutate = me.props.addImageGallery
+      } else {
+        mutate = me.props.updateFeaturedImage
+        data = {
+          id: me.props.featuredImage.id,
+          value: reader.result
+        }
+      }
+
       mutate({
         variables: {
           input: data
         }
       }).then(data => console.log(data))
-      } else {
-        //  mutate = me.props.updateFeaturedImage
-        debugger
-        data = {...data, ...me.props.featuredImage}
-        me.props.client.mutate({
-          mutation: Query.updateFeaturedImage,
-          variables: {
-            input: data
-          }
-        }).then(hello => console.log(hello))
-      }
 
-        // update featuredImage
-      me.props.change("featuredImage", file)
       document.querySelector("input[type='file'][name='featuredImage']").value = null
       }
 
