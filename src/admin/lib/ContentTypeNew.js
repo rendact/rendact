@@ -464,10 +464,10 @@ let NewContentTypeNoPostId = React.createClass({
       props.titleTag && props.dispatch(updateTitleTagLeftCharacter(65-(props.titleTag.length)));
       props.metaDescription && props.dispatch(updateMetaDescriptionLeftCharacter(160-(props.metaDescription.length)));
     } 
-    if ((this.props.isLoadPost && !props.isLoadPost) || props.mode === "create"){
-      this.disableForm(false)
-    }
-
+    if ((this.props.isLoadPost && !props.isLoadPost)){
+      disableForm(false, this.notification)
+      props.dispatch(maskArea(false))
+    } 
 
     if (props.visibilityTxt !== this.props.visibilityTxt && !this.props.visibilityIsChangedProcess){
       // set visibilityTxtTemp to this.props.visibilityTxt
@@ -1050,7 +1050,9 @@ let NewContentTypeNoPostId = React.createClass({
     )
   },
   componentWillMount: function(){
-    this.disableForm(true)
+    if (!_.isEmpty(this.props.urlParams) && this.props.isLoadPost){
+      this.disableForm(true)
+    }
   },
  
   componentDidMount: function(){
