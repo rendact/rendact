@@ -222,7 +222,7 @@ let PageHiererachyWidget = (props) => {
       </div>
       <div className="form-group">
         <p><b>Order</b></p>
-        <input type="text" id="pageOrder" placeholder="0" style={{width:50}} min="0" step="1" data-bind="value:pageOrder"/>
+        <Field type="text" id="pageOrder" placeholder="0" name="order" style={{width:50}} min="0" step="1" component="input" data-bind="value:pageOrder"/>
       </div>
       </div>                  
     </div>
@@ -1437,10 +1437,12 @@ const mapResultToProps = ({ownProps, data}) => {
       let v = data.getPost
 
       let fields = ["id","title","type","content","order","deleteData",
-      "featuredImage","slug","status","publishDate","passwordPage","parent","summary","visibility","authorId"];
+      ,"slug","status","publishDate","passwordPage","parent","summary","visibility","authorId"];
       _.forEach(fields, function(item){
         if (data.getPost) initials[item] = data.getPost[item];
       });
+
+      debugger
 
       // setting the meta values
 
