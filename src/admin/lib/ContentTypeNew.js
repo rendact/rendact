@@ -547,8 +547,15 @@ let NewContentTypeNoPostId = React.createClass({
     var resetDate = this.props.publishDateReset;
     this.props.dispatch(setPostPublishDate(resetDate, false));
   },
+
   featuredImageRemove: function(e){
-    this.props.dispatch(setFeaturedImage(""))
+    this.props.removeImageGallery({
+      variables: {
+        input: {
+          id: this.props.featuredImage.id
+        }
+      }
+    }).then(data => console.log(data))
   },
 
   featuredImageChange: function(e){
