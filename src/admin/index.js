@@ -286,7 +286,7 @@ let PageLoader = React.createClass({
             customFields={ contentData.customFields }
             tableName="Post"
             widgets={
-                ["ategoy", "featuredImage"] }
+                ["category", "featuredImage"] }
             viewRole="view-post"
             modifyRole="modify-post"
             handleNav={ me.props.handleNav }
