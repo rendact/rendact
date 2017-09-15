@@ -388,7 +388,7 @@ let NewContentTypeNoPostId = React.createClass({
     metaKeyword: React.PropTypes.string,
     metaDescription: React.PropTypes.string,
     permalinkInProcess: React.PropTypes.bool,
-    featuredImage: React.PropTypes.string,
+    featuredImage: React.PropTypes.object,
     imageGallery: React.PropTypes.array,
     tagMap: React.PropTypes.object,
     connectionValue: React.PropTypes.object,
