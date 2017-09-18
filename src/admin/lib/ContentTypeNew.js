@@ -665,7 +665,7 @@ let NewContentTypeNoPostId = React.createClass({
             modifier
           )
           }else{
-            this.props.setFeaturedImage({...featuredImage})
+            this.props.setFeaturedImage({...featuredImage, value: featuredImage.blobUrl})
           }
 
 
