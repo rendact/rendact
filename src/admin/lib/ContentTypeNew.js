@@ -1040,18 +1040,23 @@ let NewContentTypeNoPostId = React.createClass({
   },
   _genReactSelect: function(contentId){
     var me = this;
+  
     var getConnectionOptions = function(input) {
-      me.props.client.query({
+      if (!input){
+        return Promise.resolve({options: []})
+      }
+      return me.props.client.query({
         query: gql`${Query.getContentPostListQry("All", contentId).query}`}).then(data => {
-          let options = _.forEach(data.data.viewer.allPosts.edges, item => ({value: item.node.slug, label: item.node.title}));
-          return {options: options}
-        }).then(out => out)    
+          let options = _.map(data.data.viewer.allPosts.edges, item => ({value: item.node.slug, label: item.node.title}));
+          return options
+        }).then(options => ({options: options}))    
     }
 
     var handleSelectConnectionChange = function(newValue) {
       var _connectionValue = me.props.connectionValue;
       _connectionValue[contentId] = newValue
       me.props.dispatch(setConnectionValue(_connectionValue));
+      me.props.change(contentId, newValue.value)
     }
 
     return (
@@ -1337,7 +1342,11 @@ let NewContentTypeNoPostId = React.createClass({
                       if (item.type === "date")
                         form = (<DatePicker id={item.id} name={item.id} style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.props.publishDate.toISOString()} onChange={this.handleDateChange}/>)
                       if (item.type === "connection") {
-                        form = this._genReactSelect(item.connection)
+                        form = (<div>
+                          {this._genReactSelect(item.connection)}
+                          <Field component="input" type="hidden" className="metaField" name={item.connection}/>
+                        </div>
+                        )
                       }
                       return <div key={item.id} className="box box-info" style={{marginTop:20}}>
                         <div className="box-header with-border">
