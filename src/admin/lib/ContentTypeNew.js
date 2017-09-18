@@ -601,7 +601,6 @@ let NewContentTypeNoPostId = React.createClass({
 
     reader.onload = (event) => {
       let data = {
-        value: reader.result,
         blobFieldName: 'myBlobField',
         featuredImageConnectionId: me.props.urlParams.postId || null,
         type: "featuredImage",
@@ -635,7 +634,7 @@ let NewContentTypeNoPostId = React.createClass({
               value: reader.result,
               type: "",
               blobMimeType: "",
-              blobUrl: ""
+              blobUrl: reader.result
             }
           }
         },
@@ -864,6 +863,7 @@ let NewContentTypeNoPostId = React.createClass({
   imageGalleryChange: function(e){
     var me = this;
     var reader = new FileReader();
+    let file = e.target.files[0]
     reader.onload = function(){
       if (!me.props.postId) me.props.dispatch(toggleImageGalleyBinded(true));
       me.props.addImageGallery({
@@ -872,7 +872,8 @@ let NewContentTypeNoPostId = React.createClass({
             type: "gallery",
             value: reader.result,
             postId: me.props.urlParams.postId || null,
-            blobFieldName: "myBlobField"
+            blobFieldName: "myBlobField",
+            myBlobField: file
           }
         },
         optimisticResponse: {
@@ -887,7 +888,7 @@ let NewContentTypeNoPostId = React.createClass({
               blobFieldName: 'myBlobField',
               id: "customid",
               blobMimeType: null,
-              blobUrl: ""
+              blobUrl: reader.result
             }
           }
         },
@@ -933,7 +934,7 @@ let NewContentTypeNoPostId = React.createClass({
         me._errorNotif(error.message)
       });
     }
-    reader.readAsDataURL(e.target.files[0]);
+    reader.readAsDataURL(file);
   },
   handleImageClick: function(e){
     e.preventDefault();
@@ -1481,8 +1482,8 @@ const mapResultToProps = ({ownProps, data}) => {
       var _imageGalleryList = [];    
       if (v.tag && v.file.edges.length>0) {
         _.forEach(v.file.edges, function(i){
-          if (i.node.value){
-            _imageGalleryList.push({id: i.node.id, value: i.node.value, toDelete: i.node.toDelete});
+          if (i.node.blobUrl){
+            _imageGalleryList.push({id: i.node.id, value: i.node.blobUrl, toDelete: i.node.toDelete});
           }
         });
       }
