@@ -151,6 +151,11 @@ export const setFeaturedImage = (featuredImage) => ({
   featuredImage
 })
 
+export const toggleFeaturedImageBindingStatus = (status) => ({
+  type: 'TOGGLE_FEATURED_IMAGE_BINDING_STATUS',
+  status
+})
+
 export const setEditorMode = (mode) => ({
   type: 'SET_EDITOR_MODE',
   mode

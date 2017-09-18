@@ -414,8 +414,7 @@ const getPostQry = function(postId){
     }
 };
 
-const getPost = gql`query ($id: ID!){getPost(id: $id){ id,publishDate,imageFeatured{id, value},title,content,slug,author{username},status,visibility,featuredImage,
-      summary,category{edges{node{id, category{id,name}}}},comments{edges{node{id,content,name,email,website}}},file{edges{node{id value}}},
+const getPost = gql`query ($id: ID!){getPost(id: $id){ id,publishDate,imageFeatured{id, value},title,content,slug,author{username},status,visibility,order,summary,parent,category{edges{node{id, category{id,name}}}},comments{edges{node{id,content,name,email,website}}},file{edges{node{id value}}},
       tag{edges{node{id,tag{id,name}}}},meta{edges{node{id,item,value}}},createdAt}}`
 
 const deletePostQry = function(idList){

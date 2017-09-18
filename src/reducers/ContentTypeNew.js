@@ -19,6 +19,9 @@ const contentTypeNew = (state = INITIAL_VALUES, action) => {
 
     case 'UPDATE_SLUG':
       return {...state, permalink: action.slug, permalinkEditing: action.isEditorEnabled}
+
+    case 'TOGGLE_FEATURED_IMAGE_BINDING_STATUS':
+      return {...state, featuredImageBindingStatus: action.status}
     
     case 'TOGGLE_PERMALINK_PROCESS_STATE':
       return {...state, permalinkInProcess: action.state}
