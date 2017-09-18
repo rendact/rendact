@@ -24,6 +24,37 @@ import {graphql, withApollo} from 'react-apollo';
 import gql from 'graphql-tag';
 import Script from 'react-load-script'
 
+let CustomFields = (props) => (
+  <div>
+    {props.customFields.map((item) => {
+      var form;
+      if (item.type === "text" || item.type === "number")
+        form = (<Field id={props.metaIds? props.metaIds[item.id] : null} name={item.id} className="form-control metaField" type="text" component="input" style={{width: '100%'}}/>)
+      if (item.type === "date")
+        form = (<DatePicker id={item.id} name={item.id} style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={props.publishDate.toISOString()} onChange={props.handleDateChange}/>)
+      if (item.type === "connection") {
+        form = (<div>
+          {props._genReactSelect(item.id, props.getVal(item.id))}
+          <Field id={props.metaIds? props.metaIds[item.id] : null} component="input" type="hidden" className="metaField" name={item.connection}/>
+        </div>
+        )
+      }
+      return <div key={item.id} className="box box-info" style={{marginTop:20}}>
+        <div className="box-header with-border">
+          <h3 className="box-title">{item.label}</h3>         
+          <div className="pull-right box-tools">
+            <button type="button" className="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+            <i className="fa fa-minus"></i></button>
+          </div>
+        </div>
+        <div className="box-body pad">
+          {form}
+        </div>
+      </div>
+    })}
+  </div>
+)
+
 
 class CkeditorField extends React.Component {
   constructor(props){
@@ -1348,32 +1379,15 @@ let NewContentType = React.createClass({
                   }
 
                   {
-                    this.props.customFields && this.props.customFields.map(function(item){
-                      var form;
-                      if (item.type === "text" || item.type === "number")
-                        form = (<Field id={me.props.metaIds? me.props.metaIds[item.id] : null} name={item.id} className="form-control metaField" type="text" component="input" style={{width: '100%'}}/>)
-                      if (item.type === "date")
-                        form = (<DatePicker id={item.id} name={item.id} style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.props.publishDate.toISOString()} onChange={this.handleDateChange}/>)
-                      if (item.type === "connection") {
-                        form = (<div>
-                          {me._genReactSelect(item.id, me.props[item.id])}
-                          <Field id={me.props.metaIds? me.props.metaIds[item.id] : null} component="input" type="hidden" className="metaField" name={item.connection}/>
-                        </div>
-                        )
-                      }
-                      return <div key={item.id} className="box box-info" style={{marginTop:20}}>
-                        <div className="box-header with-border">
-                          <h3 className="box-title">{item.label}</h3>         
-                          <div className="pull-right box-tools">
-                            <button type="button" className="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
-                            <i className="fa fa-minus"></i></button>
-                          </div>
-                        </div>
-                        <div className="box-body pad">
-                          {form}
-                        </div>
-                      </div>
-                    }.bind(this))
+                    this.props.customFields && 
+                      <CustomFields
+                        metaIds={this.props.metaIds}
+                        customFields={this.props.customFields}
+                        publishData={this.props.publishDate}
+                        handleDateChange={this.handleDateChange}
+                        _genReactSelect={this._genReactSelect}
+                        getVal={(contentId) => this.props[contentId]}
+                      />
                   }
 
               </div>
