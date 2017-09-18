@@ -357,7 +357,7 @@ const PermalinkEditor = (props) => {
   )
 }
 
-let NewContentTypeNoPostId = React.createClass({
+let NewContentType = React.createClass({
   propTypes: {
     urlParams: React.PropTypes.object,
     isProcessing: React.PropTypes.bool.isRequired,
@@ -1420,21 +1420,7 @@ const mapStateToProps = function(state, ownProps){
 
 }
 
-NewContentTypeNoPostId = _.flow([
-  connect(mapStateToProps),
-  graphql(Query.updateFeaturedImage, {name: 'updateFeaturedImage'}),
-  graphql(gql`${Query.getUpdatePostQry().query}`, {name: 'updatePostQuery'}),
-  graphql(gql`${Query.getCreatePostQry().query}`, {name: 'createPostQuery'}),
-  graphql(gql`${Query.addImageGallery().query}`, {name: 'addImageGallery'}),
-  graphql(gql`${Query.removeImageGallery().query}`, {name: 'removeImageGallery'}),
-  withApollo,
-])(NewContentTypeNoPostId)
-
-
-NewContentTypeNoPostId = reduxForm({
-  form: 'newContentForm'
-})(NewContentTypeNoPostId)
-
+NewContentType = (NewContentType)
 
 const mapResultToProps = ({ownProps, data}) => {
     if (data.loading){
@@ -1543,16 +1529,32 @@ const mapResultToProps = ({ownProps, data}) => {
     }
 }
 
-const NewContentTypeWithPostId = graphql(Query.getPost, {
+NewContentType = _.flow([
+  connect(mapStateToProps),
+  graphql(Query.updateFeaturedImage, {name: 'updateFeaturedImage'}),
+  graphql(gql`${Query.getUpdatePostQry().query}`, {name: 'updatePostQuery'}),
+  graphql(gql`${Query.getCreatePostQry().query}`, {name: 'createPostQuery'}),
+  graphql(gql`${Query.addImageGallery().query}`, {name: 'addImageGallery'}),
+  graphql(gql`${Query.removeImageGallery().query}`, {name: 'removeImageGallery'}),
+  withApollo,
+  reduxForm({
+    form: 'newContentForm'
+  }),
+  graphql(Query.getPost, {
   options : (props) => ({
     variables: {
       id: props.postId
     }
   }),
-  props: mapResultToProps
-})(NewContentTypeNoPostId)
+  props: mapResultToProps,
+  skip: (props) => {
+    return props.urlParams && !props.urlParams.postId || !props.urlParams
+  }
+})
+])(NewContentType)
 
 
+  /*
 class NewContentType extends React.Component{
   constructor(props){
     super(props)
@@ -1601,5 +1603,6 @@ class NewContentType extends React.Component{
     )
   }
 }
+*/
 
 export default NewContentType;
