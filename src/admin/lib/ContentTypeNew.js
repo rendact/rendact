@@ -665,7 +665,7 @@ let NewContentTypeNoPostId = React.createClass({
             toModify = _.cloneDeep(toModify)
 
             if(featuredImage.id === 'customId'){
-              toModify.getPost.imageFeatured = {...toModify.getPost.imageFeatured, blobUrl: reader.result, id: 'customId'}
+              toModify.getPost.imageFeatured = {...featuredImage, ...toModify.getPost.imageFeatured,  blobUrl: reader.result, id: 'customId'}
             } else {
               toModify.getPost.imageFeatured = {...toModify.getPost.imageFeatured, ...featuredImage}
             }
