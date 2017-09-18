@@ -44,9 +44,6 @@ class CkeditorField extends React.Component {
         window.CKEDITOR.instances[i].on('change', this.props.handleContentChange)
       }
     }
-      if (this.props.data && (window.CKEDITOR && !window.CKEDITOR.instances['content'].getData())){
-        window.CKEDITOR.instances['content'].setData(this.props.data.content)
-      }
   }
 
   handleOnError(){
@@ -454,9 +451,18 @@ let NewContentTypeNoPostId = React.createClass({
     this.props.dispatch(maskArea(isFormDisabled));
   },
 
+  componentWillUnmount: function(){
+    let ckeditor = window.CKEDITOR
+    ckeditor && ckeditor.instances['content'].removeAllListeners()
+    ckeditor && ckeditor.remove('content')
+  },
+
   componentWillReceiveProps: function(props){
     console.log("nextProps", props)
     if (props.data !== this.props.data){
+      if (props.data && (window.CKEDITOR && !window.CKEDITOR.instances['content'].getData())){
+        window.CKEDITOR.instances['content'].setData(props.data.content)
+      }
       props.initialize(props.initialValues)
       props.dispatch(setTagList(props._postTagList, props._postTagList))
       props.dispatch(setPostStatus(props.data.status))
