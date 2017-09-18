@@ -549,6 +549,7 @@ let NewContentTypeNoPostId = React.createClass({
             id: this.props.featuredImage.id,
             type: "featuredImage",
             value: "",
+            blobUrl: ""
           }
         }
       },
@@ -559,7 +560,7 @@ let NewContentTypeNoPostId = React.createClass({
 
           modifier = (toDelete) => {
 
-            if (!featuredImage.value){
+            if (!featuredImage.blobUrl){
               toDelete.getPost.imageFeatured = {...toDelete.getPost.imageFeatured, id:"customId", toDelete: true}
             }else{
               toDelete.getPost.imageFeatured = null
@@ -579,10 +580,10 @@ let NewContentTypeNoPostId = React.createClass({
             modifier
           )
         } else {
-          if (!featuredImage.value){
+          if (!featuredImage.blobUrl){
             this.props.setFeaturedImage({
               ...featuredImage, 
-              value: this.props.featuredImage.value,
+              blobUrl: this.props.featuredImage.value,
               id: "customId"
             })
           } else {
@@ -652,7 +653,7 @@ let NewContentTypeNoPostId = React.createClass({
             toModify = _.cloneDeep(toModify)
 
             if(featuredImage.id === 'customId'){
-              toModify.getPost.imageFeatured = {...featuredImage}
+              toModify.getPost.imageFeatured = {...toModify.getPost.imageFeatured, blobUrl: reader.result, id: 'customId'}
             } else {
               toModify.getPost.imageFeatured = {...toModify.getPost.imageFeatured, ...featuredImage}
             }
