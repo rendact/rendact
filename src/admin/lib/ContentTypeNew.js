@@ -604,7 +604,8 @@ let NewContentTypeNoPostId = React.createClass({
         value: reader.result,
         blobFieldName: 'myBlobField',
         featuredImageConnectionId: me.props.urlParams.postId || null,
-        type: "featuredImage"
+        type: "featuredImage",
+        myBlobField: file
       }
 
       let mutate;
@@ -615,7 +616,9 @@ let NewContentTypeNoPostId = React.createClass({
         mutate = me.props.updateFeaturedImage
         data = {
           id: me.props.featuredImage.id,
-          value: reader.result
+          blobFieldName: 'myBlobField',
+          type: "featuredImage",
+          myBlobField: file
         }
       }
 
@@ -1488,7 +1491,7 @@ const mapResultToProps = ({ownProps, data}) => {
 
       let featuredImage = {}
       if (v.imageFeatured && !_.isEmpty(v.imageFeatured)){
-        featuredImage.value = v.imageFeatured.value
+        featuredImage.value = v.imageFeatured.blobUrl
         featuredImage.id = v.imageFeatured.id
         featuredImage.toDelete = v.imageFeatured.toDelete
       }

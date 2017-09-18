@@ -1,5 +1,6 @@
-import ApolloClient, {createNetworkInterface} from 'apollo-client';
+import ApolloClient from 'apollo-client';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
+import {createNetworkInterface} from './custom-network-interface';
 
 function addGraphQLSubscriptions(networkInterface, wsClient) {
   return Object.assign(networkInterface, {
@@ -23,6 +24,8 @@ const websocketUrl = `wss://${scapholdUrl}`;
 const networkInterface = createNetworkInterface({
     uri: graphqlUrl
 });
+
+
 networkInterface.use([{
   applyMiddleware(req, next) {
     // Easy way to add authorization headers for every request
