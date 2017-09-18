@@ -1038,13 +1038,14 @@ let NewContentTypeNoPostId = React.createClass({
       this._errorNotif(error.message)
     })
   },
-  _genReactSelect: function(contentId){
+  _genReactSelect: function(contentId, value){
     var me = this;
   
     var getConnectionOptions = function(input) {
       if (!input){
         return Promise.resolve({options: []})
       }
+
       return me.props.client.query({
         query: gql`${Query.getContentPostListQry("All", contentId).query}`}).then(data => {
           let options = _.map(data.data.viewer.allPosts.edges, item => ({value: item.node.slug, label: item.node.title}));
@@ -1053,21 +1054,21 @@ let NewContentTypeNoPostId = React.createClass({
     }
 
     var handleSelectConnectionChange = function(newValue) {
-      var _connectionValue = me.props.connectionValue;
-      _connectionValue[contentId] = newValue
-      me.props.dispatch(setConnectionValue(_connectionValue));
-      me.props.change(contentId, newValue.value)
+      me.props.change(contentId, newValue ? newValue.value : '')
     }
+
+
 
     return (
       <ReactSelect.Async
         name={contentId}
-        value={this.props.connectionValue[contentId]}
+        value={value}
         loadOptions={getConnectionOptions}
         onChange={handleSelectConnectionChange}
         connectedContent={contentId}
       />
     )
+
   },
   componentWillMount: function(){
     if (!_.isEmpty(this.props.urlParams) && this.props.isLoadPost){
@@ -1343,8 +1344,8 @@ let NewContentTypeNoPostId = React.createClass({
                         form = (<DatePicker id={item.id} name={item.id} style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.props.publishDate.toISOString()} onChange={this.handleDateChange}/>)
                       if (item.type === "connection") {
                         form = (<div>
-                          {this._genReactSelect(item.connection)}
-                          <Field component="input" type="hidden" className="metaField" name={item.connection}/>
+                          {me._genReactSelect(item.id, me.props[item.id])}
+                          <Field id={me.props.metaIds? me.props.metaIds[item.id] : null} component="input" type="hidden" className="metaField" name={item.connection}/>
                         </div>
                         )
                       }
@@ -1387,6 +1388,11 @@ const mapStateToProps = function(state, ownProps){
     visibilityTxt: selector(state, 'visibility'),
     statusTxt : selector(state, 'statusSelect'),
   }
+
+  _.forEach(ownProps.customFields, item => {
+    customProps[item.id] = selector(state, item.id)
+  })
+
 
   let imageGallery = ownProps.imageGallery || []
   let featuredImage = ownProps.featuredImage || {}
