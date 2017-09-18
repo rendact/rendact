@@ -22,7 +22,7 @@ import gql from 'graphql-tag'
 import _ from 'lodash'
 import request from 'request';
 import Loading from './admin/Loading';
-const store = createStore(reducer, {}, compose(applyMiddleware(clientGraphql.middleware())))
+const store = createStore(reducer, {})
 
 let Main = React.createClass({
 	propTypes: {

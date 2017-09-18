@@ -33,7 +33,6 @@ const main = (state = [], action) => {
 
 const rendactApp = combineReducers({
   form: reduxFormReducer,
-  apollo: clientGraphql.reducer(),
 	main,
   settings,
   contentNew,

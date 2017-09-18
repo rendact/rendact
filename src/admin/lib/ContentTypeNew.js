@@ -561,7 +561,7 @@ let NewContentType = React.createClass({
             id: this.props.featuredImage.id,
             type: "featuredImage",
             value: "",
-            blobUrl: ""
+            blobUrl: "",
           }
         }
       },
@@ -593,13 +593,12 @@ let NewContentType = React.createClass({
           )
         } else {
           if (!featuredImage.blobUrl){
-            this.props.setFeaturedImage({
-              ...featuredImage, 
-              blobUrl: this.props.featuredImage.value,
+            this.props.dispatch(setFeaturedImage({
+              ...this.props.featuredImage, 
               id: "customId"
-            })
+            }))
           } else {
-            this.props.setFeaturedImage({})
+            this.props.dispatch(setFeaturedImage({}))
           }
         }
       }
@@ -622,7 +621,7 @@ let NewContentType = React.createClass({
 
       let mutate;
 
-      if (!this.props.featuredImage.id){
+      if (!this.props.featuredImage || !this.props.featuredImage.id){
         mutate = me.props.addImageGallery
       } else {
         mutate = me.props.updateFeaturedImage
@@ -677,7 +676,7 @@ let NewContentType = React.createClass({
             modifier
           )
           }else{
-            this.props.setFeaturedImage({...featuredImage, value: featuredImage.blobUrl})
+            this.props.dispatch(setFeaturedImage({...featuredImage, value: featuredImage.blobUrl}))
           }
 
 
@@ -937,7 +936,7 @@ let NewContentType = React.createClass({
               }
             }
 
-            me.props.setImageGallery(imageGallery)
+            me.props.dispatch(setImageGalleryList(imageGallery))
           }
         }
       }).then(data => {
@@ -1040,7 +1039,7 @@ let NewContentType = React.createClass({
               imageGallery = _.filter(imageGallery, item => item.id !== imageId)
             }
 
-            me.props.setImageGallery(imageGallery)
+            me.props.dispatch(setImageGalleryList(imageGallery))
           }
         }
     }).then(data => {
@@ -1407,15 +1406,15 @@ const mapStateToProps = function(state, ownProps){
   })
 
 
-  let imageGallery = ownProps.imageGallery || []
-  let featuredImage = ownProps.featuredImage || {}
+  let imageGallery = ownProps.imageGallery 
+  let featuredImage = ownProps.featuredImage 
 
   return {
     ...ctn,
     ...state.maskArea,
     ...customProps,
-    imageGallery,
-    featuredImage
+    imageGallery: imageGallery || ctn.imageGallery,
+    featuredImage: featuredImage || ctn.featuredImage
   }
 
 }
@@ -1524,7 +1523,8 @@ const mapResultToProps = ({ownProps, data}) => {
         immediatelyStatus: false,
         postCategoryList: postCategoryList,
         metaIds: metaIds,
-        featuredImage
+        featuredImage,
+        mode: 'update'
       }
     }
 }
@@ -1553,56 +1553,5 @@ NewContentType = _.flow([
 })
 ])(NewContentType)
 
-
-  /*
-class NewContentType extends React.Component{
-  constructor(props){
-    super(props)
-    this.state = {
-      imageGallery : [],
-      featuredImage: {}
-    }
-
-    this.setImageGallery = this.setImageGallery.bind(this)
-    this.setFeaturedImage = this.setFeaturedImage.bind(this)
-  }
-
-  setImageGallery(gallery){
-    this.setState({imageGallery: [...gallery]})
-  }
-
-  setFeaturedImage(image){
-    this.setState({
-      featuredImage: {...image}
-    })
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if(this.props.urlParams && !nextProps.urlParams){
-      this.setImageGallery([])
-      this.setFeaturedImage({})
-    }
-  }
-
-  render(){
-    return (
-      <div>
-        {this.props.postId  ?
-            <NewContentTypeWithPostId  {...this.props} urlParams={this.props.urlParams} mode="update"/>
-            :
-            <NewContentTypeNoPostId 
-              _postTagList={[]} 
-              {...this.props} 
-              mode="create" 
-              imageGallery={this.state.imageGallery} 
-              setImageGallery={this.setImageGallery}
-              featuredImage={this.state.featuredImage}
-              setFeaturedImage={this.setFeaturedImage}
-            />}
-      </div>
-    )
-  }
-}
-*/
 
 export default NewContentType;
