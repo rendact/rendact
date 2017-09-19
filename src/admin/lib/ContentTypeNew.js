@@ -501,6 +501,7 @@ let NewContentTypeParent = React.createClass({
       props.initialize(props.initialValues)
       props.dispatch(setTagList(props._postTagList, props._postTagList))
       props.dispatch(setPostStatus(props.data.status))
+      props.dispatch(setSlug(props.data.slug, false))
       
       props.titleTag && props.dispatch(updateTitleTagLeftCharacter(65-(props.titleTag.length)));
       props.metaDescription && props.dispatch(updateMetaDescriptionLeftCharacter(160-(props.metaDescription.length)));
@@ -521,10 +522,10 @@ let NewContentTypeParent = React.createClass({
 },
   resetForm: function(){
     this.props.handleNav(this.props.slug, "new", null, null, () => {
-      //this.props.dispatch(resetPostEditor());
-      //this.props.destroy()
-      //this.props.dispatch(setTagList([], []))
       this.props.toggleCreate(true)
+      this.props.dispatch(resetPostEditor());
+      this.props.destroy()
+      this.props.dispatch(setTagList([], []))
       $(".menu-item").removeClass("active");
       $("#menu-posts-new").addClass("active");
     })
@@ -1656,6 +1657,7 @@ NewContentTypeUpdate = _.flow([
       }
     }),
     props: mapResultToProps,
+    skip: (props) => _.isEmpty(props.urlParams) || !props.urlParams.postId
   }),
 ])(NewContentTypeUpdate)
 
@@ -1675,16 +1677,16 @@ class NewContentType extends React.Component {
   }
 
   render(){
-    let props = _.cloneDeep(this.props)
-    props.toggleCreate = this.toggleCreate
     
     return this.state.create ?
       <NewContentTypeCreate 
-        {...props}
+        {...this.props}
+        toggleCreate={this.toggleCreate}
       />
       :
       <NewContentTypeUpdate
-        {...props}
+        {...this.props}
+        toggleCreate={this.toggleCreate}
       />
   }
 }

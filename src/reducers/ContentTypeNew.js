@@ -30,9 +30,9 @@ const contentTypeNew = (state = INITIAL_VALUES, action) => {
       return {...state, status: action.status}
     
     case 'RESET_POST_EDITOR':
-        let data = {postId: "", initialValues:{}, data:{}, title:"", permalink: "", content:"", summary:"", featuredImage: null, imageGallery:[],
+        let data = {postId: "", title:"", permalink: "", content:"", summary:"", featuredImage: null, imageGallery:[],
         status:"Published", immediately:"", immediatelyStatus:true, visibilityTxt:"Public",
-        permalinkEditing: false, mode: "create", titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160}
+        permalinkEditing: false, titleTagLeftCharacter: 65, metaDescriptionLeftCharacter: 160}
       return {...state, ...data}
     
     case 'SET_CATEGORY_LIST':
