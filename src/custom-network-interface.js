@@ -1,10 +1,32 @@
 import { HTTPFetchNetworkInterface } from 'apollo-client';
 import _ from 'lodash';
-import RecursiveIterator from 'recursive-iterator';
 import { print as printGraphQL } from 'graphql/language/printer';
 
 // example of custom network interface is from https://github.com/jaydenseric/apollo-upload-client/blob/master/src/network-interface.js
 // the scaphold implementation is from https://gist.github.com/ihfazhillah/6289d7958592c055a2cbcad5d3821039
+
+// this mixin is from package named lodash-deep, i modify it so this mixin can return path of instance of File object. So, currently we dont need the original package.
+var mixin = {
+deepMapValues: function(object, callback, propertyPath){
+    propertyPath = propertyPath || '';
+    if(_.isArray(object)){
+        return _.map(object, deepMapValuesIteratee);
+    }
+    else if(_.isObject(object) && !_.isDate(object) && !_.isRegExp(object) && !_.isFunction(object) && !(object instanceof File)){
+        return _.extend({}, object, _.mapValues(object, deepMapValuesIteratee));
+    }
+    else{
+        return callback(object, propertyPath);
+    }
+
+    function deepMapValuesIteratee(value, key){
+        var valuePath = propertyPath ? propertyPath + '.' + key: key;
+        return _.deepMapValues(value, callback, valuePath);
+    }
+  }
+}
+
+_.mixin(mixin)
 
 export class UploadHTTPFetchNetworkInterface extends HTTPFetchNetworkInterface {
   fetchFromRemoteEndpoint({ request, options }) {
@@ -14,13 +36,14 @@ export class UploadHTTPFetchNetworkInterface extends HTTPFetchNetworkInterface {
     let standart = true;
     const formData = new FormData();
 
-    for (const {node, path} of new RecursiveIterator(request.variables)) {
+    _.deepMapValues(request.variables, (node, path) => {
       if (node instanceof File){
-        formData.append(path[1], node)
-        _.unset(request.variables, path.join("."))
+        formData.append(_.last(path.split('.')), node)
+        _.unset(request.variables, path)
         standart = false
       }
-    }
+    })
+
 
     if (!standart){
       formData.append('query', printGraphQL(request.query));

@@ -48,7 +48,6 @@
     "react-select": ">=1.0.0-rc.4",
     "react-sortable-tree": ">=0.1.19",
     "recompose": "^0.24.0",
-    "recursive-iterator": "^3.3.0",
     "redux-form": "^7.0.3",
     "request": "^2.81.0",
     "subscriptions-transport-ws": ">=0.6.0",
