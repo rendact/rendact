@@ -1555,7 +1555,7 @@ const mapResultToProps = ({ownProps, data}) => {
       let v = data.getPost
 
       let fields = ["id","title","type","content","order","deleteData",
-      ,"slug","status","publishDate","passwordPage","parent","summary","visibility","authorId"];
+        "slug","status","publishDate","passwordPage","parent","summary","visibility","authorId"];
       _.forEach(fields, function(item){
         if (data.getPost) initials[item] = data.getPost[item];
       });

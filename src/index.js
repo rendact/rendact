@@ -14,8 +14,7 @@ import Register from './register'
 import reducer from './reducers'
 import {DragDropContext} from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
-import { createStore, applyMiddleware, compose } from 'redux'
-import clientGraphql from './apollo'
+import { createStore } from 'redux'
 import {setLogged} from './actions'
 import {connectWithStore } from './utils'
 import gql from 'graphql-tag'
