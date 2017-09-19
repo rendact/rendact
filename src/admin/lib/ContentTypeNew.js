@@ -983,34 +983,36 @@ let NewContentTypeParent = React.createClass({
       this._errorNotif(error.message)
     })
   },
-  _genReactSelect: function(contentId, value){
-    var me = this;
-  
-    var getConnectionOptions = function(input) {
+
+  handleSelectConnectionChange: function(contentId) {
+    return (newValue) => {
+      this.props.change(contentId, newValue ? newValue.value : '')
+    }
+  },
+
+  getConnectionOptions: function(contentId) {
+    return (input) => {
       if (!input){
         return Promise.resolve({options: []})
       }
 
-      return me.props.client.query({
+      return this.props.client.query({
         query: gql`${Query.getContentPostListQry("All", contentId).query}`}).then(data => {
           let options = _.map(data.data.viewer.allPosts.edges, item => ({value: item.node.slug, label: item.node.title}));
-          return options
-        }).then(options => ({options: options}))    
+          return {options: options}
+        })    
     }
+  },
 
-    var handleSelectConnectionChange = function(newValue) {
-      me.props.change(contentId, newValue ? newValue.value : '')
-    }
-
-
-
+  _genReactSelect: function(contentId, value){
     return (
       <ReactSelect.Async
         name={contentId}
         value={value}
-        loadOptions={getConnectionOptions}
-        onChange={handleSelectConnectionChange}
+        loadOptions={this.getConnectionOptions(contentId)}
+        onChange={this.handleSelectConnectionChange(contentId)}
         connectedContent={contentId}
+        autoload={false}
       />
     )
 
