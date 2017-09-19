@@ -8,7 +8,7 @@ import Halogen from 'halogen'
 import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle, swalert, getValue, disableForm} from '../../utils'
 import {Table, SearchBoxPost, DeleteButtons} from './Table'
 import {connect} from 'react-redux'
-import {setStatusCounter, initContentList, maskArea, toggleDeleteMode, toggleSelectedItemState} from '../../actions'
+import {setStatusCounter, initContentList, setloadData, maskArea, toggleDeleteMode, toggleSelectedItemState} from '../../actions'
 import {graphql, withApollo} from 'react-apollo';
 import gql from 'graphql-tag';
 
@@ -29,6 +29,8 @@ let ContentType = React.createClass({
     fields: React.PropTypes.array,
     allPostId: React.PropTypes.array,
     replaceStatusWithRole: React.PropTypes.bool,
+    _dataArr: React.PropTypes.array,
+    bEdit: React.PropTypes.bool,
   },
   getDefaultProps: function() {
     return {
@@ -36,6 +38,8 @@ let ContentType = React.createClass({
       opacity: 1,
       monthList: [],
       _allPostId: [],
+      _dataArr: [],
+      bEdit: false,
       statusCount: {},
       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
       replaceStatusWithRole: false
@@ -142,9 +146,9 @@ let ContentType = React.createClass({
           });
 
           var bEdit = hasRole(me.props.modifyRole);
+          //me.props.dispatch(setloadData(_dataArr, bEdit));
           me.table.loadData(_dataArr, bEdit);
           me.props.dispatch(initContentList(monthList, _allPostId))
-          // me.componentWillReceiveProps();
           me.disableForm(false);
         })
 
@@ -496,6 +500,18 @@ let ContentType = React.createClass({
       this.props.dispatch(initContentList(props.monthList, props._allPostId))
     }
   },
+  // componentWillReceiveProps(props){
+  //   debugger
+  //   if(props._allPostId.length !== props._dataArr.length){
+  //     this.table.loadData(props._dataArr, props.bEdit);
+  //   }
+  //   if(props._allPostId.length && !this.props._allPostId.length){
+  //     this.table.loadData(props._dataArr, props.bEdit);
+  //   }
+  //   this.props.dispatch(setStatusCounter(props._statusCount))
+  //   this.props.dispatch(initContentList(props.monthList, props._allPostId))
+    
+  // },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
     this.table = this.refs.rendactTable;
@@ -607,7 +623,7 @@ ContentType = connect(mapStateToProps)(ContentType)
 let getAllPosts = gql`
 query getAllPosts ($type: String!){
   viewer { 
-    allPosts(where: {type: {eq: $type},status: {ne: ""} }) {
+    allPosts(where: {type: {eq: $type}}) {
       edges { 
         node { 
           id,

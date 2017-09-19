@@ -15,6 +15,9 @@ const contentType = (state = INITIAL_VALUES, action) => {
 
     case 'INIT_CONTENT_LIST':
       return state.map(item =>  ({...item, monthList: action.monthList, allPostId: action.allPostId}))
+    
+    case 'SET_LOAD_DATA':
+      return state.map(item =>  ({...item, _dataArr: action._dataArr, bEdit: action.bEdit}))
 
     case 'TOGGLE_DELETE_MODE':
       return state.map(item =>  ({...item, activeStatus: action.status, deleteMode: action.state}))
