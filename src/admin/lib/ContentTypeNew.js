@@ -388,7 +388,7 @@ const PermalinkEditor = (props) => {
   )
 }
 
-let NewContentType = React.createClass({
+let NewContentTypeParent = React.createClass({
   propTypes: {
     urlParams: React.PropTypes.object,
     isProcessing: React.PropTypes.bool.isRequired,
@@ -425,6 +425,10 @@ let NewContentType = React.createClass({
     connectionValue: React.PropTypes.object,
     data: React.PropTypes.object,
     parent: React.PropTypes.string,
+    featuredImageChangeAfterware: React.PropTypes.func.isRequired,
+    featuredImageRemoveAfterware: React.PropTypes.func.isRequired,
+    imageGalleryChangeAfterware: React.PropTypes.func.isRequired,
+    imageGalleryRemoveAfterware: React.PropTypes.func.isRequired
   },
   getDefaultProps: function() {
     return {
@@ -599,38 +603,9 @@ let NewContentType = React.createClass({
       update: (store, data) =>  {
         let featuredImage = data.data.deleteFile.changedFile;
         if (this.props.postId){
-          let modifier;
-
-          modifier = (toDelete) => {
-
-            if (!featuredImage.blobUrl){
-              toDelete.getPost.imageFeatured = {...toDelete.getPost.imageFeatured, id:"customId", toDelete: true}
-            }else{
-              toDelete.getPost.imageFeatured = null
-            }
-
-            return toDelete
-          }
-
-          modifyApolloCache(
-            {
-              query: Query.getPost,
-              variables: {
-                id: this.props.urlParams.postId
-              }
-            },
-            store,
-            modifier
-          )
+          this.props.featuredImageRemoveAfterware(featuredImage, store)
         } else {
-          if (!featuredImage.blobUrl){
-            this.props.dispatch(setFeaturedImage({
-              ...this.props.featuredImage, 
-              id: "customId"
-            }))
-          } else {
-            this.props.dispatch(setFeaturedImage({}))
-          }
+          this.props.featuredImageRemoveAfterware(featuredImage, this.props.dispatch, this.props.featuredImage)
         }
       }
     }).then(data => console.log(data))
@@ -690,24 +665,9 @@ let NewContentType = React.createClass({
           }
 
           if(this.props.urlParams.postId){
-
-          let modifier = (toModify) => {
-            toModify = _.cloneDeep(toModify)
-
-            if(featuredImage.id === 'customId'){
-              toModify.getPost.imageFeatured = {...featuredImage, ...toModify.getPost.imageFeatured,  blobUrl: reader.result, id: 'customId'}
-            } else {
-              toModify.getPost.imageFeatured = {...toModify.getPost.imageFeatured, ...featuredImage}
-            }
-            return toModify
-          }
-
-          modifyApolloCache({query: Query.getPost, variables: {id : this.props.urlParams.postId}},
-            store,
-            modifier
-          )
+            this.props.featuredImageChangeAfterware(featuredImage, store, reader)
           }else{
-            this.props.dispatch(setFeaturedImage({...featuredImage, value: featuredImage.blobUrl}))
+            this.props.featuredImageChangeAfterware(featuredImage, this.props.dispatch)
           }
 
 
@@ -937,37 +897,11 @@ let NewContentType = React.createClass({
         },
         update: (store, data) => {
           let image = data.data.createFile.changedFile
-          const modifier = (toModify) => {
-            toModify.getPost.file.edges = [{node: {...image}, __typename: "FileEdge"}, ...toModify.getPost.file.edges]
-            return toModify
-          }
           if (me.props.urlParams.postId){
-            modifyApolloCache(
-              {
-                query: Query.getPost,
-                variables: {
-                  id: me.props.urlParams.postId
-                }
-              },
-              store,
-              modifier
-            )
-
+            me.props.imageGalleryChangeAfterware(image, store, me.props.urlParams.postId)
           } else {
+            me.props.imageGalleryChangeAfterware(image, me.props.dispatch, me.props.imageGallery)
             // this process imageGallery on create mode
-            let imageGallery = _.cloneDeep(me.props.imageGallery)
-
-            if (!imageGallery.length){
-              imageGallery.push({id: image.id, value: image.value})
-            } else {
-              if (imageGallery[0].value === image.value) {
-                imageGallery.splice(0, 1, {id: image.id, value: image.value})
-              } else {
-                imageGallery.splice(0, 0, {id: image.id, value: image.value})
-              }
-            }
-
-            me.props.dispatch(setImageGalleryList(imageGallery))
           }
         }
       }).then(data => {
@@ -1037,40 +971,9 @@ let NewContentType = React.createClass({
         update: (store, data) => {
           let image = data.data.deleteFile.changedFile
           if (me.props.urlParams.postId){
-            const modifier = (toModify) => {
-                if (!image.value) {
-                  toModify.getPost.file.edges = _.map(toModify.getPost.file.edges, item => {
-                    if (item.node.id === image.id) {
-                      item.node.id = "customid"
-                      item.node.toDelete = true
-                    }
-                    return item
-                  })
-                } else {
-                  toModify.getPost.file.edges = _.filter(toModify.getPost.file.edges, item => item.node.id !== imageId)
-                }
-
-                return toModify
-            }
-
-            modifyApolloCache({query: Query.getPost, variables: {id: me.props.urlParams.postId}},
-              store,
-              modifier
-            )
+            me.props.imageGalleryRemoveAfterware(image, imageId, me.props.urlParams.postId, store)
           } else {
-            let imageGallery = _.cloneDeep(me.props.imageGallery)
-
-            if(!image.value){
-              imageGallery = _.map(imageGallery, item => {
-                if(item.id === image.id){
-                  item.toDelete = true
-                } return item
-              })
-            } else {
-              imageGallery = _.filter(imageGallery, item => item.id !== imageId)
-            }
-
-            me.props.dispatch(setImageGalleryList(imageGallery))
+            me.props.imageGalleryRemoveAfterware(image, me.props.dispatch, me.props.imageGallery, imageId)
           }
         }
     }).then(data => {
@@ -1433,7 +1336,206 @@ const mapStateToProps = function(state, ownProps){
 
 }
 
-NewContentType = (NewContentType)
+
+
+NewContentTypeParent = _.flow([
+  connect(mapStateToProps),
+  graphql(Query.updateFeaturedImage, {name: 'updateFeaturedImage'}),
+  graphql(gql`${Query.getUpdatePostQry().query}`, {name: 'updatePostQuery'}),
+  graphql(gql`${Query.getCreatePostQry().query}`, {name: 'createPostQuery'}),
+  graphql(gql`${Query.addImageGallery().query}`, {name: 'addImageGallery'}),
+  graphql(gql`${Query.removeImageGallery().query}`, {name: 'removeImageGallery'}),
+  withApollo,
+  reduxForm({
+    form: 'newContentForm'
+  }),
+])(NewContentTypeParent)
+
+class NewContentTypeCreate extends React.Component {
+  constructor(props) {
+    super(props)
+
+    _.bindAll(this, [
+      'featuredImageChangeAfterware',
+      'featuredImageRemoveAfterware',
+      'imageGalleryChangeAfterware',
+      'imageGalleryRemoveAfterware'
+    ])
+  }
+
+  featuredImageChangeAfterware(featuredImage, action){
+      action(setFeaturedImage({...featuredImage, value: featuredImage.blobUrl}))
+  }
+
+  featuredImageRemoveAfterware(featuredImage, action, featuredImageCache){
+
+          if (!featuredImage.blobUrl){
+            action(setFeaturedImage({
+              ...featuredImageCache, 
+              id: "customId"
+            }))
+          } else {
+            action(setFeaturedImage({}))
+          }
+  }
+
+  imageGalleryChangeAfterware(image, action, imageGalleryCache){
+
+    let imageGallery = _.cloneDeep(imageGalleryCache)
+
+    if (!imageGallery.length){
+      imageGallery.push({id: image.id, value: image.value})
+    } else {
+      if (imageGallery[0].value === image.value) {
+        imageGallery.splice(0, 1, {id: image.id, value: image.value})
+      } else {
+        imageGallery.splice(0, 0, {id: image.id, value: image.value})
+      }
+    }
+
+    action(setImageGalleryList(imageGallery))
+  }
+
+  imageGalleryRemoveAfterware(image, action, imageGalleryCache, imageId){
+
+    let imageGallery = _.cloneDeep(imageGalleryCache)
+
+    if(!image.value){
+      imageGallery = _.map(imageGallery, item => {
+        if(item.id === image.id){
+          item.toDelete = true
+        } return item
+      })
+    } else {
+      imageGallery = _.filter(imageGallery, item => item.id !== imageId)
+    }
+
+    action(setImageGalleryList(imageGallery))
+  }
+
+  render(){
+    return <NewContentTypeParent
+      {...this.props}
+      mode="create"
+      featuredImageChangeAfterware={this.featuredImageChangeAfterware}
+      featuredImageRemoveAfterware={this.featuredImageRemoveAfterware}
+      imageGalleryChangeAfterware={this.imageGalleryChangeAfterware}
+      imageGalleryRemoveAfterware={this.imageGalleryRemoveAfterware}
+    />
+  }
+}
+
+class NewContentTypeUpdate extends React.Component {
+  constructor(props){
+    super(props)
+
+    _.bindAll(this, [
+      'featuredImageChangeAfterware',
+      'featuredImageRemoveAfterware',
+      'imageGalleryChangeAfterware',
+      'imageGalleryRemoveAfterware'
+    ])
+  }
+
+  featuredImageChangeAfterware(featuredImage, store, reader){
+
+    let modifier = (toModify) => {
+      toModify = _.cloneDeep(toModify)
+
+      if(featuredImage.id === 'customId'){
+        toModify.getPost.imageFeatured = {...featuredImage, ...toModify.getPost.imageFeatured,  blobUrl: reader.result, id: 'customId'}
+      } else {
+        toModify.getPost.imageFeatured = {...toModify.getPost.imageFeatured, ...featuredImage}
+      }
+      return toModify
+    }
+
+    modifyApolloCache({query: Query.getPost, variables: {id : this.props.urlParams.postId}},
+      store,
+      modifier
+    )
+
+  }
+
+  featuredImageRemoveAfterware(featuredImage, store, reader){
+    let modifier;
+
+    modifier = (toDelete) => {
+
+      if (!featuredImage.blobUrl){
+        toDelete.getPost.imageFeatured = {...toDelete.getPost.imageFeatured, id:"customId", toDelete: true}
+      }else{
+        toDelete.getPost.imageFeatured = null
+      }
+
+      return toDelete
+    }
+
+    modifyApolloCache(
+      {
+        query: Query.getPost,
+        variables: {
+          id: this.props.urlParams.postId
+        }
+      },
+      store,
+      modifier
+    )
+  }
+
+  imageGalleryChangeAfterware(image, store, postId){
+    const modifier = (toModify) => {
+      toModify.getPost.file.edges = [{node: {...image}, __typename: "FileEdge"}, ...toModify.getPost.file.edges]
+      return toModify
+    }
+      modifyApolloCache(
+        {
+          query: Query.getPost,
+          variables: {
+            id: postId
+          }
+        },
+        store,
+        modifier
+      )
+  }
+
+  imageGalleryRemoveAfterware(image, imageId, postId, store){
+    const modifier = (toModify) => {
+        if (!image.value) {
+          toModify.getPost.file.edges = _.map(toModify.getPost.file.edges, item => {
+            if (item.node.id === image.id) {
+              item.node.id = "customid"
+              item.node.toDelete = true
+            }
+            return item
+          })
+        } else {
+          toModify.getPost.file.edges = _.filter(toModify.getPost.file.edges, item => item.node.id !== imageId)
+        }
+
+        return toModify
+    }
+
+    modifyApolloCache({query: Query.getPost, variables: {id: postId}},
+      store,
+      modifier
+    )
+
+  }
+
+
+  render(){
+    return <NewContentTypeParent
+      {...this.props}
+      mode="update"
+      featuredImageChangeAfterware={this.featuredImageChangeAfterware}
+      featuredImageRemoveAfterware={this.featuredImageRemoveAfterware}
+      imageGalleryChangeAfterware={this.imageGalleryChangeAfterware}
+      imageGalleryRemoveAfterware={this.imageGalleryRemoveAfterware}
+    />
+  }
+}
 
 const mapResultToProps = ({ownProps, data}) => {
     if (data.loading){
@@ -1538,34 +1640,31 @@ const mapResultToProps = ({ownProps, data}) => {
         postCategoryList: postCategoryList,
         metaIds: metaIds,
         featuredImage,
-        mode: 'update'
       }
     }
 }
 
-NewContentType = _.flow([
-  connect(mapStateToProps),
-  graphql(Query.updateFeaturedImage, {name: 'updateFeaturedImage'}),
-  graphql(gql`${Query.getUpdatePostQry().query}`, {name: 'updatePostQuery'}),
-  graphql(gql`${Query.getCreatePostQry().query}`, {name: 'createPostQuery'}),
-  graphql(gql`${Query.addImageGallery().query}`, {name: 'addImageGallery'}),
-  graphql(gql`${Query.removeImageGallery().query}`, {name: 'removeImageGallery'}),
-  withApollo,
-  reduxForm({
-    form: 'newContentForm'
-  }),
+NewContentTypeUpdate = _.flow([
   graphql(Query.getPost, {
-  options : (props) => ({
-    variables: {
-      id: props.postId
-    }
+    options : (props) => ({
+      variables: {
+        id: props.postId
+      }
+    }),
+    props: mapResultToProps,
   }),
-  props: mapResultToProps,
-  skip: (props) => {
-    return props.urlParams && !props.urlParams.postId || !props.urlParams
-  }
-})
-])(NewContentType)
+])(NewContentTypeUpdate)
+
+let NewContentType = (props) => {
+  return _.isEmpty(props.urlParams) || !props.urlParams.postId ?
+    <NewContentTypeCreate 
+      {...props}
+    />
+    :
+    <NewContentTypeUpdate
+      {...props}
+    />
+}
 
 
 export default NewContentType;
