@@ -521,9 +521,10 @@ let NewContentTypeParent = React.createClass({
 },
   resetForm: function(){
     this.props.handleNav(this.props.slug, "new", null, null, () => {
-      this.props.dispatch(resetPostEditor());
-      this.props.destroy()
-      this.props.dispatch(setTagList([], []))
+      //this.props.dispatch(resetPostEditor());
+      //this.props.destroy()
+      //this.props.dispatch(setTagList([], []))
+      this.props.toggleCreate(true)
       $(".menu-item").removeClass("active");
       $("#menu-posts-new").addClass("active");
     })
@@ -841,8 +842,9 @@ let NewContentTypeParent = React.createClass({
         if (this.props.mode==="update"){
           this.props.postRefetch()
         }
-        this.props.dispatch(setEditorMode("update"))
+        //      this.props.dispatch(setEditorMode("update"))
         this.props.dispatch(setPostId(postId))
+        this.props.toggleCreate(false)
       }).catch(error => this._errorNotif(error.message))
     })
 
@@ -1020,7 +1022,7 @@ let NewContentTypeParent = React.createClass({
   componentWillMount: function(){
     if (!_.isEmpty(this.props.urlParams) && this.props.isLoadPost){
       this.disableForm(true)
-    }
+    } 
   },
  
   componentDidMount: function(){
@@ -1657,15 +1659,34 @@ NewContentTypeUpdate = _.flow([
   }),
 ])(NewContentTypeUpdate)
 
-let NewContentType = (props) => {
-  return _.isEmpty(props.urlParams) || !props.urlParams.postId ?
-    <NewContentTypeCreate 
-      {...props}
-    />
-    :
-    <NewContentTypeUpdate
-      {...props}
-    />
+class NewContentType extends React.Component {
+  constructor(props){
+    super(props)
+
+    this.state = {
+      create: _.isEmpty(this.props.urlParams) || !this.props.urlParams.postId 
+    }
+
+    this.toggleCreate = this.toggleCreate.bind(this)
+  }
+
+  toggleCreate(mode){
+    this.setState({create: mode})
+  }
+
+  render(){
+    let props = _.cloneDeep(this.props)
+    props.toggleCreate = this.toggleCreate
+    
+    return this.state.create ?
+      <NewContentTypeCreate 
+        {...props}
+      />
+      :
+      <NewContentTypeUpdate
+        {...props}
+      />
+  }
 }
 
 
