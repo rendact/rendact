@@ -1075,6 +1075,18 @@ let NewContentTypeParent = React.createClass({
 
   render: function(){
     var rootUrl = getConfig('rootUrl');
+
+    let buttonSubmitText;
+    if (this.props.mode === 'update'){
+      if (this.props.status === 'Draft') {
+        buttonSubmitText = 'Publish'
+      } else {
+        buttonSubmitText = 'Save'
+      }
+    } else {
+      buttonSubmitText = 'Publish'
+    }
+
     
     const newPost=(
       <div className="content-wrapper">
@@ -1263,7 +1275,7 @@ let NewContentTypeParent = React.createClass({
                       <div className="form-group pull-right">
                         <button type="button" className="btn btn-default btn-flat disabled" style={{marginRight: 5}}>Preview</button> 
                           <div className="btn-group">
-                            <button type="submit" onClick={this.props.handleSubmit(v => this.onSubmit(v, this.props.status))} id="publishBtn" className="btn btn-primary btn-flat">{this.props.mode==="update"?"Save":"Publish"}</button>
+                            <button type="submit" onClick={this.props.handleSubmit(v => this.onSubmit(v, this.props.status === 'Draft' ? 'Published': this.props.status))} id="publishBtn" className="btn btn-primary btn-flat">{buttonSubmitText}</button>
                             <button type="button" className="btn btn-primary btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                               <span className="caret"></span>
                               <span className="sr-only">Toggle Dropdown</span>
