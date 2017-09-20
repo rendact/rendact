@@ -25,9 +25,9 @@ let Single = React.createClass({
 				  	 	<div className="blog_box">
 							 	<div className="blog_grid">
 							  	<h3 className="wow rollIn animated" data-wow-delay="0.4s">{this.props.postData.title}</h3>
-								  { this.props.postData.featuredImage &&
+								  { this.props.postData.imageFeatured &&
 								  <a href="single.html">
-									  <img src={this.props.postData.featuredImage} className="img-responsive" alt=""/>
+									  <img src={this.props.postData.imageFeatured.blobUrl} className="img-responsive" alt=""/>
 									</a>
 									}
 					  

@@ -116,7 +116,10 @@ var qry = gql`query ($postId: ID!) {
 		author{username},
 		status,
 		visibility,
-		featuredImage,
+    imageFeatured {
+      id
+      blobUrl
+    },
 		summary,
 		category{edges{node{id, category{id,name}}}},
 		comments{edges{node{id,content,name,email,website}}},
