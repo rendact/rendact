@@ -135,7 +135,7 @@ let ContentType = React.createClass({
         });
         
         _dataArr.push(_obj);
-
+debugger
         var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
         if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
       });
@@ -271,14 +271,14 @@ let ContentType = React.createClass({
       var date = getValue("dateFilter");
       var searchValue = { 6: date };
       var te = this;
-      this.loadData(status, function(){
-        te.props.dispatch(toggleDeleteMode(status, false));
-        te.dt.columns([6]).every( function () {
-          this.search( searchValue[this.index()] ).draw();
+      this.loadData(status)
+        this.props.dispatch(toggleDeleteMode(status, false));
+        this.dt.columns([6]).every( function () {
+          te.search( searchValue[this.index()] ).draw();
           return null;
         })
         te.disableForm(false);
-      })
+      
     } ;
   },
   handleSetOwnerButton: function(e){
@@ -346,7 +346,8 @@ let ContentType = React.createClass({
   },
   componentWillReceiveProps(props){
     if(props._allPostId.length && !this.props._allPostId.length){
-      this.table.loadData(props._dataArr, props.bEdit);
+      this.loadData("All");
+      //this.table.loadData(props._dataArr, props.bEdit);
       this.props.dispatch(setStatusCounter(props._statusCount))
       this.props.dispatch(initContentList(props.monthList, props._allPostId))
     }
