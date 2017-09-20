@@ -151,15 +151,6 @@ let FeaturedImageWidget = (props) => (
 
 
 class TagWidget extends React.Component {
-  constructor(props){
-    super(props)
-
-    this.handleOnUpdate = this.handleOnUpdate.bind(this)
-  }
-
-  handleOnUpdate(value){
-    console.log(value)
-  }
   render(){
     return (
       <div className="box box-info" style={{marginTop:20}}>
