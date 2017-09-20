@@ -42,7 +42,8 @@ let ContentType = React.createClass({
       bEdit: false,
       statusCount: {},
       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
-      replaceStatusWithRole: false
+      replaceStatusWithRole: false,
+      activeStatus: "",
     }
   },
   dt: null,
@@ -247,16 +248,14 @@ let ContentType = React.createClass({
     var status = event.target.text;
     if (status==='Trash'){
       var me = this;
-      this.loadData("Trash", function(){
-        me.props.dispatch(toggleDeleteMode(status, true));
-        me.disableForm(false);
-      });
+      this.loadData("Trash");
+      this.props.dispatch(toggleDeleteMode(status, true));
+      this.disableForm(false);
     }else{
       var re = this;
-      this.loadData(status, function(){
-        re.props.dispatch(toggleDeleteMode(status, false));
-        re.disableForm(false);
-      })
+      this.loadData(status)
+      this.props.dispatch(toggleDeleteMode(status, false));
+      this.disableForm(false);
     } ;
   },
   handleDateFilter: function(event){
