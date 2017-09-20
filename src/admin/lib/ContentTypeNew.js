@@ -934,7 +934,7 @@ let NewContentTypeParent = React.createClass({
             variables: qry.variables,
           }).then((data) => {
             me.props.dispatch(toggleImageGalleyBinded(false))
-          })
+          }).catch(error => reject(error))
         }
 
         resolve("hello world")
@@ -977,7 +977,7 @@ let NewContentTypeParent = React.createClass({
       console.log("remove mutation returned data ", data)
       document.getElementById("imageGallery").value=null
     }).catch(error => {
-      this._errorNotif(error.message)
+      errorCallback("imageGalleryError", error.message, error)
     })
   },
 
@@ -1365,15 +1365,14 @@ class NewContentTypeCreate extends React.Component {
   }
 
   featuredImageRemoveAfterware(featuredImage, action, featuredImageCache){
-
-          if (!featuredImage.blobUrl){
-            action(setFeaturedImage({
-              ...featuredImageCache, 
-              id: "customId"
-            }))
-          } else {
-            action(setFeaturedImage({}))
-          }
+    if (!featuredImage.blobUrl){
+      action(setFeaturedImage({
+        ...featuredImageCache, 
+        id: "customId"
+      }))
+    } else {
+      action(setFeaturedImage({}))
+    }
   }
 
   imageGalleryChangeAfterware(image, action, imageGalleryCache){

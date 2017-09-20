@@ -23,7 +23,7 @@ const Home = React.createClass({
 													</section>
 												</div>
 												<div className="col-md-6 welcome-img">
-													{this.props.theImage(item.featuredImage)}
+													{this.props.theImage(item.imageFeatured)}
 												</div>
 												<div className="clearfix"> </div>
 											</div>
