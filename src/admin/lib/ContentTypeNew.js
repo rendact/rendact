@@ -2,8 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import $ from 'jquery';
 import Query from '../query';
-import {riques, disableForm, errorCallback, 
-        getConfig, defaultHalogenStyle, getFormData, modifyApolloCache} from '../../utils';
+import {disableForm, errorCallback, getConfig, defaultHalogenStyle, getFormData, modifyApolloCache} from '../../utils';
 import {getTemplates} from '../../includes/Theme/includes';
 import DatePicker from 'react-bootstrap-date-picker';
 import Notification from 'react-notification-system';
@@ -13,12 +12,9 @@ import ReactSelect from 'react-select';
 import 'react-select/dist/react-select.css';
 import {connect} from 'react-redux';
 import {maskArea, setSlug, setVisibilityMode, togglePermalinkProcessState, setPostStatus, resetPostEditor,
-        setCategoryList, setTagList, setImageGalleryList, setConnectionValue, 
-        toggleSaveImmediatelyMode, toggleVisibilityIsChangedProcess, togglePermalinkEditingState,
-        setPostContent, updateTitleTagLeftCharacter,
-        updateMetaDescriptionLeftCharacter, setPostPublishDate, setFeaturedImage,
-        setEditorMode, toggleImageGalleyBinded, setPageList, setAllCategoryList, setPostId,
-        setOptions, setTagMap, loadFormData, toggleFeaturedImageBindingStatus} from '../../actions'
+  setTagList, setImageGalleryList, toggleSaveImmediatelyMode, toggleVisibilityIsChangedProcess, togglePermalinkEditingState,
+  updateTitleTagLeftCharacter, updateMetaDescriptionLeftCharacter, setPostPublishDate, setFeaturedImage, 
+  toggleImageGalleyBinded,setPostId, toggleFeaturedImageBindingStatus} from '../../actions'
 import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {graphql, withApollo} from 'react-apollo';
 import gql from 'graphql-tag';
@@ -727,16 +723,15 @@ let NewContentTypeParent = React.createClass({
       return;
     }
     var _objData = this._emulateDataForSaving(v);
-    var qry = "", noticeTxt = "";
+    let noticeTxt
+    
     let mutate;
     if (this.props.mode==="create"){
-      qry = this.props.createQuery(_objData);
       noticeTxt = this.props.name+' Published!';
       mutate = this.props.createPostQuery
 
     }else{
       _objData["id"] = this.props.urlParams.postId;
-      qry = this.props.updateQuery(_objData);
       noticeTxt = this.props.name+' Updated!';
       mutate = this.props.updatePostQuery
     }
@@ -832,7 +827,7 @@ let NewContentTypeParent = React.createClass({
       }
 
       let promise = _.reduce([processBindingFeaturedImage, processBinding, processMetadata, processCategory, processTag], (prev, task) => {
-        return prev.then(() =>  task()).catch(error => this._errorNotif(error.message))
+        return prev.then(() =>  task()).catch(error => errorCallback('afterUpdateError', error.message, error))
       }, Promise.resolve())
 
       promise.then(() => {
@@ -846,7 +841,7 @@ let NewContentTypeParent = React.createClass({
         //      this.props.dispatch(setEditorMode("update"))
         this.props.dispatch(setPostId(postId))
         this.props.toggleCreate(false)
-      }).catch(error => this._errorNotif(error.message))
+      }).catch(error => errorCallback('whenPublish/save', error.message, error))
     })
 
   },
@@ -949,7 +944,6 @@ let NewContentTypeParent = React.createClass({
   handleImageRemove: function(e){
     var me = this;
     var id = e.currentTarget.id;
-    var index = id.split("-")[1];
     var imageId = id.split("-")[0];
 
     this.props.removeImageGallery({
@@ -1046,8 +1040,6 @@ let NewContentTypeParent = React.createClass({
 
   render: function(){
     var rootUrl = getConfig('rootUrl');
-    var templates = getTemplates();
-    var me = this;
     
     const newPost=(
       <div className="content-wrapper">
