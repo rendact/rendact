@@ -488,8 +488,7 @@ let NewContentTypeParent = React.createClass({
     ckeditor && ckeditor.remove('content')
   },
 
-  componentWillReceiveProps: function(props){
-    console.log("nextProps", props)
+  initializeData(props){
     if (props.data !== this.props.data){
       if (props.data && (window.CKEDITOR && !window.CKEDITOR.instances['content'].getData())){
         window.CKEDITOR.instances['content'].setData(props.data.content)
@@ -501,7 +500,13 @@ let NewContentTypeParent = React.createClass({
       
       props.titleTag && props.dispatch(updateTitleTagLeftCharacter(65-(props.titleTag.length)));
       props.metaDescription && props.dispatch(updateMetaDescriptionLeftCharacter(160-(props.metaDescription.length)));
-    } 
+    }
+  },
+
+  componentWillReceiveProps: function(props){
+    console.log("nextProps", props)
+    this.initializeData(props)
+
     if ((this.props.isLoadPost && !props.isLoadPost)){
       disableForm(false, this.notification)
       props.dispatch(maskArea(false))
@@ -515,7 +520,7 @@ let NewContentTypeParent = React.createClass({
       props.dispatch(toggleVisibilityIsChangedProcess(true))
     }
 
-},
+  },
   resetForm: function(){
     this.props.handleNav(this.props.slug, "new", null, null, () => {
       this.props.toggleCreate(true)
@@ -526,9 +531,9 @@ let NewContentTypeParent = React.createClass({
       $("#menu-posts-new").addClass("active");
     })
   },
+
   getMetaFormValues: function(v){
-    var out = getFormData("metaField");
-    return out;
+    return getFormData("metaField");
   },
 
   formatDate: function(date){
@@ -536,11 +541,13 @@ let NewContentTypeParent = React.createClass({
     if (min.length<2) min = "0"+min;
     return date.getDate()+"/"+(1+date.getMonth())+"/"+date.getFullYear()+" "+date.getHours()+":"+min;
   },
+
   notifyUnsavedData: function(state){
     if (this.props.handleUnsavedData){
       this.props.handleUnsavedData(state)
     }
   },
+
   handleTitleChange: function(event){
     this.notifyUnsavedData(true);
   },
@@ -556,15 +563,18 @@ let NewContentTypeParent = React.createClass({
     this.props.dispatch(updateTitleTagLeftCharacter(65-(titleTag.length)));
     this.notifyUnsavedData(true);
   },
+
   handleMetaDescriptionChange: function(event){
     var metaDescription = event.currentTarget.value;
     this.props.dispatch(updateMetaDescriptionLeftCharacter(160-(metaDescription.length)));
     this.notifyUnsavedData(true);
   },
+
   handleDateChange: function(date){
     this.props.dispatch(setPostPublishDate(new Date(date), false));
     this.notifyUnsavedData(true);
   },
+
   handleTimeChange: function(event){
     var hours = this.props.hours;
     var minutes = this.props.minutes;
@@ -574,6 +584,7 @@ let NewContentTypeParent = React.createClass({
     this.props.dispatch(setPostPublishDate(d, false));
     this.notifyUnsavedData(true);
   },
+
   handlePublishDateCancel: function(event){
     var resetDate = this.props.publishDateReset;
     this.props.dispatch(setPostPublishDate(resetDate, false));
@@ -595,6 +606,8 @@ let NewContentTypeParent = React.createClass({
             type: "featuredImage",
             value: "",
             blobUrl: "",
+            blobMimeType: "",
+            __typename: ""
           }
         }
       },
@@ -611,11 +624,13 @@ let NewContentTypeParent = React.createClass({
 
   featuredImageChange: function(e){
     var me = this;
+    e.persist()
     var reader = new FileReader();
     let file = e.target.files[0]
     this.props.dispatch(toggleFeaturedImageBindingStatus(true))
 
     reader.onload = (event) => {
+      e.target.disabled = true
       let data = {
         blobFieldName: 'myBlobField',
         featuredImageConnectionId: me.props.urlParams.postId || null,
@@ -623,12 +638,30 @@ let NewContentTypeParent = React.createClass({
         myBlobField: file
       }
 
+      let optimisticResponse = {
+            __typename: "",
+            changedFile: {
+              __typename: "",
+              id: 'customId',
+              value: reader.result,
+              type: "",
+              blobMimeType: "",
+              blobUrl: reader.result
+            }
+      }
+
       let mutate;
 
       if (!this.props.featuredImage || !this.props.featuredImage.id){
         mutate = me.props.addImageGallery
+        optimisticResponse = {
+          createFile : optimisticResponse
+        }
       } else {
         mutate = me.props.updateFeaturedImage
+        optimisticResponse = {
+          updateFile : optimisticResponse
+        }
         data = {
           id: me.props.featuredImage.id,
           blobFieldName: 'myBlobField',
@@ -641,19 +674,7 @@ let NewContentTypeParent = React.createClass({
         variables: {
           input: data
         },
-        optimisticResponse: {
-          updateFile: {
-            __typename: "",
-            changedFile: {
-              __typename: "",
-              id: 'customId',
-              value: reader.result,
-              type: "",
-              blobMimeType: "",
-              blobUrl: reader.result
-            }
-          }
-        },
+        optimisticResponse: optimisticResponse,
         update : (store, data) => {
           let featuredImage;
           if(data.data.updateFile){
@@ -673,6 +694,7 @@ let NewContentTypeParent = React.createClass({
       }).then(data => {
         console.log(data)
         document.querySelector("input[type='file'][name='featuredImage']").value = null
+        e.target.disabled = false
       })
     }
 
@@ -862,10 +884,12 @@ let NewContentTypeParent = React.createClass({
     });
   },
   imageGalleryChange: function(e){
+    e.persist()
     var me = this;
     var reader = new FileReader();
     let file = e.target.files[0]
     reader.onload = function(){
+      e.target.disabled = true
       if (!me.props.postId) me.props.dispatch(toggleImageGalleyBinded(true));
       me.props.addImageGallery({
         variables: {
@@ -905,6 +929,7 @@ let NewContentTypeParent = React.createClass({
       }).then(data => {
         console.log("addImageGallery mutation result", data)
         document.getElementById("imageGallery").value=null;
+        e.target.disabled = false
       }).catch(error => {
         me._errorNotif(error.message)
       });
@@ -934,7 +959,7 @@ let NewContentTypeParent = React.createClass({
             variables: qry.variables,
           }).then((data) => {
             me.props.dispatch(toggleImageGalleyBinded(false))
-          })
+          }).catch(error => reject(error))
         }
 
         resolve("hello world")
@@ -977,7 +1002,7 @@ let NewContentTypeParent = React.createClass({
       console.log("remove mutation returned data ", data)
       document.getElementById("imageGallery").value=null
     }).catch(error => {
-      this._errorNotif(error.message)
+      errorCallback("imageGalleryError", error.message, error)
     })
   },
 
@@ -1365,15 +1390,14 @@ class NewContentTypeCreate extends React.Component {
   }
 
   featuredImageRemoveAfterware(featuredImage, action, featuredImageCache){
-
-          if (!featuredImage.blobUrl){
-            action(setFeaturedImage({
-              ...featuredImageCache, 
-              id: "customId"
-            }))
-          } else {
-            action(setFeaturedImage({}))
-          }
+    if (!featuredImage.blobUrl){
+      action(setFeaturedImage({
+        ...featuredImageCache, 
+        id: "customId"
+      }))
+    } else {
+      action(setFeaturedImage({}))
+    }
   }
 
   imageGalleryChangeAfterware(image, action, imageGalleryCache){

@@ -164,7 +164,11 @@ var qry = gql`query {
   				tag{edges{node{tag{id, name}}}},
   				comments{edges{node{id,content,name,email,website}}},
   				file{edges{node{id,value}}}, 
-  				featuredImage,
+          imageFeatured{
+            blobUrl
+            type
+            id
+          },
   				createdAt
   			}
   		}

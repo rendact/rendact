@@ -85,7 +85,7 @@ export function theLogo(onClickHandler){
 export function theImage(image, pageCount, activePage, handlePageClick){
 	var fImage="";
 	if(image!=null){
- 			fImage=image;
+ 			fImage=image.blobUrl;
  		}
  		else{
  			fImage=require('../../theme/default/images/logo.png');
