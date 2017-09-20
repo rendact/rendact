@@ -1338,13 +1338,15 @@ const mapStateToProps = function(state, ownProps){
 
   let imageGallery = ownProps.imageGallery 
   let featuredImage = ownProps.featuredImage 
+  let immediatelyStatus = ownProps.immediatelyStatus
 
   return {
     ...ctn,
     ...state.maskArea,
     ...customProps,
     imageGallery: imageGallery || ctn.imageGallery,
-    featuredImage: featuredImage || ctn.featuredImage
+    featuredImage: featuredImage || ctn.featuredImage,
+    immediatelyStatus: !(immediatelyStatus === undefined) ? immediatelyStatus : ctn.immediatelyStatus
   }
 
 }
