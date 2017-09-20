@@ -80,6 +80,7 @@ class CkeditorField extends React.Component {
     let ckeditor = window.CKEDITOR
     ckeditor && ckeditor.instances['content'].removeAllListeners()
     ckeditor && ckeditor.remove('content')
+
   }
 
   render(){
@@ -491,6 +492,10 @@ let NewContentTypeParent = React.createClass({
       
       props.titleTag && props.dispatch(updateTitleTagLeftCharacter(65-(props.titleTag.length)));
       props.metaDescription && props.dispatch(updateMetaDescriptionLeftCharacter(160-(props.metaDescription.length)));
+    }
+
+    if(props.data && props.data.status !== props.status){
+      props.dispatch(setPostStatus(props.data.status))
     }
   },
 
