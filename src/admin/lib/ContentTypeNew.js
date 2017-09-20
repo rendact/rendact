@@ -80,6 +80,7 @@ class CkeditorField extends React.Component {
     let ckeditor = window.CKEDITOR
     ckeditor && ckeditor.instances['content'].removeAllListeners()
     ckeditor && ckeditor.remove('content')
+
   }
 
   render(){
@@ -151,15 +152,6 @@ let FeaturedImageWidget = (props) => (
 
 
 class TagWidget extends React.Component {
-  constructor(props){
-    super(props)
-
-    this.handleOnUpdate = this.handleOnUpdate.bind(this)
-  }
-
-  handleOnUpdate(value){
-    console.log(value)
-  }
   render(){
     return (
       <div className="box box-info" style={{marginTop:20}}>
@@ -501,6 +493,10 @@ let NewContentTypeParent = React.createClass({
       props.titleTag && props.dispatch(updateTitleTagLeftCharacter(65-(props.titleTag.length)));
       props.metaDescription && props.dispatch(updateMetaDescriptionLeftCharacter(160-(props.metaDescription.length)));
     }
+
+    if(props.data && props.data.status !== props.status){
+      props.dispatch(setPostStatus(props.data.status))
+    }
   },
 
   componentWillReceiveProps: function(props){
@@ -758,6 +754,20 @@ let NewContentTypeParent = React.createClass({
       mutate = this.props.updatePostQuery
     }
     var metaDataList = me.getMetaFormValues();
+
+    if (this.props.mode === 'create') {
+      let titleTag = _.find(metaDataList, (o) => o.item === 'titleTag')
+      if (!titleTag.value){
+        titleTag.value = this.props.title
+      }
+
+      let metaDescription = _.find(metaDataList, (o) => o.item === 'metaDescription')
+      if (!metaDescription.value){
+        metaDescription.value = this.props.summary
+      }
+      metaDataList = [...metaDataList, titleTag, metaDescription]
+    }
+
     this.disableForm(true)
 
     mutate({
@@ -1338,6 +1348,8 @@ const mapStateToProps = function(state, ownProps){
     metaKeyword: selector(state, 'metaKeyword'),
     visibilityTxt: selector(state, 'visibility'),
     statusTxt : selector(state, 'statusSelect'),
+    title: selector(state, 'title'),
+    summary: selector(state, 'summary')
   }
 
   _.forEach(ownProps.customFields, item => {
@@ -1347,13 +1359,15 @@ const mapStateToProps = function(state, ownProps){
 
   let imageGallery = ownProps.imageGallery 
   let featuredImage = ownProps.featuredImage 
+  let immediatelyStatus = ownProps.immediatelyStatus
 
   return {
     ...ctn,
     ...state.maskArea,
     ...customProps,
     imageGallery: imageGallery || ctn.imageGallery,
-    featuredImage: featuredImage || ctn.featuredImage
+    featuredImage: featuredImage || ctn.featuredImage,
+    immediatelyStatus: !(immediatelyStatus === undefined) ? immediatelyStatus : ctn.immediatelyStatus
   }
 
 }
