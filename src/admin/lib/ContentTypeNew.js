@@ -760,7 +760,12 @@ let NewContentTypeParent = React.createClass({
       if (!titleTag.value){
         titleTag.value = this.props.title
       }
-      metaDataList = [...metaDataList, titleTag]
+
+      let metaDescription = _.find(metaDataList, (o) => o.item === 'metaDescription')
+      if (!metaDescription.value){
+        metaDescription.value = this.props.summary
+      }
+      metaDataList = [...metaDataList, titleTag, metaDescription]
     }
 
     this.disableForm(true)
@@ -1343,7 +1348,8 @@ const mapStateToProps = function(state, ownProps){
     metaKeyword: selector(state, 'metaKeyword'),
     visibilityTxt: selector(state, 'visibility'),
     statusTxt : selector(state, 'statusSelect'),
-    title: selector(state, 'title')
+    title: selector(state, 'title'),
+    summary: selector(state, 'summary')
   }
 
   _.forEach(ownProps.customFields, item => {
