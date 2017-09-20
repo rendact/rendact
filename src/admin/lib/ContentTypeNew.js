@@ -624,11 +624,13 @@ let NewContentTypeParent = React.createClass({
 
   featuredImageChange: function(e){
     var me = this;
+    e.persist()
     var reader = new FileReader();
     let file = e.target.files[0]
     this.props.dispatch(toggleFeaturedImageBindingStatus(true))
 
     reader.onload = (event) => {
+      e.target.disabled = true
       let data = {
         blobFieldName: 'myBlobField',
         featuredImageConnectionId: me.props.urlParams.postId || null,
@@ -692,6 +694,7 @@ let NewContentTypeParent = React.createClass({
       }).then(data => {
         console.log(data)
         document.querySelector("input[type='file'][name='featuredImage']").value = null
+        e.target.disabled = false
       })
     }
 
@@ -881,10 +884,12 @@ let NewContentTypeParent = React.createClass({
     });
   },
   imageGalleryChange: function(e){
+    e.persist()
     var me = this;
     var reader = new FileReader();
     let file = e.target.files[0]
     reader.onload = function(){
+      e.target.disabled = true
       if (!me.props.postId) me.props.dispatch(toggleImageGalleyBinded(true));
       me.props.addImageGallery({
         variables: {
@@ -924,6 +929,7 @@ let NewContentTypeParent = React.createClass({
       }).then(data => {
         console.log("addImageGallery mutation result", data)
         document.getElementById("imageGallery").value=null;
+        e.target.disabled = false
       }).catch(error => {
         me._errorNotif(error.message)
       });
