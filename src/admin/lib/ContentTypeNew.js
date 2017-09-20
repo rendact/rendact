@@ -721,6 +721,11 @@ let NewContentTypeParent = React.createClass({
     if (["Public", "Private"].indexOf(output.visibility) === -1){
       output.visibility = "Public"
     }
+
+    if (output.parent === undefined){
+      output.parent = ''
+    }
+
     return output;
   },
   onSubmit: function(v, status) {
