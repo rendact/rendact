@@ -754,6 +754,15 @@ let NewContentTypeParent = React.createClass({
       mutate = this.props.updatePostQuery
     }
     var metaDataList = me.getMetaFormValues();
+
+    if (this.props.mode === 'create') {
+      let titleTag = _.find(metaDataList, (o) => o.item === 'titleTag')
+      if (!titleTag.value){
+        titleTag.value = this.props.title
+      }
+      metaDataList = [...metaDataList, titleTag]
+    }
+
     this.disableForm(true)
 
     mutate({
@@ -1334,6 +1343,7 @@ const mapStateToProps = function(state, ownProps){
     metaKeyword: selector(state, 'metaKeyword'),
     visibilityTxt: selector(state, 'visibility'),
     statusTxt : selector(state, 'statusSelect'),
+    title: selector(state, 'title')
   }
 
   _.forEach(ownProps.customFields, item => {
