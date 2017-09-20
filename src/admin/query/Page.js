@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 const getPageListQry = function(s) {
   var status = '{ne: "Trash"}';
-  if (s==="Trash" || s==="Draft" || s==="Reviewing")
+  if (s==="Published" || s==="Trash" || s==="Draft" || s==="Reviewing")
     status = '{eq: "'+s+'"}';
   if (s==="Full") {
     status = '{ne: ""}';

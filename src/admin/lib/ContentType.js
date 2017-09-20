@@ -135,7 +135,7 @@ let ContentType = React.createClass({
         });
         
         _dataArr.push(_obj);
-debugger
+
         var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
         if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
       });
