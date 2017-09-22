@@ -1293,9 +1293,9 @@ let NewContentTypeParent = React.createClass({
                                 <div className="col-md-6">
                                   <DatePicker id="datepicker" style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.props.publishDate.toISOString()} onChange={this.handleDateChange}/>
                                 </div>
-                                <div className="col-md-6">
-                                  <Field name="hours" component="input" type="text" className="form-control" style={{width: 30, height: 34, textAlign: "center"}}  onChange={this.handleTimeChange} />
-                                  <Field name="minutes" component="input" type="text" className="form-control" style={{width: 30, height: 34, textAlign: "center"}}  onChange={this.handleTimeChange} />
+                                <div className="col-md-6 form-inline">
+                                  <Field name="hours" component="input" type="text" className="form-control" style={{width: 30, height: 34, padding:0, textAlign: "center", margin: "0 5px"}}  onChange={this.handleTimeChange} />
+                                  <Field name="minutes" component="input" type="text" className="form-control" style={{width: 30, height: 34, textAlign: "center", padding: 0, margin: "0 5px"}}  onChange={this.handleTimeChange} />
                                 </div>
                               </div>
                               <div className="form-inline" style={{marginTop: 10}}>
