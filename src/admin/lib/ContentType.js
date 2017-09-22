@@ -187,23 +187,33 @@ let ContentType = React.createClass({
     var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     var me = this;
     var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
-    swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
-      function () {
-        me.disableForm(true);
-        riques(Query.deletePostPermanentQry(idList), 
-          function(error, response, body) {
-            if (!error && !body.errors && response.statusCode === 200) {
-              var here = me;
-              var cb = function(){here.disableForm(false)}
-              me.loadData("Trash", cb);
-            } else {
-              errorCallback(error, body.errors?body.errors[0].message:null);
-              me.disableForm(false);
-            }
-          }
-        );
-      }
-    );
+
+
+    let listOfData = this.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(idList).query}`})
+    listOfData.then(function() {
+      me.props.refetchAllMenuData().then(function() {
+        me.loadData("Trash");
+      })
+    })
+
+
+    // swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
+    //   function () {
+    //     me.disableForm(true);
+    //     riques(Query.deletePostPermanentQry(idList), 
+    //       function(error, response, body) {
+    //         if (!error && !body.errors && response.statusCode === 200) {
+    //           var here = me;
+    //           var cb = function(){here.disableForm(false)}
+    //           me.loadData("Trash", cb);
+    //         } else {
+    //           errorCallback(error, body.errors?body.errors[0].message:null);
+    //           me.disableForm(false);
+    //         }
+    //       }
+    //     );
+    //   }
+    // );
   },
   handleEmptyTrash: function(event){
     var me = this;
