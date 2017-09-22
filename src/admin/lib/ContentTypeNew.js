@@ -13,8 +13,7 @@ import 'react-select/dist/react-select.css';
 import {connect} from 'react-redux';
 import {maskArea, setSlug, setVisibilityMode, togglePermalinkProcessState, setPostStatus, resetPostEditor,
   setTagList, setImageGalleryList, toggleSaveImmediatelyMode, toggleVisibilityIsChangedProcess, togglePermalinkEditingState,
-  updateTitleTagLeftCharacter, updateMetaDescriptionLeftCharacter, setPostPublishDate, setFeaturedImage, 
-  toggleImageGalleyBinded,setPostId, toggleFeaturedImageBindingStatus} from '../../actions'
+  updateTitleTagLeftCharacter, updateMetaDescriptionLeftCharacter, setPostPublishDate, setFeaturedImage, toggleImageGalleyBinded,setPostId, toggleFeaturedImageBindingStatus, toggleStatusEditMode} from '../../actions'
 import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {graphql, withApollo} from 'react-apollo';
 import gql from 'graphql-tag';
@@ -443,7 +442,8 @@ let NewContentTypeParent = React.createClass({
     featuredImageChangeAfterware: React.PropTypes.func.isRequired,
     featuredImageRemoveAfterware: React.PropTypes.func.isRequired,
     imageGalleryChangeAfterware: React.PropTypes.func.isRequired,
-    imageGalleryRemoveAfterware: React.PropTypes.func.isRequired
+    imageGalleryRemoveAfterware: React.PropTypes.func.isRequired,
+    statusEditMode: React.PropTypes.bool
   },
   getDefaultProps: function() {
     return {
@@ -470,6 +470,7 @@ let NewContentTypeParent = React.createClass({
       connectionValue: {},
       data: {},
       parent: "",
+      statusEditMode: false,
     }
   },
   isWidgetActive: function(name){
@@ -520,9 +521,10 @@ let NewContentTypeParent = React.createClass({
       
       props.titleTag && props.dispatch(updateTitleTagLeftCharacter(65-(props.titleTag.length)));
       props.metaDescription && props.dispatch(updateMetaDescriptionLeftCharacter(160-(props.metaDescription.length)));
+    props.dispatch(toggleStatusEditMode(true))
     }
 
-    if(props.data && props.data.status !== props.status){
+    if(props.data && props.data.status !== props.status && !props.statusEditMode){
       props.dispatch(setPostStatus(props.data.status))
     }
   },
@@ -906,6 +908,7 @@ let NewContentTypeParent = React.createClass({
         //      this.props.dispatch(setEditorMode("update"))
         this.props.dispatch(setPostId(postId))
         this.props.toggleCreate(false)
+        this.props.dispatch(toggleStatusEditMode(false))
       }).catch(error => errorCallback('whenPublish/save', error.message, error))
     })
 
@@ -1241,7 +1244,7 @@ let NewContentTypeParent = React.createClass({
                        <div className="form-group">
                           <p style={{fontSize: 14}}><span className="glyphicon glyphicon-pushpin" style={{marginRight:10}}></span>
                           Status: <b>{this.props.status} </b>
-                          <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption"> Edit </button></p>
+                          <button type="button" className="btn btn-flat btn-xs btn-default" data-toggle="collapse" data-target="#statusOption" > Edit </button></p>
                           <div id="statusOption" className="collapse">
                             <div className="form-group">
                                 <Field id="statusSelect" name="statusSelect" component="select" style={{marginRight: 10, height: 30}}>
@@ -1639,6 +1642,10 @@ const mapResultToProps = ({ownProps, data}) => {
       _.forEach(fields, function(item){
         if (data.getPost) initials[item] = data.getPost[item];
       });
+
+      initials.statusSelect = initials.status
+      _.unset(initials, 'status')
+
 
 
       // setting the meta values
