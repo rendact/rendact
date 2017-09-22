@@ -345,35 +345,62 @@ CategoryWidget = graphql(categoryQuery,
   }
 )(CategoryWidget)
 
-const PermalinkEditor = (props) => {
-  return (
-    <div className="form-inline">
-      { !props.permalinkEditing ? 
-        ( <p>Permalink: &nbsp;
-          {props.mode==="update"?(
-            <a id="permalink" href={props.rootUrl+'/'+props.permalink}>{props.rootUrl}/{props.permalink}</a>
-            ) : (
-            <a id="permalink" href="#">{props.rootUrl}/{props.permalink}</a>
-            )
-          }
-          <button type="button" onClick={() => {props.dispatch(togglePermalinkEditingState(true))}} id="editBtn" className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
-            <span style={{fontSize: 12}}>Edit</span>
-          </button> 
-          { props.permalinkInProcess && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
-          </p>
-        ) : (
-          <p>Permalink: 
-          <div className="form-group" id="permalinkcontent">
-            <a id="permalink" href="#">{props.rootUrl}/</a>
-            <input id="slugcontent" defaultValue={props.permalink} type="text" className="form-control" />
-            <button type="button" className="btn btn-default" onClick={()=>{props.onCheckSlug(props.permalink)}}>OK</button>
-          </div>
-          { props.permalinkInProcess && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
-          </p>
-        )
-      }
-    </div>
-  )
+class PermalinkEditor extends React.Component {
+  constructor(props){
+    super(props)
+
+    this.state = {
+      permalink : ''
+    }
+
+    this.slugContentChange = this.slugContentChange.bind(this)
+  }
+
+  slugContentChange(e){
+    e.preventDefault()
+    this.setState({permalink: e.currentTarget.value})
+  }
+
+  render(){
+    let {
+      permalinkEditing,
+      mode,
+      rootUrl,
+      permalink,
+      dispatch,
+      permalinkInProcess,
+      onCheckSlug
+    } = this.props
+
+    return (
+      <div className="form-inline">
+        { !permalinkEditing ? 
+          ( <p>Permalink: &nbsp;
+            {mode==="update"?(
+              <a id="permalink" href={rootUrl+'/'+permalink}>{rootUrl}/{permalink}</a>
+              ) : (
+              <a id="permalink" href="#">{rootUrl}/{permalink}</a>
+              )
+            }
+            <button type="button" onClick={() => {dispatch(togglePermalinkEditingState(true))}} id="editBtn" className="btn btn-default" style={{height:25, marginLeft: 5, padding: "2px 5px"}}>
+              <span style={{fontSize: 12}}>Edit</span>
+            </button> 
+            { permalinkInProcess && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
+            </p>
+          ) : (
+            <p>Permalink: 
+            <div className="form-group" id="permalinkcontent">
+              <a id="permalink" href="#">{rootUrl}/</a>
+              <input id="slugcontent" defaultValue={permalink} onChange={this.slugContentChange} type="text" className="form-control" />
+              <button type="button" className="btn btn-default" onClick={()=>{onCheckSlug(this.state.permalink);}}>OK</button>
+            </div>
+            { permalinkInProcess && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
+            </p>
+          )
+        }
+      </div>
+    )
+  }
 }
 
 let NewContentTypeParent = React.createClass({
@@ -449,6 +476,7 @@ let NewContentTypeParent = React.createClass({
     return _.indexOf(this.props.widgets, name) > -1;
   },
   checkSlug: function(permalink){
+    this.props.dispatch(togglePermalinkEditingState(false)) 
     var me = this;
     if (permalink===this.props.permalink) return;
     this.props.dispatch(togglePermalinkProcessState(true));
@@ -721,6 +749,11 @@ let NewContentTypeParent = React.createClass({
     if (["Public", "Private"].indexOf(output.visibility) === -1){
       output.visibility = "Public"
     }
+
+    if (output.parent === undefined){
+      output.parent = ''
+    }
+
     return output;
   },
   onSubmit: function(v, status) {
