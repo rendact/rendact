@@ -159,83 +159,116 @@ let ContentType = React.createClass({
     var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
     
-    swalert('warning','Sure want to delete?','Be sure before continue!',
-      function () {
-      me.disableForm(true);
-      riques(Query.deletePostQry(idList), 
-        function(error, response, body) {
-          if (!error && !body.errors && response.statusCode === 200) {
-            var here = me;
-            var cb = function(){here.disableForm(false)}
-            me.loadData("All", cb);
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-            me.disableForm(false);
-          }
-        }
-      );
-    });
+    let listOfData = this.props.client.mutate({mutation: gql`${Query.deletePostQry(idList).query}`})
+    listOfData.then(function() {
+      me.props.refetchAllMenuData().then(function() {
+        me.loadData("All");
+      })
+    })
+
+    // swalert('warning','Sure want to delete?','Be sure before continue!',
+    // function () {
+    //   me.disableForm(true);
+    //   riques(Query.deletePostQry(idList), 
+    //     function(error, response, body) {
+    //       if (!error && !body.errors && response.statusCode === 200) {
+    //         var here = me;
+    //         var cb = function(){here.disableForm(false)}
+    //         me.loadData("All");
+    //       } else {
+    //         errorCallback(error, body.errors?body.errors[0].message:null);
+    //         me.disableForm(false);
+    //       }
+    //     }
+    //   );
+    // });
   },
   handleDeletePermanent: function(event){
     var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     var me = this;
     var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
-    swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
-      function () {
-        me.disableForm(true);
-        riques(Query.deletePostPermanentQry(idList), 
-          function(error, response, body) {
-            if (!error && !body.errors && response.statusCode === 200) {
-              var here = me;
-              var cb = function(){here.disableForm(false)}
-              me.loadData("Trash", cb);
-            } else {
-              errorCallback(error, body.errors?body.errors[0].message:null);
-              me.disableForm(false);
-            }
-          }
-        );
-      }
-    );
+
+
+    let listOfData = this.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(idList).query}`})
+    listOfData.then(function() {
+      me.props.refetchAllMenuData().then(function() {
+        me.loadData("Trash");
+      })
+    })
+
+
+    // swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
+    //   function () {
+    //     me.disableForm(true);
+    //     riques(Query.deletePostPermanentQry(idList), 
+    //       function(error, response, body) {
+    //         if (!error && !body.errors && response.statusCode === 200) {
+    //           var here = me;
+    //           var cb = function(){here.disableForm(false)}
+    //           me.loadData("Trash", cb);
+    //         } else {
+    //           errorCallback(error, body.errors?body.errors[0].message:null);
+    //           me.disableForm(false);
+    //         }
+    //       }
+    //     );
+    //   }
+    // );
   },
   handleEmptyTrash: function(event){
     var me = this;
-    swalert('warning','Sure want to empty trash?','You might lost some data forever!',
-      function () {
-        me.disableForm(true);
-        riques(Query.deletePostPermanentQry(me.props.allPostId), 
-          function(error, response, body) {
-            if (!error && !body.errors && response.statusCode === 200) {
-              var here = me;
-              var cb = function(){here.disableForm(false)}
-              me.loadData("Trash", cb);
-            } else {
-              errorCallback(error, body.errors?body.errors[0].message:null);
-              me.disableForm(false);
-            }
-          }
-        );
+
+    let listOfData = this.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(me.props.allPostId).query}`})
+    listOfData.then(function() {
+      me.props.refetchAllMenuData().then(function() {
+        me.loadData("All");
+      })
     })
+
+
+    // swalert('warning','Sure want to empty trash?','You might lost some data forever!',
+    //   function () {
+    //     me.disableForm(true);
+    //     riques(Query.deletePostPermanentQry(me.props.allPostId), 
+    //       function(error, response, body) {
+    //         if (!error && !body.errors && response.statusCode === 200) {
+    //           var here = me;
+    //           var cb = function(){here.disableForm(false)}
+    //           me.loadData("Trash", cb);
+    //         } else {
+    //           errorCallback(error, body.errors?body.errors[0].message:null);
+    //           me.disableForm(false);
+    //         }
+    //       }
+    //     );
+    // })
   },
   handleRecover: function(event){
     var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     var me = this;
     var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
+
+    let listOfData = this.props.client.mutate({mutation: gql`${Query.recoverPostQry(idList).query}`})
+    listOfData.then(function() {
+      me.props.refetchAllMenuData().then(function() {
+        me.loadData("Trash");
+      })
+    })
    
-      this.disableForm(true);
-      riques(Query.recoverPostQry(idList), 
-        function(error, response, body) {
-          if (!error && !body.errors && response.statusCode === 200) {
-            console.log(JSON.stringify(body, null, 2));
-            var here = me;
-            var cb = function(){here.disableForm(false)}
-            me.loadData("Trash", cb);
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-            me.disableForm(false);
-          }
-        }
-      );
+      // this.disableForm(true);
+      // riques(Query.recoverPostQry(idList), 
+      //   function(error, response, body) {
+      //     if (!error && !body.errors && response.statusCode === 200) {
+      //       console.log(JSON.stringify(body, null, 2));
+      //       var here = me;
+      //       var cb = function(){here.disableForm(false)}
+      //       me.loadData("Trash", cb);
+      //     } else {
+      //       errorCallback(error, body.errors?body.errors[0].message:null);
+      //       me.disableForm(false);
+      //     }
+      //   }
+      // );
   },
   handleAddNewBtn: function(event) {
     this.props.handleNav(this.props.slug,'new');
@@ -600,8 +633,10 @@ ContentType = graphql(getAllPosts,
             //fields: fields,
             monthList: monthList,
             metaItemList: metaItemList,
-            _statusCount: _statusCount
+            _statusCount: _statusCount,
+            refetchAllMenuData: data.refetch
           }
+            debugger
       } else { 
         return {
           isLoading: true
