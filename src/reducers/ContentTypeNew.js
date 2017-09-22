@@ -28,6 +28,9 @@ const contentTypeNew = (state = INITIAL_VALUES, action) => {
     
     case 'UPDATE_POST_STATUS':
       return {...state, status: action.status}
+
+    case 'TOGGLE_STATUS_EDIT_MODE':
+      return {...state, statusEditMode: action.mode}
     
     case 'RESET_POST_EDITOR':
         let data = {postId: "", title:"", permalink: "", content:"", summary:"", featuredImage: null, imageGallery:[],

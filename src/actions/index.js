@@ -61,6 +61,11 @@ export const setPostStatus = (status) => ({
   status
 })
 
+export const toggleStatusEditMode = (mode) => ({
+  type: 'TOGGLE_STATUS_EDIT_MODE',
+  mode
+})
+
 export const resetPostEditor = () => ({
   type: 'RESET_POST_EDITOR'
 })
