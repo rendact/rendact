@@ -264,21 +264,20 @@ let ContentType = React.createClass({
     if (status==='Trash'){
       var me = this;
       this.loadData("Trash", function(){
-        me.props.dispatch(toggleDeleteMode(status, true));
-        me.disableForm(false);
+      this.props.dispatch(toggleDeleteMode(status, true));
+      this.disableForm(false);
       });
     }else{
       var date = getValue("dateFilter");
       var searchValue = { 6: date };
       var te = this;
       this.loadData(status)
-        this.props.dispatch(toggleDeleteMode(status, false));
-        this.dt.columns([6]).every( function () {
-          te.search( searchValue[this.index()] ).draw();
-          return null;
-        })
-        te.disableForm(false);
-      
+      te.props.dispatch(toggleDeleteMode(status, false));
+      te.dt.columns([6]).every( function () {
+        this.search( searchValue[this.index()] ).draw();
+        return null;
+      })
+      te.disableForm(false);
     } ;
   },
   handleSetOwnerButton: function(e){
