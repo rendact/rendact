@@ -8,7 +8,7 @@ import {connect} from 'react-redux'
 import {maskArea, loadFormData} from '../../actions'
 import {reduxForm, Field, formValueSelector} from 'redux-form'
 import gql from 'graphql-tag'
-import {graphql} from 'react-apollo'
+import {graphql, withApollo} from 'react-apollo'
 
 const SettingField = ({name, title, help}) => (
     <div className="form-group">
@@ -23,7 +23,7 @@ const SettingField = ({name, title, help}) => (
 )
 
 const TabPanel = (props) => (
-    <div role="tabpanel" className="tab-pane active" id={props.id} style={{margin: 20}}>
+    <div role="tabpanel" className={props.active ? "tab-pane active" : "tab-pane"} id={props.id} style={{margin: 20}}>
       {props.children}
     </div>
 )
@@ -148,28 +148,32 @@ var Settings = React.createClass({
       data: {}
 		}
  	},
-	handleSubmitBtn: function(event){
-		event.preventDefault();
-		var me = this;
-		var _objData = getFormData('rdt-input-form');
-		this.disableForm(true);
+	handleSubmitBtn: function(values){
+    let toSave = []
 
-		var qry = Query.createUpdateSettingsMtn(_objData);
-		riques(qry, 
-			function(error, response, body){
-				if(!error && !body.errors) {
-					me.disableForm(false);
-				} else {
-					errorCallback(error, body.errors?body.errors[0].message:null);
-				}
-			}
-		);
+    _.forIn(values, (val, key) => {
+      toSave.push({
+        id: this.props.mapSettingsWithId[key],
+        item: key,
+        value: val
+      })
+    })
+
+    let query = Query.createUpdateSettingsMtn(toSave)
+    this.props.dispatch(maskArea(true))
+    disableForm(true)
+
+    this.props.client.mutate({
+      mutation: gql`${query.query}`,
+      variables: query.variables
+    }).then(data => {
+      console.log(data)
+      this.props.dispatch(maskArea(false))
+      disableForm(false)
+    })
 	}, 
-	componentWillReceiveProps(props){
-	},
 	componentDidMount: function(){
 		this.notification = this.refs.notificationSystem;
-		//this.loadData();
 	},
 	render: function(){
 		return (
@@ -194,7 +198,7 @@ var Settings = React.createClass({
 			    	<div className="row">
 					  	<div className="col-md-8">
 					  	<section className="content">
-			    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" style={{opacity: this.props.opacity}} >
+			    			<form onSubmit={this.props.handleSubmit(this.handleSubmitBtn)} className="form-horizontal" style={{opacity: this.props.opacity}} >
 
                   <ul className="nav nav-tabs" role="tablist">
                     <li role="presentation" className="active"><a href="#general" aria-controls="home" role="tab" data-toggle="tab">General</a></li>
@@ -203,7 +207,7 @@ var Settings = React.createClass({
 
 
                   <div className="tab-content">
-                    <TabPanel id="general">
+                    <TabPanel id="general" active>
                       <GeneralTab/>
                     </TabPanel>
 
@@ -242,7 +246,8 @@ const mapStateToProps = (state) => {
 
   return {
     ...state.settings,
-    ...customProps
+    ...customProps,
+    ...state.maskArea
   }
 }
 
@@ -263,16 +268,30 @@ Settings = graphql(gql`${Query.loadSettingsQry.query}`,{
       errorCallback(data.error, data.error, data.error)
        return {hasError: true}
     } else {
+      let settings = [
+        "name", "tagline", "keywords", "rootUrl",
+        "adminEmail", "timeZone", "dbApiUrl", "auth0ClientId",
+        "auth0Domain", "mailApiUrl", "mailApiKey", "frontPage",
+        "pageAsHomepage", "mailDefaultSender"
+      ]
+
     	var _data = {}
+      var mapSettingsWithId = {}
 			_.forEach(data.viewer.allOptions.edges, function(item){
-				_data[item.node.item] = item.node.value;
+        if(_.indexOf(settings, item.node.item) > -1){
+          _data[item.node.item] = item.node.value;
+          mapSettingsWithId[item.node.item] = item.node.id
+        }
 			});
 	return {
-        isLoading: false,
-        initialValues: _data
+    isLoading: false,
+    initialValues: _data,
+    mapSettingsWithId
     }
 	}
 	}
 })(Settings)
+
+Settings = withApollo(Settings)
 
 export default Settings;
