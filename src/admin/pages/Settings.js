@@ -6,13 +6,13 @@ import Query from '../query'
 import {riques, errorCallback, getFormData, disableForm, defaultHalogenStyle} from '../../utils'
 import {connect} from 'react-redux'
 import {maskArea, loadFormData} from '../../actions'
-import {reduxForm, Field} from 'redux-form'
+import {reduxForm, Field, formValueSelector} from 'redux-form'
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo'
 
 const SettingField = ({name, title, help}) => (
     <div className="form-group">
-        <label htmlFor="name" className="col-md-3">{title}</label>
+        <label htmlFor={name} className="col-md-3">{title}</label>
         <div className="col-md-9">
         <Field name={name} component="input" type="text" className="form-control"/>
         {help &&
@@ -21,6 +21,119 @@ const SettingField = ({name, title, help}) => (
       </div>
     </div>
 )
+
+const TabPanel = (props) => (
+    <div role="tabpanel" className="tab-pane active" id={props.id} style={{margin: 20}}>
+      {props.children}
+    </div>
+)
+
+const GeneralTab = (props) => (
+<div>
+  <SettingField
+    name="name"
+    title="Website name"
+    help={<span>Website name, will shows up in <code>title</code> tag</span>}
+  />
+
+  <SettingField
+    name="tagline"
+    title="Tagline"
+    help="Few words that describes your web, example: a bunch of words of mine"
+  />
+
+  <SettingField
+    name="keywords"
+    title="Keywords"
+    help="Some words represents your web"
+  />
+  <SettingField
+    name="rootUrl"
+    title="Home URL"
+  />
+
+  <SettingField
+    name="adminEmail"
+    title="Admin Email"
+  />
+  <SettingField
+    name="timeZone"
+    title="Time Zone"
+  />
+  <SettingField
+    name="dbApiUrl"
+    title="Database API URL"
+  />
+  <SettingField
+    title="Auth0 Client ID"
+    name="auth0ClientId"
+      />
+
+  <SettingField
+      title="Auth0 Domain"
+      name="auth0Domain"
+      />
+
+  <SettingField
+      title="Email API URL"
+      name="mailApiUrl"
+      />
+
+  <SettingField
+      title="Email API Key"
+      name="mailApiKey"
+      />
+
+  <SettingField
+      title="Email Default Sender"
+      name="mailDefaultSender"
+    />
+</div>
+)
+
+let HomepageTab = (props) => (
+  <div>
+    <div className="form-group">
+        <label htmlFor="frontPage" className="col-md-3">Front Page Displays</label>
+        <div className="col-md-9">
+          <div>
+        <Field name="frontPage" component="input" type="radio" value="latestPost"/> Your latest posts
+      </div>
+      <div>
+        <Field name="frontPage" component="input" type="radio" value="page"/> A static page (select below)
+      </div>
+      { props.frontPage === "page" &&
+      <div>
+        <Field name="pageAsHomePage" component="select" className="form-control">
+          <option>Select a page</option>
+          {
+            _.map(props.pageListOption, (opt, index) => (
+              <option value={opt.value} key={index}>{opt.label}</option>
+            ))
+          }
+        </Field>
+      </div>
+      }
+      </div>
+    </div>
+  </div>
+)
+
+HomepageTab = graphql(gql`${Query.getPageListQry("Published").query}`, {
+  props: ({ownProps, data}) => {
+    if (!data.loading) {
+      let pageList = data.viewer.allPosts.edges
+
+      let pageListOption = _.map(pageList, item => ({value: item.node.id, label: item.node.title}))
+
+      return {
+        pageListOption
+      }
+    }
+    return {pageListOption: []}
+  }
+})(HomepageTab)
+
 
 var Settings = React.createClass({
 	propTypes: {
@@ -90,82 +203,25 @@ var Settings = React.createClass({
 
 
                   <div className="tab-content">
-                    <div role="tabpanel" className="tab-pane active" id="general" style={{margin: 20}}>
-                  <SettingField
-                    name="name"
-                    title="Website name"
-                    help={<span>Website name, will shows up in <code>title</code> tag</span>}
-                  />
-			    			
-                  <SettingField
-                    name="tagline"
-                    title="Tagline"
-                    help="Few words that describes your web, example: a bunch of words of mine"
-                  />
+                    <TabPanel id="general">
+                      <GeneralTab/>
+                    </TabPanel>
 
-                  <SettingField
-                    name="keywords"
-                    title="Keywords"
-                    help="Some words represents your web"
-                  />
-                  <SettingField
-                    name="rootUrl"
-                    title="Home URL"
-                  />
-
-                  <SettingField
-                    name="adminEmail"
-                    title="Admin Email"
-                  />
-                  <SettingField
-                    name="timeZone"
-                    title="Time Zone"
-                  />
-                  <SettingField
-                    name="dbApiUrl"
-                    title="Database API URL"
-                  />
-									<SettingField
-                    title="Auth0 Client ID"
-								    name="auth0ClientId"
-                     />
-
-									<SettingField
-                     title="Auth0 Domain"
-								  	 name="auth0Domain"
-                     />
-
-									<SettingField
-                     title="Email API URL"
-								  	 name="mailApiUrl"
-                     />
-
-									<SettingField
-                     title="Email API Key"
-								  	 name="mailApiKey"
-                     />
-
-									<SettingField
-                     title="Email Default Sender"
-								  	 name="mailDefaultSender"
-                     />
-                    </div>
-
-
-                    <div id="homepage" style={{margin:20, height: "100%"}}></div>
-
-
+                    <TabPanel id="homepage">
+                      <HomepageTab frontPage={this.props.frontPage}/>
+                    </TabPanel>
                   </div>
 
 									
 
 									<div className="form-group">
-											<div className="col-md-9">
-												<div className="btn-group">
-													<input type="submit" value="Update Settings" className="btn btn-primary btn-sm" />
-												</div>
-											</div>
-										</div>
+                    <div className="col-md-9">
+                      <div className="btn-group">
+                        <input type="submit" value="Update Settings" className="btn btn-primary btn-sm" />
+                      </div>
+                    </div>
+                  </div>
+
 								</form>
 							</section>
 							</div>
@@ -177,10 +233,23 @@ var Settings = React.createClass({
 	}
 });
 
-const mapStateToProps = (state) => (state)
+const selector = formValueSelector('settingsForm')
+
+const mapStateToProps = (state) => {
+  let customProps = {
+    frontPage: selector(state, 'frontPage')
+  }
+
+  return {
+    ...state.settings,
+    ...customProps
+  }
+}
+
 Settings = reduxForm({
   form: 'settingsForm'
 })(Settings)
+
 Settings = connect(mapStateToProps)(Settings)
 
 //React-Apollo
