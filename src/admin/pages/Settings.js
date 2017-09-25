@@ -10,6 +10,18 @@ import {reduxForm, Field} from 'redux-form'
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo'
 
+const SettingField = ({name, title, help}) => (
+    <div className="form-group">
+        <label htmlFor="name" className="col-md-3">{title}</label>
+        <div className="col-md-9">
+        <Field name={name} component="input" type="text" className="form-control"/>
+        {help &&
+          <p className="help-block">{help}</p>
+        }
+      </div>
+    </div>
+)
+
 var Settings = React.createClass({
 	propTypes: {
 		isProcessing: React.PropTypes.bool.isRequired,
@@ -70,94 +82,83 @@ var Settings = React.createClass({
 					  	<div className="col-md-8">
 					  	<section className="content">
 			    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" style={{opacity: this.props.opacity}} >
+
+                  <ul className="nav nav-tabs" role="tablist">
+                    <li role="presentation" className="active"><a href="#general" aria-controls="home" role="tab" data-toggle="tab">General</a></li>
+                    <li role="presentation" ><a href="#homepage" aria-controls="homepage" role="tab" data-toggle="tab">Homepage</a></li>
+                  </ul>
+
+
+                  <div className="tab-content">
+                    <div role="tabpanel" className="tab-pane active" id="general" style={{margin: 20}}>
+                  <SettingField
+                    name="name"
+                    title="Website name"
+                    help={<span>Website name, will shows up in <code>title</code> tag</span>}
+                  />
 			    			
-						  		<div className="form-group">
-									  	<label htmlFor="name" className="col-md-3">Website name</label>
-									  	<div className="col-md-9">
-									  	<Field name="name" component="input" type="text" className="form-control"/>
-											<p className="help-block">Website name, will shows up in <code>title</code> tag</p>
-										</div>
-									</div>
+                  <SettingField
+                    name="tagline"
+                    title="Tagline"
+                    help="Few words that describes your web, example: a bunch of words of mine"
+                  />
 
-						  			<div className="form-group">
-									  	<label htmlFor="tagline" className="col-md-3">Tagline</label>
-									  	<div className="col-md-9">
-									  	<Field name="tagline" component="input" type="text" className="form-control"/>
-											<p className="help-block">Few words that describes your web, example: a bunch of words of mine</p>
-										</div>
-									</div>
+                  <SettingField
+                    name="keywords"
+                    title="Keywords"
+                    help="Some words represents your web"
+                  />
+                  <SettingField
+                    name="rootUrl"
+                    title="Home URL"
+                  />
 
-						  			<div className="form-group">
-									  	<label htmlFor="keywoards" className="col-md-3">Keywords</label>
-									  	<div className="col-md-9">
-									  	<Field name="keywords" component="input" type="text" className="form-control"/>
-											<p className="help-block">Some words represents your web</p>
-										</div>
-									</div>
+                  <SettingField
+                    name="adminEmail"
+                    title="Admin Email"
+                  />
+                  <SettingField
+                    name="timeZone"
+                    title="Time Zone"
+                  />
+                  <SettingField
+                    name="dbApiUrl"
+                    title="Database API URL"
+                  />
+									<SettingField
+                    title="Auth0 Client ID"
+								    name="auth0ClientId"
+                     />
 
-						  		<div className="form-group">
-									 	<label htmlFor="rootUrl" className="col-md-3">Home URL</label>
-								  	<div className="col-md-9">
-								  		<Field name="rootUrl" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
+									<SettingField
+                     title="Auth0 Domain"
+								  	 name="auth0Domain"
+                     />
 
-						  		<div className="form-group">
-								  	<label htmlFor="adminEmail" className="col-md-3">Admin Email</label>
-								  	<div className="col-md-9">
-								  		<Field name="adminEmail" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
+									<SettingField
+                     title="Email API URL"
+								  	 name="mailApiUrl"
+                     />
 
-						  		<div className="form-group">
-								  	<label htmlFor="timeZone" className="col-md-3">Time Zone</label>
-								  	<div className="col-md-9">
-								  		<Field name="timeZone" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
+									<SettingField
+                     title="Email API Key"
+								  	 name="mailApiKey"
+                     />
 
-									<div className="form-group">
-									 	<label htmlFor="dbApiUrl" className="col-md-3">Database API URL</label>
-								  	<div className="col-md-9">
-								  		<Field name="dbApiUrl" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
+									<SettingField
+                     title="Email Default Sender"
+								  	 name="mailDefaultSender"
+                     />
+                    </div>
 
-									<div className="form-group">
-									 	<label htmlFor="auth0ClientId" className="col-md-3">Auth0 Client ID</label>
-								  	<div className="col-md-9">
-								  		<Field name="auth0ClientId" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
 
-									<div className="form-group">
-									 	<label htmlFor="auth0Domain" className="col-md-3">Auth0 Domain</label>
-								  	<div className="col-md-9">
-								  		<Field name="auth0Domain" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
+                    <div id="homepage" style={{margin:20, height: "100%"}}></div>
 
-									<div className="form-group">
-									 	<label htmlFor="mailApiUrl" className="col-md-3">Email API URL</label>
-								  	<div className="col-md-9">
-								  		<Field name="mailApiUrl" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
 
-									<div className="form-group">
-									 	<label htmlFor="mailApiKey" className="col-md-3">Email API Key</label>
-								  	<div className="col-md-9">
-								  		<Field name="mailApiKey" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
+                  </div>
 
-									<div className="form-group">
-									 	<label htmlFor="mailDefaultSender" className="col-md-3">Email Default Sender</label>
-								  	<div className="col-md-9">
-								  		<Field name="mailDefaultSender" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
 									
+
 									<div className="form-group">
 											<div className="col-md-9">
 												<div className="btn-group">
@@ -176,14 +177,7 @@ var Settings = React.createClass({
 	}
 });
 
-const mapStateToProps = function(state){
-	if (!_.isEmpty(state.settings)) {
-		var out = _.head(state.settings);
-		out["initialValues"] = out.data;
-		return out;
-	} else return {}
-}
-
+const mapStateToProps = (state) => (state)
 Settings = reduxForm({
   form: 'settingsForm'
 })(Settings)

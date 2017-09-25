@@ -438,3 +438,12 @@ export const setActiveMenuId = (menuId) => ({
   latestPosts, 
   page
  })
+
+/*
+ * Settings actions
+ */
+
+export const setTab = (tab) => ({
+  type: 'SET_TAB',
+  tab
+})

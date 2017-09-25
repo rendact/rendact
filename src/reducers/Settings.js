@@ -1,14 +1,11 @@
-const settings = (state = [], action) => {
+const initialState = {
+  tab: 'general'
+}
+
+const settings = (state = initialState,  action) => {
   switch (action.type) {
-    case 'MASK_AREA':
-      return [
-        {
-          isProcessing: action.isMasked,
-          opacity: action.isMasked?0.4:1
-        }
-      ]
-    case 'LOAD_FORM_DATA':
-      return state.map(item =>  ({...item, data: action.data}))
+    case 'SET_TAB':
+      return {...state, tab: action.tab}
     default:
       return state
   }
