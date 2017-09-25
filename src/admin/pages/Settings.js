@@ -102,18 +102,18 @@ let HomepageTab = (props) => (
       <div>
         <Field name="frontPage" component="input" type="radio" value="page"/> A static page (select below)
       </div>
-      { props.frontPage === "page" &&
       <div>
+        { props.frontPage === "page" &&
         <Field name="pageAsHomePage" component="select" className="form-control">
-          <option>Select a page</option>
+          <option value="">Select a page</option>
           {
             _.map(props.pageListOption, (opt, index) => (
               <option value={opt.value} key={index}>{opt.label}</option>
             ))
           }
         </Field>
+        }
       </div>
-      }
       </div>
     </div>
   </div>
@@ -168,6 +168,13 @@ var Settings = React.createClass({
       variables: query.variables
     }).then(data => {
       console.log(data)
+
+      let createIndexFound = _.findIndex(_.keys(data.data), (o) => o.match(/CreateOptions/g))
+
+      if (createIndexFound >= 0){
+        this.props.refetchAll()
+      }
+
       this.props.dispatch(maskArea(false))
       disableForm(false)
     })
@@ -175,6 +182,22 @@ var Settings = React.createClass({
 	componentDidMount: function(){
 		this.notification = this.refs.notificationSystem;
 	},
+
+  componentWillMount: function(){
+    if(this.props.isLoading){
+      this.props.dispatch(maskArea(true))
+      disableForm(true)
+    }
+  },
+
+  componentWillReceiveProps(props){
+    if(this.props.isLoading && !props.isLoading){
+      props.dispatch(maskArea(false))
+      disableForm(false)
+      debugger
+    }
+  },
+
 	render: function(){
 		return (
 			<div className="content-wrapper">
@@ -272,7 +295,7 @@ Settings = graphql(gql`${Query.loadSettingsQry.query}`,{
         "name", "tagline", "keywords", "rootUrl",
         "adminEmail", "timeZone", "dbApiUrl", "auth0ClientId",
         "auth0Domain", "mailApiUrl", "mailApiKey", "frontPage",
-        "pageAsHomepage", "mailDefaultSender"
+        "pageAsHomePage", "mailDefaultSender"
       ]
 
     	var _data = {}
@@ -283,10 +306,12 @@ Settings = graphql(gql`${Query.loadSettingsQry.query}`,{
           mapSettingsWithId[item.node.item] = item.node.id
         }
 			});
+      debugger
 	return {
     isLoading: false,
     initialValues: _data,
-    mapSettingsWithId
+    mapSettingsWithId,
+    refetchAll: data.refetch
     }
 	}
 	}
