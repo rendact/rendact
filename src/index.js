@@ -57,7 +57,7 @@ let Main = React.createClass({
 								component={Admin} 
 								logged={this.props.logged}
 								onlogin={this.setLogged} />
-							<Match pattern="/page/:pageId?/:param1?/:param2?" component={ThemeSingle}/>
+							<Match pattern="/page/:postId?/:param1?/:param2?" component={ThemeSingle}/>
 							<Match pattern="/post/:postId?/:param1?/:param2?" component={ThemeSingle}/>
 							<Match pattern="/blog/:postId?/:param1?/:param2?" component={ThemeBlog}/>
 							<Match pattern="/category/:categoryId?/:param1?/:param2?" component={ThemeBlog}/>
