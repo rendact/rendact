@@ -3,12 +3,19 @@ const INITIAL_VALUES =  [{
       opacity: 1,
       statusCount: {},
       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
-      replaceStatusWithRole: false
+      replaceStatusWithRole: false,
+      postListStatus: "All"
     }]
 
 const contentType = (state = INITIAL_VALUES, action) => {
   console.log(action.type)
   switch (action.type) {
+
+    case 'SET_MONTH_LIST':
+      return state.map(item =>  ({...item, monthList: action.monthList}))
+
+    case 'SET_POST_LIST_STATUS':
+      return state.map(item =>  ({...item, postListStatus: action.postListStatus}))
 
     case 'UPDATE_STATUS_COUNTER':
       return state.map(item =>  ({...item, statusCount: action.count}))

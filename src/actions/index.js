@@ -17,6 +17,15 @@ export const setCheckAuthDone = (state) => ({
  * CONTENT LIST ACTION
  */
 
+export const setMonthList = (monthList) => ({
+  type: 'SET_MONTH_LIST',
+  monthList
+})
+
+export const setPostListStatus = (postListStatus) => ({
+  type: 'SET_POST_LIST_STATUS',
+  postListStatus
+})
 
 export const maskArea = (isMasked) => ({
   type: 'MASK_AREA',
