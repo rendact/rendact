@@ -3,6 +3,7 @@ import _ from 'lodash';
 import {Menu} from '../Menu.js';
 //import Query from '../../admin/query';
 import AdminConfig from '../../admin/AdminConfig';
+import {Link} from 'react-router'
 
 window.config = AdminConfig;
 
@@ -65,7 +66,7 @@ export function theContent(content){
 }
 
 export function theTitle(id, title, onClickHandler){
-	return <a href={"/post/"+id} onClick={onClickHandler} id={id}><h4>{title}</h4></a>
+	return <Link to={"/post/"+id} onClick={onClickHandler} id={id}><h4>{title}</h4></Link>
 }
 
 export function theExcerpt(content){

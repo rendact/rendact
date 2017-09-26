@@ -25,7 +25,6 @@ let HomeParent = React.createClass({
     loadDone: React.PropTypes.bool,
 		isSlugExist: React.PropTypes.bool,
 		slug: React.PropTypes.string,
-		latestPosts: React.PropTypes.array,
 		config: React.PropTypes.object,
 		postPerPage: React.PropTypes.number,
 		pageCount: React.PropTypes.number,
@@ -39,9 +38,7 @@ let HomeParent = React.createClass({
 			loadDone: false,
 			isSlugExist: false,
 			slug: "",
-			latestPosts: [],
 			config: null,
-			postPerPage: 5,
 			pageCount: 1,
 			activePage: 1,
 			isNoConnection: false,
@@ -56,18 +53,6 @@ let HomeParent = React.createClass({
 		this._reactInternalInstance._context.history.push('/post/'+id)
 	},
 
-	handlePageClick(e){
-		var page = 1;
-		if (e.target.text==="«")
-			page = this.props.activePage - 1;
-		else if (e.target.text==="»")
-			page = this.props.activePage + 1;
-		else 
-			page = parseInt(e.target.text, 10);
-		var start = (this.props.postPerPage * page) - this.props.postPerPage;
-		var latestPosts = _.slice(this.props.allPosts, start, start+this.props.postPerPage);
-		this.props.dispatch(setPaginationPage(latestPosts, page))
-	},
 
 	getWidgets(widgetArea){
 		let Widgets = [];
@@ -107,7 +92,7 @@ let HomeParent = React.createClass({
 					theLogo={theLogo}
 					theImage={theImage}
 					theConfig={this.props.config}
-					thePagination={thePagination(this.props.pageCount, this.props.activePage, this.handlePostClick)}
+					thePagination={thePagination(this.props.pageCount, this.props.activePage, this.props.handlePageClick)}
 					getWidgets={this.getWidgets}
 					footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 					listOfWidgets={this.props.listOfWidgets}
@@ -115,13 +100,6 @@ let HomeParent = React.createClass({
 	}
 })
 
-const mapStateToProps = function(state){
-  if (!_.isEmpty(state.ThemeHome)) {
-    return state.ThemeHome;
-  } else return {}
-}
-
-HomeParent = connect(mapStateToProps)(HomeParent);
 
 var getPost = gql`query ($postId: ID!) {
 	getPost(id:$postId){ 
@@ -185,8 +163,41 @@ let getPostList = gql`
 }
 `
 
-let HomeWithLatestPost = (props) => (<HomeParent {...props} data={props.latestPosts}/>);
+class HomeWithLatestPost extends React.Component{
+  constructor(props){
+    super(props)
+    this.handlePageClick = this.handlePageClick.bind(this)
+  }
+	handlePageClick(e){
+		var page = 1;
+		if (e.target.text==="«")
+			page = this.props.activePage - 1;
+		else if (e.target.text==="»")
+			page = this.props.activePage + 1;
+		else 
+			page = parseInt(e.target.text, 10);
+		var start = (this.props.postPerPage * page) - this.props.postPerPage;
+		var latestPosts = _.slice(this.props.allPosts, start, start+this.props.postPerPage);
+    debugger
+		this.props.dispatch(setPaginationPage(latestPosts, page))
+	}
+  render(){
+    return <HomeParent {...this.props} data={this.props.latestPosts} handlePageClick={this.handlePageClick}/>
+  }
+}
 
+HomeWithLatestPost.defaultProps = {
+  postPerPage: 5
+}
+
+const mapStateToProps = function(state){
+  debugger
+  if (!_.isEmpty(state.themeHome)) {
+    return state.themeHome;
+  } else return {}
+}
+
+HomeWithLatestPost = connect(mapStateToProps)(HomeWithLatestPost);
 HomeWithLatestPost = graphql(getPostList, {
   props: ({ownProps, data}) => {
     if(!data.loading){
@@ -197,7 +208,7 @@ HomeWithLatestPost = graphql(getPostList, {
       var slugFound = _.find(data.viewer.allPosts.edges, {node: {slug: ownProps.slug}})
 
       return {
-          allPosts: _postArr, 
+        allPosts: _postArr, 
         latestPosts: _.slice(_postArr, 0, pagePerPost), 
         pageCount: _postArr.length/pagePerPost,
         isSlugExist: slugFound!==null,
