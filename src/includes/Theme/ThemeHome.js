@@ -1,8 +1,6 @@
 import React from 'react';
 import AdminConfig from '../../admin/AdminConfig';
 import NotFound from '../../admin/NotFound';
-//import LostConnection from '../../admin/LostConnection';
-//import Query from '../../admin/query';
 import {saveConfig} from '../../utils';
 import {getTemplateComponent, theTitle, theContent, theExcerpt, theMenu, 
 				theLogo, theImage, thePagination} from './includes'
@@ -47,13 +45,6 @@ let HomeParent = React.createClass({
 		}
   },
 
-	handlePostClick(e){
-		e.preventDefault();
-		var id = e.currentTarget.id;
-		this._reactInternalInstance._context.history.push('/post/'+id)
-	},
-
-
 	getWidgets(widgetArea){
 		let Widgets = [];
 
@@ -78,7 +69,6 @@ let HomeParent = React.createClass({
 		require('../../theme/'+c.path+'/css/style.css');
 		require('../../theme/'+c.path+'/functions.js');
 
-		//loadWidgets();
 	},
 
 	render(){
@@ -178,7 +168,6 @@ class HomeWithLatestPost extends React.Component{
 			page = parseInt(e.target.text, 10);
 		var start = (this.props.postPerPage * page) - this.props.postPerPage;
 		var latestPosts = _.slice(this.props.allPosts, start, start+this.props.postPerPage);
-    debugger
 		this.props.dispatch(setPaginationPage(latestPosts, page))
 	}
   render(){
@@ -191,7 +180,6 @@ HomeWithLatestPost.defaultProps = {
 }
 
 const mapStateToProps = function(state){
-  debugger
   if (!_.isEmpty(state.themeHome)) {
     return state.themeHome;
   } else return {}
@@ -263,10 +251,6 @@ var qry = gql`query {
       }
     }
   }
-
-  getOptions(id: "T3B0aW9uczo1NQ=="){
-     value
-  }  
 }`
 
 ThemeHome = graphql(qry, {
@@ -284,7 +268,7 @@ ThemeHome = graphql(qry, {
         saveConfig(item.node.item, item.node.value);
       });
 
-
+      let listOfWidgets = JSON.parse(JSON.parse(localStorage.getItem('config')).listOfWidget)
 
       var allMenus = data.viewer.allMenus.edges[0];
       
@@ -292,7 +276,7 @@ ThemeHome = graphql(qry, {
         config: JSON.parse(localStorage.getItem('config')),
         slug: ownProps.location.pathname.replace("/",""),
         mainMenu: allMenus ? allMenus.node : [],
-        listOfWidgets: JSON.parse(data.getOptions.value),
+        listOfWidgets,
         loadDone: true
       }
     } 

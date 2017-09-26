@@ -7,7 +7,7 @@ import moment from 'moment';
 
 const HomeContentWithLatestPost = (props) => (
 <div>
-  {props.data && props.data.map((item) => {
+  {props.data ? props.data.map((item) => {
     return 	<div key={item.id} className="new">
         <div className="col-md-6 new-text wow fadeIn animated">
           {props.theTitle(item.id, item.title)}
@@ -22,6 +22,8 @@ const HomeContentWithLatestPost = (props) => (
         <div className="clearfix"> </div>
       </div>
     })
+      :
+      <div style={{height: 760, width: "100%", clear: 'both'}}>&nbsp;</div>
   }
   {props.thePagination}
 </div>
