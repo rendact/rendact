@@ -1,9 +1,8 @@
-export const themeHome = (state = [], action) => {
+export const themeHome = (state = {}, action) => {
   switch (action.type) {
-    case 'SET_PAGINATION_PAGE':
+    case 'SET_ACTIVE_PAGE':
       return {
           ...state,  
-          latestPosts: action.latestPosts, 
           activePage: action.page
       }
     default:

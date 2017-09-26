@@ -442,9 +442,8 @@ export const setActiveMenuId = (menuId) => ({
  * THEME ACTIONS
  */
 
- export const setPaginationPage = (latestPosts, page) => ({
-  type: 'SET_PAGINATION_PAGE',
-  latestPosts, 
+ export const setActivePageOnPagination = (page) => ({
+  type: 'SET_ACTIVE_PAGE',
   page
  })
 
