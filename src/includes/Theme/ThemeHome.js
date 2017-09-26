@@ -20,7 +20,7 @@ var pagePerPost = 5;
 
 /* Theme Components */
 
-let ThemeHome = React.createClass({
+let HomeParent = React.createClass({
 	propTypes: {
     loadDone: React.PropTypes.bool,
 		isSlugExist: React.PropTypes.bool,
@@ -97,20 +97,9 @@ let ThemeHome = React.createClass({
 	},
 
 	render(){
-		
-		if (!this.props.loadDone) {
-			return <Loading/>
-		} else {
-			if (this.props.slug){
-				let Single = getTemplateComponent('single');
-				if (this.props.isSlugExist)
-					return <Single slug={this.props.slug}/>
-				else 
-					return <NotFound/>
-			} else {
 				let Home = getTemplateComponent('home');
 				return <Home 
-					latestPosts={this.props.latestPosts}
+					data={this.props.data}
 					theTitle={theTitle}
 					theContent={theContent}
 					theExcerpt={theExcerpt}
@@ -123,8 +112,6 @@ let ThemeHome = React.createClass({
 					footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 					listOfWidgets={this.props.listOfWidgets}
 				/>
-      }
-		} 
 	}
 })
 
@@ -134,7 +121,39 @@ const mapStateToProps = function(state){
   } else return {}
 }
 
-ThemeHome = connect(mapStateToProps)(ThemeHome);
+HomeParent = connect(mapStateToProps)(HomeParent);
+
+var getPost = gql`query ($postId: ID!) {
+	getPost(id:$postId){ 
+		id,
+		title,
+		content,
+		slug,
+		author{username},
+		status,
+		visibility,
+    imageFeatured {
+      id
+      blobUrl
+    },
+		summary,
+		category{edges{node{id, category{id,name}}}},
+		comments {edges{node{id,content,name,email,website}}},
+		file{edges{node{id value}}},
+    tag{edges{node{id,tag{id,name}}}},
+    meta{edges{node{id,item,value}}},
+    createdAt
+  }
+}
+`
+
+let HomeWithPage = (props) => (<HomeParent {...props} data={props.data.getPost}/>)
+
+HomeWithPage = graphql(getPost, {
+  options: (props) => ({
+    variables: {postId: props.config.pageAsHomePage }
+  }),
+})(HomeWithPage)
 
 let getPostList = gql`
 {
@@ -166,7 +185,9 @@ let getPostList = gql`
 }
 `
 
-ThemeHome = graphql(getPostList, {
+let HomeWithLatestPost = (props) => (<HomeParent {...props} data={props.latestPosts}/>);
+
+HomeWithLatestPost = graphql(getPostList, {
   props: ({ownProps, data}) => {
     if(!data.loading){
       var _postArr = [];
@@ -174,7 +195,6 @@ ThemeHome = graphql(getPostList, {
         _postArr.push(item.node);
       });
       var slugFound = _.find(data.viewer.allPosts.edges, {node: {slug: ownProps.slug}})
-      debugger
 
       return {
           allPosts: _postArr, 
@@ -184,14 +204,28 @@ ThemeHome = graphql(getPostList, {
       }
     }
   },
-  skip: (props) => {
-    if(!props.config){
-      return true
-    }
+})(HomeWithLatestPost)
 
-    return !(props.config.frontPage === 'latestPost')
+class ThemeHome extends React.Component{
+  render(){
+    let {
+      loadDone,
+      config
+    } = this.props
+    if (!loadDone){
+      return <Loading/>
+    } else {
+
+      if(config.frontPage === 'latestPost'){
+        return <HomeWithLatestPost {...this.props}/>
+      } else {
+        return <HomeWithPage {...this.props} pageId={config.pageAsHomePage}/>
+      }
+
+    }
+      
   }
-})(ThemeHome)
+}
 
 var qry = gql`query {
   viewer {
