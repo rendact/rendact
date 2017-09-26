@@ -65,8 +65,9 @@ let ContentType = React.createClass({
   },
   filterByStatus: function(status, allPost) {
     let allPosts
-    if (status === 'All') {
-      allPosts = allPost
+    let statusAll = _.filter(allPost, item => item.status !== "Trash")
+    if (status === "All") {
+      allPosts = statusAll
     } else {
       allPosts = _.filter(allPost, item => item.status === status)
     }
@@ -169,7 +170,6 @@ let ContentType = React.createClass({
     this.props.dispatch(setStatusCounter(this.props._statusCount))
     let allPosts = this.filterByStatus(postListStatus, this.props.allPost)
     this.processDataShape(allPosts)
-debugger
   },
   disableForm: function(isFormDisabled){
     disableForm(isFormDisabled, this.notification);
