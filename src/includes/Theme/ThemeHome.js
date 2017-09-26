@@ -46,7 +46,7 @@ let ThemeHome = React.createClass({
 			activePage: 1,
 			isNoConnection: false,
       mainMenu: null,
-      listOfWidgets: []
+      listOfWidgets: [],
 		}
   },
 
@@ -136,19 +136,8 @@ const mapStateToProps = function(state){
 
 ThemeHome = connect(mapStateToProps)(ThemeHome);
 
-var qry = gql`query {
-  viewer {
-    allOptions {
-      edges {
-        node {
-          id,
-          item,
-          value
-        }
-      }
-    }
-  }
-
+let getPostList = gql`
+{
   viewer {
   	allPosts(where: {type: {eq: "post"}, status: {ne: ""}}) { 
   		edges { 
@@ -174,6 +163,49 @@ var qry = gql`query {
   		}
   	}
   }
+}
+`
+
+ThemeHome = graphql(getPostList, {
+  props: ({ownProps, data}) => {
+    if(!data.loading){
+      var _postArr = [];
+      _.forEach(data.viewer.allPosts.edges, function(item){
+        _postArr.push(item.node);
+      });
+      var slugFound = _.find(data.viewer.allPosts.edges, {node: {slug: ownProps.slug}})
+      debugger
+
+      return {
+          allPosts: _postArr, 
+        latestPosts: _.slice(_postArr, 0, pagePerPost), 
+        pageCount: _postArr.length/pagePerPost,
+        isSlugExist: slugFound!==null,
+      }
+    }
+  },
+  skip: (props) => {
+    if(!props.config){
+      return true
+    }
+
+    return !(props.config.frontPage === 'latestPost')
+  }
+})(ThemeHome)
+
+var qry = gql`query {
+  viewer {
+    allOptions {
+      edges {
+        node {
+          id,
+          item,
+          value
+        }
+      }
+    }
+  }
+
 
   viewer {
     allMenus(where: {position: {eq: "Main Menu"}}) { 
@@ -196,7 +228,7 @@ ThemeHome = graphql(qry, {
   props: ({ownProps, data}) => {
   	if (data.error){
   		return {
-  			isNoConnection: true
+  			isNoConnection: true,
   		}
   	}
 
@@ -207,22 +239,13 @@ ThemeHome = graphql(qry, {
         saveConfig(item.node.item, item.node.value);
       });
 
-      var slugFound = _.find(data.viewer.allPosts.edges, {node: {slug: ownProps.slug}})
 
-      var _postArr = [];
-      _.forEach(data.viewer.allPosts.edges, function(item){
-        _postArr.push(item.node);
-      });
 
       var allMenus = data.viewer.allMenus.edges[0];
       
       return  {
         config: JSON.parse(localStorage.getItem('config')),
         slug: ownProps.location.pathname.replace("/",""),
-        isSlugExist: slugFound!==null,
-        allPosts: _postArr, 
-        latestPosts: _.slice(_postArr, 0, pagePerPost), 
-        pageCount: _postArr.length/pagePerPost,
         mainMenu: allMenus ? allMenus.node : [],
         listOfWidgets: JSON.parse(data.getOptions.value),
         loadDone: true
@@ -230,5 +253,6 @@ ThemeHome = graphql(qry, {
     } 
   }
 })(ThemeHome);
+
 
 export default ThemeHome;
