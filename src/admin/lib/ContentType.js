@@ -162,7 +162,7 @@ let ContentType = React.createClass({
 
       var bEdit = hasRole(me.props.modifyRole);
       me.table.loadData(_dataArr, bEdit);
-      //me.props.dispatch(setMonthList(monthList))
+      me.props.dispatch(setMonthList(monthList))
       //me.disableForm(false);
   },
 
