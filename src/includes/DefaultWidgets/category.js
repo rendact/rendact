@@ -1,49 +1,47 @@
 import React from 'react'
 import _ from 'lodash'
-import {connect} from 'react-redux'
 import {setAllCategoryList} from '../../actions'
-import {riques} from '../../utils'
 import Query from '../../admin/query';
+import {gql, graphql} from 'react-apollo';
+import {Link} from 'react-router';
 
 class Widget extends React.Component {
   constructor(props){
     super(props)
 
-    this.onClick = this.onClick.bind(this)
+    this.renderCategories = this.renderCategories.bind(this)
   }
 
-  onClick(e){
-  	e.preventDefault();
-    var id = e.currentTarget.id;
-		this._reactInternalInstance._context.history.push('/category/'+id);
-  }
 
-  componentDidMount(){
-  	var me = this;
-  	riques(Query.getAllCategoryQry("post"), 
-      function(error, response, body) {
-        if (!error) {
-          var categoryList = [];
-          _.forEach(body.data.viewer.allCategories.edges, function(item){
-            categoryList.push((<li key={item.node.id}><a href={"/category/"+item.node.id} id={item.node.id} onClick={me.onClick}>{item.node.name}</a></li>));
-          });
-          me.props.dispatch(setAllCategoryList(categoryList))
-        }
-      }
-    );
+  renderCategories(){
+    return _.map(this.props.allCategoryList, item => (
+      <li key={item.node.id}><Link to={"/category/" + item.node.id}>{item.node.name}</Link></li>
+    ))
   }
 
   render(){
-    return <ul>{this.props.allCategoryList}</ul>
+    if (this.props.loading){
+      return null
+    }
+    return <ul>{this.renderCategories()}</ul>
   }
 }
 
-const mapStateToProps = function(state){
-	if (!_.isEmpty(state.widgets)) {
-		return state.widgets
-  } else return {};
-}
-Widget = connect(mapStateToProps)(Widget);
+let qry = gql`${Query.getAllCategoryQry("post").query}`
+
+Widget = graphql(qry, {
+  props: ({ownProps, data}) => {
+    if (!data.loading){
+      let allCategoryList = data.viewer.allCategories.edges
+      return {
+        allCategoryList,
+        loading: false,
+      }
+
+      return {loading: true}
+    }
+  }
+})(Widget)
 
 const WidgetFn = (widgetData) => {
 	return (
