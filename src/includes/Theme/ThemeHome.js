@@ -20,12 +20,11 @@ var pagePerPost = 5;
 
 /* Theme Components */
 
-let ThemeHome = React.createClass({
+let HomeParent = React.createClass({
 	propTypes: {
     loadDone: React.PropTypes.bool,
 		isSlugExist: React.PropTypes.bool,
 		slug: React.PropTypes.string,
-		latestPosts: React.PropTypes.array,
 		config: React.PropTypes.object,
 		postPerPage: React.PropTypes.number,
 		pageCount: React.PropTypes.number,
@@ -39,14 +38,12 @@ let ThemeHome = React.createClass({
 			loadDone: false,
 			isSlugExist: false,
 			slug: "",
-			latestPosts: [],
 			config: null,
-			postPerPage: 5,
 			pageCount: 1,
 			activePage: 1,
 			isNoConnection: false,
       mainMenu: null,
-      listOfWidgets: []
+      listOfWidgets: [],
 		}
   },
 
@@ -56,18 +53,6 @@ let ThemeHome = React.createClass({
 		this._reactInternalInstance._context.history.push('/post/'+id)
 	},
 
-	handlePageClick(e){
-		var page = 1;
-		if (e.target.text==="«")
-			page = this.props.activePage - 1;
-		else if (e.target.text==="»")
-			page = this.props.activePage + 1;
-		else 
-			page = parseInt(e.target.text, 10);
-		var start = (this.props.postPerPage * page) - this.props.postPerPage;
-		var latestPosts = _.slice(this.props.allPosts, start, start+this.props.postPerPage);
-		this.props.dispatch(setPaginationPage(latestPosts, page))
-	},
 
 	getWidgets(widgetArea){
 		let Widgets = [];
@@ -97,20 +82,9 @@ let ThemeHome = React.createClass({
 	},
 
 	render(){
-		
-		if (!this.props.loadDone) {
-			return <Loading/>
-		} else {
-			if (this.props.slug){
-				let Single = getTemplateComponent('single');
-				if (this.props.isSlugExist)
-					return <Single slug={this.props.slug}/>
-				else 
-					return <NotFound/>
-			} else {
 				let Home = getTemplateComponent('home');
 				return <Home 
-					latestPosts={this.props.latestPosts}
+					data={this.props.data}
 					theTitle={theTitle}
 					theContent={theContent}
 					theExcerpt={theExcerpt}
@@ -118,37 +92,49 @@ let ThemeHome = React.createClass({
 					theLogo={theLogo}
 					theImage={theImage}
 					theConfig={this.props.config}
-					thePagination={thePagination(this.props.pageCount, this.props.activePage, this.handlePostClick)}
+					thePagination={thePagination(this.props.pageCount, this.props.activePage, this.props.handlePageClick)}
 					getWidgets={this.getWidgets}
 					footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 					listOfWidgets={this.props.listOfWidgets}
 				/>
-      }
-		} 
 	}
 })
 
-const mapStateToProps = function(state){
-  if (!_.isEmpty(state.ThemeHome)) {
-    return state.ThemeHome;
-  } else return {}
-}
 
-ThemeHome = connect(mapStateToProps)(ThemeHome);
-
-var qry = gql`query {
-  viewer {
-    allOptions {
-      edges {
-        node {
-          id,
-          item,
-          value
-        }
-      }
-    }
+var getPost = gql`query ($postId: ID!) {
+	getPost(id:$postId){ 
+		id,
+		title,
+		content,
+		slug,
+		author{username},
+		status,
+		visibility,
+    imageFeatured {
+      id
+      blobUrl
+    },
+		summary,
+		category{edges{node{id, category{id,name}}}},
+		comments {edges{node{id,content,name,email,website}}},
+		file{edges{node{id value}}},
+    tag{edges{node{id,tag{id,name}}}},
+    meta{edges{node{id,item,value}}},
+    createdAt
   }
+}
+`
 
+let HomeWithPage = (props) => (<HomeParent {...props} data={props.data.getPost}/>)
+
+HomeWithPage = graphql(getPost, {
+  options: (props) => ({
+    variables: {postId: props.config.pageAsHomePage }
+  }),
+})(HomeWithPage)
+
+let getPostList = gql`
+{
   viewer {
   	allPosts(where: {type: {eq: "post"}, status: {ne: ""}}) { 
   		edges { 
@@ -174,6 +160,97 @@ var qry = gql`query {
   		}
   	}
   }
+}
+`
+
+class HomeWithLatestPost extends React.Component{
+  constructor(props){
+    super(props)
+    this.handlePageClick = this.handlePageClick.bind(this)
+  }
+	handlePageClick(e){
+		var page = 1;
+		if (e.target.text==="«")
+			page = this.props.activePage - 1;
+		else if (e.target.text==="»")
+			page = this.props.activePage + 1;
+		else 
+			page = parseInt(e.target.text, 10);
+		var start = (this.props.postPerPage * page) - this.props.postPerPage;
+		var latestPosts = _.slice(this.props.allPosts, start, start+this.props.postPerPage);
+    debugger
+		this.props.dispatch(setPaginationPage(latestPosts, page))
+	}
+  render(){
+    return <HomeParent {...this.props} data={this.props.latestPosts} handlePageClick={this.handlePageClick}/>
+  }
+}
+
+HomeWithLatestPost.defaultProps = {
+  postPerPage: 5
+}
+
+const mapStateToProps = function(state){
+  debugger
+  if (!_.isEmpty(state.themeHome)) {
+    return state.themeHome;
+  } else return {}
+}
+
+HomeWithLatestPost = connect(mapStateToProps)(HomeWithLatestPost);
+HomeWithLatestPost = graphql(getPostList, {
+  props: ({ownProps, data}) => {
+    if(!data.loading){
+      var _postArr = [];
+      _.forEach(data.viewer.allPosts.edges, function(item){
+        _postArr.push(item.node);
+      });
+      var slugFound = _.find(data.viewer.allPosts.edges, {node: {slug: ownProps.slug}})
+
+      return {
+        allPosts: _postArr, 
+        latestPosts: _.slice(_postArr, 0, pagePerPost), 
+        pageCount: _postArr.length/pagePerPost,
+        isSlugExist: slugFound!==null,
+      }
+    }
+  },
+})(HomeWithLatestPost)
+
+class ThemeHome extends React.Component{
+  render(){
+    let {
+      loadDone,
+      config
+    } = this.props
+    if (!loadDone){
+      return <Loading/>
+    } else {
+
+      if(config.frontPage === 'latestPost'){
+        return <HomeWithLatestPost {...this.props}/>
+      } else {
+        return <HomeWithPage {...this.props} pageId={config.pageAsHomePage}/>
+      }
+
+    }
+      
+  }
+}
+
+var qry = gql`query {
+  viewer {
+    allOptions {
+      edges {
+        node {
+          id,
+          item,
+          value
+        }
+      }
+    }
+  }
+
 
   viewer {
     allMenus(where: {position: {eq: "Main Menu"}}) { 
@@ -196,7 +273,7 @@ ThemeHome = graphql(qry, {
   props: ({ownProps, data}) => {
   	if (data.error){
   		return {
-  			isNoConnection: true
+  			isNoConnection: true,
   		}
   	}
 
@@ -207,22 +284,13 @@ ThemeHome = graphql(qry, {
         saveConfig(item.node.item, item.node.value);
       });
 
-      var slugFound = _.find(data.viewer.allPosts.edges, {node: {slug: ownProps.slug}})
 
-      var _postArr = [];
-      _.forEach(data.viewer.allPosts.edges, function(item){
-        _postArr.push(item.node);
-      });
 
       var allMenus = data.viewer.allMenus.edges[0];
       
       return  {
         config: JSON.parse(localStorage.getItem('config')),
         slug: ownProps.location.pathname.replace("/",""),
-        isSlugExist: slugFound!==null,
-        allPosts: _postArr, 
-        latestPosts: _.slice(_postArr, 0, pagePerPost), 
-        pageCount: _postArr.length/pagePerPost,
         mainMenu: allMenus ? allMenus.node : [],
         listOfWidgets: JSON.parse(data.getOptions.value),
         loadDone: true
@@ -230,5 +298,6 @@ ThemeHome = graphql(qry, {
     } 
   }
 })(ThemeHome);
+
 
 export default ThemeHome;

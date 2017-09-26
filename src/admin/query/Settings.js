@@ -35,7 +35,7 @@ const createUpdateSettingsMtn = function(arrData){
   var query = "mutation (";
   
   _.forEach(arrData, function(item, index){
-    if (_.has(item, "id")) {
+    if (_.has(item, "id") && item.id) {
       query += "$input"+index+": UpdateOptionsInput!";
     } else {
       query += "$input"+index+": CreateOptionsInput!";
@@ -50,7 +50,7 @@ const createUpdateSettingsMtn = function(arrData){
       value: item.value
     }
 
-    if (_.has(item, "id")) {
+    if (_.has(item, "id") && item.id) {
       variables["input"+index]['id'] = item.id;
       query += ' UpdateOptions'+index+' : updateOptions(input: $input'+index+'){ changedOptions{ id item value } }'; 
     } else {

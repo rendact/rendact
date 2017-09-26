@@ -18,6 +18,7 @@ import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {graphql, withApollo} from 'react-apollo';
 import gql from 'graphql-tag';
 import Script from 'react-load-script'
+import moment from 'moment'
 
 let CustomFields = (props) => (
   <div>
@@ -113,8 +114,16 @@ let ImageGalleryWidget = (props) => (
           return <div key={index} >
             {item.value && <div className="margin" style={{width: 150, float: "left", position: "relative"}}>
           <a href="" onClick={props.handleImageClick}><img src={item.value} className="margin" style={{width: 150, height: 150, borderWidth: "medium", borderStyle: "solid", borderColor: "cadetblue", opacity: item.id === "customid" || item.toDelete ? 0.5 : 1}} alt={"gallery"+index}/></a>
+
+          { item.id === "customid" &&
+
+          <div style={{position: 'absolute', right: "50%", top:"50%"}}>
+            <Halogen.FadeLoader color="black"/>
+          </div>
+          }
           <button id={item.id+"-"+index} onClick={props.handleImageRemove} type="button" className="btn btn-info btn-sm" disabled={item.id==="customid" || item.toDelete} style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
           </div>}
+          
           {item.message ? <p style={{color:'red', clear: 'left', position: 'absolute'}}>{item.message.toString()}</p> : null}
           </div>
         })
@@ -140,6 +149,11 @@ let FeaturedImageWidget = (props) => (
       { !_.isEmpty(props.featuredImage) &&
         <div style={{position: "relative", marginTop: 25}}>
           <img src={props.featuredImage.value} style={{width: "100%", opacity: props.featuredImage.id === 'customId'? 0.5 : 1}} alt={props.title}/> 
+          {props.featuredImage.id === "customId" &&
+          <div style={{position: 'absolute', left:"50%", top:"50%"}}>
+            <Halogen.FadeLoader color="black"/>
+          </div>
+          }
           <button onClick={props.onClick} disabled={props.featuredImage.id === 'customId'} type="button" className="btn btn-info btn-sm" style={{top: 15, right: 5, position: "absolute"}}><i className="fa fa-times"></i></button>
         </div>
       }
@@ -494,8 +508,11 @@ let NewContentTypeParent = React.createClass({
   saveImmediately: function(event){
     var hours = this.props.hours;
     var minute = this.props.minutes;
-    var time = this.props.publishDate + hours + minute;
-    this.props.dispatch(toggleSaveImmediatelyMode(false, time));
+    let date = _.clone(this.props.publishDate)
+
+    date.setHours(hours)
+    date.setMinutes(minute)
+    this.props.dispatch(toggleSaveImmediatelyMode(false, date));
   },
 
   disableForm: function(isFormDisabled){
@@ -563,9 +580,8 @@ let NewContentTypeParent = React.createClass({
   },
 
   formatDate: function(date){
-    var min = date.getMinutes();
-    if (min.length<2) min = "0"+min;
-    return date.getDate()+"/"+(1+date.getMonth())+"/"+date.getFullYear()+" "+date.getHours()+":"+min;
+    let momentWrapped = moment(date) 
+    return momentWrapped.format("D/M/Y H:m")
   },
 
   notifyUnsavedData: function(state){
@@ -597,17 +613,26 @@ let NewContentTypeParent = React.createClass({
   },
 
   handleDateChange: function(date){
-    this.props.dispatch(setPostPublishDate(new Date(date), false));
+    date = new Date(date)
+    date.setHours(this.props.hours)
+    date.setMinutes(this.props.minutes)
+    this.props.dispatch(setPostPublishDate(date, false));
     this.notifyUnsavedData(true);
   },
 
-  handleTimeChange: function(event){
-    var hours = this.props.hours;
-    var minutes = this.props.minutes;
-    var d = this.props.publishDate;
-    d.setHours(parseInt(hours, 10));
-    d.setMinutes(parseInt(minutes, 10));
-    this.props.dispatch(setPostPublishDate(d, false));
+  handleHoursChange: function(event){
+    let hours = parseInt(event.currentTarget.value, 10) || 0
+    let date = this.props.publishDate
+    date.setHours(hours)
+    this.props.dispatch(setPostPublishDate(date, false));
+    this.notifyUnsavedData(true);
+  },
+
+  handleMinutesChange: function(event){
+    let minutes = parseInt(event.currentTarget.value, 10) || 0
+    let date = this.props.publishDate
+    date.setMinutes(minutes)
+    this.props.dispatch(setPostPublishDate(date, false));
     this.notifyUnsavedData(true);
   },
 
@@ -1293,9 +1318,9 @@ let NewContentTypeParent = React.createClass({
                                 <div className="col-md-6">
                                   <DatePicker id="datepicker" style={{width: "100%", padddingRight: 0, textAlign: "center"}} value={this.props.publishDate.toISOString()} onChange={this.handleDateChange}/>
                                 </div>
-                                <div className="col-md-6">
-                                  <Field name="hours" component="input" type="text" className="form-control" style={{width: 30, height: 34, textAlign: "center"}}  onChange={this.handleTimeChange} />
-                                  <Field name="minutes" component="input" type="text" className="form-control" style={{width: 30, height: 34, textAlign: "center"}}  onChange={this.handleTimeChange} />
+                                <div className="col-md-6 form-inline">
+                                  <Field name="hours" component="input" type="text" className="form-control" style={{width: 30, height: 34, padding:0, textAlign: "center", margin: "0 5px"}}  onChange={this.handleHoursChange} />
+                                  <Field name="minutes" component="input" type="text" className="form-control" style={{width: 30, height: 34, textAlign: "center", padding: 0, margin: "0 5px"}}  onChange={this.handleMinutesChange} />
                                 </div>
                               </div>
                               <div className="form-inline" style={{marginTop: 10}}>
@@ -1392,6 +1417,8 @@ const mapStateToProps = function(state, ownProps){
   let ctn = state.contentTypeNew
   let customProps = {
     titleTag : selector(state, 'titleTag'),
+    hours: selector(state, 'hours'),
+    minutes: selector(state, 'minutes'),
     metaDescription: selector(state, 'metaDescription'),
     metaKeyword: selector(state, 'metaKeyword'),
     visibilityTxt: selector(state, 'visibility'),

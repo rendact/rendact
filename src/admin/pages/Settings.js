@@ -6,9 +6,134 @@ import Query from '../query'
 import {riques, errorCallback, getFormData, disableForm, defaultHalogenStyle} from '../../utils'
 import {connect} from 'react-redux'
 import {maskArea, loadFormData} from '../../actions'
-import {reduxForm, Field} from 'redux-form'
+import {reduxForm, Field, formValueSelector} from 'redux-form'
 import gql from 'graphql-tag'
-import {graphql} from 'react-apollo'
+import {graphql, withApollo} from 'react-apollo'
+
+const SettingField = ({name, title, help}) => (
+    <div className="form-group">
+        <label htmlFor={name} className="col-md-3">{title}</label>
+        <div className="col-md-9">
+        <Field name={name} component="input" type="text" className="form-control"/>
+        {help &&
+          <p className="help-block">{help}</p>
+        }
+      </div>
+    </div>
+)
+
+const TabPanel = (props) => (
+    <div role="tabpanel" className={props.active ? "tab-pane active" : "tab-pane"} id={props.id} style={{margin: 20}}>
+      {props.children}
+    </div>
+)
+
+const GeneralTab = (props) => (
+<div>
+  <SettingField
+    name="name"
+    title="Website name"
+    help={<span>Website name, will shows up in <code>title</code> tag</span>}
+  />
+
+  <SettingField
+    name="tagline"
+    title="Tagline"
+    help="Few words that describes your web, example: a bunch of words of mine"
+  />
+
+  <SettingField
+    name="keywords"
+    title="Keywords"
+    help="Some words represents your web"
+  />
+  <SettingField
+    name="rootUrl"
+    title="Home URL"
+  />
+
+  <SettingField
+    name="adminEmail"
+    title="Admin Email"
+  />
+  <SettingField
+    name="timeZone"
+    title="Time Zone"
+  />
+  <SettingField
+    name="dbApiUrl"
+    title="Database API URL"
+  />
+  <SettingField
+    title="Auth0 Client ID"
+    name="auth0ClientId"
+      />
+
+  <SettingField
+      title="Auth0 Domain"
+      name="auth0Domain"
+      />
+
+  <SettingField
+      title="Email API URL"
+      name="mailApiUrl"
+      />
+
+  <SettingField
+      title="Email API Key"
+      name="mailApiKey"
+      />
+
+  <SettingField
+      title="Email Default Sender"
+      name="mailDefaultSender"
+    />
+</div>
+)
+
+let HomepageTab = (props) => (
+  <div>
+    <div className="form-group">
+        <label htmlFor="frontPage" className="col-md-3">Front Page Displays</label>
+        <div className="col-md-9">
+          <div>
+        <Field name="frontPage" component="input" type="radio" value="latestPost"/> Your latest posts
+      </div>
+      <div>
+        <Field name="frontPage" component="input" type="radio" value="page"/> A static page (select below)
+      </div>
+      <div>
+        { props.frontPage === "page" &&
+        <Field name="pageAsHomePage" component="select" className="form-control">
+          <option value="">Select a page</option>
+          {
+            _.map(props.pageListOption, (opt, index) => (
+              <option value={opt.value} key={index}>{opt.label}</option>
+            ))
+          }
+        </Field>
+        }
+      </div>
+      </div>
+    </div>
+  </div>
+)
+
+HomepageTab = graphql(gql`${Query.getPageListQry("Published").query}`, {
+  props: ({ownProps, data}) => {
+    if (!data.loading) {
+      let pageList = data.viewer.allPosts.edges
+
+      let pageListOption = _.map(pageList, item => ({value: item.node.id, label: item.node.title}))
+
+      return {
+        pageListOption
+      }
+    }
+    return {pageListOption: []}
+  }
+})(HomepageTab)
+
 
 var Settings = React.createClass({
 	propTypes: {
@@ -23,29 +148,56 @@ var Settings = React.createClass({
       data: {}
 		}
  	},
-	handleSubmitBtn: function(event){
-		event.preventDefault();
-		var me = this;
-		var _objData = getFormData('rdt-input-form');
-		this.disableForm(true);
+	handleSubmitBtn: function(values){
+    let toSave = []
 
-		var qry = Query.createUpdateSettingsMtn(_objData);
-		riques(qry, 
-			function(error, response, body){
-				if(!error && !body.errors) {
-					me.disableForm(false);
-				} else {
-					errorCallback(error, body.errors?body.errors[0].message:null);
-				}
-			}
-		);
+    _.forIn(values, (val, key) => {
+      toSave.push({
+        id: this.props.mapSettingsWithId[key],
+        item: key,
+        value: val
+      })
+    })
+
+    let query = Query.createUpdateSettingsMtn(toSave)
+    this.props.dispatch(maskArea(true))
+    disableForm(true)
+
+    this.props.client.mutate({
+      mutation: gql`${query.query}`,
+      variables: query.variables
+    }).then(data => {
+      console.log(data)
+
+      let createIndexFound = _.findIndex(_.keys(data.data), (o) => o.match(/CreateOptions/g))
+
+      if (createIndexFound >= 0){
+        this.props.refetchAll()
+      }
+
+      this.props.dispatch(maskArea(false))
+      disableForm(false)
+    })
 	}, 
-	componentWillReceiveProps(props){
-	},
 	componentDidMount: function(){
 		this.notification = this.refs.notificationSystem;
-		//this.loadData();
 	},
+
+  componentWillMount: function(){
+    if(this.props.isLoading){
+      this.props.dispatch(maskArea(true))
+      disableForm(true)
+    }
+  },
+
+  componentWillReceiveProps(props){
+    if(this.props.isLoading && !props.isLoading){
+      props.dispatch(maskArea(false))
+      disableForm(false)
+      debugger
+    }
+  },
+
 	render: function(){
 		return (
 			<div className="content-wrapper">
@@ -69,102 +221,34 @@ var Settings = React.createClass({
 			    	<div className="row">
 					  	<div className="col-md-8">
 					  	<section className="content">
-			    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" style={{opacity: this.props.opacity}} >
-			    			
-						  		<div className="form-group">
-									  	<label htmlFor="name" className="col-md-3">Website name</label>
-									  	<div className="col-md-9">
-									  	<Field name="name" component="input" type="text" className="form-control"/>
-											<p className="help-block">Website name, will shows up in <code>title</code> tag</p>
-										</div>
-									</div>
+			    			<form onSubmit={this.props.handleSubmit(this.handleSubmitBtn)} className="form-horizontal" style={{opacity: this.props.opacity}} >
 
-						  			<div className="form-group">
-									  	<label htmlFor="tagline" className="col-md-3">Tagline</label>
-									  	<div className="col-md-9">
-									  	<Field name="tagline" component="input" type="text" className="form-control"/>
-											<p className="help-block">Few words that describes your web, example: a bunch of words of mine</p>
-										</div>
-									</div>
+                  <ul className="nav nav-tabs" role="tablist">
+                    <li role="presentation" className="active"><a href="#general" aria-controls="home" role="tab" data-toggle="tab">General</a></li>
+                    <li role="presentation" ><a href="#homepage" aria-controls="homepage" role="tab" data-toggle="tab">Homepage</a></li>
+                  </ul>
 
-						  			<div className="form-group">
-									  	<label htmlFor="keywoards" className="col-md-3">Keywords</label>
-									  	<div className="col-md-9">
-									  	<Field name="keywords" component="input" type="text" className="form-control"/>
-											<p className="help-block">Some words represents your web</p>
-										</div>
-									</div>
 
-						  		<div className="form-group">
-									 	<label htmlFor="rootUrl" className="col-md-3">Home URL</label>
-								  	<div className="col-md-9">
-								  		<Field name="rootUrl" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
+                  <div className="tab-content">
+                    <TabPanel id="general" active>
+                      <GeneralTab/>
+                    </TabPanel>
 
-						  		<div className="form-group">
-								  	<label htmlFor="adminEmail" className="col-md-3">Admin Email</label>
-								  	<div className="col-md-9">
-								  		<Field name="adminEmail" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
+                    <TabPanel id="homepage">
+                      <HomepageTab frontPage={this.props.frontPage}/>
+                    </TabPanel>
+                  </div>
 
-						  		<div className="form-group">
-								  	<label htmlFor="timeZone" className="col-md-3">Time Zone</label>
-								  	<div className="col-md-9">
-								  		<Field name="timeZone" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
-
-									<div className="form-group">
-									 	<label htmlFor="dbApiUrl" className="col-md-3">Database API URL</label>
-								  	<div className="col-md-9">
-								  		<Field name="dbApiUrl" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
-
-									<div className="form-group">
-									 	<label htmlFor="auth0ClientId" className="col-md-3">Auth0 Client ID</label>
-								  	<div className="col-md-9">
-								  		<Field name="auth0ClientId" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
-
-									<div className="form-group">
-									 	<label htmlFor="auth0Domain" className="col-md-3">Auth0 Domain</label>
-								  	<div className="col-md-9">
-								  		<Field name="auth0Domain" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
-
-									<div className="form-group">
-									 	<label htmlFor="mailApiUrl" className="col-md-3">Email API URL</label>
-								  	<div className="col-md-9">
-								  		<Field name="mailApiUrl" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
-
-									<div className="form-group">
-									 	<label htmlFor="mailApiKey" className="col-md-3">Email API Key</label>
-								  	<div className="col-md-9">
-								  		<Field name="mailApiKey" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
-
-									<div className="form-group">
-									 	<label htmlFor="mailDefaultSender" className="col-md-3">Email Default Sender</label>
-								  	<div className="col-md-9">
-								  		<Field name="mailDefaultSender" component="input" type="text" className="form-control"/>
-										</div>
-									</div>
 									
+
 									<div className="form-group">
-											<div className="col-md-9">
-												<div className="btn-group">
-													<input type="submit" value="Update Settings" className="btn btn-primary btn-sm" />
-												</div>
-											</div>
-										</div>
+                    <div className="col-md-9">
+                      <div className="btn-group">
+                        <input type="submit" value="Update Settings" className="btn btn-primary btn-sm" />
+                      </div>
+                    </div>
+                  </div>
+
 								</form>
 							</section>
 							</div>
@@ -176,17 +260,24 @@ var Settings = React.createClass({
 	}
 });
 
-const mapStateToProps = function(state){
-	if (!_.isEmpty(state.settings)) {
-		var out = _.head(state.settings);
-		out["initialValues"] = out.data;
-		return out;
-	} else return {}
+const selector = formValueSelector('settingsForm')
+
+const mapStateToProps = (state) => {
+  let customProps = {
+    frontPage: selector(state, 'frontPage')
+  }
+
+  return {
+    ...state.settings,
+    ...customProps,
+    ...state.maskArea
+  }
 }
 
 Settings = reduxForm({
   form: 'settingsForm'
 })(Settings)
+
 Settings = connect(mapStateToProps)(Settings)
 
 //React-Apollo
@@ -200,16 +291,32 @@ Settings = graphql(gql`${Query.loadSettingsQry.query}`,{
       errorCallback(data.error, data.error, data.error)
        return {hasError: true}
     } else {
+      let settings = [
+        "name", "tagline", "keywords", "rootUrl",
+        "adminEmail", "timeZone", "dbApiUrl", "auth0ClientId",
+        "auth0Domain", "mailApiUrl", "mailApiKey", "frontPage",
+        "pageAsHomePage", "mailDefaultSender"
+      ]
+
     	var _data = {}
+      var mapSettingsWithId = {}
 			_.forEach(data.viewer.allOptions.edges, function(item){
-				_data[item.node.item] = item.node.value;
+        if(_.indexOf(settings, item.node.item) > -1){
+          _data[item.node.item] = item.node.value;
+          mapSettingsWithId[item.node.item] = item.node.id
+        }
 			});
+      debugger
 	return {
-        isLoading: false,
-        initialValues: _data
+    isLoading: false,
+    initialValues: _data,
+    mapSettingsWithId,
+    refetchAll: data.refetch
     }
 	}
 	}
 })(Settings)
+
+Settings = withApollo(Settings)
 
 export default Settings;
