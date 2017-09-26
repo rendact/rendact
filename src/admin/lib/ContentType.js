@@ -8,7 +8,7 @@ import Halogen from 'halogen'
 import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle, swalert, getValue, disableForm} from '../../utils'
 import {Table, SearchBoxPost, DeleteButtons} from './Table'
 import {connect} from 'react-redux'
-import {setStatusCounter, initContentList, setloadData, maskArea, toggleDeleteMode, toggleSelectedItemState} from '../../actions'
+import {setStatusCounter, initContentList, setloadData, maskArea, toggleDeleteMode, toggleSelectedItemState, setPostListStatus, setMonthList} from '../../actions'
 import {graphql, withApollo} from 'react-apollo';
 import gql from 'graphql-tag';
 
@@ -48,39 +48,58 @@ let ContentType = React.createClass({
   },
   dt: null,
 
-  loadData: function(status, callback) {
-    var me = this;
-    var postType = this.props.postType;
+  handleStatusFilter: function(event){
+    event.preventDefault();
+    this.disableForm(true);
+    var status = event.target.text;
+    this.props.dispatch(setPostListStatus(status))
+    if (status==='Trash'){
+      this.loadData("Trash");
+      this.props.dispatch(toggleDeleteMode(status, true));
+      this.disableForm(false);
+    }else{
+      this.loadData(status)
+      this.props.dispatch(toggleDeleteMode(status, false));
+      this.disableForm(false);
+    } ;
+  },
+  filterByStatus: function(status, allPost) {
+    let allPosts
+    if (status === 'All') {
+      allPosts = allPost
+    } else {
+      allPosts = _.filter(allPost, item => item.status === status)
+    }
+    return allPosts
+  },
+  processDataShape: function(allPosts) {
+    let me = this;
     var metaItemList = _.map(this.props.customFields, function(item) { return item.id });
     var fields = _.map(this.props.fields, function(item){
       return item.id
     });
-    var listQuery = this.props.listQuery;
-    let listOfData = this.props.client.query({query: gql`${listQuery(status).query}`})
-    listOfData.then(function(data) {
       var monthList = ["all"];
       var _dataArr = [];
       var _allPostId = [];
-      var _postArr = data.data.viewer.allPosts.edges;
 
-      _.forEach(_postArr, function(item){
-        var dt = new Date(item.node.createdAt);
-        var _obj = {postId: item.node.id};
-        _allPostId.push(item.node.id);
+      _.forEach(allPosts, function(item){
+        var dt = new Date(item.createdAt);
+        var _obj = {postId: item.id};
+        _allPostId.push(item.id);
         _.forEach(fields, function(fld){
-          if (_.has(item.node, fld)) { 
+          if (_.has(item, fld)) { 
             if (fld==="createdAt") {
               _obj[fld] = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
             }
             else if (fld==="comments")
-              _obj[fld] = item.node.comments.edges.length;
+              _obj[fld] = item.comments.edges.length;
             else if (fld==="author")
-              _obj[fld] = item.node.author?item.node.author.username:"";
+              _obj[fld] = item.author?item.author.username:"";
             else if (fld==="category"){
               var categories = [];
-              _.forEach(item.node.category.edges, function(item){ 
-                if (item.node.category)
-                  categories.push(item.node.category.name)
+              _.forEach(item.category.edges, function(item){ 
+                if (item.category)
+                  categories.push(item.category.name)
               });
               if (categories.length===0)
                 categories = "Uncategorized";
@@ -88,25 +107,25 @@ let ContentType = React.createClass({
             }
             else if (fld==="tag"){
               var tags = [];
-              _.forEach(item.node.tag.edges, function(item){ 
-                if (item.node.tag)
-                  tags.push(item.node.tag.name)
+              _.forEach(item.tag.edges, function(item){ 
+                if (item.tag)
+                  tags.push(item.tag.name)
               });
               if (tags.length===0)
                 tags = "";
               _obj[fld] = tags;
             } else if (fld==="image"){
-              _obj[fld] = item.node.image?item.node.image:getConfig('rootUrl')+"/images/avatar-default.png"
+              _obj[fld] = item.image?item.image:getConfig('rootUrl')+"/images/avatar-default.png"
             } else if (fld==="roles") {
               var roles = "No Role";
-              var rolesLen = item.node.roles.edges.length;
+              var rolesLen = item.roles.edges.length;
               if (rolesLen>0) {
-                var isOwner = _.find(item.node.roles.edges, {node: {name: "Owner"}} );
+                var isOwner = _.find(item.roles.edges,  {name: "Owner"} );
                 if (isOwner) roles = "Owner";
                 else {
                   roles = _.join(
-                    _.map(item.node.roles.edges, function(item){
-                      return item.node.name;
+                    _.map(item.roles.edges, function(item){
+                      return item.name;
                     }), "<br/>");
                 }
               }
@@ -115,20 +134,20 @@ let ContentType = React.createClass({
               }
               _obj[fld] = roles;
             } else if (fld==="posts") {
-              _obj[fld] = item.node.posts.edges.length
+              _obj[fld] = item.posts.edges.length
             }
             else
-              _obj[fld] = item.node[fld];
+              _obj[fld] = item[fld];
           } else {
             if (fld==="like"){
-              var likeNode = _.find(item.node.meta.edges,{"node": {"item": "like"}});
-              var likes = likeNode?likeNode.node.value:"0";
+              var likeNode = _.find(item.meta.edges, {"item": "like"});
+              var likes = likeNode?likeNode.value:"0";
               _obj[fld] = likes;
             }
 
             if (_.indexOf(metaItemList, fld)>-1) {
-              var _edge = _.find(item.node.meta.edges,{"node": {"item": fld}});
-              var _val = _edge?_edge.node.value:"";
+              var _edge = _.find(item.meta.edges,{"node": {"item": fld}});
+              var _val = _edge?_edge.value:"";
               _obj[fld] = _val; 
             }
           }
@@ -142,11 +161,16 @@ let ContentType = React.createClass({
 
       var bEdit = hasRole(me.props.modifyRole);
       me.table.loadData(_dataArr, bEdit);
-      me.props.dispatch(initContentList(monthList, _allPostId))
-      me.disableForm(false);
-    })
+      //me.props.dispatch(setMonthList(monthList))
+      //me.disableForm(false);
   },
 
+  loadData: function(postListStatus){
+    this.props.dispatch(setStatusCounter(this.props._statusCount))
+    let allPosts = this.filterByStatus(postListStatus, this.props.allPost)
+    this.processDataShape(allPosts)
+debugger
+  },
   disableForm: function(isFormDisabled){
     disableForm(isFormDisabled, this.notification);
     this.props.dispatch(maskArea(isFormDisabled));
@@ -162,8 +186,9 @@ let ContentType = React.createClass({
     let listOfData = this.props.client.mutate({mutation: gql`${Query.deletePostQry(idList).query}`})
     listOfData.then(function() {
       me.props.refetchAllMenuData().then(function() {
-        me.loadData("All");
+        
       })
+      me.loadData("All");
     })
 
     // swalert('warning','Sure want to delete?','Be sure before continue!',
@@ -275,22 +300,6 @@ let ContentType = React.createClass({
     $(".menu-item").removeClass("active");
     $("#menu-posts-new").addClass("active");
   },
-  handleStatusFilter: function(event){
-    event.preventDefault();
-    this.disableForm(true);
-    var status = event.target.text;
-    if (status==='Trash'){
-      var me = this;
-      this.loadData("Trash");
-      this.props.dispatch(toggleDeleteMode(status, true));
-      this.disableForm(false);
-    }else{
-      var re = this;
-      this.loadData(status)
-      this.props.dispatch(toggleDeleteMode(status, false));
-      this.disableForm(false);
-    } ;
-  },
   handleDateFilter: function(event){
     this.disableForm(true);
     var status = this.props.activeStatus;
@@ -377,12 +386,16 @@ let ContentType = React.createClass({
     else return 0;
   },
   componentWillReceiveProps(props){
-    if(props._allPostId.length && !this.props._allPostId.length){
-      this.loadData("All");
-      //this.table.loadData(props._dataArr, props.bEdit);
-      this.props.dispatch(setStatusCounter(props._statusCount))
-      this.props.dispatch(initContentList(props.monthList, props._allPostId))
-    }
+    this.props.dispatch(setStatusCounter(props._statusCount))
+    let allPosts = this.filterByStatus(props.postListStatus, props.allPost)
+    this.processDataShape(allPosts)
+
+    // if(props._allPostId.length && !this.props._allPostId.length){
+    //   this.loadData("All");
+    //   this.table.loadData(props._dataArr, props.bEdit);
+    //   this.props.dispatch(setStatusCounter(props._statusCount))
+    //   this.props.dispatch(initContentList(props.monthList, props._allPostId))
+    // }
   },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
@@ -526,16 +539,11 @@ ContentType = graphql(getAllPosts,
     }),
     props: ({ownProps, data}) => {
       if (!data.loading) {
-          var monthList = ["all"];
-          var _dataArr = [];
-          var _allPostId = [];
-          var _postArr = data.viewer.allPosts.edges;
-          var fields = _.map(ownProps.fields, function(item){
-            return item.id
-          });
-          var metaItemList = _.map(ownProps.customFields, function(item) { return item.id });
+          let allPost = data.viewer.allPosts.edges;
+          allPost = _.map(allPost, item => item.node)
 
           //Show status
+          var _postArr = data.viewer.allPosts.edges;
           var _statusCount = {};
           _.forEach(ownProps.statusList, function(status){
             var found = _.filter(_postArr, {node: {status: status}});
@@ -543,100 +551,12 @@ ContentType = graphql(getAllPosts,
           });
           _statusCount["All"] = _postArr.length-_statusCount["Trash"];
 
-          //Show data
-          _.forEach(_postArr, function(item){
-            var dt = new Date(item.node.createdAt);
-            var _obj = {postId: item.node.id};
-            _allPostId.push(item.node.id);
-            _.forEach(fields, function(fld){
-              if (_.has(item.node, fld)) { 
-                if (fld==="createdAt") {
-                  _obj[fld] = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
-                }
-                else if (fld==="comments")
-                  _obj[fld] = item.node.comments.edges.length;
-                else if (fld==="author")
-                  _obj[fld] = item.node.author?item.node.author.username:"";
-                else if (fld==="category"){
-                  var categories = [];
-                  _.forEach(item.node.category.edges, function(item){ 
-                    if (item.node.category)
-                      categories.push(item.node.category.name)
-                  });
-                  if (categories.length===0)
-                    categories = "Uncategorized";
-                  _obj[fld] = categories;
-                }
-                else if (fld==="tag"){
-                  var tags = [];
-                  _.forEach(item.node.tag.edges, function(item){ 
-                    if (item.node.tag)
-                      tags.push(item.node.tag.name)
-                  });
-                  if (tags.length===0)
-                    tags = "";
-                  _obj[fld] = tags;
-                } else if (fld==="image"){
-                  _obj[fld] = item.node.image?item.node.image:getConfig('rootUrl')+"/images/avatar-default.png"
-                } else if (fld==="roles") {
-                  var roles = "No Role";
-                  var rolesLen = item.node.roles.edges.length;
-                  if (rolesLen>0) {
-                    var isOwner = _.find(item.node.roles.edges, {node: {name: "Owner"}} );
-                    if (isOwner) roles = "Owner";
-                    else {
-                      roles = _.join(
-                        _.map(item.node.roles.edges, function(item){
-                          return item.node.name;
-                        }), "<br/>");
-                    }
-                  }
-                  if (status==="No Role"){
-                    if (rolesLen>0) return;
-                  }
-                  _obj[fld] = roles;
-                } else if (fld==="posts") {
-                  _obj[fld] = item.node.posts.edges.length
-                }
-                else
-                  _obj[fld] = item.node[fld];
-                  //me.disableForm(false);
-              } else {
-                if (fld==="like"){
-                  var likeNode = _.find(item.node.meta.edges,{"node": {"item": "like"}});
-                  var likes = likeNode?likeNode.node.value:"0";
-                  _obj[fld] = likes;
-                  //me.disableForm(false);
-                }
-
-                if (_.indexOf(metaItemList, fld)>-1) {
-                  var _edge = _.find(item.node.meta.edges,{"node": {"item": fld}});
-                  var _val = _edge?_edge.node.value:"";
-                  _obj[fld] = _val; 
-                  //me.disableForm(false);
-                }
-              }
-            });
-            
-            _dataArr.push(_obj);
-
-            var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
-            if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
-          });
-
-          var bEdit = hasRole(ownProps.modifyRole);
-          return {
-            bEdit: bEdit,
-            _dataArr: _dataArr,
-            _allPostId: _allPostId,
-            _postArr: _postArr,
-            //fields: fields,
-            monthList: monthList,
-            metaItemList: metaItemList,
+          return{
+            isLoading: false,
+            allPost : allPost,
+            refetchAllMenuData : data.refetch,
             _statusCount: _statusCount,
-            refetchAllMenuData: data.refetch
           }
-            debugger
       } else { 
         return {
           isLoading: true
