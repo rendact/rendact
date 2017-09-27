@@ -11,16 +11,14 @@ import {
   goHome,
   theLogo
 } from './Theme/includes';
-import {riques} from '../utils';
 import Query from '../admin/query';
-import {setSearchQuery, setSearchResults, maskArea, setListOfWidgets} from '../actions';
+import {gql, graphql} from 'react-apollo'
 
 class ThemeSearch extends React.Component {
 	constructor(props){
     super(props);
 
     this.theMenu = this.theMenu.bind(this);
-    this.loadPosts = this.loadPosts.bind(this);
     this.goHome = goHome.bind(this);
     this.theBreadcrumb = theBreadcrumb.bind(this);
     this.theLogo = theLogo.bind(this);
@@ -33,43 +31,12 @@ class ThemeSearch extends React.Component {
       return <Menu goHome={this.goHome}/>
 	}
 
-  loadPosts(query){
-    this.props.dispatch(maskArea(true))
-    riques(Query.searchPost(query), (error, response, body) => {
-      if(!error){
-        let byTitle = body.data.viewer.titleQuery.edges.map(item => item.node)
-        let byContent = body.data.viewer.contentQuery.edges.map(item => item.node)
-        let results = _.unionBy(byTitle, byContent, 'id')
-        this.props.dispatch(setSearchResults(results));
-        this.props.dispatch(maskArea(false))
-      }
-    });
-  }
-
-  componentWillReceiveProps(props){
-    if(!this.props.query){
-      this.props.dispatch(setSearchQuery(props.params.search))
-    } else if(this.props.query !== props.params.search) {
-      this.loadPosts(props.params.search)
-    }
-  }
 
   componentDidMount(){
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
 		require('../theme/'+c.path+'/css/style.css');
 		require('../theme/'+c.path+'/functions.js');
-  }
-
-  componentWillMount(){
-    riques(Query.getListOfWidget, (error, response, body) => { 
-      if (!error && !body.errors && response.statusCode === 200) {
-        this.props.dispatch(setListOfWidgets(JSON.parse(body.data.getOptions.value)));
-      } else {
-        console.log(error, body.errors)
-      }
-    });
-    this.loadPosts(this.props.query||this.props.params.search);
   }
 
   render(){
@@ -89,14 +56,136 @@ class ThemeSearch extends React.Component {
   }
 }
 
+let query = gql`
+  query ($query: String!){
+    viewer {
+      titleQuery: allPosts (where: {title: {like: $query}}) {
+        edges {
+          node {
+            id
+            title
+            content
+            slug
+            author {username}
+            status
+            meta {
+              edges {
+                node {id, item, value}
+              }
+            }
+            category {
+              edges {
+                node {id category { id, name } }
+              }
+            }
+            tag {
+              edges {
+                node { tag { id, name } }
+              }
+            }
+            comments {
+              edges{
+                node{id,content,name,email,website}
+              }
+            }
+            file {
+              edges {
+                node{id,value}
+              }
+            }
+            featuredImage
+            createdAt
+          }
+        }
+      }
+    contentQuery: allPosts (where: {content: {like: $query}}) {
+        edges {
+          node {
+            id
+            title
+            content
+            slug
+            author {username}
+            status
+            meta {
+              edges {
+                node {id, item, value}
+              }
+            }
+            category {
+              edges {
+                node {id category { id, name } }
+              }
+            }
+            tag {
+              edges {
+                node { tag { id, name } }
+              }
+            }
+            comments {
+              edges{
+                node{id,content,name,email,website}
+              }
+            }
+            file {
+              edges {
+                node{id,value}
+              }
+            }
+            featuredImage
+            createdAt
+          }
+        }
+      }
+    }
+  }
+  `
 
-export default ThemeSearch = connect(
+ThemeSearch = graphql(query, {
+  options: (ownProps) => ({
+    variables: {
+      query: "%" + (ownProps.query || ownProps.params.search) + "%"
+    }
+  }),
+  props: ({ownProps, data}) => {
+    if(!data.loading){
+      let byTitle = data.viewer.titleQuery.edges.map(item => item.node)
+      let byContent = data.viewer.contentQuery.edges.map(item => item.node)
+      let results = _.unionBy(byTitle, byContent, 'id')
+      return {
+        results,
+        isProcessing: false,
+        opacity: 1
+      }
+    }
+    return {
+      results: [],
+      isProcessing: true,
+      opacity: 0.4
+    }
+  }
+})(ThemeSearch)
+
+
+ThemeSearch = connect(
   state => {
     return {
       query: state.search.search,
-      results: state.search.results,
-      opacity: state.maskArea.opacity,
-      isProcessing: state.maskArea.isProcessing,
-      listOfWidgets: state.listOfWidgets
   }},
 )(ThemeSearch)
+
+ThemeSearch = graphql(gql`${Query.getListOfWidget.query}`, {
+  props: ({ownProps, data}) => {
+    if(!data.loading){
+      return {
+        listOfWidgets: JSON.parse(data.getOptions.value)
+      }
+    }
+
+    return {
+      listOfWidgets: {}
+    }
+  }
+})(ThemeSearch)
+
+export default ThemeSearch
