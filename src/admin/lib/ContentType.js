@@ -73,6 +73,17 @@ let ContentType = React.createClass({
     }
     return allPosts
   },
+  monthListShape: function() {
+      debugger
+    var monthList = ["all"];
+    _.forEach(this.props.allPost, function(item){
+      var dt = new Date(item.createdAt);
+      var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
+      if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
+    })
+      debugger;
+    return monthList
+  },
   processDataShape: function(allPosts) {
     let me = this;
     var metaItemList = _.map(this.props.customFields, function(item) { return item.id });
@@ -159,7 +170,6 @@ let ContentType = React.createClass({
         var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
         if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
       });
-
       var bEdit = hasRole(me.props.modifyRole);
       me.table.loadData(_dataArr, bEdit);
       me.props.dispatch(setMonthList(monthList))
@@ -389,6 +399,7 @@ let ContentType = React.createClass({
     this.props.dispatch(setStatusCounter(props._statusCount))
     let allPosts = this.filterByStatus(props.postListStatus, props.allPost)
     this.processDataShape(allPosts)
+    //this.monthListShape(allPosts)
 
     // if(props._allPostId.length && !this.props._allPostId.length){
     //   this.loadData("All");
@@ -433,7 +444,7 @@ let ContentType = React.createClass({
                     <div className="col-xs-12">
                       <div style={{marginTop: 10, marginBottom: 20}}>
                           <select className="btn select" id="dateFilter" name="dateFilter" onChange={this.handleDateFilter} style={{marginRight:10,height:35}}>
-                            {this.props.monthList.map(function(item){
+                            {this.monthListShape().map(function(item){
                               if (item==="all")
                                 return (<option key="0" value="">Show all months</option>);
                               var s = item.split("/");
