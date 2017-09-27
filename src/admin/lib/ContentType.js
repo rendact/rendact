@@ -213,9 +213,9 @@ let ContentType = React.createClass({
       return sMonth === monthFilter
     })
   },
-  loadData: function(postListStatus, monthFilter){
+  loadData: function(allPost, postListStatus, monthFilter){
     this.props.dispatch(setStatusCounter(this.props._statusCount))
-    let allPosts = this.filterByStatus(postListStatus, this.props.allPost)
+    let allPosts = this.filterByStatus(postListStatus, allPost)
     allPosts = this.filterByMonth(monthFilter, allPosts)
     this.processDataShape(allPosts)
   },
@@ -236,7 +236,7 @@ let ContentType = React.createClass({
       me.props.refetchAllMenuData().then(function() {
         
       })
-      me.loadData("All");
+      //me.loadData("All");
     })
 
     // swalert('warning','Sure want to delete?','Be sure before continue!',
@@ -265,7 +265,7 @@ let ContentType = React.createClass({
     let listOfData = this.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(idList).query}`})
     listOfData.then(function() {
       me.props.refetchAllMenuData().then(function() {
-        me.loadData("Trash");
+        //me.loadData("Trash");
       })
     })
 
@@ -294,7 +294,7 @@ let ContentType = React.createClass({
     let listOfData = this.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(me.props.allPostId).query}`})
     listOfData.then(function() {
       me.props.refetchAllMenuData().then(function() {
-        me.loadData("All");
+        //me.loadData("All");
       })
     })
 
@@ -324,7 +324,7 @@ let ContentType = React.createClass({
     let listOfData = this.props.client.mutate({mutation: gql`${Query.recoverPostQry(idList).query}`})
     listOfData.then(function() {
       me.props.refetchAllMenuData().then(function() {
-        me.loadData("Trash");
+        //me.loadData("Trash");
       })
     })
    
@@ -418,7 +418,8 @@ let ContentType = React.createClass({
   // },
   componentWillReceiveProps(props){
     console.log(props.monthFilter)
-    this.loadData(props.postListStatus, props.monthFilter)
+    this.props.dispatch(setStatusCounter(props._statusCount))
+    this.loadData(props.allPost, props.postListStatus, props.monthFilter)
   },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
