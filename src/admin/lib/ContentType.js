@@ -20,6 +20,7 @@ let ContentType = React.createClass({
     errorMsg: React.PropTypes.string,
     loadingMsg: React.PropTypes.string,
     monthList: React.PropTypes.arrayOf(React.PropTypes.string),
+    monthFilter: React.PropTypes.arrayOf(React.PropTypes.string),
     deleteMode: React.PropTypes.bool,
     statusList: React.PropTypes.arrayOf(React.PropTypes.string),
     statusCount: React.PropTypes.object,
@@ -37,6 +38,7 @@ let ContentType = React.createClass({
       isProcessing: false,
       opacity: 1,
       monthList: [],
+      monthFilter: [],
       _allPostId: [],
       _dataArr: [],
       bEdit: false,
@@ -64,7 +66,6 @@ let ContentType = React.createClass({
     } ;
   },
   filterByStatus: function(status, allPost) {
-    debugger
     let allPosts
     let statusAll = _.filter(allPost, item => item.status !== "Trash")
     if (status === "All") {
@@ -160,6 +161,7 @@ let ContentType = React.createClass({
         var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
         if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
       });
+        debugger
       var bEdit = hasRole(me.props.modifyRole);
       me.table.loadData(_dataArr, bEdit);
       //me.props.dispatch(setMonthList(monthList))
@@ -206,6 +208,7 @@ let ContentType = React.createClass({
       var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
       sMonth === me.props.monthFilter
     })
+    return allPosts
   },
   loadData: function(postListStatus){
     this.props.dispatch(setStatusCounter(this.props._statusCount))
@@ -405,17 +408,13 @@ let ContentType = React.createClass({
       return this.props.statusCount[status]
     else return 0;
   },
+  // componentWillReceiveProps(props){
+  //   this.props.dispatch(setStatusCounter(props._statusCount))
+  //   let allPosts = this.filterByStatus(props.postListStatus, props.allPost)
+  //   this.processDataShape(allPosts)
+  // },
   componentWillReceiveProps(props){
-    this.props.dispatch(setStatusCounter(props._statusCount))
-    let allPosts = this.filterByStatus(props.postListStatus, props.allPost)
-    this.processDataShape(allPosts)
-
-    // if(props._allPostId.length && !this.props._allPostId.length){
-    //   this.loadData("All");
-    //   this.table.loadData(props._dataArr, props.bEdit);
-    //   this.props.dispatch(setStatusCounter(props._statusCount))
-    //   this.props.dispatch(initContentList(props.monthList, props._allPostId))
-    // }
+    this.loadData(props.postListStatus)
   },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
