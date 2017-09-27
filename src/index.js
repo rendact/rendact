@@ -21,6 +21,8 @@ import gql from 'graphql-tag'
 import _ from 'lodash'
 import request from 'request';
 import Loading from './admin/Loading';
+import 'jquery-ui/ui/core';
+import 'bootstrap/dist/css/bootstrap.css';
 const store = createStore(reducer, {})
 
 let Main = React.createClass({
@@ -32,7 +34,7 @@ let Main = React.createClass({
 	getDefaultProps: function() {
   	return {
 			logged: localStorage.getItem("token")?true:false,
-			checkAuthDone: false,
+			checkAuthDone: localStorage.getItem("token")?false:true,
       pathname: 'admin'
 		}
  	},
@@ -136,7 +138,6 @@ Main = graphql(getUserQry, {
   props: ({ownProps, data}) => {
   	
   	if (data.error) {
-      debugger
   		return {
         logged: false,
         error: data.error,

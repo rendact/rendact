@@ -4,8 +4,6 @@ import NotFound from '../../admin/NotFound';
 import {saveConfig} from '../../utils';
 import {getTemplateComponent, theTitle, theContent, theExcerpt, theMenu, 
 				theLogo, theImage, thePagination} from './includes'
-import 'jquery-ui/ui/core';
-import 'bootstrap/dist/css/bootstrap.css';
 import Loading from '../../admin/Loading';
 import _ from 'lodash';
 import {aboutUsWidget, contactUsWidget, recentPostWidget} from '../widgets';
