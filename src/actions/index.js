@@ -400,12 +400,6 @@ export const setSearchQuery = (search) => ({
   search
 })
 
-export const setSearchResults = (results) => ({
-  type: 'SET_SEARCH_RESULTS',
-  results
-})
-
-
 /* 
  * ADMIN ACTIONS
  */
@@ -442,9 +436,8 @@ export const setActiveMenuId = (menuId) => ({
  * THEME ACTIONS
  */
 
- export const setPaginationPage = (latestPosts, page) => ({
-  type: 'SET_PAGINATION_PAGE',
-  latestPosts, 
+ export const setActivePageOnPagination = (page) => ({
+  type: 'SET_ACTIVE_PAGE',
   page
  })
 

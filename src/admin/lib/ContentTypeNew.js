@@ -550,6 +550,10 @@ let NewContentTypeParent = React.createClass({
     console.log("nextProps", props)
     this.initializeData(props)
 
+    if (_.isEmpty(props.urlParams) && !_.isEmpty(this.props.urlParams)){
+      this.props.toggleCreate(true)
+    }
+
     if ((this.props.isLoadPost && !props.isLoadPost)){
       disableForm(false, this.notification)
       props.dispatch(maskArea(false))

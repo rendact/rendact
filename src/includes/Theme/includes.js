@@ -79,7 +79,7 @@ export function theMenu(items, onClickHandler){
 
 export function theLogo(onClickHandler){
 	return <div className="logo">
-		<a href="#" onClick={onClickHandler}><h1>Rend<span>act</span></h1></a>
+		<Link to="/"><h1>Rend<span>act</span></h1></Link>
 	</div>
 }
 

@@ -9,7 +9,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import Loading from '../../admin/Loading';
 import _ from 'lodash';
 import {aboutUsWidget, contactUsWidget, recentPostWidget} from '../widgets';
-import {setPaginationPage} from '../../actions';
+import {setActivePageOnPagination} from '../../actions';
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo';
 import {connect} from 'react-redux'
@@ -157,26 +157,34 @@ class HomeWithLatestPost extends React.Component{
   constructor(props){
     super(props)
     this.handlePageClick = this.handlePageClick.bind(this)
+    this.postSliced = this.postSliced.bind(this)
   }
+
 	handlePageClick(e){
 		var page = 1;
 		if (e.target.text==="«")
-			page = this.props.activePage - 1;
+			page = this.props.activePage - 1 || this.props.activePage;
 		else if (e.target.text==="»")
-			page = this.props.activePage + 1;
+			page = this.props.activePage + 1 || this.props.activePage;
 		else 
 			page = parseInt(e.target.text, 10);
-		var start = (this.props.postPerPage * page) - this.props.postPerPage;
-		var latestPosts = _.slice(this.props.allPosts, start, start+this.props.postPerPage);
-		this.props.dispatch(setPaginationPage(latestPosts, page))
+    this.props.dispatch(setActivePageOnPagination(page))
 	}
+
+  postSliced(){
+    let page = this.props.activePage 
+    let start = (this.props.postPerPage * page) - this.props.postPerPage
+    return _.slice(this.props.allPosts, start, start+this.props.postPerPage);
+  }
+
   render(){
-    return <HomeParent {...this.props} data={this.props.latestPosts} handlePageClick={this.handlePageClick}/>
+    return <HomeParent {...this.props} data={this.postSliced()} handlePageClick={this.handlePageClick}/>
   }
 }
 
 HomeWithLatestPost.defaultProps = {
-  postPerPage: 5
+  postPerPage: 5,
+  activePage: 1
 }
 
 const mapStateToProps = function(state){
@@ -197,7 +205,6 @@ HomeWithLatestPost = graphql(getPostList, {
 
       return {
         allPosts: _postArr, 
-        latestPosts: _.slice(_postArr, 0, pagePerPost), 
         pageCount: _postArr.length/pagePerPost,
         isSlugExist: slugFound!==null,
       }
@@ -262,7 +269,6 @@ ThemeHome = graphql(qry, {
   	}
 
     if (data.viewer) {
-      var _dataArr = [];
 
       _.forEach(data.viewer.allOptions.edges, function(item){
         saveConfig(item.node.item, item.node.value);
