@@ -32,7 +32,7 @@ let Main = React.createClass({
 	getDefaultProps: function() {
   	return {
 			logged: localStorage.getItem("token")?true:false,
-			checkAuthDone: false,
+			checkAuthDone: true,
       pathname: 'admin'
 		}
  	},
@@ -136,6 +136,7 @@ Main = graphql(getUserQry, {
   props: ({ownProps, data}) => {
   	
   	if (data.error) {
+      debugger
   		return {
         logged: false,
         error: data.error,
@@ -155,7 +156,8 @@ Main = graphql(getUserQry, {
         profileData: null
       }
     }
-  }
+  },
+  skip: !localStorage.getItem('token')
 })(Main);
 
 Main = DragDropContext(HTML5Backend)(Main);
