@@ -266,7 +266,8 @@ ThemeHome = graphql(qry, {
   		}
   	}
 
-    if (data.viewer) {
+    if (!data.loading) {
+      debugger
 
       _.forEach(data.viewer.allOptions.edges, function(item){
         saveConfig(item.node.item, item.node.value);
