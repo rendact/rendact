@@ -418,6 +418,7 @@ let ContentType = React.createClass({
   // },
   componentWillReceiveProps(props){
     console.log(props.monthFilter)
+    this.props.dispatch(setStatusCounter(props._statusCount))
     this.loadData(props.allPost, props.postListStatus, props.monthFilter)
   },
   componentDidMount: function(){
