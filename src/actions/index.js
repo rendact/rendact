@@ -400,12 +400,6 @@ export const setSearchQuery = (search) => ({
   search
 })
 
-export const setSearchResults = (results) => ({
-  type: 'SET_SEARCH_RESULTS',
-  results
-})
-
-
 /* 
  * ADMIN ACTIONS
  */
