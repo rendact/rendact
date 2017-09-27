@@ -20,7 +20,7 @@ let ContentType = React.createClass({
     errorMsg: React.PropTypes.string,
     loadingMsg: React.PropTypes.string,
     monthList: React.PropTypes.arrayOf(React.PropTypes.string),
-    monthFilter: React.PropTypes.arrayOf(React.PropTypes.string),
+    monthFilter: React.PropTypes.string,
     deleteMode: React.PropTypes.bool,
     statusList: React.PropTypes.arrayOf(React.PropTypes.string),
     statusCount: React.PropTypes.object,
@@ -38,7 +38,6 @@ let ContentType = React.createClass({
       isProcessing: false,
       opacity: 1,
       monthList: [],
-      monthFilter: [],
       _allPostId: [],
       _dataArr: [],
       bEdit: false,
@@ -46,6 +45,7 @@ let ContentType = React.createClass({
       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
       replaceStatusWithRole: false,
       activeStatus: "",
+      monthFilter: "all"
     }
   },
   dt: null,
@@ -161,7 +161,6 @@ let ContentType = React.createClass({
         var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
         if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
       });
-        debugger
       var bEdit = hasRole(me.props.modifyRole);
       me.table.loadData(_dataArr, bEdit);
       //me.props.dispatch(setMonthList(monthList))
@@ -179,6 +178,7 @@ let ContentType = React.createClass({
   handleDateFilter: function(event){
     let monthFilter = event.currentTarget.value;
     this.props.dispatch(setMonthFilter(monthFilter));
+    
 
     // this.disableForm(true);
     // var status = this.props.activeStatus;
@@ -201,19 +201,22 @@ let ContentType = React.createClass({
     //   te.disableForm(false);
     // } ;
   },
-  filterByMonth: function(allPosts) {
+  filterByMonth: function(monthFilter, allPosts) {
     var me = this
-    var allPosts = _.filter(allPosts, function(item){
+    if (monthFilter === "all"){
+      return allPosts
+    }
+
+    return _.filter(allPosts, function(item){
       var dt = new Date(item.createdAt);
       var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
-      sMonth === me.props.monthFilter
+      return sMonth === monthFilter
     })
-    return allPosts
   },
-  loadData: function(postListStatus){
+  loadData: function(postListStatus, monthFilter){
     this.props.dispatch(setStatusCounter(this.props._statusCount))
     let allPosts = this.filterByStatus(postListStatus, this.props.allPost)
-    allPosts = this.filterByMonth(allPosts)
+    allPosts = this.filterByMonth(monthFilter, allPosts)
     this.processDataShape(allPosts)
   },
   disableForm: function(isFormDisabled){
@@ -414,7 +417,8 @@ let ContentType = React.createClass({
   //   this.processDataShape(allPosts)
   // },
   componentWillReceiveProps(props){
-    this.loadData(props.postListStatus)
+    console.log(props.monthFilter)
+    this.loadData(props.postListStatus, props.monthFilter)
   },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
@@ -454,7 +458,7 @@ let ContentType = React.createClass({
                           <select className="btn select" id="dateFilter" name="dateFilter" onChange={this.handleDateFilter} style={{marginRight:10,height:35}}>
                             {this.monthListShape().map(function(item){
                               if (item==="all")
-                                return (<option key="0" value="">Show all months</option>);
+                                return (<option key="0" value="all">Show all months</option>);
                               var s = item.split("/");
                               var monthList = Fn.getMonthList();
                               var month = monthList[parseInt(s[1],10)-1];
