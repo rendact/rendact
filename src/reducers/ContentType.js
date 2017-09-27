@@ -11,8 +11,8 @@ const contentType = (state = INITIAL_VALUES, action) => {
   console.log(action.type)
   switch (action.type) {
 
-    case 'SET_MONTH_LIST':
-      return state.map(item =>  ({...item, monthList: action.monthList}))
+    case 'SET_MONTH_FILTER':
+      return state.map(item =>  ({...item, monthFilter: action.monthFilter}))
 
     case 'SET_POST_LIST_STATUS':
       return state.map(item =>  ({...item, postListStatus: action.postListStatus}))

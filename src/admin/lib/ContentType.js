@@ -8,7 +8,7 @@ import Halogen from 'halogen'
 import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle, swalert, getValue, disableForm} from '../../utils'
 import {Table, SearchBoxPost, DeleteButtons} from './Table'
 import {connect} from 'react-redux'
-import {setStatusCounter, initContentList, setloadData, maskArea, toggleDeleteMode, toggleSelectedItemState, setPostListStatus, setMonthList} from '../../actions'
+import {setStatusCounter, initContentList, setloadData, maskArea, toggleDeleteMode, toggleSelectedItemState, setPostListStatus, setMonthFilter} from '../../actions'
 import {graphql, withApollo} from 'react-apollo';
 import gql from 'graphql-tag';
 
@@ -64,6 +64,7 @@ let ContentType = React.createClass({
     } ;
   },
   filterByStatus: function(status, allPost) {
+    debugger
     let allPosts
     let statusAll = _.filter(allPost, item => item.status !== "Trash")
     if (status === "All") {
@@ -72,17 +73,6 @@ let ContentType = React.createClass({
       allPosts = _.filter(allPost, item => item.status === status)
     }
     return allPosts
-  },
-  monthListShape: function() {
-      debugger
-    var monthList = ["all"];
-    _.forEach(this.props.allPost, function(item){
-      var dt = new Date(item.createdAt);
-      var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
-      if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
-    })
-      debugger;
-    return monthList
   },
   processDataShape: function(allPosts) {
     let me = this;
@@ -172,13 +162,55 @@ let ContentType = React.createClass({
       });
       var bEdit = hasRole(me.props.modifyRole);
       me.table.loadData(_dataArr, bEdit);
-      me.props.dispatch(setMonthList(monthList))
+      //me.props.dispatch(setMonthList(monthList))
       //me.disableForm(false);
   },
+  monthListShape: function() {
+    var monthList = ["all"];
+    _.forEach(this.props.allPost, function(item){
+      var dt = new Date(item.createdAt);
+      var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
+      if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
+    })
+    return monthList
+  },
+  handleDateFilter: function(event){
+    let monthFilter = event.currentTarget.value;
+    this.props.dispatch(setMonthFilter(monthFilter));
 
+    // this.disableForm(true);
+    // var status = this.props.activeStatus;
+    // if (status==='Trash'){
+    //   var me = this;
+    //   this.loadData("Trash", function(){
+    //   this.props.dispatch(toggleDeleteMode(status, true));
+    //   this.disableForm(false);
+    //   });
+    // }else{
+    //   var date = getValue("dateFilter");
+    //   var searchValue = { 6: date };
+    //   var te = this;
+    //   this.loadData(status)
+    //   te.props.dispatch(toggleDeleteMode(status, false));
+    //   te.dt.columns([6]).every( function () {
+    //     this.search( searchValue[this.index()] ).draw();
+    //     return null;
+    //   })
+    //   te.disableForm(false);
+    // } ;
+  },
+  filterByMonth: function(allPosts) {
+    var me = this
+    var allPosts = _.filter(allPosts, function(item){
+      var dt = new Date(item.createdAt);
+      var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
+      sMonth === me.props.monthFilter
+    })
+  },
   loadData: function(postListStatus){
     this.props.dispatch(setStatusCounter(this.props._statusCount))
     let allPosts = this.filterByStatus(postListStatus, this.props.allPost)
+    allPosts = this.filterByMonth(allPosts)
     this.processDataShape(allPosts)
   },
   disableForm: function(isFormDisabled){
@@ -310,28 +342,6 @@ let ContentType = React.createClass({
     $(".menu-item").removeClass("active");
     $("#menu-posts-new").addClass("active");
   },
-  handleDateFilter: function(event){
-    this.disableForm(true);
-    var status = this.props.activeStatus;
-    if (status==='Trash'){
-      var me = this;
-      this.loadData("Trash", function(){
-      this.props.dispatch(toggleDeleteMode(status, true));
-      this.disableForm(false);
-      });
-    }else{
-      var date = getValue("dateFilter");
-      var searchValue = { 6: date };
-      var te = this;
-      this.loadData(status)
-      te.props.dispatch(toggleDeleteMode(status, false));
-      te.dt.columns([6]).every( function () {
-        this.search( searchValue[this.index()] ).draw();
-        return null;
-      })
-      te.disableForm(false);
-    } ;
-  },
   handleSetOwnerButton: function(e){
     var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     if (checkedRow.length > 1) {
@@ -399,7 +409,6 @@ let ContentType = React.createClass({
     this.props.dispatch(setStatusCounter(props._statusCount))
     let allPosts = this.filterByStatus(props.postListStatus, props.allPost)
     this.processDataShape(allPosts)
-    //this.monthListShape(allPosts)
 
     // if(props._allPostId.length && !this.props._allPostId.length){
     //   this.loadData("All");
