@@ -32,7 +32,7 @@ let Main = React.createClass({
 	getDefaultProps: function() {
   	return {
 			logged: localStorage.getItem("token")?true:false,
-			checkAuthDone: true,
+			checkAuthDone: false,
       pathname: 'admin'
 		}
  	},
