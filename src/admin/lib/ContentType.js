@@ -293,10 +293,25 @@ let ContentType = React.createClass({
     // );
   },
   handleEmptyTrash: function(event){
+    // var me = this;
+    // swalert('warning','Sure want to empty trash?','You might lost some data forever!',
+    // function () {
+    //   let listOfData = me.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(me.props.allPostId).query}`})
+    //   var he = me;
+    //   me.disableForm(true);
+    //   listOfData.then(function() {
+    //     he.props.refetchAllMenuData().then(function() {
+    //       he.disableForm(false);
+    //     })
+    //   })
+    // });
+
     var me = this;
     swalert('warning','Sure want to empty trash?','You might lost some data forever!',
     function () {
-      let listOfData = me.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(me.props.allPostId).query}`})
+      let statusTrash = _.filter(me.props.allPost, item => item.status === "Trash")
+      var idList = _.map(statusTrash, function(item){ return item.id});
+      let listOfData = me.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(idList).query}`})
       var he = me;
       me.disableForm(true);
       listOfData.then(function() {
@@ -305,7 +320,6 @@ let ContentType = React.createClass({
         })
       })
     });
-
     // swalert('warning','Sure want to empty trash?','You might lost some data forever!',
     //   function () {
     //     me.disableForm(true);
