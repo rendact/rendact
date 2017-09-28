@@ -157,11 +157,7 @@ export const Table = React.createClass({
   componentDidMount: function(){
   	var datatable = $('#'+this.props.id).DataTable({sDom: '<"H"r>t<"F"ip>'}); 
   	this.datatable = datatable;
-    $("#" + this.props.id).on('click', '.titleText', (e) => {
-      e.preventDefault()
-      let postId = e.currentTarget.id.split("-")[1]
-      this.props.handleViewPost(postId)
-    })
+    $("#" + this.props.id).on('click', '.titleText', this.props.handleTextTitleClick)
   },
   render: function(){
   	return (

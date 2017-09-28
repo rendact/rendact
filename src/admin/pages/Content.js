@@ -115,18 +115,13 @@ let Content = React.createClass({
   handleViewPage: function(postId){
     this.props.handleNav('content','edit', postId);
   },
-  onAfterTableLoad: function(){
-    var me = this;
-    var linkFn = function(event){
-      event.preventDefault();
-      var postId = this.id.split("-")[1];
-      me.handleViewPage(postId);
-    }
-    var titles = document.getElementsByClassName('contentName');
-    _.forEach(titles, function(item){
-      item.addEventListener("click", linkFn);
-    });
+
+  handleTextTitleClick: function(event) {
+    event.preventDefault()
+    var postId = event.currentTarget.id.split("-")[1];
+    this.handleViewPage(postId)
   },
+
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
     this.table = this.refs.rendactTable;
@@ -173,7 +168,7 @@ let Content = React.createClass({
                     <Table 
                       id="contentList"
                       columns={[
-                        {id: 'name', label: "Content Type Name", type: "link", width: 250, cssClass: "contentName"},
+                        {id: 'name', label: "Content Type Name", type: "link", width: 250, cssClass: "titleText"},
                         {id: 'slug', label: "Slug", width: 50},
                         {id: 'fields', label: "Fields", width: 250},
                         {id: 'status', label: "Status", textAlign:"center"},
@@ -184,6 +179,7 @@ let Content = React.createClass({
                       onSelectAll={this.checkDynamicButtonState}
                       onCheckBoxClick={this.checkDynamicButtonState}
                       onAfterLoad={this.onAfterTableLoad}
+                      handleTextTitleClick={this.handleTextTitleClick}
                     />
                   </div>
                 </div>

@@ -308,6 +308,13 @@ let ContentType = React.createClass({
   handleViewPost: function(postId){
     this.props.handleNav(this.props.slug,'edit', postId);
   },
+
+  handleTextTitleClick: function(e){
+    e.preventDefault()
+    let postId = e.currentTarget.id.split("-")[1]
+    this.handleViewPost(postId)
+  },
+
   isOwner: function(){
     var p = JSON.parse(localStorage.getItem("profile"));
     var roles = p["roles"];
@@ -409,7 +416,7 @@ let ContentType = React.createClass({
                           onSelectAll={this.checkDynamicButtonState}
                           onCheckBoxClick={this.checkDynamicButtonState}
                           style={{opacity: this.props.opacity}}
-                          handleViewPost={this.handleViewPost}
+                          handleTextTitleClick={this.handleTextTitleClick}
                         />
                   </div>
                 </div>
