@@ -321,7 +321,10 @@ let ContentType = React.createClass({
   },
   componentWillReceiveProps(props){
     this.props.dispatch(setStatusCounter(props._statusCount))
-    this.loadData(props.allPost, props.postListStatus, props.monthFilter)
+    debugger
+    if(props.allPost!==this.props.allPost){
+      this.loadData(props.allPost, props.postListStatus, props.monthFilter)
+    }
   },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
