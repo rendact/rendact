@@ -182,6 +182,7 @@ let PageLoader = React.createClass({
   getDefaultProps: function() {
     return { 
       page: 'dashboard',
+    pageId: 'dashboard',
       action: '',
       postId: '',
       configLoaded: false,
@@ -485,7 +486,7 @@ let Admin = React.createClass({
       );
     } else {
       return (
-        <Loading />
+        null
       )
     }
   }

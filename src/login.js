@@ -76,7 +76,7 @@ class Login extends React.Component{
 		var me = this;
 		var pathname = 'admin';
 		try {
-			pathname = this.props.location.state.from.pathname;
+			pathname = this.props.referrer;
 		} catch(e) {}
 
 		this.props.doLogin({"variables": {

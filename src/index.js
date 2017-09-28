@@ -60,13 +60,14 @@ let Main = React.createClass({
 								render={ function(props){
 							    return this.props.logged ? (
 							      <Redirect to={{
-							        pathname: "/"+this.props.pathname,
+							        pathname: this.props.referrer,
 							        state: { from: props.location }
 							      }}
 							      	{...props} 
 							      />
 							    ) : (
 							      <Login logged={this.props.logged} 
+                      referrer={this.props.referrer}
 							      	onlogin={this.setLogged} 
 							      	{...props}
 							      />
@@ -85,7 +86,7 @@ let Main = React.createClass({
 	}
 })
 
-const mapStateToProps = function(state){
+const mapStateToProps = function(state, ownProps){
 	if (!_.isEmpty(state.main)) {
 		return state.main;
 	} else return {}
