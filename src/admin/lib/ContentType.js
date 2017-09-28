@@ -178,28 +178,6 @@ let ContentType = React.createClass({
   handleDateFilter: function(event){
     let monthFilter = event.currentTarget.value;
     this.props.dispatch(setMonthFilter(monthFilter));
-    
-
-    // this.disableForm(true);
-    // var status = this.props.activeStatus;
-    // if (status==='Trash'){
-    //   var me = this;
-    //   this.loadData("Trash", function(){
-    //   this.props.dispatch(toggleDeleteMode(status, true));
-    //   this.disableForm(false);
-    //   });
-    // }else{
-    //   var date = getValue("dateFilter");
-    //   var searchValue = { 6: date };
-    //   var te = this;
-    //   this.loadData(status)
-    //   te.props.dispatch(toggleDeleteMode(status, false));
-    //   te.dt.columns([6]).every( function () {
-    //     this.search( searchValue[this.index()] ).draw();
-    //     return null;
-    //   })
-    //   te.disableForm(false);
-    // } ;
   },
   filterByMonth: function(monthFilter, allPosts) {
     var me = this
@@ -228,120 +206,63 @@ let ContentType = React.createClass({
   },
   handleDeleteBtn: function(event){
     var me = this;
-    var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
-    var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
-    
-    let listOfData = this.props.client.mutate({mutation: gql`${Query.deletePostQry(idList).query}`})
-    listOfData.then(function() {
-      me.props.refetchAllMenuData().then(function() {
-        
+    swalert('warning','Sure want to delete?','Be sure before continue!',
+    function () {
+      var checkedRow = document.querySelectorAll("input."+me.props.slug+"ListCb:checked");
+      var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});   
+      let listOfData = me.props.client.mutate({mutation: gql`${Query.deletePostQry(idList).query}`})
+      var he = me;
+      me.disableForm(true);
+      listOfData.then(function() {
+        he.props.refetchAllMenuData().then(function() {
+          he.disableForm(false);
+        })
       })
-      //me.loadData("All");
-    })
-
-    // swalert('warning','Sure want to delete?','Be sure before continue!',
-    // function () {
-    //   me.disableForm(true);
-    //   riques(Query.deletePostQry(idList), 
-    //     function(error, response, body) {
-    //       if (!error && !body.errors && response.statusCode === 200) {
-    //         var here = me;
-    //         var cb = function(){here.disableForm(false)}
-    //         me.loadData("All");
-    //       } else {
-    //         errorCallback(error, body.errors?body.errors[0].message:null);
-    //         me.disableForm(false);
-    //       }
-    //     }
-    //   );
-    // });
+    });
   },
   handleDeletePermanent: function(event){
-    var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     var me = this;
-    var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
-
-
-    let listOfData = this.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(idList).query}`})
-    listOfData.then(function() {
-      me.props.refetchAllMenuData().then(function() {
-        //me.loadData("Trash");
+    swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
+    function () {
+      var checkedRow = document.querySelectorAll("input."+me.props.slug+"ListCb:checked");
+      var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
+      let listOfData = me.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(idList).query}`})
+      var he = me;
+      me.disableForm(true);
+      listOfData.then(function() {
+        he.props.refetchAllMenuData().then(function() {
+          he.disableForm(false);
+        })
       })
-    })
-
-
-    // swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
-    //   function () {
-    //     me.disableForm(true);
-    //     riques(Query.deletePostPermanentQry(idList), 
-    //       function(error, response, body) {
-    //         if (!error && !body.errors && response.statusCode === 200) {
-    //           var here = me;
-    //           var cb = function(){here.disableForm(false)}
-    //           me.loadData("Trash", cb);
-    //         } else {
-    //           errorCallback(error, body.errors?body.errors[0].message:null);
-    //           me.disableForm(false);
-    //         }
-    //       }
-    //     );
-    //   }
-    // );
+    });
   },
   handleEmptyTrash: function(event){
     var me = this;
-
-    let listOfData = this.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(me.props.allPostId).query}`})
-    listOfData.then(function() {
-      me.props.refetchAllMenuData().then(function() {
-        //me.loadData("All");
+    swalert('warning','Sure want to empty trash?','You might lost some data forever!',
+    function () {
+      let statusTrash = _.filter(me.props.allPost, item => item.status === "Trash")
+      var idList = _.map(statusTrash, function(item){ return item.id});
+      let listOfData = me.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(idList).query}`})
+      var he = me;
+      me.disableForm(true);
+      listOfData.then(function() {
+        he.props.refetchAllMenuData().then(function() {
+          he.disableForm(false);
+        })
       })
-    })
-
-
-    // swalert('warning','Sure want to empty trash?','You might lost some data forever!',
-    //   function () {
-    //     me.disableForm(true);
-    //     riques(Query.deletePostPermanentQry(me.props.allPostId), 
-    //       function(error, response, body) {
-    //         if (!error && !body.errors && response.statusCode === 200) {
-    //           var here = me;
-    //           var cb = function(){here.disableForm(false)}
-    //           me.loadData("Trash", cb);
-    //         } else {
-    //           errorCallback(error, body.errors?body.errors[0].message:null);
-    //           me.disableForm(false);
-    //         }
-    //       }
-    //     );
-    // })
+    });
   },
   handleRecover: function(event){
     var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     var me = this;
     var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
-
     let listOfData = this.props.client.mutate({mutation: gql`${Query.recoverPostQry(idList).query}`})
+    this.disableForm(true);
     listOfData.then(function() {
       me.props.refetchAllMenuData().then(function() {
-        //me.loadData("Trash");
+        me.disableForm(false);
       })
     })
-   
-      // this.disableForm(true);
-      // riques(Query.recoverPostQry(idList), 
-      //   function(error, response, body) {
-      //     if (!error && !body.errors && response.statusCode === 200) {
-      //       console.log(JSON.stringify(body, null, 2));
-      //       var here = me;
-      //       var cb = function(){here.disableForm(false)}
-      //       me.loadData("Trash", cb);
-      //     } else {
-      //       errorCallback(error, body.errors?body.errors[0].message:null);
-      //       me.disableForm(false);
-      //     }
-      //   }
-      // );
   },
   handleAddNewBtn: function(event) {
     this.props.handleNav(this.props.slug,'new');
@@ -411,11 +332,6 @@ let ContentType = React.createClass({
       return this.props.statusCount[status]
     else return 0;
   },
-  // componentWillReceiveProps(props){
-  //   this.props.dispatch(setStatusCounter(props._statusCount))
-  //   let allPosts = this.filterByStatus(props.postListStatus, props.allPost)
-  //   this.processDataShape(allPosts)
-  // },
   componentWillReceiveProps(props){
     console.log(props.monthFilter)
     this.props.dispatch(setStatusCounter(props._statusCount))
