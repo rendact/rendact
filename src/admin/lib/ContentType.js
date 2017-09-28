@@ -313,27 +313,13 @@ let ContentType = React.createClass({
     var roles = p["roles"];
     return _.indexOf("Owner", roles) > -1;
   },
-  onAfterTableLoad: function(){
-    var me = this;
 
-    var postLink = function(event){
-      event.preventDefault();
-      var postId = this.id.split("-")[1];
-      me.handleViewPost(postId);
-    }
-
-    var titles = document.getElementsByClassName('titleText');
-    _.forEach(titles, function(item){
-      item.addEventListener('click',postLink);
-    });
-  },
   getStatusCount: function(status){
     if (this.props.statusCount && this.props.statusCount[status])
       return this.props.statusCount[status]
     else return 0;
   },
   componentWillReceiveProps(props){
-    console.log(props.monthFilter)
     this.props.dispatch(setStatusCounter(props._statusCount))
     this.loadData(props.allPost, props.postListStatus, props.monthFilter)
   },
@@ -422,8 +408,8 @@ let ContentType = React.createClass({
                           ref="rendactTable"
                           onSelectAll={this.checkDynamicButtonState}
                           onCheckBoxClick={this.checkDynamicButtonState}
-                          onAfterLoad={this.onAfterTableLoad}
                           style={{opacity: this.props.opacity}}
+                          handleViewPost={this.handleViewPost}
                         />
                   </div>
                 </div>

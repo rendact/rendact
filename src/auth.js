@@ -19,7 +19,6 @@ let MatchWhenAuthorized = React.createClass({
     }
   },
   componentWillMount: function(){
-    debugger
     if(!this.props.logged){
       this.props.dispatch({
         type: 'SET_REFERRER',

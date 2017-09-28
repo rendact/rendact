@@ -153,13 +153,15 @@ export const Table = React.createClass({
 	    });
 	  }
 
-	  if (me.props.onAfterLoad){
-	  	me.props.onAfterLoad.call();
-	  }
   },
   componentDidMount: function(){
   	var datatable = $('#'+this.props.id).DataTable({sDom: '<"H"r>t<"F"ip>'}); 
   	this.datatable = datatable;
+    $("#" + this.props.id).on('click', '.titleText', (e) => {
+      e.preventDefault()
+      let postId = e.currentTarget.id.split("-")[1]
+      this.props.handleViewPost(postId)
+    })
   },
   render: function(){
   	return (
