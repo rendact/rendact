@@ -21,6 +21,8 @@ import gql from 'graphql-tag'
 import _ from 'lodash'
 import request from 'request';
 import Loading from './admin/Loading';
+import 'jquery-ui/ui/core';
+import 'bootstrap/dist/css/bootstrap.css';
 const store = createStore(reducer, {})
 
 let Main = React.createClass({
@@ -32,21 +34,12 @@ let Main = React.createClass({
 	getDefaultProps: function() {
   	return {
 			logged: localStorage.getItem("token")?true:false,
-			checkAuthDone: false,
+			checkAuthDone: localStorage.getItem("token")?false:true,
       pathname: 'admin'
 		}
  	},
 	setLogged(state, pathname){
 		this.props.dispatch(setLogged(state, pathname))
-		if (!state) {
-			localStorage.removeItem('token');
-	    localStorage.removeItem('userId');
-	    localStorage.removeItem('profile');
-	    localStorage.removeItem('loginType');
-	    localStorage.removeItem('auth0_profile');
-	    localStorage.removeItem('config');
-	    request({url: 'https://rendact.auth0.com/v2/logout'});
-		}
 	},
 	render(){
 		return (
@@ -136,7 +129,6 @@ Main = graphql(getUserQry, {
   props: ({ownProps, data}) => {
   	
   	if (data.error) {
-      debugger
   		return {
         logged: false,
         error: data.error,
