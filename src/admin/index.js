@@ -40,6 +40,7 @@ import {toggleControlSidebarState, toggleUnsavedDataState, setActivePage, setAct
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo';
 import {connect} from 'react-redux'
+import request from 'request';
 
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -444,8 +445,17 @@ let Admin = React.createClass({
       }
     );
   },
-  handleSignout(){
+  handleSignout(e){
+    e.preventDefault()
     this.props.onlogin(false, 'login');
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('profile');
+    localStorage.removeItem('loginType');
+    localStorage.removeItem('auth0_profile');
+    localStorage.removeItem('config');
+    request({url: 'https://rendact.auth0.com/v2/logout'});
+    window.location.reload()
   },
   render() {
     if (this.props.logged && this.props.configLoaded) {

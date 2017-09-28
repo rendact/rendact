@@ -40,15 +40,6 @@ let Main = React.createClass({
  	},
 	setLogged(state, pathname){
 		this.props.dispatch(setLogged(state, pathname))
-		if (!state) {
-			localStorage.removeItem('token');
-	    localStorage.removeItem('userId');
-	    localStorage.removeItem('profile');
-	    localStorage.removeItem('loginType');
-	    localStorage.removeItem('auth0_profile');
-	    localStorage.removeItem('config');
-	    request({url: 'https://rendact.auth0.com/v2/logout'});
-		}
 	},
 	render(){
 		return (
