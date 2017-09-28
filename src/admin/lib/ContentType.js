@@ -228,17 +228,19 @@ let ContentType = React.createClass({
   },
   handleDeleteBtn: function(event){
     var me = this;
-    var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
-    var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
-    
-    let listOfData = this.props.client.mutate({mutation: gql`${Query.deletePostQry(idList).query}`})
-    listOfData.then(function() {
-      me.props.refetchAllMenuData().then(function() {
-        
+    swalert('warning','Sure want to delete?','Be sure before continue!',
+    function () {
+      var checkedRow = document.querySelectorAll("input."+me.props.slug+"ListCb:checked");
+      var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});   
+      let listOfData = me.props.client.mutate({mutation: gql`${Query.deletePostQry(idList).query}`})
+      var he = me;
+      me.disableForm(true);
+      listOfData.then(function() {
+        he.props.refetchAllMenuData().then(function() {
+          he.disableForm(false);
+        })
       })
-      //me.loadData("All");
-    })
-
+    });
     // swalert('warning','Sure want to delete?','Be sure before continue!',
     // function () {
     //   me.disableForm(true);
@@ -257,18 +259,20 @@ let ContentType = React.createClass({
     // });
   },
   handleDeletePermanent: function(event){
-    var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     var me = this;
-    var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
-
-
-    let listOfData = this.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(idList).query}`})
-    listOfData.then(function() {
-      me.props.refetchAllMenuData().then(function() {
-        //me.loadData("Trash");
+    swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
+    function () {
+      var checkedRow = document.querySelectorAll("input."+me.props.slug+"ListCb:checked");
+      var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
+      let listOfData = me.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(idList).query}`})
+      var he = me;
+      me.disableForm(true);
+      listOfData.then(function() {
+        he.props.refetchAllMenuData().then(function() {
+          he.disableForm(false);
+        })
       })
-    })
-
+    });
 
     // swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
     //   function () {
@@ -290,14 +294,17 @@ let ContentType = React.createClass({
   },
   handleEmptyTrash: function(event){
     var me = this;
-
-    let listOfData = this.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(me.props.allPostId).query}`})
-    listOfData.then(function() {
-      me.props.refetchAllMenuData().then(function() {
-        //me.loadData("All");
+    swalert('warning','Sure want to empty trash?','You might lost some data forever!',
+    function () {
+      let listOfData = me.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(me.props.allPostId).query}`})
+      var he = me;
+      me.disableForm(true);
+      listOfData.then(function() {
+        he.props.refetchAllMenuData().then(function() {
+          he.disableForm(false);
+        })
       })
-    })
-
+    });
 
     // swalert('warning','Sure want to empty trash?','You might lost some data forever!',
     //   function () {
@@ -320,11 +327,11 @@ let ContentType = React.createClass({
     var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
     var me = this;
     var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
-
     let listOfData = this.props.client.mutate({mutation: gql`${Query.recoverPostQry(idList).query}`})
+    this.disableForm(true);
     listOfData.then(function() {
       me.props.refetchAllMenuData().then(function() {
-        //me.loadData("Trash");
+        me.disableForm(false);
       })
     })
    
