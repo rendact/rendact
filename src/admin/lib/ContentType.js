@@ -320,7 +320,6 @@ let ContentType = React.createClass({
     var roles = p["roles"];
     return _.indexOf("Owner", roles) > -1;
   },
-
   getStatusCount: function(status){
     if (this.props.statusCount && this.props.statusCount[status])
       return this.props.statusCount[status]
@@ -328,10 +327,13 @@ let ContentType = React.createClass({
   },
   componentWillReceiveProps(props){
     this.props.dispatch(setStatusCounter(props._statusCount))
-    debugger
     if(props.allPost!==this.props.allPost){
       this.loadData(props.allPost, props.postListStatus, props.monthFilter)
     }
+  },
+  componentWillMount: function(){
+    //this.props.dispatch(setMonthFilter("all"));
+    this.props.dispatch(setPostListStatus("All"));
   },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
