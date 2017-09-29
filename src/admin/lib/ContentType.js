@@ -167,8 +167,11 @@ let ContentType = React.createClass({
       //me.disableForm(false);
   },
   monthListShape: function() {
+    var postListStatus = this.props.postListStatus;
+    var allPost = this.props.allPost;
+    let allPosts = this.filterByStatus(postListStatus, allPost)
     var monthList = ["all"];
-    _.forEach(this.props.allPost, function(item){
+    _.forEach(allPosts, function(item){
       var dt = new Date(item.createdAt);
       var sMonth = dt.getFullYear() + "/" + (dt.getMonth() + 1);
       if (monthList.indexOf(sMonth)<0) monthList.push(sMonth);
