@@ -332,7 +332,7 @@ let ContentType = React.createClass({
     }
   },
   componentWillMount: function(){
-    //this.props.dispatch(setMonthFilter("all"));
+    this.props.dispatch(setMonthFilter("all"));
     this.props.dispatch(setPostListStatus("All"));
   },
   componentDidMount: function(){
