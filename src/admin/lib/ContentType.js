@@ -54,6 +54,7 @@ let ContentType = React.createClass({
     event.preventDefault();
     this.disableForm(true);
     var status = event.target.text;
+    debugger
     this.props.dispatch(setPostListStatus(status))
     if (status==='Trash'){
       this.loadData("Trash");
@@ -334,6 +335,7 @@ let ContentType = React.createClass({
   },
   componentWillMount: function(){
     this.props.dispatch(setMonthFilter("all"));
+    this.props.dispatch(toggleDeleteMode("All", false));
     this.props.dispatch(setPostListStatus("All"));
   },
   componentDidMount: function(){
