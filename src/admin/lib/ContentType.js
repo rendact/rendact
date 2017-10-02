@@ -220,10 +220,11 @@ let ContentType = React.createClass({
       var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});   
       let listOfData = me.props.client.mutate({mutation: gql`${Query.deletePostQry(idList).query}`})
       var he = me;
-      me.disableForm(true);
+      me.disableFormContentType(true);
       listOfData.then(function() {
         he.props.refetchAllMenuData().then(function() {
-          he.disableForm(false);
+          he.props.dispatch(toggleSelectedItemState(false));
+          he.disableFormContentType(false);
         })
       })
     });
@@ -236,10 +237,11 @@ let ContentType = React.createClass({
       var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
       let listOfData = me.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(idList).query}`})
       var he = me;
-      me.disableForm(true);
+      me.disableFormContentType(true);
       listOfData.then(function() {
         he.props.refetchAllMenuData().then(function() {
-          he.disableForm(false);
+          he.props.dispatch(toggleSelectedItemState(false));
+          he.disableFormContentType(false);
         })
       })
     });
@@ -252,10 +254,11 @@ let ContentType = React.createClass({
       var idList = _.map(statusTrash, function(item){ return item.id});
       let listOfData = me.props.client.mutate({mutation: gql`${Query.deletePostPermanentQry(idList).query}`})
       var he = me;
-      me.disableForm(true);
+      me.disableFormContentType(true);
       listOfData.then(function() {
         he.props.refetchAllMenuData().then(function() {
-          he.disableForm(false);
+          he.props.dispatch(toggleSelectedItemState(false));
+          he.disableFormContentType(false);
         })
       })
     });
@@ -265,10 +268,11 @@ let ContentType = React.createClass({
     var me = this;
     var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
     let listOfData = this.props.client.mutate({mutation: gql`${Query.recoverPostQry(idList).query}`})
-    this.disableForm(true);
+    this.disableFormContentType(true);
     listOfData.then(function() {
       me.props.refetchAllMenuData().then(function() {
-        me.disableForm(false);
+        me.props.dispatch(toggleSelectedItemState(false));
+        me.disableFormContentType(false);
       })
     })
   },

@@ -46,10 +46,12 @@
     "react-router": "https://registry.npmjs.org/react-router/-/react-router-4.0.0-alpha.6.tgz",
     "react-router-scroll": ">=0.3.2",
     "react-select": ">=1.0.0-rc.4",
+    "react-sidebar": "^2.3.2",
     "react-sortable-tree": ">=0.1.19",
     "recompose": "^0.24.0",
     "redux-form": "^7.0.3",
     "request": "^2.81.0",
+    "scroll-to-element": "^2.0.0",
     "subscriptions-transport-ws": ">=0.6.0",
     "sweetalert2": ">=6.4.0"
   },
