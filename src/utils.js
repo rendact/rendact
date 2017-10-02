@@ -225,6 +225,11 @@ export const disableForm = function(state, notif, excludeClass){
   */
 }
 
+export const disableFormContentType = function(state, notif, excludeClass){
+  _.forEach(document.getElementsByTagName('input'), function(el){ if (_.indexOf(excludeClass, el.getAttribute("class"))<0) el.disabled = state;});
+  _.forEach(document.getElementsByTagName('select'), function(el){ if (_.indexOf(excludeClass, el.getAttribute("class"))<0) el.disabled = state;});
+}
+
 export const saveConfig = function(name, value){
   var config = JSON.parse(localStorage.getItem('config'));
   if (config === null ){

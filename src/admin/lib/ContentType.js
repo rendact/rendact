@@ -5,7 +5,7 @@ import Fn from './functions'
 import _ from 'lodash'
 import Notification from 'react-notification-system'
 import Halogen from 'halogen'
-import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle, swalert, getValue, disableForm} from '../../utils'
+import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle, swalert, getValue, disableForm, disableFormContentType} from '../../utils'
 import {Table, SearchBoxPost, DeleteButtons} from './Table'
 import {connect} from 'react-redux'
 import {setStatusCounter, initContentList, setloadData, maskArea, toggleDeleteMode, toggleSelectedItemState, setPostListStatus, setMonthFilter} from '../../actions'
@@ -45,24 +45,25 @@ let ContentType = React.createClass({
       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
       replaceStatusWithRole: false,
       activeStatus: "",
-      monthFilter: "all"
+      monthFilter: "all",
+      itemSelected: false
     }
   },
   dt: null,
 
   handleStatusFilter: function(event){
     event.preventDefault();
-    this.disableForm(true);
+    this.disableFormContentType(true);
     var status = event.target.text;
     this.props.dispatch(setPostListStatus(status))
     if (status==='Trash'){
       this.loadData("Trash");
       this.props.dispatch(toggleDeleteMode(status, true));
-      this.disableForm(false);
+      this.disableFormContentType(false);
     }else{
       this.loadData(status)
       this.props.dispatch(toggleDeleteMode(status, false));
-      this.disableForm(false);
+      this.disableFormContentType(false);
     } ;
   },
   filterByStatus: function(status, allPost) {
@@ -202,6 +203,10 @@ let ContentType = React.createClass({
   },
   disableForm: function(isFormDisabled){
     disableForm(isFormDisabled, this.notification);
+    this.props.dispatch(maskArea(isFormDisabled));
+  },
+  disableFormContentType: function(isFormDisabled){
+    disableFormContentType(isFormDisabled, this.notification);
     this.props.dispatch(maskArea(isFormDisabled));
   },
   isWidgetActive: function(name){
