@@ -1,9 +1,12 @@
 import React from 'react'
 import Header from '../includes/Header'
-import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
-import _ from 'lodash'
+import HeaderMobile from '../includes/HeaderMobile'
 import moment from 'moment';
+import '../css/main.min.css'
+import '../css/style.css'
+import scrollToElement from 'scroll-to-element'
+import {Link} from 'react-router'
 
 const HomeContentWithLatestPost = (props) => (
 <div>
@@ -29,6 +32,7 @@ const HomeContentWithLatestPost = (props) => (
 </div>
 )
 
+
 const HomeContentWithPage = (props) => (
 <div>
   {props.data &&
@@ -40,33 +44,46 @@ const HomeContentWithPage = (props) => (
       </a>
       }
 
-      <div className="single_desc">
         <div dangerouslySetInnerHTML={{__html: props.data.content}} />
-      </div>
     </div>
   </div>
   }
 </div>             
 )
 
+
 const Home = React.createClass({
+  onContactLinkClick: function(e){
+    if (e.target && e.target.nodeName === 'A' && e.target.className === 'button'){
+      e.preventDefault()
+      this._reactInternalInstance._context.history.push('/page/UG9zdDozNzQ=')
+    }
+  },
+
+  onGotoScrollyClick: function(e){
+    if (e.target && e.target.nodeName === 'A' && e.target.className === "goto-next scrolly"){
+      e.preventDefault()
+      scrollToElement("#items", {duration: 2000, offset:0})
+    }
+  },
+
+  componentDidMount: function(){
+    document.body.addEventListener('click', this.onContactLinkClick)
+    document.body.addEventListener('click', this.onGotoScrollyClick)
+  
+  },
 	render: function() {
 		return (
-			<div className="application">
+			<div id="page-wrapper">
 				<Header {...this.props} />	   
-				<div className="container">
-					<div className={this.props.theConfig.frontPage === "latestPost"? "col-md-8 new-section": "col-md-8"}>
 						     {
                    this.props.theConfig.frontPage === 'latestPost' ? 
                      <HomeContentWithLatestPost {...this.props}/>
                      :
                      <HomeContentWithPage {...this.props}/>
 						     }
-					</div>	
-					<Sidebar {...this.props} />
-				  <div className="clearfix"></div>
-				</div>
 				<Footer {...this.props} />	
+        <HeaderMobile {...this.props}/>
 			</div>
 		)
 	}
