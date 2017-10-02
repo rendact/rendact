@@ -1,12 +1,8 @@
 import React from 'react';
 import AdminConfig from '../../admin/AdminConfig';
 import NotFound from '../../admin/NotFound';
-import LostConnection from '../../admin/LostConnection';
-import Query from '../../admin/query';
-import {riques, errorCallback, getValue, setValue, saveConfig, loadConfig} from '../../utils';
-import {getTemplateComponent, theTitle, theContent, theExcerpt, theMenu, 
-				theLogo, theImage, thePagination, theBreadcrumb, loadMainMenu, loadWidgets,
-				getWidgets, goHome} from './includes'
+import {saveConfig} from '../../utils';
+import {getTemplateComponent,    theMenu, theLogo,   theBreadcrumb,  getWidgets, } from './includes'
 import {Menu} from '../Menu.js';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -14,9 +10,7 @@ import Loading from '../../admin/Loading';
 import _ from 'lodash';
 import {searchWidget, topPostWidget, categoriesWidget, archiveWidget, aboutUsWidget, contactUsWidget, recentPostWidget} from '../widgets';
 import Notification from 'react-notification-system';
-import {setPaginationPage} from '../../actions';
-import gql from 'graphql-tag'
-import {graphql} from 'react-apollo';
+import {graphql, gql} from 'react-apollo';
 import {connect} from 'react-redux'
 
 window.config = AdminConfig;
