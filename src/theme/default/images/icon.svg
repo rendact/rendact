@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: CorelDRAW X5 -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xml:space="preserve"
+   width="5.688889in"
+   height="5.688889in"
+   style="clip-rule:evenodd;fill-rule:evenodd;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision"
+   viewBox="0 0 5688.889 5688.889"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="icon2.svg"><metadata
+     id="metadata22"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="943"
+     inkscape:window-height="549"
+     id="namedview20"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="0.87407407"
+     inkscape:cx="135"
+     inkscape:cy="135.00001"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg2" /><defs
+     id="defs4"><style
+       type="text/css"
+       id="style6"><![CDATA[
+    .fil1 {fill:#3A5C88;fill-rule:nonzero}
+    .fil0 {fill:url(#id0);fill-rule:nonzero}
+   ]]></style><radialGradient
+       id="id0"
+       gradientUnits="userSpaceOnUse"
+       cx="1557.86"
+       cy="1581.72"
+       r="1201.45"
+       fx="1557.86"
+       fy="1581.72"><stop
+         offset="0"
+         style="stop-color:#FEFEFE"
+         id="stop9" /><stop
+         offset="1"
+         style="stop-color:#11B2C6"
+         id="stop11" /></radialGradient></defs><g
+     id="Layer_x0020_1"
+     transform="matrix(3.3424728,0,0,3.3326823,-2089.0455,-2229.5645)"><metadata
+       id="CorelCorpID_0Corel-Layer" /><g
+       id="_581505568"><path
+         class="fil0"
+         d="M 1898,825 C 1503,597 998,731 770,1126 c -228,395 -94,900 301,1128 395,228 900,94 1128,-301 228,-395 94,-900 -301,-1128 z"
+         id="path16"
+         style="fill:url(#id0);fill-rule:nonzero"
+         inkscape:connector-curvature="0" /><path
+         class="fil1"
+         d="m 1474,669 c 471,0 853,382 853,853 0,376 -243,694 -580,808 l -73,-95 c -19,-27 -38,-54 -57,-82 -39,-58 -76,-116 -110,-173 -34,-58 -66,-111 -93,-161 -28,-49 -52,-92 -71,-129 -20,-37 -34,-64 -43,-80 -6,7 -16,20 -31,38 -15,18 -33,38 -52,62 -20,23 -40,48 -61,74 -21,26 -40,52 -57,76 -17,25 -32,47 -43,68 -11,21 -17,36 -17,48 0,7 0,15 1,25 0,10 0,21 -1,31 -1,10 -4,19 -8,26 -4,7 -11,11 -20,11 -10,0 -19,-3 -28,-9 -9,-6 -16,-16 -23,-30 -7,-14 -12,-32 -15,-55 -4,-23 -6,-52 -6,-86 0,-22 7,-49 20,-79 14,-31 31,-64 54,-99 79,-125 438,-762 476,-759 74,5 123,-18 177,41 14,15 20,32 20,52 0,20 -7,44 -22,73 -14,29 -30,56 -47,82 -20,31 -193,261 -219,294 73,-13 137,-34 193,-64 55,-30 102,-63 140,-100 38,-37 66,-75 85,-116 19,-40 28,-77 28,-112 0,-34 -9,-63 -26,-87 -17,-23 -39,-42 -65,-57 -26,-15 -55,-25 -85,-32 -31,-7 -60,-10 -88,-10 -53,0 -107,7 -160,22 -53,14 -105,34 -154,58 -49,25 -95,54 -138,87 -43,33 -80,68 -111,105 -32,37 -56,75 -74,114 -18,39 -27,77 -27,114 0,20 2,36 6,49 4,13 9,23 14,30 6,9 13,16 21,21 8,7 15,14 20,18 4,5 7,9 9,13 2,4 0,6 -7,6 -21,0 -42,-5 -63,-14 -21,-9 -40,-24 -56,-44 -16,-20 -30,-46 -40,-77 -156,-464 887,-886 1183,-407 209,338 -334,621 -588,590 11,16 27,39 47,71 20,32 44,68 71,109 27,41 57,85 90,132 16,22 33,44 49,67 133,197 183,242 284,159 74,-60 177,-183 216,-264 52,-107 85,-226 85,-353 0,-430 -349,-779 -779,-779 -430,0 -779,349 -779,779 0,430 349,779 779,779 47,0 93,-4 138,-12 l 49,66 c -60,13 -123,21 -187,21 -471,0 -853,-382 -853,-853 0,-471 382,-853 853,-853 z"
+         id="path18"
+         inkscape:connector-curvature="0"
+         style="fill:#3a5c88;fill-rule:nonzero" /></g></g></svg>
