@@ -29,9 +29,51 @@ let Content = React.createClass({
       itemSelected: false
     }
   },
-  loadData: function(type, callback) {
+
+  // loadData: function(type, callback) {
+  //   var me = this;
+  //   var qry = Query.getContentListQry();
+  //   var fixedContent = {
+  //     "postId": "fixed",
+  //     "name": "Posts",
+  //     "slug": "post",
+  //     "fields": this._fieldTemplate(AdminConfig.PostFields),
+  //     "status": "active",
+  //     "createdAt": null
+  //   }
+
+  //   riques(qry, 
+  //     function(error, response, body) { 
+  //       if (body.data) { 
+  //         var _dataArr = [fixedContent];
+
+  //         _.forEach(body.data.viewer.allContents.edges, function(item){
+  //           var dt = new Date(item.node.createdAt);
+            
+  //           _dataArr.push({
+  //             "postId": item.node.id,
+  //             "name": item.node.name,
+  //             "fields": me._fieldTemplate(item.node.fields),
+  //             "slug": item.node.slug?item.node.slug:"",
+  //             "status": item.node.status?item.node.status:"inactive",
+  //             "createdAt": dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate()
+  //           });
+
+  //         });
+
+  //         var bEdit = hasRole('modify-content');
+  //         me.table.loadData(_dataArr, bEdit);
+
+  //         if (callback) callback.call();
+  //       } else {
+  //         errorCallback(error, body.errors?body.errors[0].message:null);
+  //       }
+  //     }
+  //   );
+  // },
+
+  loadData: function(allContents) {
     var me = this;
-    var qry = Query.getContentListQry();
     var fixedContent = {
       "postId": "fixed",
       "name": "Posts",
@@ -40,36 +82,20 @@ let Content = React.createClass({
       "status": "active",
       "createdAt": null
     }
-
-    riques(qry, 
-      function(error, response, body) { 
-        if (body.data) { 
           var _dataArr = [fixedContent];
-
-          _.forEach(body.data.viewer.allContents.edges, function(item){
-            var dt = new Date(item.node.createdAt);
-            
+            var dt = new Date(allContents.createdAt);
             _dataArr.push({
-              "postId": item.node.id,
-              "name": item.node.name,
-              "fields": me._fieldTemplate(item.node.fields),
-              "slug": item.node.slug?item.node.slug:"",
-              "status": item.node.status?item.node.status:"inactive",
+              "postId": allContents.id,
+              "name": allContents.name,
+              "fields": me._fieldTemplate(allContents.fields),
+              "slug": allContents.slug?allContents.slug:"",
+              "status": allContents.status?allContents.status:"inactive",
               "createdAt": dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate()
             });
-
-          });
-
           var bEdit = hasRole('modify-content');
           me.table.loadData(_dataArr, bEdit);
-
-          if (callback) callback.call();
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-      }
-    );
   },
+
   _fieldTemplate: function(arr){
     var fields = "<ul>";
     _.forEach(arr, function(item){ 
@@ -123,7 +149,9 @@ let Content = React.createClass({
     var postId = event.currentTarget.id.split("-")[1];
     this.handleViewPage(postId)
   },
-
+  componentWillReceiveProps(props){
+    this.loadData(props.allContents)
+  },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
     this.table = this.refs.rendactTable;
@@ -203,20 +231,53 @@ const mapStateToProps = function(state){
 Content = connect(mapStateToProps)(Content)
 
 //React-Apollo
-// Content = graphql(gql`${Query.getContentListQry.query}`,{
-//   props: ({ownProps, data}) => {
-//     if (!data.loading) {
-//       let allContents = data.viewer.allContents.edges;
-//       allContents = _.map(allContents, item => item.node)
-//       debugger
-//       return {
-//         isLoading: false,
-//         refetchAll: data.refetch
-//       }
-//     }
-//   }
-// })(Content)
-
-// Content = withApollo(Content)
+let getContentList = gql`
+query getContentList {
+  viewer { 
+    allContents {
+      edges {
+            node {
+              id,
+              name,
+              slug,
+              description,
+              menuIcon,
+              fields,
+              customFields,
+              label,
+              labelSingular,
+              labelAddNew,
+              labelEdit,
+              createdAt,
+              status,
+              connection
+            }
+          }
+    }
+  }
+}
+`
+Content = graphql(getContentList,
+  { 
+    options: props => ({
+      variables: {  },
+    }),
+    props: ({ownProps, data}) => {
+      if (!data.loading) {
+          let allContents = data.viewer.allContents.edges;
+          allContents = _.map(allContents, item => item.node)
+          return{
+            isLoading: false,
+            refetchAllMenuData : data.refetch,
+            allContents: allContents
+          }
+      } else { 
+        return {
+          isLoading: true
+        }
+      }
+    }
+})(Content)
+Content = withApollo(Content)
 
 export default Content;
