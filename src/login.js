@@ -1,7 +1,7 @@
 import React from 'react'
-import AdminLTEinit from './admin/lib/app.js'
 import 'bootstrap/dist/css/bootstrap.css'
 import '../public/css/Login.css'
+import AdminLTEinit from  './admin/lib/app.js'
 //import {setLogged} from './actions'
 import {connect} from 'react-redux'
 import gql from 'graphql-tag'
