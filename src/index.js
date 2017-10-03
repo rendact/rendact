@@ -17,8 +17,6 @@ import gql from 'graphql-tag'
 import isEmpty from 'lodash/isEmpty'
 import Loading from './admin/Loading';
 import Loadable from 'react-loadable'
-import 'jquery-ui/ui/core';
-import 'bootstrap/dist/css/bootstrap.css';
 
 const store = createStore(reducer, {})
 
