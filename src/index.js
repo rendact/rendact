@@ -101,7 +101,7 @@ let Main = React.createClass({
 							    return this.props.logged ? (
 							      <Redirect to={{
 							        pathname: this.props.referrer,
-							        state: { from: props.location }
+							        state: { referrer: props.referrer }
 							      }}
 							      	{...props} 
 							      />
@@ -112,6 +112,7 @@ let Main = React.createClass({
 							      	{...props}
 							      />
 							    )
+
 						  }.bind(this)}/>
 							<Miss component={ThemeHome}/>
 					</div>
@@ -127,7 +128,7 @@ let Main = React.createClass({
 })
 
 const mapStateToProps = function(state, ownProps){
-	if (isEmpty(state.main)) {
+	if (!isEmpty(state.main)) {
 		return state.main;
 	} else return {}
 }

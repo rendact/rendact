@@ -43,8 +43,7 @@ let MatchWhenAuthorized = React.createClass({
 
 const mapStateToProps = function(state){
   if (!_.isEmpty(state.main)) {
-    var out = _.head(state.main);
-    return out;
+    return state.main;
   } else return {}
 }
 
