@@ -1,21 +1,25 @@
 import React from 'react'
 import {render} from 'react-dom'
-import {ApolloProvider,graphql} from 'react-apollo'
-import {BrowserRouter, Match, Miss, Redirect} from 'react-router'
+import {ApolloProvider, graphql} from 'react-apollo'
+import BrowserRouter from 'react-router/BrowserRouter'
+import Match from 'react-router/Match'
+import Miss from 'react-router/Miss'
+import Redirect from 'react-router/Redirect'
 import {MatchWhenAuthorized} from './auth'
 import client from './apollo'
 import reducer from './reducers'
-import {DragDropContext} from 'react-dnd';
+import DragDropContext from 'react-dnd/lib/DragDropContext';
 import HTML5Backend from 'react-dnd-html5-backend';
-import { createStore } from 'redux'
+import  createStore  from 'redux/lib/createStore'
 import {setLogged} from './actions'
 import {connectWithStore } from './utils'
 import gql from 'graphql-tag'
-import _ from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import Loading from './admin/Loading';
 import Loadable from 'react-loadable'
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
+
 const store = createStore(reducer, {})
 
 const Login = Loadable({
@@ -125,7 +129,7 @@ let Main = React.createClass({
 })
 
 const mapStateToProps = function(state, ownProps){
-	if (!_.isEmpty(state.main)) {
+	if (isEmpty(state.main)) {
 		return state.main;
 	} else return {}
 }
