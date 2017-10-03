@@ -5,7 +5,7 @@ import Fn from './functions'
 import _ from 'lodash'
 import Notification from 'react-notification-system'
 import Halogen from 'halogen'
-import {riques, hasRole, errorCallback, getConfig, defaultHalogenStyle, swalert, getValue, disableForm, disableFormContentType} from '../../utils'
+import {hasRole, errorCallback, getConfig, defaultHalogenStyle, swalert, getValue, disableForm, disableFormContentType} from '../../utils'
 import {Table, SearchBoxPost, DeleteButtons} from './Table'
 import {connect} from 'react-redux'
 import {setStatusCounter, initContentList, setloadData, maskArea, toggleDeleteMode, toggleSelectedItemState, setPostListStatus, setMonthFilter} from '../../actions'
@@ -208,6 +208,7 @@ let ContentType = React.createClass({
     this.props.dispatch(maskArea(isFormDisabled));
   },
   isWidgetActive: function(name){
+    debugger
     return _.indexOf(this.props.widgets, name) > -1;
   },
   handleDeleteBtn: function(event){
@@ -286,30 +287,48 @@ let ContentType = React.createClass({
       return;
     }
 
-    this.disableForm(true);
+    //this.disableForm(true);
     var selectedId = checkedRow[0].id.split("-")[1];
-    var qry = Query.setAsOwner(selectedId, this.props.allPostId, "admin");
+    //var qry = Query.setAsOwner(selectedId, this.props.allPostId, "admin");
     var me = this;
     
-    riques(qry, 
-      function(error, response, body){
-        if(!error && !body.errors) {
-          var here = me;
-          me.notif.addNotification({
-              message: 'Role updated',
-              level: 'success',
-              position: 'tr',
-              autoDismiss: 2
-            })
-          here.disableForm(false);
-          here.loadData("All");
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-          me.disableForm(false);
-        }
-        me.notif.removeNotification('saving');
-      }, true
-    );
+    // riques(qry, 
+    //   function(error, response, body){
+    //     if(!error && !body.errors) {
+    //       var here = me;
+    //       me.notif.addNotification({
+    //           message: 'Role updated',
+    //           level: 'success',
+    //           position: 'tr',
+    //           autoDismiss: 2
+    //         })
+    //       here.disableForm(false);
+    //       here.loadData("All");
+    //     } else {
+    //       errorCallback(error, body.errors?body.errors[0].message:null);
+    //       me.disableForm(false);
+    //     }
+    //     me.notif.removeNotification('saving');
+    //   }, true
+    // );
+
+    let setAsOwner = me.props.client.query({query: gql`${Query.setAsOwner(selectedId, this.props.allPostId, "admin").query}`})
+      var he = me;
+      me.disableFormContentType(true);
+      setAsOwner.then(function() {
+        // he.props.refetchAllMenuData().then(function() {
+        //   he.props.dispatch(toggleSelectedItemState(false));
+        //   he.disableFormContentType(false);
+        // })
+        he.notif.addNotification({
+          message: 'Role updated',
+          level: 'success',
+          position: 'tr',
+          autoDismiss: 2
+        })
+        he.disableForm(false);
+        he.loadData("All");
+      })
   },
   checkDynamicButtonState: function(){
     var checkedRow = document.querySelectorAll("input."+this.props.slug+"ListCb:checked");
