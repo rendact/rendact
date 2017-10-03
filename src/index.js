@@ -39,7 +39,7 @@ const ThemeHome = Loadable({
 const ThemeSearch = Loadable({
   loader: () => new Promise((resolve) =>
     require.ensure(['./includes/themeSearch'], () => resolve(require('./includes/themeSearch')),
-	 'themehome')),
+	 'themesearch')),
   loading: () => <Loading/>
 })
 const ThemeBlog = Loadable({
@@ -59,7 +59,7 @@ const ThemeSingle = Loadable({
 const Admin = Loadable({
   loader: () => new Promise((resolve) =>
     require.ensure(['./admin'], () => resolve(require('./admin')),
-	 'themesingle')),
+	 'themeadmin')),
   loading: () => <Loading/>
 })
 

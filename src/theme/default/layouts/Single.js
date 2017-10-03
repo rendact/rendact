@@ -5,6 +5,7 @@ import Footer from '../includes/Footer'
 import Notification from 'react-notification-system';
 import moment from 'moment'
 import CommentForm from '../../../includes/Theme/CommentForm';
+import Halogen from 'halogen'
 
 let Single = React.createClass({
 	componentDidMount: function() {
@@ -24,6 +25,12 @@ let Single = React.createClass({
 				  	<div className="col-md-8">
 				  	 	<div className="blog_box">
 							 	<div className="blog_grid">
+                  {!this.props.loadDone ?
+                  <div style={{left: "50%", top: "50%", position: "relative", margin: "7rem 0"}}>
+                    <Halogen.ClipLoader color="#698a9a"/>
+                  </div>
+                      :
+                      <div>
 							  	<h3 className="wow rollIn animated" data-wow-delay="0.4s">{this.props.postData.title}</h3>
 								  { this.props.postData.imageFeatured &&
 								  <a href="single.html">
@@ -44,6 +51,9 @@ let Single = React.createClass({
 						  		    <div className="clearfix"></div>
 							  	 	</div>
 									</div>
+                </div>
+
+          }
 								</div>
 							</div>
 					  </div>			

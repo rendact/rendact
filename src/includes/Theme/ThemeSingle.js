@@ -1,17 +1,21 @@
 import React from 'react';
 import AdminConfig from '../../admin/AdminConfig';
-import NotFound from '../../admin/NotFound';
 import {saveConfig} from '../../utils';
-import {getTemplateComponent,    theMenu, theLogo,   theBreadcrumb,  getWidgets, } from './includes'
-import {Menu} from '../Menu.js';
+import {getTemplateComponent,    theMenu, theLogo,   theBreadcrumb,   } from './includes'
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
-import Loading from '../../admin/Loading';
 import _ from 'lodash';
 import {searchWidget, topPostWidget, categoriesWidget, archiveWidget, aboutUsWidget, contactUsWidget, recentPostWidget} from '../widgets';
-import Notification from 'react-notification-system';
 import {graphql, gql} from 'react-apollo';
 import {connect} from 'react-redux'
+import Loadable from 'react-loadable'
+
+const NotFound = Loadable({
+  loader: () => new Promise((resolve) =>
+    require.ensure(['../../admin/NotFound'], () => resolve(require('../../admin/NotFound')),
+	 'themenotfound')),
+  loading: () => null
+})
 
 window.config = AdminConfig;
 
@@ -37,7 +41,6 @@ let ThemeSingle = React.createClass({
 
   handlePostClick(e){
 		e.preventDefault();
-		var id = e.currentTarget.id;
 		this._reactInternalInstance._context.history.push('/')
 	},
 
@@ -69,7 +72,7 @@ let ThemeSingle = React.createClass({
 	render() {
 		let Single = getTemplateComponent('single');
 		let SinglePost = <Single 
-											postId={this.props.params.postId} 
+											postId={this.props.params.postId || this.props.params.pageId} 
 											postData={this.props.postData}
 											widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
 											footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
@@ -78,18 +81,14 @@ let ThemeSingle = React.createClass({
 											theBreadcrumb={theBreadcrumb(this.handlePostClick)}
 											theConfig={this.props.config}
 											getWidgets={this.getWidgets}
+                      loadDone={this.props.loadDone}
 										/>;
-		if (!this.props.loadDone) {
-			return <Loading/>
-		} else {
-			if (this.props.params.postId){
-				return SinglePost;
-			} else if (this.props.params.pageId){
-				return <SinglePost postId={this.props.params.pageId} />
-			} else {
-				return <NotFound/>
-			}
-		}
+
+    if (this.props.params.postId || this.props.params.pageId){
+      return SinglePost
+    } else {
+      return <NotFound/>
+    }
 	}
 });
 
@@ -122,7 +121,36 @@ var qry = gql`query ($postId: ID!) {
     meta{edges{node{id,item,value}}},
     createdAt
   }
+}`
 
+ThemeSingle = graphql(qry, {
+	options: (props) => {
+		return { 
+			variables: { 
+				postId: props.params.postId
+			} 
+		}
+	},
+  props: ({ownProps, data}) => {
+  	if (data.error){
+  		return {
+  			isNoConnection: true
+  		}
+  	}
+
+    if (!data.loading) {
+
+      
+      return  {
+      	postData: data.getPost,
+        loadDone: true
+      }
+    } 
+  }
+})(ThemeSingle);
+
+const optQry = gql`
+{
 	viewer {
     allOptions {
       edges {
@@ -152,44 +180,22 @@ var qry = gql`query ($postId: ID!) {
   }  
 }`
 
-ThemeSingle = graphql(qry, {
-	options: (props) => {
-		return { 
-			variables: { 
-				postId: props.params.postId
-			} 
-		}
-	},
+ThemeSingle = graphql(optQry, {
   props: ({ownProps, data}) => {
-  	if (data.error){
-  		return {
-  			isNoConnection: true
-  		}
-  	}
-
-    if (data.viewer) {
-    	var _dataArr = [];
-    	var _postData = [];
-
-    	if (data.getPost){
-    		_postData = data.getPost
-    	} else if (data.viewer.allPosts)
+    if(!data.loading){
 
       _.forEach(data.viewer.allOptions.edges, function(item){
         saveConfig(item.node.item, item.node.value);
       });
 
       var allMenus = data.viewer.allMenus.edges[0];
-      
-      return  {
-      	postData: data.getPost,
+      return {
       	config: JSON.parse(localStorage.getItem('config')),
         mainMenu: allMenus ? allMenus.node : [],
         listOfWidgets: JSON.parse(data.getOptions.value),
-        loadDone: true
       }
-    } 
+    }
   }
-})(ThemeSingle);
+})(ThemeSingle)
 
 export default ThemeSingle;
