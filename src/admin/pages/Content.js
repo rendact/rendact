@@ -7,6 +7,8 @@ import AdminConfig from '../AdminConfig';
 import {Table, SearchBoxPost, DeleteButtons} from '../lib/Table';
 import {connect} from 'react-redux'
 import {maskArea, toggleSelectedItemState} from '../../actions'
+import gql from 'graphql-tag'
+import {graphql, withApollo} from 'react-apollo'
 
 let Content = React.createClass({
   propTypes: {
@@ -199,4 +201,22 @@ const mapStateToProps = function(state){
 }
 
 Content = connect(mapStateToProps)(Content)
+
+//React-Apollo
+// Content = graphql(gql`${Query.getContentListQry.query}`,{
+//   props: ({ownProps, data}) => {
+//     if (!data.loading) {
+//       let allContents = data.viewer.allContents.edges;
+//       allContents = _.map(allContents, item => item.node)
+//       debugger
+//       return {
+//         isLoading: false,
+//         refetchAll: data.refetch
+//       }
+//     }
+//   }
+// })(Content)
+
+// Content = withApollo(Content)
+
 export default Content;

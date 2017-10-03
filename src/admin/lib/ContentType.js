@@ -286,40 +286,12 @@ let ContentType = React.createClass({
       swalert('error','Only one user','Only one user allowed to be an owner');
       return;
     }
-
-    //this.disableForm(true);
     var selectedId = checkedRow[0].id.split("-")[1];
-    //var qry = Query.setAsOwner(selectedId, this.props.allPostId, "admin");
     var me = this;
-    
-    // riques(qry, 
-    //   function(error, response, body){
-    //     if(!error && !body.errors) {
-    //       var here = me;
-    //       me.notif.addNotification({
-    //           message: 'Role updated',
-    //           level: 'success',
-    //           position: 'tr',
-    //           autoDismiss: 2
-    //         })
-    //       here.disableForm(false);
-    //       here.loadData("All");
-    //     } else {
-    //       errorCallback(error, body.errors?body.errors[0].message:null);
-    //       me.disableForm(false);
-    //     }
-    //     me.notif.removeNotification('saving');
-    //   }, true
-    // );
-
-    let setAsOwner = me.props.client.query({query: gql`${Query.setAsOwner(selectedId, this.props.allPostId, "admin").query}`})
+    let setAsOwner = me.props.client.mutate({mutation: gql`${Query.setAsOwner(selectedId, this.props.allPostId, "admin").query}`})
       var he = me;
       me.disableFormContentType(true);
       setAsOwner.then(function() {
-        // he.props.refetchAllMenuData().then(function() {
-        //   he.props.dispatch(toggleSelectedItemState(false));
-        //   he.disableFormContentType(false);
-        // })
         he.notif.addNotification({
           message: 'Role updated',
           level: 'success',
