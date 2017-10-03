@@ -1,6 +1,7 @@
 import ApolloClient from 'apollo-client';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import {createNetworkInterface} from './custom-network-interface';
+import {scapholdUrl} from './rendact.config.json'
 
 function addGraphQLSubscriptions(networkInterface, wsClient) {
   return Object.assign(networkInterface, {
@@ -18,7 +19,6 @@ function addGraphQLSubscriptions(networkInterface, wsClient) {
 
 // creates a subscription ready Apollo Client instance
 
-const scapholdUrl = 'us-west-2.api.scaphold.io/graphql/rendact-fork';
 const graphqlUrl = `https://${scapholdUrl}`;
 const websocketUrl = `wss://${scapholdUrl}`;
 const networkInterface = createNetworkInterface({
