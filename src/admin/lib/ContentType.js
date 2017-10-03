@@ -337,14 +337,13 @@ let ContentType = React.createClass({
   },
   componentWillReceiveProps(props){
     this.props.dispatch(setStatusCounter(props._statusCount))
-      if(props.allPost!==this.props.allPost || props.postListStatus!==this.props.postListStatus || props.monthFilter!==this.props.monthFilter){
+    if(props.allPost!==this.props.allPost || props.postListStatus!==this.props.postListStatus || props.monthFilter!==this.props.monthFilter){
       this.loadData(props.allPost, props.postListStatus, props.monthFilter)
-      }
+    }
   },
   componentWillMount: function(){
-    debugger
     this.props.dispatch(setMonthFilter("all"));
-    if (this.props.postType==="post" || this.props.postType==="page") {
+    if (this.props.postListStatus==="post" || this.props.postType==="page") {
       this.props.dispatch(toggleDeleteMode("All", false));
       this.props.dispatch(setPostListStatus("All"));
     }
