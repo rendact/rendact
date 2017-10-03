@@ -137,8 +137,15 @@ Widgets = connect(mapStateToProps)(Widgets);
 
 let widgetQry = gql`
 query {
-  getOptions(id: "T3B0aW9uczo1NQ==") {
-      value
+  viewer {
+    listOfWidget : allOptions(where: {item: {eq: "listOfWidget"}}) {
+      edges {
+        node {
+          item
+          value
+        }
+      }
+    }
   }
 
   viewer {
@@ -178,8 +185,9 @@ Widgets = graphql(widgetQry, {
     } else {
 
       let allWidgets = data.viewer.allWidgets.edges
+      let listOfWidget = _.head(data.viewer.listOfWidget.edges)
 
-      let _listOfWidget = JSON.parse(data.getOptions.value)
+      let _listOfWidget = JSON.parse(listOfWidget && listOfWidget.node.value) || {}
       
       _listOfWidget = toWidgetAreaStructure(allWidgets, _listOfWidget)
 
