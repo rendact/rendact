@@ -1,0 +1,30 @@
+#header h1 {
+	left: 6em;
+}
+
+#header nav {
+	right: 6em;
+}
+
+#logo > a,
+#titleBar > span > a {
+	color: #E3F6F8;
+	font-size: 1.5em;
+}
+
+#logo > a > span,
+#titleBar > span > a > span {
+	color: #85D5E0;
+	font-weight: 900;
+}
+
+.page-title {
+	text-align: center;
+	margin-top: 20px;
+	font-size: 1.5em;
+	font-weight: bold;
+}
+
+#items .box{
+  background-color: #222d32;
+}

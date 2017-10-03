@@ -4,13 +4,6 @@ import {ApolloProvider,graphql} from 'react-apollo'
 import {BrowserRouter, Match, Miss, Redirect} from 'react-router'
 import {MatchWhenAuthorized} from './auth'
 import client from './apollo'
-import ThemeHome from './includes/Theme/ThemeHome'
-import ThemeSingle from './includes/Theme/ThemeSingle'
-import ThemeBlog from './includes/Theme/ThemeBlog'
-import ThemeSearch from './includes/themeSearch'
-import Admin from './admin'
-import Login from './login'
-import Register from './register'
 import reducer from './reducers'
 import {DragDropContext} from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
@@ -19,11 +12,56 @@ import {setLogged} from './actions'
 import {connectWithStore } from './utils'
 import gql from 'graphql-tag'
 import _ from 'lodash'
-import request from 'request';
 import Loading from './admin/Loading';
+import Loadable from 'react-loadable'
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
 const store = createStore(reducer, {})
+
+const Login = Loadable({
+  loader: () => new Promise((resolve) =>
+    require.ensure(['./login'], () => resolve(require('./login')),
+	 'themehome')),
+  loading: () => <Loading/>
+})
+const Register = Loadable({
+  loader: () => new Promise((resolve) =>
+    require.ensure(['./register'], () => resolve(require('./register')),
+	 'themehome')),
+  loading: () => <Loading/>
+})
+const ThemeHome = Loadable({
+  loader: () => new Promise((resolve) =>
+    require.ensure(['./includes/Theme/ThemeHome'], () => resolve(require('./includes/Theme/ThemeHome')),
+	 'themehome')),
+  loading: () => <Loading/>
+})
+const ThemeSearch = Loadable({
+  loader: () => new Promise((resolve) =>
+    require.ensure(['./includes/themeSearch'], () => resolve(require('./includes/themeSearch')),
+	 'themesearch')),
+  loading: () => <Loading/>
+})
+const ThemeBlog = Loadable({
+  loader: () => new Promise((resolve) =>
+    require.ensure(['./includes/Theme/ThemeBlog'], () => resolve(require('./includes/Theme/ThemeBlog')),
+	 'themehome')),
+  loading: () => <Loading/>
+})
+
+const ThemeSingle = Loadable({
+  loader: () => new Promise((resolve) =>
+    require.ensure(['./includes/Theme/ThemeSingle'], () => resolve(require('./includes/Theme/ThemeSingle')),
+	 'themesingle')),
+  loading: () => <Loading/>
+})
+
+const Admin = Loadable({
+  loader: () => new Promise((resolve) =>
+    require.ensure(['./admin'], () => resolve(require('./admin')),
+	 'themeadmin')),
+  loading: () => <Loading/>
+})
 
 let Main = React.createClass({
 	propTypes: {
