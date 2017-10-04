@@ -164,6 +164,7 @@ let ContentType = React.createClass({
       });
       var bEdit = hasRole(me.props.modifyRole);
       me.table.loadData(_dataArr, bEdit);
+      debugger
   },
   monthListShape: function() {
     var postListStatus = this.props.postListStatus;
@@ -208,7 +209,6 @@ let ContentType = React.createClass({
     this.props.dispatch(maskArea(isFormDisabled));
   },
   isWidgetActive: function(name){
-    debugger
     return _.indexOf(this.props.widgets, name) > -1;
   },
   handleDeleteBtn: function(event){

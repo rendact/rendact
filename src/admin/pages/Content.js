@@ -83,17 +83,20 @@ let Content = React.createClass({
       "createdAt": null
     }
           var _dataArr = [fixedContent];
-            var dt = new Date(allContents.createdAt);
+          _.forEach(allContents, function(item){
+            var dt = new Date(item.createdAt);
             _dataArr.push({
-              "postId": allContents.id,
-              "name": allContents.name,
-              "fields": me._fieldTemplate(allContents.fields),
-              "slug": allContents.slug?allContents.slug:"",
-              "status": allContents.status?allContents.status:"inactive",
+              "postId": item.id,
+              "name": item.name,
+              "fields": me._fieldTemplate(item.fields),
+              "slug": item.slug?item.slug:"",
+              "status": item.status?item.status:"inactive",
               "createdAt": dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate()
             });
+          });
           var bEdit = hasRole('modify-content');
           me.table.loadData(_dataArr, bEdit);
+          debugger
   },
 
   _fieldTemplate: function(arr){
