@@ -1,6 +1,6 @@
 import React from 'react';
 import request from 'request';
-import Config from './config';
+import Config from './rendact.config.json';
 import Query from './admin/query';
 import AdminLTEinit from './admin/lib/app.js';
 import 'bootstrap/dist/css/bootstrap.css';

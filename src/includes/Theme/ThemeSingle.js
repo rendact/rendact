@@ -174,25 +174,24 @@ const optQry = gql`
       }
     }
   }
-
-  getOptions(id: "T3B0aW9uczo1NQ=="){
-     value
-  }  
 }`
 
 ThemeSingle = graphql(optQry, {
   props: ({ownProps, data}) => {
     if(!data.loading){
 
+      saveConfig('listOfWidget', {})
+
       _.forEach(data.viewer.allOptions.edges, function(item){
         saveConfig(item.node.item, item.node.value);
       });
 
       var allMenus = data.viewer.allMenus.edges[0];
+      let listOfWidgets = JSON.parse(JSON.parse(localStorage.getItem('config')).listOfWidget)
       return {
       	config: JSON.parse(localStorage.getItem('config')),
         mainMenu: allMenus ? allMenus.node : [],
-        listOfWidgets: JSON.parse(data.getOptions.value),
+        listOfWidgets,
       }
     }
   }

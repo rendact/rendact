@@ -1,6 +1,6 @@
 import React from 'react';
 import request from 'request';
-import Config from './config';
+import Config from './rendact.config.json';
 import AdminConfig from './admin/AdminConfig';
 import Query from './admin/query';
 import _ from 'lodash';

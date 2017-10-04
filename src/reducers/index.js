@@ -18,7 +18,11 @@ import maskArea from './MaskArea';
 import listOfWidgets from './ListOfWidgets';
 import {themeHome, themeSingle, themeBlog } from './Theme'
 
-const main = (state = {}, action) => {
+const INITIAL_STATE = {
+  referrer: '/admin/dashboard'
+}
+
+const main = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case 'LOGGED':
       return { ...state, logged: action.isLogged, pathname: action.pathname?action.pathname:null}

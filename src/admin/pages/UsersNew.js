@@ -10,7 +10,7 @@ import Halogen from 'halogen';
 
 import Query from '../query';
 import AdminConfig from '../AdminConfig';
-import Config from '../../config';
+import Config from '../../rendact.config.json';
 import {riques, getValue, setValue, errorCallback, disableForm, getConfig, defaultHalogenStyle, swalert} from '../../utils';
 
 var NewUser = React.createClass({

@@ -7,7 +7,7 @@ import {connect} from 'react-redux'
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo';
 import {setProfile} from './utils';
-import Config from './config';
+import Config from './rendact.config.json';
 import Auth0Lock from 'auth0-lock';
 
 class Login extends React.Component{

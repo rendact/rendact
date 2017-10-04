@@ -272,6 +272,10 @@ ThemeHome = graphql(qry, {
         saveConfig(item.node.item, item.node.value);
       });
 
+      if (!JSON.parse(localStorage.getItem('config')).listOfWidget) {
+        saveConfig("listOfWidget", {})
+      }
+
       let listOfWidgets = JSON.parse(JSON.parse(localStorage.getItem('config')).listOfWidget)
 
       var allMenus = data.viewer.allMenus.edges[0];
