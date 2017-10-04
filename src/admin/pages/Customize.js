@@ -4,7 +4,6 @@ import Notification from 'react-notification-system';
 import Halogen from 'halogen';
 import Query from '../query';
 import {disableForm, defaultHalogenStyle} from '../../utils';
-import $ from 'jquery';
 import ColorPicker from 'rc-color-picker';
 import 'rc-color-picker/assets/index.css';
 import {connect} from 'react-redux'
@@ -12,8 +11,6 @@ import {maskArea} from '../../actions'
 import {reduxForm, Field, formValueSelector} from 'redux-form'
 import gql from 'graphql-tag'
 import {graphql, withApollo} from 'react-apollo'
-
-window.$ = $;
 
 let Customize = React.createClass({
 	propTypes: {
@@ -63,7 +60,8 @@ let Customize = React.createClass({
 	},
 	componentDidMount: function(){
 		this.notification = this.refs.notificationSystem;
-		$("body").addClass("sidebar-collapse");
+		var bodyClass= document.getElementById("body").className;
+		document.getElementById("body").className = bodyClass + " " + "sidebar-collapse";
 	},
 	render: function(){
 		return (
