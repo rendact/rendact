@@ -29,49 +29,6 @@ let Content = React.createClass({
       itemSelected: false
     }
   },
-
-  // loadData: function(type, callback) {
-  //   var me = this;
-  //   var qry = Query.getContentListQry();
-  //   var fixedContent = {
-  //     "postId": "fixed",
-  //     "name": "Posts",
-  //     "slug": "post",
-  //     "fields": this._fieldTemplate(AdminConfig.PostFields),
-  //     "status": "active",
-  //     "createdAt": null
-  //   }
-
-  //   riques(qry, 
-  //     function(error, response, body) { 
-  //       if (body.data) { 
-  //         var _dataArr = [fixedContent];
-
-  //         _.forEach(body.data.viewer.allContents.edges, function(item){
-  //           var dt = new Date(item.node.createdAt);
-            
-  //           _dataArr.push({
-  //             "postId": item.node.id,
-  //             "name": item.node.name,
-  //             "fields": me._fieldTemplate(item.node.fields),
-  //             "slug": item.node.slug?item.node.slug:"",
-  //             "status": item.node.status?item.node.status:"inactive",
-  //             "createdAt": dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate()
-  //           });
-
-  //         });
-
-  //         var bEdit = hasRole('modify-content');
-  //         me.table.loadData(_dataArr, bEdit);
-
-  //         if (callback) callback.call();
-  //       } else {
-  //         errorCallback(error, body.errors?body.errors[0].message:null);
-  //       }
-  //     }
-  //   );
-  // },
-
   loadData: function(allContents) {
     var me = this;
     var fixedContent = {
@@ -96,7 +53,6 @@ let Content = React.createClass({
           });
           var bEdit = hasRole('modify-content');
           me.table.loadData(_dataArr, bEdit);
-          debugger
   },
 
   _fieldTemplate: function(arr){
@@ -119,26 +75,20 @@ let Content = React.createClass({
   },
   handleDeleteBtn: function(event){
     var me = this;
-    var checkedRow = document.querySelectorAll("input.contentListCb:checked");
-    var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
     swalert('warning', 'Sure want to delete?', "You might lost some data!",
-      function () {
-        me.disableForm(true);
-        var qry = Query.deleteContentQry(idList);
-        riques(qry, 
-          function(error, response, body) {
-            if (!error && !body.errors && response.statusCode === 200) {
-              var here = me;
-              var cb = function(){here.disableForm(false)}
-              me.loadData("All", cb);
-            } else {
-              errorCallback(error, body.errors?body.errors[0].message:null);
-            }
-            me.disableForm(false);
-          }
-        );
-      }
-    );
+    function () {
+      var checkedRow = document.querySelectorAll("input.contentListCb:checked");
+      var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
+      let listOfData = me.props.client.mutate({mutation: gql`${Query.deleteContentQry(idList).query}`})
+      var he = me;
+      me.disableForm(true);
+      listOfData.then(function() {
+        he.props.refetchAllData().then(function() {
+          he.loadData();
+          he.disableForm(false);
+        })
+      })
+    });
   },
   handleAddNewBtn: function(postId){
     this.props.handleNav('content','new');
@@ -271,7 +221,7 @@ Content = graphql(getContentList,
           allContents = _.map(allContents, item => item.node)
           return{
             isLoading: false,
-            refetchAllMenuData : data.refetch,
+            refetchAllData : data.refetch,
             allContents: allContents
           }
       } else { 

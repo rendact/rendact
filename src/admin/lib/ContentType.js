@@ -164,7 +164,6 @@ let ContentType = React.createClass({
       });
       var bEdit = hasRole(me.props.modifyRole);
       me.table.loadData(_dataArr, bEdit);
-      debugger
   },
   monthListShape: function() {
     var postListStatus = this.props.postListStatus;
