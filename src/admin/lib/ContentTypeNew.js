@@ -883,7 +883,7 @@ let NewContentTypeParent = React.createClass({
       }
 
       const processBindingFeaturedImage = () => {
-        if (this.props.mode === "create"){
+        if (this.props.mode === "create" && this.props.featuredImage){
           return new Promise((resolve, reject) => {
               this.props.updateFeaturedImage({
               variables: {
