@@ -180,6 +180,7 @@ var Settings = React.createClass({
     })
 	}, 
 	componentDidMount: function(){
+    debugger
 		this.notification = this.refs.notificationSystem;
 	},
 
@@ -194,7 +195,6 @@ var Settings = React.createClass({
     if(this.props.isLoading && !props.isLoading){
       props.dispatch(maskArea(false))
       disableForm(false)
-      debugger
     }
   },
 
@@ -306,7 +306,6 @@ Settings = graphql(gql`${Query.loadSettingsQry.query}`,{
           mapSettingsWithId[item.node.item] = item.node.id
         }
 			});
-      debugger
 	return {
     isLoading: false,
     initialValues: _data,
