@@ -449,3 +449,48 @@ export const setTab = (tab) => ({
   type: 'SET_TAB',
   tab
 })
+
+/*
+ * ContentNew.js
+ */
+
+export const setprovidedFields = (providedFields) => ({
+  type: 'SET_PROV_FIELDS',
+  providedFields
+})
+
+export const setcustomFields = (customFields) => ({
+  type: 'SET_CUSTOM_FIELDS',
+  customFields
+})
+
+export const setfields = (fields) => ({
+  type: 'SET_FIELDS',
+  fields
+})
+
+export const setcheckingSlug = (checkingSlug) => ({
+  type: 'SET_CHECKING_SLUG',
+  checkingSlug
+})
+
+export const togglecheckingSlug = (checkingSlug, slug)  => ({
+  type: 'TOGGLE_CHECKING_SLUG',
+  checkingSlug,
+  slug
+})
+
+export const NameBlur = (label, labelSingular, labelAddNew, labelEdit)  => ({
+  type: 'NAME_BLUR',
+  label, labelSingular, labelAddNew, labelEdit
+})
+
+export const AddProvidedField = (providedFields, fields)  => ({
+  type: 'ADD_PRO_FIELD',
+  providedFields, fields
+})
+
+export const setmode = (mode)  => ({
+  type: 'SET_MODE',
+  mode
+})
