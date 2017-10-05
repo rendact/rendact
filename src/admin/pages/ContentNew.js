@@ -323,15 +323,19 @@ let ContentNew = React.createClass({
 
 			    			<form onSubmit={this.handleSubmitBtn} id="contentForm" className="form-horizontal">
 			    			<div className="box-header with-border">
-		              <h3 className="box-title">General Info</h3>
-		            </div>
+		              			<h3 className="box-title">General Info</h3>
+		            		</div>
 			    			<div className="box-body">
 
 			    			{ this.props.mode === "update" &&
 			    			<div className="form-group">
 			          	<label htmlFor="fields" className="col-md-3">Content type status</label>
 							  	<div className="col-md-9">
-							  		<div className="checkbox"><label><input type="checkbox" name="status" id="status" value="active" />Content type is active</label></div>
+							  		<div className="checkbox">
+							  			<label>
+							  				<Field component="input" type="checkbox" name="status" id="status" value="active" />Content type is active
+							  			</label>
+							  		</div>
 							  	</div>
 							  </div>
 								}
@@ -387,19 +391,27 @@ let ContentNew = React.createClass({
 							  		<p className="help-block">Select some provided fields for custom content.</p>
 	                  {
 	                  	_.map(this.defaultFields, function(item){
-	                  		return <div key={item.id} className="checkbox"><label><input type="checkbox" name="checkboxField[]" value={item.id} readOnly="true" checked/>{item.label}</label></div>
+	                  		return <div key={item.id} className="checkbox">
+	                  			<label>
+	                  				<Field component="input" type="checkbox" name="checkboxField[]" value={item.id} readOnly="true" checked/>{item.label}
+	                  			</label>
+	                  			</div>
 	                  	})
 	                  }
 	                  {
 	                  	_.map(this.providedFields, function(item){
-	                  		return <div key={item.id} className="checkbox"><label><input type="checkbox" name="checkboxField[]" onChange={this.handleAddProvidedField} value={item.id}/>{item.label}</label></div>
+	                  		return <div key={item.id} className="checkbox">
+	                  		<label>
+	                  			<Field component="input" type="checkbox" name="checkboxField[]" onChange={this.handleAddProvidedField} value={item.id}/>{item.label}
+	                  		</label>
+	                  		</div>
 	                  	}.bind(this))
 	                  }
 	                </div>
 	              </div>
 
 		            <div className="form-group">
-								 	<label htmlFor="fields" className="col-md-3">Custom Fields</label>
+							<label htmlFor="fields" className="col-md-3">Custom Fields</label>
 							  	<div className="col-md-9">
 							  		<p className="help-block">Add some custom fields for custom content.</p>
 							  		<div className="form" >
@@ -408,7 +420,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Field Name</label>
 								  			</div>
 								  			<div className="col-md-9">
-								  				<input type="text" id="field-name" placeholder="Field name" className="form-control"/> 
+								  				<Field component="input" type="text" id="field-name" placeholder="Field name" className="form-control" />
 								  			</div>
 							  			</div>
 
@@ -445,7 +457,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Width</label>
 								  			</div>
 								  			<div className="col-md-9">
-								  				<input type="text" id="field-width" placeholder="Width" className="form-control"/> 
+								  				<Field component="input" type="text" id="field-width" placeholder="Width" className="form-control"/> 
 								  			</div>
 							  			</div>
 												
