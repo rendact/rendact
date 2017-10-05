@@ -1,44 +1,21 @@
 import React from 'react'
 import Header from '../includes/Header'
-import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
-import _ from 'lodash'
 import Loadable from 'react-loadable'
 
-const HomeContentWithLatestPost = Loadable({
+const HomeContent = Loadable({
   loader: () => new Promise((resolve) =>
-    require.ensure(['../includes/HomeContentWithLastestsPost'], () => resolve(require('../includes/HomeContentWithLastestsPost')),
-	 'themehomewithlastestpost')),
+    require.ensure(['../includes/HomeContent'], () => resolve(require('../includes/HomeContent')),
+	 'themehomecontent')),
   loading: () => null
 })
-
-
-const HomeContentWithPage = Loadable({
-  loader: () => new Promise((resolve) =>
-    require.ensure(['../includes/HomeContentWithPage'], () => resolve(require('../includes/HomeContentWithPage')),
-	 'themehomewithpage')),
-  loading: () => null
-})
-
-
 
 const Home = React.createClass({
 	render: function() {
 		return (
 			<div className="application">
 				<Header {...this.props} />	   
-				<div className="container">
-					<div className={this.props.theConfig.frontPage === "latestPost"? "col-md-8 new-section": "col-md-8"}>
-						     {
-                   this.props.theConfig.frontPage === 'latestPost' ? 
-                     <HomeContentWithLatestPost {...this.props}/>
-                     :
-                     <HomeContentWithPage {...this.props}/>
-						     }
-					</div>	
-					<Sidebar {...this.props} />
-				  <div className="clearfix"></div>
-				</div>
+          <HomeContent {...this.props}/>
 				<Footer {...this.props} />	
 			</div>
 		)
