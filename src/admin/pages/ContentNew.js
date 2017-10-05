@@ -5,7 +5,7 @@ import Query from '../query';
 import {riques, getValue, setValue, getFormData, errorCallback, disableForm, swalert} from '../../utils';
 import {connect} from 'react-redux'
 import {loadFormData} from '../../actions'
-import {reduxForm, Field} from 'redux-form'
+import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {maskArea, toggleSelectedItemState, setprovidedFields, setcustomFields, setfields, 
 	setcheckingSlug, togglecheckingSlug, NameBlur, AddProvidedField, setmode} from '../../actions'
 
@@ -36,34 +36,30 @@ let ContentNew = React.createClass({
 		{id:"featuredImage", label: "Featured Image", type: "text"},
 		{id:"gallery", label: "Gallery", type: "text"}
 	],
-
-	// propTypes: {
-	// 	mode: React.PropTypes.string,
-	// 	fields: React.PropTypes.string,
-	// 	providedFields: React.PropTypes.string,
-	// 	customFields: React.PropTypes.array,
-	// 	checkingSlug: React.PropTypes.bool,
-	// 	slug: React.PropTypes.string,
-	// },
-	// getDefaultProps: function() {
-	//     return {
-	//       	mode: this.props.postId?"update":"create",
-	// 		fields: this.defaultFields,
-	// 		providedFields: this.defaultFields,
-	// 		customFields: [],
-	// 		checkingSlug: false,
-	// 		slug: ''
-	//     }
-	// },
-	getInitialState: function(){
-		return {
-			mode: this.props.postId?"update":"create",
-			fields: this.defaultFields,
-			providedFields: this.defaultFields,
+	propTypes: {
+		mode: React.PropTypes.string,
+		fields: React.PropTypes.array,
+		providedFields: React.PropTypes.string,
+		customFields: React.PropTypes.array,
+		checkingSlug: React.PropTypes.bool,
+		slug: React.PropTypes.string,
+	},
+	getDefaultProps: function() {
+		debugger
+	    return {
+	      	//mode: this.props.postId?"update":"create",
+			fields: [
+				{id:"title", label: "Title", type: "link", deletable: false},
+				{id:"slug", label: "Slug", type: "text", deletable: false}
+			],
+			providedFields: [
+				{id:"title", label: "Title", type: "link", deletable: false},
+				{id:"slug", label: "Slug", type: "text", deletable: false}
+			],
 			customFields: [],
 			checkingSlug: false,
 			slug: ''
-		}
+	    }
 	},
 	loadData: function(){
 		if (!this.props.postId) return;
@@ -105,7 +101,7 @@ let ContentNew = React.createClass({
       function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
           var slugCount = body.data.viewer.allContents.edges.length;
-          if (me.state.mode==="create") {
+          if (me.props.mode==="create") {
             if (slugCount > 0) { 
             	// me.setState({checkingSlug: false, slug: slug+"-"+slugCount});
             	me.props.dispatch(togglecheckingSlug(false, slug+"-"+slugCount)); 
@@ -132,16 +128,21 @@ let ContentNew = React.createClass({
     );
   },
   handleNameBlur: function(event) {
-  	debugger
-    var name = getValue("name");
+    // var name = getValue("name");
+    var name = this.props.name;
     var slug = name.split(" ").join("-").toLowerCase();
     setValue("slug", slug);
     this.checkSlug(slug);
 
-    var label = getValue("label");
-    var labelSingular = getValue("labelSingular");
-    var labelAddNew = getValue("labelAddNew");
-    var labelEdit = getValue("labelEdit");
+    // var label = getValue("label");
+    var label = this.props.label;
+    // var labelSingular = getValue("labelSingular");
+    var labelSingular = this.props.labelSingular;
+    // var labelAddNew = getValue("labelAddNew");
+    var labelAddNew = this.props.labelAddNew;
+    // var labelEdit = getValue("labelEdit");
+    var labelEdit = this.props.labelEdit
+
     // this.setState({
     // 	label: label?null:name+"s",
     // 	labelSingular: labelSingular?null:name,
@@ -156,7 +157,8 @@ let ContentNew = React.createClass({
     ));
   },
   handleSlugBlur: function(event) {
-    var slug = getValue("slug");
+    // var slug = getValue("slug");
+    var slug = this.props.slug;
     slug = slug.split(" ").join("-").toLowerCase();
     this.checkSlug(slug);
   },
@@ -164,12 +166,11 @@ let ContentNew = React.createClass({
     disableForm(state, this.notification);
   },
 	handleSubmitBtn: function(event){
-		debugger
 		event.preventDefault();
 		var me = this;
 		var _objData = getFormData('rdt-input-form', 'object');
-		_objData['fields'] = this.state.providedFields;
-		_objData['customFields'] = this.state.customFields;
+		_objData['fields'] = this.props.providedFields;
+		_objData['customFields'] = this.props.customFields;
 
 		var status = "inactive";
 		var statusEl = document.getElementById("status");
@@ -179,7 +180,7 @@ let ContentNew = React.createClass({
 		this.disableForm(true);
 
 		var qry = "";
-	    if (this.state.mode==="create"){
+	    if (this.props.mode==="create"){
 	      qry = Query.createContentMtn(_objData);
 	    }else{
 	      _objData["id"] = this.props.postId;
@@ -212,16 +213,21 @@ let ContentNew = React.createClass({
     })
 		// this.setState({providedFields: providedFields, fields: _.concat(providedFields, this.state.customFields)});
 		this.props.dispatch(setprovidedFields(providedFields));
-		this.props.dispatch(setfields(_.concat(providedFields, this.state.customFields)));
+		this.props.dispatch(setfields(_.concat(providedFields, this.props.customFields)));
 	},
 	handleAddCustomField: function(event){
 		event.preventDefault();
-		var customFields = this.state.customFields;
-		var name = getValue("field-name");
-		var type = getValue("field-type");
-		var width = getValue("field-width");
-		var align = getValue("field-align");
-		var connection = getValue("connection");
+		var customFields = this.props.customFields;
+		// var name = getValue("field-name");
+		var name = this.props.field-name;
+		// var type = getValue("field-type");
+		var type = this.props.field-type;
+		// var width = getValue("field-width");
+		var width = this.props.field-width;
+		// var align = getValue("field-align");
+		var align = this.props.field-align;
+		// var connection = getValue("connection");
+		var connection = this.props.connection;
 
 		if (!name) {
 			swalert('error', 'Invalid value', "Field name can't be  empty!")
@@ -244,13 +250,13 @@ let ContentNew = React.createClass({
 		customFields.push(newField);
 		// this.setState({customFields: customFields, fields: _.concat(this.state.providedFields, customFields)});
 		this.props.dispatch(setcustomFields(customFields));
-		this.props.dispatch(setfields(_.concat(this.state.providedFields, customFields)))
+		this.props.dispatch(setfields(_.concat(this.props.providedFields, customFields)))
 	},
 	handleFieldDelete: function(event){
 		event.preventDefault();
 		var name = event.target.getAttribute("data");
-		var cfields = this.state.customFields;
-		var pfields = this.state.providedFields;
+		var cfields = this.props.customFields;
+		var pfields = this.props.providedFields;
 		
 		var record = _.find(cfields, {label: name});
 		if (record) {
@@ -294,8 +300,8 @@ let ContentNew = React.createClass({
 			<div className="content-wrapper">
 				<div className="container-fluid">
 				<section className="content-header">
-			      <h1>{this.state.mode==="update"?"Edit Content Type":"Add New Content Type"}
-              { this.state.mode==="update" &&
+			      <h1>{this.props.mode==="update"?"Edit Content Type":"Add New Content Type"}
+              { this.props.mode==="update" &&
                 <small style={{marginLeft: 5}}>
                   <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
                 </small>
@@ -321,7 +327,7 @@ let ContentNew = React.createClass({
 		            </div>
 			    			<div className="box-body">
 
-			    			{ this.state.mode === "update" &&
+			    			{ this.props.mode === "update" &&
 			    			<div className="form-group">
 			          	<label htmlFor="fields" className="col-md-3">Content type status</label>
 							  	<div className="col-md-9">
@@ -343,7 +349,7 @@ let ContentNew = React.createClass({
 							  	<div className="col-md-9">
 							  		<div className="form-inline">
 							  			<Field name="slug" component="input" type="text" className="form-control" onBlur={this.handleNameBlur} />
-											{ this.state.checkingSlug && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
+											{ this.props.checkingSlug && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
 											<p className="help-block">ID for the custom content type ( max. 20 characters ). Alphanumeric lower-case characters and underscores only. Min 2 letters. Once added the post type system name cannot be changed.</p>
 										</div>
 									</div>
@@ -472,7 +478,7 @@ let ContentNew = React.createClass({
 										</div>
 										<h4>Current fields</h4>
 										{
-											this.state.fields.map(function(item){
+											this.props.fields.map(function(item){
 												return <ContentField 
 																key={item.label}
 																name={item.label} 
@@ -493,28 +499,28 @@ let ContentNew = React.createClass({
 		            	<div className="form-group">
 									 	<label htmlFor="label" className="col-md-3">Name</label>
 									 	<div className="col-md-9">
-											<Field name="label" component="input" type="text" placeholder={this.state.label} className="form-control" style={{width: 'auto'}} />
+											<Field name="label" component="input" type="text" placeholder={this.props.label} className="form-control" style={{width: 'auto'}} />
 										</div>
 									</div>
 
 									<div className="form-group">
 									 	<label htmlFor="label-singular" className="col-md-3">Singular Name</label>
 									 	<div className="col-md-9">
-											<Field name="labelSingular" component="input" type="text" placeholder={this.state.labelSingular} className="form-control" style={{width: 'auto'}} />
+											<Field name="labelSingular" component="input" type="text" placeholder={this.props.labelSingular} className="form-control" style={{width: 'auto'}} />
 										</div>
 									</div>
 
 									<div className="form-group">
 									 	<label htmlFor="label-add-new" className="col-md-3">Add New</label>
 									 	<div className="col-md-9">
-											<Field name="labelAddNew" component="input" type="text" placeholder={this.state.labelAddNew} className="form-control" style={{width: 'auto'}} />
+											<Field name="labelAddNew" component="input" type="text" placeholder={this.props.labelAddNew} className="form-control" style={{width: 'auto'}} />
 										</div>
 									</div>
 
 									<div className="form-group">
 									 	<label htmlFor="label-edit" className="col-md-3">Edit</label>
 									 	<div className="col-md-9">
-											<Field name="labelEdit" component="input" type="text" placeholder={this.state.labelEdit} className="form-control" style={{width: 'auto'}} />
+											<Field name="labelEdit" component="input" type="text" placeholder={this.props.labelEdit} className="form-control" style={{width: 'auto'}} />
 										</div>
 									</div>
 		            </div>
@@ -522,7 +528,7 @@ let ContentNew = React.createClass({
 								<div className="form-group">
 									<div className="col-md-9">
 										<div className="btn-group">
-											<input type="submit" value={this.state.mode==="update"?"Update":"Add"} className="btn btn-primary btn-sm" />
+											<input type="submit" value={this.props.mode==="update"?"Update":"Add"} className="btn btn-primary btn-sm" />
 										</div>
 									</div>
 								</div>
@@ -538,16 +544,45 @@ let ContentNew = React.createClass({
 	}
 });
 
+// const mapStateToProps = function(state){
+// 	if (!_.isEmpty(state.contentNew)) {
+// 		var out = _.head(state.contentNew);
+// 		out["initialValues"] = out.data;
+// 		return out;
+// 	} else return {}
+// }
+
+// ContentNew = reduxForm({
+//   form: 'newContentForm'
+// })(ContentNew);
+// ContentNew = connect(mapStateToProps)(ContentNew);
+// export default ContentNew;
+
+
+
+const selector = formValueSelector('newContentForm');
+
 const mapStateToProps = function(state){
-	if (!_.isEmpty(state.contentNew)) {
-		var out = _.head(state.contentNew);
-		out["initialValues"] = out.data;
-		return out;
-	} else return {}
+  var customStates = {
+    // title: selector(state, 'title'),
+    // hours: selector(state, 'hours'),
+    // minutes: selector(state, 'minutes'),
+    // summary: selector(state, 'summary'),
+    // titleTag: selector(state, 'titleTag'),
+    // metaKeyword: selector(state, 'metaKeyword'),
+    // metaDescription: selector(state, 'metaDescription')
+    // slug: selector(state, 'slug')
+  }
+
+  if (!_.isEmpty(state.contentNew)) {
+    var out = _.head(state.contentNew);
+    out["initialValues"] = out.data;
+    return _.merge(out, customStates);
+  } else return customStates;
 }
 
 ContentNew = reduxForm({
   form: 'newContentForm'
-})(ContentNew);
+})(ContentNew)
 ContentNew = connect(mapStateToProps)(ContentNew);
 export default ContentNew;
