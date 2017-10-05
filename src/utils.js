@@ -7,6 +7,8 @@ import _ from 'lodash';
 import { default as swal } from 'sweetalert2';
 import {connect} from 'react-redux'
 
+
+
 export const swalert = function(type, title, body, callback, rgba){
   var background = '#fff';
   var buttonColor = '#357ca5';
