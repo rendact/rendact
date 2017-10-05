@@ -12,35 +12,82 @@ import Query from '../query';
 import AdminConfig from '../AdminConfig';
 import Config from '../../rendact.config.json';
 import {riques, getValue, setValue, errorCallback, disableForm, getConfig, defaultHalogenStyle, swalert} from '../../utils';
+import {connect} from 'react-redux'
+import {reduxForm, Field, formValueSelector} from 'redux-form'
+import gql from 'graphql-tag'
+import {graphql, withApollo} from 'react-apollo'
 
-var NewUser = React.createClass({
-	getInitialState: function(){
-		var image = getConfig('rootUrl')+"/images/avatar-default.png";
-		
-		return {
+const required = value => (value ? undefined : 'Required')
+const maxLength = max => value =>
+  value && value.length > max ? `Must be ${max} characters or less` : undefined
+const maxLength15 = maxLength(15)
+export const minLength = min => value =>
+  value && value.length < min ? `Must be ${min} characters or more` : undefined
+export const minLength2 = minLength(2)
+const number = value =>
+  value && isNaN(Number(value)) ? 'Must be a number' : undefined
+const minValue = min => value =>
+  value && value < min ? `Must be at least ${min}` : undefined
+const minValue18 = minValue(18)
+const email = value =>
+  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)
+    ? 'Invalid email address'
+    : undefined
+const facebook = value =>
+	value && !/(?:(?:http|https):\/\/)?(?:www.)?facebook.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/.test(value)
+		? 'Invalid facebook address'
+		: undefined
+const tooOld = value =>
+  value && value > 65 ? 'You might be too old for this' : undefined
+const aol = value =>
+  value && /.+@aol\.com/.test(value)
+    ? 'Really? You still use AOL for your email?'
+    : undefined
+const alphaNumeric = value =>
+  value && /[^a-zA-Z0-9 ]/i.test(value)
+    ? 'Only alphanumeric characters'
+    : undefined
+const phoneNumber = value =>
+  value && !/^(0|[1-9][0-9]{9})$/i.test(value)
+    ? 'Invalid phone number, must be 10 digits'
+    : undefined
+
+const renderField = ({
+  input,
+  label,
+  type,
+  className,
+  style,
+  meta: { touched, error, warning }
+}) =>
+  <div>
+    <input {...input} placeholder={label} type={type} className={className} style={style} />
+    {touched &&
+      ((error &&
+        <p className="help-block" style={{color: "red"}}>
+          {error}
+        </p>) ||
+        (warning &&
+          <p className="help-block" style={{color: "red"}}>
+            {warning}
+          </p>))}
+  </div>
+
+let NewUser = React.createClass({
+	propTypes: {
+    isLoading: React.PropTypes.bool.isRequired,
+    opacity: React.PropTypes.number.isRequired,
+  },
+  getDefaultProps: function() {
+  	var image = getConfig('rootUrl')+"/images/avatar-default.png";
+    return {
+			isLoading: false,
+      opacity: 1,
 			avatar: image,
 			passwordActive: false,
-			mode: this.props.userId?"update":"create",
+			mode: "",
 			roleList: [],
 			userRole: null,
-			classDivUsername:"form-group",
-			classInputUsername:"form-control",
-			classDivName:"form-group",
-			classInputName:"form-control",
-			classDivEmail:"form-group",
-			classInputEmail:"form-control",
-			classDivPhone:"form-group",
-			classInputPhone:"form-control",
-			classDivBio:"form-group",
-			classInputBio:"form-control",
-			classDivWebsite:"form-group",
-			classInputWebsite:"form-control",
-			classDivFacebook:"form-group",
-			classInputFacebook:"form-control",
-			classDivTwitter:"form-group",
-			classInputTwitter:"form-control",
-			classDivLinkedin:"form-group",
-			classInputLinkedin:"form-control",
 			usernameTextBlock:"The short unique name describes you",
 			nameTextBlock:"Your full name",
 			emailTextBlock:"",
@@ -89,7 +136,7 @@ var NewUser = React.createClass({
 		this.setState({dateOfBirth: dateOfBirth});
 		setValue("country", v.country);
 
-		_.forEach(this.state.userMetaList, function(item){
+		_.forEach(this.props.userMetaList, function(item){
 			var i = _.find(v.meta.edges, {"node": {"item": item}});
 			if (i){
 				if (item==="timezone"){
@@ -135,14 +182,14 @@ var NewUser = React.createClass({
 		var username = getValue("username");
 		var email = getValue("email");
 		var gender = getValue("gender");
-		var image = this.state.avatar;
+		var image = this.props.avatar;
 		var bio = getValue("bio");
 		//var birth = getValue("birth");
-		var dateOfBirth = this.state.dateOfBirth;
+		var dateOfBirth = this.props.dateOfBirth;
 		var phone = getValue("phone");
 		var country = getValue("country");
 		//var timezone = getValue("timezone");
-		var timezone = this.state.timezone;
+		var timezone = this.props.timezone;
 		var website = getValue("website");
 		var facebook = getValue("facebook");
 		var twitter = getValue("twitter");
@@ -152,13 +199,13 @@ var NewUser = React.createClass({
     var repassword = getValue("new-password-2");
     var changePassword = false;
 
-    if (this.state.hasErrors) {
+    if (this.props.hasErrors) {
   		swalert('error','Failed!', 'There are some errors in the form')
     	return;
   	}
 
 		var qry = '';
-		if (this.state.mode==="update"){
+		if (this.props.mode==="update"){
 			if (password) {
 	    	if (!oldPassword) {
 	    		swalert('error','Failed!', 'Please fill your old password')
@@ -270,8 +317,8 @@ var NewUser = React.createClass({
 		}
 
 		var role = getValue("role");
-		if (this.state.userRole !== role)
-			this.handleRoleChange(this.state.userRole, role);
+		if (this.props.userRole !== role)
+			this.handleRoleChange(this.props.userRole, role);
 	},
 	handleGeneratePassword: function(event){
 		event.preventDefault();
@@ -319,7 +366,7 @@ var NewUser = React.createClass({
 					me.disableForm(false);
 				}
 				me.notification.removeNotification('saving');
-			}, this.state.isAdmin
+			}, this.props.isAdmin
 		);
 	},
 	handleImageDrop: function(accepted){
@@ -385,22 +432,6 @@ var NewUser = React.createClass({
 	handleAddNewBtn: function(event) {
   	this.resetForm();
 	},
-	_markUsernameError: function(msg){
-		this.setState({
-			classDivUsername: "form-group has-error", 
-			classInputUsername:"form-control form-control-error", 
-			usernameTextBlock:msg,
-			hasErrors: true
-		});
-	},
-	_markUsernameSuccess: function(){
-		this.setState({
-			classDivUsername: "form-group has-success", 
-			classInputUsername: "form-control form-control-success", 
-			usernameTextBlock: "Good to go",
-			hasErrors: false
-		});
-	},
 	checkUsername: function(username){
 		var me = this;
 		if (username.length<4){
@@ -442,22 +473,6 @@ var NewUser = React.createClass({
         }
       }
     );
-	},
-	_markEmailError: function(msg){
-		this.setState({
-			classDivEmail: "form-group has-error", 
-			classInputEmail:"form-control form-control-error", 
-			emailTextBlock:msg,
-			hasErrors: true
-		});
-	},
-	_markEmailSuccess: function(){
-		this.setState({
-			classDivEmail: "form-group has-success", 
-			classInputEmail:"form-control form-control-success", 
-			emailTextBlock:"Good to go",
-			hasErrors: false
-		});
 	},
 	checkEmail: function(email){
 		var me = this;
@@ -508,71 +523,13 @@ var NewUser = React.createClass({
 		}
 
 	},
-	_markNameError: function(msg){
-		this.setState({
-			classDivName: "form-group has-error", 
-			classInputName:"form-control form-control-error", 
-			nameTextBlock:msg,
-			hasErrors: true
-		});
-	},
-	_markNameSuccess: function(){
-		this.setState({
-			classDivName: "form-group has-success", 
-			classInputName: "form-control form-control-success", 
-			nameTextBlock: "Good to go",
-			hasErrors: false
-		});
-	},
-	
 	checkPhone: function(phone){
 		var phoneRegex = /^[0-9-+]+$/;
-		if(!phoneRegex.test(phone)) {
-			this._markPhoneError();
-			return;
-		}
-		else{
-			this._markPhoneSuccess();
-			return;
-		}
-	},
-	_markPhoneError: function(){
-		this.setState({
-			classDivPhone: "form-group has-error", 
-			classInputPhone:"form-control form-control-error", 
-			hasErrors: true
-		});
-	},
-	_markPhoneSuccess: function(){
-		this.setState({
-			classDivPhone: "form-group has-success", 
-			classInputPhone: "form-control form-control-success", 
-			hasErrors: false
-		});
 	},
 	checkBio: function(bio){
 		if(bio.length > 100) {
-			this._markBioError();
-			return;
+			
 		}
-		else{
-			this._markBioSuccess();
-			return;
-		}
-	},
-	_markBioError: function(){
-		this.setState({
-			classDivBio: "form-group has-error", 
-			classInputBio:"form-control form-control-error", 
-			hasErrors: true
-		});
-	},
-	_markBioSuccess: function(){
-		this.setState({
-			classDivBio: "form-group has-success", 
-			classInputBio: "form-control form-control-success", 
-			hasErrors: false
-		});
 	},
 	checkWebsite: function(website){
 		var websiteRegex = /^[a-zA-Z0-9._-]+$/;
@@ -584,22 +541,6 @@ var NewUser = React.createClass({
 			this._markWebsiteSuccess();
 			return;
 		}
-	},
-	_markWebsiteError: function(msg){
-		this.setState({
-			classDivWebsite: "form-group has-error", 
-			classInputWebsite:"form-control form-control-error", 
-			websiteTextBlock:msg,
-			hasErrors: true
-		});
-	},
-	_markWebsiteSuccess: function(){
-		this.setState({
-			classDivWebsite: "form-group has-success", 
-			classInputWebsite: "form-control form-control-success", 
-			websiteTextBlock: "Good to go",
-			hasErrors: false
-		});
 	},
 	checkFacebook: function(facebook){
 		var facebookRegex = /(?:(?:http|https):\/\/)?(?:www.)?facebook.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/;
@@ -613,22 +554,6 @@ var NewUser = React.createClass({
 			return;
 		}
 	},
-	_markFacebookError: function(msg){
-		this.setState({
-			classDivFacebook: "form-group has-error", 
-			classInputFacebook:"form-control form-control-error", 
-			facebookTextBlock:msg,
-			hasErrors: true
-		});
-	},
-	_markFacebookSuccess: function(){
-		this.setState({
-			classDivFacebook: "form-group has-success", 
-			classInputFacebook: "form-control form-control-success", 
-			facebookTextBlock: "Good to go",
-			hasErrors: false
-		});
-	},
 	checkTwitter: function(twitter){	
 		var twitterRegex = /(?:(?:http|https):\/\/)?(?:www.)?twitter.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/;
 		if(!twitterRegex.test(twitter)) {
@@ -639,22 +564,6 @@ var NewUser = React.createClass({
 			this._markTwitterSuccess();
 			return;
 		}
-	},
-	_markTwitterError: function(msg){
-		this.setState({
-			classDivTwitter: "form-group has-error", 
-			classInputTwitter:"form-control form-control-error", 
-			twitterTextBlock:msg,
-			hasErrors: true
-		});
-	},
-	_markTwitterSuccess: function(){
-		this.setState({
-			classDivTwitter: "form-group has-success", 
-			classInputTwitter: "form-control form-control-success", 
-			twitterTextBlock: "Good to go",
-			hasErrors: false
-		});
 	},
 	checkLinkedin: function(linkedin){
 		var linkedinRegex = /(?:(?:http|https):\/\/)?(?:www.)?linkedin.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/;
@@ -667,75 +576,14 @@ var NewUser = React.createClass({
 			return;
 		}
 	},
-	_markLinkedinError: function(msg){
-		this.setState({
-			classDivLinkedin: "form-group has-error", 
-			classInputLinkedin:"form-control form-control-error", 
-			linkedinTextBlock:msg,
-			hasErrors: true
-		});
-	},
-	_markLinkedinSuccess: function(){
-		this.setState({
-			classDivLinkedin: "form-group has-success", 
-			classInputLinkedin: "form-control form-control-success", 
-			linkedinTextBlock: "Good to go",
-			hasErrors: false
-		});
-	},
-	handleUsernameHighlight: function(event){
-		var me = this;
-		var username = getValue("username");		
-		me.checkUsername(username);
-	},
-	handleNameHighlight: function(event){
-		var me = this;
-		var name = getValue("name");		
-		me.checkName(name);
-	},
-	handleEmailHighlight: function(event){
-		var me = this;
-		var email = getValue("email");		
-		me.checkEmail(email);
-	},
-	handlePhoneHighlight: function(event){
-		var me = this;
-		var phone = getValue("phone");		
-		me.checkPhone(phone);
-	},
-	handleBioHighlight: function(event){
-		var me = this;
-		var bio = getValue("bio");		
-		me.checkBio(bio);
-	},
-	handleWebsiteHighlight: function(event){
-		var me = this;
-		var website = getValue("website");		
-		me.checkWebsite(website);
-	},
-	handleFacebookHighlight: function(event){
-		var me = this;
-		var facebook = getValue("facebook");		
-		me.checkFacebook(facebook);
-	},
-	handleTwitterHighlight: function(event){
-		var me = this;
-		var twitter = getValue("twitter");		
-		me.checkTwitter(twitter);
-	},
-	handleLinkedinHighlight: function(event){
-		var me = this;
-		var linkedin = getValue("linkedin");		
-		me.checkLinkedin(linkedin);
-	},
 	render: function(){		
 		return (
 			<div className="content-wrapper">
 				<div className="container-fluid">
 				<section className="content-header" style={{marginBottom:20}}>
 			      <h1>
-			        {this.state.mode==="update"?"Edit User":"Add New User"}
-              { this.state.mode==="update" &&
+			        {this.props.mode==="update"?"Edit User":"Add New User"}
+              { this.props.mode==="update" &&
                 <small style={{marginLeft: 5}}>
                   <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
                 </small>
@@ -747,7 +595,7 @@ var NewUser = React.createClass({
 			        <li className="active">Add New User</li>
 			      </ol>
 			      <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
-			      { this.state.isProcessing &&
+			      { this.props.isProcessing &&
               <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
             }
 			    </section>
@@ -757,13 +605,13 @@ var NewUser = React.createClass({
 			    	<div className="row">
 					  	<div className="col-md-8">
 					  	<section className="content">
-			    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" id="profileForm" style={{opacity: this.state.opacity}}>
+			    			<form onSubmit={this.props.handleSubmit(this.handleSubmitBtn)} className="form-horizontal" id="profileForm" style={{opacity: this.props.opacity}}>
 			    				
-					  			<div className={this.state.classDivName}>
+					  			<div className="form-group">
 								  	<label htmlFor="name" className="col-md-3">Name<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
-										<input type="text" name="name" id="name" onBlur={this.handleNameHighlight} className={this.state.classInputName} required="true"/>
-										<p className="help-block">{this.state.nameTextBlock}</p>
+								  	<Field name="name" component={renderField} type="text" className="form-control" className="form-control" validate={[required]} required="true"/>
+										<p className="help-block">{this.props.nameTextBlock}</p>
 									</div>
 								</div>
 
@@ -772,23 +620,22 @@ var NewUser = React.createClass({
 							  	<div className="col-md-9">
 									<Dropzone onDrop={this.handleImageDrop}>
 										<div className="avatar-container">
-				             	<img src={this.state.avatar} alt='' id="avatar"/> 
+				             	<img src={this.props.avatar} alt='' id="avatar"/> 
 										  <div className="avatar-overlay"></div>
 										  <div className="avatar-button"><a href="#"> Change </a></div>
 										</div>
-			            			</Dropzone>
+			            </Dropzone>
 								</div>
 								</div>
 
-					  			<div className={this.state.classDivUsername}>
+					  			<div className="form-group">
 								  	<label htmlFor="tagline" className="col-md-3">Username<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
 								  		<div className="form-inline">
-											<input type="text" name="username" id="username" 
-												className={this.state.classInputUsername} onBlur={this.handleUsernameHighlight} disabled={this.state.mode==="update"?true:false}/>
-												{ this.state.checkingUsername && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
+								  		<Field name="username" component={renderField} type="text" className="form-control" className="form-control" validate={[required, maxLength15]} disabled={this.props.mode==="update"?true:false}/>
+											{ this.props.checkingUsername && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
 											</div>
-											<p className="help-block">{this.state.usernameTextBlock}</p>
+											<p className="help-block">{this.props.usernameTextBlock}</p>
 										</div>
 								</div>
 
@@ -798,7 +645,7 @@ var NewUser = React.createClass({
 										<DateTime 
 											timeFormat={false} 
 											className="datetime-input" 
-											value={this.state.dateOfBirth}
+											value={this.props.dateOfBirth}
 											onChange={this.handleBirthDateChange}/>
 									</div>
 								</div>
@@ -806,37 +653,37 @@ var NewUser = React.createClass({
 								<div className="form-group">
 								 	<label htmlFor="homeUrl" className="col-md-3">Gender</label>
 								 	<div className="col-md-9">
-										<select id="gender" name="gender" defaultValue="Male" style={{width: 150}}>
+										<Field name="gender" component="select" style={{width: 150}}>
 											<option key="" value="" >Select your gender...</option>
 											<option key="male" value="Male" >Male</option>
 											<option key="female" value="Female" >Female</option>
-										</select> 
+										</Field> 
 									</div>
 								</div>
 
-					  			<div className={this.state.classDivEmail}>
-								  	<label htmlFor="keywoards" className="col-md-3">Email<span style={{color:"red"}}>*</span></label>
+					  			<div className="form-group">
+								  	<label htmlFor="email" className="col-md-3">Email<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
 								  		<div className="form-inline">
-												<input type="email" name="email" id="email" className={this.state.classInputEmail} 
-													onBlur={this.handleEmailHighlight} disabled={this.state.mode==="update"?true:false} required="true"/>
-												{ this.state.checkingEmail && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
+								  			<Field name="email" component={renderField} type="text" className="form-control" 
+													validate={[required, email]} disabled={this.props.mode==="update"?true:false} required="true"/>
+												{ this.props.checkingEmail && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
 											</div>
-											<p className="help-block">{this.state.emailTextBlock}</p>
+											<p className="help-block">{this.props.emailTextBlock}</p>
 									</div>
 								</div>
 
-								<div className={this.state.classDivPhone}>
+								<div className="form-group">
 								  	<label htmlFor="phone" className="col-md-3">Phone</label>
 								  	<div className="col-md-9">
-										<input type="text" name="phone" id="phone" onBlur={this.handlePhoneHighlight} className={this.state.classInputPhone} />
+								  	<Field name="phone" component={renderField} type="text" validate={[phoneNumber]} className="form-control" />
 									</div>
 								</div>
 
-								<div className={this.state.classDivBio}>
-								 	<label htmlFor="homeUrl" className="col-md-3">Biography</label>
+								<div className="form-group">
+								 	<label htmlFor="bio" className="col-md-3">Biography</label>
 								 	<div className="col-md-9">
-										<textarea name="bio" id="bio" onBlur={this.handleBioHighlight} className={this.state.classInputBio}></textarea>
+								 		<Field id="content" name="bio" component="textarea" wrap="hard" type="textarea" className="form-control" />
 									</div>
 								</div>
 
@@ -854,80 +701,80 @@ var NewUser = React.createClass({
 										  absolute={true}
 										  style={{width: 300}}
 										  placeholder="Select timezone..."
-										  value={this.state.timezone}
+										  value={this.props.timezone}
 										  onChange={this.handleTimezoneChange}
 										/>
 									</div>
 								</div>
 
 								<h4 style={{marginBottom: 20}}>Social Media Accounts</h4>
-								<div className={this.state.classDivWebsite}>
+								<div className="form-group">
 								  	<label htmlFor="website" className="col-md-3">Website</label>
 								  	<div className="col-md-9">
-										<input type="text" onBlur={this.handleWebsiteHighlight} name="website" id="website" placeholder="example: www.ussunnah.com" className={this.state.classInputWebsite} />
-										<p className="help-block">{this.state.websiteTextBlock}</p>
+								  	<Field name="website" component={renderField} type="text" className="form-control"  placeholder="example: www.ussunnah.com" className="form-control" />
+										<p className="help-block">{this.props.websiteTextBlock}</p>
 									</div>
 								</div>
 
-								<div className={this.state.classDivFacebook}>
+								<div className="form-group">
 								  	<label htmlFor="facebook" className="col-md-3">Facebook Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="facebook" id="facebook" placeholder="example: www.facebook.com/ussunnah" onBlur={this.handleFacebookHighlight} className={this.state.classInputFacebook} />
-										<p className="help-block">{this.state.facebookTextBlock}</p>
+								  	<Field name="facebook" component={renderField} type="text" validate={[facebook]} className="form-control"  placeholder="example: www.facebook.com/ussunnah"/>
+										<p className="help-block">{this.props.facebookTextBlock}</p>
 									</div>
 								</div>
 
-								<div className={this.state.classDivTwitter}>
+								<div className="form-group">
 								  	<label htmlFor="twitter" className="col-md-3">Twitter Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="twitter" id="twitter" placeholder="example: www.twitter.com/ussunnah" onBlur={this.handleTwitterHighlight} className={this.state.classInputTwitter} />
-										<p className="help-block">{this.state.twitterTextBlock}</p>
+								  	<Field name="twitter" component={renderField} type="text" className="form-control" placeholder="example: www.twitter.com/ussunnah" className="form-control" />
+										<p className="help-block">{this.props.twitterTextBlock}</p>
 									</div>
 								</div>
 
-								<div className={this.state.classDivLinkedin}>
+								<div className="form-group">
 								  	<label htmlFor="linkedin" className="col-md-3">Linkedin Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="linkedin" id="linkedin" placeholder="example: www.linkedin.com/in/ussunnah" onBlur={this.handleLinkedinHighlight} className={this.state.classInputLinkedin} />
-										<p className="help-block">{this.state.linkedinTextBlock}</p>
+								  	<Field name="linkedin" component={renderField} type="text" placeholder="example: linkedin.com/in/ussunnah" className="form-control" />
+										<p className="help-block">{this.props.linkedinTextBlock}</p>
 									</div>
 								</div>
 
-								{ this.state.mode==="create" &&
+								{ this.props.mode==="create" &&
 								 [<h4 key="1" style={{marginBottom: 20}}>Password</h4>,
 								 <div key="2" className="form-group">
 									 	<label htmlFor="homeUrl" className="col-md-3">Role</label>
 									 	<div className="col-md-9">
-											<select name="role" id="role" className="form-control select">
+											<Field name="role" component="select" className="form-control select">
 												{
-													this.state.roleList.map(function(item){
+													this.props.roleList.map(function(item){
 														return <option key={item.id} value={item.id}>{item.name}</option>
 													})
 												}
-											</select>
+											</Field>
 										</div>
 									</div>]
 								 
 								}
 
-								{ this.state.mode==="update" &&
+								{ this.props.mode==="update" &&
 								 [<h4 key="1" style={{marginBottom: 20}}>Role and password</h4>,
 									<div key="2" className="form-group">
 									 	<label htmlFor="homeUrl" className="col-md-3">Role</label>
 									 	<div className="col-md-9">
-											<select name="role" id="role" className="form-control select">
+									 		<Field name="role" component="select" className="form-control select">
 												{
-													this.state.roleList.map(function(item){
+													this.props.roleList.map(function(item){
 														return <option key={item.id} value={item.id}>{item.name}</option>
 													})
 												}
-											</select>
+											</Field>
 										</div>
 									</div>,
 									<div key="3" className="form-group">
 									 	<label htmlFor="old-password" className="col-md-3">Old password</label>
 									 	<div className="col-md-9">
-											<input type="password" name="old-password" id="old-password" className="form-control" style={{width:200}}/>
+									 		<Field name="old-password" component={renderField} type="password" className="form-control" style={{width:300}}/>
 										</div>
 									</div>
 									]
@@ -956,7 +803,7 @@ var NewUser = React.createClass({
 								<div className="form-group">
 								 	<label htmlFor="new-password-2" className="col-md-3">Re-type password<span style={{color:"red"}}>*</span></label>
 								 	<div className="col-md-9">
-										<input type="password" name="new-password-2" id="new-password-2" className="form-control" style={{width:200}} disabled={!this.state.passwordActive}/>
+								 		<Field name="new-password-2" component={renderField} type="password" className="form-control" style={{width:300}} disabled={!this.props.passwordActive}/>
 									</div>
 								</div>
 
@@ -967,7 +814,7 @@ var NewUser = React.createClass({
 								<div className="form-group">
 									<div className="col-md-9">
 										<div className="btn-group">
-											<input type="submit" value={this.state.mode==="update"?"Update User":"Add User"} className="btn btn-primary btn-sm" />
+											<input type="submit" value={this.props.mode==="update"?"Update User":"Add User"} className="btn btn-primary btn-sm" />
 										</div>
 									</div>
 								</div>
@@ -983,5 +830,82 @@ var NewUser = React.createClass({
 		)
 	}
 });
+
+const selector = formValueSelector('userNewForm')
+
+const mapStateToProps = function(state){
+  if (!_.isEmpty(state.userNew)) {
+    return _.head(state.userNew)
+  } else return {}
+}
+
+NewUser = reduxForm({
+  form: 'userNewForm'
+})(NewUser)
+
+
+NewUser = connect(mapStateToProps)(NewUser)
+
+var getUserQry = gql`query GetUser($id: ID!) {
+  getUser(id: $id) {
+    id
+    username
+    fullName
+    gender
+    image
+    email
+    lastLogin
+    createdAt
+    country
+    dateOfBirth
+    meta {
+      edges {
+        node {
+          id
+          item
+          value
+        }
+      }
+    }
+    roles {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+    }
+  }
+}`
+NewUser = graphql(getUserQry, {
+	options : (props) => ({
+    variables: {
+      id: props.userId
+    }
+  }),
+  props: ({ownProps, data}) => {
+  	
+    if (data.viewer) {
+    	var _data = {}
+    	var _idMap = {}
+    	_.forEach(data.viewer.allOptions.edges, function(item){
+    		_data[item.node.item] = item.node.value;
+    		_idMap[item.node.item] = item.node.id;
+			});
+    	return {
+        initialValues: _data,
+        fieldIdMap: _idMap,
+        mode: ownProps.userId?"update":"create"
+      }
+    } else {
+    	return {
+    		mode: ownProps.userId?"update":"create"
+    	}
+    }
+
+  }
+})(NewUser);
+
+NewUser = withApollo(NewUser);
 
 export default NewUser;

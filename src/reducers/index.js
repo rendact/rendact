@@ -17,6 +17,7 @@ import search from './Search';
 import maskArea from './MaskArea';
 import listOfWidgets from './ListOfWidgets';
 import {themeHome, themeSingle, themeBlog } from './Theme'
+import userNew from './UserNew';
 
 const INITIAL_STATE = {
   referrer: '/admin/dashboard'
@@ -57,7 +58,8 @@ const rendactApp = combineReducers({
   listOfWidgets,
   themeHome,
   themeSingle,
-  themeBlog
+  themeBlog,
+  userNew
 })
 
 export default rendactApp
