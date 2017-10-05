@@ -103,6 +103,7 @@ const queries = {
   getAllActiveWidgets: Widget.getAllActiveWidgets,
   getAllTags: ContentTypeNew.getAllTags,
   updateFeaturedImage: Post.updateFeaturedImage,
+  createUpdateUserMetaMtn: User.createUpdateUserMetaMtn
 }
 
 export default queries;

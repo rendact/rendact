@@ -6,6 +6,8 @@ import {riques, getValue, setValue, getFormData, errorCallback, disableForm, swa
 import {connect} from 'react-redux'
 import {loadFormData} from '../../actions'
 import {reduxForm, Field} from 'redux-form'
+import {maskArea, toggleSelectedItemState, setprovidedFields, setcustomFields, setfields, 
+	setcheckingSlug, togglecheckingSlug, NameBlur, AddProvidedField, setmode} from '../../actions'
 
 const ContentField = React.createClass({
 	render: function(){
@@ -34,6 +36,25 @@ let ContentNew = React.createClass({
 		{id:"featuredImage", label: "Featured Image", type: "text"},
 		{id:"gallery", label: "Gallery", type: "text"}
 	],
+
+	// propTypes: {
+	// 	mode: React.PropTypes.string,
+	// 	fields: React.PropTypes.string,
+	// 	providedFields: React.PropTypes.string,
+	// 	customFields: React.PropTypes.array,
+	// 	checkingSlug: React.PropTypes.bool,
+	// 	slug: React.PropTypes.string,
+	// },
+	// getDefaultProps: function() {
+	//     return {
+	//       	mode: this.props.postId?"update":"create",
+	// 		fields: this.defaultFields,
+	// 		providedFields: this.defaultFields,
+	// 		customFields: [],
+	// 		checkingSlug: false,
+	// 		slug: ''
+	//     }
+	// },
 	getInitialState: function(){
 		return {
 			mode: this.props.postId?"update":"create",
@@ -63,9 +84,12 @@ let ContentNew = React.createClass({
 		this.props.dispatch(loadFormData(data));
 		document.getElementById("status").checked = data.status==="active"?true:false;
 		
-		this.setState({providedFields: data.fields});
-		this.setState({customFields: data.customFields});
-		this.setState({fields: _.concat(data.fields, data.customFields)});
+		// this.setState({providedFields: data.fields});
+		this.props.dispatch(setprovidedFields(data.fields));
+		// this.setState({customFields: data.customFields});
+		this.props.dispatch(setcustomFields(data.customFields));
+		// this.setState({fields: _.concat(data.fields, data.customFields)});
+		this.props.dispatch(setfields(_.concat(data.fields, data.customFields)));
 
 		var providedFieldsId = _.map(data.fields, function(item){ return item.id });
 		_.forEach(document.getElementsByName("checkboxField[]"), function(item){
@@ -75,31 +99,40 @@ let ContentNew = React.createClass({
 	},
 	checkSlug: function(slug){
     var me = this;
-    this.setState({checkingSlug: true});
+    // this.setState({checkingSlug: true});
+    this.props.dispatch(setcheckingSlug(true));
     riques( Query.checkContentSlugQry(slug),
       function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
           var slugCount = body.data.viewer.allContents.edges.length;
           if (me.state.mode==="create") {
             if (slugCount > 0) { 
-            	me.setState({checkingSlug: false, slug: slug+"-"+slugCount}); 
+            	// me.setState({checkingSlug: false, slug: slug+"-"+slugCount});
+            	me.props.dispatch(togglecheckingSlug(false, slug+"-"+slugCount)); 
             	setValue('slug', slug+"-"+slugCount)
-            } else me.setState({checkingSlug: false, slug: slug});
+            } else 
+            	// me.setState({checkingSlug: false, slug: slug});
+            	me.props.dispatch(togglecheckingSlug(false, slug));
           } else {
             if (slugCount > 1) { 
-            	me.setState({checkingSlug: false, slug: slug+"-"+slugCount}); 
+            	// me.setState({checkingSlug: false, slug: slug+"-"+slugCount}); 
+            	me.props.dispatch(togglecheckingSlug(false, slug+"-"+slugCount));
             	setValue('slug', slug+"-"+slugCount)
             }
-            else me.setState({checkingSlug: false, slug: slug});
+            else 
+            	// me.setState({checkingSlug: false, slug: slug});
+            	me.props.dispatch(togglecheckingSlug(false, slug));
           }
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
-        me.setState({checkingSlug: false});
+        // me.setState({checkingSlug: false});
+        me.props.dispatch(setcheckingSlug(false));
       }
     );
   },
   handleNameBlur: function(event) {
+  	debugger
     var name = getValue("name");
     var slug = name.split(" ").join("-").toLowerCase();
     setValue("slug", slug);
@@ -109,12 +142,18 @@ let ContentNew = React.createClass({
     var labelSingular = getValue("labelSingular");
     var labelAddNew = getValue("labelAddNew");
     var labelEdit = getValue("labelEdit");
-    this.setState({
-    	label: label?null:name+"s",
-    	labelSingular: labelSingular?null:name,
-    	labelAddNew: labelAddNew?null:"Add "+name,
-    	labelEdit: labelEdit?null:"Edit "+name
-    });
+    // this.setState({
+    // 	label: label?null:name+"s",
+    // 	labelSingular: labelSingular?null:name,
+    // 	labelAddNew: labelAddNew?null:"Add "+name,
+    // 	labelEdit: labelEdit?null:"Edit "+name
+    // });
+    this.props.dispatch(NameBlur(
+    	label?null:name+"s",
+    	labelSingular?null:name,
+    	labelAddNew?null:"Add "+name,
+    	labelEdit?null:"Edit "+name
+    ));
   },
   handleSlugBlur: function(event) {
     var slug = getValue("slug");
@@ -125,6 +164,7 @@ let ContentNew = React.createClass({
     disableForm(state, this.notification);
   },
 	handleSubmitBtn: function(event){
+		debugger
 		event.preventDefault();
 		var me = this;
 		var _objData = getFormData('rdt-input-form', 'object');
@@ -170,8 +210,9 @@ let ContentNew = React.createClass({
     	var newField = _.find(allProvidedField, {id: item.value});
 			if (newField) providedFields.push(newField);
     })
-		
-		this.setState({providedFields: providedFields, fields: _.concat(providedFields, this.state.customFields)});
+		// this.setState({providedFields: providedFields, fields: _.concat(providedFields, this.state.customFields)});
+		this.props.dispatch(setprovidedFields(providedFields));
+		this.props.dispatch(setfields(_.concat(providedFields, this.state.customFields)));
 	},
 	handleAddCustomField: function(event){
 		event.preventDefault();
@@ -201,7 +242,9 @@ let ContentNew = React.createClass({
 			connection: connection?connection:null
 		};
 		customFields.push(newField);
-		this.setState({customFields: customFields, fields: _.concat(this.state.providedFields, customFields)});
+		// this.setState({customFields: customFields, fields: _.concat(this.state.providedFields, customFields)});
+		this.props.dispatch(setcustomFields(customFields));
+		this.props.dispatch(setfields(_.concat(this.state.providedFields, customFields)))
 	},
 	handleFieldDelete: function(event){
 		event.preventDefault();
@@ -212,17 +255,20 @@ let ContentNew = React.createClass({
 		var record = _.find(cfields, {label: name});
 		if (record) {
 			_.pull(cfields, record);
-			this.setState({customFields: cfields});
+			// this.setState({customFields: cfields});
+			this.props.dispatch(setcustomFields(cfields));
 		}
 
 		var precord = _.find(pfields, {label: name});
 		if (precord) {
 			_.pull(pfields, precord);
-			this.setState({providedFields: pfields});
+			// this.setState({providedFields: pfields});
+			this.props.dispatch(setprovidedFields(pfields));
 			_.forEach(document.getElementsByName("checkboxField[]"), function(item){ if (item.value===precord.id) item.checked=false});
 		}
 
-		this.setState({fields: _.concat(cfields, pfields)});
+		// this.setState({fields: _.concat(cfields, pfields)});
+		this.props.dispatch(setfields(_.concat(cfields, pfields)));
 	},
 	handleAddNewBtn: function(event) {
     this.resetForm();
@@ -235,7 +281,9 @@ let ContentNew = React.createClass({
 	resetForm: function(){
 		document.getElementById("contentForm").reset();
 		window.history.pushState("", "", '/admin/content/new');
-		this.setState({mode: "create", fields: this.defaultFields})
+		// this.setState({mode: "create", fields: this.defaultFields})
+		this.props.dispatch(setmode("create"));
+		this.props.dispatch(setfields(this.defaultFields));
 	},
 	componentDidMount: function(){
 		this.notification = this.refs.notificationSystem;
