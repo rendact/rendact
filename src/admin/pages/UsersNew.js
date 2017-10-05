@@ -13,6 +13,7 @@ import AdminConfig from '../AdminConfig';
 import Config from '../../rendact.config.json';
 import {riques, getValue, setValue, errorCallback, disableForm, getConfig, defaultHalogenStyle, swalert} from '../../utils';
 import {connect} from 'react-redux'
+import {maskArea, setTimezone, setPasswordActive, setDateOfBirth, setAvatar, checkingUsername, checkingMail, resetForm} from '../../actions'
 import {reduxForm, Field, formValueSelector} from 'redux-form'
 import gql from 'graphql-tag'
 import {graphql, withApollo} from 'react-apollo'
@@ -21,6 +22,7 @@ const required = value => (value ? undefined : 'Required')
 const maxLength = max => value =>
   value && value.length > max ? `Must be ${max} characters or less` : undefined
 const maxLength15 = maxLength(15)
+const maxLength100 = maxLength(100)
 export const minLength = min => value =>
   value && value.length < min ? `Must be ${min} characters or more` : undefined
 export const minLength2 = minLength(2)
@@ -107,97 +109,17 @@ let NewUser = React.createClass({
       hasErrors: false
 		}
 	},
-	loadData: function(){
-		var me = this;
-		this.maskArea(true);
-		riques(Query.getUserQry(this.props.userId),
-			function(error, response, body){
-				if (!error && !body.errors) {
-          var values = body.data.getUser;
-          me.setFormValues(values);
-          me.maskArea(false);
-        } else {
-        	errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-			}
-		);
-	},
-	setFormValues: function(v){
-		var me = this;
-		setValue("name", v.fullName);
-		setValue("username", v.username);
-		setValue("email", v.email);
-		setValue("gender", v.gender);
-		//setValue("dateOfBirth", v.dateOfBirth);
-		var dateOfBirth = "";
-		if (v.dateOfBirth && v.dateOfBirth!=="") 
-			dateOfBirth = new Date(v.dateOfBirth)
-		
-		this.setState({dateOfBirth: dateOfBirth});
-		setValue("country", v.country);
-
-		_.forEach(this.props.userMetaList, function(item){
-			var i = _.find(v.meta.edges, {"node": {"item": item}});
-			if (i){
-				if (item==="timezone"){
-					me.setState({timezone: i.node.value});
-				} else {
-					setValue(i.node.item, i.node.value);
-				}
-			}
-		})
-
-		if (v.image) this.setState({avatar: v.image});
-		
-		if (v.roles.edges.length>0){
-			var roles = _.map(v.roles.edges, function(item){
-				return item.node.id
-			});
-			
-			if (roles.length>0) {
-				this.setState({userRole: roles[0]});
-				document.getElementById("role").value = roles[0];
-			}
-			
-		}
-
-		var p = JSON.parse(localStorage.getItem("profile"));
-
-		var isAdmin = (_.indexOf(p.roles, "Admin") > -1);
-		this.setState({isAdmin: isAdmin});
-		_.forEach(document.getElementsByTagName('roles[]'), function(el){ el.disabled = !isAdmin;})
-	},
 	disableForm: function(state){
 		disableForm(state, this.notification);
-		this.maskArea(state);
+		this.props.dispatch(maskArea(state));
 	},
-	maskArea: function(state){
-  	this.setState({isProcessing: state, opacity: state?0.4:1});
-  },
-	handleSubmitBtn: function(event){
+	handleSubmitBtn: function(v){
 		event.preventDefault();
 		
 		var me = this;
-		var name = getValue("name");
-		var username = getValue("username");
-		var email = getValue("email");
-		var gender = getValue("gender");
 		var image = this.props.avatar;
-		var bio = getValue("bio");
-		//var birth = getValue("birth");
 		var dateOfBirth = this.props.dateOfBirth;
-		var phone = getValue("phone");
-		var country = getValue("country");
-		//var timezone = getValue("timezone");
-		var timezone = this.props.timezone;
-		var website = getValue("website");
-		var facebook = getValue("facebook");
-		var twitter = getValue("twitter");
-		var linkedin = getValue("linkedin");
-		var password = getValue("new-password");
-		var oldPassword = getValue("old-password");
-    var repassword = getValue("new-password-2");
-    var changePassword = false;
+		var changePassword = false;
 
     if (this.props.hasErrors) {
   		swalert('error','Failed!', 'There are some errors in the form')
@@ -206,114 +128,74 @@ let NewUser = React.createClass({
 
 		var qry = '';
 		if (this.props.mode==="update"){
-			if (password) {
-	    	if (!oldPassword) {
-	    		swalert('error','Failed!', 'Please fill your old password')
-		    	return;
-	    	}
-	    	if (password!==repassword) {
-		    	swalert('error','Failed!', 'Password is not match')
-		    	return;
-		    }
-		    changePassword = true;
-	    }
-
-			qry = Query.saveProfileMtn({userId: this.props.userId, name: name, gender: gender, image: image, country: country, dateOfBirth: dateOfBirth});
+			if (v["new-password"]) changePassword = true;
+			qry = Query.saveProfileMtn({userId: this.props.userId, name: v.name, gender: v.gender, image: v.image, country: v.country, dateOfBirth: dateOfBirth});
 		} else {
-			if (!password) {
-    		swalert('error','Failed!', 'Please fill your password')
-	    	return;
-    	}
-    		
-    	if (password!==repassword) {
-	    	swalert('error','Failed!', 'Password is not match')
-	    	return;
-	    }
-			qry = Query.createUserMtn(username, password, email, name, gender, country, dateOfBirth)
+			qry = Query.createUserMtn(v.username, v["new-password"], v.email, v.name, v.gender, v.country, dateOfBirth)
 		}
 
 		this.disableForm(true);
-		
-		riques(qry, 
-			function(error, response, body){
-				if(!error && !body.errors) {
-					var p;
+		this.props.client.mutate({
+			mutation: gql`${qry.query}`,
+			variables: qry.variables
+		}).then( data => {
+			var p = me.props.mode==="update"?data.updateUser.changedUser:data.createUser.changedUser;
+			var here = me;
 
-					if (me.state.mode==="update")
-						p = body.data.updateUser.changedUser;
-					else
-						p =body.data.createUser.changedUser;
-					//me.setState({avatar: p.image})
-	        //me.setProfile(p);
-	        var here = me;
+      var isMetaEmpty = (v.bio+v.website+v.facebook+v.twitter+v.linkedin+v.timezone+v.phone)==='';
 
-	        var isMetaEmpty = (bio+website+facebook+twitter+linkedin+timezone+phone)==='';
+      if (isMetaEmpty) {
+      	if (me.props.mode==="create")
+      		me.resetForm();
+      	else
+      		me.notification.removeNotification('saving');
+      	me.disableForm(false);
+      }	else {
+        var userMetaData0 = {
+          	"bio": v.bio,
+          	"website": v.website,
+          	"facebook": v.facebook,
+          	"twitter": v.twitter,
+          	"linkedin": v.linkedin,
+          	"timezone": v.timezone,
+          	"phone": v.phone
+        };
 
-	        if (isMetaEmpty) {
-          	if (me.state.mode==="create")
-          		me.resetForm();
-          	else
-          		me.notification.removeNotification('saving');
-          	me.disableForm(false);
-          }	else {
-		        var userMetaData0 = {
-		          	"bio": bio,
-		          	"website": website,
-		          	"facebook": facebook,
-		          	"twitter": twitter,
-		          	"linkedin": linkedin,
-		          	"timezone": timezone,
-		          	"phone": phone
-		        };
-
-	      		var existMetaList = _.map(p.meta.edges, function(item){ return item.node.item });
-	          var qry = Query.createUpdateUserMetaMtn(p.id, existMetaList,userMetaData0);
-	          
-	          riques(qry, 
-							function(error, response, body){
-								if(!error && !body.errors) {
-									var metaList = [];
-									_.forEach(body.data, function(item){
-										metaList.push(item.changedUserMeta);
-									});
-									
-									if (metaList.length>0) {
-										
-									}
-								} else {
-									errorCallback(error, body.errors?body.errors[0].message:null);
-								}
-								if (here.state.mode==="create")
-		          		here.resetForm();
-		          	else 
-		          		here.disableForm(false);
-							}
-						);
-	        }
-				} else {
-					errorCallback(error, body.errors?body.errors[0].message:null);
-				}
-			}
-		);
+    		var existMetaList = _.map(p.meta.edges, function(item){ return item.node.item });
+        var qry2 = Query.createUpdateUserMetaMtn(p.id, existMetaList,userMetaData0);
+        
+        me.props.client.mutate({
+        	mutation: gql`${qry2.query}`,
+        	variables: qry2.variables
+        }).then( data => {
+        	var metaList = [];
+					_.forEach(data, function(item){
+						metaList.push(item.changedUserMeta);
+					});
+					if (here.props.mode==="create")
+        		here.resetForm();
+        	else 
+        		here.disableForm(false);
+        });
+      }
+		});
 		
 
 		// Change password
+		var qry3 = Query.changePasswordMtn(v["old-password"], v["new-password"]);
 		if (changePassword) {
-			riques(Query.changePasswordMtn(oldPassword, password), 
-				function(error, response, body){
-					if(!error && !body.errors) {
-						me.notification.addNotification({
-							message: 'Password changed',
-							level: 'success',
-							position: 'tr',
-							autoDismiss: 5
-						});
-						disableForm(false);
-					} else {
-						errorCallback(error, body.errors?body.errors[0].message:null);
-					}
-				}
-			);
+			this.props.client.mutate({
+				mutation: gql`${qry3.query}`,
+				variables: qry3.variables
+			}).then( data => {
+				me.notification.addNotification({
+					message: 'Password changed',
+					level: 'success',
+					position: 'tr',
+					autoDismiss: 5
+				});
+				disableForm(false);
+			});
 		}
 
 		var role = getValue("role");
@@ -337,96 +219,55 @@ let NewUser = React.createClass({
 		else
 			document.getElementById("new-password").setAttribute("type","password")
 	},
-	handleDateChange: function(date){
-	    this.setState({dateOfBirth: new Date(date)});
-	},
 	handleRoleChange: function(role1, role2){
 		var qry = '';
-
-		if (role1) {
-			qry = Query.updateRoleUser(this.props.userId, role1, role2, "admin");
-		} else {
-			qry = Query.addRoleToUser(this.props.userId, role2, "admin");
-		}
 		var me = this;
 
-   	riques(qry, 
-			function(error, response, body){
-				if(!error && !body.errors) {
-					var here = me;
-					me.notification.addNotification({
-							message: 'Role updated',
-							level: 'success',
-							position: 'tr',
-							autoDismiss: 2
-						})
-					here.disableForm(false);
-				} else {
-					errorCallback(error, body.errors?body.errors[0].message:null);
-					me.disableForm(false);
-				}
-				me.notification.removeNotification('saving');
-			}, this.props.isAdmin
-		);
+		if (role1) qry = Query.updateRoleUser(this.props.userId, role1, role2, "admin");
+		else qry = Query.addRoleToUser(this.props.userId, role2, "admin");
+		
+		this.props.client.mutate({
+			mutation: gql`${qry.query}`,
+			variables: qry.variables
+		}).then( data => {
+			me.notification.addNotification({
+					message: 'Role updated',
+					level: 'success',
+					position: 'tr',
+					autoDismiss: 2
+				})
+			me.disableForm(false);
+		});
 	},
 	handleImageDrop: function(accepted){
 		var me = this;
 		var reader = new FileReader();
     reader.onloadend = function(res) {
       var imageBase64 = res.target.result;
-      me.setState({avatar: imageBase64});
+      me.props.dispatch(setAvatar(imageBase64))
     }
     reader.readAsDataURL(accepted[0]);
 	},
 	handleTimezoneChange: function(tz){
-		this.setState({timezone: tz});
+		this.props.dispatch(setTimezone(tz));
 	},
 	handlePasswordChange: function(event){
 		var password = getValue("new-password");
 		if (password) {
-			this.setState({passwordActive: true})
+			this.props.dispatch(setPasswordActive(true));	
 		} else {
-			this.setState({passwordActive: false})
+			this.props.dispatch(setPasswordActive(false));	
 		}
 	},
 	handleBirthDateChange: function(date){
-	 	this.setState({dateOfBirth: date});
+		this.props.dispatch(setDateOfBirth(date));	
 	},
-	componentDidMount: function(){
-		require ('react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css');
-		require ('react-datetime/css/react-datetime.css');
-		this.notification = this.refs.notificationSystem;
-		var me = this;
-		riques( Query.getRolesQry,
-		function(error, response, body){
-			if (body.data) {
-          var here = me;
-          var roleList = me.state.roleList;
-          for (var i=0;i < body.data.viewer.allRoles.edges.length; i++) {
-          	var item = body.data.viewer.allRoles.edges[i];
-          	if (item.node.name==="Owner" && !Config.adminMode)
-          		continue;
-          	roleList.push({id: item.node.id, name: item.node.name});
-          }
-          here.setState({roleList: roleList});
-          if (me.state.mode==="update") {
-			  		me.loadData();
-			  	}
-        }
-		});
-  },
   resetForm: function(){
     document.getElementById("profileForm").reset();
     document.getElementsByName("new-password").value = null;
-    _.forEach(document.getElementsByTagName('input'), function(el){ el.value = null;})
-    
-    this.setState({
-			passwordActive: false,
-			mode: "create",
-			timezone: "",
-			country: "",
-			dateOfBirth: ""
-		});
+    //_.forEach(document.getElementsByTagName('input'), function(el){ el.value = null;})
+    this.props.reset();
+    this.props.dispatch(resetForm())
     window.history.pushState("", "", '/admin/users/new');
   },
 	handleAddNewBtn: function(event) {
@@ -434,18 +275,13 @@ let NewUser = React.createClass({
 	},
 	checkUsername: function(username){
 		var me = this;
-		if (username.length<4){
-			this._markUsernameError("Username is too short! Make sure it has minimum 4 characters");
-			return;
-		}
-		var usernameRegex = /^[a-zA-Z0-9]+$/;
-		if(!usernameRegex.test(username)) {
-			this._markUsernameError("Username is invalid, only letters and numbers allowed");
-			return;
-		}
+		this.props.dispatch(checkingUsername(true));
+		this.props.client.query({
+			query: gql`${Query.checkUsernameQry(username).query}`,
+			variables: Query.checkUsernameQry(username).variables
+		}).then( data => {
 
-		this.setState({checkingUsername: true});
-		//this.disableForm(true);
+		});
 		riques( Query.checkUsernameQry(username),
       	function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
@@ -465,7 +301,7 @@ let NewUser = React.createClass({
             	me._markUsernameError("Username is already exists");
             }
           }
-          me.setState({checkingUsername: false});
+          this.props.dispatch(checkingUsername(false))
           me.disableForm(false);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
@@ -482,7 +318,7 @@ let NewUser = React.createClass({
 			return
 		}
 
-		me.setState({checkingEmail: true});
+		this.props.dispatch(checkingMail(true))
 		//this.disableForm(true);
 		riques( Query.checkEmailQry(email),
       	function(error, response, body) {
@@ -503,7 +339,7 @@ let NewUser = React.createClass({
             	me._markEmailError("Email is already exists");
             }
           }
-          me.setState({checkingEmail: false});
+          this.props.dispatch(checkingMail(false))
           me.disableForm(false);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
@@ -512,70 +348,11 @@ let NewUser = React.createClass({
       }
     );
 	},
-	checkName: function(name){
-		if (name.length<4){
-			this._markNameError("Name is too short! Make sure it has minimum 4 characters");
-			return;		
-		}
-		else{
-			this._markNameSuccess();
-			return;
-		}
-
-	},
-	checkPhone: function(phone){
-		var phoneRegex = /^[0-9-+]+$/;
-	},
-	checkBio: function(bio){
-		if(bio.length > 100) {
-			
-		}
-	},
-	checkWebsite: function(website){
-		var websiteRegex = /^[a-zA-Z0-9._-]+$/;
-		if(!websiteRegex.test(website)) {
-			this._markWebsiteError("Website is invalid, no regular expression allowed");
-			return;
-		}
-		else{
-			this._markWebsiteSuccess();
-			return;
-		}
-	},
-	checkFacebook: function(facebook){
-		var facebookRegex = /(?:(?:http|https):\/\/)?(?:www.)?facebook.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/;
-
-		if(!facebookRegex.test(facebook)) {
-			this._markFacebookError("Facebook is invalid, have wrong regular expression");
-			return;
-		}
-		else{
-			this._markFacebookSuccess();
-			return;
-		}
-	},
-	checkTwitter: function(twitter){	
-		var twitterRegex = /(?:(?:http|https):\/\/)?(?:www.)?twitter.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/;
-		if(!twitterRegex.test(twitter)) {
-			this._markTwitterError("Twitter is invalid, have wrong regular expression");
-			return;
-		}
-		else{
-			this._markTwitterSuccess();
-			return;
-		}
-	},
-	checkLinkedin: function(linkedin){
-		var linkedinRegex = /(?:(?:http|https):\/\/)?(?:www.)?linkedin.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/;
-		if(!linkedinRegex.test(linkedin)) {
-			this._markLinkedinError("Linkedin is invalid, have wrong regular expression");
-			return;
-		}
-		else{
-			this._markLinkedinSuccess();
-			return;
-		}
-	},
+	componentDidMount: function(){
+		require ('react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css');
+		require ('react-datetime/css/react-datetime.css');
+		this.notification = this.refs.notificationSystem;
+  },
 	render: function(){		
 		return (
 			<div className="content-wrapper">
@@ -683,7 +460,7 @@ let NewUser = React.createClass({
 								<div className="form-group">
 								 	<label htmlFor="bio" className="col-md-3">Biography</label>
 								 	<div className="col-md-9">
-								 		<Field id="content" name="bio" component="textarea" wrap="hard" type="textarea" className="form-control" />
+								 		<Field id="content" name="bio" component="textarea" wrap="hard" type="textarea" validate={[maxLength100]} className="form-control" />
 									</div>
 								</div>
 
@@ -846,7 +623,7 @@ NewUser = reduxForm({
 
 NewUser = connect(mapStateToProps)(NewUser)
 
-var getUserQry = gql`query GetUser($id: ID!) {
+var getUserQry = gql`query userNew($id: ID!) {
   getUser(id: $id) {
     id
     username
@@ -876,26 +653,81 @@ var getUserQry = gql`query GetUser($id: ID!) {
       }
     }
   }
+
+  viewer{
+    allRoles{
+      edges {
+        node{
+          id
+          name
+        }
+      }
+    }
+  }
 }`
 NewUser = graphql(getUserQry, {
 	options : (props) => ({
     variables: {
-      id: props.userId
+      id: props.userId?props.userId:""
     }
   }),
   props: ({ownProps, data}) => {
   	
     if (data.viewer) {
-    	var _data = {}
-    	var _idMap = {}
-    	_.forEach(data.viewer.allOptions.edges, function(item){
-    		_data[item.node.item] = item.node.value;
-    		_idMap[item.node.item] = item.node.id;
-			});
+      var roleList = [];
+      var _data = {}
+      var timezone = "";
+      var metaValues = {};
+      var avatar = "";
+      var userRole = "";
+
+      var mode = ownProps.userId?"update":"create";
+      for (var i=0;i < data.viewer.allRoles.edges.length; i++) {
+      	var item = data.viewer.allRoles.edges[i];
+      	if (item.node.name==="Owner" && !Config.adminMode)
+      		continue;
+      	roleList.push({id: item.node.id, name: item.node.name});
+      }
+      if (mode==="update") {
+	  		_data = data.getUser;
+
+	  		_.forEach(ownProps.userMetaList, function(item){
+					var i = _.find(_data.meta.edges, {"node": {"item": item}});
+					if (i){
+						if (item==="timezone"){
+							timezone = i.node.value;
+						} else {
+							metaValues[i.node.item] = i.node.value;
+						}
+					}
+				})
+
+				if (_data.image) avatar = _data.image;
+				
+				if (_data.roles.edges.length>0){
+					var roles = _.map(_data.roles.edges, function(item){
+						return item.node.id
+					});
+					
+					if (roles.length>0) {
+						userRole = roles[0];
+					}
+					
+				}
+	  	}
+
+			var p = JSON.parse(localStorage.getItem("profile"));
+			var isAdmin = (_.indexOf(p.roles, "Admin") > -1);
+
     	return {
         initialValues: _data,
-        fieldIdMap: _idMap,
-        mode: ownProps.userId?"update":"create"
+        mode: mode,
+        roleList: roleList,
+        isAdmin: isAdmin,
+        timezone: timezone,
+        avatar: avatar,
+        userRole: userRole,
+        roleList: roleList
       }
     } else {
     	return {
