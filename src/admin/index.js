@@ -32,7 +32,7 @@ import NewContentType from './lib/ContentTypeNew';
 import CategoryContent from './lib/CategoryContent';
 import TagContent from './lib/TagContent';
 import AdminConfig from './AdminConfig';
-import AdminLTEinit from './lib/app.min.js';
+import AdminLTEinit from './lib/app.js';
 import {hasRole, getConfig, swalert} from '../utils';
 import Query from './query';
 import {saveConfig} from '../utils';
