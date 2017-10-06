@@ -10,13 +10,13 @@ import client from './apollo'
 import reducer from './reducers'
 import DragDropContext from 'react-dnd/lib/DragDropContext';
 import HTML5Backend from 'react-dnd-html5-backend';
-import  createStore  from 'redux/lib/createStore'
+import createStore from 'redux/lib/createStore'
 import {setLogged} from './actions'
 import {connectWithStore } from './utils'
-import gql from 'graphql-tag'
 import isEmpty from 'lodash/isEmpty'
 import Loading from './admin/Loading';
-import Loadable from 'react-loadable'
+import Loadable from 'react-loadable';
+import Query from './admin/query';
 
 const store = createStore(reducer, {})
 
@@ -134,39 +134,7 @@ const mapStateToProps = function(state, ownProps){
 }
 Main = connectWithStore(store, Main, mapStateToProps);
 
-var getUserQry = gql`query GetUser($id: ID!) {
-  getUser(id: $id) {
-    id
-    username
-    fullName
-    gender
-    image
-    email
-    lastLogin
-    createdAt
-    country
-    dateOfBirth
-    meta {
-      edges {
-        node {
-          id
-          item
-          value
-        }
-      }
-    }
-    roles {
-      edges {
-        node {
-          id
-          name
-        }
-      }
-    }
-  }
-}`
-
-Main = graphql(getUserQry, {
+Main = graphql(Query.getUserListQry, {
   options: { variables: { id: localStorage.userId } },
   props: ({ownProps, data}) => {
   	
