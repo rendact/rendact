@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Query from '../query';
-import {riques, hasRole, errorCallback, disableForm, swalert} from '../../utils';
+import {hasRole, disableForm, swalert} from '../../utils';
 import AdminConfig from '../AdminConfig';
 import {Table, SearchBoxPost, DeleteButtons} from '../lib/Table';
 import {connect} from 'react-redux'
