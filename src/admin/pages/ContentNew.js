@@ -23,19 +23,19 @@ const ContentField = React.createClass({
 });
 
 let ContentNew = React.createClass({
-	defaultFields: [
-		{id:"title", label: "Title", type: "link", deletable: false},
-		{id:"slug", label: "Slug", type: "text", deletable: false}
-	],
-	providedFields: [
-		{id:"author", label: "Author", type: "link"},
-		{id:"summary", label: "Summary", type: "link"},
-		{id:"content", label: "Content", type: "text"},
-		{id:"image", label: "Image", type: "text"},
-		{id:"like", label: "Like", type: "text"},
-		{id:"featuredImage", label: "Featured Image", type: "text"},
-		{id:"gallery", label: "Gallery", type: "text"}
-	],
+	// defaultFields: [
+	// 	{id:"title", label: "Title", type: "link", deletable: false},
+	// 	{id:"slug", label: "Slug", type: "text", deletable: false}
+	// ],
+	// providedFields: [
+	// 	{id:"author", label: "Author", type: "link"},
+	// 	{id:"summary", label: "Summary", type: "link"},
+	// 	{id:"content", label: "Content", type: "text"},
+	// 	{id:"image", label: "Image", type: "text"},
+	// 	{id:"like", label: "Like", type: "text"},
+	// 	{id:"featuredImage", label: "Featured Image", type: "text"},
+	// 	{id:"gallery", label: "Gallery", type: "text"}
+	// ],
 	propTypes: {
 		mode: React.PropTypes.string,
 		fields: React.PropTypes.array,
@@ -52,9 +52,18 @@ let ContentNew = React.createClass({
 				{id:"title", label: "Title", type: "link", deletable: false},
 				{id:"slug", label: "Slug", type: "text", deletable: false}
 			],
-			providedFields: [
+			defaultFields: [
 				{id:"title", label: "Title", type: "link", deletable: false},
 				{id:"slug", label: "Slug", type: "text", deletable: false}
+			],
+			providedFields: [
+				{id:"author", label: "Author", type: "link"},
+				{id:"summary", label: "Summary", type: "link"},
+				{id:"content", label: "Content", type: "text"},
+				{id:"image", label: "Image", type: "text"},
+				{id:"like", label: "Like", type: "text"},
+				{id:"featuredImage", label: "Featured Image", type: "text"},
+				{id:"gallery", label: "Gallery", type: "text"}
 			],
 			customFields: [],
 			checkingSlug: false,
@@ -590,7 +599,8 @@ const mapStateToProps = function(state){
     var out = _.head(state.contentNew);
     out["initialValues"] = out.data;
     return _.merge(out, customStates);
-  } else return customStates;
+  } else 
+  return customStates;
 }
 
 ContentNew = reduxForm({
