@@ -5,73 +5,34 @@ import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen'
 import Query from '../query';
-import {riques, disableForm, errorCallback, defaultHalogenStyle} from '../../utils';
+import {disableForm,defaultHalogenStyle} from '../../utils';
 import AdminConfig from '../AdminConfig';
 import {connect} from 'react-redux'
 import {maskArea, setOptionId} from '../../actions'
+import gql from 'graphql-tag'
+import {graphql, withApollo} from 'react-apollo'
 
 let Permission = React.createClass({
   propTypes: {
-    isProcessing: React.PropTypes.bool.isRequired,
+    isLoading: React.PropTypes.bool.isRequired,
     opacity: React.PropTypes.number.isRequired,
     errorMsg: React.PropTypes.string,
     loadingMsg: React.PropTypes.string,
     itemSelected: React.PropTypes.bool,
     itemList: React.PropTypes.array,
-    optionId: React.PropTypes.string
+    optionId: React.PropTypes.string,
+    rows: React.PropTypes.array
   },
   getDefaultProps: function() {
     return {
-      isProcessing: false,
+      isLoading: false,
       opacity: 1,
       itemList: [],
-      itemSelected: false
+      itemSelected: false,
+      rows: []
     }
   },
   dt: null,
-  loadData: function() {
-    this.dt.clear();
-    var me = this;
-    var qry = Query.getPermissionConfigQry;
-
-    this.disableForm(true);
-    riques(qry, 
-      function(error, response, body) {
-        if (!error && !body.errors && response.statusCode === 200) {
-          var roleList = AdminConfig.RoleList;
-
-          if (body.data.viewer.allOptions.edges.length>0) {
-            var item = body.data.viewer.allOptions.edges[0];
-            me.props.dispatch(setOptionId(item.node.id))
-            var permissionConfig = JSON.parse(item.node.value);
-
-            _.forEach(AdminConfig.PermissionList, function(item){
-              var row = ['<td>'+item.label+'</td>']
-              var roleId = item.id;
-
-              _.forEach(roleList, function(item){
-                var checked = "";
-                var disabled = "";
-                var val = item + "~" + roleId;
-                if (_.indexOf(permissionConfig[item], roleId)>-1) {
-                  checked = "checked";
-                }
-                if (item==="Admin" || item==="Owner") disabled="disabled";
-                row.push('<td style="textAlign: center"><center><input type="checkbox" class="permissionChk" name="permissionCheckbox" value="'+val+'" '+checked+' '+disabled+'/></center></td>');
-
-              });
-
-              me.dt.row.add(row);
-            });
-            me.dt.draw();
-            me.disableForm(false); 
-          }
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-      }
-    );
-  },
   handleSubmit: function(event) {
     event.preventDefault();
     this.disableForm(true);
@@ -98,24 +59,31 @@ let Permission = React.createClass({
     if (this.props.optionId) _objData["id"] = this.props.optionId;
     var qry = Query.createUpdateSettingsMtn([_objData]);
 
-    riques(qry, 
-      function(error, response, body) {
-        if (!error && !body.errors && response.statusCode === 200) {
-          here.notification.addNotification({
-            message: 'Config saved!',
-            level: 'success',
-            position: 'tr'
-          });
-          here.disableForm(false);
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-      }
-    );
+    var qry = Query.createUpdateSettingsMtn([_objData]);
+    this.props.client.mutate({
+      mutation: gql`${qry.query}`,
+      variables: qry.variables
+    }).then(data => {
+      here.notification.addNotification({
+        message: 'Config saved!',
+        level: 'success',
+        position: 'tr'
+      });
+      here.disableForm(false);
+    });
   },
   disableForm: function(state){
     disableForm(state, this.notification, ["permissionChk"]);
     this.props.dispatch(maskArea(state));
+  },
+  componentWillReceiveProps(props){
+    var me = this;
+    if (props.rows) {
+      _.forEach(props.rows, function(row){
+        me.dt.row.add(row);
+      });
+      me.dt.draw();
+    }
   },
   componentDidMount: function(){
     require ('datatables');
@@ -128,7 +96,6 @@ let Permission = React.createClass({
         "info"    : false
       }); 
     this.notification = this.refs.notificationSystem;
-    this.loadData();
   },
   render: function(){
     return (
@@ -158,7 +125,7 @@ let Permission = React.createClass({
                         <div className="box-tools" style={{marginTop: 10}}>
                         </div>
                       </div>       
-                      { this.props.isProcessing &&
+                      { this.props.isLoading &&
                       <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
                       }                           
                       <table id="pageListTbl" className="display" style={{opacity: this.props.opacity}}>
@@ -173,14 +140,7 @@ let Permission = React.createClass({
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <td>Loading data...</td>
-                            {
-                              AdminConfig.RoleList.map(function(item, index){
-                                return (<td key={index}></td>)
-                              })
-                            }
-                          </tr>
+                          
                         </tbody>
                     </table>
                     <br/>
@@ -205,4 +165,46 @@ const mapStateToProps = function(state){
 }
 
 Permission = connect(mapStateToProps)(Permission)
+
+Permission = graphql(gql`${Query.getPermissionConfigQry.query}`, {
+  props: ({ownProps, data}) => {
+    
+    if (data.viewer) {
+
+      var roleList = AdminConfig.RoleList;
+
+      if (data.viewer.allOptions.edges.length>0) {
+        var item = data.viewer.allOptions.edges[0];
+        var permissionConfig = JSON.parse(item.node.value);
+        var rows = [];
+
+        _.forEach(AdminConfig.PermissionList, function(item){
+          var row = ['<td>'+item.label+'</td>']
+          var roleId = item.id;
+
+          _.forEach(roleList, function(item){
+            var checked = "";
+            var disabled = "";
+            var val = item + "~" + roleId;
+            if (_.indexOf(permissionConfig[item], roleId)>-1) {
+              checked = "checked";
+            }
+            if (item==="Admin" || item==="Owner") disabled="disabled";
+            row.push('<td style="textAlign: center"><center><input type="checkbox" class="permissionChk" name="permissionCheckbox" value="'+val+'" '+checked+' '+disabled+'/></center></td>');
+
+          });
+
+          rows.push(row);
+        });
+      
+        return {
+          name: item.node.id,
+          rows: rows
+        }
+      }
+    }
+  }
+})(Permission);
+
+Permission = withApollo(Permission);
 export default Permission;

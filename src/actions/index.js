@@ -494,3 +494,36 @@ export const setmode = (mode)  => ({
   type: 'SET_MODE',
   mode
 })
+
+/* 
+ * UserNew.js
+ */
+
+export const setTimezone = (timezone)  => ({
+  type: 'SET_TIMEZONE',
+  timezone
+})
+
+export const setPasswordActive = (state)  => ({
+  type: 'SET_PASSWORD_ACTIVE',
+  state
+})
+
+export const setDateOfBirth = (date)  => ({
+  type: 'SET_DATE_BIRTH',
+  date
+})
+
+export const resetForm = ()  => ({
+  type: 'RESET_FORM'
+})
+
+export const checkingUsername = (state) => ({
+  type: 'IS_CHECKING_USERNAME',
+  state
+})
+
+export const checkingEmail = (state) => ({
+  type: 'IS_CHECKING_EMAIL',
+  state
+})
