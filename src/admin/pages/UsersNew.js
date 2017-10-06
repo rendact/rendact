@@ -12,35 +12,84 @@ import Query from '../query';
 import AdminConfig from '../AdminConfig';
 import Config from '../../rendact.config.json';
 import {riques, getValue, setValue, errorCallback, disableForm, getConfig, defaultHalogenStyle, swalert} from '../../utils';
+import {connect} from 'react-redux'
+import {maskArea, setTimezone, setPasswordActive, setDateOfBirth, setAvatar, checkingUsername, checkingMail, resetForm} from '../../actions'
+import {reduxForm, Field, formValueSelector} from 'redux-form'
+import gql from 'graphql-tag'
+import {graphql, withApollo} from 'react-apollo'
 
-var NewUser = React.createClass({
-	getInitialState: function(){
-		var image = getConfig('rootUrl')+"/images/avatar-default.png";
-		
-		return {
+const required = value => (value ? undefined : 'Required')
+const maxLength = max => value =>
+  value && value.length > max ? `Must be ${max} characters or less` : undefined
+const maxLength15 = maxLength(15)
+const maxLength100 = maxLength(100)
+export const minLength = min => value =>
+  value && value.length < min ? `Must be ${min} characters or more` : undefined
+export const minLength2 = minLength(2)
+const number = value =>
+  value && isNaN(Number(value)) ? 'Must be a number' : undefined
+const minValue = min => value =>
+  value && value < min ? `Must be at least ${min}` : undefined
+const minValue18 = minValue(18)
+const email = value =>
+  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)
+    ? 'Invalid email address'
+    : undefined
+const facebook = value =>
+	value && !/(?:(?:http|https):\/\/)?(?:www.)?facebook.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/.test(value)
+		? 'Invalid facebook address'
+		: undefined
+const tooOld = value =>
+  value && value > 65 ? 'You might be too old for this' : undefined
+const aol = value =>
+  value && /.+@aol\.com/.test(value)
+    ? 'Really? You still use AOL for your email?'
+    : undefined
+const alphaNumeric = value =>
+  value && /[^a-zA-Z0-9 ]/i.test(value)
+    ? 'Only alphanumeric characters'
+    : undefined
+const phoneNumber = value =>
+  value && !/^(0|[1-9][0-9]{9})$/i.test(value)
+    ? 'Invalid phone number, must be 10 digits'
+    : undefined
+
+const renderField = ({
+  input,
+  label,
+  type,
+  className,
+  style,
+  meta: { touched, error, warning }
+}) =>
+  <div>
+    <input {...input} placeholder={label} type={type} className={className} style={style} />
+    {touched &&
+      ((error &&
+        <p className="help-block" style={{color: "red"}}>
+          {error}
+        </p>) ||
+        (warning &&
+          <p className="help-block" style={{color: "red"}}>
+            {warning}
+          </p>))}
+  </div>
+
+let NewUser = React.createClass({
+	propTypes: {
+    isLoading: React.PropTypes.bool.isRequired,
+    opacity: React.PropTypes.number.isRequired,
+  },
+  getDefaultProps: function() {
+  	var image = getConfig('rootUrl')+"/images/avatar-default.png";
+    return {
+			isLoading: false,
+      opacity: 1,
 			avatar: image,
 			passwordActive: false,
-			mode: this.props.userId?"update":"create",
+			mode: "",
 			roleList: [],
 			userRole: null,
-			classDivUsername:"form-group",
-			classInputUsername:"form-control",
-			classDivName:"form-group",
-			classInputName:"form-control",
-			classDivEmail:"form-group",
-			classInputEmail:"form-control",
-			classDivPhone:"form-group",
-			classInputPhone:"form-control",
-			classDivBio:"form-group",
-			classInputBio:"form-control",
-			classDivWebsite:"form-group",
-			classInputWebsite:"form-control",
-			classDivFacebook:"form-group",
-			classInputFacebook:"form-control",
-			classDivTwitter:"form-group",
-			classInputTwitter:"form-control",
-			classDivLinkedin:"form-group",
-			classInputLinkedin:"form-control",
 			usernameTextBlock:"The short unique name describes you",
 			nameTextBlock:"Your full name",
 			emailTextBlock:"",
@@ -60,218 +109,98 @@ var NewUser = React.createClass({
       hasErrors: false
 		}
 	},
-	loadData: function(){
-		var me = this;
-		this.maskArea(true);
-		riques(Query.getUserQry(this.props.userId),
-			function(error, response, body){
-				if (!error && !body.errors) {
-          var values = body.data.getUser;
-          me.setFormValues(values);
-          me.maskArea(false);
-        } else {
-        	errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-			}
-		);
-	},
-	setFormValues: function(v){
-		var me = this;
-		setValue("name", v.fullName);
-		setValue("username", v.username);
-		setValue("email", v.email);
-		setValue("gender", v.gender);
-		//setValue("dateOfBirth", v.dateOfBirth);
-		var dateOfBirth = "";
-		if (v.dateOfBirth && v.dateOfBirth!=="") 
-			dateOfBirth = new Date(v.dateOfBirth)
-		
-		this.setState({dateOfBirth: dateOfBirth});
-		setValue("country", v.country);
-
-		_.forEach(this.state.userMetaList, function(item){
-			var i = _.find(v.meta.edges, {"node": {"item": item}});
-			if (i){
-				if (item==="timezone"){
-					me.setState({timezone: i.node.value});
-				} else {
-					setValue(i.node.item, i.node.value);
-				}
-			}
-		})
-
-		if (v.image) this.setState({avatar: v.image});
-		
-		if (v.roles.edges.length>0){
-			var roles = _.map(v.roles.edges, function(item){
-				return item.node.id
-			});
-			
-			if (roles.length>0) {
-				this.setState({userRole: roles[0]});
-				document.getElementById("role").value = roles[0];
-			}
-			
-		}
-
-		var p = JSON.parse(localStorage.getItem("profile"));
-
-		var isAdmin = (_.indexOf(p.roles, "Admin") > -1);
-		this.setState({isAdmin: isAdmin});
-		_.forEach(document.getElementsByTagName('roles[]'), function(el){ el.disabled = !isAdmin;})
-	},
 	disableForm: function(state){
 		disableForm(state, this.notification);
-		this.maskArea(state);
+		this.props.dispatch(maskArea(state));
 	},
-	maskArea: function(state){
-  	this.setState({isProcessing: state, opacity: state?0.4:1});
-  },
-	handleSubmitBtn: function(event){
+	handleSubmitBtn: function(v){
 		event.preventDefault();
 		
 		var me = this;
-		var name = getValue("name");
-		var username = getValue("username");
-		var email = getValue("email");
-		var gender = getValue("gender");
-		var image = this.state.avatar;
-		var bio = getValue("bio");
-		//var birth = getValue("birth");
-		var dateOfBirth = this.state.dateOfBirth;
-		var phone = getValue("phone");
-		var country = getValue("country");
-		//var timezone = getValue("timezone");
-		var timezone = this.state.timezone;
-		var website = getValue("website");
-		var facebook = getValue("facebook");
-		var twitter = getValue("twitter");
-		var linkedin = getValue("linkedin");
-		var password = getValue("new-password");
-		var oldPassword = getValue("old-password");
-    var repassword = getValue("new-password-2");
-    var changePassword = false;
+		var image = this.props.avatar;
+		var dateOfBirth = this.props.dateOfBirth;
+		var changePassword = false;
 
-    if (this.state.hasErrors) {
+    if (this.props.hasErrors) {
   		swalert('error','Failed!', 'There are some errors in the form')
     	return;
   	}
 
 		var qry = '';
-		if (this.state.mode==="update"){
-			if (password) {
-	    	if (!oldPassword) {
-	    		swalert('error','Failed!', 'Please fill your old password')
-		    	return;
-	    	}
-	    	if (password!==repassword) {
-		    	swalert('error','Failed!', 'Password is not match')
-		    	return;
-		    }
-		    changePassword = true;
-	    }
-
-			qry = Query.saveProfileMtn({userId: this.props.userId, name: name, gender: gender, image: image, country: country, dateOfBirth: dateOfBirth});
+		if (this.props.mode==="update"){
+			if (v["new-password"]) changePassword = true;
+			qry = Query.saveProfileMtn({userId: this.props.userId, name: v.name, gender: v.gender, image: v.image, country: v.country, dateOfBirth: dateOfBirth});
 		} else {
-			if (!password) {
-    		swalert('error','Failed!', 'Please fill your password')
-	    	return;
-    	}
-    		
-    	if (password!==repassword) {
-	    	swalert('error','Failed!', 'Password is not match')
-	    	return;
-	    }
-			qry = Query.createUserMtn(username, password, email, name, gender, country, dateOfBirth)
+			qry = Query.createUserMtn(v.username, v["new-password"], v.email, v.name, v.gender, v.country, dateOfBirth)
 		}
 
 		this.disableForm(true);
-		
-		riques(qry, 
-			function(error, response, body){
-				if(!error && !body.errors) {
-					var p;
+		this.props.client.mutate({
+			mutation: gql`${qry.query}`,
+			variables: qry.variables
+		}).then( data => {
+			var p = me.props.mode==="update"?data.updateUser.changedUser:data.createUser.changedUser;
+			var here = me;
 
-					if (me.state.mode==="update")
-						p = body.data.updateUser.changedUser;
-					else
-						p =body.data.createUser.changedUser;
-					//me.setState({avatar: p.image})
-	        //me.setProfile(p);
-	        var here = me;
+      var isMetaEmpty = (v.bio+v.website+v.facebook+v.twitter+v.linkedin+v.timezone+v.phone)==='';
 
-	        var isMetaEmpty = (bio+website+facebook+twitter+linkedin+timezone+phone)==='';
+      if (isMetaEmpty) {
+      	if (me.props.mode==="create")
+      		me.resetForm();
+      	else
+      		me.notification.removeNotification('saving');
+      	me.disableForm(false);
+      }	else {
+        var userMetaData0 = {
+          	"bio": v.bio,
+          	"website": v.website,
+          	"facebook": v.facebook,
+          	"twitter": v.twitter,
+          	"linkedin": v.linkedin,
+          	"timezone": v.timezone,
+          	"phone": v.phone
+        };
 
-	        if (isMetaEmpty) {
-          	if (me.state.mode==="create")
-          		me.resetForm();
-          	else
-          		me.notification.removeNotification('saving');
-          	me.disableForm(false);
-          }	else {
-		        var userMetaData0 = {
-		          	"bio": bio,
-		          	"website": website,
-		          	"facebook": facebook,
-		          	"twitter": twitter,
-		          	"linkedin": linkedin,
-		          	"timezone": timezone,
-		          	"phone": phone
-		        };
-
-	      		var existMetaList = _.map(p.meta.edges, function(item){ return item.node.item });
-	          var qry = Query.createUpdateUserMetaMtn(p.id, existMetaList,userMetaData0);
-	          
-	          riques(qry, 
-							function(error, response, body){
-								if(!error && !body.errors) {
-									var metaList = [];
-									_.forEach(body.data, function(item){
-										metaList.push(item.changedUserMeta);
-									});
-									
-									if (metaList.length>0) {
-										
-									}
-								} else {
-									errorCallback(error, body.errors?body.errors[0].message:null);
-								}
-								if (here.state.mode==="create")
-		          		here.resetForm();
-		          	else 
-		          		here.disableForm(false);
-							}
-						);
-	        }
-				} else {
-					errorCallback(error, body.errors?body.errors[0].message:null);
-				}
-			}
-		);
+    		var existMetaList = _.map(p.meta.edges, function(item){ return item.node.item });
+        var qry2 = Query.createUpdateUserMetaMtn(p.id, existMetaList,userMetaData0);
+        
+        me.props.client.mutate({
+        	mutation: gql`${qry2.query}`,
+        	variables: qry2.variables
+        }).then( data => {
+        	var metaList = [];
+					_.forEach(data, function(item){
+						metaList.push(item.changedUserMeta);
+					});
+					if (here.props.mode==="create")
+        		here.resetForm();
+        	else 
+        		here.disableForm(false);
+        });
+      }
+		});
 		
 
 		// Change password
+		var qry3 = Query.changePasswordMtn(v["old-password"], v["new-password"]);
 		if (changePassword) {
-			riques(Query.changePasswordMtn(oldPassword, password), 
-				function(error, response, body){
-					if(!error && !body.errors) {
-						me.notification.addNotification({
-							message: 'Password changed',
-							level: 'success',
-							position: 'tr',
-							autoDismiss: 5
-						});
-						disableForm(false);
-					} else {
-						errorCallback(error, body.errors?body.errors[0].message:null);
-					}
-				}
-			);
+			this.props.client.mutate({
+				mutation: gql`${qry3.query}`,
+				variables: qry3.variables
+			}).then( data => {
+				me.notification.addNotification({
+					message: 'Password changed',
+					level: 'success',
+					position: 'tr',
+					autoDismiss: 5
+				});
+				disableForm(false);
+			});
 		}
 
 		var role = getValue("role");
-		if (this.state.userRole !== role)
-			this.handleRoleChange(this.state.userRole, role);
+		if (this.props.userRole !== role)
+			this.handleRoleChange(this.props.userRole, role);
 	},
 	handleGeneratePassword: function(event){
 		event.preventDefault();
@@ -290,131 +219,69 @@ var NewUser = React.createClass({
 		else
 			document.getElementById("new-password").setAttribute("type","password")
 	},
-	handleDateChange: function(date){
-	    this.setState({dateOfBirth: new Date(date)});
-	},
 	handleRoleChange: function(role1, role2){
 		var qry = '';
-
-		if (role1) {
-			qry = Query.updateRoleUser(this.props.userId, role1, role2, "admin");
-		} else {
-			qry = Query.addRoleToUser(this.props.userId, role2, "admin");
-		}
 		var me = this;
 
-   	riques(qry, 
-			function(error, response, body){
-				if(!error && !body.errors) {
-					var here = me;
-					me.notification.addNotification({
-							message: 'Role updated',
-							level: 'success',
-							position: 'tr',
-							autoDismiss: 2
-						})
-					here.disableForm(false);
-				} else {
-					errorCallback(error, body.errors?body.errors[0].message:null);
-					me.disableForm(false);
-				}
-				me.notification.removeNotification('saving');
-			}, this.state.isAdmin
-		);
+		if (role1) qry = Query.updateRoleUser(this.props.userId, role1, role2, "admin");
+		else qry = Query.addRoleToUser(this.props.userId, role2, "admin");
+		
+		this.props.client.mutate({
+			mutation: gql`${qry.query}`,
+			variables: qry.variables
+		}).then( data => {
+			me.notification.addNotification({
+					message: 'Role updated',
+					level: 'success',
+					position: 'tr',
+					autoDismiss: 2
+				})
+			me.disableForm(false);
+		});
 	},
 	handleImageDrop: function(accepted){
 		var me = this;
 		var reader = new FileReader();
     reader.onloadend = function(res) {
       var imageBase64 = res.target.result;
-      me.setState({avatar: imageBase64});
+      me.props.dispatch(setAvatar(imageBase64))
     }
     reader.readAsDataURL(accepted[0]);
 	},
 	handleTimezoneChange: function(tz){
-		this.setState({timezone: tz});
+		this.props.dispatch(setTimezone(tz));
 	},
 	handlePasswordChange: function(event){
 		var password = getValue("new-password");
 		if (password) {
-			this.setState({passwordActive: true})
+			this.props.dispatch(setPasswordActive(true));	
 		} else {
-			this.setState({passwordActive: false})
+			this.props.dispatch(setPasswordActive(false));	
 		}
 	},
 	handleBirthDateChange: function(date){
-	 	this.setState({dateOfBirth: date});
+		this.props.dispatch(setDateOfBirth(date));	
 	},
-	componentDidMount: function(){
-		require ('react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css');
-		require ('react-datetime/css/react-datetime.css');
-		this.notification = this.refs.notificationSystem;
-		var me = this;
-		riques( Query.getRolesQry,
-		function(error, response, body){
-			if (body.data) {
-          var here = me;
-          var roleList = me.state.roleList;
-          for (var i=0;i < body.data.viewer.allRoles.edges.length; i++) {
-          	var item = body.data.viewer.allRoles.edges[i];
-          	if (item.node.name==="Owner" && !Config.adminMode)
-          		continue;
-          	roleList.push({id: item.node.id, name: item.node.name});
-          }
-          here.setState({roleList: roleList});
-          if (me.state.mode==="update") {
-			  		me.loadData();
-			  	}
-        }
-		});
-  },
   resetForm: function(){
     document.getElementById("profileForm").reset();
     document.getElementsByName("new-password").value = null;
-    _.forEach(document.getElementsByTagName('input'), function(el){ el.value = null;})
-    
-    this.setState({
-			passwordActive: false,
-			mode: "create",
-			timezone: "",
-			country: "",
-			dateOfBirth: ""
-		});
+    //_.forEach(document.getElementsByTagName('input'), function(el){ el.value = null;})
+    this.props.reset();
+    this.props.dispatch(resetForm())
     window.history.pushState("", "", '/admin/users/new');
   },
 	handleAddNewBtn: function(event) {
   	this.resetForm();
 	},
-	_markUsernameError: function(msg){
-		this.setState({
-			classDivUsername: "form-group has-error", 
-			classInputUsername:"form-control form-control-error", 
-			usernameTextBlock:msg,
-			hasErrors: true
-		});
-	},
-	_markUsernameSuccess: function(){
-		this.setState({
-			classDivUsername: "form-group has-success", 
-			classInputUsername: "form-control form-control-success", 
-			usernameTextBlock: "Good to go",
-			hasErrors: false
-		});
-	},
 	checkUsername: function(username){
 		var me = this;
-		if (username.length<4){
-			this._markUsernameError("Username is too short! Make sure it has minimum 4 characters");
-			return;
-		}
-		var usernameRegex = /^[a-zA-Z0-9]+$/;
-		if(!usernameRegex.test(username)) {
-			this._markUsernameError("Username is invalid, only letters and numbers allowed");
-			return;
-		}
+		this.props.dispatch(checkingUsername(true));
+		this.props.client.query({
+			query: gql`${Query.checkUsernameQry(username).query}`,
+			variables: Query.checkUsernameQry(username).variables
+		}).then( data => {
 
-		this.setState({checkingUsername: true});
-		//this.disableForm(true);
+		});
 		riques( Query.checkUsernameQry(username),
       	function(error, response, body) {
         if (!error && !body.errors && response.statusCode === 200) {
@@ -434,7 +301,7 @@ var NewUser = React.createClass({
             	me._markUsernameError("Username is already exists");
             }
           }
-          me.setState({checkingUsername: false});
+          this.props.dispatch(checkingUsername(false))
           me.disableForm(false);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
@@ -442,22 +309,6 @@ var NewUser = React.createClass({
         }
       }
     );
-	},
-	_markEmailError: function(msg){
-		this.setState({
-			classDivEmail: "form-group has-error", 
-			classInputEmail:"form-control form-control-error", 
-			emailTextBlock:msg,
-			hasErrors: true
-		});
-	},
-	_markEmailSuccess: function(){
-		this.setState({
-			classDivEmail: "form-group has-success", 
-			classInputEmail:"form-control form-control-success", 
-			emailTextBlock:"Good to go",
-			hasErrors: false
-		});
 	},
 	checkEmail: function(email){
 		var me = this;
@@ -467,7 +318,7 @@ var NewUser = React.createClass({
 			return
 		}
 
-		me.setState({checkingEmail: true});
+		this.props.dispatch(checkingMail(true))
 		//this.disableForm(true);
 		riques( Query.checkEmailQry(email),
       	function(error, response, body) {
@@ -488,7 +339,7 @@ var NewUser = React.createClass({
             	me._markEmailError("Email is already exists");
             }
           }
-          me.setState({checkingEmail: false});
+          this.props.dispatch(checkingMail(false))
           me.disableForm(false);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
@@ -497,245 +348,19 @@ var NewUser = React.createClass({
       }
     );
 	},
-	checkName: function(name){
-		if (name.length<4){
-			this._markNameError("Name is too short! Make sure it has minimum 4 characters");
-			return;		
-		}
-		else{
-			this._markNameSuccess();
-			return;
-		}
-
-	},
-	_markNameError: function(msg){
-		this.setState({
-			classDivName: "form-group has-error", 
-			classInputName:"form-control form-control-error", 
-			nameTextBlock:msg,
-			hasErrors: true
-		});
-	},
-	_markNameSuccess: function(){
-		this.setState({
-			classDivName: "form-group has-success", 
-			classInputName: "form-control form-control-success", 
-			nameTextBlock: "Good to go",
-			hasErrors: false
-		});
-	},
-	
-	checkPhone: function(phone){
-		var phoneRegex = /^[0-9-+]+$/;
-		if(!phoneRegex.test(phone)) {
-			this._markPhoneError();
-			return;
-		}
-		else{
-			this._markPhoneSuccess();
-			return;
-		}
-	},
-	_markPhoneError: function(){
-		this.setState({
-			classDivPhone: "form-group has-error", 
-			classInputPhone:"form-control form-control-error", 
-			hasErrors: true
-		});
-	},
-	_markPhoneSuccess: function(){
-		this.setState({
-			classDivPhone: "form-group has-success", 
-			classInputPhone: "form-control form-control-success", 
-			hasErrors: false
-		});
-	},
-	checkBio: function(bio){
-		if(bio.length > 100) {
-			this._markBioError();
-			return;
-		}
-		else{
-			this._markBioSuccess();
-			return;
-		}
-	},
-	_markBioError: function(){
-		this.setState({
-			classDivBio: "form-group has-error", 
-			classInputBio:"form-control form-control-error", 
-			hasErrors: true
-		});
-	},
-	_markBioSuccess: function(){
-		this.setState({
-			classDivBio: "form-group has-success", 
-			classInputBio: "form-control form-control-success", 
-			hasErrors: false
-		});
-	},
-	checkWebsite: function(website){
-		var websiteRegex = /^[a-zA-Z0-9._-]+$/;
-		if(!websiteRegex.test(website)) {
-			this._markWebsiteError("Website is invalid, no regular expression allowed");
-			return;
-		}
-		else{
-			this._markWebsiteSuccess();
-			return;
-		}
-	},
-	_markWebsiteError: function(msg){
-		this.setState({
-			classDivWebsite: "form-group has-error", 
-			classInputWebsite:"form-control form-control-error", 
-			websiteTextBlock:msg,
-			hasErrors: true
-		});
-	},
-	_markWebsiteSuccess: function(){
-		this.setState({
-			classDivWebsite: "form-group has-success", 
-			classInputWebsite: "form-control form-control-success", 
-			websiteTextBlock: "Good to go",
-			hasErrors: false
-		});
-	},
-	checkFacebook: function(facebook){
-		var facebookRegex = /(?:(?:http|https):\/\/)?(?:www.)?facebook.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/;
-
-		if(!facebookRegex.test(facebook)) {
-			this._markFacebookError("Facebook is invalid, have wrong regular expression");
-			return;
-		}
-		else{
-			this._markFacebookSuccess();
-			return;
-		}
-	},
-	_markFacebookError: function(msg){
-		this.setState({
-			classDivFacebook: "form-group has-error", 
-			classInputFacebook:"form-control form-control-error", 
-			facebookTextBlock:msg,
-			hasErrors: true
-		});
-	},
-	_markFacebookSuccess: function(){
-		this.setState({
-			classDivFacebook: "form-group has-success", 
-			classInputFacebook: "form-control form-control-success", 
-			facebookTextBlock: "Good to go",
-			hasErrors: false
-		});
-	},
-	checkTwitter: function(twitter){	
-		var twitterRegex = /(?:(?:http|https):\/\/)?(?:www.)?twitter.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/;
-		if(!twitterRegex.test(twitter)) {
-			this._markTwitterError("Twitter is invalid, have wrong regular expression");
-			return;
-		}
-		else{
-			this._markTwitterSuccess();
-			return;
-		}
-	},
-	_markTwitterError: function(msg){
-		this.setState({
-			classDivTwitter: "form-group has-error", 
-			classInputTwitter:"form-control form-control-error", 
-			twitterTextBlock:msg,
-			hasErrors: true
-		});
-	},
-	_markTwitterSuccess: function(){
-		this.setState({
-			classDivTwitter: "form-group has-success", 
-			classInputTwitter: "form-control form-control-success", 
-			twitterTextBlock: "Good to go",
-			hasErrors: false
-		});
-	},
-	checkLinkedin: function(linkedin){
-		var linkedinRegex = /(?:(?:http|https):\/\/)?(?:www.)?linkedin.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/;
-		if(!linkedinRegex.test(linkedin)) {
-			this._markLinkedinError("Linkedin is invalid, have wrong regular expression");
-			return;
-		}
-		else{
-			this._markLinkedinSuccess();
-			return;
-		}
-	},
-	_markLinkedinError: function(msg){
-		this.setState({
-			classDivLinkedin: "form-group has-error", 
-			classInputLinkedin:"form-control form-control-error", 
-			linkedinTextBlock:msg,
-			hasErrors: true
-		});
-	},
-	_markLinkedinSuccess: function(){
-		this.setState({
-			classDivLinkedin: "form-group has-success", 
-			classInputLinkedin: "form-control form-control-success", 
-			linkedinTextBlock: "Good to go",
-			hasErrors: false
-		});
-	},
-	handleUsernameHighlight: function(event){
-		var me = this;
-		var username = getValue("username");		
-		me.checkUsername(username);
-	},
-	handleNameHighlight: function(event){
-		var me = this;
-		var name = getValue("name");		
-		me.checkName(name);
-	},
-	handleEmailHighlight: function(event){
-		var me = this;
-		var email = getValue("email");		
-		me.checkEmail(email);
-	},
-	handlePhoneHighlight: function(event){
-		var me = this;
-		var phone = getValue("phone");		
-		me.checkPhone(phone);
-	},
-	handleBioHighlight: function(event){
-		var me = this;
-		var bio = getValue("bio");		
-		me.checkBio(bio);
-	},
-	handleWebsiteHighlight: function(event){
-		var me = this;
-		var website = getValue("website");		
-		me.checkWebsite(website);
-	},
-	handleFacebookHighlight: function(event){
-		var me = this;
-		var facebook = getValue("facebook");		
-		me.checkFacebook(facebook);
-	},
-	handleTwitterHighlight: function(event){
-		var me = this;
-		var twitter = getValue("twitter");		
-		me.checkTwitter(twitter);
-	},
-	handleLinkedinHighlight: function(event){
-		var me = this;
-		var linkedin = getValue("linkedin");		
-		me.checkLinkedin(linkedin);
-	},
+	componentDidMount: function(){
+		require ('react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css');
+		require ('react-datetime/css/react-datetime.css');
+		this.notification = this.refs.notificationSystem;
+  },
 	render: function(){		
 		return (
 			<div className="content-wrapper">
 				<div className="container-fluid">
 				<section className="content-header" style={{marginBottom:20}}>
 			      <h1>
-			        {this.state.mode==="update"?"Edit User":"Add New User"}
-              { this.state.mode==="update" &&
+			        {this.props.mode==="update"?"Edit User":"Add New User"}
+              { this.props.mode==="update" &&
                 <small style={{marginLeft: 5}}>
                   <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
                 </small>
@@ -747,7 +372,7 @@ var NewUser = React.createClass({
 			        <li className="active">Add New User</li>
 			      </ol>
 			      <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
-			      { this.state.isProcessing &&
+			      { this.props.isProcessing &&
               <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
             }
 			    </section>
@@ -757,13 +382,13 @@ var NewUser = React.createClass({
 			    	<div className="row">
 					  	<div className="col-md-8">
 					  	<section className="content">
-			    			<form onSubmit={this.handleSubmitBtn} className="form-horizontal" id="profileForm" style={{opacity: this.state.opacity}}>
+			    			<form onSubmit={this.props.handleSubmit(this.handleSubmitBtn)} className="form-horizontal" id="profileForm" style={{opacity: this.props.opacity}}>
 			    				
-					  			<div className={this.state.classDivName}>
+					  			<div className="form-group">
 								  	<label htmlFor="name" className="col-md-3">Name<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
-										<input type="text" name="name" id="name" onBlur={this.handleNameHighlight} className={this.state.classInputName} required="true"/>
-										<p className="help-block">{this.state.nameTextBlock}</p>
+								  	<Field name="name" component={renderField} type="text" className="form-control" className="form-control" validate={[required]} required="true"/>
+										<p className="help-block">{this.props.nameTextBlock}</p>
 									</div>
 								</div>
 
@@ -772,23 +397,22 @@ var NewUser = React.createClass({
 							  	<div className="col-md-9">
 									<Dropzone onDrop={this.handleImageDrop}>
 										<div className="avatar-container">
-				             	<img src={this.state.avatar} alt='' id="avatar"/> 
+				             	<img src={this.props.avatar} alt='' id="avatar"/> 
 										  <div className="avatar-overlay"></div>
 										  <div className="avatar-button"><a href="#"> Change </a></div>
 										</div>
-			            			</Dropzone>
+			            </Dropzone>
 								</div>
 								</div>
 
-					  			<div className={this.state.classDivUsername}>
+					  			<div className="form-group">
 								  	<label htmlFor="tagline" className="col-md-3">Username<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
 								  		<div className="form-inline">
-											<input type="text" name="username" id="username" 
-												className={this.state.classInputUsername} onBlur={this.handleUsernameHighlight} disabled={this.state.mode==="update"?true:false}/>
-												{ this.state.checkingUsername && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
+								  		<Field name="username" component={renderField} type="text" className="form-control" className="form-control" validate={[required, maxLength15]} disabled={this.props.mode==="update"?true:false}/>
+											{ this.props.checkingUsername && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
 											</div>
-											<p className="help-block">{this.state.usernameTextBlock}</p>
+											<p className="help-block">{this.props.usernameTextBlock}</p>
 										</div>
 								</div>
 
@@ -798,7 +422,7 @@ var NewUser = React.createClass({
 										<DateTime 
 											timeFormat={false} 
 											className="datetime-input" 
-											value={this.state.dateOfBirth}
+											value={this.props.dateOfBirth}
 											onChange={this.handleBirthDateChange}/>
 									</div>
 								</div>
@@ -806,37 +430,37 @@ var NewUser = React.createClass({
 								<div className="form-group">
 								 	<label htmlFor="homeUrl" className="col-md-3">Gender</label>
 								 	<div className="col-md-9">
-										<select id="gender" name="gender" defaultValue="Male" style={{width: 150}}>
+										<Field name="gender" component="select" style={{width: 150}}>
 											<option key="" value="" >Select your gender...</option>
 											<option key="male" value="Male" >Male</option>
 											<option key="female" value="Female" >Female</option>
-										</select> 
+										</Field> 
 									</div>
 								</div>
 
-					  			<div className={this.state.classDivEmail}>
-								  	<label htmlFor="keywoards" className="col-md-3">Email<span style={{color:"red"}}>*</span></label>
+					  			<div className="form-group">
+								  	<label htmlFor="email" className="col-md-3">Email<span style={{color:"red"}}>*</span></label>
 								  	<div className="col-md-9">
 								  		<div className="form-inline">
-												<input type="email" name="email" id="email" className={this.state.classInputEmail} 
-													onBlur={this.handleEmailHighlight} disabled={this.state.mode==="update"?true:false} required="true"/>
-												{ this.state.checkingEmail && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
+								  			<Field name="email" component={renderField} type="text" className="form-control" 
+													validate={[required, email]} disabled={this.props.mode==="update"?true:false} required="true"/>
+												{ this.props.checkingEmail && <i style={{marginLeft:5}} className="fa fa-spin fa-refresh"></i>}
 											</div>
-											<p className="help-block">{this.state.emailTextBlock}</p>
+											<p className="help-block">{this.props.emailTextBlock}</p>
 									</div>
 								</div>
 
-								<div className={this.state.classDivPhone}>
+								<div className="form-group">
 								  	<label htmlFor="phone" className="col-md-3">Phone</label>
 								  	<div className="col-md-9">
-										<input type="text" name="phone" id="phone" onBlur={this.handlePhoneHighlight} className={this.state.classInputPhone} />
+								  	<Field name="phone" component={renderField} type="text" validate={[phoneNumber]} className="form-control" />
 									</div>
 								</div>
 
-								<div className={this.state.classDivBio}>
-								 	<label htmlFor="homeUrl" className="col-md-3">Biography</label>
+								<div className="form-group">
+								 	<label htmlFor="bio" className="col-md-3">Biography</label>
 								 	<div className="col-md-9">
-										<textarea name="bio" id="bio" onBlur={this.handleBioHighlight} className={this.state.classInputBio}></textarea>
+								 		<Field id="content" name="bio" component="textarea" wrap="hard" type="textarea" validate={[maxLength100]} className="form-control" />
 									</div>
 								</div>
 
@@ -854,80 +478,80 @@ var NewUser = React.createClass({
 										  absolute={true}
 										  style={{width: 300}}
 										  placeholder="Select timezone..."
-										  value={this.state.timezone}
+										  value={this.props.timezone}
 										  onChange={this.handleTimezoneChange}
 										/>
 									</div>
 								</div>
 
 								<h4 style={{marginBottom: 20}}>Social Media Accounts</h4>
-								<div className={this.state.classDivWebsite}>
+								<div className="form-group">
 								  	<label htmlFor="website" className="col-md-3">Website</label>
 								  	<div className="col-md-9">
-										<input type="text" onBlur={this.handleWebsiteHighlight} name="website" id="website" placeholder="example: www.ussunnah.com" className={this.state.classInputWebsite} />
-										<p className="help-block">{this.state.websiteTextBlock}</p>
+								  	<Field name="website" component={renderField} type="text" className="form-control"  placeholder="example: www.ussunnah.com" className="form-control" />
+										<p className="help-block">{this.props.websiteTextBlock}</p>
 									</div>
 								</div>
 
-								<div className={this.state.classDivFacebook}>
+								<div className="form-group">
 								  	<label htmlFor="facebook" className="col-md-3">Facebook Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="facebook" id="facebook" placeholder="example: www.facebook.com/ussunnah" onBlur={this.handleFacebookHighlight} className={this.state.classInputFacebook} />
-										<p className="help-block">{this.state.facebookTextBlock}</p>
+								  	<Field name="facebook" component={renderField} type="text" validate={[facebook]} className="form-control"  placeholder="example: www.facebook.com/ussunnah"/>
+										<p className="help-block">{this.props.facebookTextBlock}</p>
 									</div>
 								</div>
 
-								<div className={this.state.classDivTwitter}>
+								<div className="form-group">
 								  	<label htmlFor="twitter" className="col-md-3">Twitter Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="twitter" id="twitter" placeholder="example: www.twitter.com/ussunnah" onBlur={this.handleTwitterHighlight} className={this.state.classInputTwitter} />
-										<p className="help-block">{this.state.twitterTextBlock}</p>
+								  	<Field name="twitter" component={renderField} type="text" className="form-control" placeholder="example: www.twitter.com/ussunnah" className="form-control" />
+										<p className="help-block">{this.props.twitterTextBlock}</p>
 									</div>
 								</div>
 
-								<div className={this.state.classDivLinkedin}>
+								<div className="form-group">
 								  	<label htmlFor="linkedin" className="col-md-3">Linkedin Account</label>
 								  	<div className="col-md-9">
-										<input type="text" name="linkedin" id="linkedin" placeholder="example: www.linkedin.com/in/ussunnah" onBlur={this.handleLinkedinHighlight} className={this.state.classInputLinkedin} />
-										<p className="help-block">{this.state.linkedinTextBlock}</p>
+								  	<Field name="linkedin" component={renderField} type="text" placeholder="example: linkedin.com/in/ussunnah" className="form-control" />
+										<p className="help-block">{this.props.linkedinTextBlock}</p>
 									</div>
 								</div>
 
-								{ this.state.mode==="create" &&
+								{ this.props.mode==="create" &&
 								 [<h4 key="1" style={{marginBottom: 20}}>Password</h4>,
 								 <div key="2" className="form-group">
 									 	<label htmlFor="homeUrl" className="col-md-3">Role</label>
 									 	<div className="col-md-9">
-											<select name="role" id="role" className="form-control select">
+											<Field name="role" component="select" className="form-control select">
 												{
-													this.state.roleList.map(function(item){
+													this.props.roleList.map(function(item){
 														return <option key={item.id} value={item.id}>{item.name}</option>
 													})
 												}
-											</select>
+											</Field>
 										</div>
 									</div>]
 								 
 								}
 
-								{ this.state.mode==="update" &&
+								{ this.props.mode==="update" &&
 								 [<h4 key="1" style={{marginBottom: 20}}>Role and password</h4>,
 									<div key="2" className="form-group">
 									 	<label htmlFor="homeUrl" className="col-md-3">Role</label>
 									 	<div className="col-md-9">
-											<select name="role" id="role" className="form-control select">
+									 		<Field name="role" component="select" className="form-control select">
 												{
-													this.state.roleList.map(function(item){
+													this.props.roleList.map(function(item){
 														return <option key={item.id} value={item.id}>{item.name}</option>
 													})
 												}
-											</select>
+											</Field>
 										</div>
 									</div>,
 									<div key="3" className="form-group">
 									 	<label htmlFor="old-password" className="col-md-3">Old password</label>
 									 	<div className="col-md-9">
-											<input type="password" name="old-password" id="old-password" className="form-control" style={{width:200}}/>
+									 		<Field name="old-password" component={renderField} type="password" className="form-control" style={{width:300}}/>
 										</div>
 									</div>
 									]
@@ -956,7 +580,7 @@ var NewUser = React.createClass({
 								<div className="form-group">
 								 	<label htmlFor="new-password-2" className="col-md-3">Re-type password<span style={{color:"red"}}>*</span></label>
 								 	<div className="col-md-9">
-										<input type="password" name="new-password-2" id="new-password-2" className="form-control" style={{width:200}} disabled={!this.state.passwordActive}/>
+								 		<Field name="new-password-2" component={renderField} type="password" className="form-control" style={{width:300}} disabled={!this.props.passwordActive}/>
 									</div>
 								</div>
 
@@ -967,7 +591,7 @@ var NewUser = React.createClass({
 								<div className="form-group">
 									<div className="col-md-9">
 										<div className="btn-group">
-											<input type="submit" value={this.state.mode==="update"?"Update User":"Add User"} className="btn btn-primary btn-sm" />
+											<input type="submit" value={this.props.mode==="update"?"Update User":"Add User"} className="btn btn-primary btn-sm" />
 										</div>
 									</div>
 								</div>
@@ -983,5 +607,137 @@ var NewUser = React.createClass({
 		)
 	}
 });
+
+const selector = formValueSelector('userNewForm')
+
+const mapStateToProps = function(state){
+  if (!_.isEmpty(state.userNew)) {
+    return _.head(state.userNew)
+  } else return {}
+}
+
+NewUser = reduxForm({
+  form: 'userNewForm'
+})(NewUser)
+
+
+NewUser = connect(mapStateToProps)(NewUser)
+
+var getUserQry = gql`query userNew($id: ID!) {
+  getUser(id: $id) {
+    id
+    username
+    fullName
+    gender
+    image
+    email
+    lastLogin
+    createdAt
+    country
+    dateOfBirth
+    meta {
+      edges {
+        node {
+          id
+          item
+          value
+        }
+      }
+    }
+    roles {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+    }
+  }
+
+  viewer{
+    allRoles{
+      edges {
+        node{
+          id
+          name
+        }
+      }
+    }
+  }
+}`
+NewUser = graphql(getUserQry, {
+	options : (props) => ({
+    variables: {
+      id: props.userId?props.userId:""
+    }
+  }),
+  props: ({ownProps, data}) => {
+  	
+    if (data.viewer) {
+      var roleList = [];
+      var _data = {}
+      var timezone = "";
+      var metaValues = {};
+      var avatar = "";
+      var userRole = "";
+
+      var mode = ownProps.userId?"update":"create";
+      for (var i=0;i < data.viewer.allRoles.edges.length; i++) {
+      	var item = data.viewer.allRoles.edges[i];
+      	if (item.node.name==="Owner" && !Config.adminMode)
+      		continue;
+      	roleList.push({id: item.node.id, name: item.node.name});
+      }
+      if (mode==="update") {
+	  		_data = data.getUser;
+
+	  		_.forEach(ownProps.userMetaList, function(item){
+					var i = _.find(_data.meta.edges, {"node": {"item": item}});
+					if (i){
+						if (item==="timezone"){
+							timezone = i.node.value;
+						} else {
+							metaValues[i.node.item] = i.node.value;
+						}
+					}
+				})
+
+				if (_data.image) avatar = _data.image;
+				
+				if (_data.roles.edges.length>0){
+					var roles = _.map(_data.roles.edges, function(item){
+						return item.node.id
+					});
+					
+					if (roles.length>0) {
+						userRole = roles[0];
+					}
+					
+				}
+	  	}
+
+			var p = JSON.parse(localStorage.getItem("profile"));
+			var isAdmin = (_.indexOf(p.roles, "Admin") > -1);
+
+    	return {
+        initialValues: _data,
+        mode: mode,
+        roleList: roleList,
+        isAdmin: isAdmin,
+        timezone: timezone,
+        avatar: avatar,
+        userRole: userRole,
+        roleList: roleList
+      }
+    } else {
+    	return {
+    		mode: ownProps.userId?"update":"create"
+    	}
+    }
+
+  }
+})(NewUser);
+
+NewUser = withApollo(NewUser);
 
 export default NewUser;

@@ -279,17 +279,17 @@ let Profile = React.createClass({
 								  	<div className="col-md-9">
 										<Dropzone onDrop={this.handleImageDrop}>
 											<div className="avatar-container">
-					              			  <img src={this.props.avatar} alt='' id="avatar"/> 
+					              <img src={this.props.avatar} alt='' id="avatar"/> 
 											  <div className="avatar-overlay"></div>
 											  <div className="avatar-button"><a href="#"> Change </a></div>
 											</div>
-				            			</Dropzone>
+				            </Dropzone>
 									</div>
 									</div>
 
-						  			<div className="form-group">
-									  	<label htmlFor="tagline" className="col-md-3">Username</label>
-									  	<div className="col-md-9">
+						  		<div className="form-group">
+									  <label htmlFor="tagline" className="col-md-3">Username</label>
+									  <div className="col-md-9">
 											<Field name="username" component="input" type="text" className="form-control" disabled/>
 											<p className="help-block">The short unique name describes you</p>
 										</div>
