@@ -30,6 +30,18 @@ const getContentListQry = function(status){
           }
         }
       }
+
+      viewer {
+        allOptions {
+          edges {
+            node {
+              id,
+              item,
+              value
+            }
+          }
+        }
+      }
     }`
   }
 }

@@ -364,8 +364,8 @@ let Admin = React.createClass({
     require ('jquery-ui/themes/base/tooltip.css');
     require ('font-awesome/css/font-awesome.css');
     require ('../../public/css/ionicons.min.css');
-    require ('../../public/css/AdminLTE.css');
-    require ('../../public/css/skins/_all-skins.css');
+    require ('../../public/css/AdminLTE.min.css');
+    require ('../../public/css/skins/_all-skins.min.css');
     require ('jquery-ui/ui/widgets/tooltip')
 
     AdminLTEinit();
@@ -420,15 +420,12 @@ let Admin = React.createClass({
         function() {
           if (postId) {
             me.props.dispatch(setActivePage(pageId, actionId, postId))
-            //window.history.pushState("", "", '/admin/'+pageId+'/'+actionId+'/'+postId);
             me._reactInternalInstance._context.history.push('/admin/'+pageId+'/'+actionId+'/'+postId)
           } else {
             me.props.dispatch(setActivePage(pageId, actionId))
             if (actionId)
-              //window.history.pushState("", "", '/admin/'+pageId+'/'+actionId);
               me._reactInternalInstance._context.history.push('/admin/'+pageId+'/'+actionId)
             else 
-              //window.history.pushState("", "", '/admin/'+pageId);
               me._reactInternalInstance._context.history.push('/admin/'+pageId)
           }
 
@@ -536,7 +533,7 @@ var qry = gql`query {
   }
 }`
 
-Admin = graphql(qry, {
+Admin = graphql(gql`${Query.getContentListQry("active").query}`, {
   props: ({ownProps, data}) => {
     if (data.viewer) {
       var _dataArr = [];
