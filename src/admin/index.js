@@ -45,7 +45,7 @@ import request from 'request';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'jquery-ui/themes/base/core.css';
-import 'sweetalert2/dist/sweetalert2.min.css';
+import 'sweetalert2/dist/sweetalert2.css';
 
 require ('bootstrap');
 
@@ -363,8 +363,8 @@ let Admin = React.createClass({
     require ('jquery-ui/themes/base/theme.css');
     require ('jquery-ui/themes/base/tooltip.css');
     require ('font-awesome/css/font-awesome.css');
-    require ('../../public/css/ionicons.min.css');
-    require ('../../public/css/AdminLTE.min.css');
+    require ('../../public/css/ionicons.css');
+    require ('../../public/css/AdminLTE.css');
     require ('../../public/css/skins/_all-skins.min.css');
     require ('jquery-ui/ui/widgets/tooltip')
 

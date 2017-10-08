@@ -40,7 +40,7 @@ class Login extends React.Component{
 
 	componentDidMount(){
 		require ('font-awesome/css/font-awesome.css');
-		require ('../public/css/ionicons.min.css');
+		require ('../public/css/ionicons.css');
 		require ('../public/css/AdminLTE.css');
 
 		var me = this;
