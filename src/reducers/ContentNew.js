@@ -1,9 +1,34 @@
 const INITIAL_VALUES =  [{
-      isProcessing: false,
-      opacity: 1,
-      deleteMode: false,
-      activeStatus: "All",
-      itemSelected: false
+      mode: "create",
+      fields: [
+        {id:"title", label: "Title", type: "link", deletable: false},
+        {id:"slug", label: "Slug", type: "text", deletable: false}
+      ],
+      defaultFields: [
+        {id:"title", label: "Title", type: "link", deletable: false},
+        {id:"slug", label: "Slug", type: "text", deletable: false}
+      ],
+      providedFields: [
+        {id:"author", label: "Author", type: "link"},
+        {id:"summary", label: "Summary", type: "link"},
+        {id:"content", label: "Content", type: "text"},
+        {id:"image", label: "Image", type: "text"},
+        {id:"like", label: "Like", type: "text"},
+        {id:"featuredImage", label: "Featured Image", type: "text"},
+        {id:"gallery", label: "Gallery", type: "text"}
+      ],
+      providedFieldsDefault: [
+        {id:"author", label: "Author", type: "link"},
+        {id:"summary", label: "Summary", type: "link"},
+        {id:"content", label: "Content", type: "text"},
+        {id:"image", label: "Image", type: "text"},
+        {id:"like", label: "Like", type: "text"},
+        {id:"featuredImage", label: "Featured Image", type: "text"},
+        {id:"gallery", label: "Gallery", type: "text"}
+      ],
+      customFields: [],
+      checkingSlug: false,
+      slug: ''
     }]
 
 const contentNew = (state = INITIAL_VALUES, action) => {

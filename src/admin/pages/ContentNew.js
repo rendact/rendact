@@ -25,9 +25,9 @@ const ContentField = React.createClass({
 let ContentNew = React.createClass({
 
 	getDefaultProps: function() {
-		debugger
 	    return {
-	      	//mode: this.props.postId?"update":"create",
+	    //mode: this.props.postId?"update":"create",
+	    mode: "create",
 			fields: [
 				{id:"title", label: "Title", type: "link", deletable: false},
 				{id:"slug", label: "Slug", type: "text", deletable: false}
@@ -37,13 +37,8 @@ let ContentNew = React.createClass({
 				{id:"slug", label: "Slug", type: "text", deletable: false}
 			],
 			providedFields: [
-				{id:"author", label: "Author", type: "link"},
-				{id:"summary", label: "Summary", type: "link"},
-				{id:"content", label: "Content", type: "text"},
-				{id:"image", label: "Image", type: "text"},
-				{id:"like", label: "Like", type: "text"},
-				{id:"featuredImage", label: "Featured Image", type: "text"},
-				{id:"gallery", label: "Gallery", type: "text"}
+				{id:"title", label: "Title", type: "link", deletable: false},
+				{id:"slug", label: "Slug", type: "text", deletable: false}
 			],
 			providedFieldsDefault: [
 				{id:"author", label: "Author", type: "link"},
@@ -103,7 +98,7 @@ let ContentNew = React.createClass({
             if (slugCount > 0) { 
             	// me.setState({checkingSlug: false, slug: slug+"-"+slugCount});
             	me.props.dispatch(togglecheckingSlug(false, slug+"-"+slugCount)); 
-            	setValue('slug', slug+"-"+slugCount)
+            	// setValue('slug', slug+"-"+slugCount)
             } else 
             	// me.setState({checkingSlug: false, slug: slug});
             	me.props.dispatch(togglecheckingSlug(false, slug));
@@ -111,7 +106,7 @@ let ContentNew = React.createClass({
             if (slugCount > 1) { 
             	// me.setState({checkingSlug: false, slug: slug+"-"+slugCount}); 
             	me.props.dispatch(togglecheckingSlug(false, slug+"-"+slugCount));
-            	setValue('slug', slug+"-"+slugCount)
+            	// setValue('slug', slug+"-"+slugCount)
             }
             else 
             	// me.setState({checkingSlug: false, slug: slug});
@@ -129,7 +124,7 @@ let ContentNew = React.createClass({
     // var name = getValue("name");
     var name = this.props.name;
     var slug = name.split(" ").join("-").toLowerCase();
-    setValue("slug", slug);
+    // setValue("slug", slug);
     this.checkSlug(slug);
 
     // var label = getValue("label");
@@ -199,14 +194,14 @@ let ContentNew = React.createClass({
 	handleAddProvidedField: function(event){
 		var me = this;
 		var providedFields = [];
-		var allProvidedField = _.concat(me.props.providedFieldsDefault, me.props.providedFieldsDefault);
+		var allProvidedField = _.concat(me.props.defaultFields, me.props.providedFieldsDefault);
 
 		var checkedFields = _.filter(document.getElementsByName("checkboxField[]"), function(item){
       return item.checked
     });
     
     _.forEach(checkedFields, function(item){
-    	var newField = _.find(allProvidedField, {id: item.value});
+    	var newField = _.find(allProvidedField, {id: item.id});
 			if (newField) providedFields.push(newField);
     })
 		// this.setState({providedFields: providedFields, fields: _.concat(providedFields, this.state.customFields)});
@@ -391,16 +386,16 @@ let ContentNew = React.createClass({
 	                  	_.map(this.props.defaultFields, function(item){
 	                  		return <div key={item.id} className="checkbox">
 	                  			<label>
-	                  				<Field component="input" type="checkbox" name="checkboxField[]" value={item.id} readOnly="true" checked/>{item.label}
+	                  				<Field component="input" type="checkbox" name="checkboxField[]"  id={item.id} value={item.id} readOnly="true" checked/>{item.label}
 	                  			</label>
 	                  			</div>
 	                  	})
 	                  }
 	                  {
-	                  	_.map(this.providedFieldsDefault, function(item){
+	                  	_.map(this.props.providedFieldsDefault, function(item){
 	                  		return <div key={item.id} className="checkbox">
 	                  		<label>
-	                  			<Field component="input" type="checkbox" name="checkboxField[]" onChange={this.handleAddProvidedField} value={item.id}/>{item.label}
+	                  			<Field component="input" type="checkbox" name="checkboxField[]" id={item.id} onChange={this.handleAddProvidedField} value={item.id}/>{item.label}
 	                  		</label>
 	                  		</div>
 	                  	}.bind(this))
@@ -586,13 +581,14 @@ const mapStateToProps = function(state){
     fieldAlign: selector(state, 'fieldAlign'),
     connection: selector(state, 'connection')
   }
+  	debugger
 
   if (!_.isEmpty(state.contentNew)) {
     var out = _.head(state.contentNew);
-    out["initialValues"] = out.data;
-    return _.merge(out, customStates);
+    out = {...out, ...customStates}
+    return out
   } else 
-  return customStates;
+  return {};
 }
 
 ContentNew = reduxForm({
