@@ -98,7 +98,7 @@ let ContentNew = React.createClass({
             if (slugCount > 0) { 
             	// me.setState({checkingSlug: false, slug: slug+"-"+slugCount});
             	me.props.dispatch(togglecheckingSlug(false, slug+"-"+slugCount)); 
-            	// setValue('slug', slug+"-"+slugCount)
+            	setValue('slug', slug+"-"+slugCount)
             } else 
             	// me.setState({checkingSlug: false, slug: slug});
             	me.props.dispatch(togglecheckingSlug(false, slug));
@@ -106,7 +106,7 @@ let ContentNew = React.createClass({
             if (slugCount > 1) { 
             	// me.setState({checkingSlug: false, slug: slug+"-"+slugCount}); 
             	me.props.dispatch(togglecheckingSlug(false, slug+"-"+slugCount));
-            	// setValue('slug', slug+"-"+slugCount)
+            	setValue('slug', slug+"-"+slugCount)
             }
             else 
             	// me.setState({checkingSlug: false, slug: slug});
@@ -240,6 +240,7 @@ let ContentNew = React.createClass({
 			align:align?align:"left",
 			connection: connection?connection:null
 		};
+
 		customFields.push(newField);
 		// this.setState({customFields: customFields, fields: _.concat(this.state.providedFields, customFields)});
 		this.props.dispatch(setcustomFields(customFields));
@@ -413,7 +414,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Field Name</label>
 								  			</div>
 								  			<div className="col-md-9">
-								  				<Field component="input" type="text" id="fieldName" placeholder="Field name" className="form-control" />
+								  				<Field component="input" type="text" name="fieldName" id="fieldName" placeholder="Field name" className="form-control" />
 								  			</div>
 							  			</div>
 
@@ -422,7 +423,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Field Type</label>
 								  			</div>
 								  			<div className="col-md-9">
-													<Field component="select"	id="fieldType" className="form-control select" onChange={this.handleFieldTypeChange}>
+													<Field component="select"	id="fieldType" name="fieldType" className="form-control select" onChange={this.handleFieldTypeChange}>
 														<option value="text">String</option>
 														<option value="text">Number</option>
 														<option value="date">Date</option>
@@ -438,7 +439,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Connect to other content</label>
 								  			</div>
 								  			<div className="col-md-9">
-								  				<Field component="select"	id="connection" className="form-control select" disabled="true">
+								  				<Field component="select" name="connection"	id="connection" className="form-control select" disabled="true">
 														<option value="testing">Testing</option>
 														<option value="developer">Developer</option>
 													</Field>
@@ -450,7 +451,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Width</label>
 								  			</div>
 								  			<div className="col-md-9">
-								  				<Field component="input" type="text" id="fieldWidth" placeholder="Width" className="form-control"/> 
+								  				<Field component="input" type="text" name="fieldWidth" id="fieldWidth" placeholder="Width" className="form-control"/> 
 								  			</div>
 							  			</div>
 												
@@ -459,7 +460,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Align</label>
 								  			</div>
 								  			<div className="col-md-9">
-								  				<Field component="select" id="fieldAlign" className="form-control select">
+								  				<Field component="select" name="fieldAlign" id="fieldAlign" className="form-control select">
 														<option value="left">Left</option>
 														<option value="right">Right</option>
 														<option value="center">Center</option>
@@ -472,7 +473,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Position in editor</label>
 								  			</div>
 								  			<div className="col-md-9">
-								  				<Field component="select" id="fieldAlign" className="form-control select">
+								  				<Field component="select" name="fieldAlign" id="fieldAlign" className="form-control select">
 														<option value="left">Left</option>
 														<option value="right">Right</option>
 													</Field> 	
