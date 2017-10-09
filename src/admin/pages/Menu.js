@@ -592,7 +592,6 @@ let Menu = React.createClass({
 
   componentDidMount: function(){
     require ('jquery-ui/themes/base/theme.css');
-    require ('../lib/jquery-sortable.js');
     require ('../../../public/css/AdminLTE.css');
     require ('../../../public/css/skins/_all-skins.css');
     require('./menucustom.css');

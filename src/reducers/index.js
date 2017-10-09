@@ -20,15 +20,14 @@ import {themeHome, themeSingle, themeBlog } from './Theme'
 import userNew from './UserNew';
 
 const INITIAL_STATE = {
-  referrer: '/admin/dashboard'
+  referrer: '/admin/dashboard',
+  logged: localStorage.getItem('token') ? true : false,
 }
 
 const main = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case 'LOGGED':
-      return { ...state, logged: action.isLogged, pathname: action.pathname?action.pathname:null}
-    case 'SET_CHECK_AUTH_DONE':
-      return { ...state, checkAuthDone: action.state }
+      return { ...state, logged: action.isLogged, referrer: action.pathname?action.pathname:state.referrer}
     case 'SET_REFERRER':
       return {...state, referrer: action.referrer}
     default:

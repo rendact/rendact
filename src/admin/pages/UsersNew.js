@@ -623,49 +623,7 @@ NewUser = reduxForm({
 
 NewUser = connect(mapStateToProps)(NewUser)
 
-var getUserQry = gql`query userNew($id: ID!) {
-  getUser(id: $id) {
-    id
-    username
-    fullName
-    gender
-    image
-    email
-    lastLogin
-    createdAt
-    country
-    dateOfBirth
-    meta {
-      edges {
-        node {
-          id
-          item
-          value
-        }
-      }
-    }
-    roles {
-      edges {
-        node {
-          id
-          name
-        }
-      }
-    }
-  }
-
-  viewer{
-    allRoles{
-      edges {
-        node{
-          id
-          name
-        }
-      }
-    }
-  }
-}`
-NewUser = graphql(getUserQry, {
+NewUser = graphql(Query.getUserListQry, {
 	options : (props) => ({
     variables: {
       id: props.userId?props.userId:""

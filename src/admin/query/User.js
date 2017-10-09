@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import gql from 'graphql-tag';
 
 const getUserQry  = function(userId){
     return {
@@ -13,43 +14,38 @@ const getUserQry  = function(userId){
     }
 };
 
-const getUserListQry = {
-"query": `query getUsers{
-        viewer {
-        allUsers {
-          edges {
-            node {
-              id,
-              username,
-              email,
-              fullName,
-              gender,
-              image,
-              country,
-              lastLogin,
-              dateOfBirth,
-              posts {
-                edges {
-                  node {
-                    id
-                  }
-                }
-              }
-              roles {
-                edges {
-                  node {
-                    id
-                    name
-                  }
-                }
-              }
-              
-            }
+const getUserListQry = gql`
+  query GetUser($id: ID!) {
+    getUser(id: $id) {
+      id
+      username
+      fullName
+      gender
+      image
+      email
+      lastLogin
+      createdAt
+      country
+      dateOfBirth
+      meta {
+        edges {
+          node {
+            id
+            item
+            value
           }
         }
       }
-    }`
-};
+      roles {
+        edges {
+          node {
+            id
+            name
+          }
+        }
+      }
+    }
+  }`
 
 const getUserListByTypeQry = function(type){
   var typeQry = "";

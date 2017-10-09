@@ -36,7 +36,7 @@ import AdminLTEinit from './lib/app.js';
 import {hasRole, getConfig, swalert} from '../utils';
 import Query from './query';
 import {saveConfig} from '../utils';
-import {toggleControlSidebarState, toggleUnsavedDataState, setActivePage, setActiveMenuId } from '../actions';
+import {toggleControlSidebarState, toggleUnsavedDataState, setActivePage, setActiveMenuId, setLogged } from '../actions';
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo';
 import {connect} from 'react-redux'
@@ -45,7 +45,7 @@ import request from 'request';
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'jquery-ui/themes/base/core.css';
-import 'sweetalert2/dist/sweetalert2.min.css';
+import 'sweetalert2/dist/sweetalert2.css';
 
 require ('bootstrap');
 
@@ -363,9 +363,9 @@ let Admin = React.createClass({
     require ('jquery-ui/themes/base/theme.css');
     require ('jquery-ui/themes/base/tooltip.css');
     require ('font-awesome/css/font-awesome.css');
-    require ('../../public/css/ionicons.min.css');
+    require ('../../public/css/ionicons.css');
     require ('../../public/css/AdminLTE.css');
-    require ('../../public/css/skins/_all-skins.css');
+    require ('../../public/css/skins/_all-skins.min.css');
     require ('jquery-ui/ui/widgets/tooltip')
 
     AdminLTEinit();
@@ -420,15 +420,12 @@ let Admin = React.createClass({
         function() {
           if (postId) {
             me.props.dispatch(setActivePage(pageId, actionId, postId))
-            //window.history.pushState("", "", '/admin/'+pageId+'/'+actionId+'/'+postId);
             me._reactInternalInstance._context.history.push('/admin/'+pageId+'/'+actionId+'/'+postId)
           } else {
             me.props.dispatch(setActivePage(pageId, actionId))
             if (actionId)
-              //window.history.pushState("", "", '/admin/'+pageId+'/'+actionId);
               me._reactInternalInstance._context.history.push('/admin/'+pageId+'/'+actionId)
             else 
-              //window.history.pushState("", "", '/admin/'+pageId);
               me._reactInternalInstance._context.history.push('/admin/'+pageId)
           }
 
@@ -448,7 +445,7 @@ let Admin = React.createClass({
   },
   handleSignout(e){
     e.preventDefault()
-    this.props.onlogin(false, 'login');
+    this.props.dispatch(setLogged(false, '/login'))
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     localStorage.removeItem('profile');
@@ -536,7 +533,7 @@ var qry = gql`query {
   }
 }`
 
-Admin = graphql(qry, {
+Admin = graphql(gql`${Query.getContentListQry("active").query}`, {
   props: ({ownProps, data}) => {
     if (data.viewer) {
       var _dataArr = [];

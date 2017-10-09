@@ -2,13 +2,14 @@ import React from 'react'
 import 'bootstrap/dist/css/bootstrap.css'
 import '../public/css/Login.css'
 import AdminLTEinit from  './admin/lib/app.js'
-//import {setLogged} from './actions'
+import {setLogged} from './actions'
 import {connect} from 'react-redux'
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo';
 import {setProfile} from './utils';
 import Config from './rendact.config.json';
 import Auth0Lock from 'auth0-lock';
+import {Redirect} from 'react-router';
 
 class Login extends React.Component{
 	constructor(props){
@@ -40,7 +41,7 @@ class Login extends React.Component{
 
 	componentDidMount(){
 		require ('font-awesome/css/font-awesome.css');
-		require ('../public/css/ionicons.min.css');
+		require ('../public/css/ionicons.css');
 		require ('../public/css/AdminLTE.css');
 
 		var me = this;
@@ -58,7 +59,7 @@ class Login extends React.Component{
 	      localStorage.setItem('loginType','auth0');
 	      console.log("Auth0 authenticated");
 	      //window.location = '/admin';
-	      this.props.onlogin(true, 'admin');
+        me.props.dispatch(setLogged(true))
 	    });
 	  }
 	  this.lock.on('authenticated', _doAuthentication);
@@ -76,7 +77,7 @@ class Login extends React.Component{
 		var me = this;
 		var pathname = 'admin';
 		try {
-			pathname = this.props.referrer;
+			pathname = this.props.location.state.form;
 		} catch(e) {}
 
 		this.props.doLogin({"variables": {
@@ -94,7 +95,8 @@ class Login extends React.Component{
           setProfile(p);
         }
         me.disableForm(false);
-				me.props.onlogin(true, pathname);
+        me._reactInternalInstance._context.history.push(pathname)
+				me.props.dispatch(setLogged(true, pathname));
       } else {
         me.setState({errorMsg: "Login failed"});
 	  		me.disableForm(false);
@@ -111,14 +113,8 @@ class Login extends React.Component{
 	}
 
 	render(){
-		const redirect = (
-			<div>
-			<h2 style={{marginTop:100,width:"100%",textAlign:"center"}}>Redirecting...</h2>
-			</div>
-		)
-
-		if(this.props.params && this.props.params.param1==="redirect")
-			return redirect;
+		if(this.props.logged)
+      return <Redirect to={this.props.location.state.form}/>;
 		
 		const loginPage = (
 			<div className="login-box">
@@ -169,7 +165,7 @@ class Login extends React.Component{
 	}
 }
 
-Login = connect()(Login);
+Login = connect(state=>state.main)(Login);
 
 var loginMtn = gql`mutation LoginUserQuery ($input: LoginUserInput!) {
   loginUser(input: $input) {
