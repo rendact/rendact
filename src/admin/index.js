@@ -363,9 +363,9 @@ let Admin = React.createClass({
     require ('jquery-ui/themes/base/theme.css');
     require ('jquery-ui/themes/base/tooltip.css');
     require ('font-awesome/css/font-awesome.css');
-    require ('../../public/css/ionicons.css');
-    require ('../../public/css/AdminLTE.css');
-    require ('../../public/css/skins/_all-skins.min.css');
+    require ('../css/ionicons.css');
+    require ('../css/AdminLTE.css');
+    require ('../css/skins/_all-skins.min.css');
     require ('jquery-ui/ui/widgets/tooltip')
 
     AdminLTEinit();

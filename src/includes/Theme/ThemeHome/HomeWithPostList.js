@@ -5,6 +5,7 @@ import HomeParent from './HomeParent';
 import {setActivePageOnPagination} from '../../../actions';
 import slice from 'lodash/slice'
 import forEach from 'lodash/forEach'
+import find from 'lodash/find'
 
 var pagePerPost = 5;
 let getPostList = gql`

@@ -4,7 +4,7 @@ import Config from './rendact.config.json';
 import Query from './admin/query';
 import AdminLTEinit from './admin/lib/app.js';
 import 'bootstrap/dist/css/bootstrap.css';
-import '../public/css/Login.css';
+import './css/Login.css';
 import { sendMail } from './utils'
 
 class Register extends React.Component{
@@ -34,8 +34,8 @@ class Register extends React.Component{
 
 	componentDidMount(){
 		require ('font-awesome/css/font-awesome.css');
-		require ('../public/css/ionicons.min.css');
-		require ('../public/css/AdminLTE.css');
+		require ('./css/ionicons.min.css');
+		require ('./css/AdminLTE.css');
 
 		AdminLTEinit();
 	}

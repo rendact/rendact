@@ -11,10 +11,10 @@ window.config = AdminConfig;
 
 export class InvalidTheme extends React.Component{
 	componentDidMount(){
-		require ('../../../public/css/AdminLTE.css');
-		require ('../../../public/css/skins/_all-skins.css');	
+		require ('../../css/AdminLTE.css');
+		require ('../../css/skins/_all-skins.css');	
 		require ('font-awesome/css/font-awesome.css');
-		require ('../../../public/css/ionicons.min.css');
+		require ('../../css/ionicons.min.css');
 	}
 	render() {
 		return (

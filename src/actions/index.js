@@ -17,6 +17,9 @@ export const setCheckAuthDone = (state) => ({
  * CONTENT LIST ACTION
  */
 
+export const checkingMail = (state) => ({
+})
+
 export const setMonthFilter = (monthFilter) => ({
   type: 'SET_MONTH_FILTER',
   monthFilter

@@ -1,6 +1,5 @@
 import React from 'react';
 import $ from 'jquery';
-window.jQuery = $;
 import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen'
@@ -11,6 +10,7 @@ import {connect} from 'react-redux'
 import {maskArea, setOptionId} from '../../actions'
 import gql from 'graphql-tag'
 import {graphql, withApollo} from 'react-apollo'
+window.jQuery = $;
 
 let Permission = React.createClass({
   propTypes: {

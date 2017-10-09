@@ -114,7 +114,7 @@ let NewUser = React.createClass({
 		this.props.dispatch(maskArea(state));
 	},
 	handleSubmitBtn: function(v){
-		event.preventDefault();
+		v.preventDefault();
 		
 		var me = this;
 		var image = this.props.avatar;
