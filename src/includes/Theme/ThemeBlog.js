@@ -3,7 +3,8 @@ import AdminConfig from '../../admin/AdminConfig';
 import NotFound from '../../admin/NotFound';
 import LostConnection from '../../admin/LostConnection';
 import Query from '../../admin/query';
-import {riques, errorCallback, getValue, setValue, saveConfig, loadConfig} from '../../utils';
+import {riques, errorCallback, getValue, setValue,  loadConfig} from '../../utils';
+import saveConfig from '../../utils/saveConfig';
 import {getTemplateComponent, theTitle, theContent, theExcerpt, theMenu, 
 				theLogo, theImage, thePagination, theBreadcrumb, loadMainMenu, loadWidgets,
 				getWidgets, goHome} from './includes'

@@ -1,11 +1,12 @@
 import React from 'react';
 import request from 'request';
-import Config from './rendact.config.json';
-import AdminConfig from './admin/AdminConfig';
-import Query from './admin/query';
+import Config from '../rendact.config.json';
+import AdminConfig from '../admin/AdminConfig';
+import Query from '../admin/query';
 import _ from 'lodash';
 import { default as swal } from 'sweetalert2';
 import {connect} from 'react-redux'
+import saveConfig from './saveConfig'
 
 
 
@@ -232,14 +233,6 @@ export const disableFormContentType = function(state, notif, excludeClass){
   _.forEach(document.getElementsByTagName('select'), function(el){ if (_.indexOf(excludeClass, el.getAttribute("class"))<0) el.disabled = state;});
 }
 
-export const saveConfig = function(name, value){
-  var config = JSON.parse(localStorage.getItem('config'));
-  if (config === null ){
-    config = {}
-  }
-  config[name] = value;
-  localStorage.setItem('config', JSON.stringify(config));
-}
 
 export const loadConfig = function(callback){
   var qry = Query.getContentListQry("active");

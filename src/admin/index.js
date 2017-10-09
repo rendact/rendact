@@ -35,7 +35,7 @@ import AdminConfig from './AdminConfig';
 import AdminLTEinit from './lib/app.js';
 import {hasRole, getConfig, swalert} from '../utils';
 import Query from './query';
-import {saveConfig} from '../utils';
+import saveConfig from '../utils/saveConfig';
 import {toggleControlSidebarState, toggleUnsavedDataState, setActivePage, setActiveMenuId, setLogged } from '../actions';
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo';

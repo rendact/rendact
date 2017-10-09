@@ -23,9 +23,7 @@ let Main = React.createClass({
 							<MatchWhenAuthorized pattern="/admin/:page?/:action?/:postId?" 
                 component={props => {
               const Admin = Loadable({
-                loader: () => new Promise((resolve) =>
-                  require.ensure([], () => resolve(require('./admin')),
-                'themeadmin')),
+                loader: () => import('./admin'),
                 loading: () => <Loading/>
               })
                   return <Admin {...props}/>
@@ -33,52 +31,40 @@ let Main = React.createClass({
 								/>
               <Match pattern="/page/:postId?/:param1?/:param2?" render={props=>{
                   const ThemeSingle = Loadable({
-                    loader: () => new Promise((resolve) => 
-                      require.ensure([], () => resolve(require('./includes/Theme/ThemeSingle')),
-                        'themesingle')),
+                    loader: () => import('./includes/Theme/ThemeSingle'),
                     loading: () => null
                   })
                 return <ThemeSingle {...props} />             }} />
               <Match pattern="/post/:postId?/:param1?/:param2?" render={props =>{
                   const ThemeSingle = Loadable({
-                    loader: () => new Promise((resolve) => 
-                      require.ensure([], () => resolve(require('./includes/Theme/ThemeSingle')),
-                        'themesingle')),
+                    loader: () => import('./includes/Theme/ThemeSingle'),
                     loading: () => null
                   })
                 return <ThemeSingle {...props} />             }} />
               <Match pattern="/blog/:postId?/:param1?/:param2?" render={props => {
                   const ThemeBlog = Loadable({
-                    loader: () => new Promise((resolve) =>
-                      require.ensure(['./includes/Theme/ThemeBlog'], () => resolve(require('./includes/Theme/ThemeBlog')),
-                    'themeblog')),
+                    loader: () => import('./includes/Theme/ThemeBlog'),
                     loading: () => <Loading/>
                   })
                 return <ThemeBlog {...props}/>
               }} />
             <Match pattern="/category/:categoryId?/:param1?/:param2?" render={props => {
                   const ThemeBlog = Loadable({
-                    loader: () => new Promise((resolve) =>
-                      require.ensure(['./includes/Theme/ThemeBlog'], () => resolve(require('./includes/Theme/ThemeBlog')),
-                    'themeblog')),
+                    loader: () => import('./includes/Theme/ThemeBlog'),
                     loading: () => <Loading/>
                   })
                 return <ThemeBlog {...props}/>
             }} />
           <Match pattern="/search/:search" render={props => {
                   const ThemeSearch = Loadable({
-                    loader: () => new Promise((resolve) =>
-                      require.ensure(['./includes/themeSearch'], () => resolve(require('./includes/themeSearch')),
-                    'themesearch')),
+                    loader: () => import('./includes/themeSearch'),
                     loading: () => <Loading/>
 })
             return <ThemeSearch {...props}/>
           }}/>
         <Match pattern="/register/:param1?" render={props => {
                   const Register = Loadable({
-                    loader: () => new Promise((resolve) =>
-                      require.ensure(['./register'], () => resolve(require('./register')),
-                    'register')),
+                    loader: () => import('./register'),
                     loading: () => <Loading/>
                   })
 
@@ -87,18 +73,14 @@ let Main = React.createClass({
         }}/>
               <Match pattern="/login/:param1?" render={props=> {
                 const Login = Loadable({
-                  loader: () => new Promise((resolve) =>
-                    require.ensure(['./login'], () => resolve(require('./login')),
-                  'login')),
+                  loader: () => import('./login'),
                   loading: () => <Loading/>
                 })
                 return <Login {...props}/>
               }}/>
             <Miss render={props => {
                 const ThemeHome = Loadable({
-                  loader: () => new Promise((resolve) =>
-                    require.ensure(['./includes/Theme/ThemeHome'], () => resolve(require('./includes/Theme/ThemeHome')),
-                  'themehome')),
+                  loader: () => import('./includes/Theme/ThemeHome'),
                   loading: () => <Loading/>
                 })
 
