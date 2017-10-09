@@ -5,8 +5,8 @@ import Loadable from 'react-loadable'
 
 const HomeContent = Loadable({
   loader: () => new Promise((resolve) =>
-    require.ensure(['../includes/HomeContent'], () => resolve(require('../includes/HomeContent')),
-	 'themehomecontent')),
+    require.ensure([], () => resolve(require('../includes/HomeContent')),
+	 'homecontent')),
   loading: () => null
 })
 
@@ -15,7 +15,11 @@ const Home = React.createClass({
 		return (
 			<div className="application">
 				<Header {...this.props} />	   
+        {this.props.loadDone ?
           <HomeContent {...this.props}/>
+            :
+            <div style={{height: '100vh'}}>&nbsp;</div>
+        }
 				<Footer {...this.props} />	
 			</div>
 		)
