@@ -25,9 +25,9 @@ const ContentField = React.createClass({
 let ContentNew = React.createClass({
 
 	getDefaultProps: function() {
-		debugger
 	    return {
-	      	//mode: this.props.postId?"update":"create",
+	    //mode: this.props.postId?"update":"create",
+	    mode: "create",
 			fields: [
 				{id:"title", label: "Title", type: "link", deletable: false},
 				{id:"slug", label: "Slug", type: "text", deletable: false}
@@ -37,13 +37,8 @@ let ContentNew = React.createClass({
 				{id:"slug", label: "Slug", type: "text", deletable: false}
 			],
 			providedFields: [
-				{id:"author", label: "Author", type: "link"},
-				{id:"summary", label: "Summary", type: "link"},
-				{id:"content", label: "Content", type: "text"},
-				{id:"image", label: "Image", type: "text"},
-				{id:"like", label: "Like", type: "text"},
-				{id:"featuredImage", label: "Featured Image", type: "text"},
-				{id:"gallery", label: "Gallery", type: "text"}
+				{id:"title", label: "Title", type: "link", deletable: false},
+				{id:"slug", label: "Slug", type: "text", deletable: false}
 			],
 			providedFieldsDefault: [
 				{id:"author", label: "Author", type: "link"},
@@ -129,7 +124,7 @@ let ContentNew = React.createClass({
     // var name = getValue("name");
     var name = this.props.name;
     var slug = name.split(" ").join("-").toLowerCase();
-    setValue("slug", slug);
+    // setValue("slug", slug);
     this.checkSlug(slug);
 
     // var label = getValue("label");
@@ -164,7 +159,7 @@ let ContentNew = React.createClass({
     disableForm(state, this.notification);
   },
 	handleSubmitBtn: function(event){
-		event.preventDefault();
+		// event.preventDefault();
 		var me = this;
 		var _objData = getFormData('rdt-input-form', 'object');
 		_objData['fields'] = this.props.providedFields;
@@ -199,14 +194,14 @@ let ContentNew = React.createClass({
 	handleAddProvidedField: function(event){
 		var me = this;
 		var providedFields = [];
-		var allProvidedField = _.concat(me.props.providedFieldsDefault, me.props.providedFieldsDefault);
+		var allProvidedField = _.concat(me.props.defaultFields, me.props.providedFieldsDefault);
 
 		var checkedFields = _.filter(document.getElementsByName("checkboxField[]"), function(item){
       return item.checked
     });
     
     _.forEach(checkedFields, function(item){
-    	var newField = _.find(allProvidedField, {id: item.value});
+    	var newField = _.find(allProvidedField, {id: item.id});
 			if (newField) providedFields.push(newField);
     })
 		// this.setState({providedFields: providedFields, fields: _.concat(providedFields, this.state.customFields)});
@@ -245,6 +240,7 @@ let ContentNew = React.createClass({
 			align:align?align:"left",
 			connection: connection?connection:null
 		};
+
 		customFields.push(newField);
 		// this.setState({customFields: customFields, fields: _.concat(this.state.providedFields, customFields)});
 		this.props.dispatch(setcustomFields(customFields));
@@ -391,16 +387,16 @@ let ContentNew = React.createClass({
 	                  	_.map(this.props.defaultFields, function(item){
 	                  		return <div key={item.id} className="checkbox">
 	                  			<label>
-	                  				<Field component="input" type="checkbox" name="checkboxField[]" value={item.id} readOnly="true" checked/>{item.label}
+	                  				<Field component="input" type="checkbox" name="checkboxField[]"  id={item.id} value={item.id} readOnly="true" checked/>{item.label}
 	                  			</label>
 	                  			</div>
 	                  	})
 	                  }
 	                  {
-	                  	_.map(this.providedFieldsDefault, function(item){
+	                  	_.map(this.props.providedFieldsDefault, function(item){
 	                  		return <div key={item.id} className="checkbox">
 	                  		<label>
-	                  			<Field component="input" type="checkbox" name="checkboxField[]" onChange={this.handleAddProvidedField} value={item.id}/>{item.label}
+	                  			<Field component="input" type="checkbox" name="checkboxField[]" id={item.id} onChange={this.handleAddProvidedField} value={item.id}/>{item.label}
 	                  		</label>
 	                  		</div>
 	                  	}.bind(this))
@@ -418,7 +414,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Field Name</label>
 								  			</div>
 								  			<div className="col-md-9">
-								  				<Field component="input" type="text" id="fieldName" placeholder="Field name" className="form-control" />
+								  				<Field component="input" type="text" name="fieldName" id="fieldName" placeholder="Field name" className="form-control" />
 								  			</div>
 							  			</div>
 
@@ -427,7 +423,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Field Type</label>
 								  			</div>
 								  			<div className="col-md-9">
-													<Field component="select"	id="fieldType" className="form-control select" onChange={this.handleFieldTypeChange}>
+													<Field component="select"	id="fieldType" name="fieldType" className="form-control select" onChange={this.handleFieldTypeChange}>
 														<option value="text">String</option>
 														<option value="text">Number</option>
 														<option value="date">Date</option>
@@ -443,7 +439,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Connect to other content</label>
 								  			</div>
 								  			<div className="col-md-9">
-								  				<Field component="select"	id="connection" className="form-control select" disabled="true">
+								  				<Field component="select" name="connection"	id="connection" className="form-control select" disabled="true">
 														<option value="testing">Testing</option>
 														<option value="developer">Developer</option>
 													</Field>
@@ -455,7 +451,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Width</label>
 								  			</div>
 								  			<div className="col-md-9">
-								  				<Field component="input" type="text" id="fieldWidth" placeholder="Width" className="form-control"/> 
+								  				<Field component="input" type="text" name="fieldWidth" id="fieldWidth" placeholder="Width" className="form-control"/> 
 								  			</div>
 							  			</div>
 												
@@ -464,7 +460,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Align</label>
 								  			</div>
 								  			<div className="col-md-9">
-								  				<Field component="select" id="fieldAlign" className="form-control select">
+								  				<Field component="select" name="fieldAlign" id="fieldAlign" className="form-control select">
 														<option value="left">Left</option>
 														<option value="right">Right</option>
 														<option value="center">Center</option>
@@ -477,7 +473,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Position in editor</label>
 								  			</div>
 								  			<div className="col-md-9">
-								  				<Field component="select" id="fieldAlign" className="form-control select">
+								  				<Field component="select" name="fieldAlign" id="fieldAlign" className="form-control select">
 														<option value="left">Left</option>
 														<option value="right">Right</option>
 													</Field> 	
@@ -589,10 +585,10 @@ const mapStateToProps = function(state){
 
   if (!_.isEmpty(state.contentNew)) {
     var out = _.head(state.contentNew);
-    out["initialValues"] = out.data;
-    return _.merge(out, customStates);
+    out = {...out, ...customStates}
+    return out
   } else 
-  return customStates;
+  return {};
 }
 
 ContentNew = reduxForm({
