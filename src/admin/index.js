@@ -36,7 +36,7 @@ import AdminLTEinit from './lib/app.js';
 import {hasRole, getConfig, swalert} from '../utils';
 import Query from './query';
 import {saveConfig} from '../utils';
-import {toggleControlSidebarState, toggleUnsavedDataState, setActivePage, setActiveMenuId } from '../actions';
+import {toggleControlSidebarState, toggleUnsavedDataState, setActivePage, setActiveMenuId, setLogged } from '../actions';
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo';
 import {connect} from 'react-redux'
@@ -445,7 +445,7 @@ let Admin = React.createClass({
   },
   handleSignout(e){
     e.preventDefault()
-    this.props.onlogin(false, 'login');
+    this.props.dispatch(setLogged(false, '/login'))
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     localStorage.removeItem('profile');
