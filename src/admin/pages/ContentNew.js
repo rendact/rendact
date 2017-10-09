@@ -159,7 +159,7 @@ let ContentNew = React.createClass({
     disableForm(state, this.notification);
   },
 	handleSubmitBtn: function(event){
-		event.preventDefault();
+		// event.preventDefault();
 		var me = this;
 		var _objData = getFormData('rdt-input-form', 'object');
 		_objData['fields'] = this.props.providedFields;
@@ -581,7 +581,6 @@ const mapStateToProps = function(state){
     fieldAlign: selector(state, 'fieldAlign'),
     connection: selector(state, 'connection')
   }
-  	debugger
 
   if (!_.isEmpty(state.contentNew)) {
     var out = _.head(state.contentNew);
