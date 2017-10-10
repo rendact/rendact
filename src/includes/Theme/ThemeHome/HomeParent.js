@@ -1,4 +1,5 @@
-import React from 'react' import map from 'lodash/map'
+import React from 'react' 
+import map from 'lodash/map'
 import {getTemplateComponent, theTitle, theContent, theExcerpt, theMenu,getWidgets, theLogo, theImage, thePagination} from './../includes'
 import {aboutUsWidget, contactUsWidget, recentPostWidget} from '../../widgets';
 import Loadable from 'react-loadable';
