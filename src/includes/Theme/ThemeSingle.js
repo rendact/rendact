@@ -1,6 +1,6 @@
 import React from 'react';
 import AdminConfig from '../../admin/AdminConfig';
-import saveConfig from '../../utils/saveConfig';
+import {saveConfig} from '../../utils';
 import {getTemplateComponent,    theMenu, theLogo,   theBreadcrumb,   } from './includes'
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
