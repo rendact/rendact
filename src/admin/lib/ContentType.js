@@ -85,6 +85,7 @@ let ContentType = React.createClass({
       var monthList = ["all"];
       var _dataArr = [];
       var _allPostId = [];
+    let status;
 
       _.forEach(allPosts, function(item){
         var dt = new Date(item.createdAt);

@@ -592,8 +592,8 @@ let Menu = React.createClass({
 
   componentDidMount: function(){
     require ('jquery-ui/themes/base/theme.css');
-    require ('../../../public/css/AdminLTE.css');
-    require ('../../../public/css/skins/_all-skins.css');
+    require ('../../css/AdminLTE.css');
+    require ('../../css/skins/_all-skins.css');
     require('./menucustom.css');
     disableBySelector(true, ["#urlSabmit div button#submit"]);
   },

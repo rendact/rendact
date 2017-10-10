@@ -1,6 +1,6 @@
 import React from 'react'
 import 'bootstrap/dist/css/bootstrap.css'
-import '../public/css/Login.css'
+import './css/Login.css'
 import AdminLTEinit from  './admin/lib/app.js'
 import {setLogged} from './actions'
 import {connect} from 'react-redux'
@@ -41,8 +41,8 @@ class Login extends React.Component{
 
 	componentDidMount(){
 		require ('font-awesome/css/font-awesome.css');
-		require ('../public/css/ionicons.css');
-		require ('../public/css/AdminLTE.css');
+		require ('./css/ionicons.css');
+		require ('./css/AdminLTE.css');
 
 		var me = this;
 		var _doAuthentication = function(authResult) {

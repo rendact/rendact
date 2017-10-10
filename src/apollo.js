@@ -2,12 +2,13 @@ import ApolloClient from 'apollo-client';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import {createNetworkInterface} from './custom-network-interface';
 import {scapholdUrl} from './rendact.config.json'
+import { print as printGraphQL } from 'graphql/language/printer';
 
 function addGraphQLSubscriptions(networkInterface, wsClient) {
   return Object.assign(networkInterface, {
     subscribe(request, handler) {
       return wsClient.subscribe({
-        query: print(request.query),
+        query: printGraphQL(request.query),
         variables: request.variables,
       }, handler);
     },

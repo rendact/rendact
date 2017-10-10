@@ -2,8 +2,8 @@ import React from 'react';
 
 var LostConnection = React.createClass({
 	componentDidMount: function(){
-		require ('../../public/css/AdminLTE.css');
-		require ('../../public/css/skins/_all-skins.css');
+		require ('../css/AdminLTE.css');
+		require ('../css/skins/_all-skins.css');
 	},
 	render: function(){
 		return (

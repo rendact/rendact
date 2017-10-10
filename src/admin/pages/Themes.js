@@ -1,7 +1,7 @@
 import React from 'react';
-import images1 from '../../../public/images/photo4.jpg';
-import images2 from '../../../public/images/photo1.png';
-import images3 from '../../../public/images/photo2.png';
+import images1 from '../../images/photo4.jpg';
+import images2 from '../../images/photo1.png';
+import images3 from '../../images/photo2.png';
 
 const Tabs = React.createClass({
   displayName: 'Tabs',

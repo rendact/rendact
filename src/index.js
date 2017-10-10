@@ -51,7 +51,7 @@ let Main = React.createClass({
                   const ThemeBlog = Loadable({
                     loader: () => new Promise((resolve) =>
                       require.ensure(['./includes/Theme/ThemeBlog'], () => resolve(require('./includes/Theme/ThemeBlog')),
-                    'themehome')),
+                    'themeblog')),
                     loading: () => <Loading/>
                   })
                 return <ThemeBlog {...props}/>
@@ -60,7 +60,7 @@ let Main = React.createClass({
                   const ThemeBlog = Loadable({
                     loader: () => new Promise((resolve) =>
                       require.ensure(['./includes/Theme/ThemeBlog'], () => resolve(require('./includes/Theme/ThemeBlog')),
-                    'themehome')),
+                    'themeblog')),
                     loading: () => <Loading/>
                   })
                 return <ThemeBlog {...props}/>
@@ -78,7 +78,7 @@ let Main = React.createClass({
                   const Register = Loadable({
                     loader: () => new Promise((resolve) =>
                       require.ensure(['./register'], () => resolve(require('./register')),
-                    'themehome')),
+                    'register')),
                     loading: () => <Loading/>
                   })
 
@@ -89,7 +89,7 @@ let Main = React.createClass({
                 const Login = Loadable({
                   loader: () => new Promise((resolve) =>
                     require.ensure(['./login'], () => resolve(require('./login')),
-                  'themehome')),
+                  'login')),
                   loading: () => <Loading/>
                 })
                 return <Login {...props}/>
