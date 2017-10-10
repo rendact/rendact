@@ -59,7 +59,7 @@ let TagContent = React.createClass({
               "count": item.node.post.edges.length
             });
           });
-
+debugger
           var bEdit = hasRole('modify-tag');
           me.table.loadData(_dataArr, bEdit);
           me.props.dispatch(initContentList(monthList))
@@ -75,7 +75,6 @@ let TagContent = React.createClass({
     var me = this;
     var checkedRow = document.querySelectorAll("input.tag-"+this.props.slug+"Cb:checked");
     var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
-    
     swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
       function () {
       me.disableForm(true);
