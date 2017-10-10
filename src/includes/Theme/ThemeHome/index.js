@@ -7,15 +7,15 @@ import Loadable from 'react-loadable'
 
 
 const HomeParent = Loadable({
-  loader: () => import(/*webpackChunkName: "homeparent" */ /*webpackMode: "lazy"*/'./HomeParent'),
+  loader: () => import('./HomeParent'),
   loading: () => null
 })
 const HomeWithLatestPost = Loadable({
-  loader: () => import(/* webpackChunkName: "homewithpostlist"*/ /*webpackMode: "lazy"*/'./HomeWithPostList'),
+  loader: () => import('./HomeWithPostList'),
   loading: () => null
 })
 const  HomeWithPage= Loadable({
-  loader: () =>import(/* webpackChunkName: "homewithpage"*/ /*webpackMode: "lazy"*/'./HomeWithPage'),
+  loader: () =>import('./HomeWithPage'),
   loading: () => null
 })
 
