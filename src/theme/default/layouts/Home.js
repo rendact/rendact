@@ -4,9 +4,7 @@ import Footer from '../includes/Footer'
 import Loadable from 'react-loadable'
 
 const HomeContent = Loadable({
-  loader: () => new Promise((resolve) =>
-    require.ensure([], () => resolve(require('../includes/HomeContent')),
-	 'homecontent')),
+  loader: () => import('../includes/HomeContent'),
   loading: () => null
 })
 
