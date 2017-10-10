@@ -1,6 +1,6 @@
 import React from 'react';
 import forEach from 'lodash/forEach'
-import {saveConfig} from '../../../utils';
+import {saveConfig} from '../../../utils/saveConfig';
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo';
 import Loadable from 'react-loadable'
@@ -8,21 +8,15 @@ import Loadable from 'react-loadable'
 
 
 const HomeParent = Loadable({
-  loader: () => new Promise((resolve) =>
-    require.ensure([], () => resolve(require('./HomeParent')),
-  'homeparent1')),
+  loader: () => import(/* webpackChunkName: "homeparent" */'./HomeParent'),
   loading: () => null
 })
 const HomeWithLatestPost = Loadable({
-  loader: () => new Promise((resolve) =>
-    require.ensure([], () => resolve(require('./HomeWithPostList')),
-  'homelatestpost')),
+  loader: () => import(/* webpackChunkName: "homewithpostlist" */'./HomeWithPostList'),
   loading: () => null
 })
 const  HomeWithPage= Loadable({
-  loader: () => new Promise((resolve) =>
-    require.ensure([], () => resolve(require('./HomeWithPage')),
-  'homewithpage')),
+  loader: () => import(/* webpackChunkName: "homewithpage" */'./HomeWithPage'),
   loading: () => null
 })
 

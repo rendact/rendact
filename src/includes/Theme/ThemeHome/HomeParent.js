@@ -1,8 +1,12 @@
-import React from 'react'
-import map from 'lodash/map'
-import {getTemplateComponent, theTitle, theContent, theExcerpt, theMenu, 
-  theLogo, theImage, thePagination} from './../includes'
+import React from 'react' import map from 'lodash/map'
+import {getTemplateComponent, theTitle, theContent, theExcerpt, theMenu,getWidgets, theLogo, theImage, thePagination} from './../includes'
 import {aboutUsWidget, contactUsWidget, recentPostWidget} from '../../widgets';
+import Loadable from 'react-loadable';
+
+let Home = Loadable({
+  loader: () => getTemplateComponent('home'),
+  loading: () => null
+})
 
 let HomeParent = React.createClass({
 	propTypes: {
@@ -16,6 +20,7 @@ let HomeParent = React.createClass({
 		isNoConnection: React.PropTypes.bool,
     mainMenu: React.PropTypes.object,
   },
+ 
   getDefaultProps: function() {
     return {
 			loadDone: false,
@@ -29,23 +34,6 @@ let HomeParent = React.createClass({
 		}
   },
 
-	getWidgets(widgetArea){
-		let Widgets = [];
-
-	  let listOfWidgets = this.props.listOfWidgets[widgetArea]?this.props.listOfWidgets[widgetArea]:[];
-		
-		map(listOfWidgets,function(item){
-      var widgetFn = require("../../DefaultWidgets/"+item.filePath).default;
-			
-			Widgets.push(<div key={item.id} className="sidebar-box">
-					<h3><span>{item.title}</span></h3>
-						{widgetFn(item.id, item.widget)}
-				</div>);
-		});
-		
-		return <div className="widgets">{Widgets}</div>;
-	},
-
 	componentDidMount(){
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
@@ -56,7 +44,6 @@ let HomeParent = React.createClass({
 
 	render(){
     
-				let Home = getTemplateComponent('home');
 				return <Home 
 					data={this.props.data}
 					theTitle={theTitle}
@@ -67,11 +54,12 @@ let HomeParent = React.createClass({
 					theImage={theImage}
 					theConfig={this.props.config}
 					thePagination={thePagination(this.props.pageCount, this.props.activePage, this.props.handlePageClick)}
-					getWidgets={this.getWidgets}
+					getWidgets={getWidgets.bind(this)}
 					footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 					listOfWidgets={this.props.listOfWidgets}
           loadDone={this.props.loadDone}
 				/>
+
 	}
 })
 

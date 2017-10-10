@@ -188,10 +188,6 @@ export const setPageList = (pageList) => ({
   pageList
 })
 
-export const setAllCategoryList = (catList) => ({
-  type: 'SET_ALL_CATEGORY_LIST',
-  catList
-})
 
 export const setTagMap = (tagMap) => ({
   type: 'SET_TAG_MAP',
@@ -435,14 +431,6 @@ export const setActiveMenuId = (menuId) => ({
   menuId
 })
 
-/*
- * THEME ACTIONS
- */
-
- export const setActivePageOnPagination = (page) => ({
-  type: 'SET_ACTIVE_PAGE',
-  page
- })
 
 /*
  * Settings actions

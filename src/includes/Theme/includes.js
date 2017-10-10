@@ -1,40 +1,20 @@
 import React from 'react';
-import _ from 'lodash';
+import map from 'lodash/map'
+import truncate from 'lodash/truncate'
 import {Menu} from '../Menu.js';
-//import Query from '../../admin/query';
 import AdminConfig from '../../admin/AdminConfig';
 import {Link} from 'react-router'
+import Loadable from 'react-loadable';
+
+const InvalidTheme = Loadable({
+  loader: () => import(/* webpackChunkName: "invalidTheme"*/'./InvalidTheme'),
+  loading: () => null
+})
 
 window.config = AdminConfig;
 
 /* Theme functions */
 
-export class InvalidTheme extends React.Component{
-	componentDidMount(){
-		require ('../../css/AdminLTE.css');
-		require ('../../css/skins/_all-skins.css');	
-		require ('font-awesome/css/font-awesome.css');
-		require ('../../css/ionicons.min.css');
-	}
-	render() {
-		return (
-			<div className="content-wrapper" style={{minHeight: 1126}}>
-			    <section className="content-header">
-			      <h1>Error Page</h1>
-			    </section>
-
-			    <section className="content">
-			      <div className="error-page">
-			        <div className="error-content">
-			          <h3><i className="fa fa-warning text-red"></i> Oops! Something went wrong.</h3>
-			          <p>We will work on fixing that right away.</p>
-			        </div>
-			      </div>
-			    </section>
-			  </div>
-		)
-	}
-}
 
 export function getTemplateComponent(type){
 	var c = window.config.theme;
@@ -44,18 +24,17 @@ export function getTemplateComponent(type){
 	}
 
 	try {
-		let Component = require('../../theme/'+c.path+'/layouts/Home.js').default;
 		if (type==="home") {
-			// pass
+      return import(/*webpackChunkName: "home"*/'../../theme/'+c.path+'/layouts/Home.js').then(Home => Home)
 		} else if (type==="blog") {
-			Component = require('../../theme/'+c.path+'/layouts/Blog.js').default;			
+      return import(/*webpackChunkName: "blog"*/'../../theme/'+c.path+'/layouts/Blog.js').then(Blog => {
+        return Blog
+      })
 		} else if (type==="single") {
-			Component = require('../../theme/'+c.path+'/layouts/Single.js').default;			
+      return import(/*webpackChunkName: "single"*/'../../theme/'+c.path+'/layouts/Single.js').then(Single => Single)
     } else if (type==="search") {
-      Component = require('../../theme/'+c.path+'/layouts/Search.js').default;
+      return import(/*webpackChunkName: "search"*/'../../theme/'+c.path+'/layouts/Search.js').then(Search => Search)
     }
-
-		return Component;
 	} catch(e) {
 		return InvalidTheme;
 	}
@@ -70,7 +49,7 @@ export function theTitle(id, title, onClickHandler){
 }
 
 export function theExcerpt(content){
-	return <div dangerouslySetInnerHTML={{__html: _.truncate(content,{"length": 100})}} />
+	return <div dangerouslySetInnerHTML={{__html: truncate(content,{"length": 100})}} />
 }
 
 export function theMenu(items, onClickHandler){
@@ -120,21 +99,22 @@ export function goHome(e){
 }
 
 export function getWidgets(widgetArea){
-	let Widgets = [];
 
   // add checking if the component has implemented with redux or not
   let listOfWidgets = this.props.listOfWidgets[widgetArea]?this.props.listOfWidgets[widgetArea]:[];
 	
-	_.map(listOfWidgets,function(item){
-		var widgetFn = require("../DefaultWidgets/"+item.filePath).default;
+	let Widgets = map(listOfWidgets,function(item){
+    return import("../DefaultWidgets/"+item.filePath).then(widgetFn => {
 		
-		Widgets.push(<div key={item.id} className="sidebar-box">
-				<h3><span>{item.title}</span></h3>
-					{widgetFn(item.id, item.widget)}
-			</div>);
+    return <div key={item.id} className="sidebar-box">
+            <h3><span>{item.title}</span></h3>
+              {widgetFn.default(item.id, item.widget)}
+          </div>
+  })
 	});
+
+  return Promise.all(Widgets).then(Widgets => <div className="widgets">{Widgets}</div>)
 	
-	return <div className="widgets">{Widgets}</div>;
 }
 
 export const getTemplates = function(){
