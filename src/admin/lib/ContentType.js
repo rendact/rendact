@@ -219,6 +219,7 @@ let ContentType = React.createClass({
       var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});   
       let listOfData = me.props.client.mutate({mutation: gql`${Query.deletePostQry(idList).query}`})
       var he = me;
+      debugger
       me.disableFormContentType(true);
       listOfData.then(function() {
         he.props.refetchAllMenuData().then(function() {
