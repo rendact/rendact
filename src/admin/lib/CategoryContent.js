@@ -95,6 +95,12 @@ let CategoryContent = React.createClass({
   handleViewPage: function(categoryId){
     this.props.handleNav(this.props.slug,'bycategory', categoryId);
   },
+  handleTextTitleClick: function(e){
+  debugger
+    e.preventDefault()
+    let postId = e.currentTarget.id.split("-")[1]
+    this.handleViewPost(postId)
+  },
   onAfterTableLoad: function(){
     var me = this;
     var nameLink = function(event){
@@ -249,7 +255,8 @@ let CategoryContent = React.createClass({
                           onCheckBoxClick={this.checkDynamicButtonState}
                           onAfterLoad={this.onAfterTableLoad}
                           style={{opacity: this.props.opacity}}
-                        />
+                          handleTextTitleClick={this.handleTextTitleClick}
+                      />
                   </div>
                 </div>
               </div>

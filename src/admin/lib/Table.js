@@ -158,6 +158,7 @@ export const Table = React.createClass({
   	var datatable = $('#'+this.props.id).DataTable({sDom: '<"H"r>t<"F"ip>'}); 
   	this.datatable = datatable;
     $("#" + this.props.id).on('click', '.titleText', this.props.handleTextTitleClick)
+  debugger
   },
   render: function(){
   	return (
@@ -261,6 +262,8 @@ export const TableTag = React.createClass({
   componentDidMount: function(){
     var datatable = $('#'+this.props.id).DataTable({sDom: '<"H"r>t<"F"ip>'}); 
     this.datatable = datatable;
+    $("#" + this.props.id).on('click', '.titleText', this.props.handleTextTitleClick)
+  debugger
   },
   render: function(){
     return (

@@ -312,6 +312,7 @@ let ContentType = React.createClass({
   },
 
   handleTextTitleClick: function(e){
+    debugger
     e.preventDefault()
     let postId = e.currentTarget.id.split("-")[1]
     this.handleViewPost(postId)
