@@ -23,7 +23,7 @@ let Main = React.createClass({
 							<MatchWhenAuthorized pattern="/admin/:page?/:action?/:postId?" 
                 component={props => {
               const Admin = Loadable({
-                loader: () => import(/* webpackChunkName: "admin"*/ /*webpackMode: "lazy"*/'./admin'),
+                loader: () => import(/* webpackChunkName: "admin"*/ './admin'),
                 loading: () => <Loading/>
               })
                   return <Admin {...props}/>
@@ -31,26 +31,26 @@ let Main = React.createClass({
 								/>
               <Match pattern="/page/:postId?/:param1?/:param2?" render={props=>{
                   const ThemeSingle = Loadable({
-                    loader: () => import('./includes/Theme/ThemeSingle'),
+                    loader: () => import(/* webpackChunkName: "themesingle"*/'./includes/Theme/ThemeSingle'),
                     loading: () => null
                   })
                 return <ThemeSingle {...props} />             }} />
               <Match pattern="/post/:postId?/:param1?/:param2?" render={props =>{
                   const ThemeSingle = Loadable({
-                    loader: () => import('./includes/Theme/ThemeSingle'),
+                    loader: () => import(/* webpackChunkName: "themesingle" */'./includes/Theme/ThemeSingle'),
                     loading: () => null
                   })
                 return <ThemeSingle {...props} />             }} />
               <Match pattern="/blog/:postId?/:param1?/:param2?" render={props => {
                   const ThemeBlog = Loadable({
-                    loader: () => import('./includes/Theme/ThemeBlog'),
+                    loader: () => import(/* webpackChunkName: "themeblog" */'./includes/Theme/ThemeBlog'),
                     loading: () => <Loading/>
                   })
                 return <ThemeBlog {...props}/>
               }} />
             <Match pattern="/category/:categoryId?/:param1?/:param2?" render={props => {
                   const ThemeBlog = Loadable({
-                    loader: () => import('./includes/Theme/ThemeBlog'),
+                    loader: () => import(/* webpackChunkName: "themeblog" */'./includes/Theme/ThemeBlog'),
                     loading: () => <Loading/>
                   })
                 return <ThemeBlog {...props}/>
@@ -80,7 +80,7 @@ let Main = React.createClass({
               }}/>
             <Miss render={props => {
                 const ThemeHome = Loadable({
-                  loader: () => import(/*webpackChunkName: "home"*/ /*webpackMode: "lazy"*/'./includes/Theme/ThemeHome'),
+                  loader: () => import(/*webpackChunkName: "themehome"*/ './includes/Theme/ThemeHome'),
                   loading: () => <Loading/>
                 })
 
