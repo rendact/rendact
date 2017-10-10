@@ -1,3 +1,23 @@
+// import _ from 'lodash';
+
+// const INITIAL_VALUES =  {
+//       isProcessing: false,
+//       opacity: 1,
+//       name:"",
+//       slug:"",
+//       postId:"",
+//       tagId:"",
+//       monthList: [],
+//       deleteMode: false,
+//       statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
+//       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
+//       activeStatus: "All",
+//       itemSelected: false,
+//       mode: "create",
+//     }
+
+// const tagContent = (state = INITIAL_VALUES, action) => {
+
 const tagContent = (state = [], action) => {
   switch (action.type) {
     case 'INIT_CONTENT_LIST':

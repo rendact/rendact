@@ -4,7 +4,7 @@ import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen'
 import {swalert, riques, hasRole, errorCallback, setValue, getValue, removeTags, disableForm, defaultHalogenStyle} from '../../utils';
-import {Table, SearchBox, DeleteButtons} from '../lib/Table';
+import {TableTag, SearchBox, DeleteButtons} from './Table';
 import {connect} from 'react-redux'
 import {initContentList, maskArea, setEditorMode, toggleSelectedItemState, setNameValue} from '../../actions'
 
@@ -243,7 +243,7 @@ let TagContent = React.createClass({
                       { this.props.isProcessing &&
                       <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
                       }                            
-                      <Table
+                      <TableTag
                           id={"tag-"+this.props.slug}
                           columns={[
                             {id: 'name', label: "Name", type: "link", target: "", cssClass:"nameText"},
