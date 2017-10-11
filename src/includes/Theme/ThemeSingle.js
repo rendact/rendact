@@ -1,19 +1,19 @@
 import React from 'react';
 import AdminConfig from '../../admin/AdminConfig';
-import {saveConfig} from '../../utils';
-import {getTemplateComponent,    theMenu, theLogo,   theBreadcrumb,   } from './includes'
-import 'jquery-ui/ui/core';
-import 'bootstrap/dist/css/bootstrap.css';
-import _ from 'lodash';
+import {saveConfig} from '../../utils/saveConfig';
+import {getTemplateComponent,    getWidgets, theMenu, theLogo,   theBreadcrumb,   } from './includes'
+import forEach from 'lodash/forEach';
 import {searchWidget, topPostWidget, categoriesWidget, archiveWidget, aboutUsWidget, contactUsWidget, recentPostWidget} from '../widgets';
 import {graphql, gql} from 'react-apollo';
 import {connect} from 'react-redux'
 import Loadable from 'react-loadable'
 
 const NotFound = Loadable({
-  loader: () => new Promise((resolve) =>
-    require.ensure(['../../admin/NotFound'], () => resolve(require('../../admin/NotFound')),
-	 'themenotfound')),
+  loader: () => import('../../admin/NotFound'),
+  loading: () => null
+})
+let Single = Loadable({
+  loader: () => getTemplateComponent('single'),
   loading: () => null
 })
 
@@ -24,15 +24,14 @@ window.config = AdminConfig;
 let ThemeSingle = React.createClass({
 	propTypes: {
     loadDone: React.PropTypes.bool,
-		postData: React.PropTypes.bool,
+		postData: React.PropTypes.object,
 		config: React.PropTypes.object,
 		mainMenu: React.PropTypes.object,
-    listOfWidgets: React.PropTypes.object
   },
   getDefaultProps: function() {
     return {
 			loadDone: false,
-			postData: false,
+			postData: {},
 			config: null,
 			listOfWidgets: [],
 			mainMenu: null
@@ -44,24 +43,6 @@ let ThemeSingle = React.createClass({
 		this._reactInternalInstance._context.history.push('/')
 	},
 
-	getWidgets(widgetArea){
-		let Widgets = [];
-
-	  // add checking if the component has implemented with redux or not
-	  let listOfWidgets = this.props.listOfWidgets[widgetArea]?this.props.listOfWidgets[widgetArea]:[];
-		
-		_.map(listOfWidgets,function(item){
-			var widgetFn = require("../DefaultWidgets/"+item.filePath).default;
-			
-			Widgets.push(<div key={item.id} className="sidebar-box">
-					<h3><span>{item.title}</span></h3>
-						{widgetFn(item.id, item.widget)}
-				</div>);
-		});
-		
-		return <div className="widgets">{Widgets}</div>;
-	},
-
 	componentDidMount(){
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
@@ -70,7 +51,6 @@ let ThemeSingle = React.createClass({
 	},
 
 	render() {
-		let Single = getTemplateComponent('single');
 		let SinglePost = <Single 
 											postId={this.props.params.postId || this.props.params.pageId} 
 											postData={this.props.postData}
@@ -80,7 +60,7 @@ let ThemeSingle = React.createClass({
 											theLogo={theLogo}
 											theBreadcrumb={theBreadcrumb(this.handlePostClick)}
 											theConfig={this.props.config}
-											getWidgets={this.getWidgets}
+											getWidgets={getWidgets.bind(this)}
                       loadDone={this.props.loadDone}
 										/>;
 
@@ -93,9 +73,7 @@ let ThemeSingle = React.createClass({
 });
 
 const mapStateToProps = function(state){
-  if (!_.isEmpty(state.ThemeSingle)) {
-    return state.ThemeSingle;
-  } else return {}
+    return state.ThemeSingle || {};
 }
 
 ThemeSingle = connect(mapStateToProps)(ThemeSingle);
@@ -182,7 +160,7 @@ ThemeSingle = graphql(optQry, {
 
       saveConfig('listOfWidget', {})
 
-      _.forEach(data.viewer.allOptions.edges, function(item){
+      forEach(data.viewer.allOptions.edges, function(item){
         saveConfig(item.node.item, item.node.value);
       });
 

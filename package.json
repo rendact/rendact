@@ -48,10 +48,12 @@
     "redux-form": "^7.0.3",
     "request": "^2.81.0",
     "scroll-to-element": "^2.0.0",
+    "source-map-explorer": "^1.5.0",
     "subscriptions-transport-ws": ">=0.6.0",
     "sweetalert2": ">=6.4.0"
   },
   "scripts": {
+    "analyze": "source-map-explorer build/static/js/main.*",
     "start": "react-scripts start",
     "build": "react-scripts build && sw-precache --root='build/' --static-file-globs='build/**/!(*map*)' --navigate-fallback='index.html'",
     "test": "react-scripts test --env=jsdom",

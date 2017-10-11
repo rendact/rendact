@@ -2,7 +2,7 @@ import React from 'react';
 import {gql, graphql} from 'react-apollo';
 import {connect} from 'react-redux';
 import HomeParent from './HomeParent';
-import {setActivePageOnPagination} from '../../../actions';
+import {setActivePageOnPagination} from '../../../actions/setActivePageOnPagination';
 import slice from 'lodash/slice'
 import forEach from 'lodash/forEach'
 import find from 'lodash/find'

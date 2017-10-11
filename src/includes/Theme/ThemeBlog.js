@@ -1,24 +1,29 @@
 import React from 'react';
 import AdminConfig from '../../admin/AdminConfig';
-import NotFound from '../../admin/NotFound';
 import LostConnection from '../../admin/LostConnection';
 import Query from '../../admin/query';
-import {riques, errorCallback, getValue, setValue, saveConfig, loadConfig} from '../../utils';
+import {riques, errorCallback, getValue, setValue,  loadConfig} from '../../utils';
+import {saveConfig} from '../../utils/saveConfig'
 import {getTemplateComponent, theTitle, theContent, theExcerpt, theMenu, 
 				theLogo, theImage, thePagination, theBreadcrumb, loadMainMenu, loadWidgets,
 				getWidgets, goHome} from './includes'
 import {Menu} from '../Menu.js';
-import 'jquery-ui/ui/core';
-import 'bootstrap/dist/css/bootstrap.css';
 import Loading from '../../admin/Loading';
-import _ from 'lodash';
+import forEach from 'lodash/forEach'
 import {searchWidget, topPostWidget, categoriesWidget, archiveWidget, aboutUsWidget, contactUsWidget, recentPostWidget} from '../widgets';
-import Notification from 'react-notification-system';
-import {setPaginationPage} from '../../actions';
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo';
 import {connect} from 'react-redux'
+import Loadable from 'react-loadable'
 
+const NotFound = Loadable({
+  loader: () => import('../../admin/NotFound'),
+  loading: () => null
+})
+let Blog = Loadable({
+  loader: () => getTemplateComponent('blog'),
+  loading: () => null
+})
 window.config = AdminConfig;
 
 /* Theme Components */
@@ -36,7 +41,6 @@ let ThemeBlog = React.createClass({
     return {
 			loadDone: false,
 			isSlugExist: false,
-			//slug: this.props.location.pathname.replace("/",""),
 			slug: "",
 			latestPosts: [],
 			listOfWidgets: [],
@@ -49,86 +53,6 @@ let ThemeBlog = React.createClass({
 		var id = e.currentTarget.id;
 		this._reactInternalInstance._context.history.push('/post/'+id)
 	},
-/*
-	componentWillMount(){
-		this.loadMainMenu();
-		var me = this;
-		var categoryId = this.props.params.categoryId?this.props.params.categoryId:"";
-
-		riques(Query.checkSlugQry(this.state.slug), 
-			(error, response, body) => {
-	      if (!error && !body.errors && response.statusCode === 200) {
-	        var slugCount = body.data.viewer.allPosts.edges.length;
-	        if (slugCount > 0) {
-	        	me.setState({isSlugExist: true});
-	        }
-	      } else {
-	        me.setState({errorMsg: "error when checking slug"});
-	      }
-	      
-	      riques(Query.getPostListQry("Full", "post", "", categoryId), 
-		      function(error, response, body) { 
-		        if (!error && !body.errors && response.statusCode === 200) {
-		          var _postArr = [];
-		          _.forEach(body.data.viewer.allPosts.edges, function(item){
-		            _postArr.push(item.node);
-		          });
-		          me.setState({latestPosts: _postArr});
-		        } else {
-		          errorCallback(error, body.errors?body.errors[0].message:null);
-		        }
-		        me.setState({loadDone: true});
-		      }
-		    );
-				
-		    me.loadWidgets();
-	    }
-		);
-		
-	},
-
-	componentWillUpdate(nextProps){
-		var me = this;
-		var categoryId = nextProps.params.categoryId?nextProps.params.categoryId:"";
-
-		if (categoryId && nextProps.params.categoryId != this.props.params.categoryId) {
-			me.setState({loadDone: false});
-			riques(Query.getPostListQry("Full", "post", "", categoryId), 
-	      function(error, response, body) { 
-	        if (!error && !body.errors && response.statusCode === 200) {
-	          var _postArr = [];
-	          _.forEach(body.data.viewer.allPosts.edges, function(item){
-	            _postArr.push(item.node);
-	          });
-	          me.setState({latestPosts: _postArr});
-	        } else {
-	          errorCallback(error, body.errors?body.errors[0].message:null);
-	        }
-	        me.setState({loadDone: true});
-	      }
-	    );
-		}
-	},
-*/
-	
-	getWidgets(widgetArea){
-		let Widgets = [];
-
-	  // add checking if the component has implemented with redux or not
-	  let listOfWidgets = this.props.listOfWidgets[widgetArea]?this.props.listOfWidgets[widgetArea]:[];
-		
-		_.map(listOfWidgets,function(item){
-			var widgetFn = require("../DefaultWidgets/"+item.filePath).default;
-			
-			Widgets.push(<div key={item.id} className="sidebar-box">
-					<h3><span>{item.title}</span></h3>
-						{widgetFn(item.id, item.widget)}
-				</div>);
-		});
-		
-		return <div className="widgets">{Widgets}</div>;
-	},
-	
 	componentDidMount(){
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
@@ -140,13 +64,12 @@ let ThemeBlog = React.createClass({
 		if (!this.props.loadDone && this.props.slug) {
 			return <Loading/>
 		} else {
-			let Blog = getTemplateComponent('blog');
 			return <Blog 
 							latestPosts={this.props.latestPosts}
 							theTitle={theTitle}
 							theContent={theContent}
 							theExcerpt={theExcerpt}
-							getWidgets={this.getWidgets}
+							getWidgets={getWidgets.bind(this)}
 							theLogo={theLogo}
 							theMenu={theMenu(this.props.mainMenu)}
 							widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
@@ -157,9 +80,7 @@ let ThemeBlog = React.createClass({
 });
 
 const mapStateToProps = function(state){
-  if (!_.isEmpty(state.ThemeBlog)) {
-    return state.ThemeBlog;
-  } else return {}
+    return state.ThemeBlog||{};
 }
 
 ThemeBlog = connect(mapStateToProps)(ThemeBlog);
@@ -237,11 +158,11 @@ ThemeBlog = graphql(qry, {
     	var _postArr = [];
 	    //var slugCount = data.viewer.allPosts.edges.length;
 
-      _.forEach(data.viewer.allOptions.edges, function(item){
+      forEach(data.viewer.allOptions.edges, function(item){
         saveConfig(item.node.item, item.node.value);
       });
 
-      _.forEach(data.viewer.allPosts.edges, function(item){
+      forEach(data.viewer.allPosts.edges, function(item){
         _postArr.push(item.node);
       })
 

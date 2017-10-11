@@ -1,7 +1,7 @@
 import React from 'react'
-import _ from 'lodash'
-import {setAllCategoryList} from '../../actions'
-import Query from '../../admin/query';
+import map from 'lodash/map'
+import {setAllCategoryList} from '../../actions/setAllCategoryList'
+import queries from '../../admin/query/Post';
 import {gql, graphql} from 'react-apollo';
 import {Link} from 'react-router';
 
@@ -14,7 +14,7 @@ class Widget extends React.Component {
 
 
   renderCategories(){
-    return _.map(this.props.allCategoryList, item => (
+    return map(this.props.allCategoryList, item => (
       <li key={item.node.id}><Link to={"/category/" + item.node.id}>{item.node.name}</Link></li>
     ))
   }
@@ -27,7 +27,7 @@ class Widget extends React.Component {
   }
 }
 
-let qry = gql`${Query.getAllCategoryQry("post").query}`
+let qry = gql`${queries.getAllCategoryQry("post").query}`
 
 Widget = graphql(qry, {
   props: ({ownProps, data}) => {

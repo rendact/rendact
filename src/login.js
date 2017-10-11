@@ -1,7 +1,6 @@
 import React from 'react'
 import 'bootstrap/dist/css/bootstrap.css'
 import './css/Login.css'
-import AdminLTEinit from  './admin/lib/app.js'
 import {setLogged} from './actions'
 import {connect} from 'react-redux'
 import gql from 'graphql-tag'
@@ -64,7 +63,6 @@ class Login extends React.Component{
 	  }
 	  this.lock.on('authenticated', _doAuthentication);
 		
-		AdminLTEinit();
 	}
 
 	handleSubmit(event) {
@@ -114,7 +112,7 @@ class Login extends React.Component{
 
 	render(){
 		if(this.props.logged)
-      return <Redirect to={this.props.location.state.form}/>;
+      return <Redirect to={this.props.location.state && this.props.location.state.form || "/admin/dashboard"}/>;
 		
 		const loginPage = (
 			<div className="login-box">
