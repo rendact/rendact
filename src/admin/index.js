@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import $ from 'jquery';
 import AdminHeader from './Header';
-import Loading from './Loading';
+import AdminLoading from './AdminLoading';
 import ControlSidebar from './ControlSidebar';
 import Footer from './Footer';
 import NotFound from './NotFound';
@@ -28,14 +28,14 @@ import Loadable from 'react-loadable';
 const loadPages = (page) => (
   Loadable({
     loader: () => import(/*webpackChunkName: "pages-[request]"*/ `./pages/${page}`),
-    loading: () => null
+    loading: () => <AdminLoading/>
   })
 )
 
 const loadLib = (lib) => (
   Loadable({
     loader: () => import(/*webpackChunkName: "lib-[request]"*/ `./lib/${lib}`),
-    loading: () => null
+    loading: () => <AdminLoading/>
   })
 )
 const ContentType = loadLib('ContentType')
