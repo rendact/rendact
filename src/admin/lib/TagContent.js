@@ -4,7 +4,7 @@ import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen'
 import {swalert, riques, hasRole, errorCallback, setValue, getValue, removeTags, disableForm, defaultHalogenStyle} from '../../utils';
-import {Table, SearchBox, DeleteButtons} from './Table';
+import {TableTagCat, SearchBox, DeleteButtons} from './Table';
 import {connect} from 'react-redux'
 import {initContentList, maskArea, setEditorMode, toggleSelectedItemState, setNameValue} from '../../actions'
 
@@ -114,14 +114,17 @@ let TagContent = React.createClass({
     this.props.handleNav(this.props.slug,'bytag', tagId);
   },
   handleTextTitleClick: function(e){
-  debugger
+    // var titles = document.getElementsByClassName('titleText');
+    // _.forEach(titles, function(item){
+    // });
+
     e.preventDefault()
     let postId = e.currentTarget.id.split("-")[1]
-    this.handleViewPost(postId)
+    //this.handleViewPost(postId)
   },
   onAfterTableLoad: function(){
     var me = this;
-
+debugger
     var nameLink = function(event){
       event.preventDefault();
       var index = this.id.split("-")[0];
@@ -248,7 +251,7 @@ let TagContent = React.createClass({
                       { this.props.isProcessing &&
                       <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
                       }                            
-                      <Table
+                      <TableTagCat
                           id={"tag-"+this.props.slug}
                           columns={[
                             {id: 'name', label: "Name", type: "link", target: "", cssClass:"nameText"},
@@ -259,7 +262,7 @@ let TagContent = React.createClass({
                           onSelectAll={this.checkDynamicButtonState}
                           onCheckBoxClick={this.checkDynamicButtonState}
                           onAfterLoad={this.onAfterTableLoad}
-                          handleTextTitleClick={this.handleTextTitleClick}
+                          // handleTextTitleClick={this.handleTextTitleClick}
                         />
                   </div>
                 </div>

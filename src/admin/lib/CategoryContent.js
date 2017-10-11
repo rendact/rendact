@@ -96,7 +96,7 @@ let CategoryContent = React.createClass({
     this.props.handleNav(this.props.slug,'bycategory', categoryId);
   },
   handleTextTitleClick: function(e){
-  debugger
+    debugger
     e.preventDefault()
     let postId = e.currentTarget.id.split("-")[1]
     this.handleViewPost(postId)
@@ -112,7 +112,6 @@ let CategoryContent = React.createClass({
       setValue("name", name);
       me.props.dispatch(setEditorMode("update", postId))
     }
-
     var names = document.getElementsByClassName('nameText');
     _.forEach(names, function(item){
       item.addEventListener('click',nameLink);
@@ -245,9 +244,9 @@ let CategoryContent = React.createClass({
                       <Table 
                           id={"category-"+this.props.slug}
                           columns={[
-                            {id: 'name', label: "Name", type: "link", textAlign:"center", cssClass:"nameText"},
+                            {id: 'name', label: "Name", type: "link", textAlign:"center", cssClass:"titleText"},
                             {id: 'description', label: "Description", textAlign:"center", width: 400},
-                            {id: 'count', label: "Count", textAlign:"center", type: "link", target: "", cssClass:"categoryText"}
+                            {id: 'count', label: "Count", textAlign:"center", type: "link", target: "", cssClass:"tagText"}
                           ]}
                           checkBoxAtFirstColumn="true"
                           ref="rendactTable"

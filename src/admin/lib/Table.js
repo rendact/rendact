@@ -158,7 +158,6 @@ export const Table = React.createClass({
   	var datatable = $('#'+this.props.id).DataTable({sDom: '<"H"r>t<"F"ip>'}); 
   	this.datatable = datatable;
     $("#" + this.props.id).on('click', '.titleText', this.props.handleTextTitleClick)
-  debugger
   },
   render: function(){
   	return (
@@ -184,7 +183,8 @@ export const Table = React.createClass({
   }
 });
 
-export const TableTag = React.createClass({
+
+export const TableTagCat = React.createClass({
   getInitialState: function(){
     require ('datatables');
     require ('datatables/media/css/jquery.dataTables.min.css');
@@ -257,17 +257,17 @@ export const TableTag = React.createClass({
         me.props.onCheckBoxClick.call();
       });
     }
-
+      if (me.props.onAfterLoad){
+       me.props.onAfterLoad.call();
+     }
   },
   componentDidMount: function(){
     var datatable = $('#'+this.props.id).DataTable({sDom: '<"H"r>t<"F"ip>'}); 
     this.datatable = datatable;
-    $("#" + this.props.id).on('click', '.titleText', this.props.handleTextTitleClick)
-  debugger
   },
   render: function(){
     return (
-      <table id={this.props.id} className="display">
+      <table id={this.props.id} className="display" style={this.props.style}>
          <thead>
           <tr>
             {this.state.tableHead}
