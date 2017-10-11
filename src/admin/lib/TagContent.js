@@ -113,18 +113,8 @@ let TagContent = React.createClass({
   handleViewPage: function(tagId){
     this.props.handleNav(this.props.slug,'bytag', tagId);
   },
-  handleTextTitleClick: function(e){
-    // var titles = document.getElementsByClassName('titleText');
-    // _.forEach(titles, function(item){
-    // });
-
-    e.preventDefault()
-    let postId = e.currentTarget.id.split("-")[1]
-    //this.handleViewPost(postId)
-  },
   onAfterTableLoad: function(){
     var me = this;
-debugger
     var nameLink = function(event){
       event.preventDefault();
       var index = this.id.split("-")[0];
@@ -262,7 +252,6 @@ debugger
                           onSelectAll={this.checkDynamicButtonState}
                           onCheckBoxClick={this.checkDynamicButtonState}
                           onAfterLoad={this.onAfterTableLoad}
-                          // handleTextTitleClick={this.handleTextTitleClick}
                         />
                   </div>
                 </div>

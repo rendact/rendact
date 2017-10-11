@@ -4,7 +4,7 @@ import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen'
 import {riques, hasRole, errorCallback, getValue, setValue, removeTags, swalert, disableForm, defaultHalogenStyle} from '../../utils';
-import {Table, SearchBox, DeleteButtons} from '../lib/Table';
+import {TableTagCat, SearchBox, DeleteButtons} from '../lib/Table';
 import {connect} from 'react-redux'
 import {initContentList, maskArea, setEditorMode, toggleSelectedItemState} from '../../actions'
 
@@ -94,12 +94,6 @@ let CategoryContent = React.createClass({
   },
   handleViewPage: function(categoryId){
     this.props.handleNav(this.props.slug,'bycategory', categoryId);
-  },
-  handleTextTitleClick: function(e){
-    debugger
-    e.preventDefault()
-    let postId = e.currentTarget.id.split("-")[1]
-    this.handleViewPost(postId)
   },
   onAfterTableLoad: function(){
     var me = this;
@@ -241,12 +235,12 @@ let CategoryContent = React.createClass({
                       { this.props.isProcessing &&
                       <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
                       }               
-                      <Table 
+                      <TableTagCat 
                           id={"category-"+this.props.slug}
                           columns={[
-                            {id: 'name', label: "Name", type: "link", textAlign:"center", cssClass:"titleText"},
+                            {id: 'name', label: "Name", type: "link", textAlign:"center", cssClass:"nameText"},
                             {id: 'description', label: "Description", textAlign:"center", width: 400},
-                            {id: 'count', label: "Count", textAlign:"center", type: "link", target: "", cssClass:"tagText"}
+                            {id: 'count', label: "Count", textAlign:"center", type: "link", target: "", cssClass:"categoryText"}
                           ]}
                           checkBoxAtFirstColumn="true"
                           ref="rendactTable"
@@ -254,7 +248,6 @@ let CategoryContent = React.createClass({
                           onCheckBoxClick={this.checkDynamicButtonState}
                           onAfterLoad={this.onAfterTableLoad}
                           style={{opacity: this.props.opacity}}
-                          handleTextTitleClick={this.handleTextTitleClick}
                       />
                   </div>
                 </div>
