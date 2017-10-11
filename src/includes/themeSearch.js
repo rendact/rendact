@@ -13,6 +13,8 @@ import {
 } from './Theme/includes';
 import Query from '../admin/query';
 import {gql, graphql} from 'react-apollo'
+import Loadable from 'react-loadable';
+
 
 class ThemeSearch extends React.Component {
 	constructor(props){
@@ -40,7 +42,7 @@ class ThemeSearch extends React.Component {
   }
 
   render(){
-    let Search = getTemplateComponent('search');
+    let Search =  getTemplateComponent('search')
     return <Search
           footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
           theMenu={this.theMenu}

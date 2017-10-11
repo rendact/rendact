@@ -12,10 +12,6 @@ const NotFound = Loadable({
   loader: () => import('../../admin/NotFound'),
   loading: () => null
 })
-let Single = Loadable({
-  loader: () => getTemplateComponent('single'),
-  loading: () => null
-})
 
 window.config = AdminConfig;
 
@@ -51,6 +47,7 @@ let ThemeSingle = React.createClass({
 	},
 
 	render() {
+    let Single = getTemplateComponent('single')
 		let SinglePost = <Single 
 											postId={this.props.params.postId || this.props.params.pageId} 
 											postData={this.props.postData}

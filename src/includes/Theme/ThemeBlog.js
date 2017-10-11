@@ -20,10 +20,6 @@ const NotFound = Loadable({
   loader: () => import('../../admin/NotFound'),
   loading: () => null
 })
-let Blog = Loadable({
-  loader: () => getTemplateComponent('blog'),
-  loading: () => null
-})
 window.config = AdminConfig;
 
 /* Theme Components */
@@ -64,6 +60,7 @@ let ThemeBlog = React.createClass({
 		if (!this.props.loadDone && this.props.slug) {
 			return <Loading/>
 		} else {
+      let Blog = getTemplateComponent('blog')
 			return <Blog 
 							latestPosts={this.props.latestPosts}
 							theTitle={theTitle}
