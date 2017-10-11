@@ -1,5 +1,6 @@
 import React from 'react';
 import map from 'lodash/map'
+import get from 'lodash/get'
 import truncate from 'lodash/truncate'
 import {Menu} from '../Menu.js';
 import AdminConfig from '../../admin/AdminConfig';
@@ -18,26 +19,25 @@ window.config = AdminConfig;
 
 export function getTemplateComponent(type){
 	var c = window.config.theme;
+
+  const importing = (name) => (
+    `${c.path}/layouts/${name}.js`
+  )
+
+  const themeMap = {
+    home: importing('Home'),
+    blog: importing('Blog'),
+    single: importing('Single'),
+    search: importing('Search')
+  }
 	
 	if (c.name==null || c.path==null) {
 		return InvalidTheme;
 	}
 
-	try {
-		if (type==="home") {
-      return import(/*webpackChunkName: "home"*/'../../theme/'+c.path+'/layouts/Home.js').then(Home => Home)
-		} else if (type==="blog") {
-      return import(/*webpackChunkName: "blog"*/'../../theme/'+c.path+'/layouts/Blog.js').then(Blog => {
-        return Blog
-      })
-		} else if (type==="single") {
-      return import(/*webpackChunkName: "single"*/'../../theme/'+c.path+'/layouts/Single.js').then(Single => Single)
-    } else if (type==="search") {
-      return import(/*webpackChunkName: "search"*/'../../theme/'+c.path+'/layouts/Search.js').then(Search => Search)
-    }
-	} catch(e) {
-		return InvalidTheme;
-	}
+  let x = themeMap[type]
+  return x ? require('../../theme/' + x).default : InvalidTheme
+
 }
 
 export function theContent(content){

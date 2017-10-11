@@ -1,6 +1,6 @@
 import $ from 'jquery';
-window.jQuery = $;
 import React from 'react'
+window.jQuery = $;
 
 const Theme = React.createClass({
 	render: function() {
