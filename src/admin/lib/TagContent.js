@@ -4,7 +4,7 @@ import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen'
 import {swalert, riques, hasRole, errorCallback, setValue, getValue, removeTags, disableForm, defaultHalogenStyle} from '../../utils';
-import {TableTag, SearchBox, DeleteButtons} from './Table';
+import {TableTagCat, SearchBox, DeleteButtons} from './Table';
 import {connect} from 'react-redux'
 import {initContentList, maskArea, setEditorMode, toggleSelectedItemState, setNameValue} from '../../actions'
 
@@ -59,7 +59,6 @@ let TagContent = React.createClass({
               "count": item.node.post.edges.length
             });
           });
-debugger
           var bEdit = hasRole('modify-tag');
           me.table.loadData(_dataArr, bEdit);
           me.props.dispatch(initContentList(monthList))
@@ -107,6 +106,7 @@ debugger
     this.props.dispatch(toggleSelectedItemState(checkedRow.length>0));
   },
   handleNameChange: function(event){
+    event.preventDefault();
     var name = getValue("name");
     this.props.dispatch(setNameValue(name));
   },
@@ -115,7 +115,6 @@ debugger
   },
   onAfterTableLoad: function(){
     var me = this;
-
     var nameLink = function(event){
       event.preventDefault();
       var index = this.id.split("-")[0];
@@ -242,7 +241,7 @@ debugger
                       { this.props.isProcessing &&
                       <div style={defaultHalogenStyle}><Halogen.PulseLoader color="#4DAF7C"/></div>                   
                       }                            
-                      <TableTag
+                      <TableTagCat
                           id={"tag-"+this.props.slug}
                           columns={[
                             {id: 'name', label: "Name", type: "link", target: "", cssClass:"nameText"},
