@@ -204,6 +204,11 @@ export const setNameValue = (name)  => ({
   name
 })
 
+export const setId = (postId)  => ({
+  type: 'SET_ID',
+  postId
+})
+
 export const setOptionId = (optionId)  => ({
   type: 'SET_OPTION_ID',
   optionId
