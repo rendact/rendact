@@ -5,32 +5,8 @@ import AdminHeader from './Header';
 import Loading from './Loading';
 import ControlSidebar from './ControlSidebar';
 import Footer from './Footer';
-import Dashboard from './pages/Dashboard';
-import Settings from './pages/Settings';
-import Content from './pages/Content';
-import NewContent from './pages/ContentNew';
-import CategoryPost from './pages/Category';
-import TagPost from './pages/Tag';
-import Themes from './pages/Themes';
-import Menu from './pages/Menu';
-import Customize from './pages/Customize';
-import Plugins from './pages/Plugins';
-import Permission from './pages/Permission';
-import Pages from './pages/Pages';
-import Posts from './pages/Posts';
-import Users from './pages/Users';
-import NewPost from './pages/PostsNew';
-import NewPage from './pages/PagesNew';
-import NewTheme from './pages/ThemesNew';
-import NewUser from './pages/UsersNew';
-import Profile from './pages/Profile';
-import Widgets from './pages/Widgets';
 import NotFound from './NotFound';
 import NotPermissible from './NotPermissible';
-import ContentType from './lib/ContentType';
-import NewContentType from './lib/ContentTypeNew';
-import CategoryContent from './lib/CategoryContent';
-import TagContent from './lib/TagContent';
 import AdminConfig from './AdminConfig';
 import AdminLTEinit from './lib/app.js';
 import {hasRole, getConfig, swalert} from '../utils';
@@ -47,6 +23,46 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'jquery-ui/themes/base/core.css';
 import 'sweetalert2/dist/sweetalert2.css';
 
+import Loadable from 'react-loadable';
+
+const loadPages = (page) => (
+  Loadable({
+    loader: () => import(/*webpackChunkName: "pages-[request]"*/ `./pages/${page}`),
+    loading: () => null
+  })
+)
+
+const loadLib = (lib) => (
+  Loadable({
+    loader: () => import(/*webpackChunkName: "lib-[request]"*/ `./lib/${lib}`),
+    loading: () => null
+  })
+)
+const ContentType = loadLib('ContentType')
+const NewContentType = loadLib('ContentTypeNew')
+const CategoryContent = loadLib('CategoryContent')
+const TagContent = loadLib('TagContent')
+
+const Dashboard = loadPages('Dashboard')
+const Settings = loadPages('Settings')
+const Content = loadPages('Content')
+const NewContent = loadPages('ContentNew')
+const CategoryPost = loadPages('Category')
+const TagPost = loadPages('Tag')
+const Themes = loadPages('Themes')
+const Menu = loadPages('Menu')
+const Customize = loadPages('Customize')
+const Plugins = loadPages('Plugins')
+const Permission = loadPages('Permission')
+const Pages = loadPages('Pages')
+const Posts = loadPages('Posts')
+const Users = loadPages('Users')
+const NewPost = loadPages('PostsNew')
+const NewPage = loadPages('PagesNew')
+const NewTheme = loadPages('ThemesNew')
+const NewUser = loadPages('UsersNew')
+const Profile = loadPages('Profile')
+const Widgets = loadPages('Widgets')
 require ('bootstrap');
 
 let SideMenu = React.createClass({
