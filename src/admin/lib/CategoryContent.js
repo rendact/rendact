@@ -110,7 +110,7 @@ let CategoryContent = React.createClass({
     event.preventDefault();
     // var name = getValue("name");
     // var postId = this.props.postId;
-    var description = this.props.description;
+    var description = getValue("description");
     // this.props.dispatch(setModeNameIdDes("update", name, postId, description))
     // this.props.dispatch(setEditorMode("update"))
     this.props.dispatch(setDescription(description))
