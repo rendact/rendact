@@ -6,7 +6,7 @@ import Halogen from 'halogen'
 import {swalert, riques, hasRole, errorCallback, setValue, getValue, removeTags, disableForm, defaultHalogenStyle} from '../../utils';
 import {TableTagCat, SearchBox, DeleteButtons} from './Table';
 import {connect} from 'react-redux'
-import {initContentList, maskArea, setEditorMode, toggleSelectedItemState, setNameValue, setId} from '../../actions'
+import {initContentList, maskArea, setEditorMode, toggleSelectedItemState, setNameValue, setId, setModeNameId} from '../../actions'
 
 let TagContent = React.createClass({
   propTypes: {
@@ -108,8 +108,11 @@ let TagContent = React.createClass({
   handleNameChange: function(event){
     event.preventDefault();
     var name = getValue("name");
-    this.props.dispatch(setNameValue(name))
-    this.props.dispatch(setEditorMode("update"))
+    var postId = this.props.postId;
+    this.props.dispatch(setModeNameId("update", name, postId))
+    // this.props.dispatch(setEditorMode("update"))
+    // this.props.dispatch(setNameValue(name))
+    // this.props.dispatch(setNameValue(postId))
   },
   handleViewPage: function(tagId){
     this.props.handleNav(this.props.slug,'bytag', tagId);
@@ -267,6 +270,7 @@ let TagContent = React.createClass({
 
 const mapStateToProps = function(state){
   if (!_.isEmpty(state.tagContent)) {
+    debugger
     return _.head(state.tagContent)
   } else return {}
 }

@@ -178,6 +178,11 @@ export const setEditorMode = (mode) => ({
   mode
 })
 
+export const setModeNameId = (mode, name, postId) => ({
+  type: 'SET_MODE_NAME_ID',
+  mode, name, postId
+})
+
 export const toggleImageGalleyBinded = (state) => ({
   type: 'TOGGLE_IMAGE_GALLERY_BINDED',
   state
