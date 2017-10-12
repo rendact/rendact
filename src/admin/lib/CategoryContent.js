@@ -186,6 +186,7 @@ let CategoryContent = React.createClass({
                   position: 'tr',
                   autoDismiss: 2
           });
+          me.resetForm();
           var here = me;
           var cb = function(){here.disableForm(false)}
           me.loadData("All", cb);
@@ -198,6 +199,7 @@ let CategoryContent = React.createClass({
   resetForm: function(){
     document.getElementById("pageForm").reset();
     setValue("name", "");
+    setValue("description", "");
     this.props.dispatch(setEditorMode("create"))
     window.history.pushState("", "", '/admin/category');
   },
@@ -244,7 +246,6 @@ let CategoryContent = React.createClass({
                        <div className="form-group">
                           
                             <input type="submit" name="submit" id="submit" value={this.props.mode==="create"?"Add New Category":"Edit Category"} className="btn btn-primary btn-sm" />
-                            <input type="button" value="Reset" style={{marginLeft: 10}} onClick={this.resetForm} className="btn btn-primary btn-sm"/>
                             
                       </div>
                     </form>
