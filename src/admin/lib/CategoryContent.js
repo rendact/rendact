@@ -25,6 +25,10 @@ let CategoryContent = React.createClass({
   getDefaultProps: function() {
     return {
       isProcessing: false,
+      name:"",
+      description:"",
+      slug:"",
+      postId:"",
       opacity: 1,
       monthList: [],
       deleteMode: false,
@@ -49,7 +53,7 @@ let CategoryContent = React.createClass({
             _dataArr.push({
               "postId": item.node.id,
               "name": item.node.name,
-              "description": "",
+              "description": item.node.description!==null?item.node.description:"",
               "count": item.node.post.edges.length
             });
           });
@@ -112,6 +116,8 @@ let CategoryContent = React.createClass({
       var row = me.table.datatable.data()[index];
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
+      var description = removeTags(row[2]);
+      debugger
       setValue("name", name);
       me.props.dispatch(setModeNameId("update", name, postId))
       // me.props.dispatch(setId(postId));
@@ -272,7 +278,7 @@ let CategoryContent = React.createClass({
 
 const mapStateToProps = function(state){
   if (!_.isEmpty(state.categoryContent)) {
-    debugger
+    // debugger
     return _.head(state.categoryContent)
   } else return {}
 }
