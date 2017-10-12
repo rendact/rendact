@@ -9,13 +9,8 @@ const INITIAL_VALUES =  [{
         {id:"slug", label: "Slug", type: "text", deletable: false}
       ],
       providedFields: [
-        {id:"author", label: "Author", type: "link"},
-        {id:"summary", label: "Summary", type: "link"},
-        {id:"content", label: "Content", type: "text"},
-        {id:"image", label: "Image", type: "text"},
-        {id:"like", label: "Like", type: "text"},
-        {id:"featuredImage", label: "Featured Image", type: "text"},
-        {id:"gallery", label: "Gallery", type: "text"}
+        {id:"title", label: "Title", type: "link", deletable: false},
+        {id:"slug", label: "Slug", type: "text", deletable: false}
       ],
       providedFieldsDefault: [
         {id:"author", label: "Author", type: "link"},
@@ -58,15 +53,6 @@ const contentNew = (state = INITIAL_VALUES, action) => {
 
     case 'SET_MODE':
       return state.map(item =>  ({...item, mode: action.mode}))
-
-
-
-
-
-
-
-
-
 
     case 'UPDATE_GENERAL_SETTING':
       return [...state]

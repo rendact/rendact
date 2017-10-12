@@ -101,28 +101,25 @@ const createContentMtn = function(data){
     }
     `;
 
-const getContentQry = function(contentId){
-  return {"query": 
-      `{
-        getContent(id:"`+contentId+`"){ 
-          id,
-          name,
-          slug,
-          description,
-          menuIcon,
-          fields,
-          customFields,
-          label,
-          labelSingular,
-          labelAddNew,
-          labelEdit,
-          createdAt,
-          status,
-          connection
-        }
-      }`
-  };
-}
+const getContentQry = gql`
+  query GetContent($id: ID!) {
+    getContent(id: $id){ 
+      id,
+      name,
+      slug,
+      description,
+      menuIcon,
+      fields,
+      customFields,
+      label,
+      labelSingular,
+      labelAddNew,
+      labelEdit,
+      createdAt,
+      status,
+      connection
+    }
+  }`
 
 const getContentPostListQry = function(s, postType, tagId, cateId) {
   var status = '{ne: "Trash"}';

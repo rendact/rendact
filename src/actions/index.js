@@ -450,7 +450,7 @@ export const setprovidedFields = (providedFields) => ({
   providedFields
 })
 
-export const setcustomFields = (customFields) => ({
+export const setCustomFields = (customFields) => ({
   type: 'SET_CUSTOM_FIELDS',
   customFields
 })

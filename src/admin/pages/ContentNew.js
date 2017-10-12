@@ -2,12 +2,14 @@ import React from 'react';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Query from '../query';
-import {riques, getValue, setValue, getFormData, errorCallback, disableForm, swalert} from '../../utils';
+import {disableForm, swalert} from '../../utils';
 import {connect} from 'react-redux'
 import {loadFormData} from '../../actions'
-import {reduxForm, Field, formValueSelector} from 'redux-form';
-import {maskArea, toggleSelectedItemState, setprovidedFields, setcustomFields, setfields, 
+import {reduxForm, Field, formValueSelector, change} from 'redux-form';
+import {maskArea, toggleSelectedItemState, setprovidedFields, setCustomFields, setfields, 
 	setcheckingSlug, togglecheckingSlug, NameBlur, AddProvidedField, setmode} from '../../actions'
+import gql from 'graphql-tag'
+import {graphql, withApollo} from 'react-apollo'
 
 const ContentField = React.createClass({
 	render: function(){
@@ -26,7 +28,6 @@ let ContentNew = React.createClass({
 
 	getDefaultProps: function() {
 	    return {
-	    //mode: this.props.postId?"update":"create",
 	    mode: "create",
 			fields: [
 				{id:"title", label: "Title", type: "link", deletable: false},
@@ -51,33 +52,16 @@ let ContentNew = React.createClass({
 			],
 			customFields: [],
 			checkingSlug: false,
-			slug: ''
+			slug: '',
+			customFieldType: 'text'
 	    }
-	},
-	loadData: function(){
-		if (!this.props.postId) return;
-		var me = this;
-		var qry = Query.getContentQry(this.props.postId);
-		riques(qry, 
-			function(error, response, body){
-				if(!error && !body.errors) {
-					var data = body.data.getContent; 
-					me.setFormValues(data);
-				} else {
-					errorCallback(error, body.errors?body.errors[0].message:null);
-				}
-			}
-		);
 	},
 	setFormValues: function(data){
 		this.props.dispatch(loadFormData(data));
 		document.getElementById("status").checked = data.status==="active"?true:false;
 		
-		// this.setState({providedFields: data.fields});
 		this.props.dispatch(setprovidedFields(data.fields));
-		// this.setState({customFields: data.customFields});
-		this.props.dispatch(setcustomFields(data.customFields));
-		// this.setState({fields: _.concat(data.fields, data.customFields)});
+		this.props.dispatch(setCustomFields(data.customFields));
 		this.props.dispatch(setfields(_.concat(data.fields, data.customFields)));
 
 		var providedFieldsId = _.map(data.fields, function(item){ return item.id });
@@ -88,60 +72,36 @@ let ContentNew = React.createClass({
 	},
 	checkSlug: function(slug){
     var me = this;
-    // this.setState({checkingSlug: true});
     this.props.dispatch(setcheckingSlug(true));
-    riques( Query.checkContentSlugQry(slug),
-      function(error, response, body) {
-        if (!error && !body.errors && response.statusCode === 200) {
-          var slugCount = body.data.viewer.allContents.edges.length;
-          if (me.props.mode==="create") {
-            if (slugCount > 0) { 
-            	// me.setState({checkingSlug: false, slug: slug+"-"+slugCount});
-            	me.props.dispatch(togglecheckingSlug(false, slug+"-"+slugCount)); 
-            	setValue('slug', slug+"-"+slugCount)
-            } else 
-            	// me.setState({checkingSlug: false, slug: slug});
-            	me.props.dispatch(togglecheckingSlug(false, slug));
-          } else {
-            if (slugCount > 1) { 
-            	// me.setState({checkingSlug: false, slug: slug+"-"+slugCount}); 
-            	me.props.dispatch(togglecheckingSlug(false, slug+"-"+slugCount));
-            	setValue('slug', slug+"-"+slugCount)
-            }
-            else 
-            	// me.setState({checkingSlug: false, slug: slug});
-            	me.props.dispatch(togglecheckingSlug(false, slug));
-          }
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
+    this.props.client.query({
+	  	query: gql`${Query.checkContentSlugQry(slug).query}`
+	  }).then( body => {
+	  	var slugCount = body.data.viewer.allContents.edges.length;
+      if (me.props.mode==="create") {
+        if (slugCount > 0) { 
+        	me.props.dispatch(togglecheckingSlug(false, slug+"-"+slugCount)); 
+        	//me.props.changeFieldValue('slug', slug+"-"+slugCount)
+        } else 
+        	me.props.dispatch(togglecheckingSlug(false, slug));
+      } else {
+        if (slugCount > 1) { 
+        	me.props.dispatch(togglecheckingSlug(false, slug+"-"+slugCount));
+        	//me.props.changeFieldValue('slug', slug+"-"+slugCount)
         }
-        // me.setState({checkingSlug: false});
-        me.props.dispatch(setcheckingSlug(false));
+        else 
+        	me.props.dispatch(togglecheckingSlug(false, slug));
       }
-    );
+	  })
   },
   handleNameBlur: function(event) {
-    // var name = getValue("name");
     var name = this.props.name;
     var slug = name.split(" ").join("-").toLowerCase();
-    // setValue("slug", slug);
     this.checkSlug(slug);
-
-    // var label = getValue("label");
     var label = this.props.label;
-    // var labelSingular = getValue("labelSingular");
     var labelSingular = this.props.labelSingular;
-    // var labelAddNew = getValue("labelAddNew");
     var labelAddNew = this.props.labelAddNew;
-    // var labelEdit = getValue("labelEdit");
     var labelEdit = this.props.labelEdit
 
-    // this.setState({
-    // 	label: label?null:name+"s",
-    // 	labelSingular: labelSingular?null:name,
-    // 	labelAddNew: labelAddNew?null:"Add "+name,
-    // 	labelEdit: labelEdit?null:"Edit "+name
-    // });
     this.props.dispatch(NameBlur(
     	label?null:name+"s",
     	labelSingular?null:name,
@@ -150,7 +110,6 @@ let ContentNew = React.createClass({
     ));
   },
   handleSlugBlur: function(event) {
-    // var slug = getValue("slug");
     var slug = this.props.slug;
     slug = slug.split(" ").join("-").toLowerCase();
     this.checkSlug(slug);
@@ -158,10 +117,9 @@ let ContentNew = React.createClass({
 	disableForm: function(state){
     disableForm(state, this.notification);
   },
-	handleSubmitBtn: function(event){
-		// event.preventDefault();
+	handleSubmitBtn: function(values){
 		var me = this;
-		var _objData = getFormData('rdt-input-form', 'object');
+		var _objData = values;
 		_objData['fields'] = this.props.providedFields;
 		_objData['customFields'] = this.props.customFields;
 
@@ -173,53 +131,42 @@ let ContentNew = React.createClass({
 		this.disableForm(true);
 
 		var qry = "";
-	    if (this.props.mode==="create"){
-	      qry = Query.createContentMtn(_objData);
-	    }else{
-	      _objData["id"] = this.props.postId;
-	      qry = Query.updateContentMtn(_objData);
-	    }
+    if (this.props.mode==="create"){
+      qry = Query.createContentMtn(_objData);
+    }else{
+      _objData["id"] = this.props.postId;
+      qry = Query.updateContentMtn(_objData);
+    }
 	  
-		riques(qry, 
-			function(error, response, body){
-				if(!error && !body.errors) {
-					me.disableForm(false);
-					//me.resetForm();
-				} else {
-					errorCallback(error, body.errors?body.errors[0].message:null);
-				}
-			}
-		);
+	  this.props.client.mutate({
+	  	mutation: gql`${qry.query}`,
+	  	variables: qry.variables
+	  }).then( data => {
+	  	me.disableForm(false);
+	  });
 	}, 
 	handleAddProvidedField: function(event){
 		var me = this;
-		var providedFields = [];
+		var providedFields = this.props.providedFields;
 		var allProvidedField = _.concat(me.props.defaultFields, me.props.providedFieldsDefault);
 
-		var checkedFields = _.filter(document.getElementsByName("checkboxField[]"), function(item){
-      return item.checked
-    });
+    var newField = _.find(allProvidedField, {id: event.target.name});
+		if (event.target.checked) {
+			providedFields.push(newField);
+		} else {
+			_.remove(providedFields, {id: event.target.name});
+		}
     
-    _.forEach(checkedFields, function(item){
-    	var newField = _.find(allProvidedField, {id: item.id});
-			if (newField) providedFields.push(newField);
-    })
-		// this.setState({providedFields: providedFields, fields: _.concat(providedFields, this.state.customFields)});
 		this.props.dispatch(setprovidedFields(providedFields));
 		this.props.dispatch(setfields(_.concat(providedFields, this.props.customFields)));
 	},
 	handleAddCustomField: function(event){
 		event.preventDefault();
 		var customFields = this.props.customFields;
-		// var name = getValue("fieldName");
-		var name = this.props.fieldName;
-		// var type = getValue("fieldType");
-		var type = this.props.fieldType;
-		// var width = getValue("fieldWidth");
-		var width = this.props.fieldWidth;
-		// var align = getValue("fieldAlign");
-		var align = this.props.fieldAlign;
-		// var connection = getValue("connection");
+		var name = this.props.customFieldName;
+		var type = this.props.customFieldType;
+		var width = this.props.customFieldWidth;
+		var align = this.props.customFieldAlign;
 		var connection = this.props.connection;
 
 		if (!name) {
@@ -227,10 +174,9 @@ let ContentNew = React.createClass({
 			return;
 		}
 		if (!type){
-			swalert('Invalid value', "Field type can't be  empty!",'error');
+			swalert('error','Invalid value', "Field type can't be  empty!");
 			return;
 		}
-
 		
 		var newField = {
 			id: name.toLowerCase(), 
@@ -242,8 +188,7 @@ let ContentNew = React.createClass({
 		};
 
 		customFields.push(newField);
-		// this.setState({customFields: customFields, fields: _.concat(this.state.providedFields, customFields)});
-		this.props.dispatch(setcustomFields(customFields));
+		this.props.dispatch(setCustomFields(customFields));
 		this.props.dispatch(setfields(_.concat(this.props.providedFields, customFields)))
 	},
 	handleFieldDelete: function(event){
@@ -255,19 +200,16 @@ let ContentNew = React.createClass({
 		var record = _.find(cfields, {label: name});
 		if (record) {
 			_.pull(cfields, record);
-			// this.setState({customFields: cfields});
-			this.props.dispatch(setcustomFields(cfields));
+			this.props.dispatch(setCustomFields(cfields));
 		}
 
 		var precord = _.find(pfields, {label: name});
 		if (precord) {
 			_.pull(pfields, precord);
-			// this.setState({providedFields: pfields});
 			this.props.dispatch(setprovidedFields(pfields));
-			_.forEach(document.getElementsByName("checkboxField[]"), function(item){ if (item.value===precord.id) item.checked=false});
+			_.forEach(document.getElementsByName(precord.id), function(item){ if (item.name===precord.id) item.checked=false});
 		}
 
-		// this.setState({fields: _.concat(cfields, pfields)});
 		this.props.dispatch(setfields(_.concat(cfields, pfields)));
 	},
 	handleAddNewBtn: function(event) {
@@ -281,13 +223,11 @@ let ContentNew = React.createClass({
 	resetForm: function(){
 		document.getElementById("contentForm").reset();
 		window.history.pushState("", "", '/admin/content/new');
-		// this.setState({mode: "create", fields: this.defaultFields})
 		this.props.dispatch(setmode("create"));
 		this.props.dispatch(setfields(this.props.defaultFields));
 	},
 	componentDidMount: function(){
 		this.notification = this.refs.notificationSystem;
-		this.loadData();
 	},
 	render: function(){
 		return (
@@ -387,7 +327,7 @@ let ContentNew = React.createClass({
 	                  	_.map(this.props.defaultFields, function(item){
 	                  		return <div key={item.id} className="checkbox">
 	                  			<label>
-	                  				<Field component="input" type="checkbox" name="checkboxField[]"  id={item.id} value={item.id} readOnly="true" checked/>{item.label}
+	                  				<Field component="input" type="checkbox" name={item.id} value={item.id} readOnly="true" checked/>{item.label}
 	                  			</label>
 	                  			</div>
 	                  	})
@@ -396,7 +336,7 @@ let ContentNew = React.createClass({
 	                  	_.map(this.props.providedFieldsDefault, function(item){
 	                  		return <div key={item.id} className="checkbox">
 	                  		<label>
-	                  			<Field component="input" type="checkbox" name="checkboxField[]" id={item.id} onChange={this.handleAddProvidedField} value={item.id}/>{item.label}
+	                  			<Field component="input" type="checkbox" name={item.id} onChange={this.handleAddProvidedField} value={item.id}/>{item.label}
 	                  		</label>
 	                  		</div>
 	                  	}.bind(this))
@@ -414,7 +354,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Field Name</label>
 								  			</div>
 								  			<div className="col-md-9">
-								  				<Field component="input" type="text" name="fieldName" id="fieldName" placeholder="Field name" className="form-control" />
+								  				<Field component="input" type="text" name="customFieldName" placeholder="Field name" className="form-control" />
 								  			</div>
 							  			</div>
 
@@ -423,9 +363,9 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Field Type</label>
 								  			</div>
 								  			<div className="col-md-9">
-													<Field component="select"	id="fieldType" name="fieldType" className="form-control select" onChange={this.handleFieldTypeChange}>
+													<Field component="select"	name="customFieldType" className="form-control select" onChange={this.handleFieldTypeChange}>
 														<option value="text">String</option>
-														<option value="text">Number</option>
+														<option value="number">Number</option>
 														<option value="date">Date</option>
 														<option value="link">Link</option>
 														<option value="image">Image</option>
@@ -451,7 +391,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Width</label>
 								  			</div>
 								  			<div className="col-md-9">
-								  				<Field component="input" type="text" name="fieldWidth" id="fieldWidth" placeholder="Width" className="form-control"/> 
+								  				<Field component="input" type="text" name="customFieldWidth" placeholder="Width" className="form-control"/> 
 								  			</div>
 							  			</div>
 												
@@ -460,7 +400,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Align</label>
 								  			</div>
 								  			<div className="col-md-9">
-								  				<Field component="select" name="fieldAlign" id="fieldAlign" className="form-control select">
+								  				<Field component="select" name="customFieldAlign" className="form-control select">
 														<option value="left">Left</option>
 														<option value="right">Right</option>
 														<option value="center">Center</option>
@@ -473,7 +413,7 @@ let ContentNew = React.createClass({
 							  					<label htmlFor="fields">Position in editor</label>
 								  			</div>
 								  			<div className="col-md-9">
-								  				<Field component="select" name="fieldAlign" id="fieldAlign" className="form-control select">
+								  				<Field component="select" name="customFieldAlign" className="form-control select">
 														<option value="left">Left</option>
 														<option value="right">Right</option>
 													</Field> 	
@@ -550,22 +490,6 @@ let ContentNew = React.createClass({
 	}
 });
 
-// const mapStateToProps = function(state){
-// 	if (!_.isEmpty(state.contentNew)) {
-// 		var out = _.head(state.contentNew);
-// 		out["initialValues"] = out.data;
-// 		return out;
-// 	} else return {}
-// }
-
-// ContentNew = reduxForm({
-//   form: 'newContentForm'
-// })(ContentNew);
-// ContentNew = connect(mapStateToProps)(ContentNew);
-// export default ContentNew;
-
-
-
 const selector = formValueSelector('newContentForm');
 
 const mapStateToProps = function(state){
@@ -576,23 +500,51 @@ const mapStateToProps = function(state){
     labelAddNew: selector(state, 'labelAddNew'),
     labelEdit: selector(state, 'labelEdit'),
     slug: selector(state, 'slug'),
-    fieldName: selector(state, 'fieldName'),
-    fieldType: selector(state, 'fieldType'),
-    fieldWidth: selector(state, 'fieldWidth'),
-    fieldAlign: selector(state, 'fieldAlign'),
+    customFieldName: selector(state, 'customFieldName'),
+    customFieldType: selector(state, 'customFieldType'),
+    customFieldWidth: selector(state, 'customFieldWidth'),
+    customFieldAlign: selector(state, 'customFieldAlign'),
     connection: selector(state, 'connection')
   }
-
+  debugger;
   if (!_.isEmpty(state.contentNew)) {
-    var out = _.head(state.contentNew);
-    out = {...out, ...customStates}
-    return out
+    return {...state.contentNew, ...customStates}
   } else 
-  return {};
+  	return customStates;
+}
+
+const mapDispatchToProps = function(dispatch){ 
+  return {
+    changeFieldValue: function(field, value) {
+      dispatch(change('menuForm', field, value))
+    }
+  }
 }
 
 ContentNew = reduxForm({
   form: 'newContentForm'
 })(ContentNew)
-ContentNew = connect(mapStateToProps)(ContentNew);
+
+ContentNew = connect(mapStateToProps, mapDispatchToProps)(ContentNew);
+
+ContentNew = graphql(Query.getContentQry, {
+	options : (props) => ({
+    variables: {
+      id: props.postId?props.postId:""
+    }
+  }),
+  props: ({ownProps, data}) => {
+  	
+    if (data.viewer) {
+    	var data = data.getContent; 
+
+    	return {
+        initialValues: data
+      }
+    } 
+  }
+})(ContentNew);
+
+ContentNew = withApollo(ContentNew);
+
 export default ContentNew;
