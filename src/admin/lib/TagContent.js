@@ -115,6 +115,7 @@ let TagContent = React.createClass({
     // this.props.dispatch(setNameValue(postId))
   },
   handleViewPage: function(tagId){
+    debugger
     this.props.handleNav(this.props.slug,'bytag', tagId);
   },
   onAfterTableLoad: function(){
@@ -270,7 +271,7 @@ let TagContent = React.createClass({
 
 const mapStateToProps = function(state){
   if (!_.isEmpty(state.tagContent)) {
-    debugger
+    // debugger
     return _.head(state.tagContent)
   } else return {}
 }

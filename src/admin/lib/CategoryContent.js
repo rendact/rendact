@@ -6,7 +6,7 @@ import Halogen from 'halogen'
 import {riques, hasRole, errorCallback, getValue, setValue, removeTags, swalert, disableForm, defaultHalogenStyle} from '../../utils';
 import {TableTagCat, SearchBox, DeleteButtons} from '../lib/Table';
 import {connect} from 'react-redux'
-import {initContentList, maskArea, setEditorMode, toggleSelectedItemState} from '../../actions'
+import {setModeNameId, setId, initContentList, maskArea, setEditorMode, toggleSelectedItemState} from '../../actions'
 
 let CategoryContent = React.createClass({
   propTypes: {
@@ -92,6 +92,15 @@ let CategoryContent = React.createClass({
     var checkedRow = document.querySelectorAll("input.category-"+this.props.slug+"Cb:checked");
     this.props.dispatch(toggleSelectedItemState(checkedRow.length>0));
   },
+  handleNameChange: function(event){
+    event.preventDefault();
+    var name = getValue("name");
+    var postId = this.props.postId;
+    // this.props.dispatch(setModeNameId("update", name, postId))
+    // this.props.dispatch(setEditorMode("update"))
+    // this.props.dispatch(setNameValue(name))
+    // this.props.dispatch(setNameValue(postId))
+  },
   handleViewPage: function(categoryId){
     this.props.handleNav(this.props.slug,'bycategory', categoryId);
   },
@@ -104,7 +113,8 @@ let CategoryContent = React.createClass({
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
       setValue("name", name);
-      me.props.dispatch(setEditorMode("update", postId))
+      me.props.dispatch(setModeNameId("update", name, postId))
+      // me.props.dispatch(setId(postId));
     }
     var names = document.getElementsByClassName('nameText');
     _.forEach(names, function(item){
@@ -199,7 +209,7 @@ let CategoryContent = React.createClass({
                       <div className="form-group">
                           <label htmlFor="name" >Category name</label>
                           <div >
-                            <input type="text" name="name" id="name" className="form-control name" required="true"/>
+                            <input type="text" name="name" id="name" className="form-control" required="true" onChange={this.handleNameChange}/>
                             <p className="help-block">The name appears on your site</p>
                           </div>
                       </div>
@@ -262,6 +272,7 @@ let CategoryContent = React.createClass({
 
 const mapStateToProps = function(state){
   if (!_.isEmpty(state.categoryContent)) {
+    debugger
     return _.head(state.categoryContent)
   } else return {}
 }

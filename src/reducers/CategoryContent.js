@@ -33,6 +33,16 @@ const categoryContent = (state = [], action) => {
           mode: action.mode
         }
       ]
+
+    case 'SET_ID':
+      return state.map(item =>  ({...item, postId: action.postId}))
+
+    case 'SET_NAME_VALUE':
+      return state.map(item =>  ({...item, name: action.name}))
+    
+    case 'SET_MODE_NAME_ID':
+      return state.map(item =>  ({...item,mode: action.mode, name: action.name, postId: action.postId}))
+    
     default:
       return state
   }
