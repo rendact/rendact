@@ -178,6 +178,11 @@ export const setEditorMode = (mode) => ({
   mode
 })
 
+export const setModeNameId = (mode, name, postId) => ({
+  type: 'SET_MODE_NAME_ID',
+  mode, name, postId
+})
+
 export const toggleImageGalleyBinded = (state) => ({
   type: 'TOGGLE_IMAGE_GALLERY_BINDED',
   state
@@ -202,6 +207,11 @@ export const setOptions = (options) => ({
 export const setNameValue = (name)  => ({
   type: 'SET_NAME_VALUE',
   name
+})
+
+export const setId = (postId)  => ({
+  type: 'SET_ID',
+  postId
 })
 
 export const setOptionId = (optionId)  => ({

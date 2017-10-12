@@ -6,7 +6,7 @@ import Halogen from 'halogen'
 import {swalert, riques, hasRole, errorCallback, setValue, getValue, removeTags, disableForm, defaultHalogenStyle} from '../../utils';
 import {TableTagCat, SearchBox, DeleteButtons} from './Table';
 import {connect} from 'react-redux'
-import {initContentList, maskArea, setEditorMode, toggleSelectedItemState, setNameValue} from '../../actions'
+import {initContentList, maskArea, setEditorMode, toggleSelectedItemState, setNameValue, setId, setModeNameId} from '../../actions'
 
 let TagContent = React.createClass({
   propTypes: {
@@ -97,7 +97,7 @@ let TagContent = React.createClass({
   resetForm: function(){
     document.getElementById("tagForm").reset();
     this.props.dispatch(setEditorMode("create"))
-    this.handleNameChange();
+    // this.handleNameChange();
     setValue("name", "");
     window.history.pushState("", "", '/admin/tag');
   },
@@ -108,7 +108,11 @@ let TagContent = React.createClass({
   handleNameChange: function(event){
     event.preventDefault();
     var name = getValue("name");
-    this.props.dispatch(setNameValue(name));
+    var postId = this.props.postId;
+    this.props.dispatch(setModeNameId("update", name, postId))
+    // this.props.dispatch(setEditorMode("update"))
+    // this.props.dispatch(setNameValue(name))
+    // this.props.dispatch(setNameValue(postId))
   },
   handleViewPage: function(tagId){
     this.props.handleNav(this.props.slug,'bytag', tagId);
@@ -122,7 +126,8 @@ let TagContent = React.createClass({
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
       setValue("name", name);
-      me.props.dispatch(setEditorMode("update", postId))
+      me.props.dispatch(setEditorMode("update"));
+      me.props.dispatch(setId(postId));
     }
 
     var titles = document.getElementsByClassName('nameText');
@@ -149,7 +154,6 @@ let TagContent = React.createClass({
     var type = this.props.postType;
     this.disableForm(true);
     var qry = "", noticeTxt = "";
-
     if (this.props.mode==="create"){
       qry = Query.createTag(name, type);
       noticeTxt = 'Tag Published!';
@@ -220,7 +224,7 @@ let TagContent = React.createClass({
                       </div>
                        <div className="form-group">
                           <button type="submit" id="submit" className="btn btn-primary btn-flat" 
-                          disabled={this.props.name===""}>{this.props.mode==="update"?"Save Changes":"Add New Tag"}</button>
+                          >{this.props.mode==="update"?"Save Changes":"Add New Tag"}</button>
                       </div>
                     </form>
                     </div>
@@ -266,6 +270,7 @@ let TagContent = React.createClass({
 
 const mapStateToProps = function(state){
   if (!_.isEmpty(state.tagContent)) {
+    debugger
     return _.head(state.tagContent)
   } else return {}
 }

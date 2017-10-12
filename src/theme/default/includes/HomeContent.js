@@ -3,17 +3,13 @@ import Loadable from 'react-loadable'
 import Sidebar from '../includes/Sidebar'
 
 const HomeContentWithLatestPost = Loadable({
-  loader: () => new Promise((resolve) =>
-    require.ensure([], () => resolve(require('../includes/HomeContentWithLastestsPost')),
-	 'themehomewithlastestpost')),
+  loader: () =>import(/* webpackChunkName: "homecontentWithlastestPost" */'../includes/HomeContentWithLastestsPost'),
   loading: () => null
 })
 
 
 const HomeContentWithPage = Loadable({
-  loader: () => new Promise((resolve) =>
-    require.ensure([], () => resolve(require('../includes/HomeContentWithPage')),
-	 'themehomewithpage')),
+  loader: () =>import(/* webpackChunkName: "HomeContentWithPage" */'../includes/HomeContentWithPage'),
   loading: () => null
 })
 
