@@ -178,9 +178,19 @@ export const setEditorMode = (mode) => ({
   mode
 })
 
+export const setDescription = (description) => ({
+  type: 'SET_DESCRIPTION',
+  description
+})
+
 export const setModeNameId = (mode, name, postId) => ({
   type: 'SET_MODE_NAME_ID',
   mode, name, postId
+})
+
+export const setModeNameIdDes = (mode, name, postId, description) => ({
+  type: 'SET_MODE_NAME_ID_DES',
+  mode, name, postId, description
 })
 
 export const toggleImageGalleyBinded = (state) => ({

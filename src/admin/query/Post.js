@@ -134,7 +134,7 @@ const getCreatePostQry = function(data){
     }
   };
 
-  const createCategory = function(name, type){
+  const createCategory = function(name, description, type){
   return {
       "query": `
     mutation createCategory($input: CreateCategoryInput!) {
@@ -142,6 +142,7 @@ const getCreatePostQry = function(data){
           changedCategory {
             id,
             name, 
+            description,
             type
         }
       }
@@ -150,13 +151,14 @@ const getCreatePostQry = function(data){
       "variables": {
         "input": {
           "name": name,
+          "description": description,
           "type" : type
         }
       }
     }
   };
 
-  const updateCategory = function(postId, name, type){
+  const updateCategory = function(postId, name, description, type){
   return {
       "query": `
     mutation updateCategory($input: UpdateCategoryInput!) {
@@ -164,6 +166,7 @@ const getCreatePostQry = function(data){
           changedCategory {
             id,
             name,
+            description,
             type
         }
       }
@@ -173,6 +176,7 @@ const getCreatePostQry = function(data){
         "input": {
           "id": postId,
           "name": name,
+          "description": description,
           "type" : type
         }
       }
