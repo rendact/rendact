@@ -6,8 +6,8 @@ import {disableForm, swalert} from '../../utils';
 import {connect} from 'react-redux'
 import {loadFormData} from '../../actions'
 import {reduxForm, Field, formValueSelector, change} from 'redux-form';
-import {maskArea, toggleSelectedItemState, setprovidedFields, setCustomFields, setfields, 
-	setcheckingSlug, togglecheckingSlug, NameBlur, AddProvidedField, setmode} from '../../actions'
+import {maskArea, setProvidedFields, setCustomFields, setFields, 
+				toggleCheckingSlug, setLabels, toggleStatusEditMode} from '../../actions'
 import gql from 'graphql-tag'
 import {graphql, withApollo} from 'react-apollo'
 
@@ -24,132 +24,121 @@ const ContentField = React.createClass({
 	}
 });
 
+const generateDefaultField = () => ([
+  {id:"title", label: "Title", type: "link", deletable: false},
+  {id:"slug", label: "Slug", type: "text", deletable: false}
+])
+
+const generateSlug = (title) => {
+	return title.split(" ").join("-").toLowerCase()
+}
+
 let ContentNew = React.createClass({
 
-	getDefaultProps: function() {
+	getDefaultProps() {
 	    return {
-	    mode: "create",
-			fields: [
-				{id:"title", label: "Title", type: "link", deletable: false},
-				{id:"slug", label: "Slug", type: "text", deletable: false}
-			],
-			defaultFields: [
-				{id:"title", label: "Title", type: "link", deletable: false},
-				{id:"slug", label: "Slug", type: "text", deletable: false}
-			],
-			providedFields: [
-				{id:"title", label: "Title", type: "link", deletable: false},
-				{id:"slug", label: "Slug", type: "text", deletable: false}
-			],
-			providedFieldsDefault: [
-				{id:"author", label: "Author", type: "link"},
-				{id:"summary", label: "Summary", type: "link"},
-				{id:"content", label: "Content", type: "text"},
-				{id:"image", label: "Image", type: "text"},
-				{id:"like", label: "Like", type: "text"},
-				{id:"featuredImage", label: "Featured Image", type: "text"},
-				{id:"gallery", label: "Gallery", type: "text"}
-			],
-			customFields: [],
-			checkingSlug: false,
-			slug: '',
-			customFieldType: 'text'
+		    mode: "create",
+				fields: generateDefaultField(),
+				defaultFields: generateDefaultField(),
+				providedFields: generateDefaultField(),
+				providedFieldsDefault: [
+					{id:"author", label: "Author", type: "link"},
+					{id:"summary", label: "Summary", type: "link"},
+					{id:"content", label: "Content", type: "text"},
+					{id:"image", label: "Image", type: "text"},
+					{id:"like", label: "Like", type: "text"},
+					{id:"featuredImage", label: "Featured Image", type: "text"},
+					{id:"gallery", label: "Gallery", type: "text"}
+				],
+				customFields: [],
+				checkingSlug: false,
+				slug: '',
+				customFieldType: 'text'
 	    }
 	},
-	setFormValues: function(data){
-		this.props.dispatch(loadFormData(data));
-		document.getElementById("status").checked = data.status==="active"?true:false;
-		
-		this.props.dispatch(setprovidedFields(data.fields));
-		this.props.dispatch(setCustomFields(data.customFields));
-		this.props.dispatch(setfields(_.concat(data.fields, data.customFields)));
 
-		var providedFieldsId = _.map(data.fields, function(item){ return item.id });
-		_.forEach(document.getElementsByName("checkboxField[]"), function(item){
-      if (_.indexOf(providedFieldsId, item.value) > -1)
-      	item.checked = true;
-    });
-	},
-	checkSlug: function(slug){
+	checkSlug(slug) {
     var me = this;
-    this.props.dispatch(setcheckingSlug(true));
+    this.disableForm(true);
+    this.props.dispatch(toggleCheckingSlug(true));
     this.props.client.query({
 	  	query: gql`${Query.checkContentSlugQry(slug).query}`
 	  }).then( body => {
 	  	var slugCount = body.data.viewer.allContents.edges.length;
+	  	var slug0 = slug;
       if (me.props.mode==="create") {
         if (slugCount > 0) { 
-        	me.props.dispatch(togglecheckingSlug(false, slug+"-"+slugCount)); 
-        	//me.props.changeFieldValue('slug', slug+"-"+slugCount)
-        } else 
-        	me.props.dispatch(togglecheckingSlug(false, slug));
+        	me.props.dispatch(toggleCheckingSlug(false)); 
+        	slug0 = slug+"-"+slugCount;
+        } else {
+        	me.props.dispatch(toggleCheckingSlug(false));
+        }
       } else {
         if (slugCount > 1) { 
-        	me.props.dispatch(togglecheckingSlug(false, slug+"-"+slugCount));
-        	//me.props.changeFieldValue('slug', slug+"-"+slugCount)
+        	me.props.dispatch(toggleCheckingSlug(false));
+        	slug0 = slug+"-"+slugCount;
         }
-        else 
-        	me.props.dispatch(togglecheckingSlug(false, slug));
+        else {
+        	me.props.dispatch(toggleCheckingSlug(false));
+        }
       }
+      me.props.changeFieldValue('slug', slug0);
+      this.disableForm(false);
 	  })
   },
-  handleNameBlur: function(event) {
-    var name = this.props.name;
-    var slug = name.split(" ").join("-").toLowerCase();
-    this.checkSlug(slug);
-    var label = this.props.label;
-    var labelSingular = this.props.labelSingular;
-    var labelAddNew = this.props.labelAddNew;
-    var labelEdit = this.props.labelEdit
 
-    this.props.dispatch(NameBlur(
-    	label?null:name+"s",
-    	labelSingular?null:name,
-    	labelAddNew?null:"Add "+name,
-    	labelEdit?null:"Edit "+name
+  handleNameBlur(event) {
+    var name = this.props.name;
+    var slug = generateSlug(name);
+    this.checkSlug(slug);
+
+    this.props.dispatch(setLabels(
+    	this.props.label?null:name+"s",
+    	this.props.labelSingular?null:name,
+    	this.props.labelAddNew?null:"Add "+name,
+    	this.props.labelEdit?null:"Edit "+name
     ));
   },
-  handleSlugBlur: function(event) {
+
+  handleSlugBlur(event) {
     var slug = this.props.slug;
-    slug = slug.split(" ").join("-").toLowerCase();
+    slug = generateSlug(slug);
     this.checkSlug(slug);
   },
-	disableForm: function(state){
+
+	disableForm(state){
     disableForm(state, this.notification);
   },
-	handleSubmitBtn: function(values){
+
+	handleSubmitBtn(values){
 		var me = this;
 		var _objData = values;
-		_objData['fields'] = this.props.providedFields;
-		_objData['customFields'] = this.props.customFields;
-
-		var status = "inactive";
-		var statusEl = document.getElementById("status");
-		if (statusEl) status = statusEl.checked?"active":"inactive";
-		_objData['status'] = status;
+		_.unset(_objData, "createdAt");
+		_.unset(_objData, "__typename");
 
 		this.disableForm(true);
 
 		var qry = "";
-    if (this.props.mode==="create"){
-      qry = Query.createContentMtn(_objData);
-    }else{
-      _objData["id"] = this.props.postId;
+    if (this.props.postId){
+    	_objData["id"] = this.props.postId;
       qry = Query.updateContentMtn(_objData);
+    }else{
+      qry = Query.createContentMtn(_objData);
     }
-	  
+			  
 	  this.props.client.mutate({
 	  	mutation: gql`${qry.query}`,
 	  	variables: qry.variables
 	  }).then( data => {
 	  	me.disableForm(false);
 	  });
-	}, 
-	handleAddProvidedField: function(event){
+	},
+
+	handleAddProvidedField(event){
 		var me = this;
 		var providedFields = this.props.providedFields;
 		var allProvidedField = _.concat(me.props.defaultFields, me.props.providedFieldsDefault);
-
+		
     var newField = _.find(allProvidedField, {id: event.target.name});
 		if (event.target.checked) {
 			providedFields.push(newField);
@@ -157,10 +146,12 @@ let ContentNew = React.createClass({
 			_.remove(providedFields, {id: event.target.name});
 		}
     
-		this.props.dispatch(setprovidedFields(providedFields));
-		this.props.dispatch(setfields(_.concat(providedFields, this.props.customFields)));
+		this.props.dispatch(setProvidedFields(providedFields));
+		this.props.dispatch(setFields(_.concat(providedFields, this.props.customFields)));
+		this.props.changeFieldValue('fields', _.concat(providedFields, this.props.customFields));
 	},
-	handleAddCustomField: function(event){
+
+	handleAddCustomField(event){
 		event.preventDefault();
 		var customFields = this.props.customFields;
 		var name = this.props.customFieldName;
@@ -189,9 +180,11 @@ let ContentNew = React.createClass({
 
 		customFields.push(newField);
 		this.props.dispatch(setCustomFields(customFields));
-		this.props.dispatch(setfields(_.concat(this.props.providedFields, customFields)))
+		this.props.dispatch(setFields(_.concat(this.props.providedFields, customFields)))
+		this.props.changeFieldValue('fields', _.concat(this.props.providedFields, customFields));
 	},
-	handleFieldDelete: function(event){
+
+	handleFieldDelete(event){
 		event.preventDefault();
 		var name = event.target.getAttribute("data");
 		var cfields = this.props.customFields;
@@ -206,36 +199,50 @@ let ContentNew = React.createClass({
 		var precord = _.find(pfields, {label: name});
 		if (precord) {
 			_.pull(pfields, precord);
-			this.props.dispatch(setprovidedFields(pfields));
+			this.props.dispatch(setProvidedFields(pfields));
 			_.forEach(document.getElementsByName(precord.id), function(item){ if (item.name===precord.id) item.checked=false});
 		}
 
-		this.props.dispatch(setfields(_.concat(cfields, pfields)));
+		this.props.dispatch(setFields(_.concat(cfields, pfields)));
 	},
-	handleAddNewBtn: function(event) {
+
+	handleAddNewBtn(event) {
     this.resetForm();
   },
-  handleFieldTypeChange: function(event) {
+
+  handleFieldTypeChange(event) {
   	var value = event.target.value;
   	var isConnection = value==="connection";
   	document.getElementById("connection").disabled = !isConnection;
   },
-	resetForm: function(){
+
+	resetForm(){
 		document.getElementById("contentForm").reset();
 		window.history.pushState("", "", '/admin/content/new');
-		this.props.dispatch(setmode("create"));
-		this.props.dispatch(setfields(this.props.defaultFields));
+		this.props.dispatch(setFields(this.props.defaultFields));
 	},
-	componentDidMount: function(){
+
+	componentWillReceiveProps(props){
+		if (props.fields) {
+			var providedFieldsId = _.map(props.fields, function(item){ return item.id });
+			_.forEach(document.getElementsByName("providedField[]"), function(item){
+	      if (_.indexOf(providedFieldsId, item.value) > -1)
+	      	item.checked = true;
+	    });
+		}
+	},
+
+	componentDidMount(){
 		this.notification = this.refs.notificationSystem;
 	},
-	render: function(){
+
+	render(){
 		return (
 			<div className="content-wrapper">
 				<div className="container-fluid">
 				<section className="content-header">
-			      <h1>{this.props.mode==="update"?"Edit Content Type":"Add New Content Type"}
-              { this.props.mode==="update" &&
+			      <h1>{this.props.postId?"Edit Content Type":"Add New Content Type"}
+              {this.props.postId==="update" &&
                 <small style={{marginLeft: 5}}>
                   <button className="btn btn-default btn-primary add-new-post-btn" onClick={this.handleAddNewBtn}>Add new</button>
                 </small>
@@ -327,7 +334,7 @@ let ContentNew = React.createClass({
 	                  	_.map(this.props.defaultFields, function(item){
 	                  		return <div key={item.id} className="checkbox">
 	                  			<label>
-	                  				<Field component="input" type="checkbox" name={item.id} value={item.id} readOnly="true" checked/>{item.label}
+	                  				<input type="checkbox" name="providedField[]" value={item.id} readOnly="true" checked/>{item.label}
 	                  			</label>
 	                  			</div>
 	                  	})
@@ -336,7 +343,7 @@ let ContentNew = React.createClass({
 	                  	_.map(this.props.providedFieldsDefault, function(item){
 	                  		return <div key={item.id} className="checkbox">
 	                  		<label>
-	                  			<Field component="input" type="checkbox" name={item.id} onChange={this.handleAddProvidedField} value={item.id}/>{item.label}
+	                  			<input type="checkbox" name="providedField[]" onChange={this.handleAddProvidedField} value={item.id}/>{item.label}
 	                  		</label>
 	                  		</div>
 	                  	}.bind(this))
@@ -474,7 +481,7 @@ let ContentNew = React.createClass({
 								<div className="form-group">
 									<div className="col-md-9">
 										<div className="btn-group">
-											<input type="submit" value={this.props.mode==="update"?"Update":"Add"} className="btn btn-primary btn-sm" />
+											<input type="submit" value={this.props.postId?"Update":"Add"} style={{width: 100}} className="btn btn-primary btn-sm" />
 										</div>
 									</div>
 								</div>
@@ -506,9 +513,10 @@ const mapStateToProps = function(state){
     customFieldAlign: selector(state, 'customFieldAlign'),
     connection: selector(state, 'connection')
   }
-  debugger;
+  
   if (!_.isEmpty(state.contentNew)) {
-    return {...state.contentNew, ...customStates}
+  	var _states = _.head(state.contentNew);
+    return {..._states, ...customStates}
   } else 
   	return customStates;
 }
@@ -516,7 +524,7 @@ const mapStateToProps = function(state){
 const mapDispatchToProps = function(dispatch){ 
   return {
     changeFieldValue: function(field, value) {
-      dispatch(change('menuForm', field, value))
+      dispatch(change('newContentForm', field, value))
     }
   }
 }
@@ -534,12 +542,13 @@ ContentNew = graphql(Query.getContentQry, {
     }
   }),
   props: ({ownProps, data}) => {
-  	
-    if (data.viewer) {
+    if (data.getContent) {
     	var data = data.getContent; 
-
     	return {
-        initialValues: data
+        initialValues: data,
+        mode: "update",
+        fields: data.fields,
+        customFields: data.customFields
       }
     } 
   }
