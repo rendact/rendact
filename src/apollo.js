@@ -1,5 +1,5 @@
-import ApolloClient from 'apollo-client';
-import { SubscriptionClient } from 'subscriptions-transport-ws';
+import ApolloClient from 'apollo-client/ApolloClient';
+import { SubscriptionClient } from 'subscriptions-transport-ws/dist/client';
 import {createNetworkInterface} from './custom-network-interface';
 import {scapholdUrl} from './rendact.config.json'
 import { print as printGraphQL } from 'graphql/language/printer';
