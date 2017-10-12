@@ -6,7 +6,7 @@ import Halogen from 'halogen'
 import {riques, hasRole, errorCallback, getValue, setValue, removeTags, swalert, disableForm, defaultHalogenStyle} from '../../utils';
 import {TableTagCat, SearchBox, DeleteButtons} from '../lib/Table';
 import {connect} from 'react-redux'
-import {setModeNameId, setId, initContentList, maskArea, setEditorMode, toggleSelectedItemState} from '../../actions'
+import {setNameValue, setDescription, setModeNameIdDes, setId, initContentList, maskArea, setEditorMode, toggleSelectedItemState} from '../../actions'
 
 let CategoryContent = React.createClass({
   propTypes: {
@@ -99,10 +99,21 @@ let CategoryContent = React.createClass({
   handleNameChange: function(event){
     event.preventDefault();
     var name = getValue("name");
-    var postId = this.props.postId;
-    // this.props.dispatch(setModeNameId("update", name, postId))
+    // var postId = this.props.postId;
+    // var description = this.props.description;
+    // this.props.dispatch(setModeNameIdDes("update", name, postId, description))
     // this.props.dispatch(setEditorMode("update"))
-    // this.props.dispatch(setNameValue(name))
+    this.props.dispatch(setNameValue(name))
+    // this.props.dispatch(setNameValue(postId))
+  },
+  handleDescription: function(event){
+    event.preventDefault();
+    // var name = getValue("name");
+    // var postId = this.props.postId;
+    var description = this.props.description;
+    // this.props.dispatch(setModeNameIdDes("update", name, postId, description))
+    // this.props.dispatch(setEditorMode("update"))
+    this.props.dispatch(setDescription(description))
     // this.props.dispatch(setNameValue(postId))
   },
   handleViewPage: function(categoryId){
@@ -117,9 +128,10 @@ let CategoryContent = React.createClass({
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
       var description = removeTags(row[2]);
-      debugger
       setValue("name", name);
-      me.props.dispatch(setModeNameId("update", name, postId))
+      setValue("description", description);
+
+      me.props.dispatch(setModeNameIdDes("update", name, postId, description))
       // me.props.dispatch(setId(postId));
     }
     var names = document.getElementsByClassName('nameText');
@@ -151,15 +163,18 @@ let CategoryContent = React.createClass({
     event.preventDefault();
     var me = this;
     var name = getValue("name");
+    var name1 = this.props.name;
+    var description = getValue("description");
+    var description1 = this.props.description;
     var type = me.props.postType;
     var qry = "", noticeTxt = "";
-    
+    debugger
     me.disableForm(true);
     if (this.props.mode==="create") {
-      qry = Query.createCategory(name, type);
+      qry = Query.createCategory(name, description, type);
       noticeTxt = 'Category Published!';
     } else {
-      qry = Query.updateCategory(this.props.postId, name, type);
+      qry = Query.updateCategory(this.props.postId, name, description, type);
       noticeTxt = 'Category Updated!';
     }
     riques(qry, 
@@ -222,7 +237,7 @@ let CategoryContent = React.createClass({
                       <div className="form-group">
                         <label htmlFor="homeUrl" >Description</label>
                         <div >
-                          <textarea name="description" id="description" className="form-control"></textarea>
+                          <textarea name="description" id="description" className="form-control" onChange={this.handleDescription}></textarea>
                           <p className="help-block">The description is not prominent by default; however, some themes may show it.</p>
                         </div>
                       </div>
