@@ -15,6 +15,7 @@ import gql from 'graphql-tag'
 import {graphql} from 'react-apollo';
 import {connect} from 'react-redux'
 import Loadable from 'react-loadable'
+import {preload} from '../../Routes'
 
 const NotFound = Loadable({
   loader: () => import('../../admin/NotFound'),
@@ -54,6 +55,7 @@ let ThemeBlog = React.createClass({
 		require ('bootstrap/dist/css/bootstrap.css');
 		require('../../theme/'+c.path+'/css/style.css');
 		require('../../theme/'+c.path+'/functions.js');
+    preload()
 	},
 
 	render() {
