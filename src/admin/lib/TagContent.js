@@ -7,7 +7,7 @@ import {swalert, riques, hasRole, errorCallback, removeTags, disableForm, defaul
 import {TableTagCat, SearchBox, DeleteButtons} from './Table';
 import {connect} from 'react-redux'
 import {reduxForm, Field, formValueSelector} from 'redux-form';
-import {initContentList, maskArea, setEditorMode, toggleSelectedItemState, setNameValue, setId, setModeNameId} from '../../actions'
+import {initContentList, maskArea, setEditorMode, seteSelectedItem, setNameValue, setId, setModeNameId,toggleSelectedItemState} from '../../actions'
 import gql from 'graphql-tag';
 import {graphql, withApollo} from 'react-apollo';
 
@@ -46,53 +46,23 @@ let TagContent = React.createClass({
     }
   },
   dt: null,
-  loadData: function(postId, callback) {
-    var me = this;
-    var qry = Query.getAllTagQry(this.props.postType);
-    riques(qry, 
-      function(error, response, body) { 
-        if (body.data) { 
-          var monthList = ["all"];
-          var _dataArr = [];
-
-          _.forEach(body.data.viewer.allTags.edges, function(item){
-            _dataArr.push({
-              "postId": item.node.id,
-              "name": item.node.name,
-              "count": item.node.post.edges.length
-            });
-          });
-          var bEdit = hasRole('modify-tag');
-          me.table.loadData(_dataArr, bEdit);
-          me.props.dispatch(initContentList(monthList))
-
-          if (callback) callback.call();
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-      }
-    );
-  },
   handleDeleteBtn: function(event){
     var me = this;
-    var checkedRow = document.querySelectorAll("input.tag-"+this.props.slug+"Cb:checked");
-    var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
     swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
-      function () {
+    function () {
+      var checkedRow = document.querySelectorAll("input.tag-"+me.props.slug+"Cb:checked");
+      var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
+      let listOfData = me.props.client.mutate({mutation: gql`${Query.deleteTagPermanentQry(idList).query}`})
+      var he = me;
       me.disableForm(true);
-      riques(Query.deleteTagPermanentQry(idList), 
-        function(error, response, body) {
-          if (!error && !body.errors && response.statusCode === 200) {
-            var here = me;
-            var cb = function(){here.disableForm(false)}
-            me.loadData("All", cb);
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-            me.disableForm(false);
-          }
-        }
-      );
-  })},
+      listOfData.then(function() {
+        he.props.refetchAllMenuData().then(function() {
+          he.props.dispatch(toggleSelectedItemState(false));
+          he.disableForm(false);
+        })
+      })
+    });
+  },
   disableForm: function(state){
     disableForm(state, this.notif);
     this.props.dispatch(maskArea(state));
@@ -173,7 +143,7 @@ let TagContent = React.createClass({
           me.resetForm();
           var here = me;
           var cb = function(){here.disableForm(false)}
-          me.loadData("All", cb);
+          // me.loadData("All", cb);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
@@ -188,10 +158,9 @@ let TagContent = React.createClass({
     this.dt = datatable;
     // this.loadData("All");
   },
-   componentWillReceiveProps(props){
-    debugger
+  componentWillReceiveProps(props){
     this.table.loadData(props._dataArr, props.bEdit);
-    this.props.dispatch(initContentList(props.monthList))
+    // this.props.dispatch(initContentList(props.monthList))
   },
 
   render: function(){
@@ -280,6 +249,7 @@ const mapStateToProps = function(state){
   }
 
   if (!_.isEmpty(state.tagContent)) {
+    debugger
     var out = _.head(state.tagContent);
     out = {...out, ...customStates}
     // return _.head(state.tagContent)
@@ -351,5 +321,5 @@ TagContent = graphql(getAllTagQry,
       }
   }
 })(TagContent)
-
+TagContent = withApollo(TagContent);
 export default TagContent;

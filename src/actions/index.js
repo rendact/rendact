@@ -57,6 +57,11 @@ export const toggleSelectedItemState = (isSelected) => ({
   isSelected
 })
 
+export const seteSelectedItem = (itemSelected) => ({
+  type: 'SELECTED_ITEM',
+  itemSelected
+})
+
 export const setSlug = (slug, isEditorEnabled) => ({
   type: 'UPDATE_SLUG',
   slug,

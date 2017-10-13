@@ -1,22 +1,3 @@
-// import _ from 'lodash';
-
-// const INITIAL_VALUES =  {
-//       isProcessing: false,
-//       opacity: 1,
-//       name:"",
-//       slug:"",
-//       postId:"",
-//       tagId:"",
-//       monthList: [],
-//       deleteMode: false,
-//       statusList: ["All", "Published", "Draft", "Pending Review", "Deleted"],
-//       dynamicStateBtnList: ["deleteBtn", "recoverBtn", "deletePermanentBtn"],
-//       activeStatus: "All",
-//       itemSelected: false,
-//       mode: "create",
-//     }
-
-// const tagContent = (state = INITIAL_VALUES, action) => {
 
 const tagContent = (state = [], action) => {
   switch (action.type) {
@@ -61,6 +42,9 @@ const tagContent = (state = [], action) => {
     
     case 'SET_MODE_NAME_ID':
       return state.map(item =>  ({...item,mode: action.mode, name: action.name, postId: action.postId}))
+    
+    case 'SELECTED_ITEM':
+      return state.map(item =>  ({...item, itemSelected: action.itemSelected}))
     
     
     default:
