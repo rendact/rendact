@@ -6,6 +6,7 @@ import AdminLTEinit from './admin/lib/app.js';
 import 'bootstrap/dist/css/bootstrap.css';
 import './css/Login.css';
 import { sendMail } from './utils'
+import {preload} from './Routes'
 
 class Register extends React.Component{
 	constructor(props){
@@ -36,6 +37,7 @@ class Register extends React.Component{
 		require ('font-awesome/css/font-awesome.css');
 		require ('./css/ionicons.min.css');
 		require ('./css/AdminLTE.css');
+    preload()
 
 		AdminLTEinit();
 	}

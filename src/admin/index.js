@@ -15,6 +15,7 @@ import {graphql} from 'react-apollo';
 import {connect} from 'react-redux'
 import request from 'request';
 import Loadable from 'react-loadable';
+import {preload} from '../Routes'
 
 import 'jquery-ui/ui/core';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -70,6 +71,7 @@ let Admin = React.createClass({
     require ('../css/AdminLTE.css');
     require ('../css/skins/_all-skins.min.css');
     require ('jquery-ui/ui/widgets/tooltip')
+    preload();
 
     AdminLTEinit();
 

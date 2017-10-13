@@ -29,3 +29,12 @@ export const ThemeHome = Loadable({
   loading: () => null
 })
 
+export const preload = () => {
+    Admin.preload()
+    ThemeSingle.preload()
+    ThemeBlog.preload()
+    ThemeSearch.preload()
+    Register.preload()
+    Login.preload()
+    ThemeHome.preload()
+}

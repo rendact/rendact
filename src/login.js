@@ -9,6 +9,7 @@ import {setProfile} from './utils';
 import Config from './rendact.config.json';
 import Auth0Lock from 'auth0-lock';
 import {Redirect} from 'react-router';
+import {preload} from './Routes'
 
 class Login extends React.Component{
 	constructor(props){
@@ -42,6 +43,7 @@ class Login extends React.Component{
 		require ('font-awesome/css/font-awesome.css');
 		require ('./css/ionicons.css');
 		require ('./css/AdminLTE.css');
+    preload()
 
 		var me = this;
 		var _doAuthentication = function(authResult) {
