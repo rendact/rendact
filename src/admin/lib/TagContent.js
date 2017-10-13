@@ -106,15 +106,12 @@ let TagContent = React.createClass({
     var checkedRow = document.querySelectorAll("input.tag-"+this.props.slug+"Cb:checked");
     this.props.dispatch(toggleSelectedItemState(checkedRow.length>0));
   },
-  handleNameChange: function(event){
-    event.preventDefault();
-    var name = getValue("name");
-    var postId = this.props.postId;
-    this.props.dispatch(setModeNameId("update", name, postId))
-    // this.props.dispatch(setEditorMode("update"))
-    // this.props.dispatch(setNameValue(name))
-    // this.props.dispatch(setNameValue(postId))
-  },
+  // handleNameChange: function(event){
+  // event.preventDefault();
+  //   var name = this.props.name;
+  //   this.props.dispatch(setNameValue(name));
+  //   debugger
+  // },
   handleViewPage: function(tagId){
     this.props.handleNav(this.props.slug,'bytag', tagId);
   },
@@ -126,9 +123,9 @@ let TagContent = React.createClass({
       var row = me.table.datatable.data()[index];
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
-      setValue("name", name);
-      me.props.dispatch(setEditorMode("update"));
-      me.props.dispatch(setId(postId));
+      
+      me.props.dispatch(setModeNameId("update", name, postId))
+      // debugger
     }
 
     var titles = document.getElementsByClassName('nameText');
@@ -212,7 +209,7 @@ let TagContent = React.createClass({
                 <div className="container-fluid">
                   <div className="row">
                     <div className="col-xs-4" style={{marginTop: 40}}>
-                    <form onSubmit={this.props.handleSubmit(this.handleSubmit)} id="tagForm" method="get">
+                    <form onSubmit={this.props.handleSubmit(this.handleSubmit)} id="tagForm" method="get" >
                       <div className="form-group">
                         <h4><b>{this.props.mode==="create"?"Add New Tag":"Edit Tag"}</b></h4>
                       </div>
@@ -280,7 +277,7 @@ const mapStateToProps = function(state){
     var out = _.head(state.tagContent);
     out = {...out, ...customStates}
     // return _.head(state.tagContent)
-    debugger
+    // debugger
     return out
   } else return {};
 }
