@@ -6,6 +6,7 @@ import Halogen from 'halogen'
 import {riques, hasRole, errorCallback, getValue, setValue, removeTags, swalert, disableForm, defaultHalogenStyle} from '../../utils';
 import {TableTagCat, SearchBox, DeleteButtons} from '../lib/Table';
 import {connect} from 'react-redux'
+import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {setNameValue, setDescription, setModeNameIdDes, setId, initContentList, maskArea, setEditorMode, toggleSelectedItemState} from '../../actions'
 
 let CategoryContent = React.createClass({
@@ -96,28 +97,13 @@ let CategoryContent = React.createClass({
     var checkedRow = document.querySelectorAll("input.category-"+this.props.slug+"Cb:checked");
     this.props.dispatch(toggleSelectedItemState(checkedRow.length>0));
   },
-  handleNameChange: function(event){
-    event.preventDefault();
-    var name = getValue("name");
-    // var postId = this.props.postId;
-    // var description = this.props.description;
-    // this.props.dispatch(setModeNameIdDes("update", name, postId, description))
-    // this.props.dispatch(setEditorMode("update"))
-    this.props.dispatch(setNameValue(name))
-    // this.props.dispatch(setNameValue(postId))
-  },
-  handleDescription: function(event){
-    event.preventDefault();
-    // var name = getValue("name");
-    // var postId = this.props.postId;
-    var description = getValue("description");
-    // this.props.dispatch(setModeNameIdDes("update", name, postId, description))
-    // this.props.dispatch(setEditorMode("update"))
-    this.props.dispatch(setDescription(description))
-    // this.props.dispatch(setNameValue(postId))
-  },
   handleViewPage: function(categoryId){
     this.props.handleNav(this.props.slug,'bycategory', categoryId);
+  },
+  notifyUnsavedData: function(state){
+    if (this.props.handleUnsavedData){
+      this.props.handleUnsavedData(state)
+    }
   },
   onAfterTableLoad: function(){
     var me = this;
@@ -128,11 +114,10 @@ let CategoryContent = React.createClass({
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
       var description = removeTags(row[2]);
-      setValue("name", name);
-      setValue("description", description);
-
+      me.props.change('name', name);
+      me.props.change('description', description);
+      me.notifyUnsavedData(true);
       me.props.dispatch(setModeNameIdDes("update", name, postId, description))
-      // me.props.dispatch(setId(postId));
     }
     var names = document.getElementsByClassName('nameText');
     _.forEach(names, function(item){
@@ -160,12 +145,12 @@ let CategoryContent = React.createClass({
     this.loadData("All");
   },
   handleSubmit: function(event){
-    event.preventDefault();
+    // event.preventDefault();
     var me = this;
-    var name = getValue("name");
-    var name1 = this.props.name;
-    var description = getValue("description");
-    var description1 = this.props.description;
+    // var name = getValue("name");
+    var name = this.props.name;
+    // var description = getValue("description");
+    var description = this.props.description;
     var type = me.props.postType;
     var qry = "", noticeTxt = "";
     debugger
@@ -198,8 +183,8 @@ let CategoryContent = React.createClass({
   },
   resetForm: function(){
     document.getElementById("pageForm").reset();
-    setValue("name", "");
-    setValue("description", "");
+    this.props.change('name', "");
+    this.props.change('description', "");
     this.props.dispatch(setEditorMode("create"))
     window.history.pushState("", "", '/admin/category');
   },
@@ -225,21 +210,21 @@ let CategoryContent = React.createClass({
                 <div className="container-fluid">
                   <div className="row">
                     <div className="col-xs-4" style={{marginTop: 40}}>
-                    <form onSubmit={this.handleSubmit} id="pageForm" method="get">
+                    <form onSubmit={this.props.handleSubmit(this.handleSubmit)} id="pageForm" method="get">
                       <div className="form-group">
                         <h4><b>{this.props.mode==="create"?"Add New Category":"Edit Category"}</b></h4>
                       </div>
                       <div className="form-group">
                           <label htmlFor="name" >Category name</label>
                           <div >
-                            <input type="text" name="name" id="name" className="form-control" required="true" onChange={this.handleNameChange}/>
+                            <Field component="input" type="text" name="name" id="name" className="form-control" required="true"/>
                             <p className="help-block">The name appears on your site</p>
                           </div>
                       </div>
                       <div className="form-group">
                         <label htmlFor="homeUrl" >Description</label>
                         <div >
-                          <textarea name="description" id="description" className="form-control" onChange={this.handleDescription}></textarea>
+                          <Field component="textarea" name="description" id="description" className="form-control" />
                           <p className="help-block">The description is not prominent by default; however, some themes may show it.</p>
                         </div>
                       </div>
@@ -292,12 +277,25 @@ let CategoryContent = React.createClass({
     )},
 });
 
+const selector = formValueSelector('categoryContentForm');
+
 const mapStateToProps = function(state){
+  var customStates = {
+    name: selector(state, 'name'),
+    description: selector(state, 'description')
+  }
+
   if (!_.isEmpty(state.categoryContent)) {
-    // debugger
-    return _.head(state.categoryContent)
+    var out = _.head(state.categoryContent);
+    out = {...out, ...customStates}
+    // return _.head(state.categoryContent)
+    return out
   } else return {}
 }
+
+CategoryContent = reduxForm({
+  form: 'categoryContentForm'
+})(CategoryContent)
 
 CategoryContent = connect(mapStateToProps)(CategoryContent)
 export default CategoryContent;
