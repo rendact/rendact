@@ -115,6 +115,11 @@ let TagContent = React.createClass({
   handleViewPage: function(tagId){
     this.props.handleNav(this.props.slug,'bytag', tagId);
   },
+  notifyUnsavedData: function(state){
+    if (this.props.handleUnsavedData){
+      this.props.handleUnsavedData(state)
+    }
+  },
   onAfterTableLoad: function(){
     var me = this;
     var nameLink = function(event){
@@ -123,8 +128,9 @@ let TagContent = React.createClass({
       var row = me.table.datatable.data()[index];
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
-      
-      me.props.dispatch(setModeNameId("update", name, postId))
+      me.props.dispatch(setModeNameId("update", name, postId));
+      me.props.change('name', name);
+      me.notifyUnsavedData(true);
       // debugger
     }
 
