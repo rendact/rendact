@@ -1,10 +1,31 @@
-import loadable from 'loadable-components'
+import Loadable from 'react-loadable';
 
-export const Admin = loadable(() => import(/* webpackChunkName: "admin"*/'./admin'))
-export const ThemeSingle = loadable(() =>   import(/* webpackChunkName: "ThemeSingle"*/ './includes/Theme/ThemeSingle'))
-export const ThemeBlog = loadable(() =>   import(/* webpackChunkName: "ThemeBlog"*/ './includes/Theme/ThemeBlog'))
-export const ThemeSearch = loadable(() =>   import(/* webpackChunkName: "Themesearch"*/ './includes/themeSearch'))
-export const Register = loadable(() =>   import(/* webpackChunkName: "register"*/ './register'))
-export const Login = loadable(() =>   import(/* webpackChunkName: "login"*/ './login'))
-export const ThemeHome = loadable(() =>  import(/* webpackChunkName: "themehome" */'./includes/Theme/ThemeHome'))
+export const Admin = Loadable({
+  loader: () => import(/* webpackChunkName: "admin"*/'./admin'),
+  loading: () => null
+})
+export const ThemeSingle = Loadable({
+  loader: () =>   import(/* webpackChunkName: "ThemeSingle"*/ './includes/Theme/ThemeSingle'),
+  loading: () => null
+})
+export const ThemeBlog = Loadable({
+  loader: () =>   import(/* webpackChunkName: "ThemeBlog"*/ './includes/Theme/ThemeBlog'),
+  loading: () => null
+})
+export const ThemeSearch = Loadable({
+  loader: () =>   import(/* webpackChunkName: "Themesearch"*/ './includes/themeSearch'),
+  loading: () => null
+})
+export const Register = Loadable({
+  loader: () =>   import(/* webpackChunkName: "register"*/ './register'),
+  loading: () => null
+})
+export const Login = Loadable({
+  loader: () =>   import(/* webpackChunkName: "login"*/ './login'),
+  loading: () => null
+})
+export const ThemeHome = Loadable({
+  loader: () =>  import(/* webpackChunkName: "themehome" */'./includes/Theme/ThemeHome'),
+  loading: () => null
+})
 
