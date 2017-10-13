@@ -8,6 +8,8 @@ import {TableTagCat, SearchBox, DeleteButtons} from './Table';
 import {connect} from 'react-redux'
 import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {initContentList, maskArea, setEditorMode, toggleSelectedItemState, setNameValue, setId, setModeNameId} from '../../actions'
+import gql from 'graphql-tag';
+import {graphql, withApollo} from 'react-apollo';
 
 let TagContent = React.createClass({
   propTypes: {
@@ -184,7 +186,12 @@ let TagContent = React.createClass({
     var datatable = this.table.datatable;
     this.refs.rendactSearchBox.bindToTable(datatable);
     this.dt = datatable;
-    this.loadData("All");
+    // this.loadData("All");
+  },
+   componentWillReceiveProps(props){
+    debugger
+    this.table.loadData(props._dataArr, props.bEdit);
+    this.props.dispatch(initContentList(props.monthList))
   },
 
   render: function(){
@@ -285,4 +292,64 @@ TagContent = reduxForm({
 })(TagContent)
 
 TagContent = connect(mapStateToProps)(TagContent);
+
+let getAllTagQry = gql`
+  query getTags ($type: String!){
+    viewer {
+      allTags (where: {type: {eq: $type}}) {
+        edges {
+          node {
+            id,
+            name,
+            post {
+              edges {
+                node{
+                  id
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`
+
+TagContent = graphql(getAllTagQry,
+  { 
+    options: props => ({
+      variables: {
+        type: props.postType,
+      },
+    }),
+    props: ({ownProps, data}) => {
+    if (!data.loading) {
+      let allTags = data.viewer.allTags.edges;
+      allTags = _.map(allTags, item => item.node)
+      var monthList = ["all"];
+      var _dataArr = [];
+
+      _.forEach(allTags, function(item){
+        _dataArr.push({
+          "postId": item.id,
+          "name": item.name,
+          "count": item.post.edges.length
+        });
+      });
+      var bEdit = hasRole('modify-tag');
+
+      return{
+        isLoading: false,
+        _dataArr : _dataArr,
+        bEdit : bEdit,
+        refetchAllMenuData : data.refetch,
+        monthList: monthList,
+      }
+    } else { 
+        return {
+          isLoading: true
+        }
+      }
+  }
+})(TagContent)
+
 export default TagContent;
