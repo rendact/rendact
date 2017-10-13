@@ -3,7 +3,7 @@ import Query from '../query';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen'
-import {riques, hasRole, errorCallback, getValue, setValue, removeTags, swalert, disableForm, defaultHalogenStyle} from '../../utils';
+import {riques, hasRole, errorCallback, removeTags, swalert, disableForm, defaultHalogenStyle} from '../../utils';
 import {TableTagCat, SearchBox, DeleteButtons} from '../lib/Table';
 import {connect} from 'react-redux'
 import {reduxForm, Field, formValueSelector} from 'redux-form';
@@ -147,9 +147,7 @@ let CategoryContent = React.createClass({
   handleSubmit: function(event){
     // event.preventDefault();
     var me = this;
-    // var name = getValue("name");
     var name = this.props.name;
-    // var description = getValue("description");
     var description = this.props.description;
     var type = me.props.postType;
     var qry = "", noticeTxt = "";
