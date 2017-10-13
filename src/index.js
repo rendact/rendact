@@ -3,7 +3,7 @@ import {BrowserRouter, Match, Miss} from 'react-router'
 import MatchWhenAuthorized from './auth'
 
 import {render} from 'react-dom'
-import ApolloProvider from 'react-apollo/ApolloProvider'
+import {ApolloProvider} from 'react-apollo'
 import client from './apollo'
 import reducer from './reducers'
 import DragDropContext from 'react-dnd/lib/DragDropContext';
