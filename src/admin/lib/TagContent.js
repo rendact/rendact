@@ -3,7 +3,7 @@ import Query from '../query';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen'
-import {swalert, riques, hasRole, errorCallback, setValue, getValue, removeTags, disableForm, defaultHalogenStyle} from '../../utils';
+import {swalert, riques, hasRole, errorCallback, removeTags, disableForm, defaultHalogenStyle} from '../../utils';
 import {TableTagCat, SearchBox, DeleteButtons} from './Table';
 import {connect} from 'react-redux'
 import {reduxForm, Field, formValueSelector} from 'redux-form';
@@ -99,19 +99,13 @@ let TagContent = React.createClass({
     document.getElementById("tagForm").reset();
     this.props.dispatch(setEditorMode("create"))
     // this.handleNameChange();
-    setValue("name", "");
+    this.props.change('name', "");
     window.history.pushState("", "", '/admin/tag');
   },
   checkDynamicButtonState: function(){
     var checkedRow = document.querySelectorAll("input.tag-"+this.props.slug+"Cb:checked");
     this.props.dispatch(toggleSelectedItemState(checkedRow.length>0));
   },
-  // handleNameChange: function(event){
-  // event.preventDefault();
-  //   var name = this.props.name;
-  //   this.props.dispatch(setNameValue(name));
-  //   debugger
-  // },
   handleViewPage: function(tagId){
     this.props.handleNav(this.props.slug,'bytag', tagId);
   },
@@ -131,7 +125,6 @@ let TagContent = React.createClass({
       me.props.dispatch(setModeNameId("update", name, postId));
       me.props.change('name', name);
       me.notifyUnsavedData(true);
-      // debugger
     }
 
     var titles = document.getElementsByClassName('nameText');
@@ -153,7 +146,7 @@ let TagContent = React.createClass({
   handleSubmit: function(event){
     // event.preventDefault();
     var me = this;
-    var name = getValue("name");
+    var name = this.props.name;
     var postId = this.props.postId;
     var type = this.props.postType;
     this.disableForm(true);
@@ -283,7 +276,6 @@ const mapStateToProps = function(state){
     var out = _.head(state.tagContent);
     out = {...out, ...customStates}
     // return _.head(state.tagContent)
-    // debugger
     return out
   } else return {};
 }
