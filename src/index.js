@@ -12,6 +12,15 @@ import createStore from 'redux/lib/createStore'
 import * as Routes from './Routes'
 
 let Main = React.createClass({
+  componentDidMount: function(){
+    Routes.Admin.preload()
+    Routes.ThemeSingle.preload()
+    Routes.ThemeBlog.preload()
+    Routes.ThemeSearch.preload()
+    Routes.Register.preload()
+    Routes.Login.preload()
+    Routes.ThemeHome.preload()
+  },
 	render(){
 		return (
 				<BrowserRouter>
