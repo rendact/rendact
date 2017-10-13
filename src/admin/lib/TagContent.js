@@ -6,6 +6,7 @@ import Halogen from 'halogen'
 import {swalert, riques, hasRole, errorCallback, setValue, getValue, removeTags, disableForm, defaultHalogenStyle} from '../../utils';
 import {TableTagCat, SearchBox, DeleteButtons} from './Table';
 import {connect} from 'react-redux'
+import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {initContentList, maskArea, setEditorMode, toggleSelectedItemState, setNameValue, setId, setModeNameId} from '../../actions'
 
 let TagContent = React.createClass({
@@ -115,7 +116,6 @@ let TagContent = React.createClass({
     // this.props.dispatch(setNameValue(postId))
   },
   handleViewPage: function(tagId){
-    debugger
     this.props.handleNav(this.props.slug,'bytag', tagId);
   },
   onAfterTableLoad: function(){
@@ -148,7 +148,7 @@ let TagContent = React.createClass({
     });
   },
   handleSubmit: function(event){
-    event.preventDefault();
+    // event.preventDefault();
     var me = this;
     var name = getValue("name");
     var postId = this.props.postId;
@@ -212,14 +212,14 @@ let TagContent = React.createClass({
                 <div className="container-fluid">
                   <div className="row">
                     <div className="col-xs-4" style={{marginTop: 40}}>
-                    <form onSubmit={this.handleSubmit} id="tagForm" method="get">
+                    <form onSubmit={this.props.handleSubmit(this.handleSubmit)} id="tagForm" method="get">
                       <div className="form-group">
                         <h4><b>{this.props.mode==="create"?"Add New Tag":"Edit Tag"}</b></h4>
                       </div>
                       <div className="form-group">
                           <label htmlFor="name" >Name</label>
                           <div >
-                            <input type="text" name="name" id="name" className="form-control" required="true" onChange={this.handleNameChange}/>
+                            <Field component="input" type="text" name="name" id="name" className="form-control" required="true" />
                             <p className="help-block">The name appears on your site</p>
                           </div>
                       </div>
@@ -269,12 +269,25 @@ let TagContent = React.createClass({
     )},
 });
 
+const selector = formValueSelector('tagContentForm');
+
 const mapStateToProps = function(state){
+  var customStates = {
+    name: selector(state, 'name')
+  }
+
   if (!_.isEmpty(state.tagContent)) {
-    // debugger
-    return _.head(state.tagContent)
-  } else return {}
+    var out = _.head(state.tagContent);
+    out = {...out, ...customStates}
+    // return _.head(state.tagContent)
+    debugger
+    return out
+  } else return {};
 }
+
+TagContent = reduxForm({
+  form: 'tagContentForm'
+})(TagContent)
 
 TagContent = connect(mapStateToProps)(TagContent);
 export default TagContent;
