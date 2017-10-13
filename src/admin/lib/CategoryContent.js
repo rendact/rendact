@@ -3,10 +3,11 @@ import Query from '../query';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen'
-import {riques, hasRole, errorCallback, getValue, setValue, removeTags, swalert, disableForm, defaultHalogenStyle} from '../../utils';
+import {riques, hasRole, errorCallback, removeTags, swalert, disableForm, defaultHalogenStyle} from '../../utils';
 import {TableTagCat, SearchBox, DeleteButtons} from '../lib/Table';
 import {connect} from 'react-redux'
-import {initContentList, maskArea, setEditorMode, toggleSelectedItemState} from '../../actions'
+import {reduxForm, Field, formValueSelector} from 'redux-form';
+import {setNameValue, setDescription, setModeNameIdDes, setId, initContentList, maskArea, setEditorMode, toggleSelectedItemState} from '../../actions'
 
 let CategoryContent = React.createClass({
   propTypes: {
@@ -25,6 +26,10 @@ let CategoryContent = React.createClass({
   getDefaultProps: function() {
     return {
       isProcessing: false,
+      name:"",
+      description:"",
+      slug:"",
+      postId:"",
       opacity: 1,
       monthList: [],
       deleteMode: false,
@@ -49,7 +54,7 @@ let CategoryContent = React.createClass({
             _dataArr.push({
               "postId": item.node.id,
               "name": item.node.name,
-              "description": "",
+              "description": item.node.description!==null?item.node.description:"",
               "count": item.node.post.edges.length
             });
           });
@@ -95,6 +100,11 @@ let CategoryContent = React.createClass({
   handleViewPage: function(categoryId){
     this.props.handleNav(this.props.slug,'bycategory', categoryId);
   },
+  notifyUnsavedData: function(state){
+    if (this.props.handleUnsavedData){
+      this.props.handleUnsavedData(state)
+    }
+  },
   onAfterTableLoad: function(){
     var me = this;
     var nameLink = function(event){
@@ -103,8 +113,11 @@ let CategoryContent = React.createClass({
       var row = me.table.datatable.data()[index];
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
-      setValue("name", name);
-      me.props.dispatch(setEditorMode("update", postId))
+      var description = removeTags(row[2]);
+      me.props.change('name', name);
+      me.props.change('description', description);
+      me.notifyUnsavedData(true);
+      me.props.dispatch(setModeNameIdDes("update", name, postId, description))
     }
     var names = document.getElementsByClassName('nameText');
     _.forEach(names, function(item){
@@ -132,18 +145,19 @@ let CategoryContent = React.createClass({
     this.loadData("All");
   },
   handleSubmit: function(event){
-    event.preventDefault();
+    // event.preventDefault();
     var me = this;
-    var name = getValue("name");
+    var name = this.props.name;
+    var description = this.props.description;
     var type = me.props.postType;
     var qry = "", noticeTxt = "";
-    
+    debugger
     me.disableForm(true);
     if (this.props.mode==="create") {
-      qry = Query.createCategory(name, type);
+      qry = Query.createCategory(name, description, type);
       noticeTxt = 'Category Published!';
     } else {
-      qry = Query.updateCategory(this.props.postId, name, type);
+      qry = Query.updateCategory(this.props.postId, name, description, type);
       noticeTxt = 'Category Updated!';
     }
     riques(qry, 
@@ -155,6 +169,7 @@ let CategoryContent = React.createClass({
                   position: 'tr',
                   autoDismiss: 2
           });
+          me.resetForm();
           var here = me;
           var cb = function(){here.disableForm(false)}
           me.loadData("All", cb);
@@ -166,7 +181,8 @@ let CategoryContent = React.createClass({
   },
   resetForm: function(){
     document.getElementById("pageForm").reset();
-    setValue("name", "");
+    this.props.change('name', "");
+    this.props.change('description', "");
     this.props.dispatch(setEditorMode("create"))
     window.history.pushState("", "", '/admin/category');
   },
@@ -192,28 +208,27 @@ let CategoryContent = React.createClass({
                 <div className="container-fluid">
                   <div className="row">
                     <div className="col-xs-4" style={{marginTop: 40}}>
-                    <form onSubmit={this.handleSubmit} id="pageForm" method="get">
+                    <form onSubmit={this.props.handleSubmit(this.handleSubmit)} id="pageForm" method="get">
                       <div className="form-group">
                         <h4><b>{this.props.mode==="create"?"Add New Category":"Edit Category"}</b></h4>
                       </div>
                       <div className="form-group">
                           <label htmlFor="name" >Category name</label>
                           <div >
-                            <input type="text" name="name" id="name" className="form-control name" required="true"/>
+                            <Field component="input" type="text" name="name" id="name" className="form-control" required="true"/>
                             <p className="help-block">The name appears on your site</p>
                           </div>
                       </div>
                       <div className="form-group">
                         <label htmlFor="homeUrl" >Description</label>
                         <div >
-                          <textarea name="description" id="description" className="form-control"></textarea>
+                          <Field component="textarea" name="description" id="description" className="form-control" />
                           <p className="help-block">The description is not prominent by default; however, some themes may show it.</p>
                         </div>
                       </div>
                        <div className="form-group">
                           
                             <input type="submit" name="submit" id="submit" value={this.props.mode==="create"?"Add New Category":"Edit Category"} className="btn btn-primary btn-sm" />
-                            <input type="button" value="Reset" style={{marginLeft: 10}} onClick={this.resetForm} className="btn btn-primary btn-sm"/>
                             
                       </div>
                     </form>
@@ -260,11 +275,25 @@ let CategoryContent = React.createClass({
     )},
 });
 
+const selector = formValueSelector('categoryContentForm');
+
 const mapStateToProps = function(state){
+  var customStates = {
+    name: selector(state, 'name'),
+    description: selector(state, 'description')
+  }
+
   if (!_.isEmpty(state.categoryContent)) {
-    return _.head(state.categoryContent)
+    var out = _.head(state.categoryContent);
+    out = {...out, ...customStates}
+    // return _.head(state.categoryContent)
+    return out
   } else return {}
 }
+
+CategoryContent = reduxForm({
+  form: 'categoryContentForm'
+})(CategoryContent)
 
 CategoryContent = connect(mapStateToProps)(CategoryContent)
 export default CategoryContent;

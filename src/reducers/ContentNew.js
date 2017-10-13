@@ -1,22 +1,11 @@
+const generateDefaultField = () => ([
+  {id:"title", label: "Title", type: "link", deletable: false},
+  {id:"slug", label: "Slug", type: "text", deletable: false}
+])
+
 const INITIAL_VALUES =  [{
-      mode: "create",
-      fields: [
-        {id:"title", label: "Title", type: "link", deletable: false},
-        {id:"slug", label: "Slug", type: "text", deletable: false}
-      ],
-      defaultFields: [
-        {id:"title", label: "Title", type: "link", deletable: false},
-        {id:"slug", label: "Slug", type: "text", deletable: false}
-      ],
-      providedFields: [
-        {id:"author", label: "Author", type: "link"},
-        {id:"summary", label: "Summary", type: "link"},
-        {id:"content", label: "Content", type: "text"},
-        {id:"image", label: "Image", type: "text"},
-        {id:"like", label: "Like", type: "text"},
-        {id:"featuredImage", label: "Featured Image", type: "text"},
-        {id:"gallery", label: "Gallery", type: "text"}
-      ],
+      defaultFields: generateDefaultField(),
+      providedFields: generateDefaultField(),
       providedFieldsDefault: [
         {id:"author", label: "Author", type: "link"},
         {id:"summary", label: "Summary", type: "link"},
@@ -25,11 +14,8 @@ const INITIAL_VALUES =  [{
         {id:"like", label: "Like", type: "text"},
         {id:"featuredImage", label: "Featured Image", type: "text"},
         {id:"gallery", label: "Gallery", type: "text"}
-      ],
-      customFields: [],
-      checkingSlug: false,
-      slug: ''
-    }]
+      ]
+}]
 
 const contentNew = (state = INITIAL_VALUES, action) => {
   console.log(action.type)
@@ -44,50 +30,18 @@ const contentNew = (state = INITIAL_VALUES, action) => {
     case 'SET_FIELDS':
       return state.map(item =>  ({...item, fields: action.fields}))
 
-    case 'SET_CHECKING_SLUG':
-      return state.map(item =>  ({...item, checkingSlug: action.checkingSlug}))
-
     case 'TOGGLE_CHECKING_SLUG':
       return state.map(item =>  ({...item, checkingSlug: action.checkingSlug, slug: action.slug}))
 
-    case 'NAME_BLUR':
+    case 'SET_LABELS':
       return state.map(item =>  ({...item, label: action.label, labelSingular: action.labelSingular, labelAddNew: action.labelAddNew, labelEdit: action.labelEdit}))
 
-    case 'ADD_PRO_FIELD':
-      return state.map(item =>  ({...item, providedFields: action.providedFields, fields:action.fields}))
-
-    case 'SET_MODE':
+    case 'TOGGLE_STATUS_EDIT_MODE':
       return state.map(item =>  ({...item, mode: action.mode}))
 
-
-
-
-
-
-
-
-
-
-    case 'UPDATE_GENERAL_SETTING':
-      return [...state]
-
-    case 'UPDATE_META_SETTING':
-      return [...state]
-
     case 'MASK_AREA':
-      return [
-        {
-          isProcessing: action.isMasked,
-          opacity: action.isMasked?0.4:1
-        }
-      ]
-
-    case 'LOAD_FORM_DATA':
-      return [
-        {
-          data: action.data
-        }
-      ]
+      return state.map(item =>  ({...item, isProcessing: action.isMasked, opacity: action.isMasked?0.4:1}))
+      
     default:
       return state
   }
