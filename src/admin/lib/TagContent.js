@@ -159,7 +159,9 @@ let TagContent = React.createClass({
     // this.loadData("All");
   },
   componentWillReceiveProps(props){
-    this.table.loadData(props._dataArr, props.bEdit);
+    if(props._dataArr!==this.props._dataArr){
+      this.table.loadData(props._dataArr, props.bEdit);
+    }
     // this.props.dispatch(initContentList(props.monthList))
   },
 
@@ -249,7 +251,6 @@ const mapStateToProps = function(state){
   }
 
   if (!_.isEmpty(state.tagContent)) {
-    debugger
     var out = _.head(state.tagContent);
     out = {...out, ...customStates}
     // return _.head(state.tagContent)
