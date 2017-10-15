@@ -5,7 +5,7 @@
   "devDependencies": {
     "react-bootstrap": "^0.30.7",
     "rendact-react-scripts": "^1.0.14",
-    "sw-precache": "^4.2.3"
+    "sw-precache": "^5.0.0"
   },
   "dependencies": {
     "apollo-client": "^1.2.2",
