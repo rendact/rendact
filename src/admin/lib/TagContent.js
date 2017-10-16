@@ -160,28 +160,40 @@ let TagContent = React.createClass({
         })
       })
     }else{
-      qry = Query.UpdateTag(postId, name, type);
-      noticeTxt = 'Tag Updated!';
-      riques(qry, 
-        function(error, response, body) { 
-          if (!error && !body.errors && response.statusCode === 200) {
-            me.notif.addNotification({
-                    message: noticeTxt,
-                    level: 'success',
-                    position: 'tr',
-                    autoDismiss: 2
-            });
-            me.resetForm();
-            var here = me;
-            var cb = function(){here.disableForm(false)}
-            // me.loadData("All", cb);
-          } else {
-            errorCallback(error, body.errors?body.errors[0].message:null);
-          }
-          me.disableForm(false);
-        });
+      // qry = Query.UpdateTag(postId, name, type);
+      // noticeTxt = 'Tag Updated!';
+      // riques(qry, 
+      //   function(error, response, body) { 
+      //     if (!error && !body.errors && response.statusCode === 200) {
+      //       me.notif.addNotification({
+      //               message: noticeTxt,
+      //               level: 'success',
+      //               position: 'tr',
+      //               autoDismiss: 2
+      //       });
+      //       me.resetForm();
+      //       var here = me;
+      //       var cb = function(){here.disableForm(false)}
+      //       // me.loadData("All", cb);
+      //     } else {
+      //       errorCallback(error, body.errors?body.errors[0].message:null);
+      //     }
+      //     me.disableForm(false);
+      //   });
+      let listOfData = me.props.client.mutate({
+        mutation: gql`${Query.UpdateTag(postId, name, type).query}`,
+        variables: Query.UpdateTag(postId, name, type).variables
+      })
+      var he = me;
+      me.disableForm(true);
+      listOfData.then(function() {
+        he.props.refetchAllMenuData().then(function() {
+          // he.props.dispatch(toggleSelectedItemState(false));
+          he.resetForm();
+          he.disableForm(false);
+        })
+      })
     }
-      
   },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
