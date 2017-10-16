@@ -122,47 +122,34 @@ let TagContent = React.createClass({
     var postId = this.props.postId;
     var type = this.props.postType;
     var noticeTxt = "";
+    var listOfData = ";"
     if (this.props.mode==="create"){
-      let listOfData = me.props.client.mutate({
+      noticeTxt = 'Tag Published!';
+      listOfData = me.props.client.mutate({
         mutation: gql`${Query.createTag(name, type).query}`,
         variables: Query.createTag(name, type).variables
       })
-      var he = me;
-      me.disableForm(true);
-      listOfData.then(function() {
-        he.props.refetchAllMenuData().then(function() {
-          // he.props.dispatch(toggleSelectedItemState(false));
-          he.resetForm();
-          he.notif.addNotification({
-              message: 'Tag Published!',
-              level: 'success',
-              position: 'tr',
-              autoDismiss: 2
-            });
-          he.disableForm(false);
-        })
-      })
     }else{
-      let listOfData = me.props.client.mutate({
+      noticeTxt = 'Tag Updated!';
+      listOfData = me.props.client.mutate({
         mutation: gql`${Query.UpdateTag(postId, name, type).query}`,
         variables: Query.UpdateTag(postId, name, type).variables
       })
-      var he = me;
-      me.disableForm(true);
-      listOfData.then(function() {
-        he.props.refetchAllMenuData().then(function() {
-          // he.props.dispatch(toggleSelectedItemState(false));
-          he.resetForm();
-          he.notif.addNotification({
-              message: 'Tag Updated!',
+    }
+  
+    this.disableForm(true);
+    listOfData.then(function() {
+        me.props.refetchAllMenuData().then(function() {
+          me.resetForm();
+          me.notif.addNotification({
+              message: noticeTxt,
               level: 'success',
               position: 'tr',
               autoDismiss: 2
             });
-          he.disableForm(false);
+          me.disableForm(false);
         })
-      })
-    }
+    })
   },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
