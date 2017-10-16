@@ -16,7 +16,7 @@ import widgets from './Widgets';
 import search from './Search';
 import maskArea from './MaskArea';
 import listOfWidgets from './ListOfWidgets';
-import {themeHome, themeSingle, themeBlog } from './Theme'
+import {themeHome, themeSingle, themeBlog, themeList } from './Theme'
 import userNew from './UserNew';
 
 const INITIAL_STATE = {
@@ -58,6 +58,7 @@ const rendactApp = combineReducers({
   themeHome,
   themeSingle,
   themeBlog,
+  themeList,
   userNew
 })
 

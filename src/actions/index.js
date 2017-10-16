@@ -522,3 +522,13 @@ export const checkingEmail = (state) => ({
   type: 'IS_CHECKING_EMAIL',
   state
 })
+
+
+/*
+ * Themes.js
+*/
+
+export const setThemesList = (themes) => ({
+  type: 'SET_THEMES_LIST',
+  themes
+})
