@@ -41,7 +41,7 @@ const tagContent = (state = [], action) => {
       return state.map(item =>  ({...item, name: action.name}))
     
     case 'SET_MODE_NAME_ID':
-      return state.map(item =>  ({...item,mode: action.mode, name: action.name, postId: action.postId}))
+      return state.map(item =>  ({...item, mode: action.mode, name: action.name, postId: action.postId}))
     
     case 'SELECTED_ITEM':
       return state.map(item =>  ({...item, itemSelected: action.itemSelected}))

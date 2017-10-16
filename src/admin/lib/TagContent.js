@@ -94,9 +94,10 @@ let TagContent = React.createClass({
       var row = me.table.datatable.data()[index];
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
-      me.props.dispatch(setModeNameId("update", name, postId));
       me.props.change('name', name);
       me.notifyUnsavedData(true);
+      me.props.dispatch(setModeNameId("update", name, postId));
+      debugger
     }
 
     var titles = document.getElementsByClassName('nameText');
@@ -130,7 +131,6 @@ let TagContent = React.createClass({
       qry = Query.UpdateTag(postId, name, type);
       noticeTxt = 'Tag Updated!';
     }
-
     riques(qry, 
       function(error, response, body) { 
         if (!error && !body.errors && response.statusCode === 200) {
@@ -159,7 +159,8 @@ let TagContent = React.createClass({
     // this.loadData("All");
   },
   componentWillReceiveProps(props){
-    if(props._dataArr!==this.props._dataArr){
+    // debugger
+    if(props._dataArr!==this.props._dataArr || props.mode===this.props.mode ){
       this.table.loadData(props._dataArr, props.bEdit);
     }
     // this.props.dispatch(initContentList(props.monthList))
@@ -246,6 +247,7 @@ let TagContent = React.createClass({
 const selector = formValueSelector('tagContentForm');
 
 const mapStateToProps = function(state){
+  debugger
   var customStates = {
     name: selector(state, 'name')
   }
