@@ -7,7 +7,7 @@ import {swalert, riques, hasRole, errorCallback, removeTags, disableForm, defaul
 import {TableTagCat, SearchBox, DeleteButtons} from './Table';
 import {connect} from 'react-redux'
 import {reduxForm, Field, formValueSelector} from 'redux-form';
-import {initContentList, maskArea, setEditorMode, seteSelectedItem, setNameValue, setId, setModeNameId,toggleSelectedItemState} from '../../actions'
+import {setNameTag, initContentList, maskArea, setEditorMode, seteSelectedItem, setNameValue, setId, setModeNameId,toggleSelectedItemState} from '../../actions'
 import gql from 'graphql-tag';
 import {graphql, withApollo} from 'react-apollo';
 
@@ -94,10 +94,10 @@ let TagContent = React.createClass({
       var row = me.table.datatable.data()[index];
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
+      // me.props.dispatch(setNameTag(name));
       me.props.change('name', name);
       me.notifyUnsavedData(true);
       me.props.dispatch(setModeNameId("update", name, postId));
-      debugger
     }
 
     var titles = document.getElementsByClassName('nameText');
@@ -119,6 +119,7 @@ let TagContent = React.createClass({
   handleSubmit: function(event){
     // event.preventDefault();
     var me = this;
+    var nameTag = this.props.nameTag;
     var name = this.props.name;
     var postId = this.props.postId;
     var type = this.props.postType;
@@ -159,8 +160,7 @@ let TagContent = React.createClass({
     // this.loadData("All");
   },
   componentWillReceiveProps(props){
-    // debugger
-    if(props._dataArr!==this.props._dataArr || props.mode===this.props.mode ){
+    if(props._dataArr!==this.props._dataArr ){
       this.table.loadData(props._dataArr, props.bEdit);
     }
     // this.props.dispatch(initContentList(props.monthList))
@@ -194,7 +194,7 @@ let TagContent = React.createClass({
                       <div className="form-group">
                           <label htmlFor="name" >Name</label>
                           <div >
-                            <Field component="input" type="text" name="name" id="name" className="form-control" required="true" />
+                            <Field component="input" type="text" name="name" id="name" className="form-control" required="true" onHange={this.handleNameChange}/>
                             <p className="help-block">The name appears on your site</p>
                           </div>
                       </div>
@@ -247,11 +247,9 @@ let TagContent = React.createClass({
 const selector = formValueSelector('tagContentForm');
 
 const mapStateToProps = function(state){
-  debugger
   var customStates = {
     name: selector(state, 'name')
   }
-
   if (!_.isEmpty(state.tagContent)) {
     var out = _.head(state.tagContent);
     out = {...out, ...customStates}
@@ -325,4 +323,5 @@ TagContent = graphql(getAllTagQry,
   }
 })(TagContent)
 TagContent = withApollo(TagContent);
+
 export default TagContent;

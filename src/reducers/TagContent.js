@@ -1,5 +1,12 @@
+const INITIAL_VALUES =  [{
+      isProcessing: false,
+      opacity: 1,
+      itemSelected: false,
+      mode: "create",
+    }]
 
-const tagContent = (state = [], action) => {
+const tagContent = (state = INITIAL_VALUES, action) => {
+// const tagContent = (state = [], action) => {
   switch (action.type) {
     case 'INIT_CONTENT_LIST':
       return [
@@ -46,7 +53,9 @@ const tagContent = (state = [], action) => {
     case 'SELECTED_ITEM':
       return state.map(item =>  ({...item, itemSelected: action.itemSelected}))
     
-    
+    case 'SET_NAME_TAG':
+      return state.map(item =>  ({...item, nameTag: action.nameTag}))
+        
     default:
       return state
   }
