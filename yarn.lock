@@ -5679,9 +5679,9 @@ remove-trailing-separator@^1.0.1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/remove-trailing-separator/-/remove-trailing-separator-1.1.0.tgz#c24bce2a283adad5bc3f58e0d48249b92379d8ef"
 
-rendact-react-scripts@^1.0.1-4.2:
-  version "1.0.1-4.2"
-  resolved "https://registry.yarnpkg.com/rendact-react-scripts/-/rendact-react-scripts-1.0.1-4.2.tgz#ac2eead0d5d9716f737b823c6a9726439a5e86fd"
+rendact-react-scripts@^1.0.1-4.3:
+  version "1.0.1-4.3"
+  resolved "https://registry.yarnpkg.com/rendact-react-scripts/-/rendact-react-scripts-1.0.1-4.3.tgz#09f6058026e2eb1deba4abc7c34f730142dc570d"
   dependencies:
     autoprefixer "7.1.2"
     babel-core "6.25.0"
