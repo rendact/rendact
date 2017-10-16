@@ -1,2 +1,3 @@
+/service-worker.js /service-worker.js 200
 /api/*  https://us-west-2.api.scaphold.io/graphql/rendact/:splat  200
 /*  /index.html  200

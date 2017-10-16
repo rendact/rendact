@@ -3,9 +3,6 @@ import {gql, graphql} from 'react-apollo';
 import {connect} from 'react-redux';
 import HomeParent from './HomeParent';
 import {setActivePageOnPagination} from '../../../actions/setActivePageOnPagination';
-import slice from 'lodash/slice'
-import forEach from 'lodash/forEach'
-import find from 'lodash/find'
 
 var pagePerPost = 5;
 let getPostList = gql`
@@ -59,7 +56,7 @@ class HomeWithLatestPost extends React.Component{
   postSliced(){
     let page = this.props.activePage 
     let start = (this.props.postPerPage * page) - this.props.postPerPage
-    return slice(this.props.allPosts, start, start+this.props.postPerPage);
+    return this.props.allPosts ?  this.props.allPosts.slice (start, start+this.props.postPerPage) : null
   }
 
   render(){
@@ -80,11 +77,8 @@ HomeWithLatestPost = connect(mapStateToProps)(HomeWithLatestPost);
 HomeWithLatestPost = graphql(getPostList, {
   props: ({ownProps, data}) => {
     if(!data.loading){
-      var _postArr = [];
-      forEach(data.viewer.allPosts.edges, function(item){
-        _postArr.push(item.node);
-      });
-      var slugFound = find(data.viewer.allPosts.edges, {node: {slug: ownProps.slug}})
+      var _postArr = data.viewer.allPosts.edges.map(item => item.node)
+      var slugFound = data.viewer.allPosts.edges.find((el) => (el.node.slug === ownProps.slug))
 
       return {
         allPosts: _postArr, 

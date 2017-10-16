@@ -1,5 +1,4 @@
 import React from 'react';
-import forEach from 'lodash/forEach'
 import {saveConfig} from '../../../utils/saveConfig';
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo';
@@ -73,9 +72,7 @@ ThemeHome = graphql(qry, {
 
     if (!data.loading) {
 
-      forEach(data.viewer.allOptions.edges, function(item){
-        saveConfig(item.node.item, item.node.value);
-      });
+      data.viewer.allOptions.edges.forEach(item => saveConfig(item.node.item, item.node.value))
 
       if (!JSON.parse(localStorage.getItem('config')).listOfWidget) {
         saveConfig("listOfWidget", {})
