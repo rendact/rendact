@@ -18,8 +18,11 @@ window.config = AdminConfig;
 
 
 export function getTemplateComponent(type){
-	var c = window.config.theme;
-
+	//var c = window.config.theme;
+	var c = JSON.parse(
+						JSON.parse(localStorage.getItem("config")).activeTheme
+					)
+	
   const importing = (name) => (
     `${c.path}/layouts/${name}.js`
   )

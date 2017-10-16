@@ -1,113 +1,121 @@
 import React from 'react';
-import images1 from '../../images/photo4.jpg';
-import images2 from '../../images/photo1.png';
-import images3 from '../../images/photo2.png';
+import _ from 'lodash';
+import Notification from 'react-notification-system';
+import {connect} from 'react-redux'
+import gql from 'graphql-tag';
+import {graphql, withApollo} from 'react-apollo'
+import {getConfig, disableForm} from '../../utils'
+import {saveConfig} from '../../utils/saveConfig'
+import {setThemesList} from '../../actions'
 
-const Tabs = React.createClass({
-  displayName: 'Tabs',
-  propTypes: {
-    selected: React.PropTypes.number,
-    children: React.PropTypes.oneOfType([
-      React.PropTypes.array,
-      React.PropTypes.element
-    ]).isRequired
-  },
-  getDefaultProps() {
-    return {
-      selected: 0
-    };
-  },
-  getInitialState() {
-    return {
-      selected: this.props.selected
-    };
-  },
-  handleClick(index, event) {
-    event.preventDefault();
-    this.setState({
-      selected: index
-    });
-  },
-  _renderTitles() {
-    function labels(child, index) {
-      let activeClass = (this.state.selected === index ? 'active' : '');
-      return (
-        <li key={index}>
-          <a href="#" 
-            className={activeClass}
-            onClick={this.handleClick.bind(this, index)}>
-            {child.props.label}
-          </a>
-        </li>
-      );
+const getThemesQry = gql`
+  query getThemes{
+    viewer {
+      allThemes {
+        edges {
+          node {
+            id,
+            name,
+            description,
+            screenshot {
+              id
+              blobUrl
+            }
+          }
+        }
+      }
     }
-    return (
-      <ul className="nav nav-tabs">
-        {this.props.children.map(labels.bind(this))}
-      </ul>
-    );
-  },
-  _renderContent() {
-    return (
-      <div className="tabs__content" style={{marginTop: 20}}>
-        {this.props.children[this.state.selected]}
-      </div>
-    );
-  },
-  render() {
-    return (
-      <div className="tabs">
-        {this._renderTitles()}
-        {this._renderContent()}
-      </div>
-    );
   }
-});
-
-const Pane = React.createClass({
-  displayName: 'Pane',
-  propTypes: {
-    label: React.PropTypes.string.isRequired,
-    children: React.PropTypes.element.isRequired
-  },
-  render() {
-    return (
-      <div>
-        {this.props.children}
-      </div>
-    );
-  }
-});
-
-
-
+`
 
 var Themes = React.createClass({
-	getInitialState : function() {
-      return { hovering: false }
-    },
+  getDefaultProps() {
+      return {
+        themes: [],
+        activeTheme: JSON.parse(getConfig("activeTheme")),
+        opacity: 1
+      }
+  },
 
-    style: function() {
-      if (this.state.hovering) {
-        return { 
-        	opacity: 1
-    	}
-      } 
-    },
+  handleChangeTheme: function(e){
+    var me = this;
+    var value = {}
+    var defaultTheme = {
+      id: 'default',
+      name: 'Default',
+      path: 'default'
+    }
 
-    onMouseOver : function (e) {
-      e.preventDefault();
+    var landingTheme = {
+      id: 'landing',
+      name: 'X Landing',
+      path: 'x-landing'
+    }
+
+    if (this.props.activeTheme.name === "Default") {
+      value = landingTheme  
+    } else {
+      value = defaultTheme  
+    }
+
+    disableForm(true);
+    this.props.client.mutate({
+      mutation: gql`
+        mutation ($input: UpdateOptionsInput!){
+          updateOptions(input: $input){
+            changedOptions {
+              id
+              item
+              value
+            }
+          }
+        }
+      `,
+      variables: {
+        "input": {
+          "id": "T3B0aW9uczo5NQ==",
+          "value": JSON.stringify(value)
+        }
+      }
+    }).then(data => {
+      disableForm(false);
+      me.notification.addNotification({
+        message: "Theme changed",
+        level: 'success',
+        position: 'tr',
+        autoDismiss: 2
+      });
+      saveConfig("activeTheme", value);
+
+      me.props.client.query({
+        query: getThemesQry
+      }).then(body => {
+        var data = _.clone(body.data.viewer.allThemes.edges); 
+        var activeTheme = _.find(data, {node: {name: value.name}});
+        _.remove(data, {node: {name: value.name}});
+        me.props.dispatch(setThemesList(_.concat(activeTheme, data)))
+      })
+    })
+
+  },
+
+  onMouseOver(e) {
+    e.preventDefault();
     let state = this.state;    // I grab the current state object
     state.hovering = true;
     this.setState(state);
-    },
+  },
 
-    onMouseOut : function (e) {
-      e.preventDefault();
+  onMouseOut(e) {
+    e.preventDefault();
     let state = this.state;    // As above, I grab the current state object
     state.hovering = false;
     this.setState(state);
-    },
+  },
+
+  componentDidMount(){
+    this.notification = this.refs.notificationSystem;
+  },
 
 	render: function(){
 		let state = this.state;
@@ -115,279 +123,82 @@ var Themes = React.createClass({
 			<div className="content-wrapper">
         <div className="container-fluid">
 				<section className="content-header">
-			    	<h1>
-            			Theme List
-          			</h1>
-
-          			<ol className="breadcrumb">
-            			<li><a href="#"><i className="fa fa-dashboard"></i>Home</a></li>
-            			<li className="active">Themes</li>
-          			</ol>
-          			<input type="search" placeholder="Search themes..." style={{marginTop: 10}}/>
-                <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
-			    </section>
+          <h1>Theme List
+            <small style={{marginLeft: 5}}>
+              <button className="btn btn-default btn-primary add-new-post-btn">Add new</button>
+            </small>
+          </h1>
+    			<ol className="breadcrumb">
+      			<li><a href="#"><i className="fa fa-dashboard"></i>Home</a></li>
+      			<li className="active">Themes</li>
+    			</ol>
+          <div style={{borderBottom:"#eee" , borderBottomStyle:"groove", borderWidth:2, marginTop: 10}}></div>
+			 </section>
+       <Notification ref="notificationSystem" />
 
 			    <section className="content">
+            <div className="row">
+              <div className="col-md-12">
+                <input type="input" style={{width: 200, marginTop: 10, marginBottom: 20}} placeholder="Search themes..." className="form-control pull-right"/>
+              </div>
+            </div>
         			<div className="row">
             			<div className="col-md-12 col-sm-6 col-xs-12">
-              				<div>
-        						<Tabs selected={0}>
-          							<Pane label="All">
-          								<div className="col-md-4">
-          								<div className="show-image"
-          								onMouseOver={this.onMouseOver} 
-                   						onMouseOut={this.onMouseOut} >
-              								<div className="thumbnail" 
-                   							style={(state.hovering) ? {opacity: 0.5} : {}} >
-            									<img src={images1} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#"  className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    								</p>
-                  								</div>
-          									</div>
-          								</div>
-          								</div>
-          								<div className="col-md-4">
-          								<div className="show-image">
-              								<div className="thumbnail">
-            									<img src={images1} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#"  className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    								</p>
-                  								</div>
-          									</div>
-          								</div>
-          								</div>
-          								<div className="col-md-4">
-              								<div className="thumbnail">
-            									<img src={images1} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#" className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    								</p>
-                  								</div>
-          									</div>
-          								</div>
-          								<div className="col-md-4">
-              								<div className="thumbnail">
-            									<img src={images1} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#" className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    								</p>
-                  								</div>
-          									</div>
-          								</div>
-          								<div className="col-md-4">
-              								<div className="thumbnail">
-            									<img src={images1} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#" className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    									</p>
-                  								</div>
-          									</div>
-          								</div>
-          								<div className="col-md-4">
-              								<div className="thumbnail">
-            									<img src={images1} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#" className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    								</p>
-                  								</div>
-          									</div>
-          								</div>
-          							</Pane>
-          							<Pane label="Free">
-            							<div className="col-md-4">
-              								<div className="thumbnail">
-            									<img src={images2} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#" className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    								</p>
-                  								</div>
-          									</div>
-          								</div>
-          								<div className="col-md-4">
-              								<div className="thumbnail">
-            									<img src={images2} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#" className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    								</p>
-                  								</div>
-          									</div>
-          								</div>
-          								<div className="col-md-4">
-              								<div className="thumbnail">
-            									<img src={images2} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#" className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    								</p>
-                  								</div>
-          									</div>
-          								</div>
-          								<div className="col-md-4">
-              								<div className="thumbnail">
-            									<img src={images2} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#" className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    								</p>
-                  								</div>
-          									</div>
-          								</div>
-          								<div className="col-md-4">
-              								<div className="thumbnail">
-            									<img src={images2} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#" className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    								</p>
-                  								</div>
-          									</div>
-          								</div>
-          								<div className="col-md-4">
-              								<div className="thumbnail">
-            									<img src={images2} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#" className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    								</p>
-                  								</div>
-          									</div>
-          								</div>
-          							</Pane>
-          							<Pane label="Premium">
-            							<div className="col-md-4">
-              								<div className="thumbnail">
-            									<img src={images3} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#" className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    								</p>
-                  								</div>
-          									</div>
-          								</div>
-          								<div className="col-md-4">
-              								<div className="thumbnail">
-            									<img src={images3} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#" className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    								</p>
-                  								</div>
-          									</div>
-          								</div>
-          								<div className="col-md-4">
-              								<div className="thumbnail">
-            									<img src={images3} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#" className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    								</p>
-                  								</div>
-          									</div>
-          								</div>
-          								<div className="col-md-4">
-              								<div className="thumbnail">
-            									<img src={images3} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#" className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    								</p>
-                  								</div>
-          									</div>
-          								</div>
-          								<div className="col-md-4">
-              								<div className="thumbnail">
-            									<img src={images3} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#" className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    								</p>
-                  								</div>
-          									</div>
-          								</div>
-          								<div className="col-md-4">
-              								<div className="thumbnail">
-            									<img src={images3} alt="" />
-            									<div className="caption">
-                    								<p>Water
-                    								<div className="pull-right box-tools">
-                    									<button href="#" className="btn btn-primary" style={{marginRight:10}}>Activate</button>
-                    									<button href="#" className="btn btn-default">Preview</button>
-                    								</div>
-                    								</p>
-                  								</div>
-          									</div>
-          								</div>
-          							</Pane>
-        						</Tabs>
-      						</div>
+                    {
+                      this.props.themes.map(function(item){
+                        return <div className="col-md-4" key={item.node.id}>
+                                <div className="show-image">
+                                    <div className="thumbnail" style={{paddingBottom: 50}}>
+                                    <img src={item.node.screenshot?item.node.screenshot.blobUrl:""} alt="" />
+                                    <div className="caption">
+                                          <h3>{item.node.name}</h3>
+                                          <p>{item.node.description}</p>
+                                          <p><div className="pull-right box-tools">
+                                            <button href="#"  className="btn btn-primary" style={{marginRight:10}} onClick={this.handleChangeTheme}>
+                                              {this.props.activeTheme.name===item.node.name?"Customize":"Activate"}
+                                            </button>
+                                            <button href="#" className="btn btn-default">Preview</button>
+                                          </div>
+                                          </p>
+                                        </div>
+                                  </div>
+                                </div>
+                              </div>
+                      }.bind(this))
+                    }
             			</div>
-					</div>
+					   </div>
         		</section>
           </div>
 		    </div>
 		)
 	}
 });
+
+const mapStateToProps = function(state){
+  if (!_.isEmpty(state.themeList)) {
+    var _states = _.head(state.themeList);
+    return {..._states}
+  } else 
+    return {}
+}
+
+Themes = connect(mapStateToProps)(Themes);
+
+Themes = graphql(getThemesQry, {
+  props: ({ownProps, data}) => {
+    if (data.viewer) {
+      var activeThemeConfig = JSON.parse(getConfig("activeTheme"));
+      var data = _.clone(data.viewer.allThemes.edges); 
+      var activeTheme = _.find(data, {node: {name: activeThemeConfig.name}});
+      _.remove(data, {node: {name: activeThemeConfig.name}});
+      return {
+        themes: _.concat(activeTheme, data)
+      }
+    } 
+  }
+})(Themes);
+
+Themes = withApollo(Themes);
 
 export default Themes;
