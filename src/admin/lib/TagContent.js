@@ -121,7 +121,7 @@ let TagContent = React.createClass({
     var name = this.props.name;
     var postId = this.props.postId;
     var type = this.props.postType;
-    var qry = "", noticeTxt = "";
+    var noticeTxt = "";
     if (this.props.mode==="create"){
       let listOfData = me.props.client.mutate({
         mutation: gql`${Query.createTag(name, type).query}`,
