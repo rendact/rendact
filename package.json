@@ -4,7 +4,7 @@
   "private": true,
   "devDependencies": {
     "react-bootstrap": "^0.30.7",
-    "rendact-react-scripts": "file:../create-react-app/packages/react-scripts/",
+    "rendact-react-scripts": "^1.0.1-4.1",
     "sw-precache": "^5.0.0"
   },
   "dependencies": {
