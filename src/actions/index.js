@@ -224,6 +224,11 @@ export const setNameValue = (name)  => ({
   name
 })
 
+export const setNameTag = (nameTag)  => ({
+  type: 'SET_NAME_TAG',
+  nameTag
+})
+
 export const setId = (postId)  => ({
   type: 'SET_ID',
   postId

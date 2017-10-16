@@ -7,7 +7,7 @@ import {swalert, riques, hasRole, errorCallback, removeTags, disableForm, defaul
 import {TableTagCat, SearchBox, DeleteButtons} from './Table';
 import {connect} from 'react-redux'
 import {reduxForm, Field, formValueSelector} from 'redux-form';
-import {initContentList, maskArea, setEditorMode, seteSelectedItem, setNameValue, setId, setModeNameId,toggleSelectedItemState} from '../../actions'
+import {setNameTag, initContentList, maskArea, setEditorMode, seteSelectedItem, setNameValue, setId, setModeNameId,toggleSelectedItemState} from '../../actions'
 import gql from 'graphql-tag';
 import {graphql, withApollo} from 'react-apollo';
 
@@ -94,9 +94,9 @@ let TagContent = React.createClass({
       var row = me.table.datatable.data()[index];
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
-      me.props.dispatch(setModeNameId("update", name, postId));
       me.props.change('name', name);
       me.notifyUnsavedData(true);
+      me.props.dispatch(setModeNameId("update", name, postId));
     }
 
     var titles = document.getElementsByClassName('nameText');
@@ -121,34 +121,48 @@ let TagContent = React.createClass({
     var name = this.props.name;
     var postId = this.props.postId;
     var type = this.props.postType;
-    this.disableForm(true);
     var qry = "", noticeTxt = "";
     if (this.props.mode==="create"){
-      qry = Query.createTag(name, type);
-      noticeTxt = 'Tag Published!';
+      let listOfData = me.props.client.mutate({
+        mutation: gql`${Query.createTag(name, type).query}`,
+        variables: Query.createTag(name, type).variables
+      })
+      var he = me;
+      me.disableForm(true);
+      listOfData.then(function() {
+        he.props.refetchAllMenuData().then(function() {
+          // he.props.dispatch(toggleSelectedItemState(false));
+          he.resetForm();
+          he.notif.addNotification({
+              message: 'Tag Published!',
+              level: 'success',
+              position: 'tr',
+              autoDismiss: 2
+            });
+          he.disableForm(false);
+        })
+      })
     }else{
-      qry = Query.UpdateTag(postId, name, type);
-      noticeTxt = 'Tag Updated!';
+      let listOfData = me.props.client.mutate({
+        mutation: gql`${Query.UpdateTag(postId, name, type).query}`,
+        variables: Query.UpdateTag(postId, name, type).variables
+      })
+      var he = me;
+      me.disableForm(true);
+      listOfData.then(function() {
+        he.props.refetchAllMenuData().then(function() {
+          // he.props.dispatch(toggleSelectedItemState(false));
+          he.resetForm();
+          he.notif.addNotification({
+              message: 'Tag Updated!',
+              level: 'success',
+              position: 'tr',
+              autoDismiss: 2
+            });
+          he.disableForm(false);
+        })
+      })
     }
-
-    riques(qry, 
-      function(error, response, body) { 
-        if (!error && !body.errors && response.statusCode === 200) {
-          me.notif.addNotification({
-                  message: noticeTxt,
-                  level: 'success',
-                  position: 'tr',
-                  autoDismiss: 2
-          });
-          me.resetForm();
-          var here = me;
-          var cb = function(){here.disableForm(false)}
-          // me.loadData("All", cb);
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-        me.disableForm(false);
-      });
   },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;
@@ -159,7 +173,7 @@ let TagContent = React.createClass({
     // this.loadData("All");
   },
   componentWillReceiveProps(props){
-    if(props._dataArr!==this.props._dataArr){
+    if(props._dataArr!==this.props._dataArr ){
       this.table.loadData(props._dataArr, props.bEdit);
     }
     // this.props.dispatch(initContentList(props.monthList))
@@ -193,7 +207,7 @@ let TagContent = React.createClass({
                       <div className="form-group">
                           <label htmlFor="name" >Name</label>
                           <div >
-                            <Field component="input" type="text" name="name" id="name" className="form-control" required="true" />
+                            <Field component="input" type="text" name="name" id="name" className="form-control" required="true" onHange={this.handleNameChange}/>
                             <p className="help-block">The name appears on your site</p>
                           </div>
                       </div>
@@ -249,7 +263,6 @@ const mapStateToProps = function(state){
   var customStates = {
     name: selector(state, 'name')
   }
-
   if (!_.isEmpty(state.tagContent)) {
     var out = _.head(state.tagContent);
     out = {...out, ...customStates}
@@ -323,4 +336,5 @@ TagContent = graphql(getAllTagQry,
   }
 })(TagContent)
 TagContent = withApollo(TagContent);
+
 export default TagContent;

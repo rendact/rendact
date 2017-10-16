@@ -8,6 +8,8 @@ import {TableTagCat, SearchBox, DeleteButtons} from '../lib/Table';
 import {connect} from 'react-redux'
 import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {setNameValue, setDescription, setModeNameIdDes, setId, initContentList, maskArea, setEditorMode, toggleSelectedItemState} from '../../actions'
+import gql from 'graphql-tag';
+import {graphql, withApollo} from 'react-apollo';
 
 let CategoryContent = React.createClass({
   propTypes: {
@@ -41,54 +43,23 @@ let CategoryContent = React.createClass({
     }
   },
   dt: null,
-  loadData: function(type, callback) {
+  handleDeleteBtn: function(event){
     var me = this;
-    var qry = Query.getAllCategoryQry(this.props.postType);
-    riques(qry, 
-      function(error, response, body) {
-        if (body.data) { 
-          var monthList = ["all"];
-          var _dataArr = [];
-
-          _.forEach(body.data.viewer.allCategories.edges, function(item){
-            _dataArr.push({
-              "postId": item.node.id,
-              "name": item.node.name,
-              "description": item.node.description!==null?item.node.description:"",
-              "count": item.node.post.edges.length
-            });
-          });
-
-          var bEdit = hasRole('modify-category');
-          me.table.loadData(_dataArr, bEdit);
-          me.props.dispatch(initContentList(monthList))
-          if (callback) callback.call();
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-      }
-    );
+    swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
+    function () {
+      var checkedRow = document.querySelectorAll("input.category-"+me.props.slug+"Cb:checked");
+      var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
+      let listOfData = me.props.client.mutate({mutation: gql`${Query.deleteCategoryPermanentQry(idList).query}`})
+      var he = me;
+      me.disableForm(true);
+      listOfData.then(function() {
+        he.props.refetchAllMenuData().then(function() {
+          he.props.dispatch(toggleSelectedItemState(false));
+          he.disableForm(false);
+        })
+      })
+    });
   },
-  handleDeleteBtn: function(event){;
-    var me = this;
-    var checkedRow = document.querySelectorAll("input.category-"+this.props.slug+"Cb:checked");
-    var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
-    swalert('warning','Sure want to delete?',"You might lost some data!",
-      function () {
-        me.disableForm(true);
-        riques(Query.deleteCategoryPermanentQry(idList), 
-          function(error, response, body) {
-            if (!error && !body.errors && response.statusCode === 200) {
-              var here = me;
-              var cb = function(){here.disableForm(false)}
-              me.loadData("All", cb);
-            } else {
-              errorCallback(error, body.errors?body.errors[0].message:null);
-              me.disableForm(false);
-            }
-          }
-        );
-  })},
   disableForm: function(state){
     disableForm(state, this.notif);
     this.props.dispatch(maskArea(state));
@@ -142,7 +113,13 @@ let CategoryContent = React.createClass({
     var datatable = this.table.datatable;
     this.refs.rendactSearchBox.bindToTable(datatable);
     this.dt = datatable;
-    this.loadData("All");
+    // this.loadData("All");
+  },
+  componentWillReceiveProps(props){
+    if(props._dataArr!==this.props._dataArr ){
+      this.table.loadData(props._dataArr, props.bEdit);
+    }
+    // this.props.dispatch(initContentList(props.monthList))
   },
   handleSubmit: function(event){
     // event.preventDefault();
@@ -172,7 +149,7 @@ let CategoryContent = React.createClass({
           me.resetForm();
           var here = me;
           var cb = function(){here.disableForm(false)}
-          me.loadData("All", cb);
+          // me.loadData("All", cb);
         } else {
           errorCallback(error, body.errors?body.errors[0].message:null);
         }
@@ -296,4 +273,67 @@ CategoryContent = reduxForm({
 })(CategoryContent)
 
 CategoryContent = connect(mapStateToProps)(CategoryContent)
+
+let getAllCategoryQry = gql`
+  query getCategories ($type: String!){
+    viewer {
+      allCategories (where: {type: {eq: $type}}) {
+        edges {
+          node {
+            id,
+            name,
+            description,
+            post {
+              edges {
+                node{
+                  id
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`
+
+CategoryContent = graphql(getAllCategoryQry,
+  { 
+    options: props => ({
+      variables: {
+        type: props.postType,
+      },
+    }),
+    props: ({ownProps, data}) => {
+    if (!data.loading) {
+      let allCategories = data.viewer.allCategories.edges;
+      allCategories = _.map(allCategories, item => item.node)
+      var monthList = ["all"];
+      var _dataArr = [];
+
+      _.forEach(allCategories, function(item){
+        _dataArr.push({
+          "postId": item.id,
+          "name": item.name,
+          "description": item.description,
+          "count": item.post.edges.length
+        });
+      });
+      var bEdit = hasRole('modify-tag');
+
+      return{
+        isLoading: false,
+        _dataArr : _dataArr,
+        bEdit : bEdit,
+        refetchAllMenuData : data.refetch,
+        monthList: monthList,
+      }
+    } else { 
+        return {
+          isLoading: true
+        }
+      }
+  }
+})(CategoryContent)
+CategoryContent = withApollo(CategoryContent);
+
 export default CategoryContent;
