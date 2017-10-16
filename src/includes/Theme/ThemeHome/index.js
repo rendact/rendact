@@ -1,5 +1,4 @@
 import React from 'react';
-import forEach from 'lodash/forEach'
 import {saveConfig} from '../../../utils/saveConfig';
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo';
@@ -27,9 +26,9 @@ class ThemeHome extends React.Component{
     }
 
     if(this.props.config.frontPage === 'latestPost'){
-      return <HomeWithLatestPost {...this.props}/>
+      return <HomeWithLatestPost component={HomeParent} {...this.props}/>
     } else {
-      return <HomeWithPage {...this.props} pageId={this.props.config.pageAsHomePage}/>
+      return <HomeWithPage {...this.props} component={HomeParent} pageId={this.props.config.pageAsHomePage}/>
     }
 
   }
@@ -73,9 +72,7 @@ ThemeHome = graphql(qry, {
 
     if (!data.loading) {
 
-      forEach(data.viewer.allOptions.edges, function(item){
-        saveConfig(item.node.item, item.node.value);
-      });
+      data.viewer.allOptions.edges.forEach(item => saveConfig(item.node.item, item.node.value))
 
       if (!JSON.parse(localStorage.getItem('config')).listOfWidget) {
         saveConfig("listOfWidget", {})
