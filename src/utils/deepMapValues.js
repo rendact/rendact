@@ -1,10 +1,13 @@
-import isArray from 'isarray'
-import isObject from 'isobject';
 import mapValues from 'map-obj'
+
+const isObject = (obj) => {
+  let type = typeof obj
+  return type !== null && (type=== 'object' || type === 'function')
+}
 
 const deepMapValues = function(object, callback, propertyPath){
     propertyPath = propertyPath || '';
-    if(isArray(object)){
+    if(Array.isArray(object)){
       return object.map(deepMapValuesIteratee);
     }
     else if(isObject(object) && !(object instanceof File)){
