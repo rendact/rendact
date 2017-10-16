@@ -72,25 +72,42 @@ let CategoryContent = React.createClass({
   //   );
   // },
   handleDeleteBtn: function(event){;
+    // var me = this;
+    // var checkedRow = document.querySelectorAll("input.category-"+this.props.slug+"Cb:checked");
+    // var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
+    // swalert('warning','Sure want to delete?',"You might lost some data!",
+    //   function () {
+    //     me.disableForm(true);
+    //     riques(Query.deleteCategoryPermanentQry(idList), 
+    //       function(error, response, body) {
+    //         if (!error && !body.errors && response.statusCode === 200) {
+    //           var here = me;
+    //           var cb = function(){here.disableForm(false)}
+    //           // me.loadData("All", cb);
+    //         } else {
+    //           errorCallback(error, body.errors?body.errors[0].message:null);
+    //           me.disableForm(false);
+    //         }
+    //       }
+    //     );
+    //   }
+    // )},
     var me = this;
-    var checkedRow = document.querySelectorAll("input.category-"+this.props.slug+"Cb:checked");
-    var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
-    swalert('warning','Sure want to delete?',"You might lost some data!",
-      function () {
-        me.disableForm(true);
-        riques(Query.deleteCategoryPermanentQry(idList), 
-          function(error, response, body) {
-            if (!error && !body.errors && response.statusCode === 200) {
-              var here = me;
-              var cb = function(){here.disableForm(false)}
-              // me.loadData("All", cb);
-            } else {
-              errorCallback(error, body.errors?body.errors[0].message:null);
-              me.disableForm(false);
-            }
-          }
-        );
-  })},
+    swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
+    function () {
+      var checkedRow = document.querySelectorAll("input.category-"+me.props.slug+"Cb:checked");
+      var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
+      let listOfData = me.props.client.mutate({mutation: gql`${Query.deleteCategoryPermanentQry(idList).query}`})
+      var he = me;
+      me.disableForm(true);
+      listOfData.then(function() {
+        he.props.refetchAllMenuData().then(function() {
+          he.props.dispatch(toggleSelectedItemState(false));
+          he.disableForm(false);
+        })
+      })
+    });
+  },
   disableForm: function(state){
     disableForm(state, this.notif);
     this.props.dispatch(maskArea(state));
