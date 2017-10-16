@@ -57,6 +57,11 @@ export const toggleSelectedItemState = (isSelected) => ({
   isSelected
 })
 
+export const seteSelectedItem = (itemSelected) => ({
+  type: 'SELECTED_ITEM',
+  itemSelected
+})
+
 export const setSlug = (slug, isEditorEnabled) => ({
   type: 'UPDATE_SLUG',
   slug,
@@ -217,6 +222,11 @@ export const setOptions = (options) => ({
 export const setNameValue = (name)  => ({
   type: 'SET_NAME_VALUE',
   name
+})
+
+export const setNameTag = (nameTag)  => ({
+  type: 'SET_NAME_TAG',
+  nameTag
 })
 
 export const setId = (postId)  => ({

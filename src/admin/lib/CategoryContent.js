@@ -3,10 +3,13 @@ import Query from '../query';
 import _ from 'lodash';
 import Notification from 'react-notification-system';
 import Halogen from 'halogen'
-import {riques, hasRole, errorCallback, getValue, setValue, removeTags, swalert, disableForm, defaultHalogenStyle} from '../../utils';
+import {riques, hasRole, errorCallback, removeTags, swalert, disableForm, defaultHalogenStyle} from '../../utils';
 import {TableTagCat, SearchBox, DeleteButtons} from '../lib/Table';
 import {connect} from 'react-redux'
+import {reduxForm, Field, formValueSelector} from 'redux-form';
 import {setNameValue, setDescription, setModeNameIdDes, setId, initContentList, maskArea, setEditorMode, toggleSelectedItemState} from '../../actions'
+import gql from 'graphql-tag';
+import {graphql, withApollo} from 'react-apollo';
 
 let CategoryContent = React.createClass({
   propTypes: {
@@ -40,54 +43,23 @@ let CategoryContent = React.createClass({
     }
   },
   dt: null,
-  loadData: function(type, callback) {
+  handleDeleteBtn: function(event){
     var me = this;
-    var qry = Query.getAllCategoryQry(this.props.postType);
-    riques(qry, 
-      function(error, response, body) {
-        if (body.data) { 
-          var monthList = ["all"];
-          var _dataArr = [];
-
-          _.forEach(body.data.viewer.allCategories.edges, function(item){
-            _dataArr.push({
-              "postId": item.node.id,
-              "name": item.node.name,
-              "description": item.node.description!==null?item.node.description:"",
-              "count": item.node.post.edges.length
-            });
-          });
-
-          var bEdit = hasRole('modify-category');
-          me.table.loadData(_dataArr, bEdit);
-          me.props.dispatch(initContentList(monthList))
-          if (callback) callback.call();
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-      }
-    );
+    swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
+    function () {
+      var checkedRow = document.querySelectorAll("input.category-"+me.props.slug+"Cb:checked");
+      var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
+      let listOfData = me.props.client.mutate({mutation: gql`${Query.deleteCategoryPermanentQry(idList).query}`})
+      var he = me;
+      me.disableForm(true);
+      listOfData.then(function() {
+        he.props.refetchAllMenuData().then(function() {
+          he.props.dispatch(toggleSelectedItemState(false));
+          he.disableForm(false);
+        })
+      })
+    });
   },
-  handleDeleteBtn: function(event){;
-    var me = this;
-    var checkedRow = document.querySelectorAll("input.category-"+this.props.slug+"Cb:checked");
-    var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
-    swalert('warning','Sure want to delete?',"You might lost some data!",
-      function () {
-        me.disableForm(true);
-        riques(Query.deleteCategoryPermanentQry(idList), 
-          function(error, response, body) {
-            if (!error && !body.errors && response.statusCode === 200) {
-              var here = me;
-              var cb = function(){here.disableForm(false)}
-              me.loadData("All", cb);
-            } else {
-              errorCallback(error, body.errors?body.errors[0].message:null);
-              me.disableForm(false);
-            }
-          }
-        );
-  })},
   disableForm: function(state){
     disableForm(state, this.notif);
     this.props.dispatch(maskArea(state));
@@ -96,28 +68,13 @@ let CategoryContent = React.createClass({
     var checkedRow = document.querySelectorAll("input.category-"+this.props.slug+"Cb:checked");
     this.props.dispatch(toggleSelectedItemState(checkedRow.length>0));
   },
-  handleNameChange: function(event){
-    event.preventDefault();
-    var name = getValue("name");
-    // var postId = this.props.postId;
-    // var description = this.props.description;
-    // this.props.dispatch(setModeNameIdDes("update", name, postId, description))
-    // this.props.dispatch(setEditorMode("update"))
-    this.props.dispatch(setNameValue(name))
-    // this.props.dispatch(setNameValue(postId))
-  },
-  handleDescription: function(event){
-    event.preventDefault();
-    // var name = getValue("name");
-    // var postId = this.props.postId;
-    var description = getValue("description");
-    // this.props.dispatch(setModeNameIdDes("update", name, postId, description))
-    // this.props.dispatch(setEditorMode("update"))
-    this.props.dispatch(setDescription(description))
-    // this.props.dispatch(setNameValue(postId))
-  },
   handleViewPage: function(categoryId){
     this.props.handleNav(this.props.slug,'bycategory', categoryId);
+  },
+  notifyUnsavedData: function(state){
+    if (this.props.handleUnsavedData){
+      this.props.handleUnsavedData(state)
+    }
   },
   onAfterTableLoad: function(){
     var me = this;
@@ -128,11 +85,10 @@ let CategoryContent = React.createClass({
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
       var description = removeTags(row[2]);
-      setValue("name", name);
-      setValue("description", description);
-
+      me.props.change('name', name);
+      me.props.change('description', description);
+      me.notifyUnsavedData(true);
       me.props.dispatch(setModeNameIdDes("update", name, postId, description))
-      // me.props.dispatch(setId(postId));
     }
     var names = document.getElementsByClassName('nameText');
     _.forEach(names, function(item){
@@ -157,49 +113,55 @@ let CategoryContent = React.createClass({
     var datatable = this.table.datatable;
     this.refs.rendactSearchBox.bindToTable(datatable);
     this.dt = datatable;
-    this.loadData("All");
+  },
+  componentWillReceiveProps(props){
+    if(props._dataArr!==this.props._dataArr ){
+      this.table.loadData(props._dataArr, props.bEdit);
+    }
+    // this.props.dispatch(initContentList(props.monthList))
   },
   handleSubmit: function(event){
-    event.preventDefault();
+    // event.preventDefault();
     var me = this;
-    var name = getValue("name");
-    var name1 = this.props.name;
-    var description = getValue("description");
-    var description1 = this.props.description;
+    var name = this.props.name;
+    var description = this.props.description;
+    var postId = this.props.postId;
     var type = me.props.postType;
-    var qry = "", noticeTxt = "";
-    debugger
-    me.disableForm(true);
-    if (this.props.mode==="create") {
-      qry = Query.createCategory(name, description, type);
+    var noticeTxt = "";
+    var listOfData = "";
+
+    if (this.props.mode==="create"){
       noticeTxt = 'Category Published!';
-    } else {
-      qry = Query.updateCategory(this.props.postId, name, description, type);
+      listOfData = me.props.client.mutate({
+        mutation: gql`${Query.createCategory(name, description, type).query}`,
+        variables: Query.createCategory(name, description, type).variables
+      })
+    }else{
       noticeTxt = 'Category Updated!';
+      listOfData = me.props.client.mutate({
+        mutation: gql`${Query.updateCategory(postId, name, description, type).query}`,
+        variables: Query.updateCategory(postId, name, description, type).variables
+      })
     }
-    riques(qry, 
-      function(error, response, body) { 
-        if (!error && !body.errors && response.statusCode === 200) {
-          me.notif.addNotification({
-                  message: noticeTxt,
-                  level: 'success',
-                  position: 'tr',
-                  autoDismiss: 2
-          });
+
+    this.disableForm(true);
+    listOfData.then(function() {
+        me.props.refetchAllMenuData().then(function() {
           me.resetForm();
-          var here = me;
-          var cb = function(){here.disableForm(false)}
-          me.loadData("All", cb);
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-        me.disableForm(false);
-      });
+          me.notif.addNotification({
+              message: noticeTxt,
+              level: 'success',
+              position: 'tr',
+              autoDismiss: 2
+            });
+          me.disableForm(false);
+        })
+    })
   },
   resetForm: function(){
     document.getElementById("pageForm").reset();
-    setValue("name", "");
-    setValue("description", "");
+    this.props.change('name', "");
+    this.props.change('description', "");
     this.props.dispatch(setEditorMode("create"))
     window.history.pushState("", "", '/admin/category');
   },
@@ -225,21 +187,21 @@ let CategoryContent = React.createClass({
                 <div className="container-fluid">
                   <div className="row">
                     <div className="col-xs-4" style={{marginTop: 40}}>
-                    <form onSubmit={this.handleSubmit} id="pageForm" method="get">
+                    <form onSubmit={this.props.handleSubmit(this.handleSubmit)} id="pageForm" method="get">
                       <div className="form-group">
                         <h4><b>{this.props.mode==="create"?"Add New Category":"Edit Category"}</b></h4>
                       </div>
                       <div className="form-group">
                           <label htmlFor="name" >Category name</label>
                           <div >
-                            <input type="text" name="name" id="name" className="form-control" required="true" onChange={this.handleNameChange}/>
+                            <Field component="input" type="text" name="name" id="name" className="form-control" required="true"/>
                             <p className="help-block">The name appears on your site</p>
                           </div>
                       </div>
                       <div className="form-group">
                         <label htmlFor="homeUrl" >Description</label>
                         <div >
-                          <textarea name="description" id="description" className="form-control" onChange={this.handleDescription}></textarea>
+                          <Field component="textarea" name="description" id="description" className="form-control" />
                           <p className="help-block">The description is not prominent by default; however, some themes may show it.</p>
                         </div>
                       </div>
@@ -292,12 +254,88 @@ let CategoryContent = React.createClass({
     )},
 });
 
+const selector = formValueSelector('categoryContentForm');
+
 const mapStateToProps = function(state){
+  var customStates = {
+    name: selector(state, 'name'),
+    description: selector(state, 'description')
+  }
+
   if (!_.isEmpty(state.categoryContent)) {
-    // debugger
-    return _.head(state.categoryContent)
+    var out = _.head(state.categoryContent);
+    out = {...out, ...customStates}
+    // return _.head(state.categoryContent)
+    return out
   } else return {}
 }
 
+CategoryContent = reduxForm({
+  form: 'categoryContentForm'
+})(CategoryContent)
+
 CategoryContent = connect(mapStateToProps)(CategoryContent)
+
+let getAllCategoryQry = gql`
+  query getCategories ($type: String!){
+    viewer {
+      allCategories (where: {type: {eq: $type}}) {
+        edges {
+          node {
+            id,
+            name,
+            description,
+            post {
+              edges {
+                node{
+                  id
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`
+
+CategoryContent = graphql(getAllCategoryQry,
+  { 
+    options: props => ({
+      variables: {
+        type: props.postType,
+      },
+    }),
+    props: ({ownProps, data}) => {
+    if (!data.loading) {
+      let allCategories = data.viewer.allCategories.edges;
+      allCategories = _.map(allCategories, item => item.node)
+      var monthList = ["all"];
+      var _dataArr = [];
+
+      _.forEach(allCategories, function(item){
+        _dataArr.push({
+          "postId": item.id,
+          "name": item.name,
+          "description": item.description,
+          "count": item.post.edges.length
+        });
+      });
+      var bEdit = hasRole('modify-tag');
+
+      return{
+        isLoading: false,
+        _dataArr : _dataArr,
+        bEdit : bEdit,
+        refetchAllMenuData : data.refetch,
+        monthList: monthList,
+      }
+    } else { 
+        return {
+          isLoading: true
+        }
+      }
+  }
+})(CategoryContent)
+CategoryContent = withApollo(CategoryContent);
+
 export default CategoryContent;
