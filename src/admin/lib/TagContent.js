@@ -122,7 +122,7 @@ let TagContent = React.createClass({
     var postId = this.props.postId;
     var type = this.props.postType;
     var noticeTxt = "";
-    var listOfData = ";"
+    var listOfData = "";
     if (this.props.mode==="create"){
       noticeTxt = 'Tag Published!';
       listOfData = me.props.client.mutate({

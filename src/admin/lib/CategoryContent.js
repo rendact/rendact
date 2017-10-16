@@ -113,7 +113,6 @@ let CategoryContent = React.createClass({
     var datatable = this.table.datatable;
     this.refs.rendactSearchBox.bindToTable(datatable);
     this.dt = datatable;
-    // this.loadData("All");
   },
   componentWillReceiveProps(props){
     if(props._dataArr!==this.props._dataArr ){
@@ -128,73 +127,36 @@ let CategoryContent = React.createClass({
     var description = this.props.description;
     var postId = this.props.postId;
     var type = me.props.postType;
+    var noticeTxt = "";
+    var listOfData = "";
 
-    // if (this.props.mode==="create") {
-    //   qry = Query.createCategory(name, description, type);
-    //   noticeTxt = 'Category Published!';
-    // } else {
-    //   qry = Query.updateCategory(this.props.postId, name, description, type);
-    //   noticeTxt = 'Category Updated!';
-    // }
-    // riques(qry, 
-    //   function(error, response, body) { 
-    //     if (!error && !body.errors && response.statusCode === 200) {
-    //       me.notif.addNotification({
-    //               message: noticeTxt,
-    //               level: 'success',
-    //               position: 'tr',
-    //               autoDismiss: 2
-    //       });
-    //       me.resetForm();
-    //       var here = me;
-    //       var cb = function(){here.disableForm(false)}
-    //       // me.loadData("All", cb);
-    //     } else {
-    //       errorCallback(error, body.errors?body.errors[0].message:null);
-    //     }
-    //     me.disableForm(false);
-    //   });
     if (this.props.mode==="create"){
-      let listOfData = me.props.client.mutate({
+      noticeTxt = 'Category Published!';
+      listOfData = me.props.client.mutate({
         mutation: gql`${Query.createCategory(name, description, type).query}`,
         variables: Query.createCategory(name, description, type).variables
       })
-      var he = me;
-      me.disableForm(true);
-      listOfData.then(function() {
-        he.props.refetchAllMenuData().then(function() {
-          // he.props.dispatch(toggleSelectedItemState(false));
-          he.resetForm();
-          he.notif.addNotification({
-              message: 'Category Published!',
-              level: 'success',
-              position: 'tr',
-              autoDismiss: 2
-            });
-          he.disableForm(false);
-        })
-      })
     }else{
-      let listOfData = me.props.client.mutate({
+      noticeTxt = 'Category Updated!';
+      listOfData = me.props.client.mutate({
         mutation: gql`${Query.updateCategory(postId, name, description, type).query}`,
         variables: Query.updateCategory(postId, name, description, type).variables
       })
-      var he = me;
-      me.disableForm(true);
-      listOfData.then(function() {
-        he.props.refetchAllMenuData().then(function() {
-          // he.props.dispatch(toggleSelectedItemState(false));
-          he.resetForm();
-          he.notif.addNotification({
-              message: 'Category Updated!',
+    }
+
+    this.disableForm(true);
+    listOfData.then(function() {
+        me.props.refetchAllMenuData().then(function() {
+          me.resetForm();
+          me.notif.addNotification({
+              message: noticeTxt,
               level: 'success',
               position: 'tr',
               autoDismiss: 2
             });
-          he.disableForm(false);
+          me.disableForm(false);
         })
-      })
-    }
+    })
   },
   resetForm: function(){
     document.getElementById("pageForm").reset();
