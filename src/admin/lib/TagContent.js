@@ -125,6 +125,7 @@ let TagContent = React.createClass({
     // this.disableForm(true);
     var qry = "", noticeTxt = "";
     if (this.props.mode==="create"){
+      
       qry = Query.createTag(name, type);
       noticeTxt = 'Tag Published!';
       riques(qry, 
@@ -145,7 +146,7 @@ let TagContent = React.createClass({
           }
           me.disableForm(false);
         });
-      
+
       // let listOfData = me.props.client.mutate({mutation: gql`${Query.createTag(name, type).query}`})
       // var he = me;
       // me.disableForm(true);
