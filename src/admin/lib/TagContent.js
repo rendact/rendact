@@ -94,7 +94,6 @@ let TagContent = React.createClass({
       var row = me.table.datatable.data()[index];
       var postId = this.id.split("-")[1];
       var name = removeTags(row[1]);
-      // me.props.dispatch(setNameTag(name));
       me.props.change('name', name);
       me.notifyUnsavedData(true);
       me.props.dispatch(setModeNameId("update", name, postId));
@@ -125,7 +124,7 @@ let TagContent = React.createClass({
     // this.disableForm(true);
     var qry = "", noticeTxt = "";
     if (this.props.mode==="create"){
-      
+
       qry = Query.createTag(name, type);
       noticeTxt = 'Tag Published!';
       riques(qry, 

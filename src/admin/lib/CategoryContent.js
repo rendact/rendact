@@ -43,55 +43,7 @@ let CategoryContent = React.createClass({
     }
   },
   dt: null,
-  // loadData: function(type, callback) {
-  //   var me = this;
-  //   var qry = Query.getAllCategoryQry(this.props.postType);
-  //   riques(qry, 
-  //     function(error, response, body) {
-  //       if (body.data) { 
-  //         var monthList = ["all"];
-  //         var _dataArr = [];
-
-  //         _.forEach(body.data.viewer.allCategories.edges, function(item){
-  //           _dataArr.push({
-  //             "postId": item.node.id,
-  //             "name": item.node.name,
-  //             "description": item.node.description!==null?item.node.description:"",
-  //             "count": item.node.post.edges.length
-  //           });
-  //         });
-
-  //         var bEdit = hasRole('modify-category');
-  //         me.table.loadData(_dataArr, bEdit);
-  //         me.props.dispatch(initContentList(monthList))
-  //         if (callback) callback.call();
-  //       } else {
-  //         errorCallback(error, body.errors?body.errors[0].message:null);
-  //       }
-  //     }
-  //   );
-  // },
-  handleDeleteBtn: function(event){;
-    // var me = this;
-    // var checkedRow = document.querySelectorAll("input.category-"+this.props.slug+"Cb:checked");
-    // var idList = _.map(checkedRow, function(item){ return item.id.split("-")[1]});
-    // swalert('warning','Sure want to delete?',"You might lost some data!",
-    //   function () {
-    //     me.disableForm(true);
-    //     riques(Query.deleteCategoryPermanentQry(idList), 
-    //       function(error, response, body) {
-    //         if (!error && !body.errors && response.statusCode === 200) {
-    //           var here = me;
-    //           var cb = function(){here.disableForm(false)}
-    //           // me.loadData("All", cb);
-    //         } else {
-    //           errorCallback(error, body.errors?body.errors[0].message:null);
-    //           me.disableForm(false);
-    //         }
-    //       }
-    //     );
-    //   }
-    // )},
+  handleDeleteBtn: function(event){
     var me = this;
     swalert('warning','Sure want to delete permanently?','You might lost some data forever!',
     function () {
