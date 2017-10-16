@@ -1,9 +1,7 @@
 import React from 'react' 
-import map from 'lodash/map'
 import {getTemplateComponent, theTitle, theContent, theExcerpt, theMenu,getWidgets, theLogo, theImage, thePagination} from './../includes'
 import {aboutUsWidget, contactUsWidget, recentPostWidget} from '../../widgets';
 import Loadable from 'react-loadable';
-import {preload} from '../../../Routes'
 
 
 let HomeParent = React.createClass({
@@ -37,7 +35,6 @@ let HomeParent = React.createClass({
 		require ('bootstrap/dist/css/bootstrap.css');
     require('../../../theme/'+c.path+'/css/style.css');
     require('../../../theme/'+c.path+'/functions.js');
-    preload()
 	},
 
 	render(){

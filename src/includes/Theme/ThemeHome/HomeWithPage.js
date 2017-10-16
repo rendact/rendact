@@ -1,6 +1,6 @@
 import React from 'react'
 import {gql, graphql} from 'react-apollo';
-import HomeParent from './HomeParent';
+import {preload} from '../../../Routes'
 
 var getPost = gql`query ($postId: ID!) {
 	getPost(id:$postId){ 
@@ -25,8 +25,15 @@ var getPost = gql`query ($postId: ID!) {
   }
 }
 `
+class HomeWithPage extends React.Component {
+  componentDidMount(){
+    preload()
+  }
 
-let HomeWithPage = (props) => (<HomeParent {...props} data={props.data.getPost}/>)
+  render(){
+    return <this.props.component {...this.props} data={this.props.data.getPost}/>
+  }
+}
 
 HomeWithPage = graphql(getPost, {
   options: (props) => ({

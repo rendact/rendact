@@ -26,9 +26,9 @@ class ThemeHome extends React.Component{
     }
 
     if(this.props.config.frontPage === 'latestPost'){
-      return <HomeWithLatestPost {...this.props}/>
+      return <HomeWithLatestPost component={HomeParent} {...this.props}/>
     } else {
-      return <HomeWithPage {...this.props} pageId={this.props.config.pageAsHomePage}/>
+      return <HomeWithPage {...this.props} component={HomeParent} pageId={this.props.config.pageAsHomePage}/>
     }
 
   }

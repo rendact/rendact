@@ -1,8 +1,8 @@
 import React from 'react';
 import {gql, graphql} from 'react-apollo';
 import {connect} from 'react-redux';
-import HomeParent from './HomeParent';
 import {setActivePageOnPagination} from '../../../actions/setActivePageOnPagination';
+import {preload} from '../../../Routes'
 
 var pagePerPost = 5;
 let getPostList = gql`
@@ -59,8 +59,12 @@ class HomeWithLatestPost extends React.Component{
     return this.props.allPosts ?  this.props.allPosts.slice (start, start+this.props.postPerPage) : null
   }
 
+  componentDidMount(){
+    preload()
+  }
+
   render(){
-    return <HomeParent {...this.props} data={this.postSliced()} handlePageClick={this.handlePageClick}/>
+    return <this.props.component {...this.props} data={this.postSliced()} handlePageClick={this.handlePageClick}/>
   }
 }
 
