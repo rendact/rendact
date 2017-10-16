@@ -119,37 +119,66 @@ let TagContent = React.createClass({
   handleSubmit: function(event){
     // event.preventDefault();
     var me = this;
-    var nameTag = this.props.nameTag;
     var name = this.props.name;
     var postId = this.props.postId;
     var type = this.props.postType;
-    this.disableForm(true);
+    // this.disableForm(true);
     var qry = "", noticeTxt = "";
     if (this.props.mode==="create"){
       qry = Query.createTag(name, type);
       noticeTxt = 'Tag Published!';
+      riques(qry, 
+        function(error, response, body) { 
+          if (!error && !body.errors && response.statusCode === 200) {
+            me.notif.addNotification({
+                    message: noticeTxt,
+                    level: 'success',
+                    position: 'tr',
+                    autoDismiss: 2
+            });
+            me.resetForm();
+            var here = me;
+            var cb = function(){here.disableForm(false)}
+            // me.loadData("All", cb);
+          } else {
+            errorCallback(error, body.errors?body.errors[0].message:null);
+          }
+          me.disableForm(false);
+        });
+      
+      // let listOfData = me.props.client.mutate({mutation: gql`${Query.createTag(name, type).query}`})
+      // var he = me;
+      // me.disableForm(true);
+      // listOfData.then(function() {
+      //   he.props.refetchAllMenuData().then(function() {
+      //     // he.props.dispatch(toggleSelectedItemState(false));
+      //     he.resetForm();
+      //     he.disableForm(false);
+      //   })
+      // })
     }else{
       qry = Query.UpdateTag(postId, name, type);
       noticeTxt = 'Tag Updated!';
+      riques(qry, 
+        function(error, response, body) { 
+          if (!error && !body.errors && response.statusCode === 200) {
+            me.notif.addNotification({
+                    message: noticeTxt,
+                    level: 'success',
+                    position: 'tr',
+                    autoDismiss: 2
+            });
+            me.resetForm();
+            var here = me;
+            var cb = function(){here.disableForm(false)}
+            // me.loadData("All", cb);
+          } else {
+            errorCallback(error, body.errors?body.errors[0].message:null);
+          }
+          me.disableForm(false);
+        });
     }
-    riques(qry, 
-      function(error, response, body) { 
-        if (!error && !body.errors && response.statusCode === 200) {
-          me.notif.addNotification({
-                  message: noticeTxt,
-                  level: 'success',
-                  position: 'tr',
-                  autoDismiss: 2
-          });
-          me.resetForm();
-          var here = me;
-          var cb = function(){here.disableForm(false)}
-          // me.loadData("All", cb);
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
-        }
-        me.disableForm(false);
-      });
+      
   },
   componentDidMount: function(){
     this.notif = this.refs.notificationSystem;

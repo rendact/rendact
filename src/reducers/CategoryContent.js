@@ -1,4 +1,12 @@
-const categoryContent = (state = [], action) => {
+const INITIAL_VALUES =  [{
+      isProcessing: false,
+      opacity: 1,
+      itemSelected: false,
+      mode: "create",
+    }]
+
+const categoryContent = (state = INITIAL_VALUES, action) => {
+  // const categoryContent = (state = [], action) => {
   switch (action.type) {
     case 'INIT_CONTENT_LIST':
       return [
