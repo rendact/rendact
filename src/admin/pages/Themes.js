@@ -40,23 +40,9 @@ var Themes = React.createClass({
   handleChangeTheme: function(e){
     var me = this;
     var value = {}
-    var defaultTheme = {
-      id: 'default',
-      name: 'Default',
-      path: 'default'
-    }
 
-    var landingTheme = {
-      id: 'landing',
-      name: 'X Landing',
-      path: 'x-landing'
-    }
-
-    if (this.props.activeTheme.name === "Default") {
-      value = landingTheme  
-    } else {
-      value = defaultTheme  
-    }
+    var themeName = e.currentTarget.getAttribute("data");
+    var themeData = _.find(this.props.themes, {node: {name: themeName}}).node;
 
     disableForm(true);
     this.props.client.mutate({
@@ -74,7 +60,7 @@ var Themes = React.createClass({
       variables: {
         "input": {
           "id": "T3B0aW9uczo5NQ==",
-          "value": JSON.stringify(value)
+          "value": JSON.stringify(themeData)
         }
       }
     }).then(data => {
@@ -85,14 +71,14 @@ var Themes = React.createClass({
         position: 'tr',
         autoDismiss: 2
       });
-      saveConfig("activeTheme", value);
+      saveConfig("activeTheme", JSON.stringify(themeData));
 
       me.props.client.query({
         query: getThemesQry
       }).then(body => {
         var data = _.clone(body.data.viewer.allThemes.edges); 
-        var activeTheme = _.find(data, {node: {name: value.name}});
-        _.remove(data, {node: {name: value.name}});
+        var activeTheme = _.find(data, {node: {name: themeData.name}});
+        _.remove(data, {node: {name: themeData.name}});
         me.props.dispatch(setThemesList(_.concat(activeTheme, data)))
       })
     })
@@ -154,7 +140,7 @@ var Themes = React.createClass({
                                           <h3>{item.node.name}</h3>
                                           <p>{item.node.description}</p>
                                           <p><div className="pull-right box-tools">
-                                            <button href="#"  className="btn btn-primary" style={{marginRight:10}} onClick={this.handleChangeTheme}>
+                                            <button href="#"  className="btn btn-primary" style={{marginRight:10}} data={item.node.name} onClick={this.handleChangeTheme}>
                                               {this.props.activeTheme.name===item.node.name?"Customize":"Activate"}
                                             </button>
                                             <button href="#" className="btn btn-default">Preview</button>
