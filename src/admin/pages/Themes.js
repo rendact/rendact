@@ -17,6 +17,7 @@ const getThemesQry = gql`
             id,
             name,
             description,
+            path,
             screenshot {
               id
               blobUrl
