@@ -42,8 +42,6 @@ let ThemeSingle = React.createClass({
 
 	componentDidMount(){
 		var c = window.config.theme;
-		require ('bootstrap/dist/css/bootstrap.css');
-		require('../../theme/'+c.path+'/css/style.css');
 		require('../../theme/'+c.path+'/functions.js');
     preload()
 	},
