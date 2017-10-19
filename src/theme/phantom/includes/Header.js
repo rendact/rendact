@@ -2,6 +2,10 @@ import React from 'react';
 import {Link} from 'react-router';
 
 class Header extends React.Component {
+  handleMenuClick(e){
+    e.preventDefault()
+    document.body.className = "is-menu-visible"
+  }
   render(){
     return (
         <header id="header" style={{background: "#fff"}}>
@@ -16,7 +20,7 @@ class Header extends React.Component {
 
             <nav>
               <ul>
-                <li><a href="#menu">Menu</a></li>
+                <li><a onClick={this.handleMenuClick} href="#menu">Menu</a></li>
               </ul>
             </nav>
           </div>

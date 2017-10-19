@@ -2,6 +2,7 @@ import React from 'react';
 import Header from '../includes/Header';
 import Footer from '../includes/Footer';
 import PostList from '../includes/PostList';
+import MenuItems from '../includes/MenuItems';
 
 class Home extends React.Component {
   componentDidMount(){
@@ -12,6 +13,7 @@ class Home extends React.Component {
   
   render(){
     return (
+      <div>
       <div id="wrapper" style={{background: "#fff"}}>
         <Header {...this.props}/>
         <div id="main">
@@ -33,6 +35,8 @@ class Home extends React.Component {
           </div>
         </div>
         <Footer {...this.props}/>
+      </div>
+      <MenuItems {...this.props}/>
       </div>
     )
   }
