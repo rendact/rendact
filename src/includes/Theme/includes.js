@@ -6,6 +6,7 @@ import {Menu} from '../Menu.js';
 import AdminConfig from '../../admin/AdminConfig';
 import {Link} from 'react-router'
 import Loadable from 'react-loadable';
+const path = require('path');
 
 const InvalidTheme = Loadable({
   loader: () => import(/* webpackChunkName: "invalidTheme"*/'./InvalidTheme'),
@@ -20,8 +21,8 @@ window.config = AdminConfig;
 export function getTemplateComponent(type){
 	//var c = window.config.theme;
 	var c = JSON.parse(
-						JSON.parse(localStorage.getItem("config")).activeTheme
-					)
+		JSON.parse(localStorage.getItem("config")).activeTheme
+	)
 	
   const importing = (name) => (
     `${c.path}/layouts/${name}.js`
@@ -37,10 +38,8 @@ export function getTemplateComponent(type){
 	if (c.name==null || c.path==null) {
 		return InvalidTheme;
 	}
-
   let x = themeMap[type]
-  return x ? require('../../theme/' + x).default : InvalidTheme
-
+  return x ? require("themes/"+x).default : InvalidTheme
 }
 
 export function theContent(content){
@@ -67,11 +66,14 @@ export function theLogo(onClickHandler){
 
 export function theImage(image, pageCount, activePage, handlePageClick){
 	var fImage="";
+	var c = JSON.parse(
+		JSON.parse(localStorage.getItem("config")).activeTheme
+	)
 	if(image!=null){
  			fImage=image.blobUrl;
  		}
  		else{
- 			fImage=require('../../theme/default/images/logo.png');
+ 			fImage=require('themes/'+c.path+'/images/logo.png');
  		}
 	return <a href="article" className="mask"><img src={fImage} alt="" className="img-responsive img-thumbnail" /></a>
 }

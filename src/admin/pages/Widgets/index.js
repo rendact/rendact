@@ -12,12 +12,12 @@ import {
   maskArea,
 } from '../../../actions';
 
-
 class Widgets extends React.Component {
   constructor(props){
     super(props);
 
-    var themeFunctions = require('../../../theme/default/functions.js');
+    var c = window.config;
+    var themeFunctions = require('themes/'+c.path+'/functions.js');
     themeFunctions.default();
   }
 

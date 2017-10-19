@@ -2,7 +2,6 @@ import React from 'react'
 import {getTemplateComponent, theTitle, theContent, theExcerpt, theMenu,getWidgets, theLogo, theImage, thePagination} from './../includes'
 import {aboutUsWidget, contactUsWidget, recentPostWidget} from '../../widgets';
 
-
 let HomeParent = React.createClass({
 	propTypes: {
     loadDone: React.PropTypes.bool,
@@ -31,12 +30,15 @@ let HomeParent = React.createClass({
 
 	componentDidMount(){
 		var c = window.config.theme;
-    require('../../../theme/'+c.path+'/functions.js');
+		
+		require('bootstrap/dist/css/bootstrap.css');
+		require("themes/"+ c.path  +"/css/style.css");
+		require("themes/"+ c.path +"/functions.js");
 	},
 
 	render(){
         let Home = getTemplateComponent('home')    
-				return <Home 
+        return <Home 
 					data={this.props.data}
 					theTitle={theTitle}
 					theContent={theContent}

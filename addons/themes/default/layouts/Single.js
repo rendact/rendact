@@ -4,7 +4,7 @@ import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
 import Notification from 'react-notification-system';
 import moment from 'moment'
-import CommentForm from '../../../includes/Theme/CommentForm';
+import CommentForm from '../../../../src/includes/Theme/CommentForm';
 import Halogen from 'halogen'
 
 let Single = React.createClass({

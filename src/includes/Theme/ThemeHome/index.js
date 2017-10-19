@@ -3,7 +3,7 @@ import {saveConfig} from '../../../utils/saveConfig';
 import gql from 'graphql-tag'
 import {graphql} from 'react-apollo';
 import Loadable from 'react-loadable'
-
+const path = require('path');
 
 
 const HomeParent = Loadable({

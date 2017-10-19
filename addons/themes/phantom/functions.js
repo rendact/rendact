@@ -1,4 +1,4 @@
-import {registerWidgetArea} from '../../includes/widgetUtils'
+import {registerWidgetArea} from '../../../src/includes/widgetUtils'
 
 const functions = function(){		
 	registerWidgetArea("Sidebar");

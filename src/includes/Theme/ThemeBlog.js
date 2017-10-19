@@ -52,7 +52,9 @@ let ThemeBlog = React.createClass({
 	},
 	componentDidMount(){
 		var c = window.config.theme;
-		require('../../theme/'+c.path+'/functions.js');
+		require ('bootstrap/dist/css/bootstrap.css');
+		require(c.path+'/css/style.css');
+		require(c.path+'/functions.js');
     preload()
 	},
 

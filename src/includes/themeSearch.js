@@ -15,6 +15,7 @@ import Query from '../admin/query';
 import {gql, graphql} from 'react-apollo'
 import Loadable from 'react-loadable';
 
+const path = require('path');
 
 class ThemeSearch extends React.Component {
 	constructor(props){
@@ -37,8 +38,8 @@ class ThemeSearch extends React.Component {
   componentDidMount(){
 		var c = window.config.theme;
 		require ('bootstrap/dist/css/bootstrap.css');
-		require('../theme/'+c.path+'/css/style.css');
-		require('../theme/'+c.path+'/functions.js');
+		require('themes/'+c.path+'/css/style.css');
+		require('themes/'+c.path+'/functions.js');
   }
 
   render(){
