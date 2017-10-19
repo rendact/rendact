@@ -7,6 +7,10 @@ import {Link} from 'react-router';
 import Halogen from 'halogen';
 
 class Search extends React.Component {
+  componentDidMount(){
+    require('../css/style.css')
+    require('bootstrap/dist/css/bootstrap.css')
+  }
   renderSearchResult(){
     if (this.props.isProcessing){
       return <div><Halogen.PulseLoader color='green'/></div>

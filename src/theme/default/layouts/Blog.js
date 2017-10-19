@@ -4,6 +4,11 @@ import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
 
 const Blog = React.createClass({
+  componentDidMount(){
+
+    require('../css/style.css')
+    require('bootstrap/dist/css/bootstrap.css')
+  },
 	render: function() {
 		return (
 			<div className="application">

@@ -11,6 +11,10 @@ const HomeContent = Loadable({
 })
 
 const Home = React.createClass({
+  componentDidMount(){
+    require('../css/style.css')
+    require('bootstrap/dist/css/bootstrap.css')
+  },
 	render: function() {
 		return (
 			<div className="application">

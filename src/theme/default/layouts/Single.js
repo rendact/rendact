@@ -10,6 +10,8 @@ import Halogen from 'halogen'
 let Single = React.createClass({
 	componentDidMount: function() {
   	this.notification = this.refs.notificationSystem;
+    require('../css/style.css')
+    require('bootstrap/dist/css/bootstrap.css')
 	},
 	render: function() {
 		return (

@@ -3,6 +3,48 @@ import Header from '../includes/Header';
 import Footer from '../includes/Footer';
 import PostList from '../includes/PostList';
 import MenuItems from '../includes/MenuItems';
+class HomeWithPostList extends React.Component {
+  render(){
+    return (
+      <div>
+            <section className="tiles">
+              {this.props.data ? this.props.data.map(item => (
+                <PostList className={"style"+(Math.floor(Math.random() *6)+1)}
+                  image={item.imageFeatured?item.imageFeatured.blobUrl:null}
+                  content={item.content && item.content.slice(0, 100) + " ..."}
+                  title={item.title}
+                  key={item.id}
+                  id={item.id}
+                />
+              ))
+                  :null
+              }
+            </section>
+              {this.props.thePagination}
+        </div>
+    )
+  }
+}
+
+class HomeWithPage extends React.Component {
+  render(){
+    
+    let {data} = this.props;
+    return (
+      <div>
+    <span className="image main">
+
+      {data && data.imageFeatured &&
+          <img src={data.imageFeatured.blobUrl} alt={data.title}/>}
+        </span>
+        <div dangerouslySetInnerHTML={{__html: data && data.content}}/>
+      </div>
+    )
+  }
+}
+
+
+
 
 class Home extends React.Component {
   componentDidMount(){
@@ -19,20 +61,13 @@ class Home extends React.Component {
         <div id="main">
           <div className="inner">
             <header></header>
-            <section className="tiles">
-              {this.props.data ? this.props.data.map(item => (
-                <PostList className={"style"+(Math.floor(Math.random() *6)+1)}
-                  image={item.imageFeatured?item.imageFeatured.blobUrl:null}
-                  content={item.content}
-                  title={item.title}
-                  key={item.id}
-                  id={item.id}
-                />
-              ))
-                  :null
+            {this.props.loadDone &&
+                this.props.theConfig.frontPage === "latestPost"?
+                  <HomeWithPostList {...this.props}/>
+                  :
+                  <HomeWithPage {...this.props}/>
               }
-            </section>
-              {this.props.thePagination}
+              
           </div>
         </div>
         <Footer {...this.props}/>
