@@ -3,8 +3,6 @@ import Header from '../includes/Header'
 import Footer from '../includes/Footer'
 import HeaderMobile from '../includes/HeaderMobile'
 import moment from 'moment';
-import '../css/main.min.css'
-import '../css/style.css'
 import scrollToElement from 'scroll-to-element'
 import {Link} from 'react-router'
 
@@ -70,13 +68,15 @@ const Home = React.createClass({
   componentDidMount: function(){
     document.body.addEventListener('click', this.onContactLinkClick)
     document.body.addEventListener('click', this.onGotoScrollyClick)
+    require('../css/style.css')
+    require('../css/main.min.css')
   
   },
 	render: function() {
 		return (
 			<div id="page-wrapper">
 				<Header {...this.props} />	   
-						     {
+						     {this.props.theConfig &&
                    this.props.theConfig.frontPage === 'latestPost' ? 
                      <HomeContentWithLatestPost {...this.props}/>
                      :
