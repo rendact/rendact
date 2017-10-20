@@ -4,6 +4,7 @@ import Query from './query';
 import _ from 'lodash';
 import {riques, disableForm, errorCallback} from '../utils';
 import Notification from 'react-notification-system';
+import {connect} from 'react-redux'
 
 window.$ = $;
 
@@ -22,7 +23,7 @@ const mySkins = [
     "skin-green-light"
     ];
 
-const ControlSidebar = React.createClass({
+let ControlSidebar = React.createClass({
   getInitialState: function(){
     return {
       
@@ -247,7 +248,9 @@ const ControlSidebar = React.createClass({
   render: function(){
     let p = JSON.parse(localStorage.getItem("profile"));
     return (
+
       <aside className="control-sidebar control-sidebar-dark">
+
           <ul className="nav nav-tabs nav-justified control-sidebar-tabs">
             <li className="active"><a href="#control-sidebar-theme-demo-options-tab" data-toggle="tab"><i className="fa fa-wrench"></i></a></li>
             {/* <li><a href="#control-sidebar-home-tab" data-toggle="tab"><i className="fa fa-home"></i></a></li> */}
@@ -555,4 +558,13 @@ const ControlSidebar = React.createClass({
   }
 });
 
+const mapStateToProps = function(state){
+  debugger
+  if (!_.isEmpty(state.header)) {
+    var out = _.head(state.header);
+    return _.head(state.header)
+  } else return {};
+}
+
+ControlSidebar = connect(mapStateToProps)(ControlSidebar);
 export default ControlSidebar;

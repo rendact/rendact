@@ -542,3 +542,12 @@ export const setThemesList = (themes) => ({
   type: 'SET_THEMES_LIST',
   themes
 })
+
+/*
+ * Header.js
+*/
+
+export const ControlSidebar = (state) => ({
+  type: 'CONTROL_SIDEBAR',
+  state
+})

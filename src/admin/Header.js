@@ -1,7 +1,10 @@
 import React from 'react';
 import { getConfig } from '../utils';
+import {ControlSidebar} from '../actions';
+import _ from 'lodash';
+import {connect} from 'react-redux'
 
-const AdminHeader = React.createClass({
+let AdminHeader = React.createClass({
   getInitialState: function(){
     return {
       goToProfile: false
@@ -13,6 +16,10 @@ const AdminHeader = React.createClass({
         name: ''
       }
     }
+  },
+  handleControlSidebar: function(){
+    this.props.dispatch(ControlSidebar(true));
+    debugger
   },
   render: function() {
     var rootUrl = getConfig('rootUrl');
@@ -111,7 +118,7 @@ const AdminHeader = React.createClass({
               </ul>
             </li>
             <li>
-              <a href="#" data-toggle="control-sidebar"><i className="fa fa-gears"></i></a>
+              <a href="#" data-toggle="control-sidebar" onClick={this.handleControlSidebar}><i className="fa fa-gears"></i></a>
             </li>
           </ul>
         </div>
@@ -122,5 +129,13 @@ const AdminHeader = React.createClass({
     return header;
   }
 });
+const mapStateToProps = function(state){
+  debugger
+  if (!_.isEmpty(state.header)) {
+    var out = _.head(state.header);
+    return _.head(state.header)
+  } else return {};
+}
 
+AdminHeader = connect(mapStateToProps)(AdminHeader);
 export default AdminHeader;
