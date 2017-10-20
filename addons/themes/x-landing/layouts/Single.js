@@ -5,7 +5,6 @@ import Footer from '../includes/Footer'
 import HeaderMobile from '../includes/HeaderMobile'
 import Notification from 'react-notification-system';
 import moment from 'moment'
-import CommentForm from '../../../../src/includes/Theme/CommentForm';
 
 let Single = React.createClass({
 	componentDidMount: function() {
