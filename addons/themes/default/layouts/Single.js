@@ -4,7 +4,6 @@ import Sidebar from '../includes/Sidebar'
 import Footer from '../includes/Footer'
 import Notification from 'react-notification-system';
 import moment from 'moment'
-import CommentForm from '../../../../src/includes/Theme/CommentForm';
 import Halogen from 'halogen'
 
 let Single = React.createClass({
@@ -87,7 +86,7 @@ let Single = React.createClass({
 									<div className="leave">
 										<h4>Leave a comment</h4>
 									</div>
-									<CommentForm postId={this.props.postId}/>
+									{this.props.theCommentForm}
 							</div>
 					</div>
 		    </div>

@@ -1,9 +1,10 @@
 import React from 'react';
 import AdminConfig from '../../admin/AdminConfig';
 import {saveConfig} from '../../utils/saveConfig';
-import {getTemplateComponent,    getWidgets, theMenu, theLogo,   theBreadcrumb,   } from './includes'
+import {getTemplateComponent, getWidgets, theMenu, theLogo, theBreadcrumb, theCommentForm} from './includes'
 import forEach from 'lodash/forEach';
-import {searchWidget, topPostWidget, categoriesWidget, archiveWidget, aboutUsWidget, contactUsWidget, recentPostWidget} from '../widgets';
+import {searchWidget, topPostWidget, categoriesWidget, archiveWidget, aboutUsWidget, 
+        contactUsWidget, recentPostWidget} from '../widgets';
 import {graphql, gql} from 'react-apollo';
 import {connect} from 'react-redux'
 import Loadable from 'react-loadable'
@@ -61,6 +62,7 @@ let ThemeSingle = React.createClass({
 											theConfig={this.props.config}
 											getWidgets={getWidgets.bind(this)}
                       loadDone={this.props.loadDone}
+                      theCommentForm={theCommentForm(this.props.postId)}
 										/>;
 
     if (this.props.params.postId || this.props.params.pageId){
