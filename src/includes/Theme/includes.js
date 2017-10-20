@@ -9,7 +9,8 @@ import {Link} from 'react-router'
 import Loadable from 'react-loadable';
 import CommentForm from './CommentForm';
 import {registerWidgetArea} from '../widgetUtils';
-const path = require('path');
+import request from 'request';
+const vm = require('vm');
 
 const InvalidTheme = Loadable({
   loader: () => import(/* webpackChunkName: "invalidTheme"*/'./InvalidTheme'),
@@ -20,11 +21,27 @@ window.config = AdminConfig;
 
 /* Theme functions */
 
-
 export function getTemplateComponent(type){
 	var c = JSON.parse(
 		JSON.parse(localStorage.getItem("config")).activeTheme
 	)
+	/*
+	request({
+		url: "http://astrologer-forehead-75301.netlify.com/themes/default/index.js",
+		method: "GET",
+		gzip: true,
+		headers: [
+	    {
+	      name: 'content-type',
+	      value: 'application/javascript'
+	    }
+	    ],
+		}, function(error, response, body){
+			var obj = vm.runInThisContext(body, './remote/theme');
+			debugger;
+			//var widgetAreas = require("./remote/theme")["widgetArea"];		
+	})
+	*/
 	
 	var widgetAreas = require("themes/"+c.path)["widgetArea"];
 	if (widgetAreas) {
@@ -78,7 +95,12 @@ export function theImage(image, pageCount, activePage, handlePageClick){
  			fImage=image.blobUrl;
  		}
  		else{
- 			fImage=require('themes/'+c.path+'/images/logo.png');
+ 			try {
+			 fImage=require('themes/'+c.path+'/images/logo.png');
+			}
+			catch (e) {
+			 fImage=require('images/logo-128.png');
+			}
  		}
 	return <a href="article" className="mask"><img src={fImage} alt="" className="img-responsive img-thumbnail" /></a>
 }
