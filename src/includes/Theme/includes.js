@@ -1,4 +1,5 @@
 import React from 'react';
+import _ from 'lodash';
 import map from 'lodash/map'
 import get from 'lodash/get'
 import truncate from 'lodash/truncate'
@@ -6,7 +7,10 @@ import {Menu} from '../Menu.js';
 import AdminConfig from '../../admin/AdminConfig';
 import {Link} from 'react-router'
 import Loadable from 'react-loadable';
-const path = require('path');
+import CommentForm from './CommentForm';
+import {registerWidgetArea} from '../widgetUtils';
+import request from 'request';
+const vm = require('vm');
 
 const InvalidTheme = Loadable({
   loader: () => import(/* webpackChunkName: "invalidTheme"*/'./InvalidTheme'),
@@ -17,29 +21,47 @@ window.config = AdminConfig;
 
 /* Theme functions */
 
-
 export function getTemplateComponent(type){
-	//var c = window.config.theme;
 	var c = JSON.parse(
 		JSON.parse(localStorage.getItem("config")).activeTheme
 	)
+	/*
+	request({
+		url: "http://astrologer-forehead-75301.netlify.com/themes/default/index.js",
+		method: "GET",
+		gzip: true,
+		headers: [
+	    {
+	      name: 'content-type',
+	      value: 'application/javascript'
+	    }
+	    ],
+		}, function(error, response, body){
+			var obj = vm.runInThisContext(body, './remote/theme');
+			debugger;
+			//var widgetAreas = require("./remote/theme")["widgetArea"];		
+	})
+	*/
 	
-  const importing = (name) => (
-    `${c.path}/layouts/${name}.js`
-  )
+	var widgetAreas = require("themes/"+c.path)["widgetArea"];
+	if (widgetAreas) {
+		_.forEach(widgetAreas, function(widgetId){
+			registerWidgetArea(widgetId)
+		});
+	}
 
   const themeMap = {
-    home: importing('Home'),
-    blog: importing('Blog'),
-    single: importing('Single'),
-    search: importing('Search')
+    home: 'Home',
+    blog: 'Blog',
+    single: 'Single',
+    search: 'Search'
   }
 	
 	if (c.name==null || c.path==null) {
 		return InvalidTheme;
 	}
-  let x = themeMap[type]
-  return x ? require("themes/"+x).default : InvalidTheme
+  let module = themeMap[type];
+  return require("themes/"+c.path)[module]
 }
 
 export function theContent(content){
@@ -73,7 +95,12 @@ export function theImage(image, pageCount, activePage, handlePageClick){
  			fImage=image.blobUrl;
  		}
  		else{
- 			fImage=require('themes/'+c.path+'/images/logo.png');
+ 			try {
+			 fImage=require('themes/'+c.path+'/images/logo.png');
+			}
+			catch (e) {
+			 fImage=require('images/logo-128.png');
+			}
  		}
 	return <a href="article" className="mask"><img src={fImage} alt="" className="img-responsive img-thumbnail" /></a>
 }
@@ -104,7 +131,6 @@ export function goHome(e){
 }
 
 export function getWidgets(widgetArea){
-
   // add checking if the component has implemented with redux or not
   let listOfWidgets = this.props.listOfWidgets[widgetArea]?this.props.listOfWidgets[widgetArea]:[];
 	
@@ -138,5 +164,9 @@ export const getTemplates = function(){
 		
 	}
 	return template;
+}
+
+export const theCommentForm = function(postId){
+	return <CommentForm postId={postId} />
 }
 

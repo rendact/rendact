@@ -1,5 +1,5 @@
 import React from 'react' 
-import {getTemplateComponent, theTitle, theContent, theExcerpt, theMenu,getWidgets, theLogo, theImage, thePagination} from './../includes'
+import {getTemplateComponent, theTitle, theContent, theExcerpt, theMenu,getWidgets, theLogo, theImage, thePagination, theCommentForm} from './../includes'
 import {aboutUsWidget, contactUsWidget, recentPostWidget} from '../../widgets';
 
 let HomeParent = React.createClass({
@@ -30,10 +30,7 @@ let HomeParent = React.createClass({
 
 	componentDidMount(){
 		var c = window.config.theme;
-		
-		require('bootstrap/dist/css/bootstrap.css');
-		require("themes/"+ c.path  +"/css/style.css");
-		require("themes/"+ c.path +"/functions.js");
+		getTemplateComponent('functions') 
 	},
 
 	render(){
@@ -52,6 +49,7 @@ let HomeParent = React.createClass({
 					footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
 					listOfWidgets={this.props.listOfWidgets}
           loadDone={this.props.loadDone}
+          theCommentForm={theCommentForm(this.props.postId)}
 				/>
 
 	}
