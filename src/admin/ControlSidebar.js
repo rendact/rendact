@@ -30,7 +30,6 @@ let ControlSidebar = React.createClass({
     }
   },
   componentDidMount: function(){
-    debugger
     require('./lib/app.js');
     this.notification = this.refs.notificationSystem;
     
@@ -250,7 +249,7 @@ let ControlSidebar = React.createClass({
     let p = JSON.parse(localStorage.getItem("profile"));
     return (
 
-      <aside className={this.props.ControlSidebar === "true" ? "control-sidebar control-sidebar-dark control-sidebar-open" : "control-sidebar control-sidebar-dark"}>
+      <aside className={this.props.ControlSidebar === true ? "control-sidebar control-sidebar-dark control-sidebar-open" : "control-sidebar control-sidebar-dark"}>
           
           <ul className="nav nav-tabs nav-justified control-sidebar-tabs">
             <li className="active"><a href="#control-sidebar-theme-demo-options-tab" data-toggle="tab"><i className="fa fa-wrench"></i></a></li>
@@ -560,7 +559,6 @@ let ControlSidebar = React.createClass({
 });
 
 const mapStateToProps = function(state){
-  // debugger
   if (!_.isEmpty(state.header)) {
     return _.head(state.header)
   } else return {};

@@ -26,7 +26,7 @@ let AdminHeader = React.createClass({
     } else if (me.props.ControlSidebar === true) {
         value === false;
     }
-    debugger
+    
     this.props.dispatch(ControlSidebar(value));
   },
   render: function() {
@@ -138,9 +138,8 @@ let AdminHeader = React.createClass({
   }
 });
 const mapStateToProps = function(state){
-  // debugger
+
   if (!_.isEmpty(state.header)) {
-    var out = _.head(state.header);
     return _.head(state.header)
   } else return {};
 }
