@@ -17,12 +17,7 @@ import request from 'request';
 import Loadable from 'react-loadable';
 import {preload} from '../Routes'
 
-import 'jquery-ui/ui/core';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'jquery-ui/themes/base/core.css';
-import 'sweetalert2/dist/sweetalert2.css';
 
-require ('bootstrap');
 
 const ControlSidebar = Loadable({
   loader: () => import(/* webpackChunkName: "controlSidebar" */ './ControlSidebar'),
@@ -71,6 +66,11 @@ let Admin = React.createClass({
     require ('../css/AdminLTE.css');
     require ('../css/skins/_all-skins.min.css');
     require ('jquery-ui/ui/widgets/tooltip')
+require( 'jquery-ui/ui/core')
+require( 'bootstrap/dist/css/bootstrap.css')
+require( 'jquery-ui/themes/base/core.css')
+require( 'sweetalert2/dist/sweetalert2.css')
+require ('bootstrap');
     preload();
 
     AdminLTEinit();

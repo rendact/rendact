@@ -1,5 +1,4 @@
 import React from 'react'
-import 'bootstrap/dist/css/bootstrap.css'
 import {setLogged} from './actions'
 import {connect} from 'react-redux'
 import gql from 'graphql-tag'
@@ -39,7 +38,6 @@ class Login extends React.Component{
 	}
 
 	componentDidMount(){
-    preload()
 		
 		var me = this;
 		var _doAuthentication = function(authResult) {
@@ -62,9 +60,11 @@ class Login extends React.Component{
 	  this.lock.on('authenticated', _doAuthentication);
 
  		require ('font-awesome/css/font-awesome.css');
-    require( './css/Login.css')
 		require ('./css/ionicons.css');
 		require ('./css/AdminLTE.css');
+    require( 'bootstrap/dist/css/bootstrap.css')
+    require( './css/Login.css')
+    preload()
 
 		
 	}

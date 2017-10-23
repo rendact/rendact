@@ -48,8 +48,6 @@ let ThemeSingle = React.createClass({
 	},
 
 	componentDidMount(){
-		var c = window.config.theme;
-    getTemplateComponent('function')
     preload()
 	},
 

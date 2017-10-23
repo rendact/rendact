@@ -2,7 +2,6 @@ import React from 'react';
 import request from 'request';
 import Config from './rendact.config.json';
 import Query from './admin/query';
-import AdminLTEinit from './admin/lib/app.js';
 import { sendMail } from './utils'
 import {preload} from './Routes'
 
@@ -39,7 +38,6 @@ require( 'bootstrap/dist/css/bootstrap.css')
 require( './css/Login.css')
     preload()
 
-		AdminLTEinit();
 	}
 
 	setProfile(p) {

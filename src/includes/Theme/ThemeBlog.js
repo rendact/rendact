@@ -58,8 +58,6 @@ let ThemeBlog = React.createClass({
 	},
 
 	componentDidMount(){
-		var c = window.config.theme;
-    getTemplateComponent('functions')
     preload()
 	},
 
