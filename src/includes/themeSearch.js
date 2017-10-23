@@ -28,6 +28,10 @@ class ThemeSearch extends React.Component {
     this.getWidgets = getWidgets.bind(this);
     this.theExcerpt = theExcerpt.bind(this);
 
+    this.state = {
+      Search: null
+    }
+
 	}
 
 	theMenu(){
@@ -35,16 +39,16 @@ class ThemeSearch extends React.Component {
 	}
 
 
-  componentDidMount(){
-		var c = window.config.theme;
-		require ('bootstrap/dist/css/bootstrap.css');
-		require('themes/'+c.path+'/css/style.css');
-		require('themes/'+c.path+'/functions.js');
+  componentWillMount(){
+    getTemplateComponent('search').then(search => {
+      if(search){
+        this.setState({Search: search})
+      }
+    })
   }
 
   render(){
-    let Search =  getTemplateComponent('search')
-    return <Search
+    return this.state.Search && <this.state.Search
           footerWidgets={[aboutUsWidget, recentPostWidget, contactUsWidget]}
           theMenu={this.theMenu}
           theLogo={this.theLogo}

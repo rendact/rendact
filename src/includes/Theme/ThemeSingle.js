@@ -36,6 +36,12 @@ let ThemeSingle = React.createClass({
 		}
   },
 
+  getInitialState: function(){
+    return {
+      Single: null
+    }
+  },
+
   handlePostClick(e){
 		e.preventDefault();
 		this._reactInternalInstance._context.history.push('/')
@@ -43,15 +49,20 @@ let ThemeSingle = React.createClass({
 
 	componentDidMount(){
 		var c = window.config.theme;
-		require ('bootstrap/dist/css/bootstrap.css');
-		require('themes/'+c.path+'/css/style.css');
-		require('themes/'+c.path+'/functions.js');
+    getTemplateComponent('function')
     preload()
 	},
 
+  componentWillMount(){
+    getTemplateComponent('single').then(single => {
+      if (single){
+        this.setState({Single: single})
+      }
+    })
+  },
+
 	render() {
-    let Single = getTemplateComponent('single')
-		let SinglePost = <Single 
+		let SinglePost = this.state.Single && <this.state.Single 
 											postId={this.props.params.postId || this.props.params.pageId} 
 											postData={this.props.postData}
 											widgets={[searchWidget, topPostWidget, categoriesWidget, archiveWidget]}
@@ -105,9 +116,7 @@ var qry = gql`query ($postId: ID!) {
 ThemeSingle = graphql(qry, {
 	options: (props) => {
 		return { 
-			variables: { 
-				postId: props.params.postId
-			} 
+			variables: { postId: props.params.postId } 
 		}
 	},
   props: ({ownProps, data}) => {

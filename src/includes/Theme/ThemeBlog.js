@@ -44,26 +44,38 @@ let ThemeBlog = React.createClass({
 			mainMenu: null
 		}
   },
+
+  getInitialState : function(){
+    return {
+      Blog: null
+    }
+  },
     
 	handlePostClick(e){
 		e.preventDefault();
 		var id = e.currentTarget.id;
 		this._reactInternalInstance._context.history.push('/post/'+id)
 	},
+
 	componentDidMount(){
 		var c = window.config.theme;
-		require ('bootstrap/dist/css/bootstrap.css');
-		require(c.path+'/css/style.css');
-		require(c.path+'/functions.js');
+    getTemplateComponent('functions')
     preload()
 	},
+
+  componentWillMount(){
+    getTemplateComponent('blog').then(blog => {
+      if(blog){
+        this.setState({Blog: blog})
+      }
+    })
+  },
 
 	render() {
 		if (!this.props.loadDone && this.props.slug) {
 			return <Loading/>
 		} else {
-      let Blog = getTemplateComponent('blog')
-			return <Blog 
+			return this.state.Blog && <this.state.Blog 
 							latestPosts={this.props.latestPosts}
 							theTitle={theTitle}
 							theContent={theContent}
