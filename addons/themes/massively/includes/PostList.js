@@ -1,7 +1,7 @@
 import React from 'react';
 
 const PostList = (props) => (
-  <section>
+  <article>
     <header>
       <span className="date">{props.date}</span>
       <h2><a href={"/post/" + props.postId}>{props.title}</a></h2>
@@ -15,7 +15,7 @@ const PostList = (props) => (
         <a className="button" href={"/post/" + props.postId}>Full Content</a>
       </li>
     </ul>
-  </section>
+  </article>
 )
 
 export default PostList;

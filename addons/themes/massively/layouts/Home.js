@@ -28,7 +28,11 @@ class Home extends React.Component {
 
         </section>
 
+        <footer>
+          {this.props.thePagination}
+        </footer>
       </div>
+
 
       <Footer {...this.props}/>
 
