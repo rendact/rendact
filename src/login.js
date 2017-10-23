@@ -39,6 +39,7 @@ class Login extends React.Component{
 	}
 
 	componentDidMount(){
+    preload()
 		
 		var me = this;
 		var _doAuthentication = function(authResult) {
@@ -64,7 +65,6 @@ class Login extends React.Component{
     require( './css/Login.css')
 		require ('./css/ionicons.css');
 		require ('./css/AdminLTE.css');
-    preload()
 
 		
 	}

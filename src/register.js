@@ -3,8 +3,6 @@ import request from 'request';
 import Config from './rendact.config.json';
 import Query from './admin/query';
 import AdminLTEinit from './admin/lib/app.js';
-import 'bootstrap/dist/css/bootstrap.css';
-import './css/Login.css';
 import { sendMail } from './utils'
 import {preload} from './Routes'
 
@@ -37,6 +35,8 @@ class Register extends React.Component{
 		require ('font-awesome/css/font-awesome.css');
 		require ('./css/ionicons.min.css');
 		require ('./css/AdminLTE.css');
+require( 'bootstrap/dist/css/bootstrap.css')
+require( './css/Login.css')
     preload()
 
 		AdminLTEinit();
