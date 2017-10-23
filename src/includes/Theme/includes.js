@@ -43,12 +43,22 @@ export function getTemplateComponent(type){
 	})
 	*/
 	
-	var widgetAreas = require("themes/"+c.path)["widgetArea"];
+  //	var widgetAreas = require("themes/"+c.path)["widgetArea"];
+  import(`themes/${c.path}`).then(theme => {
+    let widgetAreas = theme["widgetArea"];
+    if (widgetAreas) {
+      widgetAreas.forEach(widgetId => {
+        registerWidgetArea(widgetId)
+      })
+    }
+  })
+    /*
 	if (widgetAreas) {
 		_.forEach(widgetAreas, function(widgetId){
 			registerWidgetArea(widgetId)
 		});
 	}
+  */
 
   const themeMap = {
     home: 'Home',
@@ -61,7 +71,12 @@ export function getTemplateComponent(type){
 		return InvalidTheme;
 	}
   let module = themeMap[type];
-  return require("themes/"+c.path)[module]
+  return import(`themes/${c.path}`).then(theme => {
+    if(theme){
+      return theme[module]
+    } return null
+  })
+  //return require("themes/"+c.path)[module]
 }
 
 export function theContent(content){

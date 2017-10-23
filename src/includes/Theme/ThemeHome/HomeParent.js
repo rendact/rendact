@@ -28,14 +28,28 @@ let HomeParent = React.createClass({
 		}
   },
 
+  getInitialState: function(){
+    return {
+      Home:null
+    }
+  },
+
 	componentDidMount(){
 		var c = window.config.theme;
 		getTemplateComponent('functions') 
 	},
 
+  componentWillMount(){
+    getTemplateComponent('home').then(Home => {
+      if (Home){
+        this.setState({Home: Home})
+      }
+    });
+  },
+
 	render(){
-        let Home = getTemplateComponent('home')    
-        return <Home 
+    //let Home = getTemplateComponent('home')    
+        return this.state.Home  && <this.state.Home 
 					data={this.props.data}
 					theTitle={theTitle}
 					theContent={theContent}
@@ -50,7 +64,7 @@ let HomeParent = React.createClass({
 					listOfWidgets={this.props.listOfWidgets}
           loadDone={this.props.loadDone}
           theCommentForm={theCommentForm(this.props.postId)}
-				/>
+				/> 
 
 	}
 })
