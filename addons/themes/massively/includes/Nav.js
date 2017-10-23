@@ -1,11 +1,15 @@
 import React from 'react';
+/* NOTE:
+ * need a modification on menu !!
+ */
 
 const Nav = (props) => (
   <nav id="nav">
     <ul className="links">
-      <li className="active">
+      <li className={props.isHome ?"active":null}>
         <a href=""><span className="label">Home</span></a>
       </li>
+
       <li>
         <a href=""><span className="label">Profile</span></a>
       </li>

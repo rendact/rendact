@@ -41,7 +41,7 @@ class Home extends React.Component {
 
   render(){
     return <div className="fade-in" id="wrapper">
-      <HeaderWrapper intro={this.state.intro} {...this.props}/>
+      <HeaderWrapper intro={this.state.intro} isHome={true} {...this.props}/>
       <div id="main">
         <aricle className="post featured">
         </aricle>
