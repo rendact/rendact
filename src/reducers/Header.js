@@ -6,7 +6,7 @@ const header = (state = INITIAL_VALUES, action) => {
   switch (action.type) {
     
     case 'CONTROL_SIDEBAR':
-      return state.map(item =>  ({...item, ControlSidebar: action.state}))
+      return state.map(item =>  ({...item, ControlSidebar: action.ControlSidebar}))
         
     default:
       return state

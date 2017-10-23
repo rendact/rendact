@@ -17,9 +17,17 @@ let AdminHeader = React.createClass({
       }
     }
   },
-  handleControlSidebar: function(){
-    this.props.dispatch(ControlSidebar(true));
+  handleControlSidebar: function(e){
+    e.preventDefault()
+    var me = this;
+    var value = false;
+    if (me.props.ControlSidebar === false) {
+        value = true;
+    } else if (me.props.ControlSidebar === true) {
+        value === false;
+    }
     debugger
+    this.props.dispatch(ControlSidebar(value));
   },
   render: function() {
     var rootUrl = getConfig('rootUrl');
@@ -130,7 +138,7 @@ let AdminHeader = React.createClass({
   }
 });
 const mapStateToProps = function(state){
-  debugger
+  // debugger
   if (!_.isEmpty(state.header)) {
     var out = _.head(state.header);
     return _.head(state.header)
