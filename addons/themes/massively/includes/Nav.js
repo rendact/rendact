@@ -3,7 +3,7 @@ import React from 'react';
 const Nav = (props) => (
   <nav id="nav">
     <ul className="links">
-      <li>
+      <li className="active">
         <a href=""><span className="label">Home</span></a>
       </li>
       <li>
