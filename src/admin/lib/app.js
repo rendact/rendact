@@ -4,10 +4,6 @@ import FastClick from 'react-fastclick';
 const jQuery = $;
 window.jQuery = jQuery;
 
-require('bootstrap')
-require('jquery-slimscroll');
-require('jquery-ui/ui/core')
-require('bootstrap/dist/css/bootstrap.css')
 
 var AdminLTEOptions = {
     //Enable sidebar expand on hover effect for sidebar mini
@@ -177,6 +173,11 @@ const AdminLTEinit = function () {
 
   //Set up the object
   _init();
+  // make sure not in global scope
+  require('bootstrap')
+  require('jquery-slimscroll');
+  require('jquery-ui/ui/core')
+  require('bootstrap/dist/css/bootstrap.css')
 
   //Activate the layout maker
   $.AdminLTE.layout.activate();

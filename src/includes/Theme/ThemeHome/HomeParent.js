@@ -34,12 +34,7 @@ let HomeParent = React.createClass({
     }
   },
 
-	componentDidMount(){
-		var c = window.config.theme;
-		getTemplateComponent('functions') 
-	},
-
-  componentWillMount(){
+  componentDidMount(){
     getTemplateComponent('home').then(Home => {
       if (Home){
         this.setState({Home: Home})
