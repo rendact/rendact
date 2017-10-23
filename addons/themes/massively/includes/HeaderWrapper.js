@@ -6,7 +6,7 @@ import Intro from './Intro';
 class HeaderWrapper extends React.Component {
   render(){
     return <div>
-      <Intro title="Rendact" tagline="hello"/>
+      <Intro intro={this.props.intro} title="Rendact" tagline="hello"/>
       <Header title="Rendact"/>
       <Nav/>
       </div>

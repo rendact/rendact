@@ -4,13 +4,44 @@ import Footer from '../includes/Footer';
 import PostList from '../includes/PostList';
 
 class Home extends React.Component {
+  constructor(props){
+    super(props)
+
+    this.handleHideIntro = this.handleHideIntro.bind(this)
+    this.state = {
+      intro: true
+    }
+  }
+
   componentDidMount(){
     require("../css/main.css")
     document.body.className = ""
+    window.addEventListener("scroll", this.handleHideIntro)
   }
+
+  componentWillUnmount(){
+    window.removeEventListener("scroll", this.handleHideIntro)
+  }
+
+  handleHideIntro(e){
+    /* 
+     * hide intro when window.pageYOffset => header.height
+     */
+
+    let header = document.getElementById("header")
+    let headerRect = header.getBoundingClientRect()
+
+    if (window.pageYOffset >= headerRect.height - 10){
+      this.setState({intro: false})
+    } else {
+      this.setState({intro: true})
+    }
+
+  }
+
   render(){
     return <div className="fade-in" id="wrapper">
-      <HeaderWrapper {...this.props}/>
+      <HeaderWrapper intro={this.state.intro} {...this.props}/>
       <div id="main">
         <aricle className="post featured">
         </aricle>
