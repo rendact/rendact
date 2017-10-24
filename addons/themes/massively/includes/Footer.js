@@ -5,17 +5,15 @@ class Footer extends React.Component {
     return(<div>
 
         <footer id="footer">
-          <section>sections1</section>
-          <section>sections2</section>
-          <section>sections3</section>
-          <section>sections4</section>
+          {this.props.footerWidgets.map((fw,idx) => (
+            <section key={idx}>{fw}</section>
+          ))}
         </footer>
 
         <div id="copyright">
           <ul>
-            <li>footertext1</li>
-            <li>footertext2</li>
-            <li>footertext3</li>
+            <li>Massively theme</li>
+            <li>converted by Rendact Team</li>
           </ul>
         </div>
       </div>
