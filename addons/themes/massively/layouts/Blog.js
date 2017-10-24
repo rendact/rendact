@@ -1,6 +1,7 @@
 import React from 'react';
 import HeaderWrapper from '../includes/HeaderWrapper';
 import Footer from '../includes/Footer';
+import NavPanel from '../includes/NavPanel';
 
 
 class Single extends React.Component {
@@ -10,6 +11,7 @@ class Single extends React.Component {
   }
   render(){
     return(
+      <div>
       <div id="wrapper" >
         <HeaderWrapper intro={false} {...this.props}/>
         <div id="main">
@@ -33,6 +35,8 @@ class Single extends React.Component {
           {matrix: [1, 0, 0, 1, 0, 3862.8]}
         ]
         }}/>
+      </div>
+      <NavPanel {...this.props}/>
       </div>
     )
   }

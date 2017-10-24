@@ -1,7 +1,8 @@
 import React from 'react';
+import {Link} from 'react-router';
 
 const Header = (props) => (
-  <header id="header"><a className="logo" href="">{props.title}</a></header>
+  <header id="header"><Link className="logo" to="/">{props.title}</Link></header>
 )
 
 export default Header;
