@@ -2,9 +2,11 @@ import React from 'react';
 import $ from 'jquery';
 import Query from './query';
 import _ from 'lodash';
-import {riques, disableForm, errorCallback} from '../utils';
+import {disableForm, errorCallback} from '../utils';
 import Notification from 'react-notification-system';
-import {connect} from 'react-redux'
+import {connect} from 'react-redux';
+import {withApollo} from 'react-apollo';
+import gql from 'graphql-tag';
 
 window.$ = $;
 
@@ -167,30 +169,54 @@ let ControlSidebar = React.createClass({
     var me = this;
     var qry = '';
     var userMetaData = [];
+    var listOfData = "";
 
     var metaIdList = JSON.parse(localStorage.getItem("metaIdList"));
     if (metaIdList.userPrefConfig && metaIdList.userPrefConfig!=="" && metaIdList.userPrefConfig!==null) {
       userMetaData = [{id: metaIdList.userPrefConfig, item: "userPrefConfig", value: userPrefConfigStr}]
-      qry = Query.saveUserMetaMtn(localStorage.getItem("userId"), userMetaData) 
+      // qry = Query.saveUserMetaMtn(localStorage.getItem("userId"), userMetaData) 
+      listOfData = me.props.client.mutate({
+        mutation: gql`${Query.saveUserMetaMtn(localStorage.getItem("userId"), userMetaData).query}`,
+        variables: Query.saveUserMetaMtn(localStorage.getItem("userId"), userMetaData).variables
+      })
     } else {
       userMetaData = [{item: "userPrefConfig", value: userPrefConfigStr}]
-      qry = Query.createUserMetaMtn(localStorage.getItem("userId"), userMetaData)
+      // qry = Query.createUserMetaMtn(localStorage.getItem("userId"), userMetaData)
+      listOfData = me.props.client.mutate({
+        mutation: gql`${Query.createUserMetaMtn(localStorage.getItem("userId"), userMetaData).query}`,
+        variables: Query.createUserMetaMtn(localStorage.getItem("userId"), userMetaData).variables
+      })
     }
 
-    riques(qry, 
-      function(error, response, body){
-        if(!error && !body.errors) {
-          var cfg = _.find(body.data, {changedUserMeta: {item: "userPrefConfig"}});
-          if (cfg) {
+    // riques(qry, 
+    //   function(error, response, body){
+    //     if(!error && !body.errors) {
+    //       debugger
+    //       var cfg = _.find(body.data, {changedUserMeta: {item: "userPrefConfig"}});
+    //       debugger
+    //       if (cfg) {
+    //         p["userPrefConfig"] = cfg.changedUserMeta.value;
+    //         debugger
+    //         localStorage.setItem("profile", JSON.stringify(p));
+    //         debugger
+    //         me.disableForm(false);
+    //       }
+    //     } else {
+    //       errorCallback(error, body.errors?body.errors[0].message:null);
+    //     }
+    //   }
+    // );
+
+    listOfData.then(function() {
+      _.forEach(arguments, function(item){
+        var cfg = _.find(item.data, {changedUserMeta: {item: "userPrefConfig"}});
+        if (cfg) {
             p["userPrefConfig"] = cfg.changedUserMeta.value;
             localStorage.setItem("profile", JSON.stringify(p));
             me.disableForm(false);
-          }
-        } else {
-          errorCallback(error, body.errors?body.errors[0].message:null);
         }
-      }
-    );
+      })
+    })
   },
 
   resetOption: function(){
@@ -565,4 +591,7 @@ const mapStateToProps = function(state){
 }
 
 ControlSidebar = connect(mapStateToProps)(ControlSidebar);
+
+ControlSidebar = withApollo(ControlSidebar);
+
 export default ControlSidebar;
