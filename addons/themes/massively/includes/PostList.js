@@ -1,18 +1,19 @@
 import React from 'react';
+import {Link} from 'react-router';
 
 const PostList = (props) => (
   <article>
     <header>
       <span className="date">{props.date}</span>
-      <h2><a href={"/post/" + props.postId}>{props.title}</a></h2>
+      <h2><Link to={"/post/" + props.postId}>{props.title}</Link></h2>
     </header>
-    <a href="#" className="image fit">
+    <Link to="#" className="image fit">
       <img src={props.imageFeatured}/>
-    </a>
+    </Link>
     <p dangerouslySetInnerHTML={{__html: props.content}}/>
     <ul className="actions">
       <li>
-        <a className="button" href={"/post/" + props.postId}>Full Content</a>
+        <Link className="button" to={"/post/" + props.postId}>Full Content</Link>
       </li>
     </ul>
   </article>
