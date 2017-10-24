@@ -221,6 +221,7 @@ let ContentType = React.createClass({
       var he = me;
       me.disableFormContentType(true);
       listOfData.then(function() {
+        debugger
         he.props.refetchAllMenuData().then(function() {
           he.props.dispatch(toggleSelectedItemState(false));
           he.disableFormContentType(false);
@@ -311,7 +312,6 @@ let ContentType = React.createClass({
   },
 
   handleTextTitleClick: function(e){
-    debugger
     e.preventDefault()
     let postId = e.currentTarget.id.split("-")[1]
     this.handleViewPost(postId)
