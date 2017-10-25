@@ -92,7 +92,9 @@ export function theExcerpt(content){
 }
 
 export function theMenu(items, onClickHandler){
-  return <Menu menuItems={items&&items.items?items.items:[]} goHome={goHome}/>
+  return (ulParentClass) => (
+    <Menu menuItems={items&&items.items?items.items:[]} goHome={goHome} ulParentClass={ulParentClass}/>
+  )
 }
 
 export function theLogo(onClickHandler){

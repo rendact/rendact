@@ -43,14 +43,14 @@ class List extends React.Component{
   }
 
   render(){
-    return <ul className="cl-effec-16">
+    return <ul className={this.props.ulParentClass?this.props.ulParentClass:"cl-effec-16"}>
       {this.list(this.props.items)}
     </ul>
   }
 }
   
 
-export const Menu = ({menuItems}) => (
-  <List items={menuItems||[]}/>
+export const Menu = ({menuItems, ulParentClass}) => (
+  <List ulParentClass={ulParentClass} items={menuItems||[]}/>
 )
 

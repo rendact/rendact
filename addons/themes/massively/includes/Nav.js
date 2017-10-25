@@ -1,35 +1,15 @@
 import React from 'react';
-/* NOTE:
- * need a modification on menu !!
- */
+import MediaQuery from 'react-responsive';
 
-const Nav = (props) => (
-  <nav id="nav">
-    <ul className="links">
-      <li className={props.isHome ?"active":null}>
-        <a href=""><span className="label">Home</span></a>
-      </li>
+class Nav extends React.Component {
 
-      <li>
-        <a href=""><span className="label">Profile</span></a>
-      </li>
-      <li>
-        <a href=""><span className="label">Charts</span></a>
-      </li>
-    </ul>
-
-    <ul className="icons">
-      <li>
-        <a href=""><span className="label">1</span></a>
-      </li>
-      <li>
-        <a href=""><span className="label">2</span></a>
-      </li>
-      <li>
-        <a href=""><span className="label">3</span></a>
-      </li>
-    </ul>
+  render(){
+    return <nav id="nav">
+      <MediaQuery minDeviceWidth={1280}>
+        {this.props.theMenu("links")}
+      </MediaQuery>
   </nav>
-);
+  }
+}
 
 export default Nav;

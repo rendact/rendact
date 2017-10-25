@@ -72,6 +72,7 @@
     "react-notification-system": ">=0.2.12",
     "react-password-strength": ">=1.1.0",
     "react-redux": "^5.0.5",
+    "react-responsive": "^3.0.0",
     "react-router": "https://registry.npmjs.org/react-router/-/react-router-4.0.0-alpha.6.tgz",
     "react-select": ">=1.0.0-rc.4",
     "react-sidebar": "^2.3.2",
