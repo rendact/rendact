@@ -1,5 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router';
+import PanelBanner from '../includes/PanelBanner';
+import PanelFooter from '../includes/PanelFooter';
 
 
 class Home extends React.Component {
@@ -12,18 +14,13 @@ class Home extends React.Component {
     return (
       <div id="page-wrapper">
         <div id="wrapper">
-          <section className="panel banner right">
-            <div className="content color0 span-3-75">
-              <h1 className="major">{this.props.theConfig && this.props.theConfig.name}</h1>
-              <p dangerouslySetInnerHTML={{__html: this.props.theConfig && this.props.theConfig.tagline}}/>
-              <ul className="actions">
-                <li><a className="button special color1 circle icon fa-angle-right" href="#first">Next</a></li>
-              </ul>
-            </div>
-            <div className="image filtered span-1-75">
-              <img src={require('images/logo-130.png')} alt=""/>
-            </div>
-          </section>
+
+          <PanelBanner
+            title={this.props.theConfig && this.props.theConfig.name}
+            content={this.props.theConfig && this.props.theConfig.tagline}
+            image={require('images/logo-130.png')}
+          />
+
 
                     {this.props.thePagination}
 
@@ -45,7 +42,10 @@ class Home extends React.Component {
                       
                   ))
               }
+
+              <PanelFooter {...this.props}/>
                     </section>
+                    <div className="copyright">Converted from ethereal theme; Rendact Team</div>
 
         </div>
       </div>

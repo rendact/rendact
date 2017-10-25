@@ -3494,12 +3494,13 @@ div#page-wrapper .pagination {
           bottom: -3rem;
               list-style: none;
                   left: 0;
+                  margin-bottom: 0;
                     }
 
                     div#page-wrapper .pagination li {
                       display: inline;
                       padding: 5px;
-                      color: #fff;
+                      color: rgba(46, 43, 55, 0.375);
                     }
 
 
