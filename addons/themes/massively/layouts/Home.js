@@ -8,7 +8,7 @@ import NavPanel from '../includes/NavPanel';
 class HomePostList extends React.Component {
   render(){
     return (
-      <div>
+      <div id="main">
 
         <section className="posts">
           {this.props.data && this.props.data.map(post => (
@@ -22,10 +22,10 @@ class HomePostList extends React.Component {
             />
           ))}
 
-        </section>
         <footer>
           {this.props.thePagination}
         </footer>
+        </section>
       </div>
     )
   }
