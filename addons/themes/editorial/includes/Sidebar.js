@@ -17,7 +17,7 @@ export default class Sidebar extends React.Component {
     this.setState(prevState => ({active: !prevState.active}));
   }
 
-  componentDidMount(){
+  componentWillMount(){
     this.props.getWidgets('sidebar').then(w => this.setState({w: w}));
   }
 

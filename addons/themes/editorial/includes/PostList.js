@@ -1,13 +1,14 @@
 import React from 'react';
+import {Link} from 'react-router';
 
 
 const PostList = ({image, title, content, id}) => (
   <article>
-    <a className="image" href={"/post/"+ id}><img src={image} alt=""/></a>
+    <Link className="image" to={"/post/"+ id}><img src={image} alt=""/></Link>
     <h3>{title}</h3>
     <p dangerouslySetInnerHTML={{__html: content}}/>
     <ul className="actions">
-      <li><a className="button" href={"/post/" + id}>More</a></li>
+      <li><Link className="button" to={"/post/" + id}>More</Link></li>
     </ul>
   </article>
 )
