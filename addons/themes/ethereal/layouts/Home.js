@@ -1,10 +1,12 @@
 import React from 'react';
+import {Link} from 'react-router';
 
 
 class Home extends React.Component {
   componentDidMount(){
     require("../css/main.css")
     document.body.className = ""
+    document.body.addEventListener("wheel", (e) => {window.scrollBy(e.deltaY, 0)})
   }
   render(){
     return (
@@ -23,18 +25,28 @@ class Home extends React.Component {
             </div>
           </section>
 
+                    {this.props.thePagination}
+
+                    <section className="panel color2" id="first" >
               {this.props.data && 
                   this.props.data.map((post, index) => (
-                    <section className={"panel color" + (index > 4 ? index - 3 : index + 1)} key={index}>
-                      <div key={post.id} className="intro joined">
-                      <h2 className="major">{post.title}</h2>
-                      <p dangerouslySetInnerHTML={{__html: post.content}}/>
+                    <div className="panel">
+                      <div key={post.id} className="intro joined span-3">
+                        <h2 className="major"><Link to={"/post" + post.id}>{post.title}</Link></h2>
+                      <p dangerouslySetInnerHTML={{__html: post.content && post.content.replace(" ", "").replace("\n", "").slice(0, 100) + "..."}}/>
+                      <ul className="actions">
+                        <li>
+                          <Link className="button special icon circle color1 fa-external-link" to={"/post/" + post.id}>Read more</Link>
+                        </li>
+                      </ul>
                       </div>
-                      <div className="image inner"><img src={this.props.data.imageFeatured?this.props.data.imageFeatured.blobUrl:require('images/logo-130.png')} alt=""/></div>
+                      <div className="image span-2-5" style={{flexWrap: "wrap", overflow: "hidden"}}><img src={post.imageFeatured?post.imageFeatured.blobUrl:require('images/logo-130.png')} style={{margin: "30% 0"}} alt=""/></div>
+                    </div>
                       
-                    </section>
                   ))
               }
+                    </section>
+
         </div>
       </div>
     )

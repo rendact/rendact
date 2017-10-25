@@ -330,6 +330,10 @@
 	h1.major, h2.major, h3.major {
 		position: relative;
 	}
+  
+  h1.major, h2.major, h3.major{
+    border-bottom: none;
+  }
 
 		h1.major:after, h2.major:after, h3.major:after {
 			content: '';
@@ -3485,6 +3489,19 @@
 		height: 100%;
 		padding: 5rem;
 	}
+div#page-wrapper .pagination {
+      position: absolute;
+          bottom: -3rem;
+              list-style: none;
+                  left: 0;
+                    }
+
+                    div#page-wrapper .pagination li {
+                      display: inline;
+                      padding: 5px;
+                      color: #fff;
+                    }
+
 
 		@media screen and (orientation: portrait) {
 
