@@ -4,9 +4,17 @@ export default class Sidebar extends React.Component {
   constructor(props){
     super(props)
 
+    this.handleToggleSidebar = this.handleToggleSidebar.bind(this)
+
     this.state = {
-      w: null
+      w: null,
+      active: true
     }
+  }
+
+  handleToggleSidebar(e){
+    e.preventDefault();
+    this.setState(prevState => ({active: !prevState.active}));
   }
 
   componentDidMount(){
@@ -20,7 +28,7 @@ export default class Sidebar extends React.Component {
     } = this.props;
 
     return(
-      <div id="sidebar">
+      <div id="sidebar" className={!this.state.active?"inactive":""}>
         <div className="inner">
 
           <nav id="menu">
@@ -38,6 +46,7 @@ export default class Sidebar extends React.Component {
             <p className="copyright">Editorial theme for Rendact</p>
           </footer>
         </div>
+        <a className="toggle" href="#sidebar" onClick={this.handleToggleSidebar}>toggle</a>
       </div>
     )
   }
