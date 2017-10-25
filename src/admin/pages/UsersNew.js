@@ -139,7 +139,7 @@ let NewUser = React.createClass({
 			mutation: gql`${qry.query}`,
 			variables: qry.variables
 		}).then( data => {
-			// debugger
+			// me.disableForm(true);
 			var p = me.props.mode==="update"?data.updateUser.changedUser:data.createUser.changedUser;
 			var here = me;
 
@@ -179,6 +179,7 @@ let NewUser = React.createClass({
         		here.disableForm(false);
         });
       }
+      me.disableForm(false);
 		})
 		// .catch(error => {debugger});
 		
