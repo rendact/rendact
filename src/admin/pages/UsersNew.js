@@ -17,6 +17,7 @@ import {maskArea, setTimezone, setPasswordActive, setDateOfBirth, setAvatar, che
 import {reduxForm, Field, formValueSelector} from 'redux-form'
 import gql from 'graphql-tag'
 import {graphql, withApollo} from 'react-apollo'
+// import email from 'emailjs/email'
 
 const required = value => (value ? undefined : 'Required')
 const maxLength = max => value =>
@@ -114,8 +115,6 @@ let NewUser = React.createClass({
 		this.props.dispatch(maskArea(state));
 	},
 	handleSubmitBtn: function(v){
-		v.preventDefault();
-		
 		var me = this;
 		var image = this.props.avatar;
 		var dateOfBirth = this.props.dateOfBirth;
@@ -131,7 +130,8 @@ let NewUser = React.createClass({
 			if (v["new-password"]) changePassword = true;
 			qry = Query.saveProfileMtn({userId: this.props.userId, name: v.name, gender: v.gender, image: v.image, country: v.country, dateOfBirth: dateOfBirth});
 		} else {
-			qry = Query.createUserMtn(v.username, v["new-password"], v.email, v.name, v.gender, v.country, dateOfBirth)
+			qry = Query.createUserMtn(v.username, v["new-password-2"], v.email, v.name, v.gender, v.country, dateOfBirth)
+			// qry = Query.createUserMtn(v.username, v["new-password"], v.name, v.gender, v.country, dateOfBirth)	
 		}
 
 		this.disableForm(true);
@@ -139,6 +139,7 @@ let NewUser = React.createClass({
 			mutation: gql`${qry.query}`,
 			variables: qry.variables
 		}).then( data => {
+			// me.disableForm(true);
 			var p = me.props.mode==="update"?data.updateUser.changedUser:data.createUser.changedUser;
 			var here = me;
 
@@ -178,9 +179,10 @@ let NewUser = React.createClass({
         		here.disableForm(false);
         });
       }
-		});
+      me.disableForm(false);
+		})
+		// .catch(error => {debugger});
 		
-
 		// Change password
 		var qry3 = Query.changePasswordMtn(v["old-password"], v["new-password"]);
 		if (changePassword) {
