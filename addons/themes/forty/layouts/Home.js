@@ -13,15 +13,15 @@ class Home extends React.Component {
   render(){
     let {
       loadDone,
-      data
+      data,
+      thePagination
     } = this.props;
 
     return (
       <div id="wrapper">
         <Header name="Rendact" tagline="hello"/>
-        <section>
-          <div className="inner">
-            <div className="row">
+        <div id="main" style={{padding: 25}}>
+        <section className="spotlights">
               {data && data.map(post => (
                     <PostList 
                       title={post.title}
@@ -31,9 +31,11 @@ class Home extends React.Component {
                     />
                   ))
               }
-            </div>
-          </div>
+              <div style={{textAlign: "center"}}>
+                {thePagination}
+              </div>
         </section>
+        </div>
         <FooterWidgets {...this.props}/>
         <Footer />
       </div>

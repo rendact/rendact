@@ -2387,7 +2387,7 @@
 				vertical-align: middle;
 			}
 
-				ul.pagination li > .page {
+				ul.pagination li > .page, ul.pagination li > a {
 					-moz-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 					-webkit-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 					-ms-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
@@ -2404,17 +2404,17 @@
 					text-align: center;
 				}
 
-					ul.pagination li > .page.active {
+					ul.pagination li > .page.active, ul.pagination  li > a:disabled {
 						background-color: #ffffff;
 						color: #242943;
 					}
 
-						ul.pagination li > .page.active:hover {
+						ul.pagination li > .page.active:hover , ul.pagination li > a:disabled:hover{
 							background-color: #9bf1ff;
 							color: #242943 !important;
 						}
 
-						ul.pagination li > .page.active:active {
+						ul.pagination li > .page.active:active, ul.pagination li > a:disabled:active {
 							background-color: #53e3fb;
 						}
 

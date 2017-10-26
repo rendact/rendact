@@ -11,15 +11,20 @@ class PostList extends React.Component {
       } = this.props;
 
     return (
-      <div className="6u 12u$(small)">
-        <h3>{title}</h3>
-        <div><span className="image left"><img src={image}/></span>
-          <div dangerouslySetInnerHTML={{__html: content}}/>
+      <section>
+        <Link className="image" to={"/post/" + id}><img src={image} alt=""/></Link>
+        <div className="content">
+          <div className="inner">
+            <header className="major">
+              <h3>{title}</h3>
+            </header>
+            <p dangerouslySetInnerHTML={{__html: content}}/>
+            <ul className="actions">
+              <li><Link className="button" to={"/post/" + id}>Read More</Link></li>
+            </ul>
+          </div>
         </div>
-        <ul className="actions">
-          <li><Link className="button icon fa-search" to={"/post/" + id}>Read More</Link></li>
-        </ul>
-      </div>
+      </section>
     )
   }
 }
