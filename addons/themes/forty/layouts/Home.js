@@ -10,17 +10,9 @@ class Home extends React.Component {
   componentDidMount(){
     require('../assets/css/main.css')
   }
-  render(){
-    let {
-      loadDone,
-      data,
-      thePagination
-    } = this.props;
 
+  renderLatestPost(data, thePagination){
     return (
-      <div id="wrapper">
-        <Header name="Rendact" tagline="hello"/>
-        <div id="main" style={{padding: 25}}>
         <section className="spotlights">
               {data && data.map(post => (
                     <PostList 
@@ -35,9 +27,38 @@ class Home extends React.Component {
                 {thePagination}
               </div>
         </section>
+    )
+  }
+
+  render(){
+    let {
+      loadDone,
+      data,
+      thePagination,
+      theConfig
+    } = this.props;
+
+    return (
+      <div>
+      <div id="wrapper" >
+        <Header
+          name={theConfig ? theConfig.name : "Rendact"} 
+          tagline={theConfig ? theConfig.tagline: "hello"}
+        />
+        <div id="main" style={{padding: 25}}>
+          {loadDone?
+            theConfig.frontPage === "latestPost" ?
+              this.renderLatestPost(data, thePagination)
+              :
+              <Post content={data && data.content} isHome/>
+            :
+            null
+          }
         </div>
         <FooterWidgets {...this.props}/>
         <Footer />
+      </div>
+        <Menu {...this.props}/>
       </div>
     )
   }

@@ -3,6 +3,10 @@ import {Link} from 'react-router';
 
 
 class Header extends React.Component {
+  handleShowMenu(){
+    document.body.className = "is-menu-visible";
+  }
+
   render(){
 
     let {
@@ -16,7 +20,7 @@ class Header extends React.Component {
           <strong>{name}</strong>
           <span>{tagline}</span>
         </Link>
-        <nav><a href="#menu">Menu</a></nav>
+        <nav><a href="#" onClick={this.handleShowMenu}>Menu</a></nav>
       </header>
     )
   }

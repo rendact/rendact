@@ -5,7 +5,7 @@ import FooterWidgets from '../includes/FooterWidgets';
 import Menu from '../includes/Menu';
 import Post from '../includes/Post';
 
-class Home extends React.Component {
+class Single extends React.Component {
   componentDidMount(){
     require('../assets/css/main.css')
   }
@@ -13,11 +13,16 @@ class Home extends React.Component {
   render(){
     let {
       postData,
+      theConfig
     } = this.props;
 
     return (
+      <div>
       <div id="wrapper">
-        <Header name="Rendact" tagline="hello"/>
+        <Header
+          name={theConfig ? theConfig.name : "Rendact"} 
+          tagline={theConfig ? theConfig.tagline: "hello"}
+        />
           <div id="main">
             {postData &&
             <Post 
@@ -30,8 +35,10 @@ class Home extends React.Component {
           <FooterWidgets {...this.props}/>
           <Footer />
       </div>
+      <Menu {...this.props}/>
+      </div>
     )
   }
 }
 
-export default Home;
+export default Single;

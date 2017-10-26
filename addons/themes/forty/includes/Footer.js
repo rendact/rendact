@@ -6,9 +6,9 @@ class Footer extends React.Component {
       <footer id="footer">
         <div className="inner">
           <ul className="copyright">
-            <li>1footer</li>
-            <li>2footer</li>
-            <li>3footer</li>
+            <li>Forty based theme</li>
+            <li>html5up</li>
+            <li>converted by Rendact Team</li>
           </ul>
         </div>
       </footer>
