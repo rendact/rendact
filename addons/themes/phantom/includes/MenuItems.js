@@ -11,7 +11,7 @@ class MenuItems extends React.Component {
       <nav id="menu">
         <div className="inner">
           <h2>Menu</h2>
-          {this.props.theMenu}
+          {this.props.theMenu()}
           <ul></ul>
         </div>
         <a className="close" onClick={this.handleClose} href="#menu">Close</a>

@@ -16,7 +16,7 @@ const Header = React.createClass({
       <Link to="/"><span>R</span>endact</Link>
 		</h1>
     <nav id="nav">
-      {this.props.theMenu}
+      {this.props.theMenu()}
 		</nav>
 	</header>
 		)

@@ -116,7 +116,7 @@ const Header = React.createClass({
 							<span className="menu"> </span>
 							<div className="top-menu">
 								<nav className="navigation">
-									{this.props.theMenu}
+									{this.props.theMenu()}
 								</nav>		
 							</div>
 							<div className="clearfix"></div>
