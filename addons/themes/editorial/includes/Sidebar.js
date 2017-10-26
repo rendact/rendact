@@ -5,6 +5,7 @@ export default class Sidebar extends React.Component {
     super(props)
 
     this.handleToggleSidebar = this.handleToggleSidebar.bind(this)
+    this.widthChange = this.widthChange.bind(this)
 
     this.state = {
       w: null,
@@ -17,8 +18,27 @@ export default class Sidebar extends React.Component {
     this.setState(prevState => ({active: !prevState.active}));
   }
 
+  mq = window.matchMedia( "(min-width: 1280px)" )
+
   componentWillMount(){
     this.props.getWidgets('sidebar').then(w => this.setState({w: w}));
+
+  }
+
+  componentDidMount(){
+    this.mq.addListener(this.widthChange)
+  }
+
+  componentWillUnmount(){
+    this.mq.removeListener(this.widthChange)
+  }
+
+  widthChange(mq){
+    if(mq.matches){
+      this.setState({active: true})
+    } else {
+      this.setState({active: false})
+    }
   }
 
   render(){
