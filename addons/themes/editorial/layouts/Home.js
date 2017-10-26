@@ -11,7 +11,8 @@ export default class Home extends React.Component {
   render(){
     let {
       theConfig,
-      data
+      data,
+      thePagination
     } = this.props
 
     return (
@@ -32,6 +33,7 @@ export default class Home extends React.Component {
                 ))}
               </div>
             </section>
+                {thePagination}
 
           </div>
         </div>
