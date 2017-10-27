@@ -1,12 +1,11 @@
-const userNew = (state = [], action) => {
+const userNew = (state = {}, action) => {
   switch (action.type) {
     case 'MASK_AREA':
-      return [
-        {
+      return {
           isProcessing: action.isMasked,
           opacity: action.isMasked?0.4:1
         }
-      ]
+      
 
     case 'RESET_FORM':
       return {
@@ -18,22 +17,22 @@ const userNew = (state = [], action) => {
       }
 
     case 'SET_TIMEZONE':
-      return state.map(item =>  ({...item, timezone: action.timezone}))
+      return {...state, timezone: action.timezone}
 
     case 'SET_PASSWORD_ACTIVE':
-      return state.map(item =>  ({...item, passwordActive: action.state}))
+      return {...state, passwordActive: action.state}
 
     case 'SET_DATE_BIRTH':
-      return state.map(item =>  ({...item, dateOfBirth: action.date}))
+      return {...state, dateOfBirth: action.date}
     
     case 'SET_AVATAR':
-      return state.map(item =>  ({...item, avatar: action.avatar}))
+      return {...state, avatar: action.avatar}
 
     case 'IS_CHECKING_USERNAME':
-      return state.map(item =>  ({...item, checkingUsername: action.state}))
+      return {...state, checkingUsername: action.state}
 
     case 'IS_CHECKING_EMAIL':
-      return state.map(item =>  ({...item, checkingMail: action.state}))
+      return {...state, checkingMail: action.state}
 
     default:
       return state

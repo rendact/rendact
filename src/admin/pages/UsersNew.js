@@ -117,7 +117,7 @@ let NewUser = React.createClass({
 	handleSubmitBtn: function(v){
 		var me = this;
 		var image = this.props.avatar;
-		var dateOfBirth = this.props.dateOfBirth;
+		var dateOfBirth = this.props.dateOfBirth.format();
 		var changePassword = false;
 
     if (this.props.hasErrors) {
@@ -134,11 +134,12 @@ let NewUser = React.createClass({
 			// qry = Query.createUserMtn(v.username, v["new-password"], v.name, v.gender, v.country, dateOfBirth)	
 		}
 
+
 		this.disableForm(true);
 		this.props.client.mutate({
 			mutation: gql`${qry.query}`,
 			variables: qry.variables
-		}).then( data => {
+		}).then( ({data}) => {
 			// me.disableForm(true);
 			var p = me.props.mode==="update"?data.updateUser.changedUser:data.createUser.changedUser;
 			var here = me;
@@ -350,6 +351,10 @@ let NewUser = React.createClass({
       }
     );
 	},
+
+  componentWillReceiveProps(props){
+  },
+
 	componentDidMount: function(){
 		require ('react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css');
 		require ('react-datetime/css/react-datetime.css');
@@ -613,9 +618,7 @@ let NewUser = React.createClass({
 const selector = formValueSelector('userNewForm')
 
 const mapStateToProps = function(state){
-  if (!_.isEmpty(state.userNew)) {
-    return _.head(state.userNew)
-  } else return {}
+  return state.userNew || {}
 }
 
 NewUser = reduxForm({
