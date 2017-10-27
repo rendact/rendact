@@ -17,7 +17,6 @@ import {maskArea, setTimezone, setPasswordActive, setDateOfBirth, setAvatar, che
 import {reduxForm, Field, formValueSelector} from 'redux-form'
 import gql from 'graphql-tag'
 import {graphql, withApollo} from 'react-apollo'
-// import email from 'emailjs/email'
 
 const required = value => (value ? undefined : 'Required')
 const maxLength = max => value =>
@@ -65,6 +64,29 @@ const renderField = ({
 }) =>
   <div>
     <input {...input} placeholder={label} type={type} className={className} style={style} />
+    {touched &&
+      ((error &&
+        <p className="help-block" style={{color: "red"}}>
+          {error}
+        </p>) ||
+        (warning &&
+          <p className="help-block" style={{color: "red"}}>
+            {warning}
+          </p>))}
+  </div>
+
+const renderSelect = ({
+  input,
+  label,
+  className,
+  style,
+  meta: { touched, error, warning },
+  children
+}) =>
+  <div>
+    <select {...input} placeholder={label}  className={className} style={style} >
+      {children}
+    </select>
     {touched &&
       ((error &&
         <p className="help-block" style={{color: "red"}}>
@@ -437,7 +459,7 @@ let NewUser = React.createClass({
 								<div className="form-group">
                   <label htmlFor="homeUrl" className="col-md-3">Gender<span style={{color: "red"}}>*</span></label>
 								 	<div className="col-md-9">
-										<Field name="gender" component="select" style={{width: 150}}>
+										<Field name="gender" component={renderSelect} validate={required} style={{width: 150}}>
 											<option key="" value="" >Select your gender...</option>
 											<option key="male" value="Male" >Male</option>
 											<option key="female" value="Female" >Female</option>
@@ -587,7 +609,7 @@ let NewUser = React.createClass({
 								<div className="form-group">
 								 	<label htmlFor="new-password-2" className="col-md-3">Re-type password<span style={{color:"red"}}>*</span></label>
 								 	<div className="col-md-9">
-								 		<Field name="new-password-2" component={renderField} type="password" className="form-control" style={{width:300}} disabled={!this.props.passwordActive}/>
+								 		<Field name="new-password-2" validate={required} component={renderField} type="password" className="form-control" style={{width:300}} disabled={!this.props.passwordActive}/>
 									</div>
 								</div>
 
