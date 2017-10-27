@@ -1,9 +1,12 @@
 import React from 'react';
+import gql from 'graphql-tag';
+import {graphql} from 'react-apollo';
 
-export default class Home extends React.Component {
+// export default class Home extends React.Component {
+let Home = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
-  }
+  },
 
   render(){
     let {
@@ -12,63 +15,64 @@ export default class Home extends React.Component {
       thePagination,
       loadDone
     } = this.props
-
+debugger
     return (
+
       <div id="wrapper" className="divided">
 
         
           <section className="banner style1 orient-left content-align-left image-position-right fullscreen onload-image-fade-in onload-content-fade-right">
             <div className="content">
-              <h1>Story</h1>
-              <p className="major">A (modular, highly tweakable) responsive one-page template designed by <a href="https://html5up.net">HTML5 UP</a> and released for free under the <a href="https://html5up.net/license">Creative Commons</a>.</p>
+              <h1>{this.props.data ? this.props.data[0].title:""}</h1>
+              <p className="major">{this.props.data ? this.props.data[0].content:""}</p>
               <ul className="actions vertical">
                 <li><a href="#first" className="button big wide smooth-scroll-middle">Get Started</a></li>
               </ul>
             </div>
             <div className="image">
-              <img src="images/banner.jpg" alt="" />
+              <img src={ this.props.data ? this.props.data[0].imageFeatured : require('images/logo-128.png')} alt="" />
             </div>
           </section>
 
         
           <section className="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in" id="first">
             <div className="content">
-              <h2>Magna etiam feugiat</h2>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi id ante sed ex pharetra lacinia sit amet vel massa. Donec facilisis laoreet nulla eu bibendum. Donec ut ex risus. Fusce lorem lectus, pharetra pretium massa et, hendrerit vestibulum odio lorem ipsum dolor sit amet.</p>
+              <h2>{this.props.data ? this.props.data[1].title:""}</h2>
+              <p>{this.props.data ? this.props.data[1].content:""}</p>
               <ul className="actions vertical">
                 <li><a href="#" className="button">Learn More</a></li>
               </ul>
             </div>
             <div className="image">
-              <img src="images/spotlight01.jpg" alt="" />
+              <img src={ this.props.data ? this.props.data[1].imageFeatured : require('images/logo-128.png')} alt="" />
             </div>
           </section>
 
         
           <section className="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
             <div className="content">
-              <h2>Tempus adipiscing</h2>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi id ante sed ex pharetra lacinia sit amet vel massa. Donec facilisis laoreet nulla eu bibendum. Donec ut ex risus. Fusce lorem lectus, pharetra pretium massa et, hendrerit vestibulum odio lorem ipsum dolor sit amet.</p>
+              <h2>{this.props.data ? this.props.data[2].title:""}</h2>
+              <p>{this.props.data ? this.props.data[2].content.slice(0, 100):""}</p>
               <ul className="actions vertical">
                 <li><a href="#" className="button">Learn More</a></li>
               </ul>
             </div>
             <div className="image">
-              <img src="images/spotlight02.jpg" alt="" />
+              <img src={ this.props.data ? this.props.data[2].imageFeatured : require('images/logo-128.png')} alt="" />
             </div>
           </section>
 
        
           <section className="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in">
             <div className="content">
-              <h2>Pharetra etiam nulla</h2>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi id ante sed ex pharetra lacinia sit amet vel massa. Donec facilisis laoreet nulla eu bibendum. Donec ut ex risus. Fusce lorem lectus, pharetra pretium massa et, hendrerit vestibulum odio lorem ipsum dolor sit amet.</p>
+              <h2>{this.props.data ? this.props.data[3].title:""}</h2>
+              <p><p>{this.props.data ? this.props.data[2].content.slice(0, 100):""}</p></p>
               <ul className="actions vertical">
                 <li><a href="#" className="button">Learn More</a></li>
               </ul>
             </div>
             <div className="image">
-              <img src="images/spotlight03.jpg" alt="" />
+              <img src={ this.props.data ? this.props.data[3].imageFeatured : require('images/logo-128.png')} alt="" />
             </div>
           </section>
 
@@ -341,4 +345,46 @@ export default class Home extends React.Component {
       </div>
     )
   }
-}
+});
+
+// let getAllPosts = gql`
+// query getAllPosts {
+//   viewer { 
+//     allPosts(where: {type: {eq: "post"}}) {
+//       edges { 
+//         node { 
+//           id,
+//           title,
+//           content,
+//           featuredImage,
+//         }
+//       }
+//     }
+//   }
+// }
+// `
+// Home = graphql(getAllPosts,
+//   { 
+//     // options: props => ({
+//     //   variables: {
+//     //     type: props.postType,
+//     //   },
+//     // }),
+//     props: ({ownProps, data}) => {
+//       if (!data.loading) {
+//           let allPost = data.viewer.allPosts.edges;
+//           allPost = _.map(allPost, item => item.node)
+
+//           return{
+//             isLoading: false,
+//             allPost : allPost,
+//           }
+//       } else { 
+//         return {
+//           isLoading: true
+//         }
+//       }
+//     }
+// })(Home)
+
+export default Home;
