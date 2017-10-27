@@ -22,6 +22,9 @@ const userNew = (state = {}, action) => {
     case 'SET_PASSWORD_ACTIVE':
       return {...state, passwordActive: action.state}
 
+    case 'SET_PASSWORD':
+      return {...state, password: action.password}
+
     case 'SET_DATE_BIRTH':
       return {...state, dateOfBirth: action.date}
     

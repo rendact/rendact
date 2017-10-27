@@ -13,7 +13,7 @@ import AdminConfig from '../AdminConfig';
 import Config from '../../rendact.config.json';
 import {riques, getValue, setValue, errorCallback, disableForm, getConfig, defaultHalogenStyle, swalert} from '../../utils';
 import {connect} from 'react-redux'
-import {maskArea, setTimezone, setPasswordActive, setDateOfBirth, setAvatar, checkingUsername, checkingMail, resetForm} from '../../actions'
+import {maskArea, setTimezone, setPasswordActive, setDateOfBirth, setAvatar, checkingUsername, checkingMail, resetForm, setPassword} from '../../actions'
 import {reduxForm, Field, formValueSelector} from 'redux-form'
 import gql from 'graphql-tag'
 import {graphql, withApollo} from 'react-apollo'
@@ -53,6 +53,10 @@ const phoneNumber = value =>
   value && !/^(0|[1-9][0-9]{9})$/i.test(value)
     ? 'Invalid phone number, must be 10 digits'
     : undefined
+
+const passwordChecker = (password) => (value) => (
+  value === password ? undefined : "password didnt match"
+)
 
 const renderField = ({
   input,
@@ -280,6 +284,7 @@ let NewUser = React.createClass({
 		var password = getValue("new-password");
 		if (password) {
 			this.props.dispatch(setPasswordActive(true));	
+      this.props.dispatch(setPassword(password))
 		} else {
 			this.props.dispatch(setPasswordActive(false));	
 		}
@@ -609,7 +614,7 @@ let NewUser = React.createClass({
 								<div className="form-group">
 								 	<label htmlFor="new-password-2" className="col-md-3">Re-type password<span style={{color:"red"}}>*</span></label>
 								 	<div className="col-md-9">
-								 		<Field name="new-password-2" validate={required} component={renderField} type="password" className="form-control" style={{width:300}} disabled={!this.props.passwordActive}/>
+								 		<Field name="new-password-2" validate={[required, passwordChecker(this.props.password)]} component={renderField} type="password" className="form-control" style={{width:300}} disabled={!this.props.passwordActive}/>
 									</div>
 								</div>
 
