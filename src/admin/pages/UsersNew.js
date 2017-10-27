@@ -435,7 +435,7 @@ let NewUser = React.createClass({
 								</div>
 
 								<div className="form-group">
-								 	<label htmlFor="homeUrl" className="col-md-3">Gender</label>
+                  <label htmlFor="homeUrl" className="col-md-3">Gender<span style={{color: "red"}}>*</span></label>
 								 	<div className="col-md-9">
 										<Field name="gender" component="select" style={{width: 150}}>
 											<option key="" value="" >Select your gender...</option>
