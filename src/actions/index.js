@@ -504,11 +504,6 @@ export const setLabels = (label, labelSingular, labelAddNew, labelEdit)  => ({
  * UserNew.js
  */
 
-export const setPassword = (password) => ({
-  type: 'SET_PASSWORD',
-  password
-})
-
 export const setTimezone = (timezone)  => ({
   type: 'SET_TIMEZONE',
   timezone
