@@ -30,7 +30,8 @@ import {
   setAvatar,
   checkingUsername,
   checkingMail,
-  resetForm
+  resetForm,
+  setImage
 } from "../../actions";
 import { reduxForm, Field, formValueSelector } from "redux-form";
 import gql from "graphql-tag";
@@ -348,6 +349,8 @@ let NewUser = React.createClass({
       });
   },
   handleImageDrop: function(accepted) {
+    debugger;
+    /*
     var me = this;
     var reader = new FileReader();
     reader.onloadend = function(res) {
@@ -355,6 +358,7 @@ let NewUser = React.createClass({
       me.props.dispatch(setAvatar(imageBase64));
     };
     reader.readAsDataURL(accepted[0]);
+    */
   },
   handleTimezoneChange: function(tz) {
     this.props.dispatch(setTimezone(tz));
@@ -558,7 +562,10 @@ let NewUser = React.createClass({
                             <img src={this.props.avatar} alt="" id="avatar" />
                             <div className="avatar-overlay" />
                             <div className="avatar-button">
-                              <a href="#"> Change </a>
+                              <a href="#" onClick={e => e.preventDefault()}>
+                                {" "}
+                                Change{" "}
+                              </a>
                             </div>
                           </div>
                         </Dropzone>
