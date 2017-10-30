@@ -353,7 +353,7 @@ let NewUser = React.createClass({
     var reader = new FileReader();
     reader.onloadend = function(res) {
       if (me.props.image && me.props.image.id) {
-        me.props.dispatch(setImage(me.props.image.id, me.props.image.url));
+        me.props.dispatch(setImage(me.props.image.id, res.target.result));
         me.props
           .updateFile({
             variables: {
