@@ -20,8 +20,7 @@ debugger
 
       <div id="wrapper" className="divided">
 
-        {data && data.map((post) => {
-          data.map((variable, index) => (
+        {data && data.map((post, index) => (
             <section className={index%2===0 ? "spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in":"spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in" }>
           
               <div className="content">
@@ -36,7 +35,6 @@ debugger
               </div>  
             </section>
             )
-          )}
         )}
         
           <section className="wrapper style1 align-center">
