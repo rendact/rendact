@@ -205,7 +205,8 @@ let NewUser = React.createClass({
         v.name,
         v.gender,
         v.country,
-        dateOfBirth
+        dateOfBirth,
+        this.props.image.id
       );
       // qry = Query.createUserMtn(v.username, v["new-password"], v.name, v.gender, v.country, dateOfBirth)
     }
@@ -275,8 +276,9 @@ let NewUser = React.createClass({
         me.disableForm(false);
       })
       .catch(error => {
+        console.log(error);
         me.disableForm(false);
-        me.notifiaction.addNotification({
+        me.notification.addNotification({
           message: "An Error Occured",
           level: "error",
           position: "tr"
@@ -309,7 +311,7 @@ let NewUser = React.createClass({
   handleGeneratePassword: function(event) {
     event.preventDefault();
     var Password = require("node-password").Password;
-    var pw = new Password();
+    var pw = new Password().toString();
     this.setState({ passwordTemp: pw });
     this.setState({ passwordMatch: true });
     this.refs.passwordStrength.setState({ password: pw });
