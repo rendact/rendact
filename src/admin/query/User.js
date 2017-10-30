@@ -8,7 +8,7 @@ const getUserQry = function(userId) {
         getUser(id: "` +
       userId +
       `"){
-        id, username, fullName, gender, image, email, lastLogin, createdAt, country, dateOfBirth,
+        id, username, fullName, gender, image {id, blobUrl, name}, email, lastLogin, createdAt, country, dateOfBirth,
         meta { edges { node { id, item, value } }} roles { edges { node { id, name } }}
         }                                       
       }`
@@ -22,7 +22,11 @@ const getUserListQry = gql`
       username
       fullName
       gender
-      image
+      image {
+        id
+        blobUrl
+        name
+      }
       email
       lastLogin
       createdAt
