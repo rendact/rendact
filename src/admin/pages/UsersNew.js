@@ -352,21 +352,38 @@ let NewUser = React.createClass({
     var me = this;
     var reader = new FileReader();
     reader.onloadend = function(res) {
-      me.props.dispatch(setImage(null, res.target.result));
-      me.props
-        .createFile({
-          variables: {
-            input: {
-              name: "avatar",
-              type: "avatar",
-              blobFieldName: "avatarField",
-              avatarField: accepted[0]
+      if (me.props.image && me.props.image.id) {
+        me.props.dispatch(setImage(me.props.image.id, me.props.image.url));
+        me.props
+          .updateFile({
+            variables: {
+              input: {
+                id: me.props.image.id,
+                blobFieldName: "avatarField",
+                avatarField: accepted[0]
+              }
             }
-          }
-        })
-        .then(({ data: { createFile: { changedFile } } }) => {
-          me.props.dispatch(setImage(changedFile.id, changedFile.blobUrl));
-        });
+          })
+          .then(({ data: { updateFile: { changedFile } } }) => {
+            me.props.dispatch(setImage(changedFile.id, changedFile.blobUrl));
+          });
+      } else {
+        me.props.dispatch(setImage(null, res.target.result));
+        me.props
+          .createFile({
+            variables: {
+              input: {
+                name: "avatar",
+                type: "avatar",
+                blobFieldName: "avatarField",
+                avatarField: accepted[0]
+              }
+            }
+          })
+          .then(({ data: { createFile: { changedFile } } }) => {
+            me.props.dispatch(setImage(changedFile.id, changedFile.blobUrl));
+          });
+      }
     };
     reader.readAsDataURL(accepted[0]);
   },
@@ -1066,6 +1083,7 @@ NewUser = graphql(Query.getUserListQry, {
 })(NewUser);
 
 NewUser = graphql(FileQueries.createFile, { name: "createFile" })(NewUser);
+NewUser = graphql(FileQueries.updateFile, { name: "updateFile" })(NewUser);
 NewUser = withApollo(NewUser);
 
 export default NewUser;
