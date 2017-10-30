@@ -36,9 +36,9 @@ const email = value =>
     ? 'Invalid email address'
     : undefined
 const facebook = value =>
-	value && !/(?:(?:http|https):\/\/)?(?:www.)?facebook.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/.test(value)
-		? 'Invalid facebook address'
-		: undefined
+  value && !/(?:(?:http|https):\/\/)?(?:www.)?facebook.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?/.test(value)
+    ? 'Invalid facebook address'
+    : undefined
 const tooOld = value =>
   value && value > 65 ? 'You might be too old for this' : undefined
 const aol = value =>
@@ -74,7 +74,7 @@ const renderField = ({
           <p className="help-block" style={{color: "red"}}>
             {warning}
           </p>))}
-  </div>
+        </div>
 
 const renderSelect = ({
   input,
@@ -97,10 +97,10 @@ const renderSelect = ({
           <p className="help-block" style={{color: "red"}}>
             {warning}
           </p>))}
-  </div>
+        </div>
 
 let NewUser = React.createClass({
-	propTypes: {
+  propTypes: {
     isLoading: React.PropTypes.bool.isRequired,
     opacity: React.PropTypes.number.isRequired,
   },
@@ -110,11 +110,11 @@ let NewUser = React.createClass({
     }
   },
   getDefaultProps: function() {
-  	var image = getConfig('rootUrl')+"/images/avatar-default.png";
+    var image = getConfig('rootUrl')+"/images/avatar-default.png";
     return {
-			isLoading: false,
+      isLoading: false,
       opacity: 1,
-			avatar: image,
+      avatar: image,
       passwordActive: false,
       mode: "",
       roleList: [],
@@ -209,6 +209,13 @@ let NewUser = React.createClass({
         });
       }
       me.disableForm(false);
+    }).catch((error) => {
+      me.disableForm(false);
+      me.notifiaction.addNotification({
+        message: 'An Error Occured',
+        level: 'error',
+        position: 'tr'
+      });
     })
 
     // Change password
@@ -270,6 +277,7 @@ let NewUser = React.createClass({
     });
   },
   handleImageDrop: function(accepted){
+  debugger
     var me = this;
     var reader = new FileReader();
     reader.onloadend = function(res) {
