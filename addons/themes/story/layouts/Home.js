@@ -20,62 +20,24 @@ debugger
 
       <div id="wrapper" className="divided">
 
-        
-          <section className="banner style1 orient-left content-align-left image-position-right fullscreen onload-image-fade-in onload-content-fade-right">
-            <div className="content">
-              <h1>{this.props.data ? this.props.data[0].title:""}</h1>
-              <p className="major">{this.props.data ? this.props.data[0].content:""}</p>
-              <ul className="actions vertical">
-                <li><a href="#first" className="button big wide smooth-scroll-middle">Get Started</a></li>
-              </ul>
-            </div>
-            <div className="image">
-              <img src={ this.props.data ? this.props.data[0].imageFeatured : require('images/logo-128.png')} alt="" />
-            </div>
-          </section>
-
-        
-          <section className="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in" id="first">
-            <div className="content">
-              <h2>{this.props.data ? this.props.data[1].title:""}</h2>
-              <p>{this.props.data ? this.props.data[1].content:""}</p>
-              <ul className="actions vertical">
-                <li><a href="#" className="button">Learn More</a></li>
-              </ul>
-            </div>
-            <div className="image">
-              <img src={ this.props.data ? this.props.data[1].imageFeatured : require('images/logo-128.png')} alt="" />
-            </div>
-          </section>
-
-        
-          <section className="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
-            <div className="content">
-              <h2>{this.props.data ? this.props.data[2].title:""}</h2>
-              <p>{this.props.data ? this.props.data[2].content.slice(0, 100):""}</p>
-              <ul className="actions vertical">
-                <li><a href="#" className="button">Learn More</a></li>
-              </ul>
-            </div>
-            <div className="image">
-              <img src={ this.props.data ? this.props.data[2].imageFeatured : require('images/logo-128.png')} alt="" />
-            </div>
-          </section>
-
-       
-          <section className="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in">
-            <div className="content">
-              <h2>{this.props.data ? this.props.data[3].title:""}</h2>
-              <p><p>{this.props.data ? this.props.data[2].content.slice(0, 100):""}</p></p>
-              <ul className="actions vertical">
-                <li><a href="#" className="button">Learn More</a></li>
-              </ul>
-            </div>
-            <div className="image">
-              <img src={ this.props.data ? this.props.data[3].imageFeatured : require('images/logo-128.png')} alt="" />
-            </div>
-          </section>
-
+        {data && data.map((post) => {
+          data.map((variable, index) => (
+            <section className={index%2===0 ? "spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in":"spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in" }>
+          
+              <div className="content">
+                <h2>{post.title && post.title}</h2>
+                <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 100):""}} />
+                <ul className="actions vertical">
+                  <li><a href="#" className="button">Learn More</a></li>
+                </ul>
+              </div>
+              <div className="image">
+                <img src={post.imageFeatured ? post.imageFeatured.blobUrl:"" } alt="" />
+              </div>  
+            </section>
+            )
+          )}
+        )}
         
           <section className="wrapper style1 align-center">
             <div className="inner">
