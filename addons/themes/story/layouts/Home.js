@@ -1,6 +1,8 @@
 import React from 'react';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
+import FooterWidgets from '../includes/FooterWidgets';
+import Footer from '../includes/Footer';
 
 // export default class Home extends React.Component {
 let Home = React.createClass({
@@ -263,44 +265,9 @@ debugger
             </div>
           </section>
 
-        
-          <section className="wrapper style1 align-center">
-            <div className="inner medium">
-              <h2>Get in touch</h2>
-              <form method="post" action="#">
-                <div className="field half first">
-                  <label for="name">Name</label>
-                  <input type="text" name="name" id="name" value="" />
-                </div>
-                <div className="field half">
-                  <label for="email">Email</label>
-                  <input type="email" name="email" id="email" value="" />
-                </div>
-                <div className="field">
-                  <label for="message">Message</label>
-                  <textarea name="message" id="message" rows="6"></textarea>
-                </div>
-                <ul className="actions">
-                  <li><input type="submit" name="submit" id="submit" value="Send Message" /></li>
-                </ul>
-              </form>
 
-            </div>
-          </section>
-
-        
-          <footer className="wrapper style1 align-center">
-            <div className="inner">
-              <ul className="icons">
-                <li><a href="#" className="icon style2 fa-twitter"><span className="label">Twitter</span></a></li>
-                <li><a href="#" className="icon style2 fa-facebook"><span className="label">Facebook</span></a></li>
-                <li><a href="#" className="icon style2 fa-instagram"><span className="label">Instagram</span></a></li>
-                <li><a href="#" className="icon style2 fa-linkedin"><span className="label">LinkedIn</span></a></li>
-                <li><a href="#" className="icon style2 fa-envelope"><span className="label">Email</span></a></li>
-              </ul>
-              <p>&copy; Untitled. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
-            </div>
-          </footer>
+          <FooterWidgets {...this.props}/>
+          <Footer />
 
       </div>
     )
