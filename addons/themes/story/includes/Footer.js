@@ -4,6 +4,7 @@ class Footer extends React.Component {
   render(){
     return (
       <footer id="footer">
+      <section className="wrapper style1 ">
         <div className="inner">
           <ul className="copyright">
             <li>Story based theme</li>
@@ -11,6 +12,7 @@ class Footer extends React.Component {
             <li>converted by Rendact Team</li>
           </ul>
         </div>
+      </section>
       </footer>
     )
   }
