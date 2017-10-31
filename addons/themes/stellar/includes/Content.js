@@ -7,7 +7,7 @@ class Content extends React.Component {
     return (
       <section id="content" className="main">
         <span className="image main">
-          <img src={image} />
+          <img src={image} style={{ marginTop: 80 }} />
         </span>
         <h2>{title}</h2>
         <div dangerouslySetInnerHTML={{ __html: content }} />
