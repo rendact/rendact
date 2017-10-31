@@ -41,6 +41,9 @@ class Home extends React.Component {
           tagline={
             (theConfig && theConfig.tagline) || "Just another rendact blog"
           }
+          logo={
+            (theConfig && theConfig.logo) || require("images/logo-circle.svg")
+          }
         />
         <Nav {...this.props} />
         <Main>
