@@ -24,6 +24,7 @@ class Home extends React.Component {
               id={post.id}
             />
           ))}
+        {thePagination}
       </section>
     );
   }
@@ -32,12 +33,18 @@ class Home extends React.Component {
     require("../assets/css/main.css");
   }
   render() {
+    let { data, thePagination, loadDone, theConfig } = this.props;
     return (
       <div id="wrapper">
-        <Header title="Rendact" tagline="hello" />
-        <Nav />
-        <Main>{this.renderPostList(this.props.data)}</Main>
-        <Footer />
+        <Header
+          title={(theConfig && theConfig.name) || "Rendact"}
+          tagline={
+            (theConfig && theConfig.tagline) || "Just another rendact blog"
+          }
+        />
+        <Nav {...this.props} />
+        <Main>{this.renderPostList(data, thePagination)}</Main>
+        <Footer {...this.props} />
       </div>
     );
   }
