@@ -3,6 +3,8 @@ import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import FooterWidgets from '../includes/FooterWidgets';
 import Footer from '../includes/Footer';
+import Header from '../includes/Header';
+import {Link} from 'react-router';
 
 // export default class Home extends React.Component {
 let Home = React.createClass({
@@ -17,10 +19,16 @@ let Home = React.createClass({
       thePagination,
       loadDone
     } = this.props
-debugger
+// debugger
     return (
 
       <div id="wrapper" className="divided">
+
+          <Header
+            name={theConfig ? theConfig.name : "Rendact"} 
+            tagline={theConfig ? theConfig.tagline: "hello"}
+            {...this.props}
+          />
 
           {data && data.map((post, index) => (
             <section className={index%2===0 ? "spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in":"spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in" }>
@@ -29,11 +37,13 @@ debugger
                 <h2>{post.title && post.title}</h2>
                 <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 100):""}} />
                 <ul className="actions vertical">
-                  <li><a href="#" className="button">Learn More</a></li>
+                  <li><Link className="button" to={"/post/" + post.id}>Learn More</Link></li>
                 </ul>
               </div>
               <div className="image">
-                <img src={post.imageFeatured ? post.imageFeatured.blobUrl:"" } alt="" />
+                <Link to={"/post/" + post.id}>
+                  <img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
+                </Link>
               </div>  
             </section>
             )
@@ -279,45 +289,5 @@ debugger
     )
   }
 });
-
-// let getAllPosts = gql`
-// query getAllPosts {
-//   viewer { 
-//     allPosts(where: {type: {eq: "post"}}) {
-//       edges { 
-//         node { 
-//           id,
-//           title,
-//           content,
-//           featuredImage,
-//         }
-//       }
-//     }
-//   }
-// }
-// `
-// Home = graphql(getAllPosts,
-//   { 
-//     // options: props => ({
-//     //   variables: {
-//     //     type: props.postType,
-//     //   },
-//     // }),
-//     props: ({ownProps, data}) => {
-//       if (!data.loading) {
-//           let allPost = data.viewer.allPosts.edges;
-//           allPost = _.map(allPost, item => item.node)
-
-//           return{
-//             isLoading: false,
-//             allPost : allPost,
-//           }
-//       } else { 
-//         return {
-//           isLoading: true
-//         }
-//       }
-//     }
-// })(Home)
 
 export default Home;
