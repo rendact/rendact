@@ -43,7 +43,15 @@ class Home extends React.Component {
           }
         />
         <Nav {...this.props} />
-        <Main>{this.renderPostList(data, thePagination)}</Main>
+        <Main>
+          {loadDone ? (
+            theConfig.frontPage === "page" ? (
+              <Content content={data && data.content} />
+            ) : (
+              this.renderPostList(data, thePagination)
+            )
+          ) : null}
+        </Main>
         <Footer {...this.props} />
       </div>
     );
