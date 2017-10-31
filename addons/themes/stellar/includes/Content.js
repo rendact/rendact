@@ -1,0 +1,18 @@
+import React from "react";
+
+class Content extends React.Component {
+  render() {
+    ({ image, title, content, date } = this.props);
+    return (
+      <section id="content" className="main">
+        <span className="image main">
+          <img src={image} />
+        </span>
+        <h2>{title}</h2>
+        <div dangerouslySetInnerHTML={{ __html: content }} />
+      </section>
+    );
+  }
+}
+
+export default Content;
