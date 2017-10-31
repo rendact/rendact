@@ -12,6 +12,19 @@ let createFile = gql`
   }
 `;
 
+const updateFile = gql`
+  mutation updateFile($input: UpdateFileInput!) {
+    updateFile(input: $input) {
+      changedFile {
+        id
+        name
+        blobUrl
+      }
+    }
+  }
+`;
+
 export default {
-  createFile: createFile
+  createFile: createFile,
+  updateFile: updateFile
 };

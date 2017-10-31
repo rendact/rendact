@@ -9,6 +9,8 @@ import Notification from "react-notification-system";
 import Halogen from "halogen";
 
 import Query from "../query";
+import FileQueries from "../query/File";
+
 import AdminConfig from "../AdminConfig";
 import Config from "../../rendact.config.json";
 import {
@@ -143,11 +145,9 @@ let NewUser = React.createClass({
     };
   },
   getDefaultProps: function() {
-    var image = getConfig("rootUrl") + "/images/avatar-default.png";
     return {
       isLoading: false,
       opacity: 1,
-      avatar: image,
       passwordActive: false,
       mode: "",
       roleList: [],
@@ -205,7 +205,8 @@ let NewUser = React.createClass({
         v.name,
         v.gender,
         v.country,
-        dateOfBirth
+        dateOfBirth,
+        this.props.image.id
       );
       // qry = Query.createUserMtn(v.username, v["new-password"], v.name, v.gender, v.country, dateOfBirth)
     }
@@ -275,8 +276,9 @@ let NewUser = React.createClass({
         me.disableForm(false);
       })
       .catch(error => {
+        console.log(error);
         me.disableForm(false);
-        me.notifiaction.addNotification({
+        me.notification.addNotification({
           message: "An Error Occured",
           level: "error",
           position: "tr"
@@ -309,7 +311,7 @@ let NewUser = React.createClass({
   handleGeneratePassword: function(event) {
     event.preventDefault();
     var Password = require("node-password").Password;
-    var pw = new Password();
+    var pw = new Password().toString();
     this.setState({ passwordTemp: pw });
     this.setState({ passwordMatch: true });
     this.refs.passwordStrength.setState({ password: pw });
@@ -349,16 +351,43 @@ let NewUser = React.createClass({
       });
   },
   handleImageDrop: function(accepted) {
-    debugger;
-    /*
     var me = this;
     var reader = new FileReader();
     reader.onloadend = function(res) {
-      var imageBase64 = res.target.result;
-      me.props.dispatch(setAvatar(imageBase64));
+      if (me.props.image && me.props.image.id) {
+        me.props.dispatch(setImage(me.props.image.id, res.target.result));
+        me.props
+          .updateFile({
+            variables: {
+              input: {
+                id: me.props.image.id,
+                blobFieldName: "avatarField",
+                avatarField: accepted[0]
+              }
+            }
+          })
+          .then(({ data: { updateFile: { changedFile } } }) => {
+            me.props.dispatch(setImage(changedFile.id, changedFile.blobUrl));
+          });
+      } else {
+        me.props.dispatch(setImage(null, res.target.result));
+        me.props
+          .createFile({
+            variables: {
+              input: {
+                name: "avatar",
+                type: "avatar",
+                blobFieldName: "avatarField",
+                avatarField: accepted[0]
+              }
+            }
+          })
+          .then(({ data: { createFile: { changedFile } } }) => {
+            me.props.dispatch(setImage(changedFile.id, changedFile.blobUrl));
+          });
+      }
     };
     reader.readAsDataURL(accepted[0]);
-    */
   },
   handleTimezoneChange: function(tz) {
     this.props.dispatch(setTimezone(tz));
@@ -559,7 +588,15 @@ let NewUser = React.createClass({
                       <div className="col-md-9">
                         <Dropzone onDrop={this.handleImageDrop}>
                           <div className="avatar-container">
-                            <img src={this.props.avatar} alt="" id="avatar" />
+                            <img
+                              src={
+                                this.props.image && this.props.image.id
+                                  ? this.props.image.url
+                                  : require("images/avatar-default.png")
+                              }
+                              alt=""
+                              id="avatar"
+                            />
                             <div className="avatar-overlay" />
                             <div className="avatar-button">
                               <a href="#" onClick={e => e.preventDefault()}>
@@ -1047,6 +1084,8 @@ NewUser = graphql(Query.getUserListQry, {
   }
 })(NewUser);
 
+NewUser = graphql(FileQueries.createFile, { name: "createFile" })(NewUser);
+NewUser = graphql(FileQueries.updateFile, { name: "updateFile" })(NewUser);
 NewUser = withApollo(NewUser);
 
 export default NewUser;
