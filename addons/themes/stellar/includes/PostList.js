@@ -7,7 +7,9 @@ class PostList extends React.Component {
     return (
       <section className="row">
         <div className="8u">
-          <h2 style={{ textTransform: "capitalize" }}>{title}</h2>
+          <h2 style={{ textTransform: "capitalize" }}>
+            <Link to={"/post/" + id}>{title}</Link>
+          </h2>
           <p dangerouslySetInnerHTML={{ __html: content }} />
           <ul className="actions align-right">
             <li>
