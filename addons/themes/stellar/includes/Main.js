@@ -2,7 +2,12 @@ import React from "react";
 
 class Main extends React.Component {
   render() {
-    return <div id="main">{this.props.children}</div>;
+    let { children, className } = this.props;
+    return (
+      <div id="main" className={className ? className : null}>
+        {this.props.children}
+      </div>
+    );
   }
 }
 

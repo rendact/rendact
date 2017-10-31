@@ -2,6 +2,7 @@ import React from "react";
 
 class Content extends React.Component {
   render() {
+    let image, title, content, date;
     ({ image, title, content, date } = this.props);
     return (
       <section id="content" className="main">
