@@ -1,14 +1,22 @@
 import React from "react";
+import { Link } from "react-router";
 
 class Nav extends React.Component {
   render() {
+    let theMenu = this.props.theMenu();
     return (
       <nav id="nav">
-        <ul>
-          <li>3</li>
-          <li>3</li>
-          <li>3</li>
-        </ul>
+        {theMenu.props.menuItems.length ? (
+          <ul className="icons" style={{ position: "absolute" }}>
+            <li>
+              <Link to="/" className="icon fa-home">
+                {" "}
+                Home
+              </Link>
+            </li>
+          </ul>
+        ) : null}
+        {theMenu}
       </nav>
     );
   }
