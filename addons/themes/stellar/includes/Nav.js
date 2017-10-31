@@ -10,10 +10,15 @@ class Nav extends React.Component {
       alt: false
     };
   }
-  handleOnScroll(e) {
-    let rect = document.getElementById("navControl").getBoundingClientRect();
 
-    let footerRect = document.getElementById("footer").getBoundingClientRect();
+  handleOnScroll(e) {
+    let navControl, footer;
+    navControl = document.getElementById("navControl");
+    footer = document.getElementById("footer");
+
+    let rect = navControl && navControl.getBoundingClientRect();
+
+    let footerRect = footer && footer.getBoundingClientRect();
 
     if (rect.top <= window.pageXOffset) {
       this.setState({ alt: true });
@@ -25,6 +30,7 @@ class Nav extends React.Component {
       this.setState({ alt: false });
     }
   }
+
   componentDidMount() {
     window.addEventListener("scroll", this.handleOnScroll);
   }
