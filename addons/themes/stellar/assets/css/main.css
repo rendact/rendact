@@ -3799,3 +3799,15 @@
 			}
 
 		}
+
+    /* Pagination */
+    .pagination {
+      list-style: none;
+      text-align: center;
+    }
+
+    .pagination li {
+      display: inline-block;
+      font-size: 1.5rem;
+      letter-spacing: 0.2rem;
+    }
