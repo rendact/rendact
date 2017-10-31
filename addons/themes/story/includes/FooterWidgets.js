@@ -6,7 +6,7 @@ class FooterWidgets extends React.Component {
       footerWidgets
     } = this.props;
     return(
-      <section>
+      <section className="wrapper style1">
         <div className="inner">
           <div className="row">
             {footerWidgets.map((fw, i) => (
