@@ -38,6 +38,12 @@ debugger
             </section>
             )
           )}
+
+          <section className="wrapper style1 align-center">
+            <div style={{textAlign: "center"}}>
+                {this.props.thePagination}
+            </div>
+          </section>
         
           <section className="wrapper style1 align-center">
             <div className="inner">
