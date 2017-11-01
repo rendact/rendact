@@ -34,7 +34,7 @@ class Spotlight extends React.Component {
         ref={section => {
           this.section = section;
         }}
-        className="inactive"
+        className={className}
       >
         <a
           href="#"

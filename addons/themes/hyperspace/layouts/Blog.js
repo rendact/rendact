@@ -21,7 +21,7 @@ class Home extends React.Component {
         {data &&
           data.map((post, idx) => (
             <Spotlight
-              className="inactive"
+              className="active"
               content={data.content && data.content.trim.slice(0, 100)}
               title={post.title}
               image={
@@ -38,11 +38,11 @@ class Home extends React.Component {
   }
 
   render() {
-    let { loadDone, theConfig, data } = this.props;
+    let { loadDone, theConfig, latestPosts: data, thePagination } = this.props;
     return (
       <div>
-        <Nav {...this.props} />
-        <Wrapper>{this.renderPostList(data)}</Wrapper>
+        <Nav title={theConfig ? theConfig.name : "Rendact"} {...this.props} />
+        <Wrapper>{this.renderPostList(data, thePagination)}</Wrapper>
         <Footer />
       </div>
     );
