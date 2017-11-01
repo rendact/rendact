@@ -1,68 +1,54 @@
 import React from 'react';
-import gql from 'graphql-tag';
-import {graphql} from 'react-apollo';
-import FooterWidgets from '../includes/FooterWidgets';
-import Footer from '../includes/Footer';
 import Header from '../includes/Header';
-import {Link} from 'react-router';
+import Footer from '../includes/Footer';
+import FooterWidgets from '../includes/FooterWidgets';
+// import Menu from '../includes/Menu';
+// import Post from '../includes/Post';
 
-// export default class Home extends React.Component {
-let Blog = React.createClass({
+class Blog extends React.Component {
   componentDidMount(){
     require('../assets/css/main.css')
-  },
+  }
 
   render(){
     let {
+      postData,
       theConfig,
-      data,
-      thePagination,
-      loadDone
-    } = this.props
+      title,
+      image,
+      content,
+      isHome
+    } = this.props;
 // debugger
     return (
-
       <div id="wrapper" className="divided">
-
           <Header
             name={theConfig ? theConfig.name : "Rendact"} 
             tagline={theConfig ? theConfig.tagline: "hello"}
             {...this.props}
           />
-
-          {data && data.map((post, index) => (
-            <section className={index%2===0 ? "spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in":"spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in" }>
-          
-              <div className="content">
-                <h2>{post.title && post.title}</h2>
-                <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 100):""}} />
-                <ul className="actions vertical">
-                  <li><Link className="button" to={"/post/" + post.id}>Learn More</Link></li>
-                </ul>
-              </div>
-              <div className="image">
-                <Link to={"/post/" + post.id}>
-                  <img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
-                </Link>
-              </div>  
-            </section>
-            )
-          )}
-
-          <section className="wrapper style1 align-center">
-            <div style={{textAlign: "center"}}>
-                {this.props.thePagination}
+          <div id="main" className="wrapper style1">
+            <div className="inner">
+              {postData &&
+              <section id="one">
+                <div className="inner">
+                  <span className="image main"><img src={postData.imageFeatured && postData.imageFeatured.blobUrl} alt=""/></span>
+                  {!isHome &&
+                    <header className="major">
+                      <h1>{postData.title}</h1>
+                    </header>
+                  }
+                  <div dangerouslySetInnerHTML={{__html: postData.content}}/>
+                </div>
+              </section>
+              }
             </div>
-          </section>
-        
-
-
+          </div>
           <FooterWidgets {...this.props}/>
           <Footer />
-
       </div>
     )
   }
-});
+}
 
 export default Blog;

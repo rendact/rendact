@@ -19,7 +19,7 @@ class Single extends React.Component {
       content,
       isHome
     } = this.props;
-debugger
+// debugger
     return (
       <div id="wrapper" className="divided">
           <Header
