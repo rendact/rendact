@@ -4,6 +4,7 @@ import Wrapper from "../includes/Wrapper";
 import Sidebar from "../includes/Sidebar";
 import Footer from "../includes/Footer";
 import Spotlight from "../includes/Spotlight";
+import Content from "../includes/Content";
 
 class Home extends React.Component {
   constructor(props) {
@@ -34,16 +35,28 @@ class Home extends React.Component {
               key={post.id}
             />
           ))}
+        {pagination}
       </section>
     );
   }
 
   render() {
-    let { loadDone, theConfig, data } = this.props;
+    let { loadDone, theConfig, data, theMenu, thePagination } = this.props;
     return (
       <div>
-        <Sidebar />
-        <Wrapper>{this.renderPostList(data)}</Wrapper>
+        <Sidebar theMenu={theMenu} />
+        <Wrapper>
+          {loadDone ? (
+            theConfig.frontPage === "latestPost" ? (
+              this.renderPostList(data, thePagination)
+            ) : (
+              <Content
+                image={data.imageFeatured ? data.imageFeatured.blobUrl : null}
+                content={data.content}
+              />
+            )
+          ) : null}
+        </Wrapper>
         <Footer />
       </div>
     );

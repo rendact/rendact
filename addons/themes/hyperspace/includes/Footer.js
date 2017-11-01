@@ -6,9 +6,8 @@ class Footer extends React.Component {
       <footer id="footer" className="wrapper style1-alt">
         <div className="inner">
           <ul className="menu">
-            <li>footer text 1</li>
-            <li>footer text 2</li>
-            <li>footer text 3</li>
+            <li>Hyperspace</li>
+            <li>Rendact Team</li>
           </ul>
         </div>
       </footer>
