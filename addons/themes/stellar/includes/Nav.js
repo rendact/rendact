@@ -5,10 +5,6 @@ class Nav extends React.Component {
   constructor(props) {
     super(props);
     this.handleOnScroll = this.handleOnScroll.bind(this);
-
-    this.state = {
-      alt: false
-    };
   }
 
   handleOnScroll(e) {
@@ -21,13 +17,13 @@ class Nav extends React.Component {
     let footerRect = footer && footer.getBoundingClientRect();
 
     if (rect.top <= window.pageXOffset) {
-      this.setState({ alt: true });
+      this.nav && this.nav.classList.add("alt");
     } else {
-      this.setState({ alt: false });
+      this.nav && this.nav.classList.remove("alt");
     }
 
     if (footerRect.top + rect.height <= window.pageXOffset) {
-      this.setState({ alt: false });
+      this.nav && this.nav.classList.remove("alt");
     }
   }
 
@@ -42,7 +38,7 @@ class Nav extends React.Component {
     return (
       <div>
         <div id="navControl" />
-        <nav id="nav" className={this.state.alt ? "alt" : null}>
+        <nav id="nav" ref={nav => (this.nav = nav)}>
           {theMenu.props.menuItems.length ? (
             <ul className="icons" style={{ position: "absolute" }}>
               <li>
