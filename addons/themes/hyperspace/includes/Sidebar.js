@@ -2,24 +2,10 @@ import React from "react";
 
 class Sidebar extends React.Component {
   render() {
+    let { theMenu } = this.props;
     return (
       <section id="sidebar">
-        <div className="inner">
-          <ul>
-            <li>
-              <a>1</a>
-            </li>
-            <li>
-              <a>2</a>
-            </li>
-            <li>
-              <a>3</a>
-            </li>
-            <li>
-              <a>4</a>
-            </li>
-          </ul>
-        </div>
+        <div className="inner">{theMenu()}</div>
       </section>
     );
   }
