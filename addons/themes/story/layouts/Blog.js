@@ -5,7 +5,7 @@ import FooterWidgets from '../includes/FooterWidgets';
 // import Menu from '../includes/Menu';
 // import Post from '../includes/Post';
 
-class Single extends React.Component {
+class Blog extends React.Component {
   componentDidMount(){
     require('../assets/css/main.css')
   }
@@ -51,4 +51,4 @@ class Single extends React.Component {
   }
 }
 
-export default Single;
+export default Blog;
