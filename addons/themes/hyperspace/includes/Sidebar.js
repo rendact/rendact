@@ -5,7 +5,9 @@ class Sidebar extends React.Component {
     let { theMenu } = this.props;
     return (
       <section id="sidebar">
-        <div className="inner">{theMenu()}</div>
+        <div className="inner">
+          <nav>{theMenu()}</nav>
+        </div>
       </section>
     );
   }
