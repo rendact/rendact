@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router";
 
 class Spotlight extends React.Component {
   render() {
@@ -9,7 +10,7 @@ class Spotlight extends React.Component {
           href="#"
           className="image"
           style={{
-            backgroundImage: url(image),
+            backgroundImage: `url(${image})`,
             backgroundPosition: "center center"
           }}
         />
