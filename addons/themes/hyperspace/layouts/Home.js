@@ -24,7 +24,7 @@ class Home extends React.Component {
           data.map((post, idx) => (
             <Spotlight
               className="inactive"
-              content={data.content && data.content.trim.slice(0, 100)}
+              content={post.content && post.content.trim().slice(0, 100)}
               title={post.title}
               image={
                 post.imageFeatured
