@@ -1,15 +1,46 @@
 import React from "react";
+import { Link } from "react-router";
 
 class Spotlight extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleScroll = this.handleScroll.bind(this);
+  }
+
+  componentDidMount() {
+    window.addEventListener("scroll", this.handleScroll);
+  }
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.handleScroll);
+  }
+
+  handleScroll(e) {
+    if (this.section) {
+      let rect = this.section.getBoundingClientRect(),
+        scrollPos =
+          document.documentElement.scrollTop || document.body.scrollTop;
+
+      if (rect.top + 20 * 0.65 <= scrollPos) {
+        this.section.classList.remove("inactive");
+      } else {
+        this.section.classList.add("innactive");
+      }
+    }
+  }
   render() {
     let { image, content, title, id, className } = this.props;
     return (
-      <section className={className}>
+      <section
+        ref={section => {
+          this.section = section;
+        }}
+        className="inactive"
+      >
         <a
           href="#"
           className="image"
           style={{
-            backgroundImage: url(image),
+            backgroundImage: `url(${image})`,
             backgroundPosition: "center center"
           }}
         />
