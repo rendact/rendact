@@ -1,19 +1,15 @@
 import React from "react";
+import { Link } from "react-router";
 
 class Nav extends React.Component {
   render() {
+    let { theMenu, title } = this.props;
     return (
       <header id="header">
-        <a className="title">Rendact</a>
-        <nav>
-          <ul>
-            <li>
-              <a>nav item 1</a>
-              <a>nav item 2</a>
-              <a>nav item 3</a>
-            </li>
-          </ul>
-        </nav>
+        <Link to="/" className="title">
+          {title}
+        </Link>
+        <nav>{theMenu()}</nav>
       </header>
     );
   }
