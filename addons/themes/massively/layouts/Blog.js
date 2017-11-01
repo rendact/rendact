@@ -1,45 +1,131 @@
-import React from 'react';
-import HeaderWrapper from '../includes/HeaderWrapper';
-import Footer from '../includes/Footer';
-import NavPanel from '../includes/NavPanel';
+import React from "react";
+import MediaQuery from "react-responsive";
+import HeaderWrapper from "../includes/HeaderWrapper";
+import Footer from "../includes/Footer";
+import PostList from "../includes/PostList";
+import NavPanel from "../includes/NavPanel";
 
+class HomePostList extends React.Component {
+  render() {
+    return (
+      <div id="main">
+        <section className="posts">
+          {this.props.latestPosts &&
+            this.props.latestPosts.map(post => (
+              <PostList
+                key={post.id}
+                imageFeatured={
+                  post.imageFeatured
+                    ? post.imageFeatured.blobUrl
+                    : require("images/logo-128.png")
+                }
+                content={post.content && post.content.slice(0, 100) + "..."}
+                postId={post.id}
+                date={post.publishDate && post.publishDate.toString()}
+                title={post.title}
+              />
+            ))}
 
-class Single extends React.Component {
-  componentDidMount(){
-    require("../css/main.css")
-    document.body.className = "";
-  }
-  render(){
-    return(
-      <div>
-      <div id="wrapper" >
-        <HeaderWrapper intro={false} {...this.props}/>
-        <div id="main">
-          <section className="post">
-            <header className="major">
-              <span className="date">{this.props.postData.publishDate}</span>
-              <h1>{this.props.postData.title}</h1>
-            </header>
-
-            <div className="image main">
-              <img src={this.props.postData.imageFeatured?this.props.postData.imageFeatured.blobUrl:require("images/logo-128.png")}/>
-            </div>
-
-            <div dangerouslySetInnerHTML={{__html: this.props.postData.content}}/>
-
-          </section>
-        </div>
-
-        <Footer {...this.props}/>
-        <div className="bg" style={{transform: [
-          {matrix: [1, 0, 0, 1, 0, 3862.8]}
-        ]
-        }}/>
+          <footer>{this.props.thePagination}</footer>
+        </section>
       </div>
-      <NavPanel {...this.props}/>
-      </div>
-    )
+    );
   }
 }
 
-export default Single;
+class HomePage extends React.Component {
+  render() {
+    return this.props.data ? (
+      <section className="post">
+        <div className="image main">
+          <img
+            src={
+              this.props.data.imageFeatured
+                ? this.props.data.imageFeatured.blobUrl
+                : require("images/logo-128.png")
+            }
+            alt=""
+          />
+        </div>
+        <p dangerouslySetInnerHTML={{ __html: this.props.data.content }} />
+      </section>
+    ) : null;
+  }
+}
+
+class Blog extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleHideIntro = this.handleHideIntro.bind(this);
+    this.renderContent = this.renderContent.bind(this);
+
+    this.state = {
+      intro: true
+    };
+  }
+
+  componentDidMount() {
+    require("../css/main.css");
+    document.body.className = "";
+    window.addEventListener("scroll", this.handleHideIntro);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.handleHideIntro);
+    window.removeEventListener("scroll", this.handleToggleAlt);
+  }
+
+  handleHideIntro(e) {
+    /* 
+     * hide intro when window.pageYOffset => header.height
+     */
+
+    let header = document.getElementById("header");
+    let headerRect = header.getBoundingClientRect();
+
+    if (window.pageYOffset >= headerRect.height - 10) {
+      this.setState({ intro: false });
+    } else {
+      this.setState({ intro: true });
+    }
+  }
+
+  renderContent() {
+    return <BlogPostList {...this.props} />;
+  }
+
+  render() {
+    return (
+      <div>
+        <div className="fade-in" id="wrapper">
+          <HeaderWrapper
+            intro={this.state.intro}
+            isBlog={true}
+            {...this.props}
+          />
+          <div id="main">
+            {this.props.loadDone ? (
+              this.renderContent()
+            ) : (
+              <div style={{ height: "75%" }}>&nbsp;</div>
+            )}
+          </div>
+
+          <Footer {...this.props} />
+
+          <div
+            className="bg"
+            style={{
+              transform: [{ matrix: [1, 0, 0, 1, 0, 3862.8] }]
+            }}
+          />
+        </div>
+
+        <NavPanel {...this.props} />
+      </div>
+    );
+  }
+}
+
+export default Blog;
