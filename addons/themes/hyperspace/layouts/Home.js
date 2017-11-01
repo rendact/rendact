@@ -19,7 +19,12 @@ class Home extends React.Component {
 
   renderPostList(data, pagination) {
     return (
-      <section className="wrapper style2 spotlights">
+      <section
+        className="wrapper style2 spotlights"
+        style={
+          data && data.length ? { minHeight: null } : { minHeight: "100vh" }
+        }
+      >
         {data &&
           data.map((post, idx) => (
             <Spotlight
@@ -41,11 +46,18 @@ class Home extends React.Component {
   }
 
   render() {
-    let { loadDone, theConfig, data, theMenu, thePagination } = this.props;
+    let {
+      loadDone,
+      theConfig,
+      data,
+      theMenu,
+      thePagination,
+      footerWidgets
+    } = this.props;
     return (
       <div>
         <Sidebar theMenu={theMenu} />
-        <Wrapper>
+        <Wrapper footerWidgets={footerWidgets}>
           {loadDone ? (
             theConfig.frontPage === "latestPost" ? (
               this.renderPostList(data, thePagination)

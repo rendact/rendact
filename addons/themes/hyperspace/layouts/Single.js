@@ -14,12 +14,13 @@ class Home extends React.Component {
     let {
       theMenu,
       postData: { title, content, imageFeatured },
-      theConfig
+      theConfig,
+      footerWidgets
     } = this.props;
     return (
       <div>
         <Nav theMenu={theMenu} title={theConfig && theConfig.name} />
-        <Wrapper>
+        <Wrapper footerWidgets={footerWidgets}>
           <Content
             title={title}
             content={content}

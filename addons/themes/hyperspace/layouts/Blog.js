@@ -17,7 +17,12 @@ class Home extends React.Component {
 
   renderPostList(data, pagination) {
     return (
-      <section className="wrapper style2 spotlights">
+      <section
+        className="wrapper style2 spotlights"
+        style={
+          data && data.length ? { minHeight: null } : { minHeight: "100vh" }
+        }
+      >
         {data &&
           data.map((post, idx) => (
             <Spotlight
@@ -38,11 +43,19 @@ class Home extends React.Component {
   }
 
   render() {
-    let { loadDone, theConfig, latestPosts: data, thePagination } = this.props;
+    let {
+      loadDone,
+      footerWidgets,
+      theConfig,
+      latestPosts: data,
+      thePagination
+    } = this.props;
     return (
       <div>
         <Nav title={theConfig ? theConfig.name : "Rendact"} {...this.props} />
-        <Wrapper>{this.renderPostList(data, thePagination)}</Wrapper>
+        <Wrapper footerWidgets={footerWidgets}>
+          {this.renderPostList(data, thePagination)}
+        </Wrapper>
         <Footer />
       </div>
     );
