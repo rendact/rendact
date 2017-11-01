@@ -41,9 +41,20 @@ class Home extends React.Component {
           tagline={
             (theConfig && theConfig.tagline) || "Just another rendact blog"
           }
+          logo={
+            (theConfig && theConfig.logo) || require("images/logo-circle.svg")
+          }
         />
         <Nav {...this.props} />
-        <Main>{this.renderPostList(data, thePagination)}</Main>
+        <Main>
+          {loadDone ? (
+            theConfig.frontPage === "page" ? (
+              <Content content={data && data.content} />
+            ) : (
+              this.renderPostList(data, thePagination)
+            )
+          ) : null}
+        </Main>
         <Footer {...this.props} />
       </div>
     );

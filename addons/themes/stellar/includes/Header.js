@@ -8,10 +8,10 @@ class Header extends React.Component {
       <header id="header">
         {logo && (
           <span className="logo">
-            <img src={logo} />
+            <img src={logo} style={{ maxHeight: 85, maxWidth: 85 }} />
           </span>
         )}
-        <h2>{title}</h2>
+        <h1>{title}</h1>
         <p>{tagline}</p>
       </header>
     );

@@ -11,15 +11,21 @@ class Home extends React.Component {
     require("../assets/css/main.css");
   }
   render() {
-    let { theConfig } = this.props;
+    let { theConfig, postData } = this.props;
     return (
       <div id="wrapper">
-        <Header
-          title={theConfig ? theConfig.name : "Rendact"}
-          tagline={theConfig ? theConfig.tagline : "Just another rendact blog"}
-        />
+        <Header title={postData.title} />
         <Nav {...this.props} />
-        <Main>ksajfalfa</Main>
+        <Main>
+          <Content
+            image={
+              postData.imageFeatured
+                ? postData.imageFeatured.blobUrl
+                : require("images/logo-128.png")
+            }
+            content={postData.content}
+          />
+        </Main>
         <Footer {...this.props} />
       </div>
     );

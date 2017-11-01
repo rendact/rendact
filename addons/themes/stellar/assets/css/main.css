@@ -3712,7 +3712,7 @@
 	}
 
 		#footer > * {
-			width: calc(50% - 2em);
+			width: calc(33.33% - 2em);
 			margin-left: 2em;
 		}
 
@@ -3799,3 +3799,15 @@
 			}
 
 		}
+
+    /* Pagination */
+    .pagination {
+      list-style: none;
+      text-align: center;
+    }
+
+    .pagination li {
+      display: inline-block;
+      font-size: 1.5rem;
+      letter-spacing: 0.2rem;
+    }
