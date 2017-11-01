@@ -31,6 +31,7 @@ class Home extends React.Component {
                   : require("images/logo-128.png")
               }
               id={post.id}
+              key={post.id}
             />
           ))}
       </section>
