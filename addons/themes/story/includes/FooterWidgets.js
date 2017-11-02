@@ -6,7 +6,7 @@ class FooterWidgets extends React.Component {
       footerWidgets
     } = this.props;
     return(
-      <section className="wrapper style1">
+      <section className="wrapper style1" style={{backgroundColor: "#E6E6FA"}}>
         <div className="inner">
           <div className="row">
             {footerWidgets.map((fw, i) => (

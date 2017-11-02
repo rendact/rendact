@@ -3,7 +3,7 @@ import {Link} from 'react-router';
 
 class Header extends React.Component {
   render(){
-    debugger
+    // debugger
     return (
       <header id="header" className="reveal">
         <Link to="/" className="logo">

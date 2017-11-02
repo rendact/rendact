@@ -27,7 +27,7 @@ class Blog extends React.Component {
             tagline={theConfig ? theConfig.tagline: "hello"}
             {...this.props}
           />
-          <div id="main" className="wrapper style1">
+          <div id="main" className="wrapper style1" style={{backgroundColor: "#D3D3D3"}}>
             <div className="inner">
               {postData &&
               <section id="one">

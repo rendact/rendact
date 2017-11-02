@@ -2031,7 +2031,7 @@
 		input[type="button"].special,
 		button.special,
 		.button.special {
-			background-color: #000000;
+			background-color: #696969;
 			box-shadow: none;
 			color: #ffffff !important;
 		}
@@ -7147,7 +7147,7 @@
 
 		}
 
-	#wrapper > .wrapper.style2.invert:not(.color1):not(.color2):not(.color3):not(.color4):not(.color5):not(.color6):not(.color7) {
+	#wrapper > .wrapper.style2.invert:not(.color1):not(.color2):not(.color3):not(.color4):not(.color5):not(.color6):not(.color7):not(.color8) {
 		background-color: #222222;
 	}
 
@@ -8396,7 +8396,11 @@
 		}
 
 		#wrapper > .color7 {
-			background-color: #6ba78c;
+			background-color: #F5F5F5;
+		}
+
+		#wrapper > .color8 {
+			background-color: #D3D3D3;
 		}
 
 		#wrapper.divided > * {
@@ -8416,6 +8420,10 @@
 			}
 
 /* Footer */
+
+	#footer .wrapper {
+		background-color: #778899;
+	}
 
 	#footer .copyright {
 		font-size: 0.8em;
@@ -8568,7 +8576,7 @@ ul.pagination {
 		display: -webkit-flex;
 		display: -ms-flex;
 		display: flex;
-		background-color: #2a2f4a;
+		background-color: #778899;
 		box-shadow: 0 0 0.25em 0 rgba(0, 0, 0, 0.15);
 		cursor: default;
 		font-weight: 600;
