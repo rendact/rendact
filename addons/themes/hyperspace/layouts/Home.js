@@ -4,6 +4,7 @@ import Wrapper from "../includes/Wrapper";
 import Sidebar from "../includes/Sidebar";
 import Footer from "../includes/Footer";
 import Spotlight from "../includes/Spotlight";
+import Content from "../includes/Content";
 
 class Home extends React.Component {
   constructor(props) {
@@ -18,12 +19,17 @@ class Home extends React.Component {
 
   renderPostList(data, pagination) {
     return (
-      <section className="wrapper style2 spotlights">
+      <section
+        className="wrapper style2 spotlights"
+        style={
+          data && data.length ? { minHeight: null } : { minHeight: "100vh" }
+        }
+      >
         {data &&
           data.map((post, idx) => (
             <Spotlight
               className="inactive"
-              content={data.content && data.content.trim.slice(0, 100)}
+              content={post.content && post.content.trim().slice(0, 100)}
               title={post.title}
               image={
                 post.imageFeatured
@@ -34,16 +40,35 @@ class Home extends React.Component {
               key={post.id}
             />
           ))}
+        {pagination}
       </section>
     );
   }
 
   render() {
-    let { loadDone, theConfig, data } = this.props;
+    let {
+      loadDone,
+      theConfig,
+      data,
+      theMenu,
+      thePagination,
+      footerWidgets
+    } = this.props;
     return (
       <div>
-        <Sidebar />
-        <Wrapper>{this.renderPostList(data)}</Wrapper>
+        <Sidebar theMenu={theMenu} />
+        <Wrapper footerWidgets={footerWidgets}>
+          {loadDone ? (
+            theConfig.frontPage === "latestPost" ? (
+              this.renderPostList(data, thePagination)
+            ) : (
+              <Content
+                image={data.imageFeatured ? data.imageFeatured.blobUrl : null}
+                content={data.content}
+              />
+            )
+          ) : null}
+        </Wrapper>
         <Footer />
       </div>
     );

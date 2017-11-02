@@ -11,11 +11,16 @@ class Home extends React.Component {
     require("../assets/css/main.css");
   }
   render() {
-    let { postData: { title, content, imageFeatured } } = this.props;
+    let {
+      theMenu,
+      postData: { title, content, imageFeatured },
+      theConfig,
+      footerWidgets
+    } = this.props;
     return (
       <div>
-        <Nav />
-        <Wrapper>
+        <Nav theMenu={theMenu} title={theConfig && theConfig.name} />
+        <Wrapper footerWidgets={footerWidgets}>
           <Content
             title={title}
             content={content}
