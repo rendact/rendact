@@ -23,15 +23,11 @@ let Home = React.createClass({
 
         
           <header id="header">
-            <h1><a href="#">Future Imperfect</a></h1>
+            <h1>
+              <strong>{this.props.theConfig?this.props.theConfig.name:"Rendact"}</strong> 
+            </h1>
             <nav className="links">
-              <ul>
-                <li><a href="#">Lorem</a></li>
-                <li><a href="#">Ipsum</a></li>
-                <li><a href="#">Feugiat</a></li>
-                <li><a href="#">Tempus</a></li>
-                <li><a href="#">Adipiscing</a></li>
-              </ul>
+              {this.props.theMenu()}
             </nav>
             <nav className="main">
               <ul>
@@ -109,7 +105,7 @@ let Home = React.createClass({
                   </div>
                   <div className="meta">
                     <time className="published" datetime="2015-11-01">{moment(post.createdAt).format("MMMM Do YY")}</time>
-                    <a href="#" className="author"><span className="name">Jane Doe</span><img src="images/avatar.jpg" alt="" /></a>
+                    <a href="#" className="author"><span className="name">Jane Doe</span><img src={require('images/logo-128.png')} alt="" /></a>
                   </div>
                 </header>
                 <a href="#" className="image featured"><img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" /></a>
@@ -143,7 +139,7 @@ let Home = React.createClass({
 
             
               <section id="intro">
-                <a href="#" className="logo"><img src="images/logo.jpg" alt="" /></a>
+                <a href="#" className="logo"><img src={require('images/logo-128.png')} alt="" /></a>
                 <header>
                   <h2>Future Imperfect</h2>
                   <p>Another fine responsive site template by <a href="http://html5up.net">HTML5 UP</a></p>
