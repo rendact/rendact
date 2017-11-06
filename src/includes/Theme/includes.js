@@ -59,45 +59,33 @@ window.config = AdminConfig;
 /* Theme functions */
 
 export function getTemplateComponent(type) {
-  loadScript(
+  return loadScript(
     "https://59ffa3d3a6188f1d60f856af--shopkeeper-lionel-47443.netlify.com",
     "stellar"
-  ).then(() =>
-    loadStyle(
-      "https://59ffa3d3a6188f1d60f856af--shopkeeper-lionel-47443.netlify.com",
-      "stellar"
-    ).then(() => console.log("hello"))
-  );
+  )
+    .then(() =>
+      loadStyle(
+        "https://59ffa3d3a6188f1d60f856af--shopkeeper-lionel-47443.netlify.com",
+        "stellar"
+      ).then(() => console.log("hello"))
+    )
+    .catch(err => {
+      // work with default theme
 
-  var c = JSON.parse(JSON.parse(localStorage.getItem("config")).activeTheme);
-  /*
-	request({
-		url: "http://astrologer-forehead-75301.netlify.com/themes/default/index.js",
-		method: "GET",
-		gzip: true,
-		headers: [
-	    {
-	      name: 'content-type',
-	      value: 'application/javascript'
-	    }
-	    ],
-		}, function(error, response, body){
-			var obj = vm.runInThisContext(body, './remote/theme');
-			debugger;
-			//var widgetAreas = require("./remote/theme")["widgetArea"];		
-	})
-	*/
-
-  //	var widgetAreas = require("themes/"+c.path)["widgetArea"];
-  import(`themes/${c.path}`).then(theme => {
-    let widgetAreas = theme["widgetArea"];
-    if (widgetAreas) {
-      widgetAreas.forEach(widgetId => {
-        registerWidgetArea(widgetId);
+      console.log(err);
+      var c = JSON.parse(
+        JSON.parse(localStorage.getItem("config")).activeTheme
+      );
+      //	var widgetAreas = require("themes/"+c.path)["widgetArea"];
+      import(`themes/${c.path}`).then(theme => {
+        let widgetAreas = theme["widgetArea"];
+        if (widgetAreas) {
+          widgetAreas.forEach(widgetId => {
+            registerWidgetArea(widgetId);
+          });
+        }
       });
-    }
-  });
-  /*
+      /*
 	if (widgetAreas) {
 		_.forEach(widgetAreas, function(widgetId){
 			registerWidgetArea(widgetId)
@@ -105,24 +93,27 @@ export function getTemplateComponent(type) {
 	}
   */
 
-  const themeMap = {
-    home: "Home",
-    blog: "Blog",
-    single: "Single",
-    search: "Search"
-  };
+      const themeMap = {
+        home: "Home",
+        blog: "Blog",
+        single: "Single",
+        search: "Search"
+      };
 
-  if (c.name == null || c.path == null) {
-    return InvalidTheme;
-  }
-  let module = themeMap[type];
-  return import(`themes/${c.path}`).then(theme => {
-    if (theme) {
-      return theme[module];
-    }
-    return null;
-  });
-  //return require("themes/"+c.path)[module]
+      if (c.name == null || c.path == null) {
+        return InvalidTheme;
+      }
+      let module = themeMap[type];
+      return import(`themes/${c.path}`)
+        .then(theme => {
+          if (theme) {
+            return theme[module];
+          }
+          return null;
+        })
+        .then(comp => comp);
+      //return require("themes/"+c.path)[module]
+    });
 }
 
 export function theContent(content) {
