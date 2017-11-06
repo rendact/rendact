@@ -10,6 +10,8 @@ import Loadable from "react-loadable";
 import CommentForm from "./CommentForm";
 import { registerWidgetArea } from "../widgetUtils";
 import request from "request";
+window.react = React;
+window.router = require("react-router");
 const vm = require("vm");
 
 const InvalidTheme = Loadable({
@@ -26,9 +28,11 @@ const loadScript = (host, themeName) => {
     script = document.createElement("script");
     script.id = "themeScript";
     script.src = host + "/" + themeName + "/" + themeName + ".js";
+    // script.src =
+    //("https://59ffa3d3a6188f1d60f856af--shopkeeper-lionel-47443.netlify.com/stellar.js");
     script.onload = resolve;
     script.onerror = reject;
-    document.getElementById("theme").appendChild(script);
+    document.body.appendChild(script);
   });
 };
 
@@ -41,6 +45,8 @@ const loadStyle = (host, themeName) => {
     style = document.createElement("link");
     style.id = "themeStyle";
     style.href = host + "/" + themeName + "/" + themeName + ".css";
+    //  style.href = "https://shopkeeper-lionel-47443.netlify.com/style.css";
+    style.rel = "stylesheet";
     style.type = "text/css";
     style.onload = resolve;
     style.onerror = reject;
