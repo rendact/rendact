@@ -4,6 +4,7 @@ import Footer from '../includes/Footer';
 import FooterWidgets from '../includes/FooterWidgets';
 // import Menu from '../includes/Menu';
 // import Post from '../includes/Post';
+import { Link } from "react-router";
 
 class Blog extends React.Component {
   componentDidMount(){
@@ -11,14 +12,9 @@ class Blog extends React.Component {
   }
 
   render(){
-    let {
-      postData,
-      theConfig,
-      title,
-      image,
-      content,
-      isHome
-    } = this.props;
+    
+      let { theConfig, latestPosts: data, thePagination, loadDone } = this.props;
+
 // debugger
     return (
       <div id="wrapper" className="divided">
@@ -27,21 +23,33 @@ class Blog extends React.Component {
             tagline={theConfig ? theConfig.tagline: "hello"}
             {...this.props}
           />
-          <div id="main" className="wrapper style1">
+          <div id="main" className="wrapper style1" style={{backgroundColor: "#D3D3D3"}}>
             <div className="inner">
-              {postData &&
+              
               <section id="one">
                 <div className="inner">
-                  <span className="image main"><img src={postData.imageFeatured && postData.imageFeatured.blobUrl} alt=""/></span>
-                  {!isHome &&
-                    <header className="major">
-                      <h1>{postData.title}</h1>
-                    </header>
-                  }
-                  <div dangerouslySetInnerHTML={{__html: postData.content}}/>
+                  <section>
+                    <div className="posts">
+                      {data &&
+                        data.map(post => (
+                          <article>
+                            <Link className="image" to={"/post/"+ post.id}><img src={post.imageFeatured ? post.imageFeatured.blobUrl : require("images/logo-128.png") } alt=""/></Link>
+                            <h3>{post.title}</h3>
+                            <p dangerouslySetInnerHTML={{__html: post.content}}/>
+                            <ul className="actions">
+                              <li><Link className="button" to={"/post/" + post.id}>More</Link></li>
+                            </ul>
+                          </article>
+
+
+                          
+                        ))}
+                    </div>
+                    {thePagination}
+                  </section>
                 </div>
               </section>
-              }
+             
             </div>
           </div>
           <FooterWidgets {...this.props}/>

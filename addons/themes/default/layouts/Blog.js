@@ -10,6 +10,7 @@ const Blog = React.createClass({
     require('bootstrap/dist/css/bootstrap.css')
   },
 	render: function() {
+		debugger
 		return (
 			<div className="application">
 				<Header {...this.props} />   
