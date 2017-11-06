@@ -28,25 +28,25 @@ class Blog extends React.Component {
               
               <section id="one">
                 <div className="inner">
-                                <section>
-                                  <div className="posts">
-                                    {data &&
-                                      data.map(post => (
-                                        <article>
-                                          <Link className="image" to={"/post/"+ post.id}><img src={post.imageFeatured ? post.imageFeatured.blobUrl : require("images/logo-128.png") } alt=""/></Link>
-                                          <h3>{post.title}</h3>
-                                          <p dangerouslySetInnerHTML={{__html: post.content}}/>
-                                          <ul className="actions">
-                                            <li><Link className="button" to={"/post/" + post.id}>More</Link></li>
-                                          </ul>
-                                        </article>
+                  <section>
+                    <div className="posts">
+                      {data &&
+                        data.map(post => (
+                          <article>
+                            <Link className="image" to={"/post/"+ post.id}><img src={post.imageFeatured ? post.imageFeatured.blobUrl : require("images/logo-128.png") } alt=""/></Link>
+                            <h3>{post.title}</h3>
+                            <p dangerouslySetInnerHTML={{__html: post.content}}/>
+                            <ul className="actions">
+                              <li><Link className="button" to={"/post/" + post.id}>More</Link></li>
+                            </ul>
+                          </article>
 
 
-                                        
-                                      ))}
-                                  </div>
-                                  {thePagination}
-                                </section>
+                          
+                        ))}
+                    </div>
+                    {thePagination}
+                  </section>
                 </div>
               </section>
              

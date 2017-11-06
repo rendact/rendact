@@ -32,13 +32,15 @@ class Single extends React.Component {
               {postData &&
               <section id="one">
                 <div className="inner">
-                  <span className="image main"><img src={postData.imageFeatured && postData.imageFeatured.blobUrl} alt=""/></span>
-                  {!isHome &&
-                    <header className="major">
-                      <h1>{postData.title}</h1>
-                    </header>
-                  }
-                  <div dangerouslySetInnerHTML={{__html: postData.content}}/>
+                  <article>
+                    {!isHome &&
+                      <header className="major">
+                        <h1>{postData.title}</h1>
+                      </header>
+                    }
+                    <span className="image main"><img src={postData.imageFeatured ? postData.imageFeatured.blobUrl : require("images/logo-128.png") } alt=""/></span>
+                    <div dangerouslySetInnerHTML={{__html: postData.content}}/>
+                  </article>
                 </div>
               </section>
               }
