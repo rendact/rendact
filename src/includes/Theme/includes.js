@@ -10,6 +10,10 @@ import Loadable from "react-loadable";
 import CommentForm from "./CommentForm";
 import { registerWidgetArea } from "../widgetUtils";
 import request from "request";
+
+window.react = React;
+window["react-router"] = require("react-router");
+
 const vm = require("vm");
 
 const InvalidTheme = Loadable({
@@ -26,9 +30,13 @@ const loadScript = (host, themeName) => {
     script = document.createElement("script");
     script.id = "themeScript";
     script.src = host + "/" + themeName + "/" + themeName + ".js";
+    /*script.src =// uncomment this lines when debugging
+      "https://59ffa3d3a6188f1d60f856af--shopkeeper-lionel-47443.netlify.com/stellar.js";
+      */
+
     script.onload = resolve;
     script.onerror = reject;
-    document.getElementById("theme").appendChild(script);
+    document.body.appendChild(script);
   });
 };
 
@@ -41,6 +49,8 @@ const loadStyle = (host, themeName) => {
     style = document.createElement("link");
     style.id = "themeStyle";
     style.href = host + "/" + themeName + "/" + themeName + ".css";
+    //style.href = "https://shopkeeper-lionel-47443.netlify.com/style.css"; // uncomment this when debugging
+    style.rel = "stylesheet";
     style.type = "text/css";
     style.onload = resolve;
     style.onerror = reject;
@@ -53,45 +63,41 @@ window.config = AdminConfig;
 /* Theme functions */
 
 export function getTemplateComponent(type) {
-  loadScript(
-    "https://59ffa3d3a6188f1d60f856af--shopkeeper-lionel-47443.netlify.com",
-    "stellar"
-  ).then(() =>
-    loadStyle(
-      "https://59ffa3d3a6188f1d60f856af--shopkeeper-lionel-47443.netlify.com",
-      "stellar"
-    ).then(() => console.log("hello"))
-  );
+  const c = JSON.parse(JSON.parse(localStorage.getItem("config")).activeTheme);
+  const themeMap = {
+    home: "Home",
+    blog: "Blog",
+    single: "Single",
+    search: "Search"
+  };
+  return loadScript(
+    "https://59ffa3d3a6188f1d60f856af--shopkeeper-lionel-47443.netlify.com", // change host when ready
+    "stellar" // change theme name when ready
+  )
+    .then(() =>
+      loadStyle(
+        "https://59ffa3d3a6188f1d60f856af--shopkeeper-lionel-47443.netlify.com", // change host when ready
+        "stellar" // change theme when reade
+      ).then(() => {
+        console.log("hello");
+        return window[c.path][themeMap[type]]; // comment this when debugging
+        //        return window["stellar"][themeMap[type]]; // uncomment this when debugging
+      })
+    )
+    .catch(err => {
+      // work with default theme
 
-  var c = JSON.parse(JSON.parse(localStorage.getItem("config")).activeTheme);
-  /*
-	request({
-		url: "http://astrologer-forehead-75301.netlify.com/themes/default/index.js",
-		method: "GET",
-		gzip: true,
-		headers: [
-	    {
-	      name: 'content-type',
-	      value: 'application/javascript'
-	    }
-	    ],
-		}, function(error, response, body){
-			var obj = vm.runInThisContext(body, './remote/theme');
-			debugger;
-			//var widgetAreas = require("./remote/theme")["widgetArea"];		
-	})
-	*/
-
-  //	var widgetAreas = require("themes/"+c.path)["widgetArea"];
-  import(`themes/${c.path}`).then(theme => {
-    let widgetAreas = theme["widgetArea"];
-    if (widgetAreas) {
-      widgetAreas.forEach(widgetId => {
-        registerWidgetArea(widgetId);
+      console.log(err);
+      //	var widgetAreas = require("themes/"+c.path)["widgetArea"];
+      import(`themes/${c.path}`).then(theme => {
+        let widgetAreas = theme["widgetArea"];
+        if (widgetAreas) {
+          widgetAreas.forEach(widgetId => {
+            registerWidgetArea(widgetId);
+          });
+        }
       });
-    }
-  });
-  /*
+      /*
 	if (widgetAreas) {
 		_.forEach(widgetAreas, function(widgetId){
 			registerWidgetArea(widgetId)
@@ -99,24 +105,20 @@ export function getTemplateComponent(type) {
 	}
   */
 
-  const themeMap = {
-    home: "Home",
-    blog: "Blog",
-    single: "Single",
-    search: "Search"
-  };
-
-  if (c.name == null || c.path == null) {
-    return InvalidTheme;
-  }
-  let module = themeMap[type];
-  return import(`themes/${c.path}`).then(theme => {
-    if (theme) {
-      return theme[module];
-    }
-    return null;
-  });
-  //return require("themes/"+c.path)[module]
+      if (c.name == null || c.path == null) {
+        return InvalidTheme;
+      }
+      let module = themeMap[type];
+      return import(`themes/${c.path}`)
+        .then(theme => {
+          if (theme) {
+            return theme[module];
+          }
+          return null;
+        })
+        .then(comp => comp);
+      //return require("themes/"+c.path)[module]
+    });
 }
 
 export function theContent(content) {
