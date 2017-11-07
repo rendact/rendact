@@ -3171,6 +3171,10 @@
 			opacity: 0.15;
 		}
 
+		div.is-menu-visible #wrapper {
+			opacity: 0.15;
+		}
+
 		@media screen and (max-width: 1680px) {
 
 			#wrapper {
@@ -3435,6 +3439,14 @@
 			visibility: visible;
 		}
 
+		div.is-menu-visible #menu {
+			-moz-transform: translateX(0);
+			-webkit-transform: translateX(0);
+			-ms-transform: translateX(0);
+			transform: translateX(0);
+			visibility: visible;
+		}
+
 		@media screen and (max-width: 736px) {
 
 			#menu > * {
@@ -3506,3 +3518,216 @@ ul.pagination {
 				}
 
 			}
+
+/*sidebar*/
+
+#side {
+		-moz-flex-grow: 0;
+		-webkit-flex-grow: 0;
+		-ms-flex-grow: 0;
+		flex-grow: 0;
+		-moz-flex-shrink: 0;
+		-webkit-flex-shrink: 0;
+		-ms-flex-shrink: 0;
+		flex-shrink: 0;
+		-moz-transition: margin-left 0.5s ease, box-shadow 0.5s ease;
+		-webkit-transition: margin-left 0.5s ease, box-shadow 0.5s ease;
+		-ms-transition: margin-left 0.5s ease, box-shadow 0.5s ease;
+		transition: margin-left 0.5s ease, box-shadow 0.5s ease;
+		background-color: #f5f6f7;
+		font-size: 0.9em;
+		position: relative;
+		width: 26em;
+	}
+
+		#side h2 {
+			font-size: 1.38889em;
+		}
+
+		#side > .inner {
+			padding: 2.22222em 2.22222em 2.44444em 2.22222em ;
+			position: relative;
+			width: 26em;
+		}
+
+			#side > .inner > * {
+				border-bottom: solid 2px rgba(210, 215, 217, 0.75);
+				margin: 0 0 3.5em 0;
+				padding: 0 0 3.5em 0;
+			}
+
+				#side > .inner > * > :last-child {
+					margin-bottom: 0;
+				}
+
+				#side > .inner > *:last-child {
+					border-bottom: 0;
+					margin-bottom: 0;
+					padding-bottom: 0;
+				}
+
+			#side > .inner > .alt {
+				background-color: #eff1f2;
+				border-bottom: 0;
+				margin: -2.22222em 0 4.44444em -2.22222em;
+				padding: 2.22222em;
+				width: calc(100% + 4.44444em);
+			}
+
+		#side .toggle {
+			text-decoration: none;
+			-moz-transition: left 0.5s ease;
+			-webkit-transition: left 0.5s ease;
+			-ms-transition: left 0.5s ease;
+			transition: left 0.5s ease;
+			-webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+			border: 0;
+			display: block;
+			height: 7.5em;
+			left: 26em;
+			line-height: 7.5em;
+			outline: 0;
+			overflow: hidden;
+			position: absolute;
+			text-align: center;
+			text-indent: 7.5em;
+			top: 0;
+			width: 6em;
+			z-index: 10000;
+		}
+
+			#side .toggle:before {
+				-moz-osx-font-smoothing: grayscale;
+				-webkit-font-smoothing: antialiased;
+				font-family: FontAwesome;
+				font-style: normal;
+				font-weight: normal;
+				text-transform: none !important;
+			}
+
+			#side .toggle:before {
+				content: '\f0c9';
+				font-size: 2rem;
+				height: inherit;
+				left: 0;
+				line-height: inherit;
+				position: absolute;
+				text-indent: 0;
+				top: 0;
+				width: inherit;
+			}
+
+		#side.inactive {
+			margin-left: -26em;
+		}
+
+		@media screen and (max-width: 1680px) {
+
+			#side {
+				width: 24em;
+			}
+
+				#side > .inner {
+					padding: 1.66667em 1.66667em 1.33333em 1.66667em ;
+					width: 24em;
+				}
+
+					#side > .inner > .alt {
+						margin: -1.66667em 0 3.33333em -1.66667em;
+						padding: 1.66667em;
+						width: calc(100% + 3.33333em);
+					}
+
+				#side .toggle {
+					height: 6.25em;
+					left: 24em;
+					line-height: 6.25em;
+					text-indent: 5em;
+					width: 5em;
+				}
+
+					#side .toggle:before {
+						font-size: 1.5rem;
+					}
+
+				#side.inactive {
+					margin-left: -24em;
+				}
+
+		}
+
+		@media screen and (max-width: 1280px) {
+
+			#side {
+				box-shadow: 0 0 5em 0 rgba(0, 0, 0, 0.175);
+				height: 100%;
+				left: 0;
+				position: fixed;
+				top: 0;
+				z-index: 10000;
+			}
+
+				#side.inactive {
+					box-shadow: none;
+				}
+
+				#side > .inner {
+					-webkit-overflow-scrolling: touch;
+					height: 100%;
+					left: 0;
+					overflow-x: hidden;
+					overflow-y: auto;
+					position: absolute;
+					top: 0;
+				}
+
+					#side > .inner:after {
+						content: '';
+						display: block;
+						height: 4em;
+						width: 100%;
+					}
+
+				#side .toggle {
+					text-indent: 6em;
+					width: 6em;
+				}
+
+					#side .toggle:before {
+						font-size: 1.5rem;
+						margin-left: -0.4375em;
+					}
+
+				body.is-loading #side {
+					display: none;
+				}
+
+		}
+
+		@media screen and (max-width: 736px) {
+
+			#side .toggle {
+				text-indent: 7.25em;
+				width: 7.25em;
+			}
+
+				#side .toggle:before {
+					color: #7f888f;
+					margin-left: -0.0625em;
+					margin-top: -0.25em;
+					font-size: 1.1rem;
+					z-index: 1;
+				}
+
+				#side .toggle:after {
+					background: rgba(222, 225, 226, 0.75);
+					border-radius: 0.375em;
+					content: '';
+					height: 3.5em;
+					left: 1em;
+					position: absolute;
+					top: 1em;
+					width: 5em;
+				}
+
+		}
