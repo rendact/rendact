@@ -3,19 +3,20 @@ import React from 'react';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import moment from 'moment';
-import {Link} from 'react-router';
 
-let Home = React.createClass({
+let Single = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
   },
 
   render(){
     let {
+      postData,
       theConfig,
       data,
       thePagination,
-      loadDone
+      loadDone,
+      isHome
     } = this.props
     debugger
     return (
@@ -45,35 +46,30 @@ let Home = React.createClass({
 
           <div id="main">
 
-            {data && data.map((post, index) => (
+            {postData &&
               <article className="post">
                 <header>
                   <div className="title">
-                    <h2><Link to={"/post/" + post.id}>{post.title && post.title}</Link></h2>
+                    <h2><a href="#">{postData.title && postData.title}</a></h2>
                   </div>
                   <div className="meta">
-                    <time className="published">{moment(post.createdAt).format("MMMM Do YY")}</time>
-                    <small><time className="published">{moment(post.createdAt).format("h:mm:ss a")}</time></small>
+                    <time className="published" datetime="2015-11-01">{moment(postData.createdAt).format("MMMM Do YY")}</time>
+                    <small><time className="published" datetime="2015-11-01">{moment(postData.createdAt).format("h:mm:ss a")}</time></small>
                   </div>
                 </header>
-      <div className="image featured">
-        <Link to={"/post/" + post.id}>
-          <img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
-        </Link>
-      </div>
-                <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 200):""}} />
+                <a href="#" className="image featured"><img src={postData.imageFeatured ? postData.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" /></a>
+                <p dangerouslySetInnerHTML={{__html: postData.content ? postData.content:""}} />
                 <footer>
                   <ul className="actions">
-                    <li><Link className="button big" to={"/post/" + post.id}>Continue Reading</Link></li>
                   </ul>
                   <ul className="stats">
-                    <li><a href="#">{post.status}</a></li>
-                    <li><a href="#" className="icon fa-heart">{post.comments.length}</a></li>
-                    <li><a href="#" className="icon fa-comment">{post.comments.length?post.comments.length:0}</a></li>
+                    <li><a href="#">{postData.status}</a></li>
+                    <li><a href="#" className="icon fa-heart">11</a></li>
+                    <li><a href="#" className="icon fa-comment">13</a></li>
                   </ul>
                 </footer>
               </article>
-            ))}
+            }
          
             <section className="wrapper style1 align-center">
               <div style={{textAlign: "center"}}>
@@ -122,4 +118,4 @@ let Home = React.createClass({
   }
 });
 
-export default Home;
+export default Single;
