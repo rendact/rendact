@@ -11,7 +11,7 @@ import CommentForm from "./CommentForm";
 import { registerWidgetArea } from "../widgetUtils";
 import request from "request";
 
-window.react = React;
+window.react = require("react");
 window["react-router"] = require("react-router");
 
 const vm = require("vm");
@@ -30,12 +30,12 @@ const loadScript = (host, themeName) => {
     script = document.createElement("script");
     script.id = "themeScript";
     script.src = host + "/" + themeName + "/" + themeName + ".js";
-    /*script.src =// uncomment this lines when debugging
-      "https://59ffa3d3a6188f1d60f856af--shopkeeper-lionel-47443.netlify.com/stellar.js";
-      */
+    //script.src =
+    ("https://shopkeeper-lionel-47443.netlify.com/stellar/stellar.js");
 
     script.onload = resolve;
     script.onerror = reject;
+    script.type = "text/javascript";
     document.body.appendChild(script);
   });
 };
@@ -48,8 +48,9 @@ const loadStyle = (host, themeName) => {
     let style;
     style = document.createElement("link");
     style.id = "themeStyle";
-    style.href = host + "/" + themeName + "/" + themeName + ".css";
+    style.href = host + "/" + themeName + "/main.css";
     //style.href = "https://shopkeeper-lionel-47443.netlify.com/style.css"; // uncomment this when debugging
+    //style.href = "https://shopkeeper-lionel-47443.netlify.com/stellar/main.css";
     style.rel = "stylesheet";
     style.type = "text/css";
     style.onload = resolve;
@@ -63,6 +64,7 @@ window.config = AdminConfig;
 /* Theme functions */
 
 export function getTemplateComponent(type) {
+  const host = "https://shopkeeper-lionel-47443.netlify.com";
   const c = JSON.parse(JSON.parse(localStorage.getItem("config")).activeTheme);
   const themeMap = {
     home: "Home",
@@ -71,17 +73,16 @@ export function getTemplateComponent(type) {
     search: "Search"
   };
   return loadScript(
-    "https://59ffa3d3a6188f1d60f856af--shopkeeper-lionel-47443.netlify.com", // change host when ready
-    "stellar" // change theme name when ready
+    host, // change host when ready
+    c.path // change theme name when ready
   )
     .then(() =>
       loadStyle(
-        "https://59ffa3d3a6188f1d60f856af--shopkeeper-lionel-47443.netlify.com", // change host when ready
-        "stellar" // change theme when reade
+        host, // change host when ready
+        c.path // change theme when reade
       ).then(() => {
-        console.log("hello");
         return window[c.path][themeMap[type]]; // comment this when debugging
-        //        return window["stellar"][themeMap[type]]; // uncomment this when debugging
+        //return window["stellar"][themeMap[type]]; // uncomment this when debugging
       })
     )
     .catch(err => {
