@@ -31,6 +31,7 @@ const loadScript = (host, themeName) => {
     script.id = "themeScript";
     script.src = host + "/" + themeName + "/" + themeName + ".js";
     //script.src =
+    script.src = "sss"
     ("https://shopkeeper-lionel-47443.netlify.com/stellar/stellar.js");
 
     script.onload = resolve;
@@ -51,6 +52,8 @@ const loadStyle = (host, themeName) => {
     style.href = host + "/" + themeName + "/main.css";
     //style.href = "https://shopkeeper-lionel-47443.netlify.com/style.css"; // uncomment this when debugging
     //style.href = "https://shopkeeper-lionel-47443.netlify.com/stellar/main.css";
+    style.href = "https://shopkeeper-lionel-47443.netlify.com/style.css"; 
+    style.href = "https://shopkeeper-lionel-47443.netlify.com/stellar/main.css";
     style.rel = "stylesheet";
     style.type = "text/css";
     style.onload = resolve;
