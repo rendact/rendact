@@ -2,7 +2,7 @@ import $ from 'jquery'
 import React from 'react';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
-
+import moment from 'moment';
 
 let Home = React.createClass({
   componentDidMount(){
@@ -17,20 +17,17 @@ let Home = React.createClass({
       thePagination,
       loadDone
     } = this.props
+    debugger
     return (
         <div id="wrapper">
 
         
           <header id="header">
-            <h1><a href="#">Future Imperfect</a></h1>
+            <h1>
+              <strong>{this.props.theConfig?this.props.theConfig.name:"Rendact"}</strong> 
+            </h1>
             <nav className="links">
-              <ul>
-                <li><a href="#">Lorem</a></li>
-                <li><a href="#">Ipsum</a></li>
-                <li><a href="#">Feugiat</a></li>
-                <li><a href="#">Tempus</a></li>
-                <li><a href="#">Adipiscing</a></li>
-              </ul>
+              {this.props.theMenu()}
             </nav>
             <nav className="main">
               <ul>
@@ -107,8 +104,8 @@ let Home = React.createClass({
                     <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 50):""}} />
                   </div>
                   <div className="meta">
-                    <time className="published" datetime="2015-11-01">November 1, 2015</time>
-                    <a href="#" className="author"><span className="name">Jane Doe</span><img src="images/avatar.jpg" alt="" /></a>
+                    <time className="published" datetime="2015-11-01">{moment(post.createdAt).format("MMMM Do YY")}</time>
+                    <a href="#" className="author"><span className="name">Jane Doe</span><img src={require('images/logo-128.png')} alt="" /></a>
                   </div>
                 </header>
                 <a href="#" className="image featured"><img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" /></a>
@@ -118,21 +115,22 @@ let Home = React.createClass({
                     <li><a href="#" className="button big">Continue Reading</a></li>
                   </ul>
                   <ul className="stats">
-                    <li><a href="#">General</a></li>
-                    <li><a href="#" className="icon fa-heart">28</a></li>
-                    <li><a href="#" className="icon fa-comment">128</a></li>
+                    <li><a href="#">{post.status}</a></li>
+                    <li><a href="#" className="icon fa-heart">{post.comments.length}</a></li>
+                    <li><a href="#" className="icon fa-comment">{post.comments.length?post.comments.length:0}</a></li>
                   </ul>
                 </footer>
               </article>
             ))}
          
-            
+            <section className="wrapper style1 align-center">
+              <div style={{textAlign: "center"}}>
+                  {this.props.thePagination}
+              </div>
+            </section>
 
             
-              <ul className="actions pagination">
-                <li><a href="" className="disabled button big previous">Previous Page</a></li>
-                <li><a href="#" className="button big next">Next Page</a></li>
-              </ul>
+              
 
           </div>
 
@@ -141,7 +139,7 @@ let Home = React.createClass({
 
             
               <section id="intro">
-                <a href="#" className="logo"><img src="images/logo.jpg" alt="" /></a>
+                <a href="#" className="logo"><img src={require('images/logo-128.png')} alt="" /></a>
                 <header>
                   <h2>Future Imperfect</h2>
                   <p>Another fine responsive site template by <a href="http://html5up.net">HTML5 UP</a></p>
