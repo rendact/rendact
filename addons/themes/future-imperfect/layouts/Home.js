@@ -17,7 +17,7 @@ let Home = React.createClass({
       thePagination,
       loadDone
     } = this.props
-    debugger
+    // debugger
     return (
       
         <div id="wrapper">
@@ -56,11 +56,11 @@ let Home = React.createClass({
                     <small><time className="published">{moment(post.createdAt).format("h:mm:ss a")}</time></small>
                   </div>
                 </header>
-      <div className="image featured">
-        <Link to={"/post/" + post.id}>
-          <img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
-        </Link>
-      </div>
+                <div className="image featured">
+                  <Link to={"/post/" + post.id}>
+                    <img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
+                  </Link>
+                </div>
                 <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 200):""}} />
                 <footer>
                   <ul className="actions">

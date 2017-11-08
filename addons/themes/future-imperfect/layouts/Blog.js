@@ -3,21 +3,15 @@ import React from 'react';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import moment from 'moment';
+import {Link} from 'react-router';
 
-let Single = React.createClass({
+let Blog = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
   },
 
   render(){
-    let {
-      postData,
-      theConfig,
-      data,
-      thePagination,
-      loadDone,
-      isHome
-    } = this.props
+    let { theConfig, latestPosts: data, thePagination, loadDone } = this.props;
     debugger
     return (
       
@@ -46,30 +40,35 @@ let Single = React.createClass({
 
           <div id="main">
 
-            {postData &&
+            {data && data.map((post, index) => (
               <article className="post">
                 <header>
                   <div className="title">
-                    <h2><a href="#">{postData.title && postData.title}</a></h2>
+                    <h2><Link to={"/post/" + post.id}>{post.title && post.title}</Link></h2>
                   </div>
                   <div className="meta">
-                    <time className="published" datetime="2015-11-01">{moment(postData.createdAt).format("MMMM Do YY")}</time>
-                    <small><time className="published" datetime="2015-11-01">{moment(postData.createdAt).format("h:mm:ss a")}</time></small>
+                    <time className="published">{moment(post.createdAt).format("MMMM Do YY")}</time>
+                    <small><time className="published">{moment(post.createdAt).format("h:mm:ss a")}</time></small>
                   </div>
                 </header>
-                <a href="#" className="image featured"><img src={postData.imageFeatured ? postData.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" /></a>
-                <p dangerouslySetInnerHTML={{__html: postData.content ? postData.content:""}} />
+                <div className="image featured">
+                  <Link to={"/post/" + post.id}>
+                    <img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
+                  </Link>
+                </div>
+                <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 200):""}} />
                 <footer>
                   <ul className="actions">
+                    <li><Link className="button big" to={"/post/" + post.id}>Continue Reading</Link></li>
                   </ul>
                   <ul className="stats">
-                    <li><a href="#">{postData.status}</a></li>
-                    <li><a href="#" className="icon fa-heart">11</a></li>
-                    <li><a href="#" className="icon fa-comment">13</a></li>
+                    <li><a href="#">{post.status}</a></li>
+                    <li><a href="#" className="icon fa-heart">{post.comments.length}</a></li>
+                    <li><a href="#" className="icon fa-comment">{post.comments.length?post.comments.length:0}</a></li>
                   </ul>
                 </footer>
               </article>
-            }
+            ))}
          
             <section className="wrapper style1 align-center">
               <div style={{textAlign: "center"}}>
@@ -77,10 +76,15 @@ let Single = React.createClass({
               </div>
             </section>
 
+            
+              
+
           </div>
 
+       
           <section id="sidebar">
-         
+
+            
               <section id="intro">
                 <a href="#" className="logo"><img src={require('images/logo-128.png')} alt="" /></a>
                 <header>
@@ -88,6 +92,7 @@ let Single = React.createClass({
                   <h3><strong>{theConfig ? theConfig.tagline: "a simple blog"}</strong></h3>
                 </header>
               </section>
+
 
               <section className="blurb">
                 <div id="side" >
@@ -99,6 +104,7 @@ let Single = React.createClass({
                 </div>
               </section>
 
+           
               <section id="footer">
                 <p className="copyright">&copy; FUTURE-IMPERFECT <a href="http://html5up.net">HTML5 UP</a> OF RENDACT .</p>
               </section>
@@ -106,8 +112,9 @@ let Single = React.createClass({
           </section>
 
         </div>
+
     )
   }
 });
 
-export default Single;
+export default Blog;

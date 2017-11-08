@@ -2,8 +2,6 @@ import React from 'react';
 import Header from '../includes/Header';
 import Footer from '../includes/Footer';
 import FooterWidgets from '../includes/FooterWidgets';
-// import Menu from '../includes/Menu';
-// import Post from '../includes/Post';
 import { Link } from "react-router";
 
 class Blog extends React.Component {
@@ -40,9 +38,7 @@ class Blog extends React.Component {
                               <li><Link className="button" to={"/post/" + post.id}>More</Link></li>
                             </ul>
                           </article>
-
-
-                          
+ 
                         ))}
                     </div>
                     {thePagination}

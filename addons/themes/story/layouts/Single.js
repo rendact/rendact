@@ -2,8 +2,6 @@ import React from 'react';
 import Header from '../includes/Header';
 import Footer from '../includes/Footer';
 import FooterWidgets from '../includes/FooterWidgets';
-// import Menu from '../includes/Menu';
-// import Post from '../includes/Post';
 
 class Single extends React.Component {
   componentDidMount(){

@@ -7,7 +7,7 @@ import Footer from '../includes/Footer';
 import Header from '../includes/Header';
 import {Link} from 'react-router';
 
-// export default class Home extends React.Component {
+
 let Home = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
