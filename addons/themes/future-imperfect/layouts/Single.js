@@ -3,6 +3,7 @@ import React from 'react';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import moment from 'moment';
+import {Link} from 'react-router';
 
 let Single = React.createClass({
   componentDidMount(){
@@ -26,7 +27,7 @@ let Single = React.createClass({
         
           <header id="header">
             <h1>
-              <strong>{theConfig?theConfig.name:"Rendact"}</strong> 
+              <strong><Link to="/">{theConfig?theConfig.name:"Rendact"}</Link></strong> 
             </h1>
             <nav className="links">
               {this.props.theMenu()}
