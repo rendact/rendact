@@ -2161,6 +2161,8 @@
 
 /* Image */
 
+	
+
 	.image {
 		border-radius: 5px;
 		border: 0;
@@ -3866,3 +3868,67 @@
 		}
 
 	}
+
+/*pagination*/
+ul.pagination {
+			cursor: default;
+			list-style: none;
+			padding-left: 0;
+		}
+
+			ul.pagination li {
+				display: inline-block;
+				padding-left: 0;
+				vertical-align: middle;
+			}
+
+				ul.pagination li > .page, ul.pagination li > a {
+					-moz-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+					-webkit-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+					-ms-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+					transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+					border-bottom: 0;
+					display: inline-block;
+					font-size: 0.8em;
+					font-weight: 600;
+					height: 1.5em;
+					line-height: 1.5em;
+					margin: 0 0.125em;
+					min-width: 1.5em;
+					padding: 0 0.5em;
+					text-align: center;
+				}
+
+					ul.pagination li > .page.active, ul.pagination  li > a:disabled {
+						background-color: #ffffff;
+						color: #242943;
+					}
+
+						ul.pagination li > .page.active:hover , ul.pagination li > a:disabled:hover{
+							background-color: #9bf1ff;
+							color: #242943 !important;
+						}
+
+						ul.pagination li > .page.active:active, ul.pagination li > a:disabled:active {
+							background-color: #53e3fb;
+						}
+
+				ul.pagination li:first-child {
+					padding-right: 0.75em;
+				}
+
+				ul.pagination li:last-child {
+					padding-left: 0.75em;
+				}
+
+			@media screen and (max-width: 480px) {
+
+				ul.pagination li:nth-child(n+2):nth-last-child(n+2) {
+					display: none;
+				}
+
+				ul.pagination li:first-child {
+					padding-right: 0;
+				}
+
+			}
