@@ -19,7 +19,7 @@ let Single = React.createClass({
       loadDone,
       isHome
     } = this.props
-    debugger
+    // debugger
     return (
       
         <div id="wrapper">

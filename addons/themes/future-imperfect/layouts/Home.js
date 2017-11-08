@@ -30,16 +30,6 @@ let Home = React.createClass({
             <nav className="links">
               {this.props.theMenu()}
             </nav>
-            <nav className="main">
-              <ul>
-                <li className="search">
-                  <a className="fa-search" href="#search">Search</a>
-                  <form id="search" className="visible" method="get" action="#">
-                    <input type="text" name="query" placeholder="Search" />
-                  </form>
-                </li>
-              </ul>
-            </nav>
           </header>
 
 
@@ -80,9 +70,6 @@ let Home = React.createClass({
                   {this.props.thePagination}
               </div>
             </section>
-
-            
-              
 
           </div>
 
