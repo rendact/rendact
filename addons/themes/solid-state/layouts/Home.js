@@ -64,9 +64,11 @@ let Home = React.createClass({
 										<img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
 									</Link>
 									<div className="content">
-										<h2 className="major">{post.title && post.title}</h2>
+										<h2>
+											<Link className="major" to={"/post/" + post.id}>{post.title && post.title}</Link>
+										</h2>
 										<p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 200):""}} />
-										<a href="#" className="special">Learn more</a>
+										<Link className="special" to={"/post/" + post.id}>Continue Reading</Link>
 									</div>
 								</div>
 							</section>
