@@ -62,7 +62,7 @@ let Home = React.createClass({
 
 						{postData &&
 							<section id="one" className= "wrapper spotlight style1">
-							<div className="inner">
+								<div className="inner">
 									<div className="content">
 										<h2 className="major">{postData.title && postData.title}</h2>
 									</div>
@@ -72,7 +72,7 @@ let Home = React.createClass({
 								</div>
 								<div className="inner">
 									<div className="content">
-										<h2 className="major"></h2>
+										<h5 className="major"></h5>
 										<p dangerouslySetInnerHTML={{__html: postData.content ? postData.content:""}} />
 									</div>
 								</div>
@@ -84,7 +84,7 @@ let Home = React.createClass({
 					<section id="footer">
 						<div className="inner">
 
-            <h2 className="major"></h2>
+            <h5 className="major"></h5>
 						
 						<div className="row">
 							{this.props.footerWidgets.map((fw, i) => (

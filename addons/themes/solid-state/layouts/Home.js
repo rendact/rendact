@@ -10,6 +10,14 @@ let Home = React.createClass({
     require('../assets/css/main.css')
   },
 
+  handleShowMenu(){
+    document.body.className = "is-menu-visible";
+  },
+
+  handleCloseMenu(){
+    document.body.className = "";
+  },
+
   render(){
     let {
       theConfig,
@@ -32,11 +40,11 @@ let Home = React.createClass({
 							</strong>
 						</h1>
 						<nav>
-							<a href="#menu">Menu</a>
+							<a href="#" onClick={this.handleShowMenu}>Menu</a>
 						</nav>
 					</header>
 
-					<nav id="menu">
+					<nav id="menu" onClick={this.handleCloseMenu}>
 						<div className="inner">
 							<h2>Menu</h2>
 							<ul className="links">
@@ -46,7 +54,7 @@ let Home = React.createClass({
 								<li><a href="#">Log In</a></li>
 								<li><a href="#">Sign Up</a></li>
 							</ul>
-							<a href="#" className="close">Close</a>
+							<a href="#" className="close" onClick={this.handleCloseMenu}>Close</a>
 						</div>
 					</nav>
 
@@ -59,6 +67,36 @@ let Home = React.createClass({
 
 					<section id="wrapper">
 
+							<div className="wrapper">
+								<div className="inner">
+
+									<section className="features">
+
+										{data && data.map((post, index) => (
+											<article>
+												<Link className="image" to={"/post/" + post.id}>
+													<img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
+												</Link>
+												<h3>
+													<Link className="major" to={"/post/" + post.id}>{post.title && post.title}</Link>
+												</h3>
+												<p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 150):""}} />
+												<Link className="special" to={"/post/" + post.id}>Continue Reading</Link>
+											</article>
+										))}
+
+									</section>
+
+									<h4 className="major"></h4>
+
+			            <h2 style={{textAlign: "center"}}>
+			                {this.props.thePagination}
+			            </h2>
+
+								</div>
+							</div>
+
+{/*
 						{data && data.map((post, index) => (
 							<section id="one" className={index%2===0 ? "wrapper spotlight style1":"wrapper alt spotlight style2" }>
 								<div className="inner">
@@ -75,15 +113,12 @@ let Home = React.createClass({
 								</div>
 							</section>
 						))}
-
+*/}
 					</section>
 
 					<section id="footer">
 						<div className="inner">
 
-            <h2 className="major" style={{textAlign: "center"}}>
-                {this.props.thePagination}
-            </h2>
             <h2 className="major"></h2>
 						
 						<div className="row">
