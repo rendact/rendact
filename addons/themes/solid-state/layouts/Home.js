@@ -27,7 +27,7 @@ let Home = React.createClass({
     } = this.props
     // debugger
     return (
-
+		<div>
 			<div id="page-wrapper">
 
 					{/* <header id="header" className="alt">*/}
@@ -43,20 +43,6 @@ let Home = React.createClass({
 							<a href="#" onClick={this.handleShowMenu}>Menu</a>
 						</nav>
 					</header>
-
-					<nav id="menu" onClick={this.handleCloseMenu}>
-						<div className="inner">
-							<h2>Menu</h2>
-							<ul className="links">
-								<li><a href="index.html">Home</a></li>
-								<li><a href="generic.html">Generic</a></li>
-								<li><a href="elements.html">Elements</a></li>
-								<li><a href="#">Log In</a></li>
-								<li><a href="#">Sign Up</a></li>
-							</ul>
-							<a href="#" className="close" onClick={this.handleCloseMenu}>Close</a>
-						</div>
-					</nav>
 
 					<section id="banner">
 						<div className="inner">
@@ -134,6 +120,17 @@ let Home = React.createClass({
 				</section>
 
 			</div>
+
+			<nav id="menu" onClick={this.handleCloseMenu}>
+				<div className="inner">
+					<h2>Menu</h2>
+					<ul className="links">
+						<li>{this.props.theMenu("links")}</li>
+					</ul>
+					<a href="#" className="close" onClick={this.handleCloseMenu}>Close</a>
+				</div>
+			</nav>
+		</div>
     )
   }
 });
