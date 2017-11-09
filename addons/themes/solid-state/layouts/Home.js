@@ -22,16 +22,20 @@ let Home = React.createClass({
 
 			<div id="page-wrapper">
 
-				
 					{/* <header id="header" className="alt">*/}
 					<header id="header" className="">
-						<h1>{theConfig ? theConfig.name : "Rendact"}</h1>
+						<h1>
+							<strong>
+								<Link to="/">
+									{theConfig ? theConfig.name : "Rendact"}
+								</Link>
+							</strong>
+						</h1>
 						<nav>
 							<a href="#menu">Menu</a>
 						</nav>
 					</header>
 
-			
 					<nav id="menu">
 						<div className="inner">
 							<h2>Menu</h2>
@@ -46,7 +50,6 @@ let Home = React.createClass({
 						</div>
 					</nav>
 
-				
 					<section id="banner">
 						<div className="inner">
 							<div className="logo"><img src={ require('images/logo-128.png') } alt="" /></div>
@@ -54,7 +57,6 @@ let Home = React.createClass({
 						</div>
 					</section>
 
-				
 					<section id="wrapper">
 
 						{data && data.map((post, index) => (
@@ -76,8 +78,6 @@ let Home = React.createClass({
 
 					</section>
 
-
-				
 					<section id="footer">
 						<div className="inner">
 

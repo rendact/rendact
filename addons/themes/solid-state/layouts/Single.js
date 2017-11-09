@@ -5,13 +5,19 @@ import {graphql} from 'react-apollo';
 import moment from 'moment';
 import {Link} from 'react-router';
 
-let Blog = React.createClass({
+let Home = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
   },
 
   render(){
-    let { theConfig, latestPosts: data, thePagination, loadDone } = this.props;
+    let {
+    	postData,
+      theConfig,
+      data,
+      thePagination,
+      loadDone
+    } = this.props
     // debugger
     return (
 
@@ -54,31 +60,30 @@ let Blog = React.createClass({
 
 					<section id="wrapper">
 
-						{data && data.map((post, index) => (
-							<section id="one" className={index%2===0 ? "wrapper spotlight style1":"wrapper alt spotlight style2" }>
-								<div className="inner">
-									<Link className="image" to={"/post/" + post.id}>
-										<img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
-									</Link>
+						{postData &&
+							<section id="one" className= "wrapper spotlight style1">
+							<div className="inner">
 									<div className="content">
-										<h2>
-											<Link className="major" to={"/post/" + post.id}>{post.title && post.title}</Link>
-										</h2>
-										<p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 200):""}} />
-										<Link className="special" to={"/post/" + post.id}>Continue Reading</Link>
+										<h2 className="major">{postData.title && postData.title}</h2>
+									</div>
+								</div>
+								<div className="inner">
+									<img src={postData.imageFeatured ? postData.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
+								</div>
+								<div className="inner">
+									<div className="content">
+										<h2 className="major"></h2>
+										<p dangerouslySetInnerHTML={{__html: postData.content ? postData.content:""}} />
 									</div>
 								</div>
 							</section>
-						))}
+						}
 
 					</section>
 
 					<section id="footer">
 						<div className="inner">
 
-            <h2 className="major" style={{textAlign: "center"}}>
-                {this.props.thePagination}
-            </h2>
             <h2 className="major"></h2>
 						
 						<div className="row">
@@ -98,4 +103,4 @@ let Blog = React.createClass({
   }
 });
 
-export default Blog;
+export default Home;
