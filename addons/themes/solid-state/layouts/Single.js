@@ -4,10 +4,15 @@ import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import moment from 'moment';
 import {Link} from 'react-router';
+import Menu from '../includes/Menu';
 
-let Home = React.createClass({
+let Single = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
+  },
+
+  handleShowMenu(){
+    document.body.className = "is-menu-visible";
   },
 
   render(){
@@ -20,8 +25,8 @@ let Home = React.createClass({
     } = this.props
     // debugger
     return (
-
-			<div id="page-wrapper">
+    	<div>
+				<div id="page-wrapper">
 
 					{/* <header id="header" className="alt">*/}
 					<header id="header" className="">
@@ -33,23 +38,9 @@ let Home = React.createClass({
 							</strong>
 						</h1>
 						<nav>
-							<a href="#menu">Menu</a>
+							<a href="#" onClick={this.handleShowMenu}>Menu</a>
 						</nav>
 					</header>
-
-					<nav id="menu">
-						<div className="inner">
-							<h2>Menu</h2>
-							<ul className="links">
-								<li><a href="index.html">Home</a></li>
-								<li><a href="generic.html">Generic</a></li>
-								<li><a href="elements.html">Elements</a></li>
-								<li><a href="#">Log In</a></li>
-								<li><a href="#">Sign Up</a></li>
-							</ul>
-							<a href="#" className="close">Close</a>
-						</div>
-					</nav>
 
 					<section id="banner">
 						<div className="inner">
@@ -99,8 +90,10 @@ let Home = React.createClass({
 				</section>
 
 			</div>
+			<Menu {...this.props}/>
+		</div>
     )
   }
 });
 
-export default Home;
+export default Single;

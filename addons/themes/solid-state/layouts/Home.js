@@ -4,6 +4,7 @@ import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import moment from 'moment';
 import {Link} from 'react-router';
+import Menu from '../includes/Menu';
 
 let Home = React.createClass({
   componentDidMount(){
@@ -12,10 +13,6 @@ let Home = React.createClass({
 
   handleShowMenu(){
     document.body.className = "is-menu-visible";
-  },
-
-  handleCloseMenu(){
-    document.body.className = "";
   },
 
   render(){
@@ -121,15 +118,7 @@ let Home = React.createClass({
 
 			</div>
 
-			<nav id="menu" onClick={this.handleCloseMenu}>
-				<div className="inner">
-					<h2>Menu</h2>
-					<ul className="links">
-						<li>{this.props.theMenu("links")}</li>
-					</ul>
-					<a href="#" className="close" onClick={this.handleCloseMenu}>Close</a>
-				</div>
-			</nav>
+			<Menu {...this.props}/>
 		</div>
     )
   }
