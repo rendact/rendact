@@ -22,7 +22,6 @@ let Home = React.createClass({
       
         <div id="wrapper">
 
-        
           <header id="header">
             <h1>
               <strong><Link to="/">{theConfig?theConfig.name:"Rendact"}</Link></strong> 
@@ -30,6 +29,17 @@ let Home = React.createClass({
             <nav className="links">
               {this.props.theMenu()}
             </nav>
+            <nav className="main">
+              <ul>
+                <li className="search">
+                  <a className="fa-search" href="#search">Search</a>
+                  <form id="search" className="visible" method="get" action="#">
+                    <input type="text" name="query" placeholder="Search" />
+                  </form>
+                </li>
+              </ul>
+            </nav>
+
           </header>
 
 
