@@ -1,7 +1,8 @@
 import React from 'react'
 import Header from '../includes/Header';
-import Footer from '../includes/Footer';
+import FooterWidgets from '../includes/FooterWidgets';
 import MenuItems from '../includes/MenuItems';
+import Footer from '../includes/Footer';
 
 class Single extends React.Component {
   componentDidMount(){
@@ -27,6 +28,7 @@ class Single extends React.Component {
         <Footer {...this.props}/>
       </div>
       <MenuItems {...this.props}/>
+      <Footer />
       </div>
     )
   }

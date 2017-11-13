@@ -1,8 +1,10 @@
 import React from 'react';
 import Header from '../includes/Header';
-import Footer from '../includes/Footer';
+import FooterWidgets from '../includes/FooterWidgets';
 import PostList from '../includes/PostList';
 import MenuItems from '../includes/MenuItems';
+import Footer from '../includes/Footer';
+
 class HomeWithPostList extends React.Component {
   render(){
     return (
@@ -20,7 +22,11 @@ class HomeWithPostList extends React.Component {
                   :null
               }
             </section>
-              {this.props.thePagination}
+            
+              <div style={{textAlign: "center"}}>
+                {this.props.thePagination}
+              </div>
+           
         </div>
     )
   }
@@ -70,7 +76,8 @@ class Home extends React.Component {
               
           </div>
         </div>
-        <Footer {...this.props}/>
+        <FooterWidgets {...this.props}/>
+        <Footer />
       </div>
       <MenuItems {...this.props}/>
       </div>
