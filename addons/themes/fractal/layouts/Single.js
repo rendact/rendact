@@ -5,13 +5,20 @@ import {graphql} from 'react-apollo';
 import moment from 'moment';
 import {Link} from 'react-router';
 
-let Blog = React.createClass({
+let Home = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
   },
 
-render(){
-  let { theConfig, latestPosts: data, thePagination, loadDone } = this.props;
+  render(){
+    let {
+      postData,
+      theConfig,
+      data,
+      thePagination,
+      loadDone,
+      isHome
+    } = this.props
     // debugger
     return (
     <div>
@@ -31,27 +38,22 @@ render(){
           </nav>
 				</div>
 			</header>
-			
+
 			<section id="two" className="wrapper">
 				<div className="inner alt">
 
-					{data && data.map((post, index) => (
+					{postData &&
 						<section className="spotlight">
 							<div className="image">
-								<img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
+									<img src={postData.imageFeatured ? postData.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
 							</div>
 							<div className="content">
-								<h3>{post.title && post.title}</h3>
-								<p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 300):""}} />
+								<h3>{postData.title && postData.title}</h3>
+								<p dangerouslySetInnerHTML={{__html: postData.content ? postData.content :""}} />
 							</div>
 						</section>
-					))}
+					}
 
-					<section className="special">
-						<div style={{textAlign: "center"}}>
-              {this.props.thePagination}
-            </div>
-					</section>
 				</div>
 			</section>
 
@@ -75,4 +77,4 @@ render(){
   }
 });
 
-export default Blog;
+export default Home;

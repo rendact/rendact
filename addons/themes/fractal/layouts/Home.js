@@ -20,21 +20,10 @@ let Home = React.createClass({
     // debugger
     return (
     <div>
-    	<header id="head" className="">
-				<h1>
-					<strong>
-						<Link to="/">
-							{theConfig ? theConfig.name : "Rendact"}
-						</Link>
-					</strong>
-				</h1>
-				<nav className="links">
-          {this.props.theMenu()}
-        </nav>
-			</header>
+
 			<header id="header">
 				<div className="content">
-					<h1><a href="#">{theConfig?theConfig.name:"Rendact"}</a></h1>
+					<img src={ require('images/logo-128.png') } alt="" />
 					<p>{theConfig?theConfig.tagline:"Hello"}<br />
 					Just a simple, single page responsive</p>
 					<div className="actions">
@@ -42,7 +31,9 @@ let Home = React.createClass({
 					</div>
 				</div>
 				<div className="inner">
-					<img src={ require('images/logo-128.png') } alt="" />
+					<nav id="menu">
+            {this.props.theMenu()}
+          </nav>
 				</div>
 			</header>
 
@@ -52,11 +43,14 @@ let Home = React.createClass({
 					{data && data.map((post, index) => (
 						<section className="spotlight">
 							<div className="image">
-								<img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
+								<Link to={"/post/" + post.id}>
+									<img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
+								</Link>
 							</div>
 							<div className="content">
-								<h3>{post.title && post.title}</h3>
-								<p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 300):""}} />
+								<Link to={"/post/" + post.id}><h3>{post.title && post.title}</h3></Link>
+								<p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 250):""}} />
+								<Link className="button icon fa-chevron-down scrolly" to={"/post/" + post.id}>Read More</Link>
 							</div>
 						</section>
 					))}
