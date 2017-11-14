@@ -20,7 +20,7 @@ let Home = React.createClass({
     // debugger
     return (
 
-<div id="page-wrapper">
+		<div id="page-wrapper">
 
 				<header id="header">
 					<h1 id="logo"><a href="index.html">Landed</a></h1>
@@ -50,143 +50,44 @@ let Home = React.createClass({
 					</nav>
 				</header>
 
-				<section id="banner">
-					<div className="content">
-						<header>
-							<h2>The future has landed</h2>
-							<p>And there are no hoverboards or flying cars.<br />
-							Just apps. Lots of mother flipping apps.</p>
-						</header>
-						<span className="image"><img src="images/pic01.jpg" alt="" /></span>
-					</div>
-					<a href="#one" className="goto-next scrolly">Next</a>
-				</section>
-
-				<section id="one" className="spotlight style1 bottom">
-					<span className="image fit main"><img src="images/pic02.jpg" alt="" /></span>
-					<div className="content">
-						<div className="container">
-							<div className="row">
-								<div className="4u 12u$(medium)">
-									<header>
-										<h2>Odio faucibus ipsum integer consequat</h2>
-										<p>Nascetur eu nibh vestibulum amet gravida nascetur praesent</p>
-									</header>
-								</div>
-								<div className="4u 12u$(medium)">
-									<p>Feugiat accumsan lorem eu ac lorem amet sed accumsan donec.
-									Blandit orci porttitor semper. Arcu phasellus tortor enim mi
-									nisi praesent dolor adipiscing. Integer mi sed nascetur cep aliquet
-									augue varius tempus lobortis porttitor accumsan consequat
-									adipiscing lorem dolor.</p>
-								</div>
-								<div className="4u$ 12u$(medium)">
-									<p>Morbi enim nascetur et placerat lorem sed iaculis neque ante
-									adipiscing adipiscing metus massa. Blandit orci porttitor semper.
-									Arcu phasellus tortor enim mi mi nisi praesent adipiscing. Integer
-									mi sed nascetur cep aliquet augue varius tempus. Feugiat lorem
-									ipsum dolor nullam.</p>
-								</div>
-							</div>
-						</div>
-					</div>
-					<a href="#two" className="goto-next scrolly">Next</a>
-				</section>
-
-				<section id="two" className="spotlight style2 right">
-					<span className="image fit main"><img src="images/pic03.jpg" alt="" /></span>
-					<div className="content">
-						<header>
-							<h2>Interdum amet non magna accumsan</h2>
-							<p>Nunc commodo accumsan eget id nisi eu col volutpat magna</p>
-						</header>
-						<p>Feugiat accumsan lorem eu ac lorem amet ac arcu phasellus tortor enim mi mi nisi praesent adipiscing. Integer mi sed nascetur cep aliquet augue varius tempus lobortis porttitor lorem et accumsan consequat adipiscing lorem.</p>
-						<ul className="actions">
-							<li><a href="#" className="button">Learn More</a></li>
-						</ul>
-					</div>
-					<a href="#three" className="goto-next scrolly">Next</a>
-				</section>
-
-				<section id="three" className="spotlight style3 left">
-					<span className="image fit main bottom"><img src="images/pic04.jpg" alt="" /></span>
-					<div className="content">
-						<header>
-							<h2>Interdum felis blandit praesent sed augue</h2>
-							<p>Accumsan integer ultricies aliquam vel massa sapien phasellus</p>
-						</header>
-						<p>Feugiat accumsan lorem eu ac lorem amet ac arcu phasellus tortor enim mi mi nisi praesent adipiscing. Integer mi sed nascetur cep aliquet augue varius tempus lobortis porttitor lorem et accumsan consequat adipiscing lorem.</p>
-						<ul className="actions">
-							<li><a href="#" className="button">Learn More</a></li>
-						</ul>
-					</div>
-					<a href="#four" className="goto-next scrolly">Next</a>
-				</section>
-
-				<section id="four" className="wrapper style1 special fade-up">
+				<div id="main" className="wrapper style1">
 					<div className="container">
 						<header className="major">
-							<h2>Accumsan sed tempus adipiscing blandit</h2>
-							<p>Iaculis ac volutpat vis non enim gravida nisi faucibus posuere arcu consequat</p>
+							<h2>{theConfig ? theConfig.name : "Rendact"}</h2>
+							<p>{theConfig ? theConfig.tagline: "hello"}</p>
 						</header>
-						<div className="box alt">
-							<div className="row uniform">
-								<section className="4u 6u(medium) 12u$(xsmall)">
-									<span className="icon alt major fa-area-chart"></span>
-									<h3>Ipsum sed commodo</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
-								<section className="4u 6u$(medium) 12u$(xsmall)">
-									<span className="icon alt major fa-comment"></span>
-									<h3>Eleifend lorem ornare</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
-								<section className="4u$ 6u(medium) 12u$(xsmall)">
-									<span className="icon alt major fa-flask"></span>
-									<h3>Cubilia cep lobortis</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
-								<section className="4u 6u$(medium) 12u$(xsmall)">
-									<span className="icon alt major fa-paper-plane"></span>
-									<h3>Non semper interdum</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
-								<section className="4u 6u(medium) 12u$(xsmall)">
-									<span className="icon alt major fa-file"></span>
-									<h3>Odio laoreet accumsan</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
-								<section className="4u$ 6u$(medium) 12u$(xsmall)">
-									<span className="icon alt major fa-lock"></span>
-									<h3>Massa arcu accumsan</h3>
-									<p>Feugiat accumsan lorem eu ac lorem amet accumsan donec. Blandit orci porttitor.</p>
-								</section>
+						<div className="row 150%">
+							<div className="8u 12u$(medium)">
+
+   							{data && data.map((post, index) => (
+									<section id="content">
+										<a href="#" className="image fit">
+											<img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
+										</a>
+										<h3>{post.title && post.title}</h3>
+										<p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 300):""}} />
+									</section>
+								))}
+
+							</div>
+							<div className="4u 12u$(medium)">
+
+									<section id="sidebar">
+										<section>
+											{this.props.footerWidgets.map((fw, i) => (
+						            <section key={i}>{fw}</section>
+						          ))}
+						          <hr />
+										</section>
+										
+										
+									</section>
+
 							</div>
 						</div>
-						<footer className="major">
-							<ul className="actions">
-								<li><a href="#" className="button">Magna sed feugiat</a></li>
-							</ul>
-						</footer>
 					</div>
-				</section>
->
-				<section id="five" className="wrapper style2 special fade">
-					<div className="container">
-						<header>
-							<h2>Magna faucibus lorem diam</h2>
-							<p>Ante metus praesent faucibus ante integer id accumsan eleifend</p>
-						</header>
-						<form method="post" action="#" className="container 50%">
-							<div className="row uniform 50%">
-								<div className="8u 12u$(xsmall)"><input type="email" name="email" id="email" placeholder="Your Email Address" /></div>
-								<div className="4u$ 12u$(xsmall)"><input type="submit" value="Get Started" className="fit special" /></div>
-							</div>
-						</form>
-					</div>
-				</section>
+				</div>
 
-	
 				<footer id="footer">
 					<ul className="icons">
 						<li><a href="#" className="icon alt fa-twitter"><span className="label">Twitter</span></a></li>
@@ -197,7 +98,7 @@ let Home = React.createClass({
 						<li><a href="#" className="icon alt fa-envelope"><span className="label">Email</span></a></li>
 					</ul>
 					<ul className="copyright">
-						<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+						<li>&copy; Rendact Team. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
 					</ul>
 				</footer>
 
