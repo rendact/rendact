@@ -48,7 +48,9 @@ let Home = React.createClass({
 									<hr />
 									</section>
 								))}
-
+   							<div style={{textAlign: "center"}}>
+	                {thePagination}
+	              </div>
 							</div>
 							<div className="4u 12u$(medium)">
 
@@ -59,8 +61,6 @@ let Home = React.createClass({
 						          ))}
 						          <hr />
 										</section>
-										
-										
 									</section>
 
 							</div>
