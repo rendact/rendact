@@ -20,76 +20,60 @@ let Home = React.createClass({
     debugger
     return (
     <div>
+    	<header id="head" className="">
+				<h1>
+					<strong>
+						<Link to="/">
+							{theConfig ? theConfig.name : "Rendact"}
+						</Link>
+					</strong>
+				</h1>
+				<nav>
+					<a href="#" onClick={this.handleShowMenu}>Menu</a>
+				</nav>
+			</header>
 			<header id="header">
 				<div className="content">
-					<h1><a href="#">Fractal</a></h1>
-					<p>Just a simple, single page responsive<br />
-					template brought to you by <a href="http://html5up.net">HTML5 UP</a></p>
-					<ul className="actions">
-						<li><a href="#" className="button special icon fa-download">Download</a></li>
-						<li><a href="#one" className="button icon fa-chevron-down scrolly">Learn More</a></li>
-					</ul>
+					<h1><a href="#">{theConfig?theConfig.name:"Rendact"}</a></h1>
+					<p>{theConfig?theConfig.tagline:"Hello"}<br />
+					Just a simple, single page responsive</p>
+					<div className="actions">
+						<a href="#two" className="button icon fa-chevron-down scrolly">Learn More</a>
+					</div>
 				</div>
-				<div className="image phone"><div className="inner"><img src="images/screen.jpg" alt="" /></div></div>
+				<div className="inner">
+					<img src={ require('images/logo-128.png') } alt="" />
+				</div>
 			</header>
-
-			<section id="one" className="wrapper style2 special">
-				<header className="major">
-					<h2>Sed ipsum magna lorem tempus amet<br />
-					vehicula et gravida elementum</h2>
-				</header>
-				<ul className="icons major">
-					<li><span className="icon fa-camera-retro"><span className="label">Shoot</span></span></li>
-					<li><span className="icon fa-refresh"><span className="label">Process</span></span></li>
-					<li><span className="icon fa-cloud"><span className="label">Upload</span></span></li>
-				</ul>
-			</section>
 
 			<section id="two" className="wrapper">
 				<div className="inner alt">
-					<section className="spotlight">
-						<div className="image"><img src="images/pic01.jpg" alt="" /></div>
-						<div className="content">
-							<h3>Magna sed ultrices</h3>
-							<p>Morbi mattis ornare ornare. Duis quam turpis, gravida at leo elementum elit fusce accumsan dui libero, quis vehicula lectus ultricies eu. In convallis amet leo non sapien iaculis efficitur consequat lorem ipsum.</p>
-						</div>
-					</section>
-					<section className="spotlight">
-						<div className="image"><img src="images/pic02.jpg" alt="" /></div>
-						<div className="content">
-							<h3>Ultrices nullam aliquam</h3>
-							<p>Morbi mattis ornare ornare. Duis quam turpis, gravida at leo elementum elit fusce accumsan dui libero, quis vehicula lectus ultricies eu. In convallis amet leo non sapien iaculis efficitur consequat lorem ipsum.</p>
-						</div>
-					</section>
-					<section className="spotlight">
-						<div className="image"><img src="images/pic03.jpg" alt="" /></div>
-						<div className="content">
-							<h3>Aliquam sed magna</h3>
-							<p>Morbi mattis ornare ornare. Duis quam turpis, gravida at leo elementum elit fusce accumsan dui libero, quis vehicula lectus ultricies eu. In convallis amet leo non sapien iaculis efficitur consequat lorem ipsum.</p>
-						</div>
-					</section>
+
+					{data && data.map((post, index) => (
+						<section className="spotlight">
+							<div className="image">
+								<img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
+							</div>
+							<div className="content">
+								<h3>{post.title && post.title}</h3>
+								<p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 300):""}} />
+							</div>
+						</section>
+					))}
+
 					<section className="special">
-						<ul className="icons labeled">
-							<li><span className="icon fa-camera-retro"><span className="label">Ipsum lorem accumsan</span></span></li>
-							<li><span className="icon fa-refresh"><span className="label">Sed vehicula elementum</span></span></li>
-							<li><span className="icon fa-cloud"><span className="label">Elit fusce consequat</span></span></li>
-							<li><span className="icon fa-code"><span className="label">Lorem nullam tempus</span></span></li>
-							<li><span className="icon fa-desktop"><span className="label">Adipiscing amet sapien</span></span></li>
-						</ul>
+						<div style={{textAlign: "center"}}>
+              {this.props.thePagination}
+            </div>
 					</section>
 				</div>
 			</section>
 
-			<section id="three" className="wrapper style2 special">
-				<header className="major">
-					<h2>Magna leo sapien gravida</h2>
-					<p>Gravida at leo elementum elit fusce accumsan dui libero, quis vehicula<br />
-					lectus ultricies eu. In convallis amet leo sapien iaculis efficitur.</p>
-				</header>
-				<ul className="actions">
-					<li><a href="#" className="button special icon fa-download">Download</a></li>
-					<li><a href="#" className="button">Learn More</a></li>
-				</ul>
+			<section id="three" className="wrapper style2 special" style={{ padding: 50 }}>
+          <div className="row">
+            {this.props.footerWidgets &&
+              this.props.footerWidgets.map((fw, idx) => <div className="4u">{fw}</div>)}
+          </div>
 			</section>
 
 			<footer id="footer">
@@ -98,7 +82,7 @@ let Home = React.createClass({
 					<li><a href="#" className="icon fa-twitter"><span className="label">Twitter</span></a></li>
 					<li><a href="#" className="icon fa-instagram"><span className="label">Instagram</span></a></li>
 				</ul>
-				<p className="copyright">&copy; Untitled. Credits: <a href="http://html5up.net">HTML5 UP</a></p>
+				<p className="copyright">&copy; Rendact Team. Credits: <a href="http://html5up.net">HTML5 UP</a></p>
 			</footer>
 		</div>	
 		)
