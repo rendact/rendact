@@ -25,7 +25,7 @@ let Single = React.createClass({
 			<div id="page-wrapper">
 
 				<header id="header">
-					<h1 id="logo"><a href="index.html"><strong>{theConfig ? theConfig.name : "Rendact"}</strong></a></h1>
+					<h1 id="logo"><Link to="/"><strong>{theConfig ? theConfig.name : "Rendact"}</strong></Link></h1>
 					<nav id="nav">
 								{this.props.theMenu()}
 					</nav>
