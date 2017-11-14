@@ -22,7 +22,7 @@ let Home = React.createClass({
       thePagination,
       loadDone
     } = this.props
-    debugger
+    // debugger
     return (
 		<div>
 			<div id="page-wrapper">
