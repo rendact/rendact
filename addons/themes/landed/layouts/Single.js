@@ -47,14 +47,16 @@ let Single = React.createClass({
 						</div>
 					</div>
 				}
-				<div className="container">
+				<footer id="footer">
+
+					<div className="container">
 		        <div className="row">
 		          {this.props.footerWidgets.map((fw, i) => (
 		            <div className="4u 12u$(medium)" key={i}>{fw}</div>
 		          ))}
 		        </div>
-	      </div>
-				<footer id="footer">
+	      	</div>
+	      	<hr />
 					<ul className="icons">
 						<li><a href="#" className="icon alt fa-twitter"><span className="label">Twitter</span></a></li>
 						<li><a href="#" className="icon alt fa-facebook"><span className="label">Facebook</span></a></li>

@@ -23,7 +23,7 @@ let Home = React.createClass({
 		<div id="page-wrapper">
 
 				<header id="header">
-					<h1 id="logo"><a href="index.html"><strong>{theConfig ? theConfig.name : "Rendact"}</strong></a></h1>
+					<h1 id="logo"><Link to="/"><strong>{theConfig ? theConfig.name : "Rendact"}</strong></Link></h1>
 					<nav id="nav">
 								{this.props.theMenu()}
 					</nav>
@@ -40,11 +40,18 @@ let Home = React.createClass({
 
    							{data && data.map((post, index) => (
 									<section id="content">
-										<a href="#" className="image fit">
+										<Link className="image fit" to={"/post/" + post.id}>
 											<img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
-										</a>
-										<h3>{post.title && post.title}</h3>
+										</Link>
+										<Link to={"/post/" + post.id}>
+											<h3>{post.title && post.title}</h3>
+										</Link>
 										<p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 300):""}} />
+										<footer>
+											<ul className="actions">
+												<li><Link className="button" to={"/post/" + post.id}>Learn More</Link></li>
+											</ul>
+										</footer>
 									<hr />
 									</section>
 								))}
