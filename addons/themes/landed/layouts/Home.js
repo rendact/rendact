@@ -45,6 +45,7 @@ let Home = React.createClass({
 										</a>
 										<h3>{post.title && post.title}</h3>
 										<p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 300):""}} />
+									<hr />
 									</section>
 								))}
 
