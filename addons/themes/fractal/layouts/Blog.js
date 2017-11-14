@@ -5,18 +5,13 @@ import {graphql} from 'react-apollo';
 import moment from 'moment';
 import {Link} from 'react-router';
 
-let Home = React.createClass({
+let Blog = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
   },
 
-  render(){
-    let {
-      theConfig,
-      data,
-      thePagination,
-      loadDone
-    } = this.props
+render(){
+  let { theConfig, latestPosts: data, thePagination, loadDone } = this.props;
     // debugger
     return (
     <div>
@@ -32,20 +27,7 @@ let Home = React.createClass({
           {this.props.theMenu()}
         </nav>
 			</header>
-			<header id="header">
-				<div className="content">
-					<h1><a href="#">{theConfig?theConfig.name:"Rendact"}</a></h1>
-					<p>{theConfig?theConfig.tagline:"Hello"}<br />
-					Just a simple, single page responsive</p>
-					<div className="actions">
-						<a href="#two" className="button icon fa-chevron-down scrolly">Learn More</a>
-					</div>
-				</div>
-				<div className="inner">
-					<img src={ require('images/logo-128.png') } alt="" />
-				</div>
-			</header>
-
+			
 			<section id="two" className="wrapper">
 				<div className="inner alt">
 
@@ -89,4 +71,4 @@ let Home = React.createClass({
   }
 });
 
-export default Home;
+export default Blog;
