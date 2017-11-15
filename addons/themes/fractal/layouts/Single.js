@@ -25,7 +25,9 @@ let Home = React.createClass({
     	
 			<header id="header">
 				<div className="content">
-					<img src={ require('images/logo-128.png') } alt="" />
+					<Link to="/">
+						<img src={ require('images/logo-128.png') } alt="" />
+					</Link>
 					<p>{theConfig?theConfig.tagline:"Hello"}<br />
 					Just a simple, single page responsive</p>
 					<div className="actions">

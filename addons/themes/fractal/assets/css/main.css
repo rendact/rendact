@@ -4274,3 +4274,31 @@
 		padding: 0;
 		text-transform: uppercase;
 	}
+
+	#menu ul li {
+		background-color: none;
+    border: 2px solid #e7e7e7;
+    border-radius: 8px;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+		margin-bottom: 20px;
+	}
+
+
+/*img*/
+	.img {
+		border-radius: 6px;
+		border: 0;
+		display: inline-block;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.img {
+		box-shadow: 0 0 0 4px #ffffff, 0 0 0 5px #e6e6e6;
+	}
