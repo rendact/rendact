@@ -4,18 +4,27 @@ import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import moment from 'moment';
 import {Link} from 'react-router';
+import scrollToElement from 'scroll-to-element';
 
 let Blog = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
   },
 
-render(){
-  let { theConfig, latestPosts: data, thePagination, loadDone } = this.props;
+  handleScrolly(e){
+    scrollToElement("#two", {
+      duration: 1500,
+      offset: 0,
+      ease: 'in-sine'
+    })
+  },
+
+  render(){
+    let { theConfig, latestPosts: data, thePagination, loadDone } = this.props;
     // debugger
     return (
     <div>
-    	
+
 			<header id="header">
 				<div className="content">
 					<Link to="/">
@@ -24,7 +33,7 @@ render(){
 					<p>{theConfig?theConfig.tagline:"Hello"}<br />
 					Just a simple, single page responsive</p>
 					<div className="actions">
-						<a href="#two" className="button icon fa-chevron-down scrolly">Learn More</a>
+						<a href="#two" className="button icon fa-chevron-down scrolly" onClick={this.handleScrolly}>Learn More</a>
 					</div>
 				</div>
 				<div className="inner">
@@ -33,18 +42,21 @@ render(){
           </nav>
 				</div>
 			</header>
-			
+
 			<section id="two" className="wrapper">
 				<div className="inner alt">
 
 					{data && data.map((post, index) => (
 						<section className="spotlight">
 							<div className="image">
-								<img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
+								<Link to={"/post/" + post.id}>
+									<img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
+								</Link>
 							</div>
 							<div className="content">
-								<h3>{post.title && post.title}</h3>
-								<p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 300):""}} />
+								<Link to={"/post/" + post.id}><h3>{post.title && post.title}</h3></Link>
+								<p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 250):""}} />
+								<Link className="button icon fa-chevron-down scrolly" to={"/post/" + post.id}>Read More</Link>
 							</div>
 						</section>
 					))}

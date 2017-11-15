@@ -4,10 +4,19 @@ import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import moment from 'moment';
 import {Link} from 'react-router';
+import scrollToElement from 'scroll-to-element';
 
 let Home = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
+  },
+
+  handleScrolly(e){
+    scrollToElement("#two", {
+      duration: 1500,
+      offset: 0,
+      ease: 'in-sine'
+    })
   },
 
   render(){
@@ -31,7 +40,7 @@ let Home = React.createClass({
 					<p>{theConfig?theConfig.tagline:"Hello"}<br />
 					Just a simple, single page responsive</p>
 					<div className="actions">
-						<a href="#two" className="button icon fa-chevron-down scrolly">Learn More</a>
+						<a href="#two" className="button icon fa-chevron-down scrolly" onClick={this.handleScrolly}>Learn More</a>
 					</div>
 				</div>
 				<div className="inner">
