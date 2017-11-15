@@ -12,6 +12,7 @@ let Home = React.createClass({
     require('../css/style2.css');
     require('../css/style3.css');
     require('../css/style4.css');
+    require('../assets/css/main.css')
   },
 
   render(){
@@ -26,38 +27,43 @@ let Home = React.createClass({
 
       <div>
         <ul className="cb-slideshow">
-            <li><span>Image 01</span><div><h3>re·lax·a·tion</h3></div></li>
-            <li><span>Image 02</span><div><h3>qui·e·tude</h3></div></li>
-            <li><span>Image 03</span><div><h3>bal·ance</h3></div></li>
-            <li><span>Image 04</span><div><h3>e·qua·nim·i·ty</h3></div></li>
-            <li><span>Image 05</span><div><h3>com·po·sure</h3></div></li>
-            <li><span>Image 06</span><div><h3>se·ren·i·ty</h3></div></li>
+            <li><span>Image 01</span></li>
+            <li><span>Image 02</span></li>
+            <li><span>Image 03</span></li>
+            <li><span>Image 04</span></li>
+            <li><span>Image 05</span></li>
+            <li><span>Image 06</span></li>
         </ul>
         <div className="container">
             
-            <div className="codrops-top">
-                <a href="http://tympanus.net/Development/RockingLetters/">
-                    <strong>&laquo; Previous Demo: </strong>Rocking Letters with CSS3 &amp; jQuery
-                </a>
-                <span className="right">
-                    <a href="http://www.flickr.com/photos/markjsebastian/" target="_blank">Photography by Mark Sebastian</a>
-                    <a href="http://creativecommons.org/licenses/by-sa/2.0/deed.en" target="_blank">CC BY-SA 2.0</a>
-                    <a href="http://tympanus.net/codrops/2012/01/02/fullscreen-background-image-slideshow-with-css3/">
-                        <strong>Back to the Codrops Article</strong>
-                    </a>
-                </span>
-                <div className="clr"></div>
-            </div>
-            <header>
-                <h1>CSS3 <span>Fullscreen Slideshow</span></h1>
-                <h2>A CSS-only slideshow for background images</h2>
-        <p className="codrops-demos">
-          <a href="#" className="current-demo">Demo 1</a>
-          <a href="index2.html">Demo 2</a>
-          <a href="index3.html">Demo 3</a>
-          <a href="index4.html">Demo 4</a>
-        </p>
+            <header id="header">
+              <a href="#" className="logo"><img src={require('images/logo-128.png')} alt="" /></a>
+              <p>{theConfig ? theConfig.tagline: "A simple template for telling the world when you will launch"}</p>
+            
+              <form id="signup-form" method="post" action="#">
+                <input type="email" name="email" id="email" placeholder="Email Address" />
+                <input type="submit" value="Sign Up" />
+              </form>
+
+              <div id="footer">
+                <ul className="icons">
+                  <li><a href="#" className="icon fa-twitter"><span className="label">Twitter</span></a></li>
+                  <li><a href="#" className="icon fa-instagram"><span className="label">Instagram</span></a></li>
+                  <li><a href="#" className="icon fa-github"><span className="label">GitHub</span></a></li>
+                  <li><a href="#" className="icon fa-envelope-o"><span className="label">Email</span></a></li>
+                </ul>
+                <ul className="copyright">
+                  <li>&copy; Rendact Team.</li><li>Credits: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+              </div>
+
             </header>
+
+        
+            
+
+        
+            
         </div>
       </div>
 
