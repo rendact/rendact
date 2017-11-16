@@ -2,12 +2,20 @@ import $ from 'jquery'
 import React from 'react';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
-import moment from 'moment';
+import scrollToElement from 'scroll-to-element';
 import {Link} from 'react-router';
 
 let Home = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
+  },
+
+  handleScrolly(e){
+    scrollToElement("#scroll", {
+      duration: 1500,
+      offset: 0,
+      ease: 'in-sine'
+    })
   },
 
   handleShowMenu(){
@@ -54,10 +62,10 @@ let Home = React.createClass({
               <p>{theConfig?theConfig.tagline:"Hello"}<br />
               Just a simple, single page responsive</p>
             </div>
-            <a href="#one" className="more scrolly">Learn More</a>
+            <a href="#scroll" className="more scrolly" onClick={this.handleScrolly}>Learn More</a>
           </section>
 
-          <section id="one" className="wrapper style1 special">
+          <section id="scroll" className="wrapper style1 special">
             <div className="inner">
               <ul className="icons major">
                 <li><span className="icon fa-diamond major style1"><span className="label">Lorem</span></span></li>
