@@ -44,25 +44,15 @@ let Home = React.createClass({
 
           <section id="banner">
             <div className="inner">
-              <h2>Spectral</h2>
-              <p>Another fine responsive<br />
-              site template freebie<br />
-              crafted by <a href="http://html5up.net">HTML5 UP</a>.</p>
-              <ul className="actions">
-                <li><a href="#" className="button special">Activate</a></li>
-              </ul>
+              <h2>{theConfig?theConfig.name:"Rendact"}</h2>
+              <p>{theConfig?theConfig.tagline:"Hello"}<br />
+              Just a simple, single page responsive</p>
             </div>
             <a href="#one" className="more scrolly">Learn More</a>
           </section>
 
           <section id="one" className="wrapper style1 special">
             <div className="inner">
-              <header className="major">
-                <h2>Arcu aliquet vel lobortis ata nisl<br />
-                eget augue amet aliquet nisl cep donec</h2>
-                <p>Aliquam ut ex ut augue consectetur interdum. Donec amet imperdiet eleifend<br />
-                fringilla tincidunt. Nullam dui leo Aenean mi ligula, rhoncus ullamcorper.</p>
-              </header>
               <ul className="icons major">
                 <li><span className="icon fa-diamond major style1"><span className="label">Lorem</span></span></li>
                 <li><span className="icon fa-heart-o major style2"><span className="label">Ipsum</span></span></li>
@@ -99,14 +89,10 @@ let Home = React.createClass({
 
           <section id="cta" className="wrapper style4">
             <div className="inner">
-              <header>
-                <h2>Arcue ut vel commodo</h2>
-                <p>Aliquam ut ex ut augue consectetur interdum endrerit imperdiet amet eleifend fringilla.</p>
-              </header>
-              <ul className="actions vertical">
-                <li><a href="#" className="button fit special">Activate</a></li>
-                <li><a href="#" className="button fit">Learn More</a></li>
-              </ul>
+              <div className="row">
+                {this.props.footerWidgets &&
+                  this.props.footerWidgets.map((fw, idx) => <div className="4u">{fw}</div>)}
+              </div>
             </div>
           </section>
 
@@ -119,7 +105,7 @@ let Home = React.createClass({
               <li><a href="#" className="icon fa-envelope-o"><span className="label">Email</span></a></li>
             </ul>
             <ul className="copyright">
-              <li>&copy; Untitled</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+              <li>&copy; Rendact</li><li>Design: Rendact Team & <a href="http://html5up.net">HTML5 UP</a></li>
             </ul>
           </footer>
 
