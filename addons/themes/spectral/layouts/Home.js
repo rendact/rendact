@@ -10,6 +10,14 @@ let Home = React.createClass({
     require('../assets/css/main.css')
   },
 
+  handleShowMenu(){
+    document.body.className = "landing is-menu-visible";
+  },
+
+  handleCloseMenu(){
+    document.body.className = "landing";
+  },
+
   render(){
     let {
       theConfig,
@@ -20,23 +28,21 @@ let Home = React.createClass({
     // debugger
     return (
 
-     <div id="page-wrapper">
+      <div>
+        <div id="page-wrapper">
 
-          <header id="header" className="alt">
-            <h1><a href="index.html">Spectral</a></h1>
+          {/*<header id="header" className={id!=="banner"?"alt":""}>*/}
+          <header id="header" className="">
+            <strong>
+              <Link to="/">
+                <h1>{theConfig ? theConfig.name : "Rendact"}</h1>
+              </Link>
+            </strong>
             <nav id="nav">
               <ul>
                 <li className="special">
-                  <a href="#menu" className="menuToggle"><span>Menu</span></a>
-                  <div id="menu">
-                    <ul>
-                      <li><a href="index.html">Home</a></li>
-                      <li><a href="generic.html">Generic</a></li>
-                      <li><a href="elements.html">Elements</a></li>
-                      <li><a href="#">Sign Up</a></li>
-                      <li><a href="#">Log In</a></li>
-                    </ul>
-                  </div>
+                  <a href="#" onClick={this.handleShowMenu} className="menuToggle"><span>Menu</span></a>
+                  
                 </li>
               </ul>
             </nav>
@@ -70,7 +76,9 @@ let Home = React.createClass({
                     <img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
                   </Link></div>
                 <div className="content">
-                  <h2>{post.title && post.title}</h2>
+                  <h2>
+                    <Link to={"/post/" + post.id}>{post.title && post.title}</Link>
+                  </h2>
                   <p>Aliquam ut ex ut augue consectetur interdum. Donec hendrerit imperdiet. Mauris eleifend fringilla nullam aenean mi ligula.</p>
                   <Link className="button" to={"/post/" + post.id}>Read More</Link>
                 </div>
@@ -108,7 +116,13 @@ let Home = React.createClass({
               <li>&copy; Rendact</li><li>Design: Rendact Team & <a href="http://html5up.net">HTML5 UP</a></li>
             </ul>
           </footer>
-
+        </div>
+        <div id="menu">
+          <ul className="links">
+            <li>{this.props.theMenu("links")}</li>
+          </ul>
+          <a href="#" className="close" onClick={this.handleCloseMenu}></a>
+        </div>
       </div> 
 
     )
