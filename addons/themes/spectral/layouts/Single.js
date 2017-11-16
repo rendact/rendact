@@ -14,6 +14,10 @@ let Single = React.createClass({
     document.body.className = "is-menu-visible";
   },
 
+  handleCloseMenu(){
+    document.body.className = "landing";
+  },
+
   handleScrolly(e){
     scrollToElement("#scroll", {
       duration: 1500,
@@ -73,6 +77,15 @@ let Single = React.createClass({
             </article>
           }
 
+            <section id="cta" className="wrapper style4">
+              <div className="inner">
+                <div className="row">
+                  {this.props.footerWidgets &&
+                    this.props.footerWidgets.map((fw, idx) => <div className="4u">{fw}</div>)}
+                </div>
+              </div>
+            </section>
+
             <footer id="footer">
               <ul className="icons">
                 <li><a href="#" className="icon fa-twitter"><span className="label">Twitter</span></a></li>
@@ -82,12 +95,17 @@ let Single = React.createClass({
                 <li><a href="#" className="icon fa-envelope-o"><span className="label">Email</span></a></li>
               </ul>
               <ul className="copyright">
-                <li>&copy; Untitled</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                <li>&copy; Rendact</li><li>Design: Rendact Team & <a href="http://html5up.net">HTML5 UP</a></li>
               </ul>
             </footer>
 
         </div>
-
+        <div id="menu" onClick={this.handleCloseMenu}>
+          <ul>
+            <li>{this.props.theMenu()}</li>
+          </ul>
+          <a href="#" className="close" onClick={this.handleCloseMenu}></a>
+        </div>
       </div>
     )
   }
