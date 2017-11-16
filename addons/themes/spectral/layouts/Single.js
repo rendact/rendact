@@ -14,6 +14,14 @@ let Single = React.createClass({
     document.body.className = "is-menu-visible";
   },
 
+  handleScrolly(e){
+    scrollToElement("#scroll", {
+      duration: 1500,
+      offset: 0,
+      ease: 'in-sine'
+    })
+  },
+
   render(){
     let {
     	postData,
@@ -38,29 +46,33 @@ let Single = React.createClass({
               <ul>
                 <li className="special">
                   <a href="#" onClick={this.handleShowMenu} className="menuToggle"><span>Menu</span></a>
-                  
                 </li>
               </ul>
             </nav>
           </header>
+
           {postData &&
             <article id="main">
               <header>
-                <h2>Generic Page</h2>
-                <p>Aliquam ut ex ut interdum donec amet imperdiet eleifend</p>
+                <h2>{theConfig?theConfig.name:"Rendact"}</h2>
+                <p>{theConfig?theConfig.tagline:"Hello"}<br />
+                Just a simple, single page responsive</p>
+                <a href="#" className="more scrolly" onClick={this.handleScrolly}>Learn More</a>
               </header>
-              <section className="wrapper style5">
+              <section id="scroll" className="wrapper style5">
                 <div className="inner">
+                  <h2>{postData.title && postData.title}</h2>
+                  <hr />
                   <div style={{textAlign: "center"}}>
                     <img src={postData.imageFeatured ? postData.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
                   </div>
                   <hr />
-                  <h3>{postData.title && postData.title}</h3>
                   <p dangerouslySetInnerHTML={{__html: postData.content ? postData.content:""}} />
                 </div>
               </section>
             </article>
           }
+
             <footer id="footer">
               <ul className="icons">
                 <li><a href="#" className="icon fa-twitter"><span className="label">Twitter</span></a></li>

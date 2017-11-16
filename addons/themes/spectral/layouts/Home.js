@@ -50,7 +50,6 @@ let Home = React.createClass({
               <ul>
                 <li className="special">
                   <a href="#" onClick={this.handleShowMenu} className="menuToggle"><span>Menu</span></a>
-                  
                 </li>
               </ul>
             </nav>
@@ -87,7 +86,7 @@ let Home = React.createClass({
                   <h2>
                     <Link to={"/post/" + post.id}>{post.title && post.title}</Link>
                   </h2>
-                  <p>Aliquam ut ex ut augue consectetur interdum. Donec hendrerit imperdiet. Mauris eleifend fringilla nullam aenean mi ligula.</p>
+                  <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 200):""}} />
                   <Link className="button" to={"/post/" + post.id}>Read More</Link>
                 </div>
               </section>
