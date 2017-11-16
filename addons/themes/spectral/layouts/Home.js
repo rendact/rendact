@@ -62,7 +62,7 @@ let Home = React.createClass({
               <p>{theConfig?theConfig.tagline:"Hello"}<br />
               Just a simple, single page responsive</p>
             </div>
-            <a href="#scroll" className="more scrolly" onClick={this.handleScrolly}>Learn More</a>
+            <a href="#" className="more scrolly" onClick={this.handleScrolly}>Learn More</a>
           </section>
 
           <section id="scroll" className="wrapper style1 special">
