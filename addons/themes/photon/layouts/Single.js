@@ -5,7 +5,7 @@ import {graphql} from 'react-apollo';
 import scrollToElement from 'scroll-to-element';
 import {Link} from 'react-router';
 
-let Home = React.createClass({
+let Single = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
   },
@@ -20,10 +20,12 @@ let Home = React.createClass({
 
   render(){
     let {
+      postData,
       theConfig,
       data,
       thePagination,
-      loadDone
+      loadDone,
+      isHome
     } = this.props
   
     return (
@@ -44,38 +46,24 @@ let Home = React.createClass({
           </div>
         </section>
 
-        {data && data.map((post, index) => (
-          <section id="one" className={index%2===0 ? "main style12" : "main style11"}>
+        {postData &&
+          <section id="one" className="main style1">
             <div className="container">
               <div className="row 150%">
-                <div className="6u 12u$(medium)">
                   <header className="major">
-                    <h2><strong><Link to={"/post/" + post.id}>{post.title && post.title}</Link></strong></h2>
+                    <h2><strong>{postData.title && postData.title}</strong></h2>
                   </header>
-                  <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 200):""}} />
-                  <Link className="button" to={"/post/" + post.id}>Read More</Link>
-                </div>
-                <div className="6u 12u$(medium) important(medium)">
+
                   <span className="image fit">
-                    <Link to={"/post/" + post.id}>
-                      <img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
-                    </Link>
+                      <img src={postData.imageFeatured ? postData.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
                   </span>
-                </div>
+
+                  <p dangerouslySetInnerHTML={{__html: postData.content ? postData.content:""}} />
+              
               </div>
             </div>
           </section>
-        ))}
-
-        <section id="three" className="main style1 special">
-          <div className="container">
-            <header className="major">
-              <div style={{textAlign: "center"}}>
-                {thePagination}
-              </div>
-            </header>
-          </div>
-        </section>
+        }
 
         <section id="two" className="main style2">
           <div className="container">
@@ -117,4 +105,4 @@ let Home = React.createClass({
   }
 });
 
-export default Home;
+export default Single;
