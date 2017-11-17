@@ -30,6 +30,12 @@ let Single = React.createClass({
   
     return (
       <div>
+        <header id="head">
+          <h1 id="logo"><Link to="/"><strong>{theConfig ? theConfig.name : "Rendact"}</strong></Link></h1>
+          <nav id="nav">
+                {this.props.theMenu()}
+          </nav>
+        </header>
 
         <section id="header">
           <div className="inner">
