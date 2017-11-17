@@ -5,7 +5,7 @@ import {graphql} from 'react-apollo';
 import scrollToElement from 'scroll-to-element';
 import {Link} from 'react-router';
 
-let Home = React.createClass({
+let Blog = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
   },
@@ -19,12 +19,7 @@ let Home = React.createClass({
   },
 
   render(){
-    let {
-      theConfig,
-      data,
-      thePagination,
-      loadDone
-    } = this.props
+    let { theConfig, latestPosts: data, thePagination, loadDone } = this.props;
   
     return (
       <div>
@@ -116,4 +111,4 @@ let Home = React.createClass({
   }
 });
 
-export default Home;
+export default Blog;
