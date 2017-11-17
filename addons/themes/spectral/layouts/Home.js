@@ -123,6 +123,7 @@ let Home = React.createClass({
               <li>&copy; Rendact</li><li>Design: Rendact Team & <a href="http://html5up.net">HTML5 UP</a></li>
             </ul>
           </footer>
+          
         </div>
         <div id="menu" onClick={this.handleCloseMenu}>
           <ul>

@@ -12,7 +12,7 @@
 	button,
 	.button {
 		position: relative;
-		/*-ms-behavior: url("assets/js/ie/PIE.htc");*/
+		-ms-behavior: url("../js/ie/PIE.htc");
 		border: solid 2px #e6e6e6 !important;
 	}
 
@@ -43,12 +43,12 @@
 /* Image */
 
 	.image {
-		/*-ms-behavior: url("assets/js/ie/PIE.htc");*/
+		-ms-behavior: url("../js/ie/PIE.htc");
 	}
 
 		.image img {
 			position: relative;
-			/*-ms-behavior: url("assets/js/ie/PIE.htc");*/
+			-ms-behavior: url("../js/ie/PIE.htc");
 		}
 
 		.image.phone:before, .image.phone:after {
