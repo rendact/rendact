@@ -24,96 +24,81 @@ let Home = React.createClass({
     return (
     <div>	
 			<header id="header">
-				<div class="inner">
-					<a href="#" class="image avatar"><img src="images/avatar.jpg" alt="" /></a>
-					<h1><strong>I am Strata</strong>, a super simple<br />
-					responsive site template freebie<br />
+				<div className="inner">
+					<div class="image avatar">
+						<Link to="/">
+							<img src={ require('images/logo-128.png') } alt="" />
+						</Link>
+					</div>
+					<h1><strong>We are {theConfig?theConfig.name:"Rendact"} Team</strong><br />
+					{theConfig?theConfig.tagline:"Hello, this is new theme"}<br />
 					crafted by <a href="http://html5up.net">HTML5 UP</a>.</h1>
 				</div>
+				<footer id="footer">
+					<div className="inner">
+						<ul className="icons">
+							<li><a href="#" className="icon fa-twitter"><span className="label">Twitter</span></a></li>
+							<li><a href="#" className="icon fa-github"><span className="label">Github</span></a></li>
+							<li><a href="#" className="icon fa-dribbble"><span className="label">Dribbble</span></a></li>
+							<li><a href="#" className="icon fa-envelope-o"><span className="label">Email</span></a></li>
+						</ul>
+						<ul className="copyright">
+							<li className="copyright">&copy; Rendact Team. Credits: <a href="http://html5up.net">HTML5 UP</a></li>
+						</ul>
+					</div>
+				</footer>
 			</header>
 
 			<div id="main">
 
-					<section id="one">
-						<header class="major">
-							<h2>Ipsum lorem dolor aliquam ante commodo<br />
-							magna sed accumsan arcu neque.</h2>
-						</header>
-						<p>Accumsan orci faucibus id eu lorem semper. Eu ac iaculis ac nunc nisi lorem vulputate lorem neque cubilia ac in adipiscing in curae lobortis tortor primis integer massa adipiscing id nisi accumsan pellentesque commodo blandit enim arcu non at amet id arcu magna. Accumsan orci faucibus id eu lorem semper nunc nisi lorem vulputate lorem neque cubilia.</p>
-						<ul class="actions">
-							<li><a href="#" class="button">Learn More</a></li>
-						</ul>
-					</section>
-
 					<section id="two">
-						<h2>Recent Work</h2>
-						<div class="row">
-							<article class="6u 12u$(xsmall) work-item">
-								<a href="images/fulls/01.jpg" class="image fit thumb"><img src="images/thumbs/01.jpg" alt="" /></a>
-								<h3>Magna sed consequat tempus</h3>
-								<p>Lorem ipsum dolor sit amet nisl sed nullam feugiat.</p>
-							</article>
-							<article class="6u$ 12u$(xsmall) work-item">
-								<a href="images/fulls/02.jpg" class="image fit thumb"><img src="images/thumbs/02.jpg" alt="" /></a>
-								<h3>Ultricies lacinia interdum</h3>
-								<p>Lorem ipsum dolor sit amet nisl sed nullam feugiat.</p>
-							</article>
-							<article class="6u 12u$(xsmall) work-item">
-								<a href="images/fulls/03.jpg" class="image fit thumb"><img src="images/thumbs/03.jpg" alt="" /></a>
-								<h3>Tortor metus commodo</h3>
-								<p>Lorem ipsum dolor sit amet nisl sed nullam feugiat.</p>
-							</article>
-							<article class="6u$ 12u$(xsmall) work-item">
-								<a href="images/fulls/04.jpg" class="image fit thumb"><img src="images/thumbs/04.jpg" alt="" /></a>
-								<h3>Quam neque phasellus</h3>
-								<p>Lorem ipsum dolor sit amet nisl sed nullam feugiat.</p>
-							</article>
-							<article class="6u 12u$(xsmall) work-item">
-								<a href="images/fulls/05.jpg" class="image fit thumb"><img src="images/thumbs/05.jpg" alt="" /></a>
-								<h3>Nunc enim commodo aliquet</h3>
-								<p>Lorem ipsum dolor sit amet nisl sed nullam feugiat.</p>
-							</article>
-							<article class="6u$ 12u$(xsmall) work-item">
-								<a href="images/fulls/06.jpg" class="image fit thumb"><img src="images/thumbs/06.jpg" alt="" /></a>
-								<h3>Risus ornare lacinia</h3>
-								<p>Lorem ipsum dolor sit amet nisl sed nullam feugiat.</p>
-							</article>
+						<h2>Post List</h2>
+						<div className="row">
+							{data && data.map((post, index) => (
+								<article className="6u 12u$(xsmall) work-item">									
+									<a href="images/fulls/01.jpg" className="image fit thumb">
+										<img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
+									</a>
+									<h3>{post.title && post.title}</h3>
+									<p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 50):""}} />
+								</article>
+							))}
 						</div>
-						<ul class="actions">
-							<li><a href="#" class="button">Full Portfolio</a></li>
+						<ul className="actions" style={{textAlign: "center"}}>
+							<li>{this.props.thePagination}</li>
 						</ul>
 					</section>
 
 					<section id="three">
 						<h2>Get In Touch</h2>
 						<p>Accumsan pellentesque commodo blandit enim arcu non at amet id arcu magna. Accumsan orci faucibus id eu lorem semper nunc nisi lorem vulputate lorem neque lorem ipsum dolor.</p>
-						<div class="row">
-							<div class="8u 12u$(small)">
+						<div className="row">
+							<div className="8u 12u$(small)">
 								<form method="post" action="#">
-									<div class="row uniform 50%">
-										<div class="6u 12u$(xsmall)"><input type="text" name="name" id="name" placeholder="Name" /></div>
-										<div class="6u$ 12u$(xsmall)"><input type="email" name="email" id="email" placeholder="Email" /></div>
-										<div class="12u$"><textarea name="message" id="message" placeholder="Message" rows="4"></textarea></div>
+									<div className="row uniform 50%">
+										<div className="6u 12u$(xsmall)"><input type="text" name="name" id="name" placeholder="Name" /></div>
+										<div className="6u$ 12u$(xsmall)"><input type="email" name="email" id="email" placeholder="Email" /></div>
+										<div className="12u$"><textarea name="message" id="message" placeholder="Message" rows="4"></textarea></div>
 									</div>
 								</form>
-								<ul class="actions">
+								<ul className="actions">
 									<li><input type="submit" value="Send Message" /></li>
 								</ul>
 							</div>
-							<div class="4u$ 12u$(small)">
-								<ul class="labeled-icons">
+							<div className="4u$ 12u$(small)">
+								<ul className="labeled-icons">
 									<li>
-										<h3 class="icon fa-home"><span class="label">Address</span></h3>
+										<h3 className="icon fa-home"><span className="label">Address</span></h3>
 										1234 Somewhere Rd.<br />
 										Nashville, TN 00000<br />
 										United States
 									</li>
 									<li>
-										<h3 class="icon fa-mobile"><span class="label">Phone</span></h3>
+										<h3 className="icon fa-mobile"><span className="label">Phone</span></h3>
 										000-000-0000
 									</li>
 									<li>
-										<h3 class="icon fa-envelope-o"><span class="label">Email</span></h3>
+										<h3 className="icon fa-envelope-o"><span className="label">Email</span></h3>
 										<a href="#">hello@untitled.tld</a>
 									</li>
 								</ul>
@@ -123,19 +108,6 @@ let Home = React.createClass({
 
 			</div>
 
-			<footer id="footer">
-				<div class="inner">
-					<ul class="icons">
-						<li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
-						<li><a href="#" class="icon fa-github"><span class="label">Github</span></a></li>
-						<li><a href="#" class="icon fa-dribbble"><span class="label">Dribbble</span></a></li>
-						<li><a href="#" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
-					</ul>
-					<ul class="copyright">
-						<li>&copy; Untitled</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
-					</ul>
-				</div>
-			</footer>
 			</div>
 		)
   }
