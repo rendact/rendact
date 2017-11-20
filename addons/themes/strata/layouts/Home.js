@@ -22,36 +22,27 @@ let Home = React.createClass({
     } = this.props
 
     return (
-    <div>	
-			<header id="header">
-				<div className="inner">
-					<div class="image avatar">
-						<Link to="/">
-							<img src={ require('images/logo-128.png') } alt="" />
-						</Link>
-					</div>
-					<h1><strong>We are {theConfig?theConfig.name:"Rendact"} Team</strong><br />
-					{theConfig?theConfig.tagline:"Hello, this is new theme"}<br />
-					crafted by <a href="http://html5up.net">HTML5 UP</a>.</h1>
-				</div>
-				<footer id="footer">
+	    <div>	
+				<header id="header">
 					<div className="inner">
-						<ul className="icons">
-							<li><a href="#" className="icon fa-twitter"><span className="label">Twitter</span></a></li>
-							<li><a href="#" className="icon fa-github"><span className="label">Github</span></a></li>
-							<li><a href="#" className="icon fa-dribbble"><span className="label">Dribbble</span></a></li>
-							<li><a href="#" className="icon fa-envelope-o"><span className="label">Email</span></a></li>
-						</ul>
-						<ul className="copyright">
-							<li className="copyright">&copy; Rendact Team. Credits: <a href="http://html5up.net">HTML5 UP</a></li>
-						</ul>
+						<div className="image avatar">
+							<Link to="/">
+								<img src={ require('images/logo-128.png') } alt="" />
+							</Link>
+						</div>
+						<h1><strong>We are {theConfig?theConfig.name:"Rendact"} Team</strong><br />
+						{theConfig?theConfig.tagline:"Hello, this is new theme"}<br />
+						crafted by <a href="http://html5up.net">HTML5 UP</a>.</h1>
 					</div>
-				</footer>
-			</header>
+				</header>
 
-			<div id="main">
-
+				<div id="main">
 					<section id="two">
+						<div id="head">
+							<nav id="nav">
+		            {this.props.theMenu()}
+		          </nav>
+		        </div>
 						<h2>Post List</h2>
 						<div className="row">
 							{data && data.map((post, index) => (
@@ -76,8 +67,21 @@ let Home = React.createClass({
 	          </div>
 					</section>
 
-			</div>
+				</div>
 
+						<footer id="footer">
+							<div className="inner">
+								<ul className="icons">
+									<li><a href="#" className="icon fa-twitter"><span className="label">Twitter</span></a></li>
+									<li><a href="#" className="icon fa-github"><span className="label">Github</span></a></li>
+									<li><a href="#" className="icon fa-dribbble"><span className="label">Dribbble</span></a></li>
+									<li><a href="#" className="icon fa-envelope-o"><span className="label">Email</span></a></li>
+								</ul>
+								<ul className="copyright">
+									<li className="copyright">&copy; Rendact Team. Credits: <a href="http://html5up.net">HTML5 UP</a></li>
+								</ul>
+							</div>
+						</footer>
 			</div>
 		)
   }
