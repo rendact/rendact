@@ -37,39 +37,37 @@ render(){
 					</div>
 				</header>
 
-				<div id="main">
-					<section id="one">
-						<div id="head">
-							<nav id="nav">
-		            {this.props.theMenu()}
-		          </nav>
-		        </div>
-						<header className="major">
-							<h2>{post.title && post.title}</h2>
-						</header>
-						<a href="images/fulls/01.jpg" className="image fit thumb">
-							<img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
-						</a>
-						<p dangerouslySetInnerHTML={{__html: post.content ? post.content:""}} />
-						<ul className="actions">
-							<li><a href="#" className="button">Learn More</a></li>
+				{postData &&
+					<div id="main">
+						<section id="one">
+							<div id="head">
+								<nav id="nav">
+			            {this.props.theMenu()}
+			          </nav>
+			        </div>
+							<header className="major">
+								<h2>{postData.title && postData.title}</h2>
+							</header>
+							<a href="#" className="image fit">
+								<img src={postData.imageFeatured ? postData.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
+							</a>
+							<p dangerouslySetInnerHTML={{__html: postData.content ? postData.content:""}} />
+						</section>
+					</div>
+				}
+				<footer id="footer">
+					<div className="inner">
+						<ul className="icons">
+							<li><a href="#" className="icon fa-twitter"><span className="label">Twitter</span></a></li>
+							<li><a href="#" className="icon fa-github"><span className="label">Github</span></a></li>
+							<li><a href="#" className="icon fa-dribbble"><span className="label">Dribbble</span></a></li>
+							<li><a href="#" className="icon fa-envelope-o"><span className="label">Email</span></a></li>
 						</ul>
-					</section>
-				</div>
-
-						<footer id="footer">
-							<div className="inner">
-								<ul className="icons">
-									<li><a href="#" className="icon fa-twitter"><span className="label">Twitter</span></a></li>
-									<li><a href="#" className="icon fa-github"><span className="label">Github</span></a></li>
-									<li><a href="#" className="icon fa-dribbble"><span className="label">Dribbble</span></a></li>
-									<li><a href="#" className="icon fa-envelope-o"><span className="label">Email</span></a></li>
-								</ul>
-								<ul className="copyright">
-									<li className="copyright">&copy; Rendact Team. Credits: <a href="http://html5up.net">HTML5 UP</a></li>
-								</ul>
-							</div>
-						</footer>
+						<ul className="copyright">
+							<li className="copyright">&copy; Rendact Team. Credits: <a href="http://html5up.net">HTML5 UP</a></li>
+						</ul>
+					</div>
+				</footer>
 			</div>
 		)
   }

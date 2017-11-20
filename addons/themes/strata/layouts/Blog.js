@@ -42,11 +42,11 @@ let Blog = React.createClass({
 						<div className="row">
 							{data && data.map((post, index) => (
 								<article className="6u 12u$(xsmall) work-item">									
-									<a href="images/fulls/01.jpg" className="image fit thumb">
+									<Link to={"/post/" + post.id} className="image fit thumb">
 										<img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
-									</a>
-									<h3>{post.title && post.title}</h3>
-									<p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 50):""}} />
+									</Link>
+									<h3><Link to={"/post/" + post.id}>{post.title && post.title}</Link></h3>
+									<p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 60):""}} />
 								</article>
 							))}
 						</div>
@@ -64,19 +64,19 @@ let Blog = React.createClass({
 
 				</div>
 
-						<footer id="footer">
-							<div className="inner">
-								<ul className="icons">
-									<li><a href="#" className="icon fa-twitter"><span className="label">Twitter</span></a></li>
-									<li><a href="#" className="icon fa-github"><span className="label">Github</span></a></li>
-									<li><a href="#" className="icon fa-dribbble"><span className="label">Dribbble</span></a></li>
-									<li><a href="#" className="icon fa-envelope-o"><span className="label">Email</span></a></li>
-								</ul>
-								<ul className="copyright">
-									<li className="copyright">&copy; Rendact Team. Credits: <a href="http://html5up.net">HTML5 UP</a></li>
-								</ul>
-							</div>
-						</footer>
+				<footer id="footer">
+					<div className="inner">
+						<ul className="icons">
+							<li><a href="#" className="icon fa-twitter"><span className="label">Twitter</span></a></li>
+							<li><a href="#" className="icon fa-github"><span className="label">Github</span></a></li>
+							<li><a href="#" className="icon fa-dribbble"><span className="label">Dribbble</span></a></li>
+							<li><a href="#" className="icon fa-envelope-o"><span className="label">Email</span></a></li>
+						</ul>
+						<ul className="copyright">
+							<li className="copyright">&copy; Rendact Team. Credits: <a href="http://html5up.net">HTML5 UP</a></li>
+						</ul>
+					</div>
+				</footer>
 			</div>
 		)
   }
