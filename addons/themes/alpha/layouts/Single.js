@@ -6,7 +6,7 @@ import moment from 'moment';
 import {Link} from 'react-router';
 import scrollToElement from 'scroll-to-element';
 
-let Home = React.createClass({
+let Single = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
   },
@@ -15,20 +15,14 @@ let Home = React.createClass({
     document.body.className = "landing";
   },
 
-  handleScrolly(e){
-    scrollToElement("#main", {
-      duration: 1500,
-      offset: 0,
-      ease: 'in-sine'
-    })
-  },
-
   render(){
     let {
+      postData,
       theConfig,
       data,
       thePagination,
-      loadDone
+      loadDone,
+      isHome
     } = this.props
 
     return (
@@ -52,40 +46,21 @@ let Home = React.createClass({
         </header>
 
         <section id="banner">
-          <h2>{theConfig?theConfig.name:"Rendact"}</h2>
-          <p>{theConfig?theConfig.tagline:"Hello"}</p>
-          <ul className="actions">
-            <li><a href="#" className="button" onClick={this.handleScrolly}>Learn More</a></li>
-          </ul>
+          <h2>{postData.title && postData.title}</h2>
         </section>
 
+        {postData &&
         <section id="main" className="container">
-            
-          <div className="row">
-            {data && data.map((post, index) => (
-              <div className="6u 12u(narrower)">
-                <section className="box special">
-                  <Link className="image featured" to={"/post/" + post.id}>
-                    <img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
-                  </Link>
-                  <h3>{post.title && post.title}</h3>
-                  <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 200):""}} />
-                  <ul className="actions">
-                    <li>
-                      <Link className="button alt" to={"/post/" + post.id}>Read More</Link>
-                    </li>
-                  </ul>
-                </section>
-              </div>
-            ))}
-          </div>
+          <section className="box special">
+            <span className="image featured">
+              <img src={postData.imageFeatured ? postData.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
+            </span>
+            <header className="major">
+              <p dangerouslySetInnerHTML={{__html: postData.content ? postData.content :""}} />
+            </header>
+          </section>
         </section>
-
-        <section class="box special features">
-          <div style={{textAlign: "center"}}>
-            {this.props.thePagination}
-          </div>
-        </section>
+        }
 
         <section id="cta">
           <div className="container">
@@ -115,4 +90,4 @@ let Home = React.createClass({
   }
 });
 
-export default Home;
+export default Single;

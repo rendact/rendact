@@ -36,7 +36,7 @@ let Blog = React.createClass({
             <ul>
               <li>
                 <div className="dropdown">
-                  <a href="#" class="icon fa-angle-down">Menu</a>
+                  <a href="#" className="icon fa-angle-down">Menu</a>
                   <div className="dropdown-content">
                     {this.props.theMenu()}
                   </div>
