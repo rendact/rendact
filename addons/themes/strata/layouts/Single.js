@@ -37,8 +37,8 @@ render(){
 					</div>
 				</header>
 
-				{postData &&
-					<div id="main">
+				<div id="main">
+					{postData &&
 						<section id="one">
 							<div id="head">
 								<nav id="nav">
@@ -53,21 +53,29 @@ render(){
 							</a>
 							<p dangerouslySetInnerHTML={{__html: postData.content ? postData.content:""}} />
 						</section>
-					</div>
-				}
-				<footer id="footer">
-					<div className="inner">
-						<ul className="icons">
-							<li><a href="#" className="icon fa-twitter"><span className="label">Twitter</span></a></li>
-							<li><a href="#" className="icon fa-github"><span className="label">Github</span></a></li>
-							<li><a href="#" className="icon fa-dribbble"><span className="label">Dribbble</span></a></li>
-							<li><a href="#" className="icon fa-envelope-o"><span className="label">Email</span></a></li>
-						</ul>
-						<ul className="copyright">
-							<li className="copyright">&copy; Rendact Team. Credits: <a href="http://html5up.net">HTML5 UP</a></li>
-						</ul>
-					</div>
-				</footer>
+					}
+					<section id="three">
+						<div className="row">
+	            {this.props.footerWidgets &&
+	              this.props.footerWidgets.map((fw, idx) => <div className="4u">{fw}</div>)}
+	          </div>
+					</section>
+
+					<section>
+						<footer id="footer">
+								<ul className="icons">
+									<li><a href="#" className="icon fa-twitter"><span className="label">Twitter</span></a></li>
+									<li><a href="#" className="icon fa-github"><span className="label">Github</span></a></li>
+									<li><a href="#" className="icon fa-dribbble"><span className="label">Dribbble</span></a></li>
+									<li><a href="#" className="icon fa-envelope-o"><span className="label">Email</span></a></li>
+								</ul>
+								<ul className="copyright">
+									<li className="copyright">&copy; Rendact Team. Credits: <a href="http://html5up.net">HTML5 UP</a></li>
+								</ul>
+						</footer>
+					</section>
+
+				</div>
 			</div>
 		)
   }

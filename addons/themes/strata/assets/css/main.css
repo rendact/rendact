@@ -2532,17 +2532,20 @@
 		}
 
 /* Footer */
+	#footer {
+		text-align: center;
+	}
 
 	#footer .icons {
 		margin: 1em 0 0 0;
 	}
 
 		#footer .icons a {
-			color: rgba(255, 255, 255, 0.4);
+			color: rgba(0, 0, 0, 0.4);
 		}
 
 	#footer .copyright {
-		color: rgba(255, 255, 255, 0.4);
+		color: rgba(0, 0, 0, 0.4);
 		font-size: 0.8em;
 		list-style: none;
 		margin: 1em 0 0 0;
@@ -2550,7 +2553,7 @@
 	}
 
 		#footer .copyright li {
-			border-left: solid 1px rgba(255, 255, 255, 0.25);
+			border-left: solid 1px rgba(0, 0, 0, 0.25);
 			display: inline-block;
 			line-height: 1em;
 			margin-left: 0.75em;
@@ -2947,7 +2950,7 @@
 
 		/* Footer */
 
-			#footer {
+			/*#footer {
 				background-attachment: scroll;
 				background-color: #1f1815;
 				background-image: url("images/overlay.png"), url("../../images/kapal.jpg");
@@ -2960,7 +2963,7 @@
 				position: relative;
 				text-align: center;
 				width: 100%;
-			}
+			}*/
 
 				#footer .icons {
 					margin: 0 0 1em 0;
