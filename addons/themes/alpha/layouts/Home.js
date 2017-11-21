@@ -16,7 +16,7 @@ let Home = React.createClass({
   },
 
   handleScrolly(e){
-    scrollToElement("#two", {
+    scrollToElement("#main", {
       duration: 1500,
       offset: 0,
       ease: 'in-sine'
@@ -35,7 +35,7 @@ let Home = React.createClass({
       
       <div id="page-wrapper">
 
-        <header id="header" className="alt">
+        <header id="header" className="ravael">
           <h1><a href="index.html">Alpha</a> by HTML5 UP</h1>
           <nav id="nav">
             <ul>
@@ -63,11 +63,10 @@ let Home = React.createClass({
         </header>
 
         <section id="banner">
-          <h2>Alpha</h2>
-          <p>Another fine responsive site template freebie by HTML5 UP.</p>
+          <h2>{theConfig?theConfig.name:"Rendact"}</h2>
+          <p>{theConfig?theConfig.tagline:"Hello"}</p>
           <ul className="actions">
-            <li><a href="#" className="button special">Sign Up</a></li>
-            <li><a href="#" className="button">Learn More</a></li>
+            <li><a href="#" className="button" onClick={this.handleScrolly}>Learn More</a></li>
           </ul>
         </section>
 
@@ -84,7 +83,7 @@ let Home = React.createClass({
                   <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 200):""}} />
                   <ul className="actions">
                     <li>
-                      <Link to={"/post/" + post.id}>Read More</Link>
+                      <Link className="button alt" to={"/post/" + post.id}>Read More</Link>
                     </li>
                   </ul>
                 </section>
