@@ -100,9 +100,11 @@ let Home = React.createClass({
         </section>
 
         <section id="cta">
-          <div className="row">
-            {this.props.footerWidgets &&
-              this.props.footerWidgets.map((fw, idx) => <div className="4u">{fw}</div>)}
+          <div className="container">
+            <div className="row">
+              {this.props.footerWidgets &&
+                this.props.footerWidgets.map((fw, idx) => <div className="4u">{fw}</div>)}
+            </div>
           </div>
         </section>
 
