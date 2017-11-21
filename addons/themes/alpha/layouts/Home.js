@@ -36,28 +36,17 @@ let Home = React.createClass({
       <div id="page-wrapper">
 
         <header id="header" className="ravael">
-          <h1><a href="index.html">Alpha</a> by HTML5 UP</h1>
+          <h1><a href="index.html">Home</a></h1>
           <nav id="nav">
             <ul>
-              <li><a href="index.html">Home</a></li>
               <li>
-                <a href="#" className="icon fa-angle-down">Layouts</a>
-                <ul>
-                  <li><a href="generic.html">Generic</a></li>
-                  <li><a href="contact.html">Contact</a></li>
-                  <li><a href="elements.html">Elements</a></li>
-                  <li>
-                    <a href="#">Submenu</a>
-                    <ul>
-                      <li><a href="#">Option One</a></li>
-                      <li><a href="#">Option Two</a></li>
-                      <li><a href="#">Option Three</a></li>
-                      <li><a href="#">Option Four</a></li>
-                    </ul>
-                  </li>
-                </ul>
+                <div className="dropdown">
+                  <a href="#" class="icon fa-angle-down">Menu</a>
+                  <div className="dropdown-content">
+                    {this.props.theMenu()}
+                  </div>
+                </div>
               </li>
-              <li><a href="#" className="button">Sign Up</a></li>
             </ul>
           </nav>
         </header>
