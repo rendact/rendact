@@ -93,22 +93,17 @@ let Home = React.createClass({
           </div>
         </section>
 
+        <section class="box special features">
+          <div style={{textAlign: "center"}}>
+            {this.props.thePagination}
+          </div>
+        </section>
+
         <section id="cta">
-
-          <h2>Sign up for beta access</h2>
-          <p>Blandit varius ut praesent nascetur eu penatibus nisi risus faucibus nunc.</p>
-
-          <form>
-            <div className="row uniform 50%">
-              <div className="8u 12u(mobilep)">
-                <input type="email" name="email" id="email" placeholder="Email Address" />
-              </div>
-              <div className="4u 12u(mobilep)">
-                <input type="submit" value="Sign Up" className="fit" />
-              </div>
-            </div>
-          </form>
-
+          <div className="row">
+            {this.props.footerWidgets &&
+              this.props.footerWidgets.map((fw, idx) => <div className="4u">{fw}</div>)}
+          </div>
         </section>
 
         <footer id="footer">
@@ -121,7 +116,7 @@ let Home = React.createClass({
             <li><a href="#" className="icon fa-google-plus"><span className="label">Google+</span></a></li>
           </ul>
           <ul className="copyright">
-            <li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+            <li>&copy; Rendact Team. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
           </ul>
         </footer>
 
