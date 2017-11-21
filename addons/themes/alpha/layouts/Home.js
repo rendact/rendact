@@ -11,6 +11,10 @@ let Home = React.createClass({
     require('../assets/css/main.css')
   },
 
+  componentWillMount(){
+    document.body.className = "landing";
+  },
+
   handleScrolly(e){
     scrollToElement("#two", {
       duration: 1500,
@@ -28,7 +32,7 @@ let Home = React.createClass({
     } = this.props
 
     return (
-
+      
       <div id="page-wrapper">
 
         <header id="header" className="alt">
@@ -68,72 +72,25 @@ let Home = React.createClass({
         </section>
 
         <section id="main" className="container">
-
-          <section className="box special">
-            <header className="major">
-              <h2>Introducing the ultimate mobile app
-              <br />
-              for doing stuff with your phone</h2>
-              <p>Blandit varius ut praesent nascetur eu penatibus nisi risus faucibus nunc ornare<br />
-              adipiscing nunc adipiscing. Condimentum turpis massa.</p>
-            </header>
-            <span className="image featured"><img src="images/pic01.jpg" alt="" /></span>
-          </section>
-
-          <section className="box special features">
-            <div className="features-row">
-              <section>
-                <span className="icon major fa-bolt accent2"></span>
-                <h3>Magna etiam</h3>
-                <p>Integer volutpat ante et accumsan commophasellus sed aliquam feugiat lorem aliquet ut enim rutrum phasellus iaculis accumsan dolore magna aliquam veroeros.</p>
-              </section>
-              <section>
-                <span className="icon major fa-area-chart accent3"></span>
-                <h3>Ipsum dolor</h3>
-                <p>Integer volutpat ante et accumsan commophasellus sed aliquam feugiat lorem aliquet ut enim rutrum phasellus iaculis accumsan dolore magna aliquam veroeros.</p>
-              </section>
-            </div>
-            <div className="features-row">
-              <section>
-                <span className="icon major fa-cloud accent4"></span>
-                <h3>Sed feugiat</h3>
-                <p>Integer volutpat ante et accumsan commophasellus sed aliquam feugiat lorem aliquet ut enim rutrum phasellus iaculis accumsan dolore magna aliquam veroeros.</p>
-              </section>
-              <section>
-                <span className="icon major fa-lock accent5"></span>
-                <h3>Enim phasellus</h3>
-                <p>Integer volutpat ante et accumsan commophasellus sed aliquam feugiat lorem aliquet ut enim rutrum phasellus iaculis accumsan dolore magna aliquam veroeros.</p>
-              </section>
-            </div>
-          </section>
-
+            
           <div className="row">
-            <div className="6u 12u(narrower)">
-
-              <section className="box special">
-                <span className="image featured"><img src="images/pic02.jpg" alt="" /></span>
-                <h3>Sed lorem adipiscing</h3>
-                <p>Integer volutpat ante et accumsan commophasellus sed aliquam feugiat lorem aliquet ut enim rutrum phasellus iaculis accumsan dolore magna aliquam veroeros.</p>
-                <ul className="actions">
-                  <li><a href="#" className="button alt">Learn More</a></li>
-                </ul>
-              </section>
-
-            </div>
-            <div className="6u 12u(narrower)">
-
-              <section className="box special">
-                <span className="image featured"><img src="images/pic03.jpg" alt="" /></span>
-                <h3>Accumsan integer</h3>
-                <p>Integer volutpat ante et accumsan commophasellus sed aliquam feugiat lorem aliquet ut enim rutrum phasellus iaculis accumsan dolore magna aliquam veroeros.</p>
-                <ul className="actions">
-                  <li><a href="#" className="button alt">Learn More</a></li>
-                </ul>
-              </section>
-
-            </div>
+            {data && data.map((post, index) => (
+              <div className="6u 12u(narrower)">
+                <section className="box special">
+                  <Link className="image featured" to={"/post/" + post.id}>
+                    <img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
+                  </Link>
+                  <h3>{post.title && post.title}</h3>
+                  <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 200):""}} />
+                  <ul className="actions">
+                    <li>
+                      <Link to={"/post/" + post.id}>Read More</Link>
+                    </li>
+                  </ul>
+                </section>
+              </div>
+            ))}
           </div>
-
         </section>
 
         <section id="cta">
@@ -169,7 +126,6 @@ let Home = React.createClass({
         </footer>
 
     </div>
-
     )
   }
 });
