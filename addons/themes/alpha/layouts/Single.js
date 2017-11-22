@@ -37,7 +37,7 @@ let Single = React.createClass({
                 <div className="dropdown">
                   <a href="#" className="icon fa-angle-down">Menu</a>
                   <div className="dropdown-content">
-                    {this.props.theMenu()}
+                    {this.props.theMenu(links)}
                   </div>
                 </div>
               </li>

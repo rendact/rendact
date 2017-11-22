@@ -2305,6 +2305,7 @@
 		text-decoration: none;
 		border-bottom: none;
 		position: relative;
+		margin-right: 20px;
 	}
 
 		.icon:before {
@@ -3868,6 +3869,11 @@
 	}
 
 
+
+
+
+
+
 /*dropdown*/
 .dropdown {
     position: relative;
@@ -3878,12 +3884,16 @@
     display: none;
     position: absolute;
     background-color: #878080;
-    min-width: 160px;
+    max-width: 125px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    padding: 12px 16px;
-    z-index: 1;
+   
+    
 }
 
 .dropdown:hover .dropdown-content {
     display: block;
+}
+
+.dropdown a {
+	padding: 0;
 }
