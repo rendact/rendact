@@ -12,7 +12,7 @@ let Blog = React.createClass({
 
   render(){
     let { theConfig, latestPosts: data, thePagination, loadDone } = this.props;
-    debugger
+    
     return (
 
 		<div id="page-wrapper">
