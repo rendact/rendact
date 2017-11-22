@@ -55,12 +55,6 @@ debugger
                   <header className="major">
                     <h2>{theConfig?theConfig.name:"Rendact"}</h2>
                   </header>
-                </div>
-              </section>
-
-              <section id="three">
-                <div className="container">
-                  <h3>Posts List</h3>
                   <div className="features">
                     {data && data.map((post, index) => (
                       <article>

@@ -2556,8 +2556,7 @@
 				}
 
 				#header > nav ul li:hover {
-					color: #ffffff !important;
-					border-bottom-color: transparent;
+					background-color: #00FFFF;
 				}
 
 					#header > nav ul li a {
