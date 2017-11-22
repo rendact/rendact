@@ -2555,6 +2555,11 @@
 					padding: 0;
 				}
 
+				#header > nav ul li:hover {
+					color: #ffffff !important;
+					border-bottom-color: transparent;
+				}
+
 					#header > nav ul li a {
 						-moz-transition: none;
 						-webkit-transition: none;
