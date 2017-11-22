@@ -15,10 +15,12 @@ let Home = React.createClass({
 
   render(){
     let {
+      postData,
       theConfig,
       data,
       thePagination,
-      loadDone
+      loadDone,
+      isHome
     } = this.props
 
     return (
@@ -49,28 +51,23 @@ let Home = React.createClass({
       <div id="wrapper">
 
           <div id="main">
-
+            {postData &&
               <section id="one">
                 <div className="container">
                   <header className="major">
-                    <h2>{theConfig?theConfig.name:"Rendact"}</h2>
+                    <h2>{postData.title && postData.title}</h2>
                   </header>
                   <div className="features">
-                    {data && data.map((post, index) => (
-                      <article>
-                        <Link to={"/post/" + post.id} className="image">
-                          <img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
-                        </Link>
-                        <div className="inner">
-                          <h4><Link to={"/post/" + post.id}>{post.title && post.title}</Link></h4>
-                          <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 100):""}} />
-                          <Link className="button" to={"/post/" + post.id}>Learn More</Link>
-                        </div>
+                      <article className="image">
+                        <img src={postData.imageFeatured ? postData.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
                       </article>
-                    ))}
+                      <article>
+                        <p dangerouslySetInnerHTML={{__html: postData.content ? postData.content:""}} />
+                      </article>
                   </div>
                 </div>
               </section>
+            }
 
                 {this.props.footerWidgets &&
                 this.props.footerWidgets.map((fw, idx) => 
