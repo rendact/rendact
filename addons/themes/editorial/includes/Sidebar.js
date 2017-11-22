@@ -46,7 +46,7 @@ export default class Sidebar extends React.Component {
       theMenu,
       footerWidgets
     } = this.props;
-
+debugger
     return(
       <div id="sidebar" className={!this.state.active?"inactive":""}>
         <div className="inner">

@@ -20,7 +20,7 @@ let Home = React.createClass({
       thePagination,
       loadDone
     } = this.props
-
+debugger
     return (
     <div>
       <section id="header">
