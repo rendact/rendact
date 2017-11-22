@@ -32,7 +32,7 @@ let Home = React.createClass({
               <img src={ require('images/logo-128.png') } alt="" />
             </Link>
           </span>
-          <h1 id="logo"><a href="#">MENU</a></h1>
+          <h1 id="logo">MENU</h1>
         </header>
         <nav id="nav">
           {this.props.theMenu()}
