@@ -6,7 +6,7 @@ import moment from 'moment';
 import {Link} from 'react-router';
 import scrollToElement from 'scroll-to-element';
 
-let Home = React.createClass({
+let Single = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
   },
@@ -23,10 +23,12 @@ let Home = React.createClass({
 
   render(){
     let {
+      postData,
       theConfig,
       data,
       thePagination,
-      loadDone
+      loadDone,
+      isHome
     } = this.props
     // debugger
     return (
@@ -47,28 +49,23 @@ let Home = React.createClass({
         </div>
       </section>
 
-      {data && data.map((post, index) => (
-        <section id={index} className="main special">
+      {postData &&
+        <section id="one" className="main special">
           <div className="container">
-            <span className="image fit primary"><img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" /></span>
+            <span className="image fit primary"><img src={postData.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" /></span>
             <div className="content">
               <header className="major">
-                 <Link to={"/post/" + post.id}><h2>{post.title && post.title}</h2></Link>
+                <h2>{postData.title && postData.title}</h2>
               </header>
-              <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 100):""}} />
-              <Link className="button" to={"/post/" + post.id}>Learn More</Link>
+              <p dangerouslySetInnerHTML={{__html: postData.content ? postData.content.slice(0, 100):""}} />
             </div>
-            <a href="#" value={index+1} onClick={this.handleScrolly} className="goto-next scrolly">Next</a>
           </div>
         </section>
-      ))}
+      }
 
       <section>
         <div className="container">
           <header className="major">
-            <div style={{textAlign: "center"}}>
-              {this.props.thePagination}
-            </div>
           </header>
         </div>
       </section>
@@ -98,4 +95,4 @@ let Home = React.createClass({
   }
 });
 
-export default Home;
+export default Single;
