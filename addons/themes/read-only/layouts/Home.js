@@ -20,7 +20,7 @@ let Home = React.createClass({
       thePagination,
       loadDone
     } = this.props
-debugger
+
     return (
     <div>
       <section id="header">
@@ -72,9 +72,19 @@ debugger
                 </div>
               </section>
 
-                {this.props.footerWidgets &&
-                this.props.footerWidgets.map((fw, idx) => 
-                  <section><div className="container">{fw}</div></section>)}
+              <section>
+                <div className="container">
+                  <header className="major">
+                    <div style={{textAlign: "center"}}>
+                      {this.props.thePagination}
+                    </div>
+                  </header>
+                </div>
+              </section>
+
+              {this.props.footerWidgets &&
+              this.props.footerWidgets.map((fw, idx) => 
+              <section><div className="container">{fw}</div></section>)}
               
           </div>
 

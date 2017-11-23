@@ -6,14 +6,14 @@ import moment from 'moment';
 import {Link} from 'react-router';
 import scrollToElement from 'scroll-to-element';
 
-let Home = React.createClass({
+let Blog = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
   },
 
   handleScrolly(e){
     var value = e.value;
-    debugger
+    // debugger
     scrollToElement("#two", {
       duration: 1500,
       offset: 0,
@@ -22,13 +22,8 @@ let Home = React.createClass({
   },
 
   render(){
-    let {
-      theConfig,
-      data,
-      thePagination,
-      loadDone
-    } = this.props
-    // debugger
+    let { theConfig, latestPosts: data, thePagination, loadDone } = this.props;
+
     return (
     <div>
 
@@ -98,4 +93,4 @@ let Home = React.createClass({
   }
 });
 
-export default Home;
+export default Blog;
