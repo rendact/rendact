@@ -43,7 +43,7 @@ class NavPanel extends React.Component {
   }
 
   handleNavPanelClose(e){
-    if(document.body.className === "landing navPanel-visible" && e.currentTarget.id !== "navPanelToggle"){
+    if(document.body.className === "landing navPanel-visible" && e.currentTarget.id !== "navButton"){
       if (e.target.id !== "navPanel") document.body.className = "landing"
     }
   }

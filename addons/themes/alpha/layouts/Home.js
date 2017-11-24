@@ -33,9 +33,8 @@ let Home = React.createClass({
     } = this.props
 
     return (
-      
+    <div>
       <div id="page-wrapper">
-
         <header id="header" className="ravael">
           <h1><a href="index.html">Home</a></h1>
           <nav id="nav">
@@ -110,6 +109,7 @@ let Home = React.createClass({
             <li>&copy; Rendact Team. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
           </ul>
         </footer>
+      </div>
       <NavPanel {...this.props}/>
     </div>
     )

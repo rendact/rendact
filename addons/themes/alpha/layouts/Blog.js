@@ -5,6 +5,7 @@ import {graphql} from 'react-apollo';
 import moment from 'moment';
 import {Link} from 'react-router';
 import scrollToElement from 'scroll-to-element';
+import NavPanel from '../includes/NavPanel';
 
 let Blog = React.createClass({
   componentDidMount(){
@@ -27,9 +28,8 @@ let Blog = React.createClass({
     let { theConfig, latestPosts: data, thePagination, loadDone } = this.props;
 
     return (
-      
+    <div>
       <div id="page-wrapper">
-
         <header id="header" className="ravael">
           <h1><a href="index.html">Home</a></h1>
           <nav id="nav">
@@ -104,7 +104,8 @@ let Blog = React.createClass({
             <li>&copy; Rendact Team. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
           </ul>
         </footer>
-
+      </div>
+      <NavPanel {...this.props}/>
     </div>
     )
   }
