@@ -36,8 +36,9 @@ let Home = React.createClass({
 								</Link>
 							</strong>
 						</h1>
-						<nav>
-							<a href="#" onClick={this.handleShowMenu}>Menu</a>
+						
+						<nav id="nav">
+							<a href="#menu" className="menuToggle" onClick={this.handleShowMenu}><span>Menu</span></a>
 						</nav>
 					</header>
 
