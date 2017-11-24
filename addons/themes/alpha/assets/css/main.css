@@ -3465,6 +3465,25 @@
 					text-decoration: none;
 				}
 
+				#navPanel nav > ul > li {
+					border-bottom: 0;
+					border-top: solid 1px rgba(255, 255, 255, 0.05);
+					color: #bbb;
+					display: block;
+					height: 44px;
+					line-height: 44px;
+					padding: 0 1em 0 1em;
+					text-decoration: none;
+				}
+
+				#navPanel nav > ul > li {
+					color: #fff;
+				}
+
+					#navPanel nav > ul > li a {
+						color: #fff;
+					}
+
 					#navPanel .link:first-child {
 						border-top: 0;
 					}

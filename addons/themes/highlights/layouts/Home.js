@@ -13,6 +13,7 @@ let Home = React.createClass({
 
   handleScrolly(e){
     var value = e.value;
+    var next = document.getElementsByid.value;
     debugger
     scrollToElement("#two", {
       duration: 1500,
@@ -58,7 +59,7 @@ let Home = React.createClass({
               <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 100):""}} />
               <Link className="button" to={"/post/" + post.id}>Learn More</Link>
             </div>
-            <a href="#" value={index+1} onClick={this.handleScrolly} className="goto-next scrolly">Next</a>
+            <a href="#" id={index} value={index+1} onClick={this.handleScrolly} className="goto-next scrolly">Next</a>
           </div>
         </section>
       ))}

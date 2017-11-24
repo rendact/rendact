@@ -5,6 +5,7 @@ import {graphql} from 'react-apollo';
 import moment from 'moment';
 import {Link} from 'react-router';
 import scrollToElement from 'scroll-to-element';
+import NavPanel from '../includes/NavPanel';
 
 let Home = React.createClass({
   componentDidMount(){
@@ -109,7 +110,7 @@ let Home = React.createClass({
             <li>&copy; Rendact Team. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
           </ul>
         </footer>
-
+      <NavPanel {...this.props}/>
     </div>
     )
   }
