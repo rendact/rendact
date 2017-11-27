@@ -4,6 +4,7 @@ import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import moment from 'moment';
 import {Link} from 'react-router';
+import NavPanel from '../includes/NavPanel';
 
 let Blog = React.createClass({
   componentDidMount(){
@@ -14,9 +15,8 @@ let Blog = React.createClass({
     let { theConfig, latestPosts: data, thePagination, loadDone } = this.props;
     
     return (
-
-		<div id="page-wrapper">
-
+    <div>
+			<div id="page-wrapper">
 				<header id="header">
 					<h1 id="logo"><Link to="/"><strong>{theConfig ? theConfig.name : "Rendact"}</strong></Link></h1>
 					<nav id="nav">
@@ -83,7 +83,8 @@ let Blog = React.createClass({
 						<li>&copy; Rendact Team. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
 					</ul>
 				</footer>
-
+			</div>
+			<NavPanel {...this.props}/>
 		</div>
 
     )

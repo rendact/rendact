@@ -11,6 +11,15 @@ let Home = React.createClass({
     require('../assets/css/main.css')
   },
 
+  handleScrollyBegin(e){
+    debugger
+    scrollToElement("#0id", {
+      duration: 1500,
+      offset: 0,
+      ease: 'in-sine'
+    })
+  },
+
   handleScrolly(e){
     var value = e.value;
     var next = document.getElementsByid.value;
@@ -43,13 +52,13 @@ let Home = React.createClass({
         </header>
         <div className="container">
           <ul className="actions">
-            <li><a href="#one" className="button special scrolly">Begin</a></li>
+            <li><a href="#" className="button special scrolly" onClick={this.handleScrollyBegin}>Begin</a></li>
           </ul>
         </div>
       </section>
 
       {data && data.map((post, index) => (
-        <section id={index} className="main special">
+        <section id={index+"id"} className="main special">
           <div className="container">
             <span className="image fit primary"><img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" /></span>
             <div className="content">
@@ -59,7 +68,9 @@ let Home = React.createClass({
               <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 100):""}} />
               <Link className="button" to={"/post/" + post.id}>Learn More</Link>
             </div>
-            <a href="#" id={index} value={index+1} onClick={this.handleScrolly} className="goto-next scrolly">Next</a>
+            {index%4!==0 || index===0 && 
+              <a href="#" value={index+1+"id"} onClick={this.handleScrolly} className="goto-next scrolly">Next</a>
+            }
           </div>
         </section>
       ))}
