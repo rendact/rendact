@@ -2507,7 +2507,7 @@
 
 	#header {
 		background-attachment: scroll,							scroll,					fixed;
-		background-image: url("images/top-3200.svg"), url("images/overlay.png"), url("../../images/header.jpg");
+		background-image: url("images/top-3200.svg"), url("images/overlay.png"), url("../../images/gedung.jpg");
 		background-position: bottom center,					top left,				center center;
 		background-repeat: repeat-x,						repeat,					no-repeat;
 		background-size: 3200px 460px,					auto,					cover;
@@ -2563,6 +2563,11 @@
 			color: #544d55;
 		}
 
+		#header .pic {
+			height: 2.35em;
+			width: 2.35em;
+		}
+
 		#header .logo {
 			background: #4eb980;
 			border-radius: 100%;
@@ -2574,6 +2579,11 @@
 			line-height: 2.35em;
 			margin: 0 0 0.75em 0;
 			text-align: center;
+			width: 2.35em;
+		}
+
+			#header .logo img {
+			height: 2.35em;
 			width: 2.35em;
 		}
 
@@ -3125,4 +3135,146 @@
 					display: none;
 				}
 
+	}
+
+/* Pagination */
+
+	.pagination {
+		display: inline-flex;
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+		cursor: default;
+		list-style: none;
+		margin: 60px 0 2rem 2px;
+		padding: 0;
+	}
+
+		.pagination a, .pagination span {
+			-moz-transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+			-webkit-transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+			-ms-transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+			transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+			border: solid 2px;
+			display: inline-block;
+			font-family: "Source Sans Pro", Helvetica, sans-serif;
+			font-size: 0.8rem;
+			font-weight: 900;
+			height: 3rem;
+			letter-spacing: 0.075em;
+			line-height: calc(3rem - 4px);
+			margin-left: -2px;
+			min-width: 3rem;
+			position: relative;
+			text-align: center;
+			text-decoration: none;
+			text-transform: uppercase;
+		}
+
+		.pagination .next, .pagination .previous {
+			text-decoration: none;
+			padding: 0 1.75rem;
+		}
+
+			.pagination .next:before, .pagination .previous:before {
+				-moz-osx-font-smoothing: grayscale;
+				-webkit-font-smoothing: antialiased;
+				font-family: FontAwesome;
+				font-style: normal;
+				font-weight: normal;
+				text-transform: none !important;
+			}
+
+			.pagination .next:before, .pagination .previous:before {
+				display: inline-block;
+				color: inherit !important;
+			}
+
+		.pagination .previous:before {
+			content: '\f104';
+			margin-right: 0.9375em;
+		}
+
+		.pagination .next:before {
+			content: '\f105';
+			float: right;
+			margin-left: 0.9375em;
+		}
+
+		@media screen and (max-width: 980px) {
+
+			.pagination a, .pagination span {
+				font-size: 0.9rem;
+			}
+
+		}
+
+		@media screen and (max-width: 480px) {
+
+			.pagination .page, .pagination .extra {
+				display: none;
+			}
+
+		}
+
+	.pagination a, .pagination span {
+		border-color: #eeeeee;
+	}
+
+	.pagination a {
+		color: #212931 !important;
+	}
+
+		.pagination a:hover {
+			color: #18bfef !important;
+			border-color: #18bfef;
+			z-index: 1;
+		}
+
+			.pagination a:hover + a, .pagination a:hover + span {
+				border-left-color: #18bfef;
+			}
+
+		.pagination a.active {
+			background-color: #eeeeee;
+		}
+
+	.pagination span {
+		color: #eeeeee;
+	}
+
+	/* Menu */
+
+	#menu ul {
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+		color: #3d4449;
+		font-family: "Roboto Slab", serif;
+		font-family: 400;
+		letter-spacing: 0.075em;
+		list-style: none;
+		margin-bottom: 0;
+		padding: 0;
+		text-transform: uppercase;
+	}
+
+	#menu ul li {
+		background-color: none;
+    border: 2px solid #e7e7e7;
+    border-radius: 8px;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+		display: inline-block;
+	}
+
+	.test {
+    background-color: yellow;
 	}
