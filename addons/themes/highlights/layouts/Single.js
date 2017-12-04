@@ -13,7 +13,6 @@ let Single = React.createClass({
 
   handleScrolly(e){
     var value = e.value;
-    debugger
     scrollToElement("#two", {
       duration: 1500,
       offset: 0,
@@ -30,7 +29,7 @@ let Single = React.createClass({
       loadDone,
       isHome
     } = this.props
-    // debugger
+    
     return (
     <div>
 
