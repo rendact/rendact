@@ -9,22 +9,23 @@ import scrollToElement from 'scroll-to-element';
 let Home = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
+
+    // $( window ).ready(function() {
+    //   var wHeight = $(window).height();
+    //   $('.main')
+    //     .height(wHeight)
+    //     .scrollie({
+    //       scrollOffset : -50,
+    //       scrollingInView : function(elem) {
+    //         var bgColor = elem.data('background');
+    //         $('body').css('background-color', bgColor);
+    //       }
+    //     });
+    // });
   },
 
   handleScrollyBegin(e){
-    debugger
-    scrollToElement("#0id", {
-      duration: 1500,
-      offset: 0,
-      ease: 'in-sine'
-    })
-  },
-
-  handleScrolly(e){
-    var value = e.value;
-    var next = document.getElementsByid.value;
-    debugger
-    scrollToElement("#two", {
+    scrollToElement("#post", {
       duration: 1500,
       offset: 0,
       ease: 'in-sine'
@@ -38,12 +39,12 @@ let Home = React.createClass({
       thePagination,
       loadDone
     } = this.props
-    // debugger
+ 
     return (
     <div>
 
       <section id="header">
-        <header className="major">
+        <header className="major" style={{position: "fixed", height: "auto", top: "50%", left: "0px", width: "100%", marginTop:"-133px"}}>
           <h1>{theConfig?theConfig.name:"Rendact"}</h1>
           <p>{theConfig?theConfig.tagline:"Hello, you are in Rendact"}</p>
           <nav id="menu">
@@ -58,7 +59,7 @@ let Home = React.createClass({
       </section>
 
       {data && data.map((post, index) => (
-        <section id={index+"id"} className="main special">
+        <section id="post" className="main special">
           <div className="container">
             <span className="image fit primary"><img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" /></span>
             <div className="content">
@@ -68,9 +69,9 @@ let Home = React.createClass({
               <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 100):""}} />
               <Link className="button" to={"/post/" + post.id}>Learn More</Link>
             </div>
-            {index%4!==0 || index===0 && 
+            {/*{index%4!==0 || index===0 && 
               <a href="#" value={index+1+"id"} onClick={this.handleScrolly} className="goto-next scrolly">Next</a>
-            }
+            }*/}
           </div>
         </section>
       ))}

@@ -3175,3 +3175,7 @@
     cursor: pointer;
 		display: inline-block;
 	}
+
+	.test {
+    background-color: yellow;
+	}
