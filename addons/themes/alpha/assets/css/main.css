@@ -3887,12 +3887,7 @@
 		color: #a6a9ac;
 	}
 
-
-
-
-
-
-
+	
 /*dropdown*/
 .dropdown {
     position: relative;
@@ -3903,14 +3898,23 @@
     display: none;
     position: absolute;
     background-color: #878080;
-    max-width: 125px;
+    max-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-   
-    
+ 		z-index: 1;   
 }
 
 .dropdown:hover .dropdown-content {
     display: block;
+    right: 0;
+}
+
+.dropdown:hover .dropdown-content ul {
+    display: block;
+    right: 0;
+}
+
+.dropdown .dropdown-content ul li {
+    margin-right: 0;
 }
 
 .dropdown a {
