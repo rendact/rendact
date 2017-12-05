@@ -90,7 +90,9 @@ let Single = React.createClass({
                           <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 150):""}} />
                         </section>
                         <ul className="buttons">
-                          <li><a href="#" className="button">See More</a></li>
+                          <li>
+                            <Link className="button" to={"/post/" + post.id}>See More</Link>
+                          </li>
                         </ul>
                       </div>
                     ))}

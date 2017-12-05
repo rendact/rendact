@@ -1699,6 +1699,16 @@
 			width: 100%;
 		}
 
+		header.special img {
+			cursor: default;
+			height: 2em;
+			left: 0;
+			position: absolute;
+			text-align: center;
+			top: 1em;
+			width: 100%;
+		}
+
 			header.special .icon:before {
 				font-size: 3.5em;
 				opacity: 0.35;
@@ -3311,7 +3321,7 @@
 .dropdown-content {
     display: none;
     position: absolute;
-    background-color: #878080;
+    background-color: #b4b4b4;
     max-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
  		z-index: 1;   
@@ -3329,6 +3339,11 @@
 
 .dropdown .dropdown-content ul li {
     margin-right: 8px;
+    text-decoration: underline;
+}
+
+.dropdown .dropdown-content ul li a {
+    color: #ffffff;
 }
 
 .dropdown a {
