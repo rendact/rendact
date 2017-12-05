@@ -36,7 +36,9 @@ let Home = React.createClass({
     <div>
       <div id="page-wrapper">
         <header id="header" className="ravael">
-          <h1><a href="index.html">Home</a></h1>
+          <h1>
+            <Link to={"/"}>{theConfig?theConfig.name:"Rendact"}</Link>
+          </h1>
           <nav id="nav">
             <ul>
               <li>
