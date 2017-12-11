@@ -6,7 +6,7 @@ import moment from 'moment';
 import {Link} from 'react-router';
 import scrollToElement from 'scroll-to-element';
 
-let Single = React.createClass({
+let Home = React.createClass({
   componentDidMount(){
     require('../assets/css/main.css')
   },
@@ -136,4 +136,4 @@ let Single = React.createClass({
   }
 });
 
-export default Single;
+export default Home;
