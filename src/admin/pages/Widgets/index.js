@@ -17,8 +17,8 @@ class Widgets extends React.Component {
     super(props);
 
     var c = window.config;
-    var themeFunctions = require('themes/'+c.path+'/functions.js');
-    themeFunctions.default();
+    //var themeFunctions = require('themes/'+c.path+'/functions.js');
+    //themeFunctions.default();
   }
 
   componentWillReceiveProps(props){

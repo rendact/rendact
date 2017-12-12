@@ -31,8 +31,7 @@ const loadScript = (host, themeName) => {
     script.id = "themeScript";
     script.src = host + "/" + themeName + "/" + themeName + ".js";
     //script.src =
-    script.src = "sss"
-    ("https://shopkeeper-lionel-47443.netlify.com/stellar/stellar.js");
+    //script.src = "https://shopkeeper-lionel-47443.netlify.com/stellar/stellar.js";
 
     script.onload = resolve;
     script.onerror = reject;
@@ -51,9 +50,7 @@ const loadStyle = (host, themeName) => {
     style.id = "themeStyle";
     style.href = host + "/" + themeName + "/main.css";
     //style.href = "https://shopkeeper-lionel-47443.netlify.com/style.css"; // uncomment this when debugging
-    //style.href = "https://shopkeeper-lionel-47443.netlify.com/stellar/main.css";
-    style.href = "https://shopkeeper-lionel-47443.netlify.com/style.css"; 
-    style.href = "https://shopkeeper-lionel-47443.netlify.com/stellar/main.css";
+    //style.href = "https://shopkeeper-lionel-47443.netlify.com/stellar/main.css"; // uncomment this when debugging
     style.rel = "stylesheet";
     style.type = "text/css";
     style.onload = resolve;
@@ -68,6 +65,7 @@ window.config = AdminConfig;
 
 export function getTemplateComponent(type) {
   const host = "https://shopkeeper-lionel-47443.netlify.com";
+  debugger;
   const c = JSON.parse(JSON.parse(localStorage.getItem("config")).activeTheme);
   const themeMap = {
     home: "Home",
@@ -93,7 +91,7 @@ export function getTemplateComponent(type) {
 
       console.log(err);
       //	var widgetAreas = require("themes/"+c.path)["widgetArea"];
-      import(`themes/${c.path}`).then(theme => {
+      import('default').then(theme => {
         let widgetAreas = theme["widgetArea"];
         if (widgetAreas) {
           widgetAreas.forEach(widgetId => {
@@ -113,7 +111,7 @@ export function getTemplateComponent(type) {
         return InvalidTheme;
       }
       let module = themeMap[type];
-      return import(`themes/${c.path}`)
+      return import('default')
         .then(theme => {
           if (theme) {
             return theme[module];
