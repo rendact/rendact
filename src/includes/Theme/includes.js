@@ -65,7 +65,7 @@ window.config = AdminConfig;
 
 export function getTemplateComponent(type) {
   const host = "https://shopkeeper-lionel-47443.netlify.com";
-  debugger;
+  // debugger;
   const c = JSON.parse(JSON.parse(localStorage.getItem("config")).activeTheme);
   const themeMap = {
     home: "Home",
