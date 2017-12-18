@@ -8,6 +8,8 @@ coverage
 
 # production
 build
+buildTheme
+themeBuild
 
 # misc
 .DS_Store
