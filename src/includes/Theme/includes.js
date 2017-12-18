@@ -48,7 +48,7 @@ const loadStyle = (host, themeName) => {
     let style;
     style = document.createElement("link");
     style.id = "themeStyle";
-    style.href = host + "/" + themeName + "/main.css";
+    style.href = host + "/" + themeName + "/style.css";
     //style.href = "https://shopkeeper-lionel-47443.netlify.com/style.css"; // uncomment this when debugging
     //style.href = "https://shopkeeper-lionel-47443.netlify.com/stellar/main.css"; // uncomment this when debugging
     style.rel = "stylesheet";
@@ -91,7 +91,7 @@ export function getTemplateComponent(type) {
 
       console.log(err);
       //	var widgetAreas = require("themes/"+c.path)["widgetArea"];
-      import('default').then(theme => {
+      import("default").then(theme => {
         let widgetAreas = theme["widgetArea"];
         if (widgetAreas) {
           widgetAreas.forEach(widgetId => {
@@ -111,7 +111,7 @@ export function getTemplateComponent(type) {
         return InvalidTheme;
       }
       let module = themeMap[type];
-      return import('default')
+      return import("default")
         .then(theme => {
           if (theme) {
             return theme[module];
