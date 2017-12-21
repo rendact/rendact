@@ -73,7 +73,7 @@ let Blog = React.createClass({
             <div className="container">
               <div className="row">
                 {data && data.map((post, index) => (
-                  <div className="4u 12u(medium)">
+                  <div className="6u 12u(medium)">
                       <section className="box feature">
                         <Link className="image featured" to={"/post/" + post.id}>
                           <img src={post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
