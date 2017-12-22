@@ -1402,6 +1402,52 @@
 				width: auto;
 			}
 
+/* Image */
+
+	.pic {
+		border: 0;
+		display: inline-block;
+		position: relative;
+		border-radius: 5px;
+	}
+
+		.pic img {
+			display: block;
+			border-radius: 5px;
+		}
+
+		.pic.left {
+			display: block;
+			float: left;
+			margin: 0 2em 2em 0;
+			position: relative;
+			top: 0.25em;
+		}
+
+			.pic.left img {
+				display: block;
+				width: 100%;
+			}
+
+		.pic.fit {
+			display: block;
+		}
+
+			.pic.fit img {
+				display: block;
+				width: 100%;
+			}
+
+		.pic.featured {
+			display: block;
+			margin: 0 0 2em 0;
+		}
+
+			.pic.featured img {
+				display: block;
+				width: 100%;
+			}
+
 /* Button */
 
 	input[type="button"],
