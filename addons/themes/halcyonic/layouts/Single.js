@@ -51,7 +51,7 @@ let Home = React.createClass ({
                             <img src={postData.imageFeatured ? postData.imageFeatured.blobUrl: require('images/logo-128.png') } alt="" />
                           </a>
                           <header>
-                            <h2>One Column</h2>
+                            <h2>{postData.title && postData.title}</h2>
                           </header>
                           <p dangerouslySetInnerHTML={{__html: postData.content ? postData.content :""}} />
                         </section>
