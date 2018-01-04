@@ -6,7 +6,7 @@ import moment from 'moment';
 import {Link} from 'react-router';
 import scrollToElement from 'scroll-to-element';
 
-class Home extends React.Component {
+class Blog extends React.Component {
 
   constructor(props){
     super(props)
@@ -52,12 +52,7 @@ class Home extends React.Component {
   }
 
   render(){
-    let {
-      theConfig,
-      data,
-      thePagination,
-      loadDone
-    } = this.props
+    let { theConfig, latestPosts: data, thePagination, loadDone } = this.props;
 
     return (
       <div>
@@ -81,16 +76,16 @@ class Home extends React.Component {
         </section>
 
         {data && data.map((post, index) => (
-          <section id="inti"
-            style={{backgroundImage: `url(${post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png')})`}} 
-            className={index%2===0 ? "posts main style2 right dark fullscreen" : "posts main style2 left dark fullscreen"}>
-              <div className="content box style2">
+          <section id="inti" className={index%2===0 ? "main style2 right dark fullscreen posts " : "main style2 left dark fullscreen posts"} 
+            style={{backgroundImage: `url(${post.imageFeatured ? post.imageFeatured.blobUrl: require('images/logo-128.png')})`}} >
+            <div className="content box style2">
               <header>
                 <h2><Link to={"/post/" + post.id}>{post.title && post.title}</Link></h2>
               </header>
               <p dangerouslySetInnerHTML={{__html: post.content ? post.content.slice(0, 150):""}} />
               <Link className="button" to={"/post/" + post.id}>See More</Link>
             </div>
+            <a href="#two" className="button style2 down anchored">Next</a>
           </section>
         ))}
         
@@ -124,4 +119,4 @@ class Home extends React.Component {
   }
 }
 
-export default Home;
+export default Blog;
